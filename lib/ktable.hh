@@ -1,8 +1,20 @@
+#ifndef KTABLE_HH
+#define KTABLE_HH
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <assert.h>
+
+// bit representation of A/T/C/G.
+#define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0 : \
+			  (toupper(ch)) == 'T' ? 1 : \
+			  (toupper(ch)) == 'C' ? 2 : 3)
+
+#define revtwobit_repr(n) ((n) == 0 ? 'A' : \
+                           (n) == 1 ? 'T' : \
+                           (n) == 2 ? 'C' : 'G')
 
 namespace khmer {
   typedef long long CounterType;
@@ -90,3 +102,5 @@ namespace khmer {
     KTable * intersect(const KTable &other) const;
   };
 }
+
+#endif // KTABLE_HH

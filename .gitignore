@@ -1,3 +1,6 @@
 *.pyc
 *.o
 *.so
+*~
+python/build
+lib/test

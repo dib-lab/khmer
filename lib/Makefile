@@ -1,7 +1,12 @@
-CXXFLAGS=-g
+CXXFLAGS=-g -fPIC
 
 all: test
 
-test: test.cc ktable.o
+clean:
+	rm -f *.o
+
+test: test.cc ktable.o hashtable.o
 
 ktable.o: ktable.cc ktable.hh
+
+hashtable.o: hashtable.cc hashtable.hh
