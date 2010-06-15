@@ -216,7 +216,7 @@ static PyMethodDef khmer_ktable_methods[] = {
   { "reverse_hash", reverse_hash, METH_VARARGS, "Convert int to string" },
   { "count", count, METH_VARARGS, "Count the given kmer" },
   { "consume", consume, METH_VARARGS, "Count all k-mers in the given string" },
-  { "get", get, METH_VARARGS, "Get the count for the given khmer" },
+  { "get", get, METH_VARARGS, "Get the count for the given k-mer" },
   { "max_hash", max_hash, METH_VARARGS, "Get the maximum hash value"},
   { "n_entries", n_entries, METH_VARARGS, "Get the number of possible entries"},
   { "ksize", ksize, METH_VARARGS, "Get k"},
@@ -360,12 +360,168 @@ PyObject * consume_genome(PyObject * self, PyObject * args)
   return (PyObject *) ktable_obj;
 }
 
+/***********************************************************************/
+
+//
+// KHashtable object
+//
+
+typedef struct {
+  PyObject_HEAD
+  khmer::Hashtable * hashtable;
+} khmer_KHashtableObject;
+
+static void khmer_hashtable_dealloc(PyObject *);
+
+static PyObject * hash_count(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * kmer;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer)) {
+    return NULL;
+  }
+
+  if (strlen(kmer) != hashtable->ksize()) {
+    // @CTB
+    return NULL;
+  }
+
+  hashtable->count(kmer);
+
+  return PyInt_FromLong(1);
+}
+
+static PyObject * hash_consume(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * long_str;
+
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+    return NULL;
+  }
+
+  if (strlen(long_str) <= hashtable->ksize()) {
+    // @CTB
+    return NULL;
+  }
+
+  hashtable->consume_string(long_str);
+
+  unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
+
+  return PyInt_FromLong(n_consumed);
+}
+
+static PyObject * hash_get(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * arg;
+
+  if (!PyArg_ParseTuple(args, "O", &arg)) {
+    return NULL;
+  }
+
+  unsigned long count = 0;
+
+  if (PyInt_Check(arg)) {
+    long pos = PyInt_AsLong(arg);
+    count = hashtable->get_count((unsigned int) pos);
+  } else if (PyString_Check(arg)) {
+    std::string s = PyString_AsString(arg);
+    count = hashtable->get_count(s.c_str());
+  }
+
+  return PyInt_FromLong(count);
+}
+
+static PyMethodDef khmer_hashtable_methods[] = {
+  { "count", hash_count, METH_VARARGS, "Count the given kmer" },
+  { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
+
+  {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyObject *
+khmer_hashtable_getattr(PyObject * obj, char * name)
+{
+  return Py_FindMethod(khmer_hashtable_methods, obj, name);
+}
+
+#define is_hashtable_obj(v)  ((v)->ob_type == &khmer_KHashtableType)
+
+static PyTypeObject khmer_KHashtableType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "KHashtable", sizeof(khmer_KHashtableObject),
+    0,
+    khmer_hashtable_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_hashtable_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "hashtable object",           /* tp_doc */
+};
+
+//
+// new_hashtable
+//
+
+static PyObject* new_hashtable(PyObject * self, PyObject * args)
+{
+  unsigned int k = 0;
+  unsigned int size = 0;
+
+  if (!PyArg_ParseTuple(args, "II", &k, &size)) {
+    return NULL;
+  }
+
+  khmer_KHashtableObject * khashtable_obj = (khmer_KHashtableObject *) \
+    PyObject_New(khmer_KHashtableObject, &khmer_KHashtableType);
+
+  khashtable_obj->hashtable = new khmer::Hashtable(k, size);
+
+  return (PyObject *) khashtable_obj;
+}
+
+//
+// khmer_hashtable_dealloc -- clean up a table object.
+//
+
+static void khmer_hashtable_dealloc(PyObject* self)
+{
+  khmer_KHashtableObject * obj = (khmer_KHashtableObject *) self;
+  delete obj->hashtable;
+  obj->hashtable = NULL;
+  
+  PyObject_Del((PyObject *) obj);
+}
+
 //
 // Module machinery.
 //
 
 static PyMethodDef KhmerMethods[] = {
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
+  { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty hashtable" },
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },
   { NULL, NULL, 0, NULL }
 };
@@ -373,6 +529,7 @@ static PyMethodDef KhmerMethods[] = {
 DL_EXPORT(void) init_khmer(void)
 {
   khmer_KTableType.ob_type = &PyType_Type;
+  khmer_KHashtableType.ob_type = &PyType_Type;
 
   PyObject * m;
   m = Py_InitModule("_khmer", KhmerMethods);

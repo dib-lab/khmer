@@ -7,8 +7,8 @@ namespace khmer {
   typedef unsigned char HashcountType;
   class Hashtable {
   protected:
-    const unsigned int _tablesize;
     const unsigned int _ksize;
+    const unsigned int _tablesize;
 
     HashcountType * _counts;
 
@@ -26,6 +26,12 @@ namespace khmer {
     ~Hashtable() {
       delete _counts; _counts = NULL;
     }
+
+    // accessor to get 'k'
+    const unsigned int ksize() const { return _ksize; }
+
+    // accessors to get table info
+    const unsigned int n_entries() const { return _tablesize; }
 
     void count(const char * kmer) {
       unsigned int bin = _hash(kmer, _ksize) % _tablesize;
