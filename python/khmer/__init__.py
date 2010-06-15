@@ -31,6 +31,7 @@ class KmerCount(object):
 # from http://www.rsok.com/~jrm/printprimes.html
 PRIMES_1m = [1000003, 1009837]
 PRIMES_100m = [100009979, 100000007]
+PRIMES_1b = [1000000007, 1000000919]
 
 class HashtableIntersect(object):
     def __init__(self, k, size1, size2):
