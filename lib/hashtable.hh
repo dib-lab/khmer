@@ -3,6 +3,8 @@
 
 #include "khmer.hh"
 
+#define MAX_COUNT 255
+
 namespace khmer {
   typedef unsigned char HashcountType;
   class Hashtable {
@@ -35,11 +37,13 @@ namespace khmer {
 
     void count(const char * kmer) {
       unsigned int bin = _hash(kmer, _ksize) % _tablesize;
+      if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;
     }
 
     void count(unsigned int khash) {
       unsigned int bin = khash % _tablesize;
+      if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;
     }
 
@@ -57,6 +61,10 @@ namespace khmer {
 
     // count every k-mer in the string.
     void consume_string(const std::string &s);
+
+    // @@CTB doc
+    HashcountType get_min_count(const std::string &s);
+    HashcountType get_max_count(const std::string &s);
   };
 };
 

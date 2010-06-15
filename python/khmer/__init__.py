@@ -27,3 +27,24 @@ class KmerCount(object):
 
     def __getitem__(self, k):
         return self._kt.get(k)
+
+# from http://www.rsok.com/~jrm/printprimes.html
+PRIMES_1m = [1000003, 1009837]
+PRIMES_100m = [100009979, 100000007]
+
+class HashtableIntersect(object):
+    def __init__(self, k, size1, size2):
+        self._kh1 = new_hashtable(k, size1)
+        self._kh2 = new_hashtable(k, size2)
+
+    def consume(self, seq):
+        self._kh1.consume(seq)
+        self._kh2.consume(seq)
+
+    def get_min_count(self, seq):
+        return min(self._kh1.get_min_count(seq),
+                   self._kh2.get_min_count(seq))
+
+    def get_max_count(self, seq):
+        return min(self._kh1.get_max_count(seq),
+                   self._kh2.get_max_count(seq))

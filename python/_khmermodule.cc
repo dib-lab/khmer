@@ -405,7 +405,7 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  if (strlen(long_str) <= hashtable->ksize()) {
+  if (strlen(long_str) < hashtable->ksize()) {
     // @CTB
     return NULL;
   }
@@ -415,6 +415,50 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
 
   return PyInt_FromLong(n_consumed);
+}
+
+static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * long_str;
+
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+    return NULL;
+  }
+
+  if (strlen(long_str) < hashtable->ksize()) {
+    // @CTB
+    return NULL;
+  }
+
+  khmer::HashcountType c = hashtable->get_min_count(long_str);
+  unsigned int N = c;
+
+  return PyInt_FromLong(N);
+}
+
+static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * long_str;
+
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+    return NULL;
+  }
+
+  if (strlen(long_str) < hashtable->ksize()) {
+    // @CTB
+    return NULL;
+  }
+
+  khmer::HashcountType c = hashtable->get_max_count(long_str);
+  unsigned int N = c;
+
+  return PyInt_FromLong(N);
 }
 
 static PyObject * hash_get(PyObject * self, PyObject * args)
@@ -445,6 +489,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
+  { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
+  { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
