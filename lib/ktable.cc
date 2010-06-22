@@ -8,23 +8,31 @@ using namespace khmer;
 // _hash: hash a k-length DNA sequence into an unsigned int.
 //
 
-unsigned int khmer::_hash(const char * kmer, unsigned int k)
+unsigned long long int khmer::_hash(const char * kmer, unsigned int k, 
+                                    unsigned long long int * h, unsigned long long int * r)
 {
-  unsigned int h = 0;
-  unsigned int r = 0;
-
-  h |= twobit_repr(kmer[0]);
-  r |= twobit_comp(kmer[k-1]);
+  *h |= twobit_repr(kmer[0]);
+  *r |= twobit_comp(kmer[k-1]);
 
   for (unsigned int i = 1; i < k; i++) {
-    h = h << 2;
-    r = r << 2;
+    *h = *h << 2;
+    *r = *r << 2;
 
-    h |= twobit_repr(kmer[i]);
-    r |= twobit_comp(kmer[k-1-i]);
+    *h |= twobit_repr(kmer[i]);
+    *r |= twobit_comp(kmer[k-1-i]);
   }
 
-  return h < r ? h : r;
+  return *h < *r ? *h : *r;
+}
+
+unsigned long long int khmer::_hash(const char * kmer, unsigned int k)
+{
+  unsigned long long int h = 0;
+  unsigned long long int r = 0;
+
+  unsigned long long retVal = _hash(kmer, k, &h, &r);
+
+  return retVal;
 }
 
 //
@@ -70,8 +78,15 @@ void KTable::consume_string(const std::string &s)
     mask |= 3;
   }
 
-  unsigned int h = _hash(sp, _ksize);
-  _counts[h]++;
+  unsigned long long int h;
+  unsigned long long int r;
+
+  _hash(sp, _ksize, &h, &r);
+  
+  if (h < r)
+     _counts[h]++;
+  else
+    _counts[r]++;
 
   for (unsigned int i = _ksize; i < length; i++) {
     short int repr = twobit_repr(sp[i]);
@@ -85,7 +100,17 @@ void KTable::consume_string(const std::string &s)
     // mask off the 2 bits we shifted over.
     h &= mask;
 
-    _counts[h]++;
+    // now handle reverse complement
+    r &= mask;
+
+    r = r << 2;
+
+    r |= twobit_repr(sp[i]);
+
+    if (h < r)
+      _counts[h]++;
+    else
+      _counts[r]++;
   }
 
 #endif // 0

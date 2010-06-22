@@ -147,7 +147,7 @@ void Hashtable::consume_string(const std::string &s)
     mask |= 3;
   }
 
-  unsigned int h = _hash(sp, _ksize);
+  unsigned long long int h = _hash(sp, _ksize);
   unsigned int bin = h % _tablesize;
   if (_counts[bin] != MAX_COUNT) {
     _counts[bin]++;
@@ -187,7 +187,7 @@ HashcountType Hashtable::get_min_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned int h = _hash(sp, _ksize);
+  unsigned long long int h = _hash(sp, _ksize);
 
   min_count = this->get_count(h);
 
@@ -223,7 +223,7 @@ HashcountType Hashtable::get_max_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned int h = _hash(sp, _ksize);
+  unsigned long long int h = _hash(sp, _ksize);
 
   max_count = this->get_count(h);
 

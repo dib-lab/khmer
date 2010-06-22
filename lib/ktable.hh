@@ -25,7 +25,9 @@ namespace khmer {
   typedef long long CounterType;
 
   // two-way hash functions.
-  unsigned int _hash(const char * kmer, unsigned int k);
+  unsigned long long int _hash(const char * kmer, unsigned int k);
+  unsigned long long int _hash(const char * kmer, unsigned int k,
+                               unsigned long long int * h, unsigned long long int * r);
   std::string _revhash(unsigned int hash, unsigned int k);
 
   //
@@ -37,7 +39,7 @@ namespace khmer {
   class KTable {
   protected:
     const unsigned int _ksize;	// 'k'
-    unsigned int _max_hash;	// 4**k
+    unsigned long long int _max_hash;	// 4**k
 
     CounterType * _counts;	// counts table.
 
@@ -64,8 +66,8 @@ namespace khmer {
     const unsigned int ksize() const { return _ksize; }
 
     // accessors to get table info
-    const unsigned int max_hash() const { return _max_hash; }
-    const unsigned int n_entries() const { return _max_hash + 1; }
+    const unsigned long long int max_hash() const { return _max_hash; }
+    const unsigned long long int n_entries() const { return _max_hash + 1; }
 
     // add the given k-mer into the counts table.
     void count(const char * kmer) {
@@ -73,7 +75,7 @@ namespace khmer {
     }
 
     // get the count for the given k-mer.
-    const unsigned int get_count(const char * kmer) const {
+    const unsigned long long int get_count(const char * kmer) const {
       return _counts[_hash(kmer, _ksize)];
     }
 

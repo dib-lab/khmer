@@ -14,13 +14,13 @@ using namespace std;
 // _hash: hash a k-length DNA sequence into an unsigned int.
 //
 
-unsigned int _hash(const char * kmer, unsigned int k)
+unsigned long long int _hash(const char * kmer, unsigned int k)
 {
-  unsigned int h = 0;
-  unsigned int r = 0;
+  unsigned long long int h = 0;
+  unsigned long long int r = 0;
 
   h |= twobit_repr(kmer[0]);
-  r != twobit_comp(kmer[k-1]);
+  r |= twobit_comp(kmer[k-1]);
 
   for (unsigned int i = 1; i < k; i++) {
     h = h << 2;

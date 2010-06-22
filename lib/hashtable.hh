@@ -39,7 +39,7 @@ namespace khmer {
     const unsigned int n_entries() const { return _tablesize; }
 
     void count(const char * kmer) {
-      unsigned int bin = _hash(kmer, _ksize) % _tablesize;
+      unsigned long long int bin = _hash(kmer, _ksize) % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;
     }
@@ -51,8 +51,8 @@ namespace khmer {
     }
 
     // get the count for the given k-mer.
-    const unsigned int get_count(const char * kmer) const {
-      unsigned int bin = _hash(kmer, _ksize) % _tablesize;
+    const unsigned long long int get_count(const char * kmer) const {
+      unsigned long long int bin = _hash(kmer, _ksize) % _tablesize;
       return _counts[bin];
     }
 
