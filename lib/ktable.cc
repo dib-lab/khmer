@@ -11,6 +11,7 @@ using namespace khmer;
 unsigned int khmer::_hash(const char * kmer, unsigned int k)
 {
   unsigned int h = 0;
+  unsigned int r = 0;
 
   h |= twobit_repr(kmer[0]);
 

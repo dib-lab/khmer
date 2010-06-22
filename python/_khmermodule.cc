@@ -3,7 +3,7 @@
 //
 
 #include "Python.h"
-
+#include "../lib/seqfuncs.hh"
 #include <khmer.hh>
 
 //
@@ -394,6 +394,42 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
   return PyInt_FromLong(1);
 }
 
+static PyObject * hash_filter_fasta_file(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * long_str1;
+  char * long_str2;
+  int i, j;
+
+  if (!PyArg_ParseTuple(args, "ssii", &long_str1, &long_str2, &i, &j)) {
+    return NULL;
+  }
+
+  hashtable->filter_fasta_file(long_str1, long_str2, i, j);
+
+  return PyInt_FromLong(0);
+}
+
+static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * long_str;
+
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+    return NULL;
+  }
+
+  hashtable->consume_fasta(long_str);
+
+  unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
+
+  return PyInt_FromLong(n_consumed);
+}
+
 static PyObject * hash_consume(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -488,6 +524,8 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
 static PyMethodDef khmer_hashtable_methods[] = {
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "filter_fasta_file", hash_filter_fasta_file, METH_VARARGS, "Filter and trim reads file"},
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
@@ -534,9 +572,9 @@ static PyTypeObject khmer_KHashtableType = {
 static PyObject* new_hashtable(PyObject * self, PyObject * args)
 {
   unsigned int k = 0;
-  unsigned int size = 0;
+  unsigned long long size = 0;
 
-  if (!PyArg_ParseTuple(args, "II", &k, &size)) {
+  if (!PyArg_ParseTuple(args, "IL", &k, &size)) {
     return NULL;
   }
 

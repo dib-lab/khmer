@@ -1,7 +1,131 @@
 #include "khmer.hh"
 #include "hashtable.hh"
+#include "seqfuncs.hh"
 
 using namespace khmer;
+using namespace std;
+
+//
+// filter_fasta_file: filter and trims a FASTA file into a new one
+//
+
+void Hashtable::filter_fasta_file(const std::string &inputfile,
+                                  const std::string &outputfile, 
+                                  int minLength, 
+                                  int threshold)
+{
+   string line;
+   ifstream infile(inputfile.c_str());
+   ofstream outfile;
+   outfile.open(outputfile.c_str());
+   int isRead = 0;
+   string name;
+   string seq;
+
+   int n = 0;
+
+   if (infile.is_open())
+   {
+      while(!infile.eof())
+      {
+         getline(infile, line);
+         if (line.length() == 0)
+            break;
+
+         if (isRead)
+         {
+            seq = line;
+            int numPos = seq.length() - Hashtable::_ksize + 1;
+            int readAbund[numPos];
+
+            int start;
+            int stop;
+            
+            n++;
+            if (n % 10000 == 0)
+               cout << n << endl;
+
+            for (int i = 0; i < numPos; i++)
+            {
+               string kmer= seq.substr(i, Hashtable::_ksize);
+               readAbund[i] = Hashtable::get_min_count(kmer);            
+            }
+
+            start = 0;
+            for (int i = 0; i < numPos; i++)
+            {
+               if (readAbund[i] >= threshold)
+                  break;
+               else
+                  start++;
+            }
+
+            stop = numPos - 1;
+            for (int i = (numPos-1); i >= 0; i--)
+            {
+               if (readAbund[i] >= threshold)
+                  break;
+               else
+                  stop--;
+            }
+
+            if ((stop - start + Hashtable::_ksize) > minLength)
+            {
+               string mySeq = seq.substr(start,(stop-start)+Hashtable::_ksize);
+               //cout << ">" << name << endl;
+               //cout << mySeq << endl;
+               outfile << ">" << name << endl;
+               outfile << mySeq << endl;
+            }
+
+            name.clear();
+            seq.clear();
+         }
+         else
+         {
+            name = line.substr(1, line.length()-1);
+         }
+
+         isRead = isRead? 0 : 1;
+      }
+   }
+  
+   infile.close();
+   outfile.close();
+
+}
+
+
+//
+// consume_fasta: consume a FASTA file of reads
+//
+
+void Hashtable::consume_fasta(const std::string &filename)
+{
+   string line;
+   ifstream infile(filename.c_str());
+   int isRead = 0;
+   int n = 0;
+
+   if (infile.is_open())
+   {
+     while (!infile.eof())
+     {
+       getline(infile, line);
+
+       n++;
+       if (n % 10000 == 0)
+         cout << n << endl;
+
+       if (isRead) {
+         for (int i = 0; i < (line.size() - Hashtable::_ksize + 1); i++)
+           Hashtable::consume_string(line.substr(i, Hashtable::_ksize));
+       }
+       
+       isRead = isRead? 0 : 1;
+     }
+  }
+}
 
 //
 // consume_string: run through every k-mer in the given string, & hash it.

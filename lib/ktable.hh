@@ -9,12 +9,17 @@
 
 // bit representation of A/T/C/G.
 #define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0 : \
-			  (toupper(ch)) == 'T' ? 1 : \
-			  (toupper(ch)) == 'C' ? 2 : 3)
+                         (toupper(ch)) == 'T' ? 1 : \
+                         (toupper(ch)) == 'C' ? 2 : 3)
 
 #define revtwobit_repr(n) ((n) == 0 ? 'A' : \
                            (n) == 1 ? 'T' : \
                            (n) == 2 ? 'C' : 'G')
+
+#define twobit_comp(ch) ((toupper(ch)) == 'A' ? 1 : \
+                         (toupper(ch)) == 'T' ? 0 : \
+                         (toupper(ch)) == 'C' ? 3 : 2)
+
 
 namespace khmer {
   typedef long long CounterType;
