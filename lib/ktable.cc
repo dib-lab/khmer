@@ -14,13 +14,17 @@ unsigned int khmer::_hash(const char * kmer, unsigned int k)
   unsigned int r = 0;
 
   h |= twobit_repr(kmer[0]);
+  r |= twobit_comp(kmer[k-1]);
 
   for (unsigned int i = 1; i < k; i++) {
     h = h << 2;
+    r = r << 2;
+
     h |= twobit_repr(kmer[i]);
+    r |= twobit_comp(kmer[k-1-i]);
   }
 
-  return h;
+  return h < r ? h : r;
 }
 
 //
@@ -54,17 +58,17 @@ void KTable::consume_string(const std::string &s)
   const unsigned int length = s.length();
   const char * sp = s.c_str();
 
+#if 1
+  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+    count(&sp[i]);
+  }
+#else
+
   unsigned int mask = 0;
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
-
-#if 0
-  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
-    count(&sp[i]);
-  }
-#else
 
   unsigned int h = _hash(sp, _ksize);
   _counts[h]++;

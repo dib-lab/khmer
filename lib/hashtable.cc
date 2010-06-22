@@ -136,17 +136,16 @@ void Hashtable::consume_string(const std::string &s)
   const unsigned int length = s.length();
   const char * sp = s.c_str();
 
+#if 1
+  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+    count(&sp[i]);
+  }
+#else
   unsigned int mask = 0;
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
-
-#if 0
-  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
-    count(&sp[i]);
-  }
-#else
 
   unsigned int h = _hash(sp, _ksize);
   unsigned int bin = h % _tablesize;

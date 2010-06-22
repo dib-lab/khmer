@@ -1,5 +1,36 @@
 import sys
 import khmer
+import string
+from array import array
+
+__complementTranslation = string.maketrans('ACTG', 'TGAC')
+
+def complement(s):
+    """
+    Return complement of 's'.
+    """
+    c = string.translate(s, __complementTranslation)
+    return c
+
+#
+# reverse
+#
+
+def reverse(s):
+    """
+    Return reverse of 's'.
+    """
+    r = array('c', s)
+    r.reverse()
+    r = string.join(r, '')
+
+    return r
+
+def rc(s):
+    return reverse(complement(s))
+
+def test_rc():
+    assert rc("ACTG") == "CAGT"
 
 ### build a k-table of length L, and test it.
 
@@ -65,23 +96,15 @@ class Test_KTable:
 
         kt2 = khmer.new_ktable(L)
 
-        kt_dict = {}
         for start in range(0, len(s) - L + 1):
             word = s[start:start+L]
-            n = kt_dict.get(word, 0)
-            kt_dict[word] = n + 1
 
             kt2.count(word)
 
         for i in range(0, kt.n_entries()):
             n = kt.get(i)                       # test 'consume_str' numbers
-            n2 = kt_dict.get(kt.reverse_hash(i), 0) # ...against dictionaries,
             n3 = kt2.get(i)                     # and 'count' count.
-            n4 = kt.get(kt.reverse_hash(i))     # test 'get' of kmer
-
-            assert n == n2
             assert n == n3
-            assert n == n4
 
         for i in range(0, kt.n_entries()):
             kt.set(i, 1)

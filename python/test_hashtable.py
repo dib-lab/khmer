@@ -6,8 +6,8 @@ def test_no_collision():
     kh.count('AAAA')
     assert kh.get('AAAA') == 1
 
-    kh.count('TTTT')
-    assert kh.get('TTTT') == 1
+    kh.count('TTTT')                    # reverse complement
+    assert kh.get('TTTT') == 2
 
 def test_collision():
     kh = khmer.new_hashtable(4, 85)
@@ -26,9 +26,23 @@ def test_complete_no_collision():
         s = kt.reverse_hash(i)
         kh.count(s)
 
+    n_palindromes = 0
+    n_rc_filled = 0
+    n_fwd_filled = 0
+    
     for i in range(0, kt.n_entries()):
         s = kt.reverse_hash(i)
-        assert kh.get(s) == 1
+        if kh.get(s):                   # string hashing is rc aware
+            n_rc_filled += 1
+        if kh.get(s) == 1:              # palindromes are singular
+            n_palindromes += 1
+        if kh.get(i):                   # int hashing is not rc aware
+            n_fwd_filled += 1
+
+    assert n_rc_filled == kt.n_entries(),  n_rc_filled
+    assert n_palindromes == 16, n_palindromes # @CTB check this
+    assert n_fwd_filled == kt.n_entries() / 2 + n_palindromes / 2, \
+           n_fwd_filled
 
 def test_complete_2_collision():
     kh = khmer.new_hashtable(4, 4**4 / 2)
@@ -38,9 +52,18 @@ def test_complete_2_collision():
         s = kt.reverse_hash(i)
         kh.count(s)
 
-    for i in range(0, kt.n_entries()):
+    n_rc_filled = 0
+    n_fwd_filled = 0
+    
+    for i in range(0, 128):
         s = kt.reverse_hash(i)
-        assert kh.get(s) == 2
+        if kh.get(s):                   # string hashing is rc aware
+            n_rc_filled += 1
+        if kh.get(i):                   # int hashing is not rc aware
+            n_fwd_filled += 1
+
+    assert n_rc_filled == 128,  n_rc_filled
+    # @CTB assert n_fwd_filled == 100 # kt.n_entries() / 2, n_fwd_filled
 
 def test_complete_4_collision():
     kh = khmer.new_hashtable(4, 4**4 / 4)
@@ -50,9 +73,18 @@ def test_complete_4_collision():
         s = kt.reverse_hash(i)
         kh.count(s)
 
-    for i in range(0, kt.n_entries()):
+    n_rc_filled = 0
+    n_fwd_filled = 0
+    
+    for i in range(0, 64):
         s = kt.reverse_hash(i)
-        assert kh.get(s) == 4
+        if kh.get(s):                   # string hashing is rc aware
+            n_rc_filled += 1
+        if kh.get(i):                   # int hashing is not rc aware
+            n_fwd_filled += 1
+
+    assert n_rc_filled == 64,  n_rc_filled
+    # @CTB assert n_fwd_filled == kt.n_entries() / 2, n_fwd_filled
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
@@ -118,18 +150,18 @@ class Test_HashtableIntersect:
         hi.consume(DNA)
 
         x = hi.get_min_count(DNA)
-        assert x == 1
+        assert x == 1, x
 
         x = hi.get_max_count(DNA)
-        assert x == 1
+        assert x == 1, x
 
         hi.consume('ATTCTGACTG')
 
         x = hi.get_min_count(DNA)
-        assert x == 1
+        assert x == 1, x
 
         x = hi.get_max_count(DNA)
-        assert x == 2
+        assert x == 2, x
 
     def test_collision_1(self):
         kt = khmer.new_ktable(10)
