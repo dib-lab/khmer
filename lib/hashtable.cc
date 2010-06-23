@@ -39,50 +39,6 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
                outfile << seq << endl;
             }
 
-            /*
-            int numPos = seq.length() - Hashtable::_ksize + 1;
-
-            int readAbund[numPos];
-
-            int start;
-            int stop;
-            
-            n++;
-            if (n % 10000 == 0)
-               cout << n << endl;
-
-            for (int i = 0; i < numPos; i++)
-            {
-               string kmer= seq.substr(i, Hashtable::_ksize);
-               readAbund[i] = Hashtable::get_min_count(kmer);            
-            }
-
-            start = 0;
-            for (int i = 0; i < numPos; i++)
-            {
-               if (readAbund[i] >= threshold)
-                  break;
-               else
-                  start++;
-            }
-
-            stop = numPos - 1;
-            for (int i = (numPos-1); i >= 0; i--)
-            {
-               if (readAbund[i] >= threshold)
-                  break;
-               else
-                  stop--;
-            }
-
-            if ((stop - start + Hashtable::_ksize) > minLength)
-            {
-               string mySeq = seq.substr(start,(stop-start)+Hashtable::_ksize);
-               outfile << ">" << name << endl;
-               outfile << mySeq << endl;
-            }
-            */
-
             name.clear();
             seq.clear();
          }
@@ -212,10 +168,11 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
 
   _hash(sp, _ksize, &h, &r);
 
-  if (h < r)
+  if (h < r) {
     min_count = this->get_count(h);
-  else
+  } else {
     min_count = this->get_count(r);  
+  }
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -232,10 +189,11 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     r &= mask;
     r |= twobit_repr(sp[i]);
 
-    if (h < r)
+    if (h < r) {
       count = this->get_count(h);
-    else
+    } else {
       count = this->get_count(r);
+    }
     
     if (count < min_count) {
       min_count = count;
@@ -256,15 +214,15 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h;
-  unsigned long long int r;
+  HashIntoType h = 0, r = 0;
 
   _hash(sp, _ksize, &h, &r);
 
-  if (h < r)
+  if (h < r) {
     max_count = this->get_count(h);
-  else
+  } else {
     max_count = this->get_count(r);
+  }
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -281,10 +239,11 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     r &= mask;
     r |= twobit_repr(sp[i]);
 
-    if (h < r)
+    if (h < r) {
       count = this->get_count(h);
-    else
+    } else {
       count = this->get_count(r);    
+    }
 
     if (count > max_count) {
       max_count = count;
