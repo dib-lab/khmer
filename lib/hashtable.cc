@@ -22,8 +22,6 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
    string name;
    string seq;
 
-   int n = 0;
-
    if (infile.is_open())
    {
       while(!infile.eof())
@@ -35,7 +33,15 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
          if (isRead)
          {
             seq = line;
+
+            if (get_max_count(seq) >= minLength) {
+               outfile << ">" << name << endl;
+               outfile << seq << endl;
+            }
+
+            /*
             int numPos = seq.length() - Hashtable::_ksize + 1;
+
             int readAbund[numPos];
 
             int start;
@@ -72,11 +78,10 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
             if ((stop - start + Hashtable::_ksize) > minLength)
             {
                string mySeq = seq.substr(start,(stop-start)+Hashtable::_ksize);
-               //cout << ">" << name << endl;
-               //cout << mySeq << endl;
                outfile << ">" << name << endl;
                outfile << mySeq << endl;
             }
+            */
 
             name.clear();
             seq.clear();
@@ -92,7 +97,6 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
   
    infile.close();
    outfile.close();
-
 }
 
 
@@ -113,14 +117,12 @@ void Hashtable::consume_fasta(const std::string &filename)
      {
        getline(infile, line);
 
-       n++;
-       if (n % 10000 == 0)
-         cout << n << endl;
-
        if (isRead) {
-	 unsigned int length = line.size() - Hashtable::_ksize + 1;
-         for (unsigned int i = 0; i < length; i++)
-           Hashtable::consume_string(line.substr(i, Hashtable::_ksize));
+         n++;
+         if (n % 10000 == 0)
+           cout << n << endl;
+
+         Hashtable::consume_string(line);
        }
        
        isRead = isRead? 0 : 1;
@@ -148,11 +150,20 @@ void Hashtable::consume_string(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h = _hash(sp, _ksize);
-  unsigned int bin = h % _tablesize;
-  if (_counts[bin] != MAX_COUNT) {
+  unsigned long long int h; 
+  unsigned long long int r;
+  
+  _hash(sp, _ksize, &h, &r);
+
+  unsigned int bin;
+
+  if (h < r)
+    bin = h % _tablesize;
+  else
+    bin = r % _tablesize;
+
+  if (_counts[bin] != MAX_COUNT)
     _counts[bin]++;
-  }
 
   for (unsigned int i = _ksize; i < length; i++) {
     short int repr = twobit_repr(sp[i]);
@@ -166,10 +177,18 @@ void Hashtable::consume_string(const std::string &s)
     // mask off the 2 bits we shifted over.
     h &= mask;
 
-    unsigned int bin = h % _tablesize;
-    if (_counts[bin] != MAX_COUNT) {
-      _counts[h % _tablesize]++;
-    }
+    // now handle reverse complement
+    r &= mask;
+    r = r << 2;
+    r |= twobit_repr(sp[i]);
+
+    if (h < r)
+      bin = h % _tablesize;
+    else
+      bin = r % _tablesize;
+
+    if (_counts[bin] != MAX_COUNT)
+      _counts[bin]++;
   }
 
 #endif // 0
@@ -188,9 +207,15 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h = _hash(sp, _ksize);
+  unsigned long long int h;
+  unsigned long long int r;
 
-  min_count = this->get_count(h);
+  _hash(sp, _ksize, &h, &r);
+
+  if (h < r)
+    min_count = this->get_count(h);
+  else
+    min_count = this->get_count(r);  
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -202,7 +227,16 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     // mask off the 2 bits we shifted over.
     h &= mask;
 
-    count = this->get_count(h);
+    // now handle reverse complement
+    r = r << 2;
+    r &= mask;
+    r |= twobit_repr(sp[i]);
+
+    if (h < r)
+      count = this->get_count(h);
+    else
+      count = this->get_count(r);
+    
     if (count < min_count) {
       min_count = count;
     }
@@ -222,9 +256,15 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h = _hash(sp, _ksize);
+  unsigned long long int h;
+  unsigned long long int r;
 
-  max_count = this->get_count(h);
+  _hash(sp, _ksize, &h, &r);
+
+  if (h < r)
+    max_count = this->get_count(h);
+  else
+    max_count = this->get_count(r);
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -236,7 +276,16 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     // mask off the 2 bits we shifted over.
     h &= mask;
 
-    count = this->get_count(h);
+    // now handle reverse complement
+    r = r << 2;
+    r &= mask;
+    r |= twobit_repr(sp[i]);
+
+    if (h < r)
+      count = this->get_count(h);
+    else
+      count = this->get_count(r);    
+
     if (count > max_count) {
       max_count = count;
     }

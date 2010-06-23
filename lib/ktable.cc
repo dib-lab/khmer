@@ -100,10 +100,8 @@ void KTable::consume_string(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r &= mask;
-
     r = r << 2;
-
+    r &= mask;
     r |= twobit_repr(sp[i]);
 
     if (h < r)
