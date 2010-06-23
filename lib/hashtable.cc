@@ -118,7 +118,8 @@ void Hashtable::consume_fasta(const std::string &filename)
          cout << n << endl;
 
        if (isRead) {
-         for (int i = 0; i < (line.size() - Hashtable::_ksize + 1); i++)
+	 unsigned int length = line.size() - Hashtable::_ksize + 1;
+         for (unsigned int i = 0; i < length; i++)
            Hashtable::consume_string(line.substr(i, Hashtable::_ksize));
        }
        
@@ -133,11 +134,11 @@ void Hashtable::consume_fasta(const std::string &filename)
 
 void Hashtable::consume_string(const std::string &s)
 {
-  const unsigned int length = s.length();
   const char * sp = s.c_str();
 
 #if 1
-  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+  const unsigned int length = s.length() - _ksize + 1;
+  for (unsigned int i = 0; i < length; i++) {
     count(&sp[i]);
   }
 #else
@@ -175,14 +176,14 @@ void Hashtable::consume_string(const std::string &s)
 }
 
 
-HashcountType Hashtable::get_min_count(const std::string &s)
+BoundedCounterType Hashtable::get_min_count(const std::string &s)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  HashcountType min_count, count;
+  BoundedCounterType min_count, count;
 
   unsigned int mask = 0;
-  for (unsigned int i = 0; i < _ksize; i++) {
+  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
@@ -192,8 +193,6 @@ HashcountType Hashtable::get_min_count(const std::string &s)
   min_count = this->get_count(h);
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 
@@ -211,14 +210,14 @@ HashcountType Hashtable::get_min_count(const std::string &s)
   return min_count;
 }
 
-HashcountType Hashtable::get_max_count(const std::string &s)
+BoundedCounterType Hashtable::get_max_count(const std::string &s)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  HashcountType max_count, count;
+  BoundedCounterType max_count, count;
 
   unsigned int mask = 0;
-  for (unsigned int i = 0; i < _ksize; i++) {
+  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
@@ -228,8 +227,6 @@ HashcountType Hashtable::get_max_count(const std::string &s)
   max_count = this->get_count(h);
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 

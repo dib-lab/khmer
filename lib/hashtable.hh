@@ -9,21 +9,22 @@
 #define MAX_COUNT 255
 
 namespace khmer {
-  typedef unsigned char HashcountType;
+  typedef unsigned char BoundedCounterType;
+
   class Hashtable {
   protected:
-    const unsigned int _ksize;
-    const unsigned long long int _tablesize;
+    const WordLength _ksize;
+    const HashIntoType _tablesize;
 
-    HashcountType * _counts;
+    BoundedCounterType * _counts;
 
     void _allocate_counters() {
-      _counts = new HashcountType[_tablesize];
-      memset(_counts, 0, _tablesize * sizeof(HashcountType));
+      _counts = new BoundedCounterType[_tablesize];
+      memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
     }
 
   public:
-    Hashtable(unsigned int ksize, unsigned long long int tablesize) :
+    Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
       _allocate_counters();
     }
@@ -33,32 +34,32 @@ namespace khmer {
     }
 
     // accessor to get 'k'
-    const unsigned int ksize() const { return _ksize; }
+    const WordLength ksize() const { return _ksize; }
 
     // accessors to get table info
-    const unsigned int n_entries() const { return _tablesize; }
+    const HashIntoType n_entries() const { return _tablesize; }
 
     void count(const char * kmer) {
-      unsigned long long int bin = _hash(kmer, _ksize) % _tablesize;
+      HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;
     }
 
     void count(unsigned int khash) {
-      unsigned int bin = khash % _tablesize;
+      HashIntoType bin = khash % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;
     }
 
     // get the count for the given k-mer.
-    const unsigned long long int get_count(const char * kmer) const {
-      unsigned long long int bin = _hash(kmer, _ksize) % _tablesize;
+    const BoundedCounterType get_count(const char * kmer) const {
+      HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
       return _counts[bin];
     }
 
     // get the count for the given k-mer hash.
-    const unsigned int get_count(unsigned int khash) const {
-      unsigned int bin = khash % _tablesize;
+    const BoundedCounterType get_count(HashIntoType khash) const {
+      HashIntoType bin = khash % _tablesize;
       return _counts[bin];
     }
 
@@ -75,8 +76,8 @@ namespace khmer {
                            int threshold);
 
     // @@CTB doc
-    HashcountType get_min_count(const std::string &s);
-    HashcountType get_max_count(const std::string &s);
+    BoundedCounterType get_min_count(const std::string &s);
+    BoundedCounterType get_max_count(const std::string &s);
   };
 
   class HashtableIntersect {
@@ -85,7 +86,8 @@ namespace khmer {
     khmer::Hashtable * _kh2;
 
   public:
-    HashtableIntersect(unsigned int ksize, unsigned int tablesize1, unsigned int tablesize2)
+    HashtableIntersect(WordLength ksize,
+		       HashIntoType tablesize1, HashIntoType tablesize2)
     {
       _kh1 = new Hashtable(ksize, tablesize1);
       _kh2 = new Hashtable(ksize, tablesize2);
@@ -104,26 +106,28 @@ namespace khmer {
       _kh2->consume_string(s);
     }
 
-    HashcountType get_min_count(const std::string &s)
+    BoundedCounterType get_min_count(const std::string &s)
     {
-      HashcountType kh1Min = _kh1->get_min_count(s);
-      HashcountType kh2Min = _kh2->get_min_count(s);
+      BoundedCounterType kh1Min = _kh1->get_min_count(s);
+      BoundedCounterType kh2Min = _kh2->get_min_count(s);
 
-      if (kh1Min < kh2Min)
+      if (kh1Min < kh2Min) {
         return kh1Min;
-      else
+      } else {
         return kh2Min;
+      }
     }
 
-    HashcountType get_max_count(const std::string &s)
+    BoundedCounterType get_max_count(const std::string &s)
     {
-      HashcountType kh1Max = _kh1->get_max_count(s);
-      HashcountType kh2Max = _kh2->get_max_count(s);
+      BoundedCounterType kh1Max = _kh1->get_max_count(s);
+      BoundedCounterType kh2Max = _kh2->get_max_count(s);
 
-      if (kh1Max > kh2Max)
+      if (kh1Max > kh2Max) {
         return kh1Max;
-      else
+      } else {
         return kh2Max;
+      }
     }
   };
 };
