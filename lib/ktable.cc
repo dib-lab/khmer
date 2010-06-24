@@ -1,7 +1,10 @@
 #include <assert.h>
 #include "ktable.hh"
 #include <math.h>
+#include <string>
+#include <iostream>
 
+using namespace std;
 using namespace khmer;
 
 //
@@ -63,8 +66,9 @@ std::string khmer::_revhash(HashIntoType hash, WordLength k)
 void KTable::consume_string(const std::string &s)
 {
   const char * sp = s.c_str();
+  unsigned int length = s.length();
 
-#if 1
+#if 0
   const unsigned int length = s.length() - _ksize + 1;
   for (unsigned int i = 0; i < length; i++) {
     count(&sp[i]);
@@ -100,9 +104,8 @@ void KTable::consume_string(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r = r << 2;
-    r &= mask;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r)
       _counts[h]++;

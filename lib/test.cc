@@ -1,5 +1,4 @@
 #include "ktable.hh"
-#include "seqfuncs.hh"
 #include <iostream>
 #include <string>
 
@@ -45,10 +44,6 @@ int main()
     assert(d.get_count(&s[i]) >= 1);
   }
 
-  string str1 = getReverseComplement("CCGTA");
-  string str2 = string("TACGG");
-  assert(str1.compare(str2) == 0); 
-  
   printf("Tests SUCCESSFUL.\n");
 
   return 0;

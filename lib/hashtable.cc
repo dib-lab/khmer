@@ -1,6 +1,6 @@
 #include "khmer.hh"
 #include "hashtable.hh"
-#include "seqfuncs.hh"
+#include <iostream>
 
 using namespace khmer;
 using namespace std;
@@ -65,7 +65,6 @@ void Hashtable::consume_fasta(const std::string &filename)
    string line;
    ifstream infile(filename.c_str());
    int isRead = 0;
-   int n = 0;
 
    if (infile.is_open())
    {
@@ -93,8 +92,9 @@ void Hashtable::consume_fasta(const std::string &filename)
 void Hashtable::consume_string(const std::string &s)
 {
   const char * sp = s.c_str();
+  unsigned int length = s.length();
 
-#if 1
+#if 0
   const unsigned int length = s.length() - _ksize + 1;
   for (unsigned int i = 0; i < length; i++) {
     count(&sp[i]);
@@ -106,12 +106,12 @@ void Hashtable::consume_string(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h; 
-  unsigned long long int r;
+  unsigned long long int h = 0; 
+  unsigned long long int r = 0;
   
   _hash(sp, _ksize, &h, &r);
 
-  unsigned int bin;
+  unsigned long long int bin;
 
   if (h < r)
     bin = h % _tablesize;
@@ -134,9 +134,8 @@ void Hashtable::consume_string(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r &= mask;
-    r = r << 2;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r)
       bin = h % _tablesize;
@@ -163,9 +162,9 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h;
-  unsigned long long int r;
-
+  unsigned long long int h = 0;
+  unsigned long long int r = 0;
+  
   _hash(sp, _ksize, &h, &r);
 
   if (h < r) {
@@ -185,9 +184,8 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r = r << 2;
-    r &= mask;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r) {
       count = this->get_count(h);
@@ -235,9 +233,8 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r = r << 2;
-    r &= mask;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
 
     if (h < r) {
       count = this->get_count(h);
