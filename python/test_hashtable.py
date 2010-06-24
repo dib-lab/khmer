@@ -139,6 +139,35 @@ def test_get_maxcount():
     x = kh.get_max_count(s)
     assert x == 4
 
+def test_get_maxcount_rc():
+   kh = khmer.new_hashtable(4, 4**4)
+
+   s = "AAAAACGT"
+   src = "ACGTTTTT"
+   kh.consume(s)
+
+   x = kh.get_max_count(s)
+   assert x == 2
+
+   kh.consume(src)
+   x = kh.get_max_count(s)
+   assert x == 4
+
+def test_get_mincount_rc():
+   kh = khmer.new_hashtable(4, 4**4)
+
+   s = "AAAAACGT"
+   src = "ACGTTTTT"
+
+   kh.consume(s)
+   x = kh.get_min_count(s)
+   assert x == 1
+
+   kh.consume(src)
+   x = kh.get_min_count(s)
+   assert x == 2
+
+
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
 class Test_HashtableIntersect:

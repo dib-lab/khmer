@@ -38,8 +38,18 @@ unsigned long long int _hash(const char * kmer, unsigned int k)
 
 int main()
 {
-   cout << _hash("ACGTTGCAACGTTGCAA", 17) << endl;
-   cout << _hash("TTGCAACGTTGCAACGT", 17) << endl;
+   cout << _hash("GTTT", 4) << endl;
+   cout << _hash("CGTT", 4) << endl;
+
+   unsigned int h = 191;
+
+   cout << h << endl;
+
+   h = h >> 2;
+   h |= (1 << 6);
+
+   cout << h << endl;
+
 
    return 0;
 }

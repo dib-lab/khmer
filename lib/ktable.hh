@@ -80,7 +80,7 @@ namespace khmer {
     }
 
     // get the count for the given k-mer hash.
-    const unsigned int get_count(unsigned int i) const {
+    const unsigned long long int get_count(unsigned long long int i) const {
       return _counts[i];
     }
 

@@ -144,7 +144,7 @@ void Hashtable::consume_string(const std::string &s)
   const unsigned int length = s.length();
   const char * sp = s.c_str();
 
-#if 0
+#if 1
   for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
     count(&sp[i]);
   }
@@ -160,7 +160,7 @@ void Hashtable::consume_string(const std::string &s)
   
   _hash(sp, _ksize, &h, &r);
 
-  unsigned int bin;
+  unsigned long long int bin;
 
   if (h < r)
     bin = h % _tablesize;
@@ -183,9 +183,9 @@ void Hashtable::consume_string(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r &= mask;
-    r = r << 2;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    //r &= mask;
+    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r)
       bin = h % _tablesize;
@@ -212,9 +212,9 @@ HashcountType Hashtable::get_min_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h;
-  unsigned long long int r;
-
+  unsigned long long int h = 0;
+  unsigned long long int r = 0;
+  
   _hash(sp, _ksize, &h, &r);
 
   if (h < r)
@@ -235,9 +235,9 @@ HashcountType Hashtable::get_min_count(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r = r << 2;
-    r &= mask;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    //r &= mask;
+    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r)
       count = this->get_count(h);
@@ -263,8 +263,8 @@ HashcountType Hashtable::get_max_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h;
-  unsigned long long int r;
+  unsigned long long int h = 0;
+  unsigned long long int r = 0;
 
   _hash(sp, _ksize, &h, &r);
 
@@ -286,9 +286,8 @@ HashcountType Hashtable::get_max_count(const std::string &s)
     h &= mask;
 
     // now handle reverse complement
-    r = r << 2;
-    r &= mask;
-    r |= twobit_repr(sp[i]);
+    r = r >> 2;
+    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
 
     if (h < r)
       count = this->get_count(h);

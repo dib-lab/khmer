@@ -45,7 +45,7 @@ namespace khmer {
     }
 
     void count(unsigned int khash) {
-      unsigned int bin = khash % _tablesize;
+      unsigned long long int bin = khash % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;
     }
@@ -57,8 +57,8 @@ namespace khmer {
     }
 
     // get the count for the given k-mer hash.
-    const unsigned int get_count(unsigned int khash) const {
-      unsigned int bin = khash % _tablesize;
+    const unsigned long long int get_count(unsigned long long int khash) const {
+      unsigned long long int bin = khash % _tablesize;
       return _counts[bin];
     }
 
