@@ -1,13 +1,11 @@
-CXXFLAGS=-g -fPIC -O2
+CXXFLAGS=-g -fPIC
 
 all: test
 
 clean:
 	rm -f *.o
 
-test: test.cc seqfuncs.o ktable.o hashtable.o
-
-seqfuncs.o: seqfuncs.cc seqfuncs.hh
+test: test.cc ktable.o hashtable.o
 
 ktable.o: ktable.cc ktable.hh
 

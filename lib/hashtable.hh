@@ -2,7 +2,6 @@
 #define HASHTABLE_HH
 
 #include "khmer.hh"
-#include "seqfuncs.hh"
 #include <fstream>
 #include <string>
 

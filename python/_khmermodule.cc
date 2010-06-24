@@ -3,7 +3,6 @@
 //
 
 #include "Python.h"
-#include "../lib/seqfuncs.hh"
 #include <khmer.hh>
 
 //

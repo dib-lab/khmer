@@ -1,6 +1,6 @@
 #include "khmer.hh"
 #include "hashtable.hh"
-#include "seqfuncs.hh"
+#include <iostream>
 
 using namespace khmer;
 using namespace std;
