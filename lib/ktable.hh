@@ -30,6 +30,7 @@ namespace khmer {
   HashIntoType _hash(const char * kmer, WordLength k);
   HashIntoType _hash(const char * kmer, WordLength k,
 			      HashIntoType * h, HashIntoType * r);
+  HashIntoType _hash_forward(const char * kmer, WordLength k);
 
   std::string _revhash(HashIntoType hash, WordLength k);
 

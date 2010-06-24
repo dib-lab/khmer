@@ -8,12 +8,14 @@ using namespace std;
 using namespace khmer;
 
 //
-// _hash: hash a k-length DNA sequence into an unsigned int.
+// _hash: hash a k-length DNA sequence into a 64-bit number.
 //
 
 HashIntoType khmer::_hash(const char * kmer, WordLength k, 
 			  HashIntoType * h, HashIntoType * r)
 {
+  assert(k <= sizeof(HashIntoType)*2); // sizeof(HashIntoType) * 4 / 2
+
   *h |= twobit_repr(kmer[0]);
   *r |= twobit_comp(kmer[k-1]);
 
@@ -28,6 +30,8 @@ HashIntoType khmer::_hash(const char * kmer, WordLength k,
   return *h < *r ? *h : *r;
 }
 
+// _hash: return the maximum of the forward and reverse hash.
+
 HashIntoType khmer::_hash(const char * kmer, WordLength k)
 {
   HashIntoType h = 0;
@@ -35,6 +39,18 @@ HashIntoType khmer::_hash(const char * kmer, WordLength k)
 
   
   return _hash(kmer, k, &h, &r);
+}
+
+// _hash_forward: return the hash from the forward direction only.
+
+HashIntoType khmer::_hash_forward(const char * kmer, WordLength k)
+{
+  HashIntoType h = 0;
+  HashIntoType r = 0;
+
+  
+  _hash(kmer, k, &h, &r);
+  return h;			// return forward only
 }
 
 //
@@ -81,8 +97,8 @@ void KTable::consume_string(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h;
-  unsigned long long int r;
+  HashIntoType h;
+  HashIntoType r;
 
   _hash(sp, _ksize, &h, &r);
   
