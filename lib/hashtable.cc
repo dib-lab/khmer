@@ -64,7 +64,7 @@ void Hashtable::consume_fasta(const std::string &filename)
 {
    string line;
    ifstream infile(filename.c_str());
-   int isRead = 0;
+   int isRead = 0, n =0;
 
    if (infile.is_open())
    {
