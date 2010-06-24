@@ -22,8 +22,6 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
    string name;
    string seq;
 
-   int n = 0;
-
    if (infile.is_open())
    {
       while(!infile.eof())
@@ -49,10 +47,6 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
             int start;
             int stop;
             
-            n++;
-            if (n % 10000 == 0)
-               cout << n << endl;
-
             for (int i = 0; i < numPos; i++)
             {
                string kmer= seq.substr(i, Hashtable::_ksize);
@@ -111,7 +105,6 @@ void Hashtable::consume_fasta(const std::string &filename)
    string line;
    ifstream infile(filename.c_str());
    int isRead = 0;
-   int n = 0;
 
    if (infile.is_open())
    {
@@ -119,16 +112,8 @@ void Hashtable::consume_fasta(const std::string &filename)
      {
        getline(infile, line);
 
-       if (isRead) {
-
-         n++;
-         if (n % 10000 == 0)
-           cout << n << endl;
-
+       if (isRead)
          Hashtable::consume_string(line);
-         //for (int i = 0; i < (line.size() - Hashtable::_ksize + 1); i++)
-         //  Hashtable::consume_string(line.substr(i, Hashtable::_ksize));
-       }
        
        isRead = isRead? 0 : 1;
      }
@@ -141,11 +126,12 @@ void Hashtable::consume_fasta(const std::string &filename)
 
 void Hashtable::consume_string(const std::string &s)
 {
-  const unsigned int length = s.length();
   const char * sp = s.c_str();
+  unsigned int length = s.length();
 
-#if 1
-  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+#if 0
+  const unsigned int length = s.length() - _ksize + 1;
+  for (unsigned int i = 0; i < length; i++) {
     count(&sp[i]);
   }
 #else
@@ -155,8 +141,8 @@ void Hashtable::consume_string(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h; 
-  unsigned long long int r;
+  unsigned long long int h = 0; 
+  unsigned long long int r = 0;
   
   _hash(sp, _ksize, &h, &r);
 
@@ -184,7 +170,6 @@ void Hashtable::consume_string(const std::string &s)
 
     // now handle reverse complement
     r = r >> 2;
-    //r &= mask;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r)
@@ -200,14 +185,14 @@ void Hashtable::consume_string(const std::string &s)
 }
 
 
-HashcountType Hashtable::get_min_count(const std::string &s)
+BoundedCounterType Hashtable::get_min_count(const std::string &s)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  HashcountType min_count, count;
+  BoundedCounterType min_count, count;
 
   unsigned int mask = 0;
-  for (unsigned int i = 0; i < _ksize; i++) {
+  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
@@ -223,8 +208,6 @@ HashcountType Hashtable::get_min_count(const std::string &s)
     min_count = this->get_count(r);  
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 
@@ -236,7 +219,6 @@ HashcountType Hashtable::get_min_count(const std::string &s)
 
     // now handle reverse complement
     r = r >> 2;
-    //r &= mask;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
     if (h < r)
@@ -251,14 +233,14 @@ HashcountType Hashtable::get_min_count(const std::string &s)
   return min_count;
 }
 
-HashcountType Hashtable::get_max_count(const std::string &s)
+BoundedCounterType Hashtable::get_max_count(const std::string &s)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  HashcountType max_count, count;
+  BoundedCounterType max_count, count;
 
   unsigned int mask = 0;
-  for (unsigned int i = 0; i < _ksize; i++) {
+  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
@@ -274,8 +256,6 @@ HashcountType Hashtable::get_max_count(const std::string &s)
     max_count = this->get_count(r);
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 

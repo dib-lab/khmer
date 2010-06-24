@@ -11,14 +11,13 @@ using namespace khmer;
 // _hash: hash a k-length DNA sequence into an unsigned int.
 //
 
-unsigned long long int khmer::_hash(const char * kmer, unsigned int k, 
-                                    unsigned long long int * h, 
-                                    unsigned long long int * r)
+HashIntoType khmer::_hash(const char * kmer, WordLength k, 
+			  HashIntoType * h, HashIntoType * r)
 {
   *h |= twobit_repr(kmer[0]);
   *r |= twobit_comp(kmer[k-1]);
 
-  for (unsigned int i = 1; i < k; i++) {
+  for (WordLength i = 1; i < k; i++) {
     *h = *h << 2;
     *r = *r << 2;
 
@@ -29,28 +28,27 @@ unsigned long long int khmer::_hash(const char * kmer, unsigned int k,
   return *h < *r ? *h : *r;
 }
 
-unsigned long long int khmer::_hash(const char * kmer, unsigned int k)
+HashIntoType khmer::_hash(const char * kmer, WordLength k)
 {
-  unsigned long long int h = 0;
-  unsigned long long int r = 0;
+  HashIntoType h = 0;
+  HashIntoType r = 0;
 
-  unsigned long long retVal = _hash(kmer, k, &h, &r);
-
-  return retVal;
+  
+  return _hash(kmer, k, &h, &r);
 }
 
 //
 // _revhash: given an unsigned int, return the associated k-mer.
 //
 
-std::string khmer::_revhash(unsigned int hash, unsigned int k)
+std::string khmer::_revhash(HashIntoType hash, WordLength k)
 {
   std::string s = "";
 
   unsigned int val = hash & 3;
   s += revtwobit_repr(val);
 
-  for (unsigned int i = 1; i < k; i++) {
+  for (WordLength i = 1; i < k; i++) {
     hash = hash >> 2;
     val = hash & 3;
     s += revtwobit_repr(val);
@@ -67,11 +65,12 @@ std::string khmer::_revhash(unsigned int hash, unsigned int k)
 
 void KTable::consume_string(const std::string &s)
 {
-  const unsigned int length = s.length();
   const char * sp = s.c_str();
+  unsigned int length = s.length();
 
 #if 0
-  for (unsigned int i = 0; i < s.length() - _ksize + 1; i++) {
+  const unsigned int length = s.length() - _ksize + 1;
+  for (unsigned int i = 0; i < length; i++) {
     count(&sp[i]);
   }
 #else

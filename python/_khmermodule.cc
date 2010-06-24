@@ -3,7 +3,7 @@
 //
 
 #include "Python.h"
-#include <khmer.hh>
+#include "khmer.hh"
 
 //
 // Function necessary for Python loading:
@@ -468,7 +468,7 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::HashcountType c = hashtable->get_min_count(long_str);
+  khmer::BoundedCounterType c = hashtable->get_min_count(long_str);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
@@ -490,7 +490,7 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::HashcountType c = hashtable->get_max_count(long_str);
+  khmer::BoundedCounterType c = hashtable->get_max_count(long_str);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
