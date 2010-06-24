@@ -4,3 +4,4 @@
 *~
 python/build
 lib/test
+lib/bittest.cc
