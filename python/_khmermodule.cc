@@ -477,10 +477,11 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
     return NULL;
   }
 
@@ -489,7 +490,9 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::BoundedCounterType c = hashtable->get_min_count(long_str);
+  khmer::BoundedCounterType c = hashtable->get_min_count(long_str,
+							 lower_bound,
+							 upper_bound);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
@@ -499,10 +502,11 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
     return NULL;
   }
 
@@ -511,7 +515,9 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::BoundedCounterType c = hashtable->get_max_count(long_str);
+  khmer::BoundedCounterType c = hashtable->get_max_count(long_str,
+							 lower_bound,
+							 upper_bound);
   unsigned int N = c;
 
   return PyInt_FromLong(N);

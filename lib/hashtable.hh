@@ -79,8 +79,13 @@ namespace khmer {
                            int threshold);
 
     // @@CTB doc
-    BoundedCounterType get_min_count(const std::string &s);
-    BoundedCounterType get_max_count(const std::string &s);
+    BoundedCounterType get_min_count(const std::string &s,
+				     HashIntoType lower_bound = 0,
+				     HashIntoType upper_bound = 0);
+				     
+    BoundedCounterType get_max_count(const std::string &s,
+				     HashIntoType lower_bound = 0,
+				     HashIntoType upper_bound = 0);
   };
 
   class HashtableIntersect {

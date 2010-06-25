@@ -154,11 +154,13 @@ unsigned int Hashtable::consume_string(const std::string &s,
 }
 
 
-BoundedCounterType Hashtable::get_min_count(const std::string &s)
+BoundedCounterType Hashtable::get_min_count(const std::string &s,
+					    HashIntoType lower_bound,
+					    HashIntoType upper_bound)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  BoundedCounterType min_count, count;
+  BoundedCounterType min_count = 255, count;
 
   unsigned int mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
@@ -167,13 +169,17 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
   }
 
   HashIntoType h = 0, r = 0;
-  
-  _hash(sp, _ksize, &h, &r);
+  bool bounded = true;
 
-  if (h < r) {
-    min_count = this->get_count(h);
-  } else {
-    min_count = this->get_count(r);  
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
+
+  HashIntoType bin;
+  
+  bin = _hash(sp, _ksize, &h, &r);
+  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+    min_count = this->get_count(bin);
   }
 
   for (unsigned int i = _ksize; i < length; i++) {
@@ -190,24 +196,26 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    if (h < r) {
-      count = this->get_count(h);
-    } else {
-      count = this->get_count(r);
-    }
+    bin = (h < r) ? h : r;
+
+    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+      count = this->get_count(bin);
     
-    if (count < min_count) {
-      min_count = count;
+      if (count < min_count) {
+	min_count = count;
+      }
     }
   }
   return min_count;
 }
 
-BoundedCounterType Hashtable::get_max_count(const std::string &s)
+BoundedCounterType Hashtable::get_max_count(const std::string &s,
+					    HashIntoType lower_bound,
+					    HashIntoType upper_bound)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  BoundedCounterType max_count, count;
+  BoundedCounterType max_count = 0, count;
 
   unsigned int mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
@@ -216,13 +224,15 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
   }
 
   HashIntoType h = 0, r = 0;
+  bool bounded = true;
 
-  _hash(sp, _ksize, &h, &r);
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
 
-  if (h < r) {
-    max_count = this->get_count(h);
-  } else {
-    max_count = this->get_count(r);
+  HashIntoType bin = _hash(sp, _ksize, &h, &r);
+  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+    max_count = this->get_count(bin);
   }
 
   for (unsigned int i = _ksize; i < length; i++) {
@@ -239,14 +249,13 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2-2));
 
-    if (h < r) {
-      count = this->get_count(h);
-    } else {
-      count = this->get_count(r);    
-    }
+    bin = (h < r) ? h : r;
+    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+      count = this->get_count(bin);
 
-    if (count > max_count) {
-      max_count = count;
+      if (count > max_count) {
+	max_count = count;
+      }
     }
   }
   return max_count;

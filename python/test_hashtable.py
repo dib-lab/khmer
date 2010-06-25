@@ -185,12 +185,12 @@ class Test_ConsumeString(object):
         n = self.kh.consume('TTTTT')
         assert n == 2
         assert self.kh.get(0) == 2
-
+        
     def test_bounded(self):
         n = self.kh.consume('AAAAA', 1, 4**4)
         assert n == 0, n
         assert self.kh.get(0) == 0
-        
+
     def test_bounded_2(self):
         n = self.kh.consume('AAAAA', 0, 1)
         assert n == 2, n
@@ -205,6 +205,42 @@ class Test_ConsumeString(object):
         n = self.kh.consume('TTTTT', 0, 1)
         assert n == 2, n
         assert self.kh.get(0) == 2
+
+    def test_min_count(self):
+        self.kh.consume('AAAA')
+
+        count = self.kh.get_min_count('AAAA')
+        assert count == 1
+        
+    def test_min_count_in_bound(self):
+        self.kh.consume('AAAA')
+
+        count = self.kh.get_min_count('AAAAA', 0, 1)
+        assert count == 1
+        
+    def test_min_count_out_bound(self):
+        self.kh.consume('AAAA')
+
+        count = self.kh.get_min_count('AAAAA', 1, 4**4)
+        assert count == 255
+
+    def test_max_count(self):
+        self.kh.consume('AAAA')
+
+        count = self.kh.get_max_count('AAAA')
+        assert count == 1
+        
+    def test_max_count_in_bound(self):
+        self.kh.consume('AAAA')
+
+        count = self.kh.get_max_count('AAAAA', 0, 1)
+        assert count == 1
+        
+    def test_max_count_out_bound(self):
+        self.kh.consume('AAAA')
+
+        count = self.kh.get_max_count('AAAAA', 1, 4**4)
+        assert count == 0
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
