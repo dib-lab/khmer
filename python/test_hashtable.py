@@ -167,6 +167,13 @@ def test_get_mincount_rc():
    x = kh.get_min_count(s)
    assert x == 2
 
+def test_consume_fasta():
+   kh = khmer.new_hashtable(25, 4**15)
+   kh.consume_fasta("1000.fa")
+
+   minCount = kh.get_min_count("GCGCCTGGCTCAAGAATGCGGCACTAACCGGCACTGCCGTGGTAAACAATCCGTTTTGGTGGAGCGTGGATGAAAAATTCTTCACTAATGCGCTGGCCACAAAACTCGCCGTCG")
+   
+   assert minCount > 0
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 

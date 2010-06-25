@@ -34,7 +34,7 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
          {
             seq = line;
 
-            if (get_max_count(seq) >= minLength) {
+            if (get_min_count(seq) <= minLength) {
                outfile << ">" << name << endl;
                outfile << seq << endl;
             }
@@ -146,7 +146,7 @@ void Hashtable::consume_string(const std::string &s)
   
   _hash(sp, _ksize, &h, &r);
 
-  unsigned long long int bin;
+  unsigned long long int bin = 0;
 
   if (h < r)
     bin = h % _tablesize;
