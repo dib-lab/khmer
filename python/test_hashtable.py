@@ -169,7 +169,7 @@ def test_get_mincount_rc():
 
 def test_consume_fasta():
    kh = khmer.new_hashtable(25, 4**15)
-   kh.consume_fasta("1000.fa")
+   kh.consume_fasta("20.fa")
 
    minCount = kh.get_min_count("GCGCCTGGCTCAAGAATGCGGCACTAACCGGCACTGCCGTGGTAAACAATCCGTTTTGGTGGAGCGTGGATGAAAAATTCTTCACTAATGCGCTGGCCACAAAACTCGCCGTCG")
    
