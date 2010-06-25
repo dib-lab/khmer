@@ -63,7 +63,9 @@ namespace khmer {
     }
 
     // count every k-mer in the string.
-    void consume_string(const std::string &s);
+    unsigned int consume_string(const std::string &s,
+				HashIntoType lower_bound = 0,
+				HashIntoType upper_bound = 0);
 
     // count every k-mer in the FASTA file.
     void consume_fasta(const std::string &filename);

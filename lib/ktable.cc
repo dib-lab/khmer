@@ -108,8 +108,6 @@ void KTable::consume_string(const std::string &s)
     _counts[r]++;
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 

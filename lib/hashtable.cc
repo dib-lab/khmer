@@ -89,41 +89,38 @@ void Hashtable::consume_fasta(const std::string &filename)
 // consume_string: run through every k-mer in the given string, & hash it.
 //
 
-void Hashtable::consume_string(const std::string &s)
+unsigned int Hashtable::consume_string(const std::string &s,
+				       HashIntoType lower_bound,
+				       HashIntoType upper_bound)
 {
   const char * sp = s.c_str();
   unsigned int length = s.length();
+  unsigned int n_consumed = 0;
 
-#if 0
-  const unsigned int length = s.length() - _ksize + 1;
-  for (unsigned int i = 0; i < length; i++) {
-    count(&sp[i]);
-  }
-#else
   unsigned int mask = 0;
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  unsigned long long int h = 0; 
-  unsigned long long int r = 0;
+  HashIntoType h = 0, r = 0;
+  bool bounded = true;
+
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
   
-  _hash(sp, _ksize, &h, &r);
+  HashIntoType bin = _hash(sp, _ksize, &h, &r);
 
-  unsigned long long int bin;
-
-  if (h < r)
-    bin = h % _tablesize;
-  else
-    bin = r % _tablesize;
-
-  if (_counts[bin] != MAX_COUNT)
-    _counts[bin]++;
+  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+    bin = bin % _tablesize;
+    if (_counts[bin] != MAX_COUNT) {
+      _counts[bin]++;
+      n_consumed++;
+    }
+  }
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 
@@ -137,16 +134,17 @@ void Hashtable::consume_string(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    if (h < r)
-      bin = h % _tablesize;
-    else
-      bin = r % _tablesize;
+    bin = (h < r) ? h : r;
 
-    if (_counts[bin] != MAX_COUNT)
-      _counts[bin]++;
+    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+      bin = bin % _tablesize;
+      if (_counts[bin] != MAX_COUNT) {
+	_counts[bin]++;
+	n_consumed++;
+      }
+    }
   }
-
-#endif // 0
+  return n_consumed;
 }
 
 
@@ -162,8 +160,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     mask |= 3;
   }
 
-  unsigned long long int h = 0;
-  unsigned long long int r = 0;
+  HashIntoType h = 0, r = 0;
   
   _hash(sp, _ksize, &h, &r);
 

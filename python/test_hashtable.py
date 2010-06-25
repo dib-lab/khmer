@@ -167,6 +167,44 @@ def test_get_mincount_rc():
    x = kh.get_min_count(s)
    assert x == 2
 
+class Test_ConsumeString(object):
+    def setup(self):
+        self.kh = khmer.new_hashtable(4, 4**4)
+
+    def test_simple(self):
+        n = self.kh.consume('AAAA')
+        assert n == 1
+        assert self.kh.get(0) == 1
+        
+    def test_simple_2(self):
+        n = self.kh.consume('AAAAA')
+        assert n == 2
+        assert self.kh.get(0) == 2
+        
+    def test_simple_rc(self):
+        n = self.kh.consume('TTTTT')
+        assert n == 2
+        assert self.kh.get(0) == 2
+
+    def test_bounded(self):
+        n = self.kh.consume('AAAAA', 1, 4**4)
+        assert n == 0, n
+        assert self.kh.get(0) == 0
+        
+    def test_bounded_2(self):
+        n = self.kh.consume('AAAAA', 0, 1)
+        assert n == 2, n
+        assert self.kh.get(0) == 2
+        
+    def test_bounded_rc(self):
+        n = self.kh.consume('TTTTT', 1, 4**4)
+        assert n == 0, n
+        assert self.kh.get(0) == 0
+        
+    def test_bounded_2_rc(self):
+        n = self.kh.consume('TTTTT', 0, 1)
+        assert n == 2, n
+        assert self.kh.get(0) == 2
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 

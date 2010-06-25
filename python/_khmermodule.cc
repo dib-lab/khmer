@@ -428,6 +428,8 @@ static PyObject * hash_filter_fasta_file(PyObject * self, PyObject *args)
 
   hashtable->filter_fasta_file(long_str1, long_str2, i, j);
 
+  // @CTB str memory leak from long_str1/long_str2?
+
   return PyInt_FromLong(0);
 }
 
@@ -444,6 +446,7 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
   hashtable->consume_fasta(long_str);
 
+  // @CTB this cannot be right!
   unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
 
   return PyInt_FromLong(n_consumed);
@@ -455,19 +458,19 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * long_str;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
     return NULL;
   }
-
+  
   if (strlen(long_str) < hashtable->ksize()) {
     // @CTB
     return NULL;
   }
 
-  hashtable->consume_string(long_str);
-
-  unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
+  unsigned int n_consumed;
+  n_consumed = hashtable->consume_string(long_str, lower_bound, upper_bound);
 
   return PyInt_FromLong(n_consumed);
 }
@@ -640,13 +643,13 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
 static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 {
   char * kmer;
-  int ksize;
+  unsigned int ksize;
 
   if (!PyArg_ParseTuple(args, "si", &kmer, &ksize)) {
     return NULL;
   }
 
-  if ((char)ksize != ksize) {	// @CTB
+  if ((unsigned char)ksize != ksize) {	// @CTB
     return NULL;
   }
 

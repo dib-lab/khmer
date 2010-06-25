@@ -1,1 +1,3 @@
 make _hash etc. return unsigned long long
+
+arrange hashtable such that for the rc case, the upper half is not populated.
