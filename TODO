@@ -1,3 +1,6 @@
 make _hash etc. return unsigned long long
 
 arrange hashtable such that for the rc case, the upper half is not populated.
+
+also, can probably arrange parallelization split & hash table size so
+that modulus exactly fills split portion of table.
