@@ -29,7 +29,7 @@ typedef struct {
 
 static void khmer_ktable_dealloc(PyObject *);
 
-static PyObject * forward_hash(PyObject * self, PyObject * args)
+static PyObject * ktable_forward_hash(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -48,7 +48,26 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
   return PyInt_FromLong(khmer::_hash(kmer, ktable->ksize()));
 }
 
-static PyObject * reverse_hash(PyObject * self, PyObject * args)
+static PyObject * ktable_forward_hash_no_rc(PyObject * self, PyObject * args)
+{
+  khmer_KTableObject * me = (khmer_KTableObject *) self;
+  khmer::KTable * ktable = me->ktable;
+
+  char * kmer;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer)) {
+    return NULL;
+  }
+
+  if (strlen(kmer) != ktable->ksize()) {
+    // @CTB
+    return NULL;
+  }
+
+  return PyInt_FromLong(khmer::_hash_forward(kmer, ktable->ksize()));
+}
+
+static PyObject * ktable_reverse_hash(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -211,8 +230,9 @@ static PyObject * update(PyObject * self, PyObject * args);
 static PyObject * intersect(PyObject * self, PyObject * args);
 
 static PyMethodDef khmer_ktable_methods[] = {
-  { "forward_hash", forward_hash, METH_VARARGS, "Convert string to int" },
-  { "reverse_hash", reverse_hash, METH_VARARGS, "Convert int to string" },
+  { "forward_hash", ktable_forward_hash, METH_VARARGS, "Convert string to int" },
+  { "forward_hash_no_rc", ktable_forward_hash_no_rc, METH_VARARGS, "Convert string to int, with no reverse complement handling" },
+  { "reverse_hash", ktable_reverse_hash, METH_VARARGS, "Convert int to string" },
   { "count", count, METH_VARARGS, "Count the given kmer" },
   { "consume", consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "get", get, METH_VARARGS, "Get the count for the given k-mer" },
@@ -598,6 +618,63 @@ static void khmer_hashtable_dealloc(PyObject* self)
   PyObject_Del((PyObject *) obj);
 }
 
+//////////////////////////////
+// standalone functions
+
+static PyObject * forward_hash(PyObject * self, PyObject * args)
+{
+  char * kmer;
+  int ksize;
+
+  if (!PyArg_ParseTuple(args, "si", &kmer, &ksize)) { // @CTB
+    return NULL;
+  }
+
+  if ((char)ksize != ksize) {	// @CTB
+    return NULL;
+  }
+
+  return PyInt_FromLong(khmer::_hash(kmer, ksize));
+}
+
+static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
+{
+  char * kmer;
+  int ksize;
+
+  if (!PyArg_ParseTuple(args, "si", &kmer, &ksize)) {
+    return NULL;
+  }
+
+  if ((char)ksize != ksize) {	// @CTB
+    return NULL;
+  }
+
+  if (strlen(kmer) != ksize) {
+    // @CTB
+    return NULL;
+  }
+
+  return PyInt_FromLong(khmer::_hash_forward(kmer, ksize));
+}
+
+static PyObject * reverse_hash(PyObject * self, PyObject * args)
+{
+  khmer::HashIntoType val;
+  int ksize;
+  
+  if (!PyArg_ParseTuple(args, "lI", &val, &ksize)) {
+    return NULL;
+  }
+
+  if ((char)ksize != ksize) {	// @CTB
+    return NULL;
+  }
+
+  return PyString_FromString(khmer::_revhash(val, ksize).c_str());
+}
+
+
 //
 // Module machinery.
 //
@@ -606,6 +683,9 @@ static PyMethodDef KhmerMethods[] = {
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty hashtable" },
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },
+  { "forward_hash", forward_hash, METH_VARARGS, "", },
+  { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
+  { "reverse_hash", reverse_hash, METH_VARARGS, "", },
   { NULL, NULL, 0, NULL }
 };
 
