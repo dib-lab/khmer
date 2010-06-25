@@ -60,11 +60,14 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
 // consume_fasta: consume a FASTA file of reads
 //
 
-void Hashtable::consume_fasta(const std::string &filename)
+unsigned int Hashtable::consume_fasta(const std::string &filename,
+				      HashIntoType lower_bound,
+				      HashIntoType upper_bound)
 {
    string line;
    ifstream infile(filename.c_str());
    int isRead = 0, n =0;
+   unsigned int n_consumed = 0;
 
    if (infile.is_open())
    {
@@ -77,12 +80,15 @@ void Hashtable::consume_fasta(const std::string &filename)
          if (n % 10000 == 0)
            cout << n << endl;
 
-         Hashtable::consume_string(line);
+         n_consumed += Hashtable::consume_string(line,
+						 lower_bound,
+						 upper_bound);
        }
        
        isRead = isRead? 0 : 1;
      }
-  }
+   }
+   return n_consumed;
 }
 
 //

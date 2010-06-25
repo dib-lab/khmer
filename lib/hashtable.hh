@@ -68,7 +68,9 @@ namespace khmer {
 				HashIntoType upper_bound = 0);
 
     // count every k-mer in the FASTA file.
-    void consume_fasta(const std::string &filename);
+    unsigned int consume_fasta(const std::string &filename,
+			       HashIntoType lower_bound = 0,
+			       HashIntoType upper_bound = 0);
 
     // filter/trim through the given FASTA file.
     void filter_fasta_file(const std::string &inputfile,

@@ -438,16 +438,14 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
-  char * long_str;
+  char * filename;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
     return NULL;
   }
 
-  hashtable->consume_fasta(long_str);
-
-  // @CTB this cannot be right!
-  unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
+  unsigned int n_consumed;
+  n_consumed = hashtable->consume_fasta(filename);
 
   return PyInt_FromLong(n_consumed);
 }
