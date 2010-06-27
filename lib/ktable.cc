@@ -33,7 +33,6 @@ HashIntoType khmer::_hash(const char * kmer, WordLength k)
   HashIntoType h = 0;
   HashIntoType r = 0;
 
-  
   return _hash(kmer, k, &h, &r);
 }
 
@@ -75,7 +74,7 @@ void KTable::consume_string(const std::string &s)
   }
 #else
 
-  unsigned int mask = 0;
+  unsigned long long int mask = 0;
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;

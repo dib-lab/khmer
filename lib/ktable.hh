@@ -8,22 +8,22 @@
 #include <assert.h>
 
 // bit representation of A/T/C/G.
-#define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0 : \
-                         (toupper(ch)) == 'T' ? 1 : \
-                         (toupper(ch)) == 'C' ? 2 : 3)
+#define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0LL : \
+                         (toupper(ch)) == 'T' ? 1LL : \
+                         (toupper(ch)) == 'C' ? 2LL : 3LL)
 
 #define revtwobit_repr(n) ((n) == 0 ? 'A' : \
                            (n) == 1 ? 'T' : \
                            (n) == 2 ? 'C' : 'G')
 
-#define twobit_comp(ch) ((toupper(ch)) == 'A' ? 1 : \
-                         (toupper(ch)) == 'T' ? 0 : \
-                         (toupper(ch)) == 'C' ? 3 : 2)
+#define twobit_comp(ch) ((toupper(ch)) == 'A' ? 1LL : \
+                         (toupper(ch)) == 'T' ? 0LL : \
+                         (toupper(ch)) == 'C' ? 3LL : 2LL)
 
 
 namespace khmer {
-  typedef unsigned long long ExactCounterType;
-  typedef unsigned long long HashIntoType;
+  typedef unsigned long long int ExactCounterType;
+  typedef unsigned long long int HashIntoType;
   typedef unsigned char WordLength;
 
   // two-way hash functions.

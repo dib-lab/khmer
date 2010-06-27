@@ -424,9 +424,7 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
   hashtable->consume_fasta(long_str);
 
-  unsigned int n_consumed = strlen(long_str) - hashtable->ksize() + 1;
-
-  return PyInt_FromLong(n_consumed);
+  return PyInt_FromLong(0);
 }
 
 static PyObject * hash_consume(PyObject * self, PyObject * args)

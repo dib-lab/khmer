@@ -44,7 +44,7 @@ namespace khmer {
       _counts[bin]++;
     }
 
-    void count(unsigned int khash) {
+    void count(HashIntoType khash) {
       HashIntoType bin = khash % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
       _counts[bin]++;

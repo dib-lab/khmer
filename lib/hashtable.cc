@@ -112,8 +112,10 @@ void Hashtable::consume_fasta(const std::string &filename)
      {
        getline(infile, line);
 
-       if (isRead)
+       if (isRead)  {
          Hashtable::consume_string(line);
+         cout << line << endl;
+       }
        
        isRead = isRead? 0 : 1;
      }
@@ -127,7 +129,6 @@ void Hashtable::consume_fasta(const std::string &filename)
 void Hashtable::consume_string(const std::string &s)
 {
   const char * sp = s.c_str();
-  unsigned int length = s.length();
 
 #if 0
   const unsigned int length = s.length() - _ksize + 1;
@@ -135,18 +136,19 @@ void Hashtable::consume_string(const std::string &s)
     count(&sp[i]);
   }
 #else
-  unsigned int mask = 0;
+  HashIntoType mask = 0;
+  unsigned int length = s.length();
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  unsigned long long int h = 0; 
-  unsigned long long int r = 0;
+  HashIntoType h = 0; 
+  HashIntoType r = 0;
   
   _hash(sp, _ksize, &h, &r);
 
-  unsigned long long int bin = 0;
+  HashIntoType bin = 0;
 
   if (h < r)
     bin = h % _tablesize;
@@ -191,14 +193,14 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
   const char * sp = s.c_str();
   BoundedCounterType min_count, count;
 
-  unsigned int mask = 0;
+  HashIntoType mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  unsigned long long int h = 0;
-  unsigned long long int r = 0;
+  HashIntoType h = 0;
+  HashIntoType r = 0;
   
   _hash(sp, _ksize, &h, &r);
 
@@ -239,14 +241,14 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
   const char * sp = s.c_str();
   BoundedCounterType max_count, count;
 
-  unsigned int mask = 0;
+  unsigned long long int mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  unsigned long long int h = 0;
-  unsigned long long int r = 0;
+  HashIntoType h = 0;
+  HashIntoType r = 0;
 
   _hash(sp, _ksize, &h, &r);
 
