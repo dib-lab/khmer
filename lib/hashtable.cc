@@ -55,39 +55,75 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
    outfile.close();
 }
 
+//
+// checkAndProcessRead: checks for non-ACGT characters
+//
+
+unsigned int Hashtable::checkAndProcessRead(const std::string &read,
+                                            HashIntoType lower_bound,
+                                            HashIntoType upper_bound)
+{
+   unsigned int i;
+
+   for (i = 0; i < read.length(); i++)  {
+      if (!(read[i] == 'A' ||
+            read[i] == 'C' ||
+            read[i] == 'G' ||
+            read[i] == 'T'))  {
+         break;
+      }
+   }
+
+   if (i == read.length())  {
+      return consume_string(read, lower_bound, upper_bound);
+   }
+   else  {
+      return 0;
+   }
+}
 
 //
 // consume_fasta: consume a FASTA file of reads
 //
-
 unsigned int Hashtable::consume_fasta(const std::string &filename,
-				      HashIntoType lower_bound,
-				      HashIntoType upper_bound)
+                              HashIntoType lower_bound,
+                              HashIntoType upper_bound)
 {
    string line;
    ifstream infile(filename.c_str());
-   int isRead = 0, n =0;
-   unsigned int n_consumed = 0;
 
-   if (infile.is_open())
-   {
-     while (!infile.eof())
-     {
-       getline(infile, line);
+   unsigned int n_consumed=0, n=0;
 
-       if (isRead) {
-         n++;
-         if (n % 10000 == 0)
-           cout << n << endl;
+   string currName = "";
+   string currSeq = "";
 
-         n_consumed += Hashtable::consume_string(line,
-						 lower_bound,
-						 upper_bound);
-       }
-       
-       isRead = isRead? 0 : 1;
-     }
+   if (infile.is_open())  {
+      while(!infile.eof())  {
+         getline(infile, line);
+
+         if (line[0] == '>')  {
+            if (currSeq != "")  {
+               n++;
+               if (n % 10000 == 0)
+                  cout << n << endl;
+
+               n_consumed += checkAndProcessRead(currSeq, lower_bound, upper_bound);
+               currSeq = "";
+            }
+            currName = line.substr(1, line.length()-1);
+         }
+         else  {
+            currSeq += line;
+         }
+      }
    }
+
+   if (currSeq != "")  {
+      n_consumed += checkAndProcessRead(currSeq, lower_bound, upper_bound);
+   }
+
+   infile.close();
+
    return n_consumed;
 }
 

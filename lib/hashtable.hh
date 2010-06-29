@@ -67,6 +67,11 @@ namespace khmer {
 				HashIntoType lower_bound = 0,
 				HashIntoType upper_bound = 0);
 
+    // checks each read for non-ACGT characters
+    unsigned int checkAndProcessRead(const std::string &read,
+                                HashIntoType lower_bound = 0,
+                                HashIntoType upper_bound = 0);
+
     // count every k-mer in the FASTA file.
     unsigned int consume_fasta(const std::string &filename,
 			       HashIntoType lower_bound = 0,
