@@ -4,6 +4,7 @@ import _khmer
 from _khmer import new_ktable
 from _khmer import new_hashtable
 from _khmer import consume_genome
+from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 
 class KmerCount(object):
     def __init__(self, size, report_zero=False):

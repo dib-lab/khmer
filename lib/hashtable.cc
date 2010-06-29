@@ -34,50 +34,10 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
          {
             seq = line;
 
-            if (get_min_count(seq) <= minLength) {
+            if (get_max_count(seq) >= minLength) {
                outfile << ">" << name << endl;
                outfile << seq << endl;
             }
-
-            /*
-            int numPos = seq.length() - Hashtable::_ksize + 1;
-
-            int readAbund[numPos];
-
-            int start;
-            int stop;
-            
-            for (int i = 0; i < numPos; i++)
-            {
-               string kmer= seq.substr(i, Hashtable::_ksize);
-               readAbund[i] = Hashtable::get_min_count(kmer);            
-            }
-
-            start = 0;
-            for (int i = 0; i < numPos; i++)
-            {
-               if (readAbund[i] >= threshold)
-                  break;
-               else
-                  start++;
-            }
-
-            stop = numPos - 1;
-            for (int i = (numPos-1); i >= 0; i--)
-            {
-               if (readAbund[i] >= threshold)
-                  break;
-               else
-                  stop--;
-            }
-
-            if ((stop - start + Hashtable::_ksize) > minLength)
-            {
-               string mySeq = seq.substr(start,(stop-start)+Hashtable::_ksize);
-               outfile << ">" << name << endl;
-               outfile << mySeq << endl;
-            }
-            */
 
             name.clear();
             seq.clear();
@@ -100,11 +60,14 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
 // consume_fasta: consume a FASTA file of reads
 //
 
-void Hashtable::consume_fasta(const std::string &filename)
+unsigned int Hashtable::consume_fasta(const std::string &filename,
+				      HashIntoType lower_bound,
+				      HashIntoType upper_bound)
 {
    string line;
    ifstream infile(filename.c_str());
-   int isRead = 0;
+   int isRead = 0, n =0;
+   unsigned int n_consumed = 0;
 
    if (infile.is_open())
    {
@@ -112,55 +75,58 @@ void Hashtable::consume_fasta(const std::string &filename)
      {
        getline(infile, line);
 
-       if (isRead)  {
-         Hashtable::consume_string(line);
-         cout << line << endl;
+       if (isRead) {
+         n++;
+         if (n % 10000 == 0)
+           cout << n << endl;
+
+         n_consumed += Hashtable::consume_string(line,
+						 lower_bound,
+						 upper_bound);
        }
        
        isRead = isRead? 0 : 1;
      }
-  }
+   }
+   return n_consumed;
 }
 
 //
 // consume_string: run through every k-mer in the given string, & hash it.
 //
 
-void Hashtable::consume_string(const std::string &s)
+unsigned int Hashtable::consume_string(const std::string &s,
+				       HashIntoType lower_bound,
+				       HashIntoType upper_bound)
 {
   const char * sp = s.c_str();
-
-#if 0
-  const unsigned int length = s.length() - _ksize + 1;
-  for (unsigned int i = 0; i < length; i++) {
-    count(&sp[i]);
-  }
-#else
-  HashIntoType mask = 0;
   unsigned int length = s.length();
+  unsigned int n_consumed = 0;
+
+  unsigned int mask = 0;
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  HashIntoType h = 0; 
-  HashIntoType r = 0;
+  HashIntoType h = 0, r = 0;
+  bool bounded = true;
+
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
   
-  _hash(sp, _ksize, &h, &r);
+  HashIntoType bin = _hash(sp, _ksize, &h, &r);
 
-  HashIntoType bin = 0;
-
-  if (h < r)
-    bin = h % _tablesize;
-  else
-    bin = r % _tablesize;
-
-  if (_counts[bin] != MAX_COUNT)
-    _counts[bin]++;
+  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+    bin = bin % _tablesize;
+    if (_counts[bin] != MAX_COUNT) {
+      _counts[bin]++;
+      n_consumed++;
+    }
+  }
 
   for (unsigned int i = _ksize; i < length; i++) {
-    short int repr = twobit_repr(sp[i]);
-
     // left-shift the previous hash over
     h = h << 2;
 
@@ -174,40 +140,47 @@ void Hashtable::consume_string(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    if (h < r)
-      bin = h % _tablesize;
-    else
-      bin = r % _tablesize;
+    bin = (h < r) ? h : r;
 
-    if (_counts[bin] != MAX_COUNT)
-      _counts[bin]++;
+    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+      bin = bin % _tablesize;
+      if (_counts[bin] != MAX_COUNT) {
+	_counts[bin]++;
+	n_consumed++;
+      }
+    }
   }
-
-#endif // 0
+  return n_consumed;
 }
 
 
-BoundedCounterType Hashtable::get_min_count(const std::string &s)
+BoundedCounterType Hashtable::get_min_count(const std::string &s,
+					    HashIntoType lower_bound,
+					    HashIntoType upper_bound)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  BoundedCounterType min_count, count;
+  BoundedCounterType min_count = 255, count;
 
-  HashIntoType mask = 0;
+  unsigned int mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  HashIntoType h = 0;
-  HashIntoType r = 0;
-  
-  _hash(sp, _ksize, &h, &r);
+  HashIntoType h = 0, r = 0;
+  bool bounded = true;
 
-  if (h < r)
-    min_count = this->get_count(h);
-  else
-    min_count = this->get_count(r);  
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
+
+  HashIntoType bin;
+  
+  bin = _hash(sp, _ksize, &h, &r);
+  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+    min_count = this->get_count(bin);
+  }
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -223,39 +196,44 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    if (h < r)
-      count = this->get_count(h);
-    else
-      count = this->get_count(r);
+    bin = (h < r) ? h : r;
+
+    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+      count = this->get_count(bin);
     
-    if (count < min_count) {
-      min_count = count;
+      if (count < min_count) {
+	min_count = count;
+      }
     }
   }
   return min_count;
 }
 
-BoundedCounterType Hashtable::get_max_count(const std::string &s)
+BoundedCounterType Hashtable::get_max_count(const std::string &s,
+					    HashIntoType lower_bound,
+					    HashIntoType upper_bound)
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  BoundedCounterType max_count, count;
+  BoundedCounterType max_count = 0, count;
 
-  unsigned long long int mask = 0;
+  unsigned int mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
   }
 
-  HashIntoType h = 0;
-  HashIntoType r = 0;
+  HashIntoType h = 0, r = 0;
+  bool bounded = true;
 
-  _hash(sp, _ksize, &h, &r);
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
 
-  if (h < r)
-    max_count = this->get_count(h);
-  else
-    max_count = this->get_count(r);
+  HashIntoType bin = _hash(sp, _ksize, &h, &r);
+  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+    max_count = this->get_count(bin);
+  }
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -271,13 +249,13 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2-2));
 
-    if (h < r)
-      count = this->get_count(h);
-    else
-      count = this->get_count(r);    
+    bin = (h < r) ? h : r;
+    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+      count = this->get_count(bin);
 
-    if (count > max_count) {
-      max_count = count;
+      if (count > max_count) {
+	max_count = count;
+      }
     }
   }
   return max_count;
