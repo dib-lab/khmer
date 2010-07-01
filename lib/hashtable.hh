@@ -29,7 +29,7 @@ namespace khmer {
     }
 
     ~Hashtable() {
-      delete _counts; _counts = NULL;
+      if (_counts) { delete _counts; _counts = NULL; }
     }
 
     // accessor to get 'k'
