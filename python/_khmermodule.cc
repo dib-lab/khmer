@@ -697,10 +697,31 @@ static PyObject * readmask_and(PyObject * self, PyObject * args)
 }
 
 
+static PyObject * readmask_merge(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+  PyObject * other_py_obj;
+
+  khmer::ReadMaskTable * mask = me->mask;
+
+  if (!PyArg_ParseTuple(args, "O", &other_py_obj)) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * other = (khmer_ReadMaskObject *) other_py_obj;
+
+  mask->merge(*(other->mask));
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+
 static PyMethodDef khmer_readmask_methods[] = {
   { "get", readmask_get, METH_VARARGS, "" },
   { "set", readmask_set, METH_VARARGS, "" },
   { "do_and", readmask_and, METH_VARARGS, "" },
+  { "merge", readmask_merge, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -863,12 +884,32 @@ static PyObject * minmax_add_max(PyObject * self, PyObject * args)
   return PyInt_FromLong(val);
 }
 
+static PyObject * minmax_merge(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  PyObject * other_py_obj;
+
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  if (!PyArg_ParseTuple(args, "O", &other_py_obj)) {
+    return NULL;
+  }
+
+  khmer_MinMaxObject * other = (khmer_MinMaxObject *) other_py_obj;
+
+  mmt->merge(*(other->mmt));
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef khmer_minmax_methods[] = {
   { "get_min", minmax_get_min, METH_VARARGS, "" },
   { "get_max", minmax_get_max, METH_VARARGS, "" },
   { "add_min", minmax_add_min, METH_VARARGS, "" },
   { "add_max", minmax_add_max, METH_VARARGS, "" },
   { "clear", minmax_clear, METH_VARARGS, "" },
+  { "merge", minmax_merge, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

@@ -37,6 +37,13 @@ namespace khmer {
       assert(index < _tablesize);
       _mask[index] = keep ? 1 : 0;
     }
+
+    void merge(ReadMaskTable &other) {
+      assert(this->_tablesize == other._tablesize);
+      for (unsigned int i = 0; i < _tablesize; i++) {
+	_mask[i] = _mask[i] && other._mask[i] ? 1 : 0;
+      }
+    }
   };
 
   // ** //
@@ -97,7 +104,9 @@ namespace khmer {
 
       MinMaxValue * mmv = &_table[index];
 
-      if (mmv->min_val == 0) {
+      if (val == 0) {
+	;
+      } else if (mmv->min_val == 0) {
 	mmv->min_val = (unsigned char) val;
       } else if (val < mmv->min_val) {
 	mmv->min_val = (unsigned char) val;
@@ -111,6 +120,14 @@ namespace khmer {
 
       MinMaxValue * mmv = &_table[index];
       mmv->min_val = mmv->max_val = 0;
+    }
+
+    void merge(MinMaxTable &other) {
+      assert(this->_tablesize == other._tablesize);
+      for (unsigned int i = 0; i < _tablesize; i++) {
+	this->add_min(i, other.get_min(i));
+	this->add_max(i, other.get_max(i));
+      }
     }
   };
 

@@ -45,3 +45,69 @@ class Test_Basic:
         assert v == 2
         
         assert mmt.get_max(0) == 2
+
+    def test_merge_1(self):
+        mmt = self.mmt
+        mmt2 = khmer.new_minmax(MINMAXTABLE_SIZE)
+
+        mmt.add_min(0, 2)
+        mmt.add_max(0, 5)
+
+        mmt.merge(mmt2)
+
+        v = mmt.get_min(0)
+        assert v == 2, v
+        
+        v = mmt.get_max(0)
+        assert v == 5, v
+
+    def test_merge_2(self):
+        mmt = self.mmt
+        mmt2 = khmer.new_minmax(MINMAXTABLE_SIZE)
+
+        mmt2.add_min(0, 2)
+        mmt2.add_max(0, 5)
+
+        mmt.merge(mmt2)
+
+        v = mmt.get_min(0)
+        assert v == 2, v
+        
+        v = mmt.get_max(0)
+        assert v == 5, v
+
+    def test_merge_3(self):
+        mmt = self.mmt
+        mmt2 = khmer.new_minmax(MINMAXTABLE_SIZE)
+
+        mmt.add_min(0, 2)
+        mmt.add_max(0, 5)
+        
+        mmt2.add_min(0, 3)
+        mmt2.add_max(0, 4)
+
+        mmt.merge(mmt2)
+
+        v = mmt.get_min(0)
+        assert v == 2, v
+        
+        v = mmt.get_max(0)
+        assert v == 5, v
+
+    def test_merge_4(self):
+        mmt = self.mmt
+        mmt2 = khmer.new_minmax(MINMAXTABLE_SIZE)
+
+        mmt.add_min(0, 3)
+        mmt.add_max(0, 4)
+        
+        mmt2.add_min(0, 2)
+        mmt2.add_max(0, 5)
+
+        mmt.merge(mmt2)
+
+        v = mmt.get_min(0)
+        assert v == 2, v
+        
+        v = mmt.get_max(0)
+        assert v == 5, v
