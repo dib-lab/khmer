@@ -3,6 +3,7 @@ from distutils.core import setup, Extension
 # the c++ extension module (needs to be linked in with ktable.o ...)
 extension_mod = Extension("khmer._khmermodule",
                           ["_khmermodule.cc"],
+                          extra_compile_args=['-g'],
                           include_dirs=['../lib',],
                           library_dirs=['../lib',],
                           extra_objects=['../lib/ktable.o',
