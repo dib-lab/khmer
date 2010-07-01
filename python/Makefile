@@ -6,4 +6,4 @@ test:	all
 
 clean:
 	python setup.py clean
-	rm khmer/*.so
+	/bin/rm -f khmer/*.so
