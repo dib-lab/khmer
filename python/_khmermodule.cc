@@ -1133,7 +1133,7 @@ DL_EXPORT(void) init_khmer(void)
   PyObject * m;
   m = Py_InitModule("_khmer", KhmerMethods);
 
-  KhmerError = PyErr_NewException("_khmer.error", NULL, NULL);
+  KhmerError = PyErr_NewException((char *)"_khmer.error", NULL, NULL);
   Py_INCREF(KhmerError);
 
   PyModule_AddObject(m, "error", KhmerError);
