@@ -101,12 +101,16 @@ namespace khmer {
       if (_table) { delete _table; _table = NULL; }
     }
 
-    const BoundedCounterType get_min(unsigned int index) {
+    const unsigned int get_tablesize() const {
+      return _tablesize;
+    }
+
+    const BoundedCounterType get_min(unsigned int index) const {
       assert(index < _tablesize);
       return _table[index].min_val;
     }
 
-    const BoundedCounterType get_max(unsigned int index) {
+    const BoundedCounterType get_max(unsigned int index) const {
       assert(index < _tablesize);
       return _table[index].max_val;
     }
@@ -158,7 +162,7 @@ namespace khmer {
       }
     }
 
-    void save(const std::string &outputfile) {
+    void save(const std::string &outputfile) const {
       std::ofstream outfile;
       outfile.open(outputfile.c_str(), std::ofstream::binary);
 

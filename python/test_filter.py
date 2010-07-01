@@ -28,10 +28,13 @@ class Test_Filter(object):
         filename = os.path.join(thisdir, 'test_data/simple_1.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
-        n_consumed = ht.consume_fasta(filename)
+        (total_reads, n_consumed) = ht.consume_fasta(filename)
+        assert total_reads == 3, total_reads
         assert n_consumed == 63, n_consumed
 
-        n_seq_kept = ht.filter_fasta_file(filename, outname, 2, 0)
+        (total_reads, n_seq_kept) = khmer.filter_fasta_file(ht, filename,
+                                                            total_reads,
+                                                            outname, 2)
         assert n_seq_kept == 2, n_seq_kept
 
         names = load_fa_seq_names(outname)
@@ -43,10 +46,13 @@ class Test_Filter(object):
         filename = os.path.join(thisdir, 'test_data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
-        n_consumed = ht.consume_fasta(filename)
+        (total_reads, n_consumed) = ht.consume_fasta(filename)
+        assert total_reads == 4, total_reads
         assert n_consumed == 63, n_consumed
 
-        n_seq_kept = ht.filter_fasta_file(filename, outname, 1, 0)
+        (total_reads, n_seq_kept) = khmer.filter_fasta_file(ht, filename,
+                                                            total_reads,
+                                                            outname, 1)
         assert n_seq_kept == 3, n_seq_kept
 
         names = load_fa_seq_names(outname)

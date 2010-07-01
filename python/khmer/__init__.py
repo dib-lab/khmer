@@ -8,6 +8,8 @@ from _khmer import new_minmax
 from _khmer import consume_genome
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 
+from filter_utils import filter_fasta_file
+
 class KmerCount(object):
     def __init__(self, size, report_zero=False):
         self._kt = new_ktable(size)

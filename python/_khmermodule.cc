@@ -4,6 +4,8 @@
 
 #include "Python.h"
 #include "khmer.hh"
+#include "ktable.hh"
+#include "hashtable.hh"
 #include "storage.hh"
 
 //
@@ -391,6 +393,77 @@ typedef struct {
   khmer::Hashtable * hashtable;
 } khmer_KHashtableObject;
 
+typedef struct {
+  PyObject_HEAD
+  khmer::ReadMaskTable * mask;
+} khmer_ReadMaskObject;
+
+#define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
+
+static void khmer_readmask_dealloc(PyObject *);
+static PyObject * khmer_readmask_getattr(PyObject *, char *);
+
+static PyTypeObject khmer_ReadMaskType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "ReadMask", sizeof(khmer_ReadMaskObject),
+    0,
+    khmer_readmask_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_readmask_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "readmask object",           /* tp_doc */
+};
+
+typedef struct {
+  PyObject_HEAD
+  khmer::MinMaxTable * mmt;
+} khmer_MinMaxObject;
+
+
+#define is_minmax_obj(v)  ((v)->ob_type == &khmer_MinMaxType)
+
+static void khmer_minmax_dealloc(PyObject* self);
+static PyObject * khmer_minmax_getattr(PyObject *, char *);
+
+static PyTypeObject khmer_MinMaxType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "MinMax", sizeof(khmer_MinMaxObject),
+    0,
+    khmer_minmax_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_minmax_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "minmax object",           /* tp_doc */
+};
+
+
+
 static void khmer_hashtable_dealloc(PyObject *);
 
 static PyObject * hash_count(PyObject * self, PyObject * args)
@@ -414,23 +487,92 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
   return PyInt_FromLong(1);
 }
 
-static PyObject * hash_filter_fasta_file(PyObject * self, PyObject *args)
+static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
+{
+  khmer_ReadMaskObject * readmask_obj;
+
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename;
+  unsigned int total_reads;
+  PyObject * readmask_py_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "si|O", &filename, &total_reads,
+			&readmask_py_obj)) {
+    return NULL;
+  }
+
+  khmer::ReadMaskTable * readmask = NULL;
+  if (readmask_py_obj) {
+    readmask_obj = (khmer_ReadMaskObject *) readmask_py_obj;
+    readmask = readmask_obj->mask;
+  }
+
+  khmer::MinMaxTable * mmt;
+  mmt = hashtable->fasta_file_to_minmax(filename, total_reads, readmask);
+
+  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
+    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
+
+  minmax_obj->mmt = mmt;
+
+  return (PyObject *) minmax_obj;
+}
+
+static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
-  char * long_str1;
-  char * long_str2;
-  int i, j;
-  unsigned int n_kept;
+  char * filename;
+  unsigned int threshold;
 
-  if (!PyArg_ParseTuple(args, "ssii", &long_str1, &long_str2, &i, &j)) {
+  PyObject * o1 = NULL, * o2 = NULL;
+
+  if (!PyArg_ParseTuple(args, "sOi|O", &filename, &o1, &threshold, &o2)) {
     return NULL;
   }
 
-  n_kept = hashtable->filter_fasta_file(long_str1, long_str2, i, j);
+  khmer::MinMaxTable * mmt;
+  mmt = ((khmer_MinMaxObject *) o1)->mmt;
 
-  // @CTB str memory leak from long_str1/long_str2?
+  khmer::ReadMaskTable * old_readmask = NULL;
+  if (o2) {
+    old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
+  }
+
+  khmer::ReadMaskTable * readmask;
+  readmask = hashtable->filter_fasta_file_max(filename, *mmt, threshold,
+					      old_readmask);
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+
+  readmask_obj->mask = readmask;
+
+  return (PyObject *) readmask_obj;
+}
+
+static PyObject * hash_output_filtered_fasta_file(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * inputfilename;
+  char * outputfilename;
+  PyObject * readmask_obj;
+  unsigned int n_kept;
+
+  if (!PyArg_ParseTuple(args, "ssO", &inputfilename, &outputfilename,
+			&readmask_obj)) {
+    return NULL;
+  }
+
+  khmer::ReadMaskTable * readmask;
+  readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  n_kept = hashtable->output_filtered_fasta_file(inputfilename, outputfilename,
+						 readmask);
 
   return PyInt_FromLong(n_kept);
 }
@@ -446,10 +588,10 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  unsigned int n_consumed;
-  n_consumed = hashtable->consume_fasta(filename);
+  unsigned int n_consumed, total_reads;
+  hashtable->consume_fasta(filename, total_reads, n_consumed);
 
-  return PyInt_FromLong(n_consumed);
+  return Py_BuildValue("ii", total_reads, n_consumed);
 }
 
 static PyObject * hash_consume(PyObject * self, PyObject * args)
@@ -553,7 +695,9 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
-  { "filter_fasta_file", hash_filter_fasta_file, METH_VARARGS, "Filter and trim reads file"},
+  { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
+  { "filter_fasta_file_max", hash_filter_fasta_file_max, METH_VARARGS, "" },
+  { "output_filtered_fasta_file", hash_output_filtered_fasta_file, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
@@ -630,13 +774,6 @@ static void khmer_hashtable_dealloc(PyObject* self)
 //
 // ReadMask object
 //
-
-typedef struct {
-  PyObject_HEAD
-  khmer::ReadMaskTable * mask;
-} khmer_ReadMaskObject;
-
-static void khmer_readmask_dealloc(PyObject *);
 
 static PyObject * readmask_get(PyObject * self, PyObject * args)
 {
@@ -768,32 +905,6 @@ khmer_readmask_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_readmask_methods, obj, name);
 }
 
-#define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
-
-static PyTypeObject khmer_ReadMaskType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "ReadMask", sizeof(khmer_ReadMaskObject),
-    0,
-    khmer_readmask_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_readmask_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "readmask object",           /* tp_doc */
-};
-
 //
 // new_readmask
 //
@@ -830,13 +941,6 @@ static void khmer_readmask_dealloc(PyObject* self)
 //
 // MinMaxTable object
 //
-
-typedef struct {
-  PyObject_HEAD
-  khmer::MinMaxTable * mmt;
-} khmer_MinMaxObject;
-
-static void khmer_minmax_dealloc(PyObject *);
 
 static PyObject * minmax_clear(PyObject * self, PyObject * args)
 {
@@ -991,32 +1095,6 @@ khmer_minmax_getattr(PyObject * obj, char * name)
 {
   return Py_FindMethod(khmer_minmax_methods, obj, name);
 }
-
-#define is_minmax_obj(v)  ((v)->ob_type == &khmer_MinMaxType)
-
-static PyTypeObject khmer_MinMaxType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "MinMax", sizeof(khmer_MinMaxObject),
-    0,
-    khmer_minmax_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_minmax_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "minmax object",           /* tp_doc */
-};
 
 //
 // new_minmax

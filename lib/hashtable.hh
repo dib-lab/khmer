@@ -71,15 +71,24 @@ namespace khmer {
                                 HashIntoType upper_bound = 0);
 
     // count every k-mer in the FASTA file.
-    unsigned int consume_fasta(const std::string &filename,
-			       HashIntoType lower_bound = 0,
-			       HashIntoType upper_bound = 0);
+    void consume_fasta(const std::string &filename,
+		       unsigned int &total_reads,
+		       unsigned int &n_consumed,
+		       HashIntoType lower_bound = 0,
+		       HashIntoType upper_bound = 0);
 
-    // filter/trim through the given FASTA file.
-    unsigned int filter_fasta_file(const std::string &inputfile,
-				   const std::string &outputfile,
-				   int minLength, 
-				   int threshold);
+    MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
+				       unsigned int total_reads,
+				       ReadMaskTable * readmask = NULL);
+
+    ReadMaskTable * filter_fasta_file_max(const std::string &inputfile,
+					  MinMaxTable &minmax,
+					  BoundedCounterType threshold,
+					  ReadMaskTable * readmask = NULL);
+
+    unsigned int output_filtered_fasta_file(const std::string &inputfile,
+					    const std::string &outputfile,
+					    ReadMaskTable * readmask);
 
     // @@CTB doc
     BoundedCounterType get_min_count(const std::string &s,

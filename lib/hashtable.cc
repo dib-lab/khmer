@@ -5,14 +5,122 @@
 using namespace khmer;
 using namespace std;
 
+MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
+					      unsigned int total_reads,
+					      ReadMaskTable * readmask)
+{
+   string line;
+   ifstream infile(inputfile.c_str());
+   int isRead = 0;
+   string name;
+   string seq;
+   unsigned int read_num = 0;
+
+   MinMaxTable * mmt = new MinMaxTable(total_reads);
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 bool valid_read = true;
+	 seq = line;
+	 if (!readmask || readmask->get(read_num)) {
+
+	   for (unsigned int i = 0; i < seq.length(); i++)  {
+	     if (!is_valid_dna(seq[i])) {
+	       valid_read = false;
+	       break;
+	     }
+	   }
+
+	   if (valid_read) {
+	     BoundedCounterType minval = get_min_count(seq);
+	     BoundedCounterType maxval = get_max_count(seq);
+
+	     mmt->add_min(read_num, minval);
+	     mmt->add_max(read_num, maxval);
+	   }
+	   name.clear();
+	   seq.clear();
+	 }
+
+	 read_num += 1;
+       }
+       else {
+	 name = line.substr(1, line.length()-1);
+       }
+
+       isRead = isRead ? 0 : 1;
+     }
+   }
+  
+   infile.close();
+
+   return mmt;
+}
+
 //
 // filter_fasta_file: filter and trims a FASTA file into a new one
 //
 
-unsigned int Hashtable::filter_fasta_file(const std::string &inputfile,
-					  const std::string &outputfile, 
-					  int minLength, 
-					  int threshold)
+ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
+						 MinMaxTable &minmax,
+						 BoundedCounterType threshold,
+						 ReadMaskTable * old_readmask)
+{
+   string line;
+   ifstream infile(inputfile.c_str());
+   int isRead = 0;
+   string name;
+   string seq;
+   unsigned int read_num = 0;
+   ReadMaskTable * readmask = new ReadMaskTable(minmax.get_tablesize());
+
+   if (old_readmask) {
+     readmask->merge(*old_readmask);
+   }
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 seq = line;
+	 if (readmask->get(read_num)) {
+	   BoundedCounterType maxval = minmax.get_max(read_num);
+
+	   if (maxval < threshold) {
+	     readmask->set(read_num, false);
+	   }
+	   name.clear();
+	   seq.clear();
+	 }
+
+	 read_num += 1;
+       }
+       else {
+	 name = line.substr(1, line.length()-1);
+       }
+
+       isRead = isRead ? 0 : 1;
+     }
+   }
+  
+   infile.close();
+
+   return readmask;
+}
+
+unsigned int Hashtable::output_filtered_fasta_file(const std::string &inputfile,
+						   const std::string &outputfile,
+						   ReadMaskTable * readmask)
 {
    string line;
    ifstream infile(inputfile.c_str());
@@ -22,44 +130,34 @@ unsigned int Hashtable::filter_fasta_file(const std::string &inputfile,
    string name;
    string seq;
    unsigned int n_kept = 0;
+   unsigned int read_num = 0;
 
-   if (infile.is_open())
-   {
-      while(!infile.eof())
-      {
-         getline(infile, line);
-         if (line.length() == 0) {
-            break;
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 seq = line;
+
+	 if (readmask->get(read_num)) {
+	     outfile << ">" << name << endl;
+	     outfile << seq << endl;
+
+	     n_kept++;
 	 }
+	 name.clear();
+	 seq.clear();
 
-         if (isRead)
-         {
-	    bool valid_read = true;
-	    seq = line;
+	 read_num++;
+       } else {
+	 name = line.substr(1, line.length()-1);
+       }
 
-	    for (unsigned int i = 0; i < seq.length(); i++)  {
-	      if (!is_valid_dna(seq[i])) {
-		valid_read = false;
-		break;
-	      }
-	    }
-
-            if (valid_read && get_max_count(seq) >= minLength) {
-               outfile << ">" << name << endl;
-               outfile << seq << endl;
-
-	       n_kept++;
-            }
-            name.clear();
-            seq.clear();
-         }
-         else
-         {
-            name = line.substr(1, line.length()-1);
-         }
-
-         isRead = isRead? 0 : 1;
-      }
+       isRead = isRead? 0 : 1;
+     }
    }
   
    infile.close();
@@ -97,14 +195,18 @@ unsigned int Hashtable::checkAndProcessRead(const std::string &read,
 //
 // consume_fasta: consume a FASTA file of reads
 //
-unsigned int Hashtable::consume_fasta(const std::string &filename,
-                              HashIntoType lower_bound,
-                              HashIntoType upper_bound)
+
+void Hashtable::consume_fasta(const std::string &filename,
+			       unsigned int &total_reads,
+			       unsigned int &n_consumed,
+			       HashIntoType lower_bound,
+			       HashIntoType upper_bound)
 {
+   total_reads = 0;
+   n_consumed = 0;
+
    string line;
    ifstream infile(filename.c_str());
-
-   unsigned int n_consumed=0, n=0;
 
    string currName = "";
    string currSeq = "";
@@ -115,9 +217,9 @@ unsigned int Hashtable::consume_fasta(const std::string &filename,
 
          if (line[0] == '>')  {
             if (currSeq != "")  {
-               n++;
-               if (n % 10000 == 0) { // @CTB remove me
-                  cout << n << endl;
+               total_reads++;
+               if (total_reads % 10000 == 0) { // @CTB remove me
+                  cout << total_reads << endl;
 	       }
 
                n_consumed += checkAndProcessRead(currSeq, lower_bound,
@@ -133,12 +235,11 @@ unsigned int Hashtable::consume_fasta(const std::string &filename,
    }
 
    if (currSeq != "")  {
-      n_consumed += checkAndProcessRead(currSeq, lower_bound, upper_bound);
+     total_reads++;
+     n_consumed += checkAndProcessRead(currSeq, lower_bound, upper_bound);
    }
 
    infile.close();
-
-   return n_consumed;
 }
 
 //
