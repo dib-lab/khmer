@@ -1,8 +1,12 @@
+import os
+import tempfile
+import shutil
+
 import khmer
 
 MINMAXTABLE_SIZE=50
 
-class Test_Basic:
+class Test_Basic(object):
     def __init__(self):
         self.mmt = khmer.new_minmax(MINMAXTABLE_SIZE)
 
@@ -111,3 +115,64 @@ class Test_Basic:
         
         v = mmt.get_max(0)
         assert v == 5, v
+        
+class Test_Filestuff(object):
+    def __init__(self):
+        self.mmt = khmer.new_minmax(MINMAXTABLE_SIZE)
+        self.tempdir = tempfile.mkdtemp()
+        self.filename = os.path.join(self.tempdir, 'tst')
+
+    def test_saveload(self):
+        mmt = self.mmt
+
+        for i in range(0, MINMAXTABLE_SIZE):
+            mmt.add_min(i, i)
+            mmt.add_max(i, MINMAXTABLE_SIZE-i)
+
+        mmt.save(self.filename)
+
+        mmt2 = khmer.new_minmax(0)
+        mmt2.load(self.filename)
+
+        for i in range(0, MINMAXTABLE_SIZE):
+            assert mmt.get_min(i) == mmt2.get_min(i)
+            assert mmt.get_min(i) == i
+            
+            assert mmt.get_max(i) == mmt2.get_max(i)
+            assert mmt.get_max(i) == MINMAXTABLE_SIZE - i
+
+    def test_save_no_load(self):
+        mmt = self.mmt
+
+        for i in range(0, MINMAXTABLE_SIZE):
+            mmt.add_min(i, i)
+            mmt.add_max(i, MINMAXTABLE_SIZE-i)
+
+        mmt.save(self.filename)
+
+        mmt2 = khmer.new_minmax(MINMAXTABLE_SIZE)
+        # no load!
+
+        try:
+            for i in range(0, MINMAXTABLE_SIZE):
+                if mmt2.get_min(i) != mmt.get_min(i):
+                    raise Exception         # supposed to happen!
+
+            assert 0
+        except AssertionError:
+            raise
+        except Exception:
+            pass
+
+        try:
+            for i in range(0, MINMAXTABLE_SIZE):
+                if mmt2.get_max(i) != mmt.get_max(i):
+                    raise Exception         # supposed to happen!
+            assert 0
+        except AssertionError:
+            raise
+        except Exception:
+            pass
+                
+    def teardown(self):
+        shutil.rmtree(self.tempdir)

@@ -940,6 +940,40 @@ static PyObject * minmax_merge(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * minmax_save(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+
+  khmer::MinMaxTable * mmt = me->mmt;
+  char * filename;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  mmt->save(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * minmax_load(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+
+  khmer::MinMaxTable * mmt = me->mmt;
+  char * filename;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  mmt->load(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef khmer_minmax_methods[] = {
   { "get_min", minmax_get_min, METH_VARARGS, "" },
   { "get_max", minmax_get_max, METH_VARARGS, "" },
@@ -947,6 +981,8 @@ static PyMethodDef khmer_minmax_methods[] = {
   { "add_max", minmax_add_max, METH_VARARGS, "" },
   { "clear", minmax_clear, METH_VARARGS, "" },
   { "merge", minmax_merge, METH_VARARGS, "" },
+  { "load", minmax_load, METH_VARARGS, "" },
+  { "save", minmax_save, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

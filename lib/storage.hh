@@ -76,16 +76,18 @@ namespace khmer {
   typedef struct {
     BoundedCounterType min_val;
     BoundedCounterType max_val;
-  } MinMaxValue;;
+  } MinMaxValue;
 
   class MinMaxTable {
   protected:
     const unsigned int _tablesize;
     MinMaxValue * _table;
 
-    void _allocate() {
+    void _allocate(bool initialize=true) {
       _table = new MinMaxValue[_tablesize];
-      memset(_table, 0, sizeof(MinMaxValue) * _tablesize);
+      if (initialize) {
+	memset(_table, 0, sizeof(MinMaxValue) * _tablesize);
+      }
     }
 
   public:
@@ -153,6 +155,26 @@ namespace khmer {
 	this->add_min(i, other.get_min(i));
 	this->add_max(i, other.get_max(i));
       }
+    }
+
+    void save(const std::string &outputfile) {
+      std::ofstream outfile;
+      outfile.open(outputfile.c_str(), std::ofstream::binary);
+
+      outfile.write((const char *) &_tablesize, sizeof(_tablesize));
+      outfile.write((const char *) _table, _tablesize * sizeof(MinMaxValue));
+      outfile.close();
+    }
+
+    void load(const std::string &inputfile) {
+      std::ifstream infile;
+      infile.open(inputfile.c_str(), std::ifstream::binary);
+
+      infile.read((char *) &_tablesize, sizeof(_tablesize));
+      _allocate(false);
+      infile.read((char *) _table, _tablesize * sizeof(MinMaxValue));
+
+      infile.close();
     }
   };
 
