@@ -769,6 +769,174 @@ static void khmer_readmask_dealloc(PyObject* self)
   PyObject_Del((PyObject *) obj);
 }
 
+//
+// MinMaxTable object
+//
+
+typedef struct {
+  PyObject_HEAD
+  khmer::MinMaxTable * mmt;
+} khmer_MinMaxObject;
+
+static void khmer_minmax_dealloc(PyObject *);
+
+static PyObject * minmax_clear(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  unsigned int index;
+
+  if (!PyArg_ParseTuple(args, "I", &index)) {
+    return NULL;
+  }
+
+  mmt->clear(index);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * minmax_get_min(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  unsigned int index;
+
+  if (!PyArg_ParseTuple(args, "I", &index)) {
+    return NULL;
+  }
+
+  unsigned int val = mmt->get_min(index);
+
+  return PyInt_FromLong(val);
+}
+
+static PyObject * minmax_get_max(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  unsigned int index;
+
+  if (!PyArg_ParseTuple(args, "I", &index)) {
+    return NULL;
+  }
+
+  unsigned int val = mmt->get_max(index);
+
+  return PyInt_FromLong(val);
+}
+
+static PyObject * minmax_add_min(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  unsigned int index;
+  unsigned int val;
+
+  if (!PyArg_ParseTuple(args, "II", &index, &val)) {
+    return NULL;
+  }
+
+  val = mmt->add_min(index, val);
+  
+  return PyInt_FromLong(val);
+}
+
+static PyObject * minmax_add_max(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  unsigned int index;
+  unsigned int val;
+
+  if (!PyArg_ParseTuple(args, "II", &index, &val)) {
+    return NULL;
+  }
+
+  val = mmt->add_max(index, val);
+  
+  return PyInt_FromLong(val);
+}
+
+static PyMethodDef khmer_minmax_methods[] = {
+  { "get_min", minmax_get_min, METH_VARARGS, "" },
+  { "get_max", minmax_get_max, METH_VARARGS, "" },
+  { "add_min", minmax_add_min, METH_VARARGS, "" },
+  { "add_max", minmax_add_max, METH_VARARGS, "" },
+  { "clear", minmax_clear, METH_VARARGS, "" },
+  {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyObject *
+khmer_minmax_getattr(PyObject * obj, char * name)
+{
+  return Py_FindMethod(khmer_minmax_methods, obj, name);
+}
+
+#define is_minmax_obj(v)  ((v)->ob_type == &khmer_MinMaxType)
+
+static PyTypeObject khmer_MinMaxType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "MinMax", sizeof(khmer_MinMaxObject),
+    0,
+    khmer_minmax_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_minmax_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "minmax object",           /* tp_doc */
+};
+
+//
+// new_minmax
+//
+
+static PyObject* new_minmax(PyObject * self, PyObject * args)
+{
+  unsigned int size = 0;
+
+  if (!PyArg_ParseTuple(args, "I", &size)) {
+    return NULL;
+  }
+
+  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
+    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
+
+  minmax_obj->mmt = new khmer::MinMaxTable(size);
+
+  return (PyObject *) minmax_obj;
+}
+
+//
+// khmer_minmax_dealloc -- clean up a minmax object.
+//
+
+static void khmer_minmax_dealloc(PyObject* self)
+{
+  khmer_MinMaxObject * obj = (khmer_MinMaxObject *) self;
+  delete obj->mmt;
+  obj->mmt = NULL;
+  
+  PyObject_Del((PyObject *) obj);
+}
+
 
 //////////////////////////////
 // standalone functions
@@ -835,6 +1003,7 @@ static PyMethodDef KhmerMethods[] = {
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty hashtable" },
   { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
+  { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },
   { "forward_hash", forward_hash, METH_VARARGS, "", },
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
