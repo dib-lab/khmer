@@ -168,7 +168,7 @@ def test_get_mincount_rc():
    assert x == 2
 
 def test_64bitshift():
-   kh = khmer.new_hashtable(25, 4**15)
+   kh = khmer.new_hashtable(25, 4**10)
    fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"
    substr =    "ATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGC"
    
