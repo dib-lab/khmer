@@ -7,6 +7,8 @@
 #include <string>
 #include <assert.h>
 
+#include "khmer.hh"
+
 // test validity
 #define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
 			  (toupper(ch)) == 'G' || (toupper(ch)) == 'T')
@@ -26,10 +28,6 @@
 
 
 namespace khmer {
-  typedef unsigned long long int ExactCounterType;
-  typedef unsigned long long int HashIntoType;
-  typedef unsigned char WordLength;
-
   // two-way hash functions.
   HashIntoType _hash(const char * kmer, WordLength k);
   HashIntoType _hash(const char * kmer, WordLength k,
@@ -116,6 +114,6 @@ namespace khmer {
     void update(const KTable &other);
     KTable * intersect(const KTable &other) const;
   };
-}
+};
 
 #endif // KTABLE_HH

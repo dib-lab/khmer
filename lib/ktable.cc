@@ -1,8 +1,10 @@
 #include <assert.h>
-#include "ktable.hh"
 #include <math.h>
 #include <string>
 #include <iostream>
+
+#include "khmer.hh"
+#include "ktable.hh"
 
 using namespace std;
 using namespace khmer;

@@ -1,15 +1,13 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-#include "khmer.hh"
 #include <fstream>
 #include <string>
 
-#define MAX_COUNT 255
+#include "khmer.hh"
+#include "storage.hh"
 
 namespace khmer {
-  typedef unsigned char BoundedCounterType;
-
   class Hashtable {
   protected:
     const WordLength _ksize;
@@ -67,7 +65,7 @@ namespace khmer {
 				HashIntoType lower_bound = 0,
 				HashIntoType upper_bound = 0);
 
-    // checks each read for non-ACGT characters
+    // checks each read for non-ACGT characters  // @CTB protected?
     unsigned int checkAndProcessRead(const std::string &read,
                                 HashIntoType lower_bound = 0,
                                 HashIntoType upper_bound = 0);

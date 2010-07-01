@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include "khmer.hh"
+#include "ktable.hh"
 #include "hashtable.hh"
 
 namespace khmer {
