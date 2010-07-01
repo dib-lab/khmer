@@ -717,12 +717,48 @@ static PyObject * readmask_merge(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * readmask_save(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+
+  khmer::ReadMaskTable * mask = me->mask;
+  char * filename;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  mask->save(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * readmask_load(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+
+  khmer::ReadMaskTable * mask = me->mask;
+  char * filename;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  mask->load(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 static PyMethodDef khmer_readmask_methods[] = {
   { "get", readmask_get, METH_VARARGS, "" },
   { "set", readmask_set, METH_VARARGS, "" },
   { "do_and", readmask_and, METH_VARARGS, "" },
   { "merge", readmask_merge, METH_VARARGS, "" },
+  { "save", readmask_save, METH_VARARGS, "" },
+  { "load", readmask_load, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

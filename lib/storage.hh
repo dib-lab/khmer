@@ -11,10 +11,12 @@ namespace khmer {
     const unsigned int _tablesize;
     unsigned char * _mask;
 
-    void _allocate() {
+    void _allocate(bool initialize=true) {
       _mask = new unsigned char[_tablesize];
-      for (unsigned int i = 0; i < _tablesize; i++) {
-	_mask[i] = 1;
+      if (initialize) {
+	for (unsigned int i = 0; i < _tablesize; i++) {
+	  _mask[i] = 1;
+	}
       }
     }
 
@@ -29,20 +31,43 @@ namespace khmer {
     }
 
     const bool get(unsigned int index) {
-      assert(index < _tablesize);
+      if (index >= _tablesize) { return false; } // @CTB throw?
+
       return _mask[index];
     }
 
     void set(unsigned int index, bool keep) {
-      assert(index < _tablesize);
+      if (index >= _tablesize) { return; } // @CTB throw?
+
       _mask[index] = keep ? 1 : 0;
     }
 
     void merge(ReadMaskTable &other) {
-      assert(this->_tablesize == other._tablesize);
+      if (this ->_tablesize != other._tablesize) { return; } // @CTB throw?
+
       for (unsigned int i = 0; i < _tablesize; i++) {
 	_mask[i] = _mask[i] && other._mask[i] ? 1 : 0;
       }
+    }
+
+    void save(const std::string &outputfile) {
+      std::ofstream outfile;
+      outfile.open(outputfile.c_str(), std::ofstream::binary);
+
+      outfile.write((const char *) &_tablesize, sizeof(_tablesize));
+      outfile.write((const char *) _mask, _tablesize);
+      outfile.close();
+    }
+
+    void load(const std::string &inputfile) {
+      std::ifstream infile;
+      infile.open(inputfile.c_str(), std::ifstream::binary);
+
+      infile.read((char *) &_tablesize, sizeof(_tablesize));
+      _allocate(false);
+      infile.read((char *) _mask, _tablesize);
+
+      infile.close();
     }
   };
 
