@@ -9,10 +9,10 @@ using namespace std;
 // filter_fasta_file: filter and trims a FASTA file into a new one
 //
 
-void Hashtable::filter_fasta_file(const std::string &inputfile,
-                                  const std::string &outputfile, 
-                                  int minLength, 
-                                  int threshold)
+unsigned int Hashtable::filter_fasta_file(const std::string &inputfile,
+					  const std::string &outputfile, 
+					  int minLength, 
+					  int threshold)
 {
    string line;
    ifstream infile(inputfile.c_str());
@@ -21,24 +21,35 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
    int isRead = 0;
    string name;
    string seq;
+   unsigned int n_kept = 0;
 
    if (infile.is_open())
    {
       while(!infile.eof())
       {
          getline(infile, line);
-         if (line.length() == 0)
+         if (line.length() == 0) {
             break;
+	 }
 
          if (isRead)
          {
-            seq = line;
+	    bool valid_read = true;
+	    seq = line;
 
-            if (get_max_count(seq) >= minLength) {
+	    for (unsigned int i = 0; i < seq.length(); i++)  {
+	      if (!is_valid_dna(seq[i])) {
+		valid_read = false;
+		break;
+	      }
+	    }
+
+            if (valid_read && get_max_count(seq) >= minLength) {
                outfile << ">" << name << endl;
                outfile << seq << endl;
-            }
 
+	       n_kept++;
+            }
             name.clear();
             seq.clear();
          }
@@ -53,6 +64,8 @@ void Hashtable::filter_fasta_file(const std::string &inputfile,
   
    infile.close();
    outfile.close();
+
+   return n_kept;
 }
 
 //
@@ -64,17 +77,16 @@ unsigned int Hashtable::checkAndProcessRead(const std::string &read,
                                             HashIntoType upper_bound)
 {
    unsigned int i;
+   bool is_valid = true;
 
    for (i = 0; i < read.length(); i++)  {
-      if (!(read[i] == 'A' ||
-            read[i] == 'C' ||
-            read[i] == 'G' ||
-            read[i] == 'T'))  {
+     if (!is_valid_dna(read[i])) {
+         is_valid = false;
          break;
       }
    }
 
-   if (i == read.length())  {
+   if (is_valid) {
       return consume_string(read, lower_bound, upper_bound);
    }
    else  {
@@ -104,10 +116,12 @@ unsigned int Hashtable::consume_fasta(const std::string &filename,
          if (line[0] == '>')  {
             if (currSeq != "")  {
                n++;
-               if (n % 10000 == 0)
+               if (n % 10000 == 0) { // @CTB remove me
                   cout << n << endl;
+	       }
 
-               n_consumed += checkAndProcessRead(currSeq, lower_bound, upper_bound);
+               n_consumed += checkAndProcessRead(currSeq, lower_bound,
+						 upper_bound);
                currSeq = "";
             }
             currName = line.substr(1, line.length()-1);

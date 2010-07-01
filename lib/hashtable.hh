@@ -78,10 +78,10 @@ namespace khmer {
 			       HashIntoType upper_bound = 0);
 
     // filter/trim through the given FASTA file.
-    void filter_fasta_file(const std::string &inputfile,
-                           const std::string &outputfile,
-                           int minLength, 
-                           int threshold);
+    unsigned int filter_fasta_file(const std::string &inputfile,
+				   const std::string &outputfile,
+				   int minLength, 
+				   int threshold);
 
     // @@CTB doc
     BoundedCounterType get_min_count(const std::string &s,

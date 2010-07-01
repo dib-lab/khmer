@@ -422,16 +422,17 @@ static PyObject * hash_filter_fasta_file(PyObject * self, PyObject *args)
   char * long_str1;
   char * long_str2;
   int i, j;
+  unsigned int n_kept;
 
   if (!PyArg_ParseTuple(args, "ssii", &long_str1, &long_str2, &i, &j)) {
     return NULL;
   }
 
-  hashtable->filter_fasta_file(long_str1, long_str2, i, j);
+  n_kept = hashtable->filter_fasta_file(long_str1, long_str2, i, j);
 
   // @CTB str memory leak from long_str1/long_str2?
 
-  return PyInt_FromLong(0);
+  return PyInt_FromLong(n_kept);
 }
 
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)

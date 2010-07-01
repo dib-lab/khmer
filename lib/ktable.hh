@@ -7,6 +7,10 @@
 #include <string>
 #include <assert.h>
 
+// test validity
+#define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
+			  (toupper(ch)) == 'G' || (toupper(ch)) == 'T')
+
 // bit representation of A/T/C/G.
 #define twobit_repr(ch) ((toupper(ch)) == 'A' ? 0LL : \
                          (toupper(ch)) == 'T' ? 1LL : \
