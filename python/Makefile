@@ -3,3 +3,7 @@ all:
 
 test:	all
 	nosetests
+
+clean:
+	python setup.py clean
+	rm khmer/*.so
