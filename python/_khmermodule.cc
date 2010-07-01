@@ -4,6 +4,7 @@
 
 #include "Python.h"
 #include "khmer.hh"
+#include "storage.hh"
 
 //
 // Function necessary for Python loading:
@@ -625,6 +626,150 @@ static void khmer_hashtable_dealloc(PyObject* self)
   PyObject_Del((PyObject *) obj);
 }
 
+//
+// ReadMask object
+//
+
+typedef struct {
+  PyObject_HEAD
+  khmer::ReadMaskTable * mask;
+} khmer_ReadMaskObject;
+
+static void khmer_readmask_dealloc(PyObject *);
+
+static PyObject * readmask_get(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+  khmer::ReadMaskTable * mask = me->mask;
+
+  khmer::BoundedCounterType val;
+  unsigned int index;
+
+  if (!PyArg_ParseTuple(args, "I", &index)) {
+    return NULL;
+  }
+
+  val = mask->get(index);
+
+  return PyBool_FromLong(val);
+}
+
+static PyObject * readmask_set(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+  khmer::ReadMaskTable * mask = me->mask;
+
+  unsigned int index;
+  unsigned int setval;
+
+  if (!PyArg_ParseTuple(args, "II", &index, &setval)) {
+    return NULL;
+  }
+
+  if (setval) { mask->set(index, 1); }
+  else { mask->set(index, 0); }
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * readmask_and(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+  khmer::ReadMaskTable * mask = me->mask;
+
+  khmer::BoundedCounterType val;
+  unsigned int index;
+  unsigned int setval;
+
+  if (!PyArg_ParseTuple(args, "II", &index, &setval)) {
+    return NULL;
+  }
+
+  val = mask->get(index);
+
+  if (setval && val) { val = 1; } 
+  else { val = 0; }
+
+  mask->set(index, val);
+  
+  return PyBool_FromLong(val);
+}
+
+
+static PyMethodDef khmer_readmask_methods[] = {
+  { "get", readmask_get, METH_VARARGS, "" },
+  { "set", readmask_set, METH_VARARGS, "" },
+  { "do_and", readmask_and, METH_VARARGS, "" },
+  {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyObject *
+khmer_readmask_getattr(PyObject * obj, char * name)
+{
+  return Py_FindMethod(khmer_readmask_methods, obj, name);
+}
+
+#define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
+
+static PyTypeObject khmer_ReadMaskType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "ReadMask", sizeof(khmer_ReadMaskObject),
+    0,
+    khmer_readmask_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_readmask_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "readmask object",           /* tp_doc */
+};
+
+//
+// new_readmask
+//
+
+static PyObject* new_readmask(PyObject * self, PyObject * args)
+{
+  unsigned int size = 0;
+
+  if (!PyArg_ParseTuple(args, "I", &size)) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+
+  readmask_obj->mask = new khmer::ReadMaskTable(size);
+
+  return (PyObject *) readmask_obj;
+}
+
+//
+// khmer_readmask_dealloc -- clean up a readmask object.
+//
+
+static void khmer_readmask_dealloc(PyObject* self)
+{
+  khmer_ReadMaskObject * obj = (khmer_ReadMaskObject *) self;
+  delete obj->mask;
+  obj->mask = NULL;
+  
+  PyObject_Del((PyObject *) obj);
+}
+
+
 //////////////////////////////
 // standalone functions
 
@@ -689,6 +834,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
 static PyMethodDef KhmerMethods[] = {
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty hashtable" },
+  { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },
   { "forward_hash", forward_hash, METH_VARARGS, "", },
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },

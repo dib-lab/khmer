@@ -6,3 +6,5 @@ also, can probably arrange parallelization split & hash table size so
 that modulus exactly fills split portion of table.
 
 mismatch hashing - compute min num - each base
+
+copyright, C++ file comments at top
