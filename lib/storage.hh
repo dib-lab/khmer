@@ -36,7 +36,15 @@ namespace khmer {
       if (_mask) { delete _mask; _mask = NULL; }
     }
 
-    const bool get(unsigned int index) {
+    const unsigned int n_kept() const {
+      unsigned int n = 0;
+      for (unsigned int i = 0; i < _tablesize; i++) {
+	if (_mask[i]) { n++; }
+      }
+      return n;
+    }
+
+    const bool get(unsigned int index) const {
       if (index >= _tablesize) { return false; } // @CTB throw?
 
       return _mask[index];

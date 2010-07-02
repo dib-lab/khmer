@@ -623,15 +623,72 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename;
+  PyObject * readmask_obj = NULL;
+  PyObject * update_readmask_bool = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
+  if (!PyArg_ParseTuple(args, "s|iiOO", &filename, &lower_bound, &upper_bound,
+			&readmask_obj, &update_readmask_bool)) {
     return NULL;
   }
 
+  if (update_readmask_bool && !PyBool_Check(update_readmask_bool)) {
+    return NULL;
+  }
+
+  bool update_readmask = false;
+  khmer::ReadMaskTable * readmask = NULL;
+
+  if (readmask_obj) {
+    if (update_readmask_bool == Py_True) {
+      update_readmask = true;
+    }
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  }
+
   unsigned int n_consumed, total_reads;
-  hashtable->consume_fasta(filename, total_reads, n_consumed);
+  hashtable->consume_fasta(filename, total_reads, n_consumed,
+			   lower_bound, upper_bound, &readmask,
+			   update_readmask);
+
+  // this should still be null!
+  if (!update_readmask && !readmask_obj) {
+    assert(readmask == NULL);
+  }
 
   return Py_BuildValue("ii", total_reads, n_consumed);
+}
+
+// Does this contain a memory leak?
+
+static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+
+  if (!PyArg_ParseTuple(args, "s|ii", &filename, &lower_bound, &upper_bound)) {
+    return NULL;
+  }
+
+  khmer::ReadMaskTable * readmask = NULL;
+  unsigned int n_consumed, total_reads;
+
+  // this will allocate 'readmask' and fill it in.
+  hashtable->consume_fasta(filename, total_reads, n_consumed,
+			   lower_bound, upper_bound, &readmask, true);
+
+  if (!readmask) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *)	\
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+  readmask_obj->mask = readmask;
+
+  return Py_BuildValue("iiO", total_reads, n_consumed, readmask_obj);
 }
 
 static PyObject * hash_consume(PyObject * self, PyObject * args)
@@ -736,6 +793,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_build_readmask", hash_consume_fasta_build_readmask, METH_VARARGS, "Count all k-mers in a given file, creating a readmask object to mask off bad reads" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "filter_fasta_file_max", hash_filter_fasta_file_max, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
@@ -830,6 +888,22 @@ static PyObject * readmask_get(PyObject * self, PyObject * args)
   val = mask->get(index);
 
   return PyBool_FromLong(val);
+}
+
+static PyObject * readmask_n_kept(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+  khmer::ReadMaskTable * mask = me->mask;
+
+  unsigned int n_kept;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  n_kept = mask->n_kept();
+
+  return PyInt_FromLong(n_kept);
 }
 
 static PyObject * readmask_set(PyObject * self, PyObject * args)
@@ -945,6 +1019,7 @@ static PyObject * readmask_filter_fasta_file(PyObject * self, PyObject *args)
 }
 
 static PyMethodDef khmer_readmask_methods[] = {
+  { "n_kept", readmask_n_kept, METH_VARARGS, "" },
   { "get", readmask_get, METH_VARARGS, "" },
   { "set", readmask_set, METH_VARARGS, "" },
   { "do_and", readmask_and, METH_VARARGS, "" },
