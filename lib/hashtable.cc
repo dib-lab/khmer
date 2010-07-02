@@ -118,9 +118,9 @@ ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
    return readmask;
 }
 
-unsigned int Hashtable::output_filtered_fasta_file(const std::string &inputfile,
-						   const std::string &outputfile,
-						   ReadMaskTable * readmask)
+unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
+					       const std::string &outputfile,
+					       ReadMaskTable * readmask)
 {
    string line;
    ifstream infile(inputfile.c_str());

@@ -554,29 +554,6 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
   return (PyObject *) readmask_obj;
 }
 
-static PyObject * hash_output_filtered_fasta_file(PyObject * self, PyObject *args)
-{
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
-
-  char * inputfilename;
-  char * outputfilename;
-  PyObject * readmask_obj;
-  unsigned int n_kept;
-
-  if (!PyArg_ParseTuple(args, "ssO", &inputfilename, &outputfilename,
-			&readmask_obj)) {
-    return NULL;
-  }
-
-  khmer::ReadMaskTable * readmask;
-  readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
-  n_kept = hashtable->output_filtered_fasta_file(inputfilename, outputfilename,
-						 readmask);
-
-  return PyInt_FromLong(n_kept);
-}
-
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -697,7 +674,6 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "filter_fasta_file_max", hash_filter_fasta_file_max, METH_VARARGS, "" },
-  { "output_filtered_fasta_file", hash_output_filtered_fasta_file, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
@@ -888,6 +864,21 @@ static PyObject * readmask_load(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * readmask_filter_fasta_file(PyObject * self, PyObject *args)
+{
+  char * inputfilename;
+  char * outputfilename;
+  khmer::ReadMaskTable * readmask = ((khmer_ReadMaskObject *) self)->mask;
+
+  if (!PyArg_ParseTuple(args, "ss", &inputfilename, &outputfilename)) {
+    return NULL;
+  }
+
+  unsigned int n_kept;
+  n_kept = readmask->filter_fasta_file(inputfilename, outputfilename);
+
+  return PyInt_FromLong(n_kept);
+}
 
 static PyMethodDef khmer_readmask_methods[] = {
   { "get", readmask_get, METH_VARARGS, "" },
@@ -896,6 +887,7 @@ static PyMethodDef khmer_readmask_methods[] = {
   { "merge", readmask_merge, METH_VARARGS, "" },
   { "save", readmask_save, METH_VARARGS, "" },
   { "load", readmask_load, METH_VARARGS, "" },
+  { "filter_fasta_file", readmask_filter_fasta_file, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -1185,7 +1177,6 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
 
   return PyString_FromString(khmer::_revhash(val, ksize).c_str());
 }
-
 
 //
 // Module machinery.

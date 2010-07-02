@@ -86,10 +86,6 @@ namespace khmer {
 					  BoundedCounterType threshold,
 					  ReadMaskTable * readmask = NULL);
 
-    unsigned int output_filtered_fasta_file(const std::string &inputfile,
-					    const std::string &outputfile,
-					    ReadMaskTable * readmask);
-
     // @@CTB doc
     BoundedCounterType get_min_count(const std::string &s,
 				     HashIntoType lower_bound = 0,

@@ -57,3 +57,17 @@ class Test_Filter(object):
 
         names = load_fa_seq_names(outname)
         assert names == ['1', '2', '3']
+
+    def test_readmask(self):
+        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        outname = os.path.join(self.tempdir, 'test_filter.out')
+
+        readmask = khmer.new_readmask(4)
+        readmask.set(1, False)
+        readmask.set(2, False)
+        readmask.set(3, False)
+
+        readmask.filter_fasta_file(filename, outname)
+
+        names = load_fa_seq_names(outname)
+        assert names == ['1'], names

@@ -7,6 +7,11 @@
 #include "hashtable.hh"
 
 namespace khmer {
+  class ReadMaskTable;
+  unsigned int output_filtered_fasta_file(const std::string &inputfile,
+					  const std::string &outputfile,
+					  ReadMaskTable * readmask);
+
   class ReadMaskTable {
   protected:
     const unsigned int _tablesize;
@@ -69,6 +74,11 @@ namespace khmer {
       infile.read((char *) _mask, _tablesize);
 
       infile.close();
+    }
+
+    unsigned int filter_fasta_file(const std::string &inputfile,
+				   const std::string &outputfile) {
+      return output_filtered_fasta_file(inputfile, outputfile, this);
     }
   };
 
