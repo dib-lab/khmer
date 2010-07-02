@@ -43,8 +43,8 @@ namespace khmer {
 	if (_counts[i]) {
 	  n++;
 	}
-	return n;
       }
+      return n;
     }
 
     void count(const char * kmer) {

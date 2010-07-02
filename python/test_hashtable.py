@@ -183,6 +183,8 @@ class Test_ConsumeString(object):
         assert self.kh.n_occupied() == 0
         n = self.kh.consume('AAAA')
         assert self.kh.n_occupied() == 1
+        n = self.kh.consume('AACT')
+        assert self.kh.n_occupied() == 2
 
     def test_simple(self):
         n = self.kh.consume('AAAA')
