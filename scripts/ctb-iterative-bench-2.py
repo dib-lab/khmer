@@ -47,6 +47,26 @@ primes = [100000007,
           100000357,
           100000379]
 
+primes = [75000007,
+          75000017,
+          75000031,
+          75000047,
+          75000071,
+          75000083,
+          75000097,
+          75000103,
+          75000113,
+          75000143,
+          75000157,
+          75000169,
+          75000173,
+          75000179,
+          75000181,
+          75000187,
+          75000197,
+          75000227,
+          75000241]
+
 ###
 
 this_filename = filename
@@ -66,7 +86,7 @@ for n, prime in enumerate(primes):
 
     print '%d: kept %d of %d (%.1f%%)' % (n, n_seq_kept, total_reads, n_seq_kept/float(total_reads)*100)
 
-    fp.write('%d %d\n' % (n, n_seq_kept))
+    fp.write('%d %d %d\n' % (n, n_seq_kept, ht_small.n_occupied()))
     fp.flush()
 
     this_filename = next_filename
