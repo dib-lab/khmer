@@ -73,27 +73,27 @@ this_filename = filename
 readmask = None
 
 for n, prime in enumerate(primes):
-    ht_small = khmer.new_hashtable(15, prime)
+    ht = khmer.new_hashtable(15, prime)
 
     if not readmask:
-        x = ht_small.consume_fasta_build_readmask(this_filename)
+        x = ht.consume_fasta_build_readmask(this_filename)
         total_reads, n_consumed, readmask = x
     else:
-        total_reads, n_consumed = ht_small.consume_fasta(this_filename, 0, 0,
-                                                         readmask)
+        total_reads, n_consumed = ht.consume_fasta(this_filename, 0, 0,
+                                                   readmask)
         
     print '%d: ate %d k-mers of %d reads' % (n, n_consumed, total_reads)
 
     print 'filtering...'
-    minmax = ht_small.fasta_file_to_minmax(this_filename, total_reads)
-    readmask = ht_small.filter_fasta_file_max(this_filename, minmax,
-                                              5, readmask)
+    minmax = ht.fasta_file_to_minmax(this_filename, total_reads)
+    readmask = ht.filter_fasta_file_max(this_filename, minmax,
+                                        5, readmask)
 
     n_seq_kept = readmask.n_kept()
 
     print '%d: kept %d of %d (%.1f%%)' % (n, n_seq_kept, total_reads, n_seq_kept/float(total_reads)*100)
 
-    fp.write('%d %d %d\n' % (n, n_seq_kept, ht_small.n_occupied()))
+    fp.write('%d %d %d\n' % (n, n_seq_kept, ht.n_occupied()))
     fp.flush()
 
 ###
