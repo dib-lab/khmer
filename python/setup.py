@@ -18,6 +18,6 @@ setup(name = "khmer", version = "0.2",
       author = 'C. Titus Brown and Jason Pell',
       author_email = 'ctb@msu.edu',
       url = 'http://ged.msu.edu/',
-      license='BSD',
+      license='New BSD License',
       packages = [py_mod,],
       ext_modules = [extension_mod,])
