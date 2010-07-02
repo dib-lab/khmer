@@ -16,7 +16,7 @@ py_mod = 'khmer'
 setup(name = "khmer", version = "0.2",
       description = 'khmer k-mer counting library',
       author = 'C. Titus Brown',
-      author_email = 'titus@caltech.edu',
+      author_email = 'ctb@msu.edu',
       url = 'http://cartwheel.caltech.edu/',
       packages = [py_mod,],
       ext_modules = [extension_mod,])
