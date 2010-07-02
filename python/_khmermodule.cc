@@ -515,6 +515,20 @@ static PyTypeObject khmer_MinMaxType = {
 
 static void khmer_hashtable_dealloc(PyObject *);
 
+static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  khmer::HashIntoType n = hashtable->n_occupied();
+
+  return PyInt_FromLong(n);
+}
+
 static PyObject * hash_count(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -718,6 +732,7 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
 }
 
 static PyMethodDef khmer_hashtable_methods[] = {
+  { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },

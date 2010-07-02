@@ -36,6 +36,17 @@ namespace khmer {
     // accessors to get table info
     const HashIntoType n_entries() const { return _tablesize; }
 
+    // count number of occupied bins
+    const HashIntoType n_occupied() const {
+      HashIntoType n = 0;
+      for (HashIntoType i = 0; i < _tablesize; i++) {
+	if (_counts[i]) {
+	  n++;
+	}
+	return n;
+      }
+    }
+
     void count(const char * kmer) {
       HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }

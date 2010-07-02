@@ -179,6 +179,11 @@ class Test_ConsumeString(object):
     def setup(self):
         self.kh = khmer.new_hashtable(4, 4**4)
 
+    def test_n_occupied(self):
+        assert self.kh.n_occupied() == 0
+        n = self.kh.consume('AAAA')
+        assert self.kh.n_occupied() == 1
+
     def test_simple(self):
         n = self.kh.consume('AAAA')
         assert n == 1
@@ -252,7 +257,7 @@ class Test_ConsumeString(object):
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 
-class Test_HashtableIntersect:
+class Test_HashtableIntersect(object):
     def setup(self):
         self.hi = khmer.HashtableIntersect(10, *khmer.PRIMES_1m)
 
