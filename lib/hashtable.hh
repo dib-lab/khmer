@@ -86,7 +86,9 @@ namespace khmer {
 		       unsigned int &total_reads,
 		       unsigned int &n_consumed,
 		       HashIntoType lower_bound = 0,
-		       HashIntoType upper_bound = 0);
+		       HashIntoType upper_bound = 0,
+		       ReadMaskTable ** readmask = NULL,
+		       bool update_readmask = true);
 
     MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
 				       unsigned int total_reads,

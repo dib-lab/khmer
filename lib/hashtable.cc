@@ -1,6 +1,8 @@
+#include <iostream>
+#include <list>
+
 #include "khmer.hh"
 #include "hashtable.hh"
-#include <iostream>
 
 using namespace khmer;
 using namespace std;
@@ -197,10 +199,12 @@ unsigned int Hashtable::checkAndProcessRead(const std::string &read,
 //
 
 void Hashtable::consume_fasta(const std::string &filename,
-			       unsigned int &total_reads,
-			       unsigned int &n_consumed,
-			       HashIntoType lower_bound,
-			       HashIntoType upper_bound)
+			      unsigned int &total_reads,
+			      unsigned int &n_consumed,
+			      HashIntoType lower_bound,
+			      HashIntoType upper_bound,
+			      ReadMaskTable ** orig_readmask,
+			      bool update_readmask)
 {
    total_reads = 0;
    n_consumed = 0;
@@ -208,38 +212,99 @@ void Hashtable::consume_fasta(const std::string &filename,
    string line;
    ifstream infile(filename.c_str());
 
+   if (!infile.is_open())  {
+     return;
+   }
+
    string currName = "";
    string currSeq = "";
 
-   if (infile.is_open())  {
-      while(!infile.eof())  {
-         getline(infile, line);
+   //
+   // readmask stuff: were we given one? do we want to update it?
+   // 
 
-         if (line[0] == '>')  {
-            if (currSeq != "")  {
-               total_reads++;
-               if (total_reads % 10000 == 0) { // @CTB remove me
-                  cout << total_reads << endl;
-	       }
+   ReadMaskTable * readmask = NULL;
+   std::list<unsigned int> masklist;
 
-               n_consumed += checkAndProcessRead(currSeq, lower_bound,
-						 upper_bound);
-               currSeq = "";
-            }
-            currName = line.substr(1, line.length()-1);
-         }
-         else  {
-            currSeq += line;
-         }
-      }
+   if (orig_readmask && update_readmask) {
+     if (*orig_readmask) { readmask = *orig_readmask; }
+     // else: readmask == NULL, will fill in from masklist later
    }
 
-   if (currSeq != "")  {
-     total_reads++;
-     n_consumed += checkAndProcessRead(currSeq, lower_bound, upper_bound);
+   //
+   // iterate through the FASTA file & consume the reads.
+   //
+
+   while(1)  {
+     getline(infile, line);
+
+     if (line[0] == '>' || infile.eof())  {
+
+       // do we have a sequence to process?
+       if (currSeq != "")  {
+
+	 // do we want to process it?
+	 if (!readmask || readmask->get(total_reads)) {
+
+	   // yep! process.
+
+	   unsigned int this_n_consumed;
+	   this_n_consumed = checkAndProcessRead(currSeq,
+						 lower_bound,
+						 upper_bound);
+
+	   // was this an invalid sequence -> mark as bad?
+	   if (this_n_consumed == 0 && update_readmask) {
+	     if (readmask) {
+	       readmask->set(total_reads, false);
+	     } else {
+	       masklist.push_back(total_reads);
+	     }
+	   } else {		// nope -- count it!
+	     n_consumed += this_n_consumed;
+	   }
+	 }
+	       
+	 // reset the sequence info, increment read number, etc.
+	 currSeq = "";
+	 total_reads++;
+	 if (total_reads % 10000 == 0) { // @CTB remove me!
+	   cout << total_reads << endl;
+	 }
+       }
+
+       // new sequence => new sequence name
+       if (line[0] == '>') {
+	 currName = line.substr(1, line.length()-1);
+       }
+     }
+     else  {			// additional line for sequence
+       currSeq += line;
+     }
+     
+     // @ end of file? break out.
+     if (infile.eof()) {
+       break;
+     }
    }
 
    infile.close();
+
+   //
+   // We've either updated the readmask in place, OR we need to create a
+   // new one.
+   //
+
+   if (orig_readmask && update_readmask && readmask == NULL) {
+     // allocate, fill in from masklist
+     readmask = new ReadMaskTable(total_reads);
+
+     list<unsigned int>::const_iterator it;
+     for(it = masklist.begin(); it != masklist.end(); ++it) {
+       readmask->set(*it, false);
+     }
+     *orig_readmask = readmask;
+   }
 }
 
 //
