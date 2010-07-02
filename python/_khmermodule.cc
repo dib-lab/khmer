@@ -1,5 +1,5 @@
 //
-// A module for Python that exports two functions, 'find_iupac' and 'find_pwm'.
+// A module for Python that exports khmer C++ library functions.
 //
 
 #include "Python.h"
@@ -22,7 +22,7 @@ static PyObject *KhmerError;
 /***********************************************************************/
 
 //
-// KTable object
+// KTable object -- exact counting of k-mers.
 //
 
 typedef struct {
@@ -31,6 +31,10 @@ typedef struct {
 } khmer_KTableObject;
 
 static void khmer_ktable_dealloc(PyObject *);
+
+//
+// ktable_forward_hash - hash k-mers into numbers
+//
 
 static PyObject * ktable_forward_hash(PyObject * self, PyObject * args)
 {
@@ -51,6 +55,10 @@ static PyObject * ktable_forward_hash(PyObject * self, PyObject * args)
   return PyInt_FromLong(khmer::_hash(kmer, ktable->ksize()));
 }
 
+//
+// ktable_forward_hash_no_rc -- hash k-mers into numbers, with no RC handling
+//
+
 static PyObject * ktable_forward_hash_no_rc(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
@@ -70,6 +78,10 @@ static PyObject * ktable_forward_hash_no_rc(PyObject * self, PyObject * args)
   return PyInt_FromLong(khmer::_hash_forward(kmer, ktable->ksize()));
 }
 
+//
+// ktable_reverse_hash -- reverse-hash numbers into DNA strings
+//
+
 static PyObject * ktable_reverse_hash(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
@@ -84,7 +96,11 @@ static PyObject * ktable_reverse_hash(PyObject * self, PyObject * args)
   return PyString_FromString(khmer::_revhash(val, ktable->ksize()).c_str());
 }
 
-static PyObject * count(PyObject * self, PyObject * args)
+//
+// ktable_count -- count the given k-mer in the ktable
+//
+
+static PyObject * ktable_count(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -105,7 +121,11 @@ static PyObject * count(PyObject * self, PyObject * args)
   return PyInt_FromLong(1);
 }
 
-static PyObject * consume(PyObject * self, PyObject * args)
+//
+// ktable_consume -- count all of the k-mers in the given string
+//
+
+static PyObject * ktable_consume(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -128,7 +148,7 @@ static PyObject * consume(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_consumed);
 }
 
-static PyObject * get(PyObject * self, PyObject * args)
+static PyObject * ktable_get(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -152,7 +172,17 @@ static PyObject * get(PyObject * self, PyObject * args)
   return PyInt_FromLong(count);
 }
 
-static PyObject * set(PyObject * self, PyObject * args)
+static PyObject * ktable__getitem__(PyObject * self, Py_ssize_t index)
+{
+  khmer_KTableObject * me = (khmer_KTableObject *) self;
+  khmer::KTable * ktable = me->ktable;
+
+  khmer::ExactCounterType count = ktable->get_count(index);
+
+  return PyInt_FromLong(count);
+}
+
+static PyObject * ktable_set(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -176,7 +206,7 @@ static PyObject * set(PyObject * self, PyObject * args)
   return Py_None;
 }
 
-static PyObject * max_hash(PyObject * self, PyObject * args)
+static PyObject * ktable_max_hash(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -188,7 +218,7 @@ static PyObject * max_hash(PyObject * self, PyObject * args)
   return PyInt_FromLong(ktable->max_hash());
 }
 
-static PyObject * n_entries(PyObject * self, PyObject * args)
+static PyObject * ktable_n_entries(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -200,7 +230,15 @@ static PyObject * n_entries(PyObject * self, PyObject * args)
   return PyInt_FromLong(ktable->n_entries());
 }
 
-static PyObject * ksize(PyObject * self, PyObject * args)
+Py_ssize_t ktable__len__(PyObject * self)
+{
+  khmer_KTableObject * me = (khmer_KTableObject *) self;
+  khmer::KTable * ktable = me->ktable;
+
+  return ktable->n_entries();
+}
+
+static PyObject * ktable_ksize(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -212,7 +250,7 @@ static PyObject * ksize(PyObject * self, PyObject * args)
   return PyInt_FromLong(ktable->ksize());
 }
 
-static PyObject * clear(PyObject * self, PyObject * args)
+static PyObject * ktable_clear(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -229,25 +267,25 @@ static PyObject * clear(PyObject * self, PyObject * args)
 
 
 // fwd decl --> defined below
-static PyObject * update(PyObject * self, PyObject * args);
-static PyObject * intersect(PyObject * self, PyObject * args);
+static PyObject * ktable_update(PyObject * self, PyObject * args);
+static PyObject * ktable_intersect(PyObject * self, PyObject * args);
 
 static PyMethodDef khmer_ktable_methods[] = {
   { "forward_hash", ktable_forward_hash, METH_VARARGS, "Convert string to int" },
   { "forward_hash_no_rc", ktable_forward_hash_no_rc, METH_VARARGS, "Convert string to int, with no reverse complement handling" },
   { "reverse_hash", ktable_reverse_hash, METH_VARARGS, "Convert int to string" },
-  { "count", count, METH_VARARGS, "Count the given kmer" },
-  { "consume", consume, METH_VARARGS, "Count all k-mers in the given string" },
-  { "get", get, METH_VARARGS, "Get the count for the given k-mer" },
-  { "max_hash", max_hash, METH_VARARGS, "Get the maximum hash value"},
-  { "n_entries", n_entries, METH_VARARGS, "Get the number of possible entries"},
-  { "ksize", ksize, METH_VARARGS, "Get k"},
-  { "set", set, METH_VARARGS, "Set counter to a value"},
-  { "update", update, METH_VARARGS, "Combine another ktable with this one"},
-  { "intersect", intersect, METH_VARARGS,
+  { "count", ktable_count, METH_VARARGS, "Count the given kmer" },
+  { "consume", ktable_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "get", ktable_get, METH_VARARGS, "Get the count for the given k-mer" },
+  { "max_hash", ktable_max_hash, METH_VARARGS, "Get the maximum hash value"},
+  { "n_entries", ktable_n_entries, METH_VARARGS, "Get the number of possible entries"},
+  { "ksize", ktable_ksize, METH_VARARGS, "Get k"},
+  { "set", ktable_set, METH_VARARGS, "Set counter to a value"},
+  { "update", ktable_update, METH_VARARGS, "Combine another ktable with this one"},
+  { "intersect", ktable_intersect, METH_VARARGS,
     "Create another ktable containing the intersection of two ktables:"
     "where both ktables have an entry, the counts will be summed."},
-  { "clear", clear, METH_VARARGS, "Set all entries to 0." },
+  { "clear", ktable_clear, METH_VARARGS, "Set all entries to 0." },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -259,6 +297,17 @@ khmer_ktable_getattr(PyObject * obj, char * name)
 }
 
 #define is_ktable_obj(v)  ((v)->ob_type == &khmer_KTableType)
+
+static PySequenceMethods khmer_KTable_SequenceMethods = {
+  ktable__len__,
+  0,
+  0,
+  ktable__getitem__,
+  0,
+  0,
+  0,
+  0
+};
 
 static PyTypeObject khmer_KTableType = {
     PyObject_HEAD_INIT(NULL)
@@ -272,7 +321,7 @@ static PyTypeObject khmer_KTableType = {
     0,				/*tp_compare*/
     0,				/*tp_repr*/
     0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
+    &khmer_KTable_SequenceMethods, /*tp_as_sequence*/
     0,				/*tp_as_mapping*/
     0,				/*tp_hash */
     0,				/*tp_call*/
@@ -317,7 +366,7 @@ static void khmer_ktable_dealloc(PyObject* self)
   PyObject_Del((PyObject *) obj);
 }
 
-static PyObject * update(PyObject * self, PyObject * args)
+static PyObject * ktable_update(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
@@ -336,7 +385,7 @@ static PyObject * update(PyObject * self, PyObject * args)
   return Py_None;
 }
 
-static PyObject * intersect(PyObject * self, PyObject * args)
+static PyObject * ktable_intersect(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;

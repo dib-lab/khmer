@@ -47,7 +47,7 @@ class Test_KTable:
         assert kt.ksize() == L
         assert kt.max_hash() == 4**L - 1
         assert kt.n_entries() == 4**L
-
+        assert len(kt) == 4**L
     
     def test_hash(self):
         kt = self.kt
@@ -159,6 +159,7 @@ class Test_KTable:
         kt.clear()
         for i in range(0, 4**L):
             assert kt.get(i) == 0
+            assert kt[i] == 0
 
 def test_KmerCount():
     ### test KmerCount class
