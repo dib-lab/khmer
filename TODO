@@ -8,3 +8,7 @@ that modulus exactly fills split portion of table.
 mismatch hashing - compute min num - each base
 
 copyright, C++ file comments at top
+
+CTRL-C, threading
+
+tests for readmask updating, etc. in various circumstances!

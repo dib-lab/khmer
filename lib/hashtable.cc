@@ -226,9 +226,8 @@ void Hashtable::consume_fasta(const std::string &filename,
    ReadMaskTable * readmask = NULL;
    std::list<unsigned int> masklist;
 
-   if (orig_readmask && update_readmask) {
-     if (*orig_readmask) { readmask = *orig_readmask; }
-     // else: readmask == NULL, will fill in from masklist later
+   if (orig_readmask && *orig_readmask) {
+     readmask = *orig_readmask;
    }
 
    //
@@ -338,8 +337,8 @@ unsigned int Hashtable::consume_string(const std::string &s,
     bin = bin % _tablesize;
     if (_counts[bin] != MAX_COUNT) {
       _counts[bin]++;
-      n_consumed++;
     }
+    n_consumed++;
   }
 
   for (unsigned int i = _ksize; i < length; i++) {
@@ -362,8 +361,8 @@ unsigned int Hashtable::consume_string(const std::string &s,
       bin = bin % _tablesize;
       if (_counts[bin] != MAX_COUNT) {
 	_counts[bin]++;
-	n_consumed++;
       }
+      n_consumed++;
     }
   }
   return n_consumed;
