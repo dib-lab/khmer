@@ -3,8 +3,10 @@ that modulus exactly fills split portion of table.
 
 mismatch hashing - compute min num - each base?
 
-copyright, C++ file comments at top
+copyright, C++ file comments at top; license; etc.
 
 tests for readmask updating, etc. in various circumstances!
 
 tests for khmer saturation vs valid reads
+
+profiling
