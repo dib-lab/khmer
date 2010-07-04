@@ -4,6 +4,8 @@
 #include "khmer.hh"
 #include "hashtable.hh"
 
+#define CALLBACK_PERIOD 10000
+
 using namespace khmer;
 using namespace std;
 
@@ -206,7 +208,9 @@ void Hashtable::consume_fasta(const std::string &filename,
 			      HashIntoType lower_bound,
 			      HashIntoType upper_bound,
 			      ReadMaskTable ** orig_readmask,
-			      bool update_readmask)
+			      bool update_readmask,
+			      CallbackFn callback,
+			      void * callback_data)
 {
    total_reads = 0;
    n_consumed = 0;
@@ -272,8 +276,8 @@ void Hashtable::consume_fasta(const std::string &filename,
 	 // reset the sequence info, increment read number, etc.
 	 currSeq = "";
 	 total_reads++;
-	 if (total_reads % 10000 == 0) { // @CTB remove me!
-	   cout << total_reads << endl;
+	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	   callback(callback_data, total_reads, n_consumed);
 	 }
        }
 

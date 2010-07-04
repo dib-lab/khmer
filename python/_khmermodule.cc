@@ -2,6 +2,8 @@
 // A module for Python that exports khmer C++ library functions.
 //
 
+#include <iostream>
+
 #include "Python.h"
 #include "khmer.hh"
 #include "ktable.hh"
@@ -16,7 +18,21 @@ extern "C" {
   void init_khmer();
 }
 
-// exception to raise
+class _khmer_exception {
+private:
+  std::string _message;
+public:
+  _khmer_exception(std::string message) : _message(message) { };
+  inline const std::string get_message() const { return _message; };
+};
+
+class _khmer_signal : public _khmer_exception {
+public:
+  _khmer_signal(std::string message) : _khmer_exception(message) { };
+};
+
+
+// Python exception to raise
 static PyObject *KhmerError;
 
 /***********************************************************************/
@@ -617,6 +633,20 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
   return (PyObject *) readmask_obj;
 }
 
+void _report_fn(void * data, unsigned int n_reads, unsigned int n_kmers)
+{
+  std::cout << n_reads << std::endl;
+
+  // handle signals (like CTRL-C)
+  if (PyErr_CheckSignals() != 0) {
+    throw _khmer_signal("PyErr_CheckSignals received a signal");
+  }
+
+  // ...allow other Python threads to do stuff...
+  Py_BEGIN_ALLOW_THREADS;
+  Py_END_ALLOW_THREADS;
+}
+
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -647,9 +677,14 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   }
 
   unsigned int n_consumed, total_reads;
-  hashtable->consume_fasta(filename, total_reads, n_consumed,
-			   lower_bound, upper_bound, &readmask,
-			   update_readmask);
+
+  try {
+    hashtable->consume_fasta(filename, total_reads, n_consumed,
+			     lower_bound, upper_bound, &readmask,
+			     update_readmask, _report_fn);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
 
   // this should still be null!
   if (!update_readmask && !readmask_obj) {
@@ -677,14 +712,19 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
   unsigned int n_consumed, total_reads;
 
   // this will allocate 'readmask' and fill it in.
-  hashtable->consume_fasta(filename, total_reads, n_consumed,
-			   lower_bound, upper_bound, &readmask, true);
-
-  if (!readmask) {
+  try {
+    hashtable->consume_fasta(filename, total_reads, n_consumed,
+			     lower_bound, upper_bound, &readmask, true,
+			     _report_fn);
+  } catch  (_khmer_signal &e) {
     return NULL;
   }
 
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *)	\
+  if (!readmask) {		// @CTB
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
     PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
   readmask_obj->mask = readmask;
 
