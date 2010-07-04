@@ -90,7 +90,8 @@ namespace khmer {
 				   const std::string &outputfile,
 				   CallbackFn callback = NULL,
 				   void * callback_data = NULL) {
-      return output_filtered_fasta_file(inputfile, outputfile, this);
+      return output_filtered_fasta_file(inputfile, outputfile, this,
+					callback, callback_data);
     }
   };
 

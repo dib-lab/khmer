@@ -57,7 +57,7 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 	 read_num += 1;
 
 	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
 	   try {
 	     callback("fasta_file_to_minmax", callback_data, read_num, 0);
 	   } catch (...) {
@@ -153,7 +153,6 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       ReadMaskTable * readmask,
 					       CallbackFn callback,
 					       void * callback_data)
-
 {
    string line;
    ifstream infile(inputfile.c_str());

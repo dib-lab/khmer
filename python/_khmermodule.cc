@@ -31,9 +31,11 @@ public:
   _khmer_signal(std::string message) : _khmer_exception(message) { };
 };
 
-
 // Python exception to raise
 static PyObject *KhmerError;
+
+// default callback obj;
+static PyObject *callback_obj = NULL;
 
 // callback function to pass into C++ functions
 
@@ -45,16 +47,21 @@ void _report_fn(const char * info, void * data, unsigned int n_reads,
     throw _khmer_signal("PyErr_CheckSignals received a signal");
   }
 
-  // if 'data' is set, it is a Python callable:
+  // set data to default?
+  if (!data && callback_obj) {
+    data = callback_obj;
+  }
+
+  // if 'data' is set, it is None, or a Python callable
   if (data) {
     PyObject * obj = (PyObject *) data;
-    PyObject * args = Py_BuildValue("sii", info, n_reads, other);
+    if (obj != Py_None) {
+      PyObject * args = Py_BuildValue("sii", info, n_reads, other);
 
-    PyObject * r = PyObject_Call(obj, args, NULL);
-    Py_XDECREF(r);
-    Py_DECREF(args);
-  } else {
-    std::cout << "..." << info << " " << n_reads << " " << other << std::endl;
+      PyObject * r = PyObject_Call(obj, args, NULL);
+      Py_XDECREF(r);
+      Py_DECREF(args);
+    }
   }
 
   if (PyErr_Occurred()) {
@@ -97,7 +104,8 @@ static PyObject * ktable_forward_hash(PyObject * self, PyObject * args)
   }
 
   if (strlen(kmer) != ktable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "k-mer length must be the same as the hashtable k-size");
     return NULL;
   }
 
@@ -120,7 +128,8 @@ static PyObject * ktable_forward_hash_no_rc(PyObject * self, PyObject * args)
   }
 
   if (strlen(kmer) != ktable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "k-mer length must be the same as the hashtable k-size");
     return NULL;
   }
 
@@ -161,7 +170,8 @@ static PyObject * ktable_count(PyObject * self, PyObject * args)
   }
 
   if (strlen(kmer) != ktable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "k-mer length must be the same as the hashtable k-size");
     return NULL;
   }
 
@@ -185,8 +195,9 @@ static PyObject * ktable_consume(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  if (strlen(long_str) <= ktable->ksize()) {
-    // @CTB
+  if (strlen(long_str) < ktable->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
     return NULL;
   }
 
@@ -590,7 +601,8 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
   }
 
   if (strlen(kmer) != hashtable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "k-mer length must be the same as the hashtable k-size");
     return NULL;
   }
 
@@ -601,25 +613,27 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
 
 static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
 {
-  khmer_ReadMaskObject * readmask_obj;
-
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename;
   unsigned int total_reads;
-  PyObject * readmask_py_obj = NULL;
+  PyObject * readmask_obj = NULL;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(args, "si|OO", &filename, &total_reads,
-			&readmask_py_obj, &callback_obj)) {
+			&readmask_obj, &callback_obj)) {
     return NULL;
   }
 
   khmer::ReadMaskTable * readmask = NULL;
-  if (readmask_py_obj && readmask_py_obj != Py_None) {
-    readmask_obj = (khmer_ReadMaskObject *) readmask_py_obj;
-    readmask = readmask_obj->mask;
+  if (readmask_obj && readmask_obj != Py_None) {
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "third argument must be None or a readmask object");
+      return NULL;
+    }
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
   }
 
   khmer::MinMaxTable * mmt;
@@ -655,11 +669,20 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
     return NULL;
   }
 
-  khmer::MinMaxTable * mmt;
-  mmt = ((khmer_MinMaxObject *) o1)->mmt;
+  if (!is_minmax_obj(o1)) {
+    PyErr_SetString(PyExc_TypeError,
+		    "second argument must be a minmax object");
+    return NULL;
+  }
+  khmer::MinMaxTable * mmt = ((khmer_MinMaxObject *) o1)->mmt;
 
   khmer::ReadMaskTable * old_readmask = NULL;
   if (o2 && o2 != Py_None) {
+    if (!is_readmask_obj(o2)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fourth argument must be None or a readmask object");
+      return NULL;
+    }
     old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
   }
 
@@ -699,6 +722,7 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
   // make sure update_readmask_bool is the right type of object
   if (update_readmask_bool && !PyBool_Check(update_readmask_bool)) {
+    PyErr_SetString(PyExc_TypeError, "fifth argument must be True/False");
     return NULL;
   }
 
@@ -706,10 +730,17 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   bool update_readmask = false;
   khmer::ReadMaskTable * readmask = NULL;
 
-  if (readmask_obj) {
+  if (readmask_obj && readmask_obj != Py_None) {
     if (update_readmask_bool == Py_True) {
       update_readmask = true;
     }
+
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fourth argument must be None or a readmask object");
+      return NULL;
+    }
+    
     readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
   }
 
@@ -759,7 +790,9 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
     return NULL;
   }
 
-  if (!readmask) {		// @CTB
+  if (!readmask) {
+    PyErr_SetString(PyExc_RuntimeError,
+		    "unexpected error in C++/consume_fasta; die die die.");
     return NULL;
   }
 
@@ -783,7 +816,8 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   }
   
   if (strlen(long_str) < hashtable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
     return NULL;
   }
 
@@ -806,7 +840,8 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
   }
 
   if (strlen(long_str) < hashtable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
     return NULL;
   }
 
@@ -831,7 +866,8 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
   }
 
   if (strlen(long_str) < hashtable->ksize()) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
     return NULL;
   }
 
@@ -1355,11 +1391,12 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
   char * kmer;
   int ksize;
 
-  if (!PyArg_ParseTuple(args, "si", &kmer, &ksize)) { // @CTB
+  if (!PyArg_ParseTuple(args, "si", &kmer, &ksize)) {
     return NULL;
   }
 
-  if ((char)ksize != ksize) {	// @CTB
+  if ((char)ksize != ksize) {
+    PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
     return NULL;
   }
 
@@ -1375,12 +1412,14 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  if ((unsigned char)ksize != ksize) {	// @CTB
+  if ((unsigned char)ksize != ksize) {
+    PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
     return NULL;
   }
 
   if (strlen(kmer) != ksize) {
-    // @CTB
+    PyErr_SetString(PyExc_ValueError,
+		    "k-mer length must be the same as the hashtable k-size");
     return NULL;
   }
 
@@ -1396,11 +1435,28 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  if ((char)ksize != ksize) {	// @CTB
+  if ((char)ksize != ksize) {
+    PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
     return NULL;
   }
 
   return PyString_FromString(khmer::_revhash(val, ksize).c_str());
+}
+
+static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
+{
+  PyObject * o;
+  
+  if (!PyArg_ParseTuple(args, "O", &o)) {
+    return NULL;
+  }
+
+  Py_XDECREF(callback_obj);
+  Py_INCREF(o);
+  callback_obj = o;
+
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 //
@@ -1416,6 +1472,7 @@ static PyMethodDef KhmerMethods[] = {
   { "forward_hash", forward_hash, METH_VARARGS, "", },
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
   { "reverse_hash", reverse_hash, METH_VARARGS, "", },
+  { "set_reporting_callback", set_reporting_callback, METH_VARARGS, "" },
   { NULL, NULL, 0, NULL }
 };
 

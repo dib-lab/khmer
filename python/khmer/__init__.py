@@ -7,8 +7,21 @@ from _khmer import new_readmask
 from _khmer import new_minmax
 from _khmer import consume_genome
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
+from _khmer import set_reporting_callback
 
 from filter_utils import filter_fasta_file
+
+###
+
+def _default_reporting_callback(info, n_reads, other):
+    print '...', info, n_reads, other
+
+def reset_reporting_callback():
+    set_reporting_callback(_default_reporting_callback)
+
+reset_reporting_callback()
+
+###
 
 class KmerCount(object):
     def __init__(self, size, report_zero=False):
