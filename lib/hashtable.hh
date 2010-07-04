@@ -76,10 +76,11 @@ namespace khmer {
 				HashIntoType lower_bound = 0,
 				HashIntoType upper_bound = 0);
 
-    // checks each read for non-ACGT characters  // @CTB protected?
-    unsigned int checkAndProcessRead(const std::string &read,
-                                HashIntoType lower_bound = 0,
-                                HashIntoType upper_bound = 0);
+    // checks each read for non-ACGT characters
+    unsigned int check_and_process_read(const std::string &read,
+					bool &is_valid,
+					HashIntoType lower_bound = 0,
+					HashIntoType upper_bound = 0);
 
     // count every k-mer in the FASTA file.
     void consume_fasta(const std::string &filename,

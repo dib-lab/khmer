@@ -12,3 +12,5 @@ copyright, C++ file comments at top
 CTRL-C, threading
 
 tests for readmask updating, etc. in various circumstances!
+
+tests for khmer saturation vs valid reads

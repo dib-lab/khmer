@@ -169,15 +169,17 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 }
 
 //
-// checkAndProcessRead: checks for non-ACGT characters
+// check_and_process_read: checks for non-ACGT characters before consuming
 //
 
-unsigned int Hashtable::checkAndProcessRead(const std::string &read,
+unsigned int Hashtable::check_and_process_read(const std::string &read,
+					    bool &is_valid,
                                             HashIntoType lower_bound,
                                             HashIntoType upper_bound)
 {
    unsigned int i;
-   bool is_valid = true;
+
+   is_valid = true;
 
    for (i = 0; i < read.length(); i++)  {
      if (!is_valid_dna(read[i])) {
@@ -248,12 +250,15 @@ void Hashtable::consume_fasta(const std::string &filename,
 	   // yep! process.
 
 	   unsigned int this_n_consumed;
-	   this_n_consumed = checkAndProcessRead(currSeq,
-						 lower_bound,
-						 upper_bound);
+	   bool is_valid;
+
+	   this_n_consumed = check_and_process_read(currSeq,
+						    is_valid,
+						    lower_bound,
+						    upper_bound);
 
 	   // was this an invalid sequence -> mark as bad?
-	   if (this_n_consumed == 0 && update_readmask) {
+	   if (!is_valid && update_readmask) {
 	     if (readmask) {
 	       readmask->set(total_reads, false);
 	     } else {
