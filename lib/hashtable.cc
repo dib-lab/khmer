@@ -11,7 +11,9 @@ using namespace std;
 
 MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 					      unsigned int total_reads,
-					      ReadMaskTable * readmask)
+					      ReadMaskTable * readmask,
+					      CallbackFn callback,
+					      void * callback_data)
 {
    string line;
    ifstream infile(inputfile.c_str());
@@ -53,6 +55,17 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 	 }
 
 	 read_num += 1;
+
+	 // run callback, if specified
+	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("fasta_file_to_minmax", callback_data, read_num, 0);
+	   } catch (...) {
+	     infile.close();
+	     delete mmt;
+	     throw;
+	   }
+	 }
        }
        else {
 	 name = line.substr(1, line.length()-1);
@@ -68,13 +81,16 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 }
 
 //
-// filter_fasta_file: filter and trims a FASTA file into a new one
+// filter_fasta_file_max: filter and trims a FASTA file into a new one
 //
 
 ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
 						 MinMaxTable &minmax,
 						 BoundedCounterType threshold,
-						 ReadMaskTable * old_readmask)
+						 ReadMaskTable * old_readmask,
+						 CallbackFn callback,
+						 void * callback_data)
+
 {
    string line;
    ifstream infile(inputfile.c_str());
@@ -108,6 +124,16 @@ ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
 	 }
 
 	 read_num += 1;
+
+	 // run callback, if specified
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("filter_fasta_file_max", callback_data, read_num, 0);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
        }
        else {
 	 name = line.substr(1, line.length()-1);
@@ -124,7 +150,10 @@ ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
 
 unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       const std::string &outputfile,
-					       ReadMaskTable * readmask)
+					       ReadMaskTable * readmask,
+					       CallbackFn callback,
+					       void * callback_data)
+
 {
    string line;
    ifstream infile(inputfile.c_str());
@@ -156,6 +185,19 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 	 seq.clear();
 
 	 read_num++;
+
+	 // run callback, if specified
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("output_filtered_fasta_file", callback_data,
+		      read_num, n_kept);
+	   } catch (...) {
+	     infile.close();
+	     outfile.close();
+	     throw;
+	   }
+	 }
+
        } else {
 	 name = line.substr(1, line.length()-1);
        }
@@ -273,11 +315,18 @@ void Hashtable::consume_fasta(const std::string &filename,
 	   }
 	 }
 	       
-	 // reset the sequence info, increment read number, etc.
+	 // reset the sequence info, increment read number
 	 currSeq = "";
 	 total_reads++;
+
+	 // run callback, if specified
 	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   callback(callback_data, total_reads, n_consumed);
+	   try {
+	     callback("consume_fasta", callback_data, total_reads, n_consumed);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
 	 }
        }
 

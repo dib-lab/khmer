@@ -35,6 +35,39 @@ public:
 // Python exception to raise
 static PyObject *KhmerError;
 
+// callback function to pass into C++ functions
+
+void _report_fn(const char * info, void * data, unsigned int n_reads,
+		unsigned int other)
+{
+  // handle signals etc. (like CTRL-C)
+  if (PyErr_CheckSignals() != 0) {
+    throw _khmer_signal("PyErr_CheckSignals received a signal");
+  }
+
+  // if 'data' is set, it is a Python callable:
+  if (data) {
+    PyObject * obj = (PyObject *) data;
+    PyObject * args = Py_BuildValue("sii", info, n_reads, other);
+
+    PyObject * r = PyObject_Call(obj, args, NULL);
+    Py_XDECREF(r);
+    Py_DECREF(args);
+  } else {
+    std::cout << "..." << info << " " << n_reads << " " << other << std::endl;
+  }
+
+  if (PyErr_Occurred()) {
+    throw _khmer_signal("PyErr_Occurred is set");
+  }
+
+  // ...allow other Python threads to do stuff...
+  Py_BEGIN_ALLOW_THREADS;
+  Py_END_ALLOW_THREADS;
+}
+
+
+
 /***********************************************************************/
 
 //
@@ -576,20 +609,27 @@ static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
   char * filename;
   unsigned int total_reads;
   PyObject * readmask_py_obj = NULL;
+  PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "si|O", &filename, &total_reads,
-			&readmask_py_obj)) {
+  if (!PyArg_ParseTuple(args, "si|OO", &filename, &total_reads,
+			&readmask_py_obj, &callback_obj)) {
     return NULL;
   }
 
   khmer::ReadMaskTable * readmask = NULL;
-  if (readmask_py_obj) {
+  if (readmask_py_obj && readmask_py_obj != Py_None) {
     readmask_obj = (khmer_ReadMaskObject *) readmask_py_obj;
     readmask = readmask_obj->mask;
   }
 
   khmer::MinMaxTable * mmt;
-  mmt = hashtable->fasta_file_to_minmax(filename, total_reads, readmask);
+  try {
+    mmt = hashtable->fasta_file_to_minmax(filename, total_reads, readmask,
+					  _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  
 
   khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
     PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
@@ -608,8 +648,10 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
   unsigned int threshold;
 
   PyObject * o1 = NULL, * o2 = NULL;
+  PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "sOi|O", &filename, &o1, &threshold, &o2)) {
+  if (!PyArg_ParseTuple(args, "sOi|OO", &filename, &o1, &threshold, &o2,
+			&callback_obj)) {
     return NULL;
   }
 
@@ -617,13 +659,18 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
   mmt = ((khmer_MinMaxObject *) o1)->mmt;
 
   khmer::ReadMaskTable * old_readmask = NULL;
-  if (o2) {
+  if (o2 && o2 != Py_None) {
     old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
   }
 
   khmer::ReadMaskTable * readmask;
-  readmask = hashtable->filter_fasta_file_max(filename, *mmt, threshold,
-					      old_readmask);
+  try {
+    readmask = hashtable->filter_fasta_file_max(filename, *mmt, threshold,
+						old_readmask,
+						_report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
 
   khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
     PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
@@ -631,20 +678,6 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
   readmask_obj->mask = readmask;
 
   return (PyObject *) readmask_obj;
-}
-
-void _report_fn(void * data, unsigned int n_reads, unsigned int n_kmers)
-{
-  std::cout << n_reads << std::endl;
-
-  // handle signals (like CTRL-C)
-  if (PyErr_CheckSignals() != 0) {
-    throw _khmer_signal("PyErr_CheckSignals received a signal");
-  }
-
-  // ...allow other Python threads to do stuff...
-  Py_BEGIN_ALLOW_THREADS;
-  Py_END_ALLOW_THREADS;
 }
 
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
@@ -656,16 +689,20 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   PyObject * readmask_obj = NULL;
   PyObject * update_readmask_bool = NULL;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|iiOO", &filename, &lower_bound, &upper_bound,
-			&readmask_obj, &update_readmask_bool)) {
+  if (!PyArg_ParseTuple(args, "s|iiOOO", &filename, &lower_bound, &upper_bound,
+			&readmask_obj, &update_readmask_bool,
+			&callback_obj)) {
     return NULL;
   }
 
+  // make sure update_readmask_bool is the right type of object
   if (update_readmask_bool && !PyBool_Check(update_readmask_bool)) {
     return NULL;
   }
 
+  // set C++ parameters accordingly
   bool update_readmask = false;
   khmer::ReadMaskTable * readmask = NULL;
 
@@ -676,25 +713,25 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
   }
 
+  // call the C++ function, and trap signals => Python
+
   unsigned int n_consumed, total_reads;
 
   try {
     hashtable->consume_fasta(filename, total_reads, n_consumed,
 			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn);
+			     update_readmask, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
 
-  // this should still be null!
+  // error checking -- this should still be null!
   if (!update_readmask && !readmask_obj) {
     assert(readmask == NULL);
   }
 
   return Py_BuildValue("ii", total_reads, n_consumed);
 }
-
-// Does this contain a memory leak?
 
 static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * args)
 {
@@ -703,8 +740,10 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
 
   char * filename;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|ii", &filename, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
+			&callback_obj)) {
     return NULL;
   }
 
@@ -715,7 +754,7 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
   try {
     hashtable->consume_fasta(filename, total_reads, n_consumed,
 			     lower_bound, upper_bound, &readmask, true,
-			     _report_fn);
+			     _report_fn, callback_obj);
   } catch  (_khmer_signal &e) {
     return NULL;
   }
@@ -1047,13 +1086,20 @@ static PyObject * readmask_filter_fasta_file(PyObject * self, PyObject *args)
   char * inputfilename;
   char * outputfilename;
   khmer::ReadMaskTable * readmask = ((khmer_ReadMaskObject *) self)->mask;
+  PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss", &inputfilename, &outputfilename)) {
+  if (!PyArg_ParseTuple(args, "ss|O", &inputfilename, &outputfilename,
+			&callback_obj)) {
     return NULL;
   }
 
   unsigned int n_kept;
-  n_kept = readmask->filter_fasta_file(inputfilename, outputfilename);
+  try {
+    n_kept = readmask->filter_fasta_file(inputfilename, outputfilename,
+					 _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
 
   return PyInt_FromLong(n_kept);
 }

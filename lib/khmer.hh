@@ -15,4 +15,7 @@ namespace khmer {
   // largest number we can count up to, approximately. (8 bytes/255).
   // see MAX_COUNT, above.
   typedef unsigned char BoundedCounterType;
+
+  typedef void (*CallbackFn)(const char * info, void * callback_data,
+			     unsigned int n_reads, unsigned int other);
 };

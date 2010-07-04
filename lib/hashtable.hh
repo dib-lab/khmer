@@ -8,8 +8,6 @@
 #include "storage.hh"
 
 namespace khmer {
-  typedef void (*CallbackFn)(void *, unsigned int n_reads, unsigned int kmers);
-
   class Hashtable {
   protected:
     const WordLength _ksize;
@@ -97,14 +95,17 @@ namespace khmer {
 
     MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
 				       unsigned int total_reads,
-				       ReadMaskTable * readmask = NULL);
+				       ReadMaskTable * readmask = NULL,
+				       CallbackFn callback = NULL,
+				       void * callback_data = NULL);
 
     ReadMaskTable * filter_fasta_file_max(const std::string &inputfile,
 					  MinMaxTable &minmax,
 					  BoundedCounterType threshold,
-					  ReadMaskTable * readmask = NULL);
+					  ReadMaskTable * readmask = NULL,
+					  CallbackFn callback = NULL,
+					  void * callback_data = NULL);
 
-    // @@CTB doc
     BoundedCounterType get_min_count(const std::string &s,
 				     HashIntoType lower_bound = 0,
 				     HashIntoType upper_bound = 0);

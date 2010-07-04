@@ -10,7 +10,9 @@ namespace khmer {
   class ReadMaskTable;
   unsigned int output_filtered_fasta_file(const std::string &inputfile,
 					  const std::string &outputfile,
-					  ReadMaskTable * readmask);
+					  ReadMaskTable * readmask,
+					  CallbackFn callback = NULL,
+					  void * callback_data = NULL);
 
   class ReadMaskTable {
   protected:
@@ -85,7 +87,9 @@ namespace khmer {
     }
 
     unsigned int filter_fasta_file(const std::string &inputfile,
-				   const std::string &outputfile) {
+				   const std::string &outputfile,
+				   CallbackFn callback = NULL,
+				   void * callback_data = NULL) {
       return output_filtered_fasta_file(inputfile, outputfile, this);
     }
   };
