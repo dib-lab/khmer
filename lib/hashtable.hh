@@ -37,9 +37,11 @@ namespace khmer {
     const HashIntoType n_entries() const { return _tablesize; }
 
     // count number of occupied bins
-    const HashIntoType n_occupied() const {
+    const HashIntoType n_occupied(HashIntoType start=0,
+				  HashIntoType stop=0) const {
       HashIntoType n = 0;
-      for (HashIntoType i = 0; i < _tablesize; i++) {
+      if (stop == 0) { stop = _tablesize; }
+      for (HashIntoType i = start; i < stop; i++) {
 	if (_counts[i]) {
 	  n++;
 	}

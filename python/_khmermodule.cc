@@ -580,14 +580,29 @@ static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
+  khmer::HashIntoType start = 0, stop = 0;
+
+  if (!PyArg_ParseTuple(args, "|LL", &start, &stop)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType n = hashtable->n_occupied(start, stop);
+
+  return PyInt_FromLong(n);
+}
+
+static PyObject * hash_n_entries(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
   if (!PyArg_ParseTuple(args, "")) {
     return NULL;
   }
 
-  khmer::HashIntoType n = hashtable->n_occupied();
-
-  return PyInt_FromLong(n);
+  return PyInt_FromLong(hashtable->n_entries());
 }
+
 
 static PyObject * hash_count(PyObject * self, PyObject * args)
 {
@@ -955,6 +970,7 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
 
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
+  { "n_entries", hash_n_entries, METH_VARARGS, "" },
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },

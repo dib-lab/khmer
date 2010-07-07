@@ -186,6 +186,18 @@ class Test_ConsumeString(object):
         n = self.kh.consume('AACT')
         assert self.kh.n_occupied() == 2
 
+    def test_n_occupied_args(self):
+        assert self.kh.n_occupied() == 0
+        n = self.kh.consume('AAAA')
+        assert self.kh.n_occupied(0, 1) == 1
+        assert self.kh.n_occupied(1, 4**4) == 0
+
+        hash = khmer.forward_hash('AACT', 4)
+        n = self.kh.consume('AACT')
+        assert self.kh.n_occupied(0, hash + 1) == 2
+        assert self.kh.n_occupied(hash + 1, 4**4) == 0
+        assert self.kh.n_occupied(hash, hash + 1) == 1
+
     def test_simple(self):
         n = self.kh.consume('AAAA')
         assert n == 1
