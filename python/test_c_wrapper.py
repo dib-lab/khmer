@@ -69,7 +69,7 @@ def test_raise_in_filter_fasta_file_max():
     mmt = ht.fasta_file_to_minmax(reads_filename, N_READS)
 
     try:
-        ht.filter_fasta_file_max(reads_filename, mmt, 2, None, callback_raise)
+        ht.filter_fasta_file_any(reads_filename, mmt, 2, None, callback_raise)
         assert 0
     except GoodException:
         pass
@@ -80,7 +80,7 @@ def test_bad_mmt_in_filter_fasta_file_max():
     ht = khmer.new_hashtable(4, 4**4)
 
     try:
-        ht.filter_fasta_file_max(reads_filename, "hi", 2)
+        ht.filter_fasta_file_any(reads_filename, "hi", 2)
         assert 0
     except TypeError:
         pass                            # expected
@@ -92,7 +92,7 @@ def test_bad_readmask_in_filter_fasta_file_max():
     mmt = ht.fasta_file_to_minmax(reads_filename, N_READS)
 
     try:
-        ht.filter_fasta_file_max(reads_filename, mmt, 2, "hi")
+        ht.filter_fasta_file_any(reads_filename, mmt, 2, "hi")
         assert 0
     except TypeError:
         pass                            # expected

@@ -653,7 +653,7 @@ static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
   return (PyObject *) minmax_obj;
 }
 
-static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
+static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
@@ -688,7 +688,57 @@ static PyObject * hash_filter_fasta_file_max(PyObject * self, PyObject *args)
 
   khmer::ReadMaskTable * readmask;
   try {
-    readmask = hashtable->filter_fasta_file_max(filename, *mmt, threshold,
+    readmask = hashtable->filter_fasta_file_any(filename, *mmt, threshold,
+						old_readmask,
+						_report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+
+  readmask_obj->mask = readmask;
+
+  return (PyObject *) readmask_obj;
+}
+
+static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename;
+  unsigned int threshold;
+
+  PyObject * o1 = NULL, * o2 = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "sOi|OO", &filename, &o1, &threshold, &o2,
+			&callback_obj)) {
+    return NULL;
+  }
+
+  if (!is_minmax_obj(o1)) {
+    PyErr_SetString(PyExc_TypeError,
+		    "second argument must be a minmax object");
+    return NULL;
+  }
+  khmer::MinMaxTable * mmt = ((khmer_MinMaxObject *) o1)->mmt;
+
+  khmer::ReadMaskTable * old_readmask = NULL;
+  if (o2 && o2 != Py_None) {
+    if (!is_readmask_obj(o2)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fourth argument must be None or a readmask object");
+      return NULL;
+    }
+    old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
+  }
+
+  khmer::ReadMaskTable * readmask;
+  try {
+    readmask = hashtable->filter_fasta_file_all(filename, *mmt, threshold,
 						old_readmask,
 						_report_fn, callback_obj);
   } catch (_khmer_signal &e) {
@@ -910,7 +960,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_build_readmask", hash_consume_fasta_build_readmask, METH_VARARGS, "Count all k-mers in a given file, creating a readmask object to mask off bad reads" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
-  { "filter_fasta_file_max", hash_filter_fasta_file_max, METH_VARARGS, "" },
+  { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
+  { "filter_fasta_file_all", hash_filter_fasta_file_all, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },

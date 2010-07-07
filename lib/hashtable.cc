@@ -81,10 +81,11 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 }
 
 //
-// filter_fasta_file_max: filter and trims a FASTA file into a new one
+// filter_fasta_file_any: filters a FASTA file based on whether any (at
+// least one) k-mer in a sequence has 'threshold' counts in the hashtable.
 //
 
-ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
+ReadMaskTable * Hashtable::filter_fasta_file_any(const std::string &inputfile,
 						 MinMaxTable &minmax,
 						 BoundedCounterType threshold,
 						 ReadMaskTable * old_readmask,
@@ -128,7 +129,76 @@ ReadMaskTable * Hashtable::filter_fasta_file_max(const std::string &inputfile,
 	 // run callback, if specified
 	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
 	   try {
-	     callback("filter_fasta_file_max", callback_data, read_num, 0);
+	     callback("filter_fasta_file_any", callback_data, read_num, 0);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
+       }
+       else {
+	 name = line.substr(1, line.length()-1);
+       }
+
+       isRead = isRead ? 0 : 1;
+     }
+   }
+  
+   infile.close();
+
+   return readmask;
+}
+
+//
+// filter_fasta_file_all: filters a FASTA file based on whether all
+// k-mers in a sequence have 'threshold' counts in the hashtable.
+//
+
+ReadMaskTable * Hashtable::filter_fasta_file_all(const std::string &inputfile,
+						 MinMaxTable &minmax,
+						 BoundedCounterType threshold,
+						 ReadMaskTable * old_readmask,
+						 CallbackFn callback,
+						 void * callback_data)
+
+{
+   string line;
+   ifstream infile(inputfile.c_str());
+   int isRead = 0;
+   string name;
+   string seq;
+   unsigned int read_num = 0;
+   ReadMaskTable * readmask = new ReadMaskTable(minmax.get_tablesize());
+
+   if (old_readmask) {
+     readmask->merge(*old_readmask);
+   }
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 seq = line;
+	 if (readmask->get(read_num)) {
+	   BoundedCounterType minval = minmax.get_min(read_num);
+
+	   if (minval < threshold) {
+	     readmask->set(read_num, false);
+	   }
+	   name.clear();
+	   seq.clear();
+	 }
+
+	 read_num += 1;
+
+	 // run callback, if specified
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("filter_fasta_file_all", callback_data, read_num, 0);
 	   } catch (...) {
 	     infile.close();
 	     throw;

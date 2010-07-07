@@ -32,9 +32,9 @@ class Test_Filter(object):
         assert total_reads == 3, total_reads
         assert n_consumed == 63, n_consumed
 
-        (total_reads, n_seq_kept) = khmer.filter_fasta_file(ht, filename,
-                                                            total_reads,
-                                                            outname, 2)
+        (total_reads, n_seq_kept) = khmer.filter_fasta_file_any(ht, filename,
+                                                                total_reads,
+                                                                outname, 2)
         assert n_seq_kept == 2, n_seq_kept
 
         names = load_fa_seq_names(outname)
@@ -50,9 +50,9 @@ class Test_Filter(object):
         assert total_reads == 4, total_reads
         assert n_consumed == 63, n_consumed
 
-        (total_reads, n_seq_kept) = khmer.filter_fasta_file(ht, filename,
-                                                            total_reads,
-                                                            outname, 1)
+        (total_reads, n_seq_kept) = khmer.filter_fasta_file_any(ht, filename,
+                                                                total_reads,
+                                                                outname, 1)
         assert n_seq_kept == 3, n_seq_kept
 
         names = load_fa_seq_names(outname)
