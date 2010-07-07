@@ -26,6 +26,9 @@
                          (toupper(ch)) == 'T' ? 0LL : \
                          (toupper(ch)) == 'C' ? 3LL : 2LL)
 
+// choose wisely between forward and rev comp.
+#define uniqify_rc(f, r) ((h) < (r) ? (h) : (r))
+
 
 namespace khmer {
   // two-way hash functions.

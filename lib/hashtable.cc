@@ -482,7 +482,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    bin = (h < r) ? h : r;
+    bin = uniqify_rc(h, r);
 
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
       bin = bin % _tablesize;
@@ -538,7 +538,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    bin = (h < r) ? h : r;
+    bin = uniqify_rc(h, r);
 
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
       count = this->get_count(bin);
@@ -591,7 +591,7 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2-2));
 
-    bin = (h < r) ? h : r;
+    bin = uniqify_rc(h, r);
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
       count = this->get_count(bin);
 

@@ -35,7 +35,7 @@ HashIntoType khmer::_hash(const char * kmer, const WordLength k,
   *_h = h;
   *_r = r;
 
-  return h < r ? h : r;
+  return uniqify_rc(h, r);
 }
 
 // _hash: return the maximum of the forward and reverse hash.
@@ -109,10 +109,7 @@ void KTable::consume_string(const std::string &s)
 
   _hash(sp, _ksize, &h, &r);
   
-  if (h < r)
-     _counts[h]++;
-  else
-    _counts[r]++;
+  _counts[uniqify_rc(h, r)]++;
 
   for (unsigned int i = _ksize; i < length; i++) {
     // left-shift the previous hash over
@@ -128,10 +125,7 @@ void KTable::consume_string(const std::string &s)
     r = r >> 2;
     r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
 
-    if (h < r)
-      _counts[h]++;
-    else
-      _counts[r]++;
+    _counts[uniqify_rc(h, r)]++;
   }
 
 #endif // 0
