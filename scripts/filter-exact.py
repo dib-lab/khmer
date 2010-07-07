@@ -3,7 +3,7 @@ import sys
 
 import khmer
 
-KSIZE=15
+KSIZE=17
 HASHTABLE_SIZE=4**KSIZE
 MIN_ABUNDANCE=5
 
@@ -12,7 +12,7 @@ outfilename = sys.argv[2]
 
 print 'filtering %d-mers exactly;' % KSIZE
 print 'from file %s to file %s;' % (infilename, outfilename,)
-print 'looking for sequences with at least one k-mer with count > %d' \
+print 'looking for sequences with at least one k-mer with count >= %d' \
       % MIN_ABUNDANCE
 
 ht = khmer.new_hashtable(KSIZE, HASHTABLE_SIZE)
