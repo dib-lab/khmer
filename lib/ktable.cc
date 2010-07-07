@@ -14,23 +14,28 @@ using namespace khmer;
 //
 
 HashIntoType khmer::_hash(const char * kmer, const WordLength k, 
-			  HashIntoType * h, HashIntoType * r)
+			  HashIntoType * _h, HashIntoType *_r)
 {
   // sizeof(HashIntoType) * 8 bits / 2 bits/base  
   assert(k <= sizeof(HashIntoType)*4);
 
-  *h |= twobit_repr(kmer[0]);
-  *r |= twobit_comp(kmer[k-1]);
+  HashIntoType h = 0, r = 0;
+
+  h |= twobit_repr(kmer[0]);
+  r |= twobit_comp(kmer[k-1]);
 
   for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
-    *h = *h << 2;
-    *r = *r << 2;
+    h = h << 2;
+    r = r << 2;
 
-    *h |= twobit_repr(kmer[i]);
-    *r |= twobit_comp(kmer[j]);
+    h |= twobit_repr(kmer[i]);
+    r |= twobit_comp(kmer[j]);
   }
 
-  return *h < *r ? *h : *r;
+  *_h = h;
+  *_r = r;
+
+  return h < r ? h : r;
 }
 
 // _hash: return the maximum of the forward and reverse hash.
