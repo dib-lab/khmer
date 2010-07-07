@@ -13,7 +13,7 @@ using namespace khmer;
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
 
-HashIntoType khmer::_hash(const char * kmer, WordLength k, 
+HashIntoType khmer::_hash(const char * kmer, const WordLength k, 
 			  HashIntoType * h, HashIntoType * r)
 {
   // sizeof(HashIntoType) * 8 bits / 2 bits/base  
@@ -22,12 +22,12 @@ HashIntoType khmer::_hash(const char * kmer, WordLength k,
   *h |= twobit_repr(kmer[0]);
   *r |= twobit_comp(kmer[k-1]);
 
-  for (WordLength i = 1; i < k; i++) {
+  for (WordLength i = 1, j = k - 2; i < k; i++, j--) {
     *h = *h << 2;
     *r = *r << 2;
 
     *h |= twobit_repr(kmer[i]);
-    *r |= twobit_comp(kmer[k-1-i]);
+    *r |= twobit_comp(kmer[j]);
   }
 
   return *h < *r ? *h : *r;
@@ -35,7 +35,7 @@ HashIntoType khmer::_hash(const char * kmer, WordLength k,
 
 // _hash: return the maximum of the forward and reverse hash.
 
-HashIntoType khmer::_hash(const char * kmer, WordLength k)
+HashIntoType khmer::_hash(const char * kmer, const WordLength k)
 {
   HashIntoType h = 0;
   HashIntoType r = 0;
