@@ -4,7 +4,7 @@ import sys
 import khmer
 
 KSIZE=32
-HASHTABLE_SIZE=4**17
+HASHTABLE_SIZE=4**17+1
 MIN_ABUNDANCE=5
 
 infilename = sys.argv[1]
