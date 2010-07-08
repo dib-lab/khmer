@@ -17,5 +17,5 @@ namespace khmer {
   typedef unsigned char BoundedCounterType;
 
   typedef void (*CallbackFn)(const char * info, void * callback_data,
-			     unsigned int n_reads, unsigned int other);
+			     unsigned int n_reads, unsigned long long other);
 };

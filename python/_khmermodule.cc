@@ -40,7 +40,7 @@ static PyObject *callback_obj = NULL;
 // callback function to pass into C++ functions
 
 void _report_fn(const char * info, void * data, unsigned int n_reads,
-		unsigned int other)
+		unsigned long long other)
 {
   // handle signals etc. (like CTRL-C)
   if (PyErr_CheckSignals() != 0) {
@@ -56,7 +56,7 @@ void _report_fn(const char * info, void * data, unsigned int n_reads,
   if (data) {
     PyObject * obj = (PyObject *) data;
     if (obj != Py_None) {
-      PyObject * args = Py_BuildValue("sii", info, n_reads, other);
+      PyObject * args = Py_BuildValue("siL", info, n_reads, other);
 
       PyObject * r = PyObject_Call(obj, args, NULL);
       Py_XDECREF(r);
@@ -811,7 +811,8 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
   // call the C++ function, and trap signals => Python
 
-  unsigned int n_consumed, total_reads;
+  unsigned long long n_consumed;
+  unsigned int total_reads;
 
   try {
     hashtable->consume_fasta(filename, total_reads, n_consumed,
@@ -826,7 +827,7 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     assert(readmask == NULL);
   }
 
-  return Py_BuildValue("ii", total_reads, n_consumed);
+  return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
 static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * args)
@@ -844,7 +845,8 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
   }
 
   khmer::ReadMaskTable * readmask = NULL;
-  unsigned int n_consumed, total_reads;
+  unsigned int total_reads;
+  unsigned long long n_consumed;
 
   // this will allocate 'readmask' and fill it in.
   try {
@@ -865,7 +867,7 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
     PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
   readmask_obj->mask = readmask;
 
-  return Py_BuildValue("iiO", total_reads, n_consumed, readmask_obj);
+  return Py_BuildValue("iLO", total_reads, n_consumed, readmask_obj);
 }
 
 static PyObject * hash_consume(PyObject * self, PyObject * args)
