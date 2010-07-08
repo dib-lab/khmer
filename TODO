@@ -10,3 +10,19 @@ tests for readmask updating, etc. in various circumstances!
 tests for khmer saturation vs valid reads
 
 profiling
+
+
+reading on hash functions:
+
+ http://www.burtleburtle.net/bob/hash/doobs.html
+ http://www.burtleburtle.net/bob/c/lookup3.c
+ http://www.burtleburtle.net/bob/hash/doobs.html
+ http://www.codinghorror.com/blog/2007/12/hashtables-pigeonholes-and-birthdays.html
+ http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1131890/
+
+things to reference or at least look at:
+
+  http://sourceforge.net/apps/mediawiki/kmer/index.php?title=Getting_Started_with_Meryl
+  http://www.hgsc.bcm.tmc.edu/cascade-tech-software_bang-ti.hgsc
+  http://www.hgsc.bcm.tmc.edu/cascade-tech-software_cbt-ti.hgsc
+  http://code.google.com/p/google-sparsehash/
