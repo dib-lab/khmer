@@ -22,6 +22,27 @@ class Test_Filter(object):
     def teardown(self):
         shutil.rmtree(self.tempdir)
 
+    def test_abund(self):
+        ht = khmer.new_hashtable(10, 4**10)
+
+        filename = os.path.join(thisdir, 'test-abund-read.fa')
+        outname = os.path.join(self.tempdir, 'test_abund.out')
+
+        ht.consume_fasta(filename)
+        ht.output_fasta_kmer_pos_freq(filename, outname)
+        
+        fd = open(outname, "r")
+
+        output = fd.readlines()
+        assert len(output) == 1
+
+        output = output[0]
+        output = output.strip().split()
+
+        assert ['1']*(114-10+1) == output
+
+        fd.close()
+
     def test_filter(self):
         ht = khmer.new_hashtable(10, 4**10)
 
