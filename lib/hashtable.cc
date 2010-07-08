@@ -218,6 +218,95 @@ ReadMaskTable * Hashtable::filter_fasta_file_all(const std::string &inputfile,
    return readmask;
 }
 
+//
+// filter_fasta_file_run: filters a FASTA file based on whether a run of
+// k-mers in a sequence al have 'threshold' counts in the hashtable.
+//
+
+ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
+						 unsigned int total_reads,
+						 BoundedCounterType threshold,
+						 unsigned int runlength,
+						 ReadMaskTable * old_readmask,
+						 CallbackFn callback,
+						 void * callback_data)
+
+{
+   string line;
+   ifstream infile(inputfile.c_str());
+   int isRead = 0;
+   string name;
+   string seq;
+   unsigned int read_num = 0;
+   unsigned int n_kept = 0;
+   ReadMaskTable * readmask = new ReadMaskTable(total_reads);
+
+   if (old_readmask) {
+     readmask->merge(*old_readmask);
+   }
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 seq = line;
+	 if (readmask->get(read_num)) {
+	   bool keep = false;
+	   
+	   const unsigned int length = seq.length();
+	   const char * s = seq.c_str();
+	   unsigned int this_run = 0;
+
+	   for (unsigned int i = 0; i < length - _ksize + 1; i++) {
+	     HashIntoType count = this->get_count(s);
+	     this_run++;
+	     if (count < threshold) {
+	       this_run = 0;
+	     } else if (this_run >= runlength) {
+	       keep = true;
+	       break;
+	     }
+	     s++;
+	   }
+
+	   if (!keep) {
+	     readmask->set(read_num, false);
+	   } else {
+	     n_kept++;
+	   }
+	   name.clear();
+	   seq.clear();
+	 }
+
+	 read_num += 1;
+
+	 // run callback, if specified
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("filter_fasta_file_run", callback_data, read_num,n_kept);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
+       }
+       else {
+	 name = line.substr(1, line.length()-1);
+       }
+
+       isRead = isRead ? 0 : 1;
+     }
+   }
+  
+   infile.close();
+
+   return readmask;
+}
+
 unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       const std::string &outputfile,
 					       ReadMaskTable * readmask,
@@ -442,10 +531,10 @@ unsigned int Hashtable::consume_string(const std::string &s,
 				       HashIntoType upper_bound)
 {
   const char * sp = s.c_str();
-  unsigned int length = s.length();
+  const unsigned int length = s.length();
   unsigned int n_consumed = 0;
 
-  unsigned int mask = 0;
+  HashIntoType mask = 0;
   for (unsigned int i = 0; i < _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
@@ -492,6 +581,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
       n_consumed++;
     }
   }
+
   return n_consumed;
 }
 
@@ -504,7 +594,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
   const char * sp = s.c_str();
   BoundedCounterType min_count = 255, count;
 
-  unsigned int mask = 0;
+  HashIntoType mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;
@@ -559,7 +649,7 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
   const char * sp = s.c_str();
   BoundedCounterType max_count = 0, count;
 
-  unsigned int mask = 0;
+  HashIntoType mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
     mask = mask << 2;
     mask |= 3;

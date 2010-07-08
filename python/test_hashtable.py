@@ -173,7 +173,16 @@ def test_64bitshift():
    substr =    "ATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGC"
    
    kh.consume(fullstr)
-   assert 0 < kh.get_min_count(substr)
+   assert 0 < kh.get_min_count(substr), kh.get_min_count(substr)
+   
+def test_64bitshift_2():
+   kh = khmer.new_hashtable(25, 4**10)
+   fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"
+   
+   kh.consume(fullstr)
+   for i in range(len(fullstr) - 25 + 1):
+       substr = fullstr[i:i+25]
+       assert kh.get(substr) > 0
 
 class Test_ConsumeString(object):
     def setup(self):

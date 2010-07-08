@@ -4,7 +4,7 @@ import sys
 import khmer
 
 KSIZE=32
-HASHTABLE_SIZE=4**17
+HASHTABLE_SIZE=4**15
 MIN_ABUNDANCE=2
 
 infilename = sys.argv[1]
@@ -22,8 +22,8 @@ print 'just ate %d reads, %d k-mers' % (total_reads, n_consumed)
 
 print 'filtering...'
 
-minmax = ht.fasta_file_to_minmax(infilename, total_reads)
-readmask = ht.filter_fasta_file_all(infilename, minmax, MIN_ABUNDANCE)
+readmask = ht.filter_fasta_file_run(infilename, total_reads, MIN_ABUNDANCE,
+                                    KSIZE)
 
 print 'keeping %d reads' % readmask.n_kept()
 

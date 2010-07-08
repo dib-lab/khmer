@@ -768,6 +768,52 @@ static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
   return (PyObject *) readmask_obj;
 }
 
+static PyObject * hash_filter_fasta_file_run(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename;
+  unsigned int threshold;
+  unsigned int total_reads;
+  unsigned int runlength;
+
+  PyObject * o1 = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "siii|OO", &filename, &total_reads, &threshold,
+			&runlength, &o1, &callback_obj)) {
+    return NULL;
+  }
+
+  khmer::ReadMaskTable * old_readmask = NULL;
+  if (o1 && o1 != Py_None) {
+    if (!is_readmask_obj(o1)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fifth argument must be None or a readmask object");
+      return NULL;
+    }
+    old_readmask = ((khmer_ReadMaskObject *) o1)->mask;
+  }
+
+  khmer::ReadMaskTable * readmask;
+  try {
+    readmask = hashtable->filter_fasta_file_run(filename, total_reads,
+						threshold, runlength,
+						old_readmask,
+						_report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+
+  readmask_obj->mask = readmask;
+
+  return (PyObject *) readmask_obj;
+}
+
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1002,6 +1048,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
   { "filter_fasta_file_all", hash_filter_fasta_file_all, METH_VARARGS, "" },
+  { "filter_fasta_file_run", hash_filter_fasta_file_run, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
