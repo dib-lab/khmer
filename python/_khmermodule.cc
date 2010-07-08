@@ -970,6 +970,28 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
   return PyInt_FromLong(count);
 }
 
+static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  khmer::HashIntoType * dist;
+  dist = hashtable->abundance_distribution();
+  
+  PyObject * x = PyList_New(256);
+  for (int i = 0; i < 256; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+  }
+
+  delete dist;
+
+  return x;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -983,6 +1005,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
+  { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };

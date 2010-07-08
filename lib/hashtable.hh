@@ -122,6 +122,8 @@ namespace khmer {
     BoundedCounterType get_max_count(const std::string &s,
 				     HashIntoType lower_bound = 0,
 				     HashIntoType upper_bound = 0);
+
+    HashIntoType * abundance_distribution() const;
   };
 
   class HashtableIntersect {

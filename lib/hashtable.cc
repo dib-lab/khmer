@@ -603,3 +603,18 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
   return max_count;
 }
 
+HashIntoType * Hashtable::abundance_distribution() const
+{
+  HashIntoType * dist = new HashIntoType[256];
+  HashIntoType i;
+  
+  for (i = 0; i < 256; i++) {
+    dist[i] = 0;
+  }
+
+  for (i = 0; i < _tablesize; i++) {
+    dist[_counts[i]]++;
+  }
+
+  return dist;
+}

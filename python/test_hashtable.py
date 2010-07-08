@@ -186,6 +186,25 @@ class Test_ConsumeString(object):
         n = self.kh.consume('AACT')
         assert self.kh.n_occupied() == 2
 
+    def test_abundance_dist(self):
+        dist = self.kh.abundance_distribution()
+        assert dist[0] == 4**4
+        assert sum(dist[1:]) == 0
+        
+        n = self.kh.consume('AAAA')
+        n = self.kh.consume('AACT')
+        
+        dist = self.kh.abundance_distribution()
+        assert sum(dist[1:]) == 2
+        assert dist[1] == 2
+
+        n = self.kh.consume('AAAA')
+        n = self.kh.consume('AACT')
+
+        dist = self.kh.abundance_distribution()
+        assert sum(dist[1:]) == 2
+        assert dist[2] == 2, dist
+
     def test_n_occupied_args(self):
         assert self.kh.n_occupied() == 0
         n = self.kh.consume('AAAA')
