@@ -63,7 +63,7 @@ def is_prime(n):
 
 def get_n_primes_near_x(n, x):
    '''
-   steps backward until n primes have been
+   steps backward until n primes (other than 2) have been
    found that are smaller than x.
    '''
    primes = []

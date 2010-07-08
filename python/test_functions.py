@@ -31,3 +31,8 @@ def test_reverse_hash():
     
     s = khmer.reverse_hash(255, 4)
     assert s == "GGGG"
+
+def test_get_primes():
+   primes = khmer.get_n_primes_near_x(7, 20)
+
+   assert primes == [19, 17, 13, 11, 7, 5, 3]
