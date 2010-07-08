@@ -3,13 +3,23 @@ import tempfile
 import shutil
 
 import khmer
-import screed
-from screed.fasta import fasta_iter
+try:
+   import screed
+   from screed.fasta import fasta_iter
+except ImportError:
+   pass
+
+import nose
 
 thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
 def load_fa_seq_names(filename):
+    try:
+       fasta_iter
+    except NameError:
+       raise nose.SkipTest
+
     fp = open(filename)
     records = list(fasta_iter(fp))
     names = [ r['name'] for r in records ]
