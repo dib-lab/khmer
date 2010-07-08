@@ -46,6 +46,36 @@ class KmerCount(object):
     def __getitem__(self, k):
         return self._kt.get(k)
 
+def is_prime(n):
+   '''
+   checks if a number is prime
+   '''
+   if n < 2:
+      return False
+   if n == 2:
+      return True
+   if n % 2 == 0:
+      return False
+   for x in range(3, int(n**0.5)+1, 2):
+      if n % x == 0:
+         return False
+   return True
+
+def get_n_primes_near_x(n, x):
+   '''
+   steps backward until n primes have been
+   found that are smaller than x.
+   '''
+   primes = []
+   i = x-1
+   if i % 2 == 0:
+      i -= 1
+   while len(primes) != n and i > 0:
+      if is_prime(i):
+         primes.append(i)
+      i -= 2
+   return primes
+
 # from http://www.rsok.com/~jrm/printprimes.html
 PRIMES_1m = [1000003, 1009837]
 PRIMES_100m = [100009979, 100000007]

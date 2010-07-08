@@ -626,6 +626,23 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
   return PyInt_FromLong(1);
 }
 
+static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * infile;
+  char * outfile;
+
+  if (!PyArg_ParseTuple(args, "ss", &infile, &outfile)) {
+    return NULL;
+  }
+
+  hashtable->output_fasta_kmer_pos_freq(infile, outfile);
+
+  return PyInt_FromLong(0);
+}
+
 static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1049,6 +1066,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
   { "filter_fasta_file_all", hash_filter_fasta_file_all, METH_VARARGS, "" },
   { "filter_fasta_file_run", hash_filter_fasta_file_run, METH_VARARGS, "" },
+  { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },

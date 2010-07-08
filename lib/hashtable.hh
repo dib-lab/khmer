@@ -123,6 +123,9 @@ namespace khmer {
 					  CallbackFn callback = NULL,
 					  void * callback_data = NULL);
 
+    void output_fasta_kmer_pos_freq(const std::string &inputfile,
+                                    const std::string &outputfile);
+
     BoundedCounterType get_min_count(const std::string &s,
 				     HashIntoType lower_bound = 0,
 				     HashIntoType upper_bound = 0);
