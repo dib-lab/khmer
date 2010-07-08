@@ -307,6 +307,49 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
    return readmask;
 }
 
+///
+/// output_fasta_kmer_pos_freq: outputs the kmer frequencies for each read
+///
+
+void Hashtable::output_fasta_kmer_pos_freq(const std::string &inputfile,
+                                           const std::string &outputfile)
+{
+  string line;
+  ifstream infile(inputfile.c_str());
+  ofstream outfile;
+  outfile.open(outputfile.c_str());
+  int isRead = 0;
+  string name;
+  string seq;
+
+  if (infile.is_open()) {
+    while(!infile.eof()) {
+      getline(infile, line);
+      if (line.length() == 0) {
+        break;
+      }
+
+      if (isRead) {
+        seq = line;
+
+        int numPos = seq.length() - Hashtable::_ksize + 1;
+
+        for (int i = 0; i < numPos; i++)  {
+          string kmer = seq.substr(i, Hashtable::_ksize);
+          outfile << (int)Hashtable::get_count(kmer.c_str()) << " ";
+        }
+        outfile << endl;
+      }
+
+      isRead = isRead? 0 : 1;
+    }
+  }
+
+  infile.close();
+  outfile.close();
+}
+
+
 unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       const std::string &outputfile,
 					       ReadMaskTable * readmask,
