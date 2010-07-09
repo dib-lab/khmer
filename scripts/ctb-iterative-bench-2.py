@@ -171,8 +171,7 @@ for n, prime in enumerate(primes):
 
     print 'filtering...'
     minmax = ht.fasta_file_to_minmax(this_filename, total_reads)
-    readmask = ht.filter_fasta_file_any(this_filename, minmax,
-                                        5, readmask)
+    readmask = ht.filter_fasta_file_any(minmax, 5, readmask)
 
     n_seq_kept = readmask.n_kept()
 

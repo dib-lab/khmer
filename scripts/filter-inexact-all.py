@@ -25,7 +25,7 @@ print 'just ate %d reads, %d k-mers' % (total_reads, n_consumed)
 print 'filtering...'
 
 minmax = ht.fasta_file_to_minmax(infilename, total_reads)
-readmask = ht.filter_fasta_file_all(infilename, minmax, MIN_ABUNDANCE)
+readmask = ht.filter_fasta_file_all(minmax, MIN_ABUNDANCE)
 
 print 'keeping %d reads' % readmask.n_kept()
 
