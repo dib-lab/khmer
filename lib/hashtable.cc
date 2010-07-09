@@ -85,67 +85,41 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 // least one) k-mer in a sequence has 'threshold' counts in the hashtable.
 //
 
-ReadMaskTable * Hashtable::filter_fasta_file_any(const std::string &inputfile,
-						 MinMaxTable &minmax,
+ReadMaskTable * Hashtable::filter_fasta_file_any(MinMaxTable &minmax,
 						 BoundedCounterType threshold,
 						 ReadMaskTable * old_readmask,
 						 CallbackFn callback,
 						 void * callback_data)
 
 {
-   string line;
-   ifstream infile(inputfile.c_str());
-   int isRead = 0;
-   string name;
-   string seq;
-   unsigned int read_num = 0;
-   ReadMaskTable * readmask = new ReadMaskTable(minmax.get_tablesize());
+   unsigned int read_num;
+   const unsigned int tablesize = minmax.get_tablesize();
+   ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
    if (old_readmask) {
      readmask->merge(*old_readmask);
    }
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-	 break;
+   for (read_num = 0; read_num < tablesize; read_num++) {
+     if (readmask->get(read_num)) {
+       BoundedCounterType maxval = minmax.get_max(read_num);
+
+       if (maxval < threshold) {
+	 readmask->set(read_num, false);
        }
 
-       if (isRead) {
-	 seq = line;
-	 if (readmask->get(read_num)) {
-	   BoundedCounterType maxval = minmax.get_max(read_num);
-
-	   if (maxval < threshold) {
-	     readmask->set(read_num, false);
-	   }
-	   name.clear();
-	   seq.clear();
-	 }
-
-	 read_num += 1;
-
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("filter_fasta_file_any", callback_data, read_num, 0);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
+       // run callback, if specified
+       if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	 try {
+	   callback("filter_fasta_file_any", callback_data, read_num, 0);
+	 } catch (...) {
+	   delete readmask;
+	   throw;
 	 }
        }
-       else {
-	 name = line.substr(1, line.length()-1);
-       }
-
-       isRead = isRead ? 0 : 1;
      }
    }
   
-   infile.close();
-
    return readmask;
 }
 
@@ -154,67 +128,41 @@ ReadMaskTable * Hashtable::filter_fasta_file_any(const std::string &inputfile,
 // k-mers in a sequence have 'threshold' counts in the hashtable.
 //
 
-ReadMaskTable * Hashtable::filter_fasta_file_all(const std::string &inputfile,
-						 MinMaxTable &minmax,
+ReadMaskTable * Hashtable::filter_fasta_file_all(MinMaxTable &minmax,
 						 BoundedCounterType threshold,
 						 ReadMaskTable * old_readmask,
 						 CallbackFn callback,
 						 void * callback_data)
-
 {
-   string line;
-   ifstream infile(inputfile.c_str());
-   int isRead = 0;
-   string name;
-   string seq;
-   unsigned int read_num = 0;
-   ReadMaskTable * readmask = new ReadMaskTable(minmax.get_tablesize());
+   unsigned int read_num;
+   const unsigned int tablesize = minmax.get_tablesize();
+
+   ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
    if (old_readmask) {
      readmask->merge(*old_readmask);
    }
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-	 break;
+   for (read_num = 0; read_num < tablesize; read_num++) {
+     if (readmask->get(read_num)) {
+       BoundedCounterType minval = minmax.get_min(read_num);
+
+       if (minval < threshold) {
+	 readmask->set(read_num, false);
        }
 
-       if (isRead) {
-	 seq = line;
-	 if (readmask->get(read_num)) {
-	   BoundedCounterType minval = minmax.get_min(read_num);
-
-	   if (minval < threshold) {
-	     readmask->set(read_num, false);
-	   }
-	   name.clear();
-	   seq.clear();
-	 }
-
-	 read_num += 1;
-
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("filter_fasta_file_all", callback_data, read_num, 0);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
+       // run callback, if specified
+       if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	 try {
+	   callback("filter_fasta_file_all", callback_data, read_num, 0);
+	 } catch (...) {
+	   delete readmask;
+	   throw;
 	 }
        }
-       else {
-	 name = line.substr(1, line.length()-1);
-       }
-
-       isRead = isRead ? 0 : 1;
      }
    }
   
-   infile.close();
-
    return readmask;
 }
 

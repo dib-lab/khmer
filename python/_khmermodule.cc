@@ -690,14 +690,12 @@ static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
-  char * filename;
   unsigned int threshold;
 
   PyObject * o1 = NULL, * o2 = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "sOi|OO", &filename, &o1, &threshold, &o2,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "Oi|OO", &o1, &threshold, &o2, &callback_obj)) {
     return NULL;
   }
 
@@ -720,7 +718,7 @@ static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
 
   khmer::ReadMaskTable * readmask;
   try {
-    readmask = hashtable->filter_fasta_file_any(filename, *mmt, threshold,
+    readmask = hashtable->filter_fasta_file_any(*mmt, threshold,
 						old_readmask,
 						_report_fn, callback_obj);
   } catch (_khmer_signal &e) {
@@ -740,14 +738,12 @@ static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
-  char * filename;
   unsigned int threshold;
 
   PyObject * o1 = NULL, * o2 = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "sOi|OO", &filename, &o1, &threshold, &o2,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "Oi|OO", &o1, &threshold, &o2, &callback_obj)) {
     return NULL;
   }
 
@@ -770,7 +766,7 @@ static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
 
   khmer::ReadMaskTable * readmask;
   try {
-    readmask = hashtable->filter_fasta_file_all(filename, *mmt, threshold,
+    readmask = hashtable->filter_fasta_file_all(*mmt, threshold,
 						old_readmask,
 						_report_fn, callback_obj);
   } catch (_khmer_signal &e) {
