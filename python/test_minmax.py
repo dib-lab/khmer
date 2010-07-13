@@ -10,6 +10,9 @@ class Test_Basic(object):
     def __init__(self):
         self.mmt = khmer.new_minmax(MINMAXTABLE_SIZE)
 
+    def test_tablesize(self):
+        assert self.mmt.tablesize() == MINMAXTABLE_SIZE
+
     def test_min_1(self):
         mmt = self.mmt
         

@@ -10,6 +10,9 @@ class Test_Basic(object):
     def __init__(self):
         self.rt = khmer.new_readmask(READTABLE_SIZE)
         
+    def test_tablesize(self):
+        assert self.rt.tablesize() == READTABLE_SIZE
+
     def test_set_true(self):
         rt = self.rt
 
@@ -23,6 +26,16 @@ class Test_Basic(object):
         rt.set(0, False)
         assert not rt.get(0)
         assert rt.n_kept() == READTABLE_SIZE - 1, rt.n_kept()
+
+    def test_invert(self):
+        rt = self.rt
+
+        rt.set(0, False)
+        rt.set(1, True)
+        rt.invert()
+        
+        assert rt.get(0)
+        assert not rt.get(1)
 
     def test_do_and_1(self):
         rt = self.rt

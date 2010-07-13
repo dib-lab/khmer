@@ -1313,6 +1313,21 @@ static PyObject * readmask_load(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * readmask_invert(PyObject * self, PyObject * args)
+{
+  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
+  khmer::ReadMaskTable * mask = me->mask;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  mask->invert();
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * readmask_filter_fasta_file(PyObject * self, PyObject *args)
 {
   char * inputfilename;
@@ -1336,12 +1351,27 @@ static PyObject * readmask_filter_fasta_file(PyObject * self, PyObject *args)
   return PyInt_FromLong(n_kept);
 }
 
+
+static PyObject * readmask_tablesize(PyObject * self, PyObject * args)
+{
+  khmer::ReadMaskTable * readmask = ((khmer_ReadMaskObject *) self)->mask;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(readmask->get_tablesize());
+}
+
+
 static PyMethodDef khmer_readmask_methods[] = {
   { "n_kept", readmask_n_kept, METH_VARARGS, "" },
+  { "tablesize", readmask_tablesize, METH_VARARGS, "" },
   { "get", readmask_get, METH_VARARGS, "" },
   { "set", readmask_set, METH_VARARGS, "" },
   { "do_and", readmask_and, METH_VARARGS, "" },
   { "merge", readmask_merge, METH_VARARGS, "" },
+  { "invert", readmask_invert, METH_VARARGS, "" },
   { "save", readmask_save, METH_VARARGS, "" },
   { "load", readmask_load, METH_VARARGS, "" },
   { "filter_fasta_file", readmask_filter_fasta_file, METH_VARARGS, "" },
@@ -1527,7 +1557,20 @@ static PyObject * minmax_load(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * minmax_tablesize(PyObject * self, PyObject * args)
+{
+  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
+  khmer::MinMaxTable * mmt = me->mmt;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(mmt->get_tablesize());
+}
+
 static PyMethodDef khmer_minmax_methods[] = {
+  { "tablesize", minmax_tablesize, METH_VARARGS, "" },
   { "get_min", minmax_get_min, METH_VARARGS, "" },
   { "get_max", minmax_get_max, METH_VARARGS, "" },
   { "add_min", minmax_add_min, METH_VARARGS, "" },

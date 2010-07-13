@@ -38,6 +38,10 @@ namespace khmer {
       if (_mask) { delete _mask; _mask = NULL; }
     }
 
+    const unsigned int get_tablesize() const {
+      return _tablesize;
+    }
+
     const unsigned int n_kept() const {
       unsigned int n = 0;
       for (unsigned int i = 0; i < _tablesize; i++) {
@@ -63,6 +67,12 @@ namespace khmer {
 
       for (unsigned int i = 0; i < _tablesize; i++) {
 	_mask[i] = _mask[i] && other._mask[i] ? 1 : 0;
+      }
+    }
+
+    void invert() {
+      for (unsigned int i = 0; i < _tablesize; i++) {
+	_mask[i] = !_mask[i];
       }
     }
 
