@@ -1,3 +1,7 @@
+import os
+thisdir = os.path.dirname(__file__)
+thisdir = os.path.abspath(thisdir)
+
 import khmer
 
 def test_no_collision():
@@ -194,6 +198,27 @@ class Test_ConsumeString(object):
         assert self.kh.n_occupied() == 1
         n = self.kh.consume('AACT')
         assert self.kh.n_occupied() == 2
+
+    def test_abundance_by_pos(self):
+        kh = self.kh
+
+        for i in range(0, 300):
+            kh.count('ATCG')
+
+        for i in range(0, 10):
+            kh.count('ATGG')
+
+        short_filename = os.path.join(thisdir, 'test-short.fa')
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6,
+                                                None, 10)
+        assert dist[4] == 1
+        assert sum(dist) == 1
+        
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6,
+                                                None, 255)
+        assert dist[0] == 1
+        assert dist[2] == 1
+        assert sum(dist) == 2
 
     def test_abundance_dist(self):
         dist = self.kh.abundance_distribution()

@@ -699,3 +699,82 @@ HashIntoType * Hashtable::abundance_distribution() const
 
   return dist;
 }
+
+HashIntoType * Hashtable::fasta_count_kmers_by_position(const std::string &inputfile,
+					     const unsigned int max_read_len,
+					     ReadMaskTable * readmask,
+					     BoundedCounterType limit_by_count,
+					     CallbackFn callback,
+					     void * callback_data)
+{
+  unsigned long long *counts = new unsigned long long[max_read_len];
+
+  for (unsigned int i = 0; i < max_read_len; i++) {
+    counts[i] = 0;
+  }
+
+  string line;
+  ifstream infile(inputfile.c_str());
+  int isRead = 0;
+  string name;
+  string seq;
+  unsigned int read_num = 0;
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 bool valid_read = true;
+	 seq = line;
+	 if (!readmask || readmask->get(read_num)) {
+	   for (unsigned int i = 0; i < seq.length(); i++)  {
+	     if (!is_valid_dna(seq[i])) {
+	       valid_read = false;
+	       break;
+	     }
+	   }
+
+	   if (valid_read) {
+	     for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	       string kmer = seq.substr(i, i + _ksize);
+	       BoundedCounterType n = get_count(kmer.c_str());
+
+	       if (limit_by_count == 0 || n == limit_by_count) {
+		 if (i < max_read_len) {
+		   counts[i]++;
+		 }
+	       }
+	     }
+	   }
+	   name.clear();
+	   seq.clear();
+	 }
+
+	 read_num += 1;
+
+	 // run callback, if specified
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("fasta_file_count_kmers_by_position", callback_data, read_num, 0);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
+       }
+       else {
+	 name = line.substr(1, line.length()-1);
+       }
+
+       isRead = isRead ? 0 : 1;
+     }
+   }
+  
+   infile.close();
+
+  return counts;
+}

@@ -1051,6 +1051,48 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
   return x;
 }
 
+static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * inputfile;
+  int max_read_len;
+  int limit_by = 0;
+  PyObject * readmask_obj = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "si|OiO", &inputfile, &max_read_len,
+			&readmask_obj, &limit_by, &callback_obj)) {
+    return NULL;
+  }
+
+  khmer::ReadMaskTable * readmask = NULL;
+  if (readmask_obj && readmask_obj != Py_None){
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "third argument must be None or a readmask object");
+      return NULL;
+    }
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  }
+    
+
+  unsigned long long * counts;
+  counts = hashtable->fasta_count_kmers_by_position(inputfile, max_read_len,
+						    readmask, limit_by,
+						    _report_fn, callback_obj);
+					 
+  PyObject * x = PyList_New(max_read_len);
+  for (int i = 0; i < max_read_len; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(counts[i]));
+  }
+
+  delete counts;
+
+  return x;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1067,6 +1109,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
+  { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
