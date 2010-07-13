@@ -209,13 +209,11 @@ class Test_ConsumeString(object):
             kh.count('ATGG')
 
         short_filename = os.path.join(thisdir, 'test-short.fa')
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6,
-                                                None, 10)
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
         assert dist[4] == 1
         assert sum(dist) == 1
         
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6,
-                                                None, 255)
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 255)
         assert dist[0] == 1
         assert dist[2] == 1
         assert sum(dist) == 2

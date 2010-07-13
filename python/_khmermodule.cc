@@ -1062,8 +1062,8 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
   PyObject * readmask_obj = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "si|OiO", &inputfile, &max_read_len,
-			&readmask_obj, &limit_by, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sii|OO", &inputfile, &max_read_len, &limit_by,
+			&readmask_obj, &callback_obj)) {
     return NULL;
   }
 
@@ -1071,7 +1071,7 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
   if (readmask_obj && readmask_obj != Py_None){
     if (!is_readmask_obj(readmask_obj)) {
       PyErr_SetString(PyExc_TypeError,
-		      "third argument must be None or a readmask object");
+		      "fourth argument must be None or a readmask object");
       return NULL;
     }
     readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
