@@ -17,9 +17,8 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 {
    string line;
    ifstream infile(inputfile.c_str());
-   int isRead = 0;
-   string name;
-   string seq;
+   string name = "";
+   string seq = "";
    unsigned int read_num = 0;
 
    MinMaxTable * mmt = new MinMaxTable(total_reads);
@@ -27,51 +26,51 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
    if (infile.is_open()) {
      while(!infile.eof()) {
        getline(infile, line);
-       if (line.length() == 0) {
-	 break;
-       }
 
-       if (isRead) {
-	 bool valid_read = true;
-	 seq = line;
-	 if (!readmask || readmask->get(read_num)) {
+       if (line[0] == '>' || infile.eof()) {
+	 if (seq != "") {
 
-	   for (unsigned int i = 0; i < seq.length(); i++)  {
-	     if (!is_valid_dna(seq[i])) {
-	       valid_read = false;
-	       break;
+	   bool valid_read = true;
+	   if (!readmask || readmask->get(read_num)) {
+
+	     for (unsigned int i = 0; i < seq.length(); i++)  {
+	       if (!is_valid_dna(seq[i])) {
+		 valid_read = false;
+		 break;
+	       }
 	     }
-	   }
 
-	   if (valid_read) {
-	     BoundedCounterType minval = get_min_count(seq);
-	     BoundedCounterType maxval = get_max_count(seq);
+	     if (valid_read) {
+	       BoundedCounterType minval = get_min_count(seq);
+	       BoundedCounterType maxval = get_max_count(seq);
 
-	     mmt->add_min(read_num, minval);
-	     mmt->add_max(read_num, maxval);
+	       mmt->add_min(read_num, minval);
+	       mmt->add_max(read_num, maxval);
+	     }
 	   }
 	   name.clear();
 	   seq.clear();
-	 }
 
-	 read_num += 1;
+	   read_num += 1;
 
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("fasta_file_to_minmax", callback_data, read_num, 0);
-	   } catch (...) {
-	     infile.close();
-	     delete mmt;
-	     throw;
+	   // run callback, if specified
+	   if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	     try {
+	       callback("fasta_file_to_minmax", callback_data, read_num, 0);
+	     } catch (...) {
+	       infile.close();
+	       delete mmt;
+	       throw;
+	     }
 	   }
+	 }
+	 if (line[0] == '>') {
+	   name = line.substr(1, line.length() - 1);
 	 }
        }
        else {
-	 name = line.substr(1, line.length()-1);
+	 seq += line;
        }
-
-       isRead = isRead ? 0 : 1;
      }
    }
   
@@ -777,4 +776,75 @@ HashIntoType * Hashtable::fasta_count_kmers_by_position(const std::string &input
    infile.close();
 
   return counts;
+}
+
+void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
+					      ReadMaskTable * readmask,
+					      BoundedCounterType limit_by_count,
+					      CallbackFn callback,
+					      void * callback_data)
+{
+  string line;
+  ifstream infile(inputfile.c_str());
+  int isRead = 0;
+  string name;
+  string seq;
+  unsigned int read_num = 0;
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+	 break;
+       }
+
+       if (isRead) {
+	 bool valid_read = true;
+	 seq = line;
+	 if (!readmask || readmask->get(read_num)) {
+	   for (unsigned int i = 0; i < seq.length(); i++)  {
+	     if (!is_valid_dna(seq[i])) {
+	       valid_read = false;
+	       break;
+	     }
+	   }
+
+	   if (valid_read) {
+	     for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	       string kmer = seq.substr(i, i + _ksize);
+	       BoundedCounterType n = get_count(kmer.c_str());
+	       char ss[_ksize + 1];
+	       strncpy(ss, kmer.c_str(), _ksize);
+	       ss[_ksize] = 0;
+
+	       if (n == limit_by_count) {
+		 cout << ss << endl;
+	       }
+	     }
+	   }
+	   name.clear();
+	   seq.clear();
+	 }
+
+	 read_num += 1;
+
+	 // run callback, if specified
+	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("fasta_file_dump_kmers_by_abundance", callback_data, read_num, 0);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
+       }
+       else {
+	 name = line.substr(1, line.length()-1);
+       }
+
+       isRead = isRead ? 0 : 1;
+     }
+   }
+  
+   infile.close();
 }

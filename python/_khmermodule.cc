@@ -1093,6 +1093,41 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
   return x;
 }
 
+static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * inputfile;
+  int limit_by = 0;
+  PyObject * readmask_obj = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "si|OO", &inputfile, &limit_by,
+			&readmask_obj, &callback_obj)) {
+    return NULL;
+  }
+
+  khmer::ReadMaskTable * readmask = NULL;
+  if (readmask_obj && readmask_obj != Py_None){
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "third argument must be None or a readmask object");
+      return NULL;
+    }
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  }
+    
+
+  hashtable->fasta_dump_kmers_by_abundance(inputfile,
+					   readmask, limit_by,
+					   _report_fn, callback_obj);
+					 
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1110,7 +1145,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
-
+  { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

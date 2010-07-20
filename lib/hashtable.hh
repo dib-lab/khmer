@@ -141,6 +141,11 @@ namespace khmer {
 						 CallbackFn callback = NULL,
 						 void * callback_data = NULL);
 
+    void fasta_dump_kmers_by_abundance(const std::string &inputfile,
+				       ReadMaskTable * readmask,
+				       BoundedCounterType limit_by_count,
+				       CallbackFn callback = NULL,
+				       void * callback_data = NULL);
   };
 
   class HashtableIntersect {
