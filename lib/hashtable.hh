@@ -153,6 +153,7 @@ namespace khmer {
     void mark_connected_graph(const std::string& kmer) const;
 
     void empty_bins(bool empty_marked=false);
+    unsigned int calc_connected_graph_size(const std::string& kmer) const;
 
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
@@ -165,6 +166,13 @@ namespace khmer {
 	  } else{
 	    std::cout << _revhash(i, _ksize) << " " << count << std::endl;
 	  }
+	}
+      }
+    }
+    void clear_marks() {
+      for (HashIntoType i = 0; i < _tablesize; i++) {
+	if (_counts[i]) {
+	  _counts[i] &= 127;
 	}
       }
     }

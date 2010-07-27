@@ -849,9 +849,6 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
    infile.close();
 }
 
-#define empty(c) (!((c) & 127))
-#define marked(c) ((c) & (1<<7))
-
 void Hashtable::mark_connected_graph(const std::string &kmer) const
 {
   const unsigned char seen = 1 << 7;
@@ -897,6 +894,70 @@ void Hashtable::mark_connected_graph(const std::string &kmer) const
   mark_connected_graph(prev);
   mark_connected_graph(next);
 }
+
+unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer)
+const
+{
+  const unsigned char seen = 1 << 7;
+  unsigned int left_max = 0, right_max = 0, left_cur, right_cur;
+
+  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  const BoundedCounterType val = _counts[bin];
+
+  if (empty(val) || marked(val)) {
+    return 0;
+  }
+  _counts[bin] |= seen;
+
+  // std::cout << kmer << std::endl;
+
+  std::string front, back;
+  std::string prev, next;
+  std::string base;
+
+  front = kmer.substr(0, _ksize - 1);
+  back = kmer.substr(1, _ksize - 1);
+
+  base = "A";
+  prev = base + front;
+  next = back + base;
+  left_cur = calc_connected_graph_size(prev);
+  if (left_cur > left_max) { left_max = left_cur; }
+
+  right_cur = calc_connected_graph_size(next);
+  if (right_cur > right_max) { right_max = right_cur; }
+
+  base = "C";
+  prev = base + front;
+  next = back + base;
+  left_cur = calc_connected_graph_size(prev);
+  if (left_cur > left_max) { left_max = left_cur; }
+
+  right_cur = calc_connected_graph_size(next);
+  if (right_cur > right_max) { right_max = right_cur; }
+
+  base = "G";
+  prev = base + front;
+  next = back + base;
+  left_cur = calc_connected_graph_size(prev);
+  if (left_cur > left_max) { left_max = left_cur; }
+
+  right_cur = calc_connected_graph_size(next);
+  if (right_cur > right_max) { right_max = right_cur; }
+
+  base = "T";
+  prev = base + front;
+  next = back + base;
+  left_cur = calc_connected_graph_size(prev);
+  if (left_cur > left_max) { left_max = left_cur; }
+
+  right_cur = calc_connected_graph_size(next);
+  if (right_cur > right_max) { right_max = right_cur; }
+
+  return left_max + right_max + 1;
+}
+
+
 
 void Hashtable::empty_bins(bool empty_marked)
 {
