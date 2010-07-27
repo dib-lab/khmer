@@ -582,7 +582,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  BoundedCounterType min_count = 255, count;
+  BoundedCounterType min_count = MAX_COUNT, count;
 
   HashIntoType mask = 0;
   for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
@@ -847,4 +847,73 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
    }
   
    infile.close();
+}
+
+#define empty(c) (!((c) & 127))
+#define marked(c) ((c) & (1<<7))
+
+void Hashtable::mark_connected_graph(const std::string &kmer) const
+{
+  const unsigned char seen = 1 << 7;
+
+  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  const BoundedCounterType val = _counts[bin];
+
+  if (empty(val) || marked(val)) {
+    return;
+  }
+  _counts[bin] |= seen;
+
+  std::cout << kmer << std::endl;
+
+  std::string front, back;
+  std::string prev, next;
+  std::string base;
+
+  front = kmer.substr(0, _ksize - 1);
+  back = kmer.substr(1, _ksize - 1);
+
+  base = "A";
+  prev = base + front;
+  next = back + base;
+  mark_connected_graph(prev);
+  mark_connected_graph(next);
+
+  base = "C";
+  prev = base + front;
+  next = back + base;
+  mark_connected_graph(prev);
+  mark_connected_graph(next);
+
+  base = "G";
+  prev = base + front;
+  next = back + base;
+  mark_connected_graph(prev);
+  mark_connected_graph(next);
+
+  base = "T";
+  prev = base + front;
+  next = back + base;
+  mark_connected_graph(prev);
+  mark_connected_graph(next);
+}
+
+void Hashtable::empty_bins(bool empty_marked)
+{
+  for (HashIntoType i = 0; i < _tablesize; i++) {
+    if (!_counts[i]) {		// no counts, not marked
+      continue;
+    }
+
+    if (marked(_counts[i])) {
+      if (empty_marked) {
+	_counts[i] = 0;
+      }
+    }
+    else {
+      if (!empty_marked) {
+	_counts[i] = 0;
+      }
+    }
+  }
 }

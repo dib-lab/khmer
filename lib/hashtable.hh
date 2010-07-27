@@ -146,6 +146,18 @@ namespace khmer {
 				       BoundedCounterType limit_by_count,
 				       CallbackFn callback = NULL,
 				       void * callback_data = NULL);
+
+    void mark_connected_graph(const std::string& kmer) const;
+
+    void empty_bins(bool empty_marked=false);
+
+    void dump_kmers_and_counts() const {
+      for (HashIntoType i = 0; i < _tablesize; i++) {
+	if (_counts[i]) {
+	  std::cout << _revhash(i, _ksize) << " " << _counts[i] << std::endl;
+	}
+      }
+    }
   };
 
   class HashtableIntersect {
