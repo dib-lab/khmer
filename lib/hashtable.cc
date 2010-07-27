@@ -864,7 +864,7 @@ void Hashtable::mark_connected_graph(const std::string &kmer) const
   }
   _counts[bin] |= seen;
 
-  std::cout << kmer << std::endl;
+  // std::cout << kmer << std::endl;
 
   std::string front, back;
   std::string prev, next;
