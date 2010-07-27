@@ -1171,15 +1171,47 @@ static PyObject * hash_empty_bins(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+// callback function to pass into dump function
+
+void _dump_report_fn(const char * info, unsigned int count, void * data)
+{
+  // handle signals etc. (like CTRL-C)
+  if (PyErr_CheckSignals() != 0) {
+    throw _khmer_signal("PyErr_CheckSignals received a signal");
+  }
+
+  // if 'data' is set, it is a Python callable
+  if (data) {
+    PyObject * obj = (PyObject *) data;
+    if (obj != Py_None) {
+      PyObject * args = Py_BuildValue("si", info, count);
+
+      PyObject * r = PyObject_Call(obj, args, NULL);
+      Py_XDECREF(r);
+      Py_DECREF(args);
+    }
+  }
+
+  if (PyErr_Occurred()) {
+    throw _khmer_signal("PyErr_Occurred is set");
+  }
+
+  // ...allow other Python threads to do stuff...
+  Py_BEGIN_ALLOW_THREADS;
+  Py_END_ALLOW_THREADS;
+}
+
+
 static PyObject * hash_dump_kmers_and_counts(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
-  if (!PyArg_ParseTuple(args, "")) {
+  PyObject * cb = NULL;
+  if (!PyArg_ParseTuple(args, "|O", &cb)) {
     return NULL;
   }
-  hashtable->dump_kmers_and_counts();
+  hashtable->dump_kmers_and_counts(_dump_report_fn, cb);
   
   Py_INCREF(Py_None);
   return Py_None;

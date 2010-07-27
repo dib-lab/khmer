@@ -7,6 +7,9 @@
 #include "khmer.hh"
 #include "storage.hh"
 
+#define empty(c) (!((c) & 127))
+#define marked(c) ((c) & (1<<7))
+
 namespace khmer {
   class Hashtable {
   protected:
@@ -155,11 +158,12 @@ namespace khmer {
 
     void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
       for (HashIntoType i = 0; i < _tablesize; i++) {
+	BoundedCounterType count = _counts[i] & 127;
 	if (_counts[i]) {
 	  if (cb_fn) {
-	    cb_fn(_revhash(i, _ksize).c_str(), _counts[i], data);
+	    cb_fn(_revhash(i, _ksize).c_str(), count, data);
 	  } else{
-	    std::cout << _revhash(i, _ksize) << " " << _counts[i] << std::endl;
+	    std::cout << _revhash(i, _ksize) << " " << count << std::endl;
 	  }
 	}
       }
