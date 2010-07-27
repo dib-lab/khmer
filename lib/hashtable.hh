@@ -151,10 +151,16 @@ namespace khmer {
 
     void empty_bins(bool empty_marked=false);
 
-    void dump_kmers_and_counts() const {
+    typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
+
+    void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
       for (HashIntoType i = 0; i < _tablesize; i++) {
 	if (_counts[i]) {
-	  std::cout << _revhash(i, _ksize) << " " << _counts[i] << std::endl;
+	  if (cb_fn) {
+	    cb_fn(_revhash(i, _ksize).c_str(), _counts[i], data);
+	  } else{
+	    std::cout << _revhash(i, _ksize) << " " << _counts[i] << std::endl;
+	  }
 	}
       }
     }
