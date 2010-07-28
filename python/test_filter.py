@@ -68,7 +68,6 @@ class Test_Filter(object):
                                                                     7)
 
 
-        print "First", total_reads, n_seq_kept
         assert total_reads == 2
         assert n_seq_kept == 1 
 
@@ -78,7 +77,6 @@ class Test_Filter(object):
                                                                     outname, 2,
                                                                     4)
 
-        print "Second", total_reads, n_seq_kept
         assert total_reads == 2
         assert n_seq_kept == 2
 
