@@ -895,7 +895,52 @@ void Hashtable::mark_connected_graph(const std::string &kmer) const
   mark_connected_graph(next);
 }
 
-unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer)
+void Hashtable::zero_connected_graph(const std::string &kmer) const
+{
+  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  const BoundedCounterType val = _counts[bin];
+
+  if (empty(val)) {
+    return;
+  }
+  _counts[bin] = 0;
+
+  // std::cout << kmer << std::endl;
+
+  std::string front, back;
+  std::string prev, next;
+  std::string base;
+
+  front = kmer.substr(0, _ksize - 1);
+  back = kmer.substr(1, _ksize - 1);
+
+  base = "A";
+  prev = base + front;
+  next = back + base;
+  zero_connected_graph(prev);
+  zero_connected_graph(next);
+
+  base = "C";
+  prev = base + front;
+  next = back + base;
+  zero_connected_graph(prev);
+  zero_connected_graph(next);
+
+  base = "G";
+  prev = base + front;
+  next = back + base;
+  zero_connected_graph(prev);
+  zero_connected_graph(next);
+
+  base = "T";
+  prev = base + front;
+  next = back + base;
+  zero_connected_graph(prev);
+  zero_connected_graph(next);
+}
+
+unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer,
+						  unsigned int threshold)
 const
 {
   const unsigned char seen = 1 << 7;
@@ -921,37 +966,49 @@ const
   base = "A";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev);
+  left_cur = calc_connected_graph_size(prev, threshold);
   if (left_cur > left_max) { left_max = left_cur; }
 
-  right_cur = calc_connected_graph_size(next);
+  right_cur = calc_connected_graph_size(next, threshold);
   if (right_cur > right_max) { right_max = right_cur; }
+
+  if (threshold && (left_max + right_max + 1 > threshold)) {
+    return threshold;
+  }
 
   base = "C";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev);
+  left_cur = calc_connected_graph_size(prev, threshold);
   if (left_cur > left_max) { left_max = left_cur; }
 
-  right_cur = calc_connected_graph_size(next);
+  right_cur = calc_connected_graph_size(next, threshold);
   if (right_cur > right_max) { right_max = right_cur; }
+
+  if (threshold && (left_max + right_max + 1 > threshold)) {
+    return threshold;
+  }
 
   base = "G";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev);
+  left_cur = calc_connected_graph_size(prev, threshold);
   if (left_cur > left_max) { left_max = left_cur; }
 
-  right_cur = calc_connected_graph_size(next);
+  right_cur = calc_connected_graph_size(next, threshold);
   if (right_cur > right_max) { right_max = right_cur; }
+
+  if (threshold && (left_max + right_max + 1 > threshold)) {
+    return threshold;
+  }
 
   base = "T";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev);
+  left_cur = calc_connected_graph_size(prev, threshold);
   if (left_cur > left_max) { left_max = left_cur; }
 
-  right_cur = calc_connected_graph_size(next);
+  right_cur = calc_connected_graph_size(next, threshold);
   if (right_cur > right_max) { right_max = right_cur; }
 
   return left_max + right_max + 1;
@@ -977,4 +1034,43 @@ void Hashtable::empty_bins(bool empty_marked)
       }
     }
   }
+}
+
+void Hashtable::trim_graphs(unsigned int min_size)
+{
+  for (HashIntoType i = 0; i < _tablesize; i++) {
+    if (_counts[i]) {
+      std::string kmer = _revhash(i, _ksize);
+      unsigned int size = calc_connected_graph_size(kmer, min_size);
+      if (size && size < min_size) {
+	std::cout << "removing: " << kmer << "; size: " << size << "\n";
+	zero_connected_graph(kmer);
+      }
+    }
+  }
+}
+
+HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
+const
+{
+  HashIntoType * p = new HashIntoType[max_size];
+  const unsigned char seen = 1 << 7;
+
+  for (unsigned int i = 0; i < max_size; i++) {
+    p[i] = 0;
+  }
+
+  for (HashIntoType i = 0; i < _tablesize; i++) {
+    BoundedCounterType count = _counts[i];
+    if (count && !(count & seen)) {
+      std::string kmer = _revhash(i, _ksize);
+      unsigned int size = calc_connected_graph_size(kmer, max_size);
+      if (size) {
+	if (size >= max_size) { size = max_size; }
+	p[size] += 1;
+      }
+    }
+  }
+
+  return p;
 }

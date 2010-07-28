@@ -1217,6 +1217,73 @@ static PyObject * hash_dump_kmers_and_counts(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * _kmer;
+  unsigned int threshold = 0;
+  if (!PyArg_ParseTuple(args, "s|i", &_kmer, threshold)) {
+    return NULL;
+  }
+  std::string kmer(_kmer);
+  unsigned int size = hashtable->calc_connected_graph_size(kmer, threshold);
+
+  return PyInt_FromLong(size);
+}
+
+static PyObject * hash_clear_marks(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+  hashtable->clear_marks();
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_trim_graphs(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  unsigned int threshold = 0;
+  if (!PyArg_ParseTuple(args, "i", &threshold)) {
+    return NULL;
+  }
+  hashtable->trim_graphs(threshold);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_graphsize_distribution(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  unsigned int threshold = 0;
+  if (!PyArg_ParseTuple(args, "i", &threshold)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType * p = hashtable->graphsize_distribution(threshold);
+  
+  PyObject * x = PyList_New(threshold);
+  for (unsigned int i = 0; i < threshold; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(p[i]));
+  }
+
+  delete p;
+
+  return x;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1238,6 +1305,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "empty_bins", hash_empty_bins, METH_VARARGS, "" },
   { "mark_connected_graph", hash_mark_connected_graph, METH_VARARGS, "" },
   { "dump_kmers_and_counts", hash_dump_kmers_and_counts, METH_VARARGS, "" },
+  { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
+  { "clear_marks", hash_clear_marks, METH_VARARGS, "" },
+  { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
+  { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

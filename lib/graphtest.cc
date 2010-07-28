@@ -52,5 +52,12 @@ int main()
   ht.clear_marks();
   std::cout << ht.calc_connected_graph_size("CCCCC") << "\n";
 
+  std::cout << "e\n";
+  ht.clear_marks();
+  std::cout << ht.calc_connected_graph_size("AAAAT") << "\n";
+  std::cout << ht.calc_connected_graph_size("CCCCC") << "\n";
+  ht.clear_marks();
+  ht.trim_graphs(2);
+
   return 0;
 }
