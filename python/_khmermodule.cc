@@ -676,13 +676,61 @@ static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
     return NULL;
   }
   
-
   khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
     PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
 
   minmax_obj->mmt = mmt;
 
   return (PyObject *) minmax_obj;
+}
+
+static PyObject * hash_filter_fasta_file_limit_n(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  unsigned int threshold, n;
+  char * filename;
+  PyObject * o1 = NULL, * o2 = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "sOii|OO", &filename, &o1, &threshold, &n, &o2, &callback_obj)) {
+    return NULL;
+  }
+
+  if (!is_minmax_obj(o1)) {
+    PyErr_SetString(PyExc_TypeError,
+                    "third argument must be a minmax object");
+    return NULL;
+  }
+  khmer::MinMaxTable * mmt = ((khmer_MinMaxObject *) o1)->mmt;
+
+  khmer::ReadMaskTable * old_readmask = NULL;
+  if (o2 && o2 != Py_None) {
+    if (!is_readmask_obj(o2)) {
+      PyErr_SetString(PyExc_TypeError,
+                      "sixth must be None or a readmask object");
+      return NULL;
+    }
+    old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
+  }
+
+  khmer::ReadMaskTable * readmask;
+  try {
+    readmask = hashtable->filter_fasta_file_limit_n(filename, *mmt, threshold,
+                                                n, old_readmask,
+                                                _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+
+  readmask_obj->mask = readmask;
+
+  return (PyObject *) readmask_obj;
+
 }
 
 static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
@@ -1136,6 +1184,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_build_readmask", hash_consume_fasta_build_readmask, METH_VARARGS, "Count all k-mers in a given file, creating a readmask object to mask off bad reads" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
+  { "filter_fasta_file_limit_n", hash_filter_fasta_file_limit_n, METH_VARARGS, "" },
   { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
   { "filter_fasta_file_all", hash_filter_fasta_file_all, METH_VARARGS, "" },
   { "filter_fasta_file_run", hash_filter_fasta_file_run, METH_VARARGS, "" },

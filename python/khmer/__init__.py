@@ -9,7 +9,7 @@ from _khmer import consume_genome
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback
 
-from filter_utils import filter_fasta_file_any, filter_fasta_file_all
+from filter_utils import filter_fasta_file_any, filter_fasta_file_all, filter_fasta_file_limit_n
 
 ###
 

@@ -53,6 +53,36 @@ class Test_Filter(object):
 
         fd.close()
 
+    def test_filter_limit_n(self):
+        ht = khmer.new_hashtable(4, 4**4)
+
+        filename = os.path.join(thisdir, 'test_data/simple_3.fa')
+        outname = os.path.join(self.tempdir, 'test_filter.out')
+
+        (total_reads, n_consumed) = ht.consume_fasta(filename)
+        assert total_reads == 2, total_reads
+
+        (total_reads, n_seq_kept) = khmer.filter_fasta_file_limit_n(ht, filename,
+                                                                    total_reads,
+                                                                    outname, 2,
+                                                                    7)
+
+
+        print "First", total_reads, n_seq_kept
+        assert total_reads == 2
+        assert n_seq_kept == 1 
+
+ 
+        (total_reads, n_seq_kept) = khmer.filter_fasta_file_limit_n(ht, filename,
+                                                                    total_reads,
+                                                                    outname, 2,
+                                                                    4)
+
+        print "Second", total_reads, n_seq_kept
+        assert total_reads == 2
+        assert n_seq_kept == 2
+
+
     def test_filter(self):
         ht = khmer.new_hashtable(10, 4**10)
 

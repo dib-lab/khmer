@@ -113,6 +113,14 @@ namespace khmer {
 					  CallbackFn callback = NULL,
 					  void * callback_data = NULL);
 
+    ReadMaskTable * filter_fasta_file_limit_n(const std::string &readsfile,
+                                              MinMaxTable &minmax,
+                                              BoundedCounterType threshold,
+                                              BoundedCounterType n, 
+                                              ReadMaskTable * old_readmask = NULL,
+                                              CallbackFn callback = NULL,
+                                              void * callback_data = NULL);
+
     ReadMaskTable * filter_fasta_file_run(const std::string &inputfile,
 					  unsigned int total_reads,
 					  BoundedCounterType threshold,

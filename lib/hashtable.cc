@@ -123,6 +123,81 @@ ReadMaskTable * Hashtable::filter_fasta_file_any(MinMaxTable &minmax,
 }
 
 //
+// filter_fasta_file_limit_n: filters a FASTA file based on whether
+// a read has at least n kmers that meet a 'threshold' count
+//
+
+ReadMaskTable * Hashtable::filter_fasta_file_limit_n(const std::string &readsfile,
+                                                     MinMaxTable &minmax,
+                                                     BoundedCounterType threshold,
+                                                     BoundedCounterType n,
+                                                     ReadMaskTable * old_readmask,
+                                                     CallbackFn callback,
+                                                     void * callback_data)
+{
+   string line;
+   ifstream infile(readsfile.c_str());
+   int isRead = 0;
+   string name;
+   string seq;
+
+   unsigned int read_num = 0;
+   const unsigned int tablesize = minmax.get_tablesize();
+
+   ReadMaskTable * readmask = new ReadMaskTable(tablesize);
+
+   if (old_readmask) {
+     readmask->merge(*old_readmask);
+   }
+
+   if (infile.is_open()) {
+     while(!infile.eof()) {
+       getline(infile, line);
+       if (line.length() == 0) {
+         break;
+       }
+ 
+       if (isRead) {
+         seq = line;
+         if (readmask->get(read_num)) {
+           int numPos = seq.length() - _ksize + 1;
+           unsigned int n_met = 0;
+ 
+           for (int i = 0; i < numPos; i++)  {
+             string kmer = seq.substr(i, _ksize);
+             if ((int)this->get_count(kmer.c_str()) >= threshold)  {
+               n_met++;
+             }
+           }
+ 
+           if (n_met < n)  {
+             readmask->set(read_num, false);
+           }
+ 
+           read_num++;
+ 
+           // run callback, if specified
+           if (read_num % CALLBACK_PERIOD == 0 && callback) {
+             try {
+               callback("filter_fasta_file_all", callback_data, read_num, 0);
+             } catch (...) {
+               delete readmask;
+               throw;
+             }
+           }
+         }
+       }
+ 
+       isRead = isRead? 0 : 1;
+     }
+   }
+
+   infile.close();
+
+   return readmask;
+}
+
+//
 // filter_fasta_file_all: filters a FASTA file based on whether all
 // k-mers in a sequence have 'threshold' counts in the hashtable.
 //
@@ -279,11 +354,11 @@ void Hashtable::output_fasta_kmer_pos_freq(const std::string &inputfile,
       if (isRead) {
         seq = line;
 
-        int numPos = seq.length() - Hashtable::_ksize + 1;
+        int numPos = seq.length() - _ksize + 1;
 
         for (int i = 0; i < numPos; i++)  {
-          string kmer = seq.substr(i, Hashtable::_ksize);
-          outfile << (int)Hashtable::get_count(kmer.c_str()) << " ";
+          string kmer = seq.substr(i, _ksize);
+          outfile << (int)get_count(kmer.c_str()) << " ";
         }
         outfile << endl;
       }

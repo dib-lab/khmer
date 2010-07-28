@@ -86,6 +86,18 @@ def test_bad_mmt_in_filter_fasta_file_max():
         pass                            # expected
     except:
         raise
+
+def test_bad_readmask_in_filter_fasta_file_limit_n():
+    ht = khmer.new_hashtable(4, 4**4)
+    mmt = ht.fasta_file_to_minmax(reads_filename, N_READS)
+
+    try:
+        ht.filter_fasta_file_limit_n(mmt, 2, 2, "hi")
+        assert 0
+    except TypeError:
+        pass
+    except:
+        raise
         
 def test_bad_readmask_in_filter_fasta_file_max():
     ht = khmer.new_hashtable(4, 4**4)
