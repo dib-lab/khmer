@@ -1090,6 +1090,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
       std::string kmer = _revhash(i, _ksize);
       unsigned int size = calc_connected_graph_size(kmer);
       if (size) {
+	if (size > 5000) { std::cout << "GRAPH SIZE: " << size << "\n"; }
 	if (size >= max_size) {
 	  size = max_size;
 	}
