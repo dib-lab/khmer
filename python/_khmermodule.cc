@@ -1223,14 +1223,29 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * _kmer;
-  unsigned int threshold = 0;
-  if (!PyArg_ParseTuple(args, "s|i", &_kmer, threshold)) {
+  if (!PyArg_ParseTuple(args, "s", &_kmer)) {
     return NULL;
   }
   std::string kmer(_kmer);
-  unsigned int size = hashtable->calc_connected_graph_size(kmer, threshold);
+  unsigned int size = hashtable->calc_connected_graph_size(kmer);
 
   return PyInt_FromLong(size);
+}
+
+static PyObject * hash_clear_marks_for_connected_graph(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * _kmer;
+  if (!PyArg_ParseTuple(args, "s", &_kmer)) {
+    return NULL;
+  }
+  std::string kmer(_kmer);
+  hashtable->clear_marks_for_connected_graph(kmer);
+
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 static PyObject * hash_clear_marks(PyObject * self, PyObject * args)
@@ -1306,6 +1321,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "mark_connected_graph", hash_mark_connected_graph, METH_VARARGS, "" },
   { "dump_kmers_and_counts", hash_dump_kmers_and_counts, METH_VARARGS, "" },
   { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
+  { "clear_marks_for_connected_graph", hash_clear_marks_for_connected_graph, METH_VARARGS, "" },
   { "clear_marks", hash_clear_marks, METH_VARARGS, "" },
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },

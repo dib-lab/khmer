@@ -213,8 +213,8 @@ class Test_ConsumeString(object):
         assert dist[4] == 1
         assert sum(dist) == 1
         
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 255)
-        assert dist[0] == 1
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 127)
+        assert dist[0] == 1, dist[0]
         assert dist[2] == 1
         assert sum(dist) == 2
 
@@ -319,6 +319,70 @@ class Test_ConsumeString(object):
 
         count = self.kh.get_max_count('AAAAA', 1, 4**4)
         assert count == 0
+
+class Test_GraphFu(object):
+    def setup(self):
+        self.ht = khmer.new_hashtable(12, 4**12)
+
+    def test_clear_marks_for(self):
+        ht = self.ht
+        ht.consume_fasta('test-graph.fa')
+
+        kmer = "TTAGGACTGCAC"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 69, x
+        
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 0, x
+
+        ht.clear_marks_for_connected_graph(kmer)
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 69, x
+        
+    def test_counts(self):
+        ht = self.ht
+        ht.consume_fasta('test-graph.fa')
+
+        kmer = "TTAGGACTGCAC"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 69, x
+        ht.clear_marks_for_connected_graph(kmer)
+        
+        kmer = "TGCGTTTCAATC"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 68, x
+        ht.clear_marks_for_connected_graph(kmer)
+
+        kmer = "ATACTGTAAATA"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 36, x
+        ht.clear_marks_for_connected_graph(kmer)
+
+    def test_trim(self):
+        ht = self.ht
+        ht.consume_fasta('test-graph.fa')
+        ht.trim_graphs(40)
+
+        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
+        assert x == 69, x
+        
+        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
+        assert x == 68, x
+        
+        x = ht.calc_connected_graph_size("ATACTGTAAATA")
+        assert x == 0, x
+
+    def test_graphsize_distrib(self):
+        ht = self.ht
+        ht.consume_fasta('test-graph.fa')
+        x = ht.graphsize_distribution(200)
+
+        assert sum(x) == 3
+        assert x[69] == 1
+        assert x[68] == 1
+        assert x[36] == 1
+
+####
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 

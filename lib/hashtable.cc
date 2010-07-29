@@ -939,20 +939,17 @@ void Hashtable::zero_connected_graph(const std::string &kmer) const
   zero_connected_graph(next);
 }
 
-unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer,
-						  unsigned int threshold)
-const
+void Hashtable::clear_marks_for_connected_graph(const std::string &kmer)
 {
   const unsigned char seen = 1 << 7;
-  unsigned int left_max = 0, right_max = 0, left_cur, right_cur;
 
   HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
-  if (empty(val) || marked(val)) {
-    return 0;
+  if (empty(val) || !(_counts[bin] & seen)) {
+    return;
   }
-  _counts[bin] |= seen;
+  _counts[bin] &= 127;
 
   // std::cout << kmer << std::endl;
 
@@ -966,52 +963,77 @@ const
   base = "A";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev, threshold);
-  if (left_cur > left_max) { left_max = left_cur; }
-
-  right_cur = calc_connected_graph_size(next, threshold);
-  if (right_cur > right_max) { right_max = right_cur; }
-
-  if (threshold && (left_max + right_max + 1 > threshold)) {
-    return threshold;
-  }
+  clear_marks_for_connected_graph(prev);
+  clear_marks_for_connected_graph(next);
 
   base = "C";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev, threshold);
-  if (left_cur > left_max) { left_max = left_cur; }
-
-  right_cur = calc_connected_graph_size(next, threshold);
-  if (right_cur > right_max) { right_max = right_cur; }
-
-  if (threshold && (left_max + right_max + 1 > threshold)) {
-    return threshold;
-  }
+  clear_marks_for_connected_graph(prev);
+  clear_marks_for_connected_graph(next);
 
   base = "G";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev, threshold);
-  if (left_cur > left_max) { left_max = left_cur; }
-
-  right_cur = calc_connected_graph_size(next, threshold);
-  if (right_cur > right_max) { right_max = right_cur; }
-
-  if (threshold && (left_max + right_max + 1 > threshold)) {
-    return threshold;
-  }
+  clear_marks_for_connected_graph(prev);
+  clear_marks_for_connected_graph(next);
 
   base = "T";
   prev = base + front;
   next = back + base;
-  left_cur = calc_connected_graph_size(prev, threshold);
-  if (left_cur > left_max) { left_max = left_cur; }
+  clear_marks_for_connected_graph(prev);
+  clear_marks_for_connected_graph(next);
+}
 
-  right_cur = calc_connected_graph_size(next, threshold);
-  if (right_cur > right_max) { right_max = right_cur; }
 
-  return left_max + right_max + 1;
+unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer)
+const
+{
+  const unsigned char seen = 1 << 7;
+
+  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  const BoundedCounterType val = _counts[bin];
+
+  if (empty(val) || marked(val)) {
+    return 0;
+  }
+  _counts[bin] |= seen;
+
+  // std::cout << kmer << std::endl;
+
+  unsigned int total = 1;
+  std::string front, back;
+  std::string prev, next;
+  std::string base;
+
+  front = kmer.substr(0, _ksize - 1);
+  back = kmer.substr(1, _ksize - 1);
+
+  base = "A";
+  prev = base + front;
+  next = back + base;
+  total += calc_connected_graph_size(prev);
+  total += calc_connected_graph_size(next);
+
+  base = "C";
+  prev = base + front;
+  next = back + base;
+  total += calc_connected_graph_size(prev);
+  total += calc_connected_graph_size(next);
+
+  base = "G";
+  prev = base + front;
+  next = back + base;
+  total += calc_connected_graph_size(prev);
+  total += calc_connected_graph_size(next);
+
+  base = "T";
+  prev = base + front;
+  next = back + base;
+  total += calc_connected_graph_size(prev);
+  total += calc_connected_graph_size(next);
+
+  return total;
 }
 
 
@@ -1041,17 +1063,18 @@ void Hashtable::trim_graphs(unsigned int min_size)
   for (HashIntoType i = 0; i < _tablesize; i++) {
     if (_counts[i]) {
       std::string kmer = _revhash(i, _ksize);
-      unsigned int size = calc_connected_graph_size(kmer, min_size);
+      unsigned int size = calc_connected_graph_size(kmer);
       if (size && size < min_size) {
-	std::cout << "removing: " << kmer << "; size: " << size << "\n";
+	// std::cout << "removing: " << kmer << "; size: " << size << "\n";
 	zero_connected_graph(kmer);
       }
     }
   }
+
+  clear_marks();
 }
 
 HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
-const
 {
   HashIntoType * p = new HashIntoType[max_size];
   const unsigned char seen = 1 << 7;
@@ -1064,13 +1087,15 @@ const
     BoundedCounterType count = _counts[i];
     if (count && !(count & seen)) {
       std::string kmer = _revhash(i, _ksize);
-      unsigned int size = calc_connected_graph_size(kmer, max_size);
+      unsigned int size = calc_connected_graph_size(kmer);
       if (size) {
 	if (size >= max_size) { size = max_size; }
 	p[size] += 1;
       }
     }
   }
+
+  clear_marks();
 
   return p;
 }
