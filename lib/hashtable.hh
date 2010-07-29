@@ -157,7 +157,8 @@ namespace khmer {
     HashIntoType * graphsize_distribution(const unsigned int &max_size);
 
     void empty_bins(bool empty_marked=false);
-    unsigned int calc_connected_graph_size(const std::string& kmer) const;
+    unsigned int calc_connected_graph_size(const std::string& kmer,
+					   unsigned int level=0) const;
 
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 

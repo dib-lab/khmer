@@ -5,6 +5,7 @@ using namespace std;
 
 int main()
 {
+#if 0
   khmer::Hashtable ht(5, 1024);
 
   ht.count("AAAAA");
@@ -58,6 +59,15 @@ int main()
   std::cout << ht.calc_connected_graph_size("CCCCC") << "\n";
   ht.clear_marks();
   ht.trim_graphs(2);
+
+#endif
+
+  std::string filename = "../foo.fa";
+  unsigned int total_reads;
+  unsigned long long n_consumed;
+  khmer::Hashtable ht2(16, 4294967296);
+  ht2.consume_fasta(filename, total_reads, n_consumed);
+  ht2.trim_graphs(100);
 
   return 0;
 }

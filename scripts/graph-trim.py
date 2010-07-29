@@ -1,7 +1,7 @@
 import khmer
 import sys
 
-K = 17
+K = 16
 HASHTABLE_SIZE=4**K
 
 infile = sys.argv[1]
@@ -17,16 +17,17 @@ print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
 fp = open('aaa.1', 'w')
 for n, i in enumerate(ht.graphsize_distribution(500)):
     print >>fp, n, i
-ht.clear_marks()
+fp.close()
     
 print 'trimming to', threshold
 ht.trim_graphs(threshold)
-ht.clear_marks()
+
 print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
 
 fp = open('aaa.2', 'w')
 for n, i in enumerate(ht.graphsize_distribution(500)):
     print >>fp, n, i
+fp.close()
     
 print 'filtering'
 minmax = ht.fasta_file_to_minmax(infile, total_reads)

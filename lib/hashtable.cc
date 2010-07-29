@@ -986,7 +986,8 @@ void Hashtable::clear_marks_for_connected_graph(const std::string &kmer)
 }
 
 
-unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer)
+unsigned int Hashtable::calc_connected_graph_size(const std::string &kmer,
+						  unsigned int r)
 const
 {
   const unsigned char seen = 1 << 7;
@@ -999,7 +1000,7 @@ const
   }
   _counts[bin] |= seen;
 
-  // std::cout << kmer << std::endl;
+  // std::cout << kmer << " " << r << std::endl;
 
   unsigned int total = 1;
   std::string front, back;
@@ -1012,26 +1013,26 @@ const
   base = "A";
   prev = base + front;
   next = back + base;
-  total += calc_connected_graph_size(prev);
-  total += calc_connected_graph_size(next);
+  total += calc_connected_graph_size(prev, r + 1);
+  total += calc_connected_graph_size(next, r + 1);
 
   base = "C";
   prev = base + front;
   next = back + base;
-  total += calc_connected_graph_size(prev);
-  total += calc_connected_graph_size(next);
+  total += calc_connected_graph_size(prev, r + 1);
+  total += calc_connected_graph_size(next, r + 1);
 
   base = "G";
   prev = base + front;
   next = back + base;
-  total += calc_connected_graph_size(prev);
-  total += calc_connected_graph_size(next);
+  total += calc_connected_graph_size(prev, r + 1);
+  total += calc_connected_graph_size(next, r + 1);
 
   base = "T";
   prev = base + front;
   next = back + base;
-  total += calc_connected_graph_size(prev);
-  total += calc_connected_graph_size(next);
+  total += calc_connected_graph_size(prev, r + 1);
+  total += calc_connected_graph_size(next, r + 1);
 
   return total;
 }
@@ -1089,7 +1090,9 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
       std::string kmer = _revhash(i, _ksize);
       unsigned int size = calc_connected_graph_size(kmer);
       if (size) {
-	if (size >= max_size) { size = max_size; }
+	if (size >= max_size) {
+	  size = max_size;
+	}
 	p[size] += 1;
       }
     }
