@@ -1227,7 +1227,7 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
     return NULL;
   }
   std::string kmer(_kmer);
-  unsigned int size = hashtable->calc_connected_graph_size(kmer);
+  unsigned int size = hashtable->calc_connected_graph_size(kmer.c_str());
 
   return PyInt_FromLong(size);
 }
