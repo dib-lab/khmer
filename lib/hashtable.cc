@@ -179,7 +179,7 @@ ReadMaskTable * Hashtable::filter_fasta_file_limit_n(const std::string &readsfil
            // run callback, if specified
            if (read_num % CALLBACK_PERIOD == 0 && callback) {
              try {
-               callback("filter_fasta_file_all", callback_data, read_num, 0);
+               callback("filter_fasta_file_limit_n", callback_data, read_num, 0);
              } catch (...) {
                delete readmask;
                throw;
