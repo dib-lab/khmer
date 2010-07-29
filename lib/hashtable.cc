@@ -849,11 +849,14 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
    infile.close();
 }
 
-void Hashtable::mark_connected_graph(const std::string &kmer) const
+//////////////////////////////////////////////////////////////////////
+// graph stuff
+
+void Hashtable::mark_connected_graph(const char * kmer)
 {
   const unsigned char seen = 1 << 7;
 
-  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
   if (empty(val) || marked(val)) {
@@ -863,41 +866,34 @@ void Hashtable::mark_connected_graph(const std::string &kmer) const
 
   // std::cout << kmer << std::endl;
 
-  std::string front, back;
-  std::string prev, next;
-  std::string base;
+  char new_kmer[_ksize + 1];
+  new_kmer[_ksize] = 0;		// NULL terminate
+  strncpy(new_kmer, kmer + 1, _ksize - 1);
 
-  front = kmer.substr(0, _ksize - 1);
-  back = kmer.substr(1, _ksize - 1);
+  new_kmer[_ksize - 1] = 'A';
+  mark_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'C';
+  mark_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'G';
+  mark_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'T';
+  mark_connected_graph(new_kmer);
 
-  base = "A";
-  prev = base + front;
-  next = back + base;
-  mark_connected_graph(prev);
-  mark_connected_graph(next);
+  strncpy(new_kmer + 1, kmer, _ksize - 1);
 
-  base = "C";
-  prev = base + front;
-  next = back + base;
-  mark_connected_graph(prev);
-  mark_connected_graph(next);
-
-  base = "G";
-  prev = base + front;
-  next = back + base;
-  mark_connected_graph(prev);
-  mark_connected_graph(next);
-
-  base = "T";
-  prev = base + front;
-  next = back + base;
-  mark_connected_graph(prev);
-  mark_connected_graph(next);
+  new_kmer[0] = 'A';
+  mark_connected_graph(new_kmer);
+  new_kmer[0] = 'C';
+  mark_connected_graph(new_kmer);
+  new_kmer[0] = 'G';
+  mark_connected_graph(new_kmer);
+  new_kmer[0] = 'T';
+  mark_connected_graph(new_kmer);
 }
 
-void Hashtable::zero_connected_graph(const std::string &kmer) const
+void Hashtable::zero_connected_graph(const char * kmer)
 {
-  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
   if (empty(val)) {
@@ -907,43 +903,36 @@ void Hashtable::zero_connected_graph(const std::string &kmer) const
 
   // std::cout << kmer << std::endl;
 
-  std::string front, back;
-  std::string prev, next;
-  std::string base;
+  char new_kmer[_ksize + 1];
+  new_kmer[_ksize] = 0;		// NULL terminate
+  strncpy(new_kmer, kmer + 1, _ksize - 1);
 
-  front = kmer.substr(0, _ksize - 1);
-  back = kmer.substr(1, _ksize - 1);
+  new_kmer[_ksize - 1] = 'A';
+  zero_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'C';
+  zero_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'G';
+  zero_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'T';
+  zero_connected_graph(new_kmer);
 
-  base = "A";
-  prev = base + front;
-  next = back + base;
-  zero_connected_graph(prev);
-  zero_connected_graph(next);
+  strncpy(new_kmer + 1, kmer, _ksize - 1);
 
-  base = "C";
-  prev = base + front;
-  next = back + base;
-  zero_connected_graph(prev);
-  zero_connected_graph(next);
-
-  base = "G";
-  prev = base + front;
-  next = back + base;
-  zero_connected_graph(prev);
-  zero_connected_graph(next);
-
-  base = "T";
-  prev = base + front;
-  next = back + base;
-  zero_connected_graph(prev);
-  zero_connected_graph(next);
+  new_kmer[0] = 'A';
+  zero_connected_graph(new_kmer);
+  new_kmer[0] = 'C';
+  zero_connected_graph(new_kmer);
+  new_kmer[0] = 'G';
+  zero_connected_graph(new_kmer);
+  new_kmer[0] = 'T';
+  zero_connected_graph(new_kmer);
 }
 
-void Hashtable::clear_marks_for_connected_graph(const std::string &kmer)
+void Hashtable::clear_marks_for_connected_graph(const char * kmer)
 {
   const unsigned char seen = 1 << 7;
 
-  HashIntoType bin = _hash(kmer.c_str(), _ksize) % _tablesize;
+  HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
   if (empty(val) || !(_counts[bin] & seen)) {
@@ -953,36 +942,29 @@ void Hashtable::clear_marks_for_connected_graph(const std::string &kmer)
 
   // std::cout << kmer << std::endl;
 
-  std::string front, back;
-  std::string prev, next;
-  std::string base;
+  char new_kmer[_ksize + 1];
+  new_kmer[_ksize] = 0;		// NULL terminate
+  strncpy(new_kmer, kmer + 1, _ksize - 1);
 
-  front = kmer.substr(0, _ksize - 1);
-  back = kmer.substr(1, _ksize - 1);
+  new_kmer[_ksize - 1] = 'A';
+  clear_marks_for_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'C';
+  clear_marks_for_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'G';
+  clear_marks_for_connected_graph(new_kmer);
+  new_kmer[_ksize - 1] = 'T';
+  clear_marks_for_connected_graph(new_kmer);
 
-  base = "A";
-  prev = base + front;
-  next = back + base;
-  clear_marks_for_connected_graph(prev);
-  clear_marks_for_connected_graph(next);
+  strncpy(new_kmer + 1, kmer, _ksize - 1);
 
-  base = "C";
-  prev = base + front;
-  next = back + base;
-  clear_marks_for_connected_graph(prev);
-  clear_marks_for_connected_graph(next);
-
-  base = "G";
-  prev = base + front;
-  next = back + base;
-  clear_marks_for_connected_graph(prev);
-  clear_marks_for_connected_graph(next);
-
-  base = "T";
-  prev = base + front;
-  next = back + base;
-  clear_marks_for_connected_graph(prev);
-  clear_marks_for_connected_graph(next);
+  new_kmer[0] = 'A';
+  clear_marks_for_connected_graph(new_kmer);
+  new_kmer[0] = 'C';
+  clear_marks_for_connected_graph(new_kmer);
+  new_kmer[0] = 'G';
+  clear_marks_for_connected_graph(new_kmer);
+  new_kmer[0] = 'T';
+  clear_marks_for_connected_graph(new_kmer);
 }
 
 
@@ -991,8 +973,6 @@ unsigned int Hashtable::calc_connected_graph_size(const char * kmer,
 const
 {
   const unsigned char seen = 1 << 7;
-  char new_kmer[_ksize + 1];
-  new_kmer[_ksize] = 0;		// NULL terminate
 
   HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
@@ -1006,6 +986,8 @@ const
 
   unsigned int total = 1;
 
+  char new_kmer[_ksize + 1];
+  new_kmer[_ksize] = 0;		// NULL terminate
   strncpy(new_kmer, kmer + 1, _ksize - 1);
 
   new_kmer[_ksize - 1] = 'A';
@@ -1061,7 +1043,7 @@ void Hashtable::trim_graphs(unsigned int min_size)
       unsigned int size = calc_connected_graph_size(kmer.c_str());
       if (size && size < min_size) {
 	// std::cout << "removing: " << kmer << "; size: " << size << "\n";
-	zero_connected_graph(kmer);
+	zero_connected_graph(kmer.c_str());
       }
     }
   }

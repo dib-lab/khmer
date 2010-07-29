@@ -1138,8 +1138,7 @@ static PyObject * hash_mark_connected_graph(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  std::string kmer(_kmer);
-  hashtable->mark_connected_graph(kmer);
+  hashtable->mark_connected_graph(_kmer);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1226,8 +1225,7 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
   if (!PyArg_ParseTuple(args, "s", &_kmer)) {
     return NULL;
   }
-  std::string kmer(_kmer);
-  unsigned int size = hashtable->calc_connected_graph_size(kmer.c_str());
+  unsigned int size = hashtable->calc_connected_graph_size(_kmer);
 
   return PyInt_FromLong(size);
 }
@@ -1241,8 +1239,7 @@ static PyObject * hash_clear_marks_for_connected_graph(PyObject * self, PyObject
   if (!PyArg_ParseTuple(args, "s", &_kmer)) {
     return NULL;
   }
-  std::string kmer(_kmer);
-  hashtable->clear_marks_for_connected_graph(kmer);
+  hashtable->clear_marks_for_connected_graph(_kmer);
 
   Py_INCREF(Py_None);
   return Py_None;
