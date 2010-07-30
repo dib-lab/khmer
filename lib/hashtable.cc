@@ -968,6 +968,46 @@ void Hashtable::clear_marks_for_connected_graph(const char * kmer)
 }
 
 
+void Hashtable::calc_connected_graph_size(const char * kmer,
+					  unsigned long long& count)
+{
+  const unsigned char seen = 1 << 7;
+
+  HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
+  const BoundedCounterType val = _counts[bin];
+
+  if (empty(val) || marked(val)) {
+    return;
+  }
+  _counts[bin] |= seen;
+  count += 1;
+
+  char new_kmer[_ksize + 1];
+  new_kmer[_ksize] = 0;		// NULL terminate
+  strncpy(new_kmer, kmer + 1, _ksize - 1);
+
+  new_kmer[_ksize - 1] = 'A';
+  calc_connected_graph_size(new_kmer, count);
+  new_kmer[_ksize - 1] = 'C';
+  calc_connected_graph_size(new_kmer, count);
+  new_kmer[_ksize - 1] = 'G';
+  calc_connected_graph_size(new_kmer, count);
+  new_kmer[_ksize - 1] = 'T';
+  calc_connected_graph_size(new_kmer, count);
+
+  strncpy(new_kmer + 1, kmer, _ksize - 1);
+
+  new_kmer[0] = 'A';
+  calc_connected_graph_size(new_kmer, count);
+  new_kmer[0] = 'C';
+  calc_connected_graph_size(new_kmer, count);
+  new_kmer[0] = 'G';
+  calc_connected_graph_size(new_kmer, count);
+  new_kmer[0] = 'T';
+  calc_connected_graph_size(new_kmer, count);
+}
+
+#if 0
 unsigned int Hashtable::calc_connected_graph_size(const char * kmer,
 						  unsigned int r)
 const
@@ -1012,7 +1052,7 @@ const
 
   return total;
 }
-
+#endif
 
 
 void Hashtable::empty_bins(bool empty_marked)
@@ -1037,10 +1077,12 @@ void Hashtable::empty_bins(bool empty_marked)
 
 void Hashtable::trim_graphs(unsigned int min_size)
 {
+  unsigned long long size;
   for (HashIntoType i = 0; i < _tablesize; i++) {
     if (_counts[i]) {
       std::string kmer = _revhash(i, _ksize);
-      unsigned int size = calc_connected_graph_size(kmer.c_str());
+      size = 0;
+      calc_connected_graph_size(kmer.c_str(), size);
       if (size && size < min_size) {
 	// std::cout << "removing: " << kmer << "; size: " << size << "\n";
 	zero_connected_graph(kmer.c_str());
@@ -1055,6 +1097,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
 {
   HashIntoType * p = new HashIntoType[max_size];
   const unsigned char seen = 1 << 7;
+  unsigned long long size;
 
   for (unsigned int i = 0; i < max_size; i++) {
     p[i] = 0;
@@ -1064,7 +1107,8 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
     BoundedCounterType count = _counts[i];
     if (count && !(count & seen)) {
       std::string kmer = _revhash(i, _ksize);
-      unsigned int size = calc_connected_graph_size(kmer.c_str());
+      size = 0;
+      calc_connected_graph_size(kmer.c_str(), size);
       if (size) {
 	if (size > 5000) { std::cout << "GRAPH SIZE: " << size << "\n"; }
 	if (size >= max_size) {
