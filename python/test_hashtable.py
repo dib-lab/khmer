@@ -320,25 +320,10 @@ class Test_ConsumeString(object):
         count = self.kh.get_max_count('AAAAA', 1, 4**4)
         assert count == 0
 
-class Test_GraphFu(object):
+class Test_ExactGraphFu(object):
     def setup(self):
         self.ht = khmer.new_hashtable(12, 4**12)
 
-    def test_clear_marks_for(self):
-        ht = self.ht
-        ht.consume_fasta('test-graph.fa')
-
-        kmer = "TTAGGACTGCAC"
-        x = ht.calc_connected_graph_size(kmer)
-        assert x == 69, x
-        
-        x = ht.calc_connected_graph_size(kmer)
-        assert x == 0, x
-
-        ht.clear_marks_for_connected_graph(kmer)
-        x = ht.calc_connected_graph_size(kmer)
-        assert x == 69, x
-        
     def test_counts(self):
         ht = self.ht
         ht.consume_fasta('test-graph.fa')
@@ -361,7 +346,10 @@ class Test_GraphFu(object):
     def test_trim(self):
         ht = self.ht
         ht.consume_fasta('test-graph.fa')
-        ht.trim_graphs(40)
+        ht.trim_graphs('test-graph.fa', 40, 'zfy.out')
+
+        ht = khmer.new_hashtable(12, 4**12)
+        ht.consume_fasta('zfy.out')
 
         x = ht.calc_connected_graph_size("TTAGGACTGCAC")
         assert x == 69, x
@@ -377,10 +365,31 @@ class Test_GraphFu(object):
         ht.consume_fasta('test-graph.fa')
         x = ht.graphsize_distribution(200)
 
-        assert sum(x) == 3
+        assert sum(x) == 3, x
         assert x[69] == 1
         assert x[68] == 1
         assert x[36] == 1
+
+class Test_InexactGraphFu(object):
+    def setup(self):
+        self.ht = khmer.new_hashtable(12, 4**8+1)
+
+    def test_trim(self):
+        ht = self.ht
+        ht.consume_fasta('test-graph.fa')
+        ht.trim_graphs('test-graph.fa', 40, 'zfy.out')
+
+        ht = khmer.new_hashtable(12, 4**12)
+        ht.consume_fasta('zfy.out')
+
+        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
+        assert x >= 69, x
+        
+        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
+        assert x >= 68, x               # @CTB why 69??
+        
+        x = ht.calc_connected_graph_size("ATACTGTAAATA")
+        assert x == 0, x
 
 ####
 

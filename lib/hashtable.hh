@@ -156,13 +156,18 @@ namespace khmer {
     void mark_connected_graph(const char * kmer);
     unsigned long long zero_connected_graph(const char * kmer,
 					    SeenSet& keeper);
-    void trim_graphs(unsigned int min_size);
+    void trim_graphs(const std::string infilename,
+		     const std::string outfilename,
+		     unsigned int min_size,
+		     CallbackFn callback = NULL,
+		     void * callback_data = NULL);
 
     HashIntoType * graphsize_distribution(const unsigned int &max_size);
 
     void empty_bins(bool empty_marked=false);
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
+				   SeenSet& keeper,
 				   unsigned long long threshold=0);
     void calc_connected_graph_size2(const char * kmer,
 				    unsigned long long& count,

@@ -1222,11 +1222,13 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * _kmer;
-  if (!PyArg_ParseTuple(args, "s", &_kmer)) {
+  unsigned int max_size = 0;
+  if (!PyArg_ParseTuple(args, "s|i", &_kmer, &max_size)) {
     return NULL;
   }
   unsigned long long size = 0;
-  hashtable->calc_connected_graph_size(_kmer, size);
+  khmer::SeenSet keeper;
+  hashtable->calc_connected_graph_size(_kmer, size, keeper, max_size);
 
   return PyInt_FromLong(size);
 }
@@ -1266,10 +1268,15 @@ static PyObject * hash_trim_graphs(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   unsigned int threshold = 0;
-  if (!PyArg_ParseTuple(args, "i", &threshold)) {
+  char * filename = NULL;
+  char * outfile = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "sis|O", &filename, &threshold, &outfile,
+			&callback_obj)) {
     return NULL;
   }
-  hashtable->trim_graphs(threshold);
+  hashtable->trim_graphs(filename, outfile, threshold, _report_fn, callback_obj);
   
   Py_INCREF(Py_None);
   return Py_None;
@@ -1289,6 +1296,7 @@ static PyObject * hash_graphsize_distribution(PyObject * self, PyObject * args)
   
   PyObject * x = PyList_New(threshold);
   for (unsigned int i = 0; i < threshold; i++) {
+    if (i > 0) { p[i] /= i; }
     PyList_SET_ITEM(x, i, PyInt_FromLong(p[i]));
   }
 
