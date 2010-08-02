@@ -1225,7 +1225,7 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
   if (!PyArg_ParseTuple(args, "s", &_kmer)) {
     return NULL;
   }
-  unsigned long long size;
+  unsigned long long size = 0;
   hashtable->calc_connected_graph_size(_kmer, size);
 
   return PyInt_FromLong(size);

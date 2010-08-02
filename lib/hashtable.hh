@@ -151,14 +151,22 @@ namespace khmer {
 				       void * callback_data = NULL);
 
     void mark_connected_graph(const char * kmer);
-    void zero_connected_graph(const char * kmer);
+    unsigned long long zero_connected_graph(const char * kmer);
     void trim_graphs(unsigned int min_size);
 
     HashIntoType * graphsize_distribution(const unsigned int &max_size);
 
     void empty_bins(bool empty_marked=false);
     void calc_connected_graph_size(const char * kmer,
-				   unsigned long long& count);
+				   unsigned long long& count,
+				   unsigned long long threshold=0);
+    void calc_connected_graph_size2(const char * kmer,
+				    unsigned long long& count,
+				    unsigned long long threshold=0,
+				    const HashIntoType watermark=0);
+
+    bool is_graph_size_larger(const char * kmer,
+			      const unsigned long long threshold);
 
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 

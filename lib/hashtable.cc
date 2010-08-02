@@ -5,6 +5,7 @@
 #include "hashtable.hh"
 
 #define CALLBACK_PERIOD 10000
+#define MAX_CLUSTER_EXPLORE 250
 
 using namespace khmer;
 using namespace std;
@@ -891,15 +892,16 @@ void Hashtable::mark_connected_graph(const char * kmer)
   mark_connected_graph(new_kmer);
 }
 
-void Hashtable::zero_connected_graph(const char * kmer)
+unsigned long long Hashtable::zero_connected_graph(const char * kmer)
 {
   HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
   if (empty(val)) {
-    return;
+    return 0;
   }
   _counts[bin] = 0;
+  unsigned long long removed = 1;
 
   // std::cout << kmer << std::endl;
 
@@ -908,24 +910,26 @@ void Hashtable::zero_connected_graph(const char * kmer)
   strncpy(new_kmer, kmer + 1, _ksize - 1);
 
   new_kmer[_ksize - 1] = 'A';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
   new_kmer[_ksize - 1] = 'C';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
   new_kmer[_ksize - 1] = 'G';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
   new_kmer[_ksize - 1] = 'T';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
 
   strncpy(new_kmer + 1, kmer, _ksize - 1);
 
   new_kmer[0] = 'A';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
   new_kmer[0] = 'C';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
   new_kmer[0] = 'G';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
   new_kmer[0] = 'T';
-  zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer);
+
+  return removed;
 }
 
 void Hashtable::clear_marks_for_connected_graph(const char * kmer)
@@ -969,7 +973,8 @@ void Hashtable::clear_marks_for_connected_graph(const char * kmer)
 
 
 void Hashtable::calc_connected_graph_size(const char * kmer,
-					  unsigned long long& count)
+					  unsigned long long& count,
+					  unsigned long long threshold)
 {
   const unsigned char seen = 1 << 7;
 
@@ -982,6 +987,10 @@ void Hashtable::calc_connected_graph_size(const char * kmer,
   _counts[bin] |= seen;
   count += 1;
 
+  if (threshold && count >= threshold) {
+    return;
+  }
+
   char new_kmer[_ksize + 1];
   new_kmer[_ksize] = 0;		// NULL terminate
   strncpy(new_kmer, kmer + 1, _ksize - 1);
@@ -1007,53 +1016,72 @@ void Hashtable::calc_connected_graph_size(const char * kmer,
   calc_connected_graph_size(new_kmer, count);
 }
 
-#if 0
-unsigned int Hashtable::calc_connected_graph_size(const char * kmer,
-						  unsigned int r)
-const
+void Hashtable::calc_connected_graph_size2(const char * kmer,
+					   unsigned long long& count,
+					   unsigned long long threshold,
+					   const HashIntoType watermark)
 {
   const unsigned char seen = 1 << 7;
 
   HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
-  if (empty(val) || marked(val)) {
-    return 0;
+  // nothing here, go home.
+  if (empty(val)) {
+    return;
   }
+
+  // below the watermark, already been here & kept it, go away.
+  if (bin < watermark) {
+    // std::cout << "watermark\n";
+    count = threshold + 1;
+    return;
+  }
+
+  // have we already seen me? don't count; exit.
+  if (val & seen) {
+    // std::cout << "seen.\n";
+    return;
+  }
+
+  // mark as seen, to prevent cycles... and increment count.
   _counts[bin] |= seen;
+  count += 1;
 
-  // std::cout << kmer << " " << r << std::endl;
+  // now that we've counted you, are we above the threshold? if so, exit.
+  if (count < threshold) {
+    char new_kmer[_ksize + 1];
+    new_kmer[_ksize] = 0;		// NULL terminate
 
-  unsigned int total = 1;
+    strncpy(new_kmer + 1, kmer, _ksize - 1);
 
-  char new_kmer[_ksize + 1];
-  new_kmer[_ksize] = 0;		// NULL terminate
-  strncpy(new_kmer, kmer + 1, _ksize - 1);
+    new_kmer[0] = 'A';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    new_kmer[0] = 'C';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    new_kmer[0] = 'G';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    new_kmer[0] = 'T';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
 
-  new_kmer[_ksize - 1] = 'A';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-  new_kmer[_ksize - 1] = 'C';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-  new_kmer[_ksize - 1] = 'G';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-  new_kmer[_ksize - 1] = 'T';
-  total += calc_connected_graph_size(new_kmer, r + 1);
+    strncpy(new_kmer, kmer + 1, _ksize - 1);
 
-  strncpy(new_kmer + 1, kmer, _ksize - 1);
-
-  new_kmer[0] = 'A';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-  new_kmer[0] = 'C';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-  new_kmer[0] = 'G';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-  new_kmer[0] = 'T';
-  total += calc_connected_graph_size(new_kmer, r + 1);
-
-  return total;
+    new_kmer[_ksize - 1] = 'T';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    new_kmer[_ksize - 1] = 'A';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    new_kmer[_ksize - 1] = 'C';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    new_kmer[_ksize - 1] = 'G';
+    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+  }
 }
-#endif
 
+bool Hashtable::is_graph_size_larger(const char * kmer,
+				     const unsigned long long threshold)
+{
+  return false;
+}
 
 void Hashtable::empty_bins(bool empty_marked)
 {
@@ -1077,15 +1105,34 @@ void Hashtable::empty_bins(bool empty_marked)
 
 void Hashtable::trim_graphs(unsigned int min_size)
 {
-  unsigned long long size;
+  const unsigned char seen = 1 << 7;
+  unsigned int max_depth = MAX_CLUSTER_EXPLORE;
+  unsigned long long queried = 0;
+  unsigned long long removed = 0;
+
+  if (min_size > max_depth) {
+    max_depth = min_size + 2;
+  }
+
   for (HashIntoType i = 0; i < _tablesize; i++) {
-    if (_counts[i]) {
+    if (_counts[i] && !(_counts[i] & seen)) {
+      std::cout << "at: " << i / 1000000 << "m of " << _tablesize / 1000000 << "m queried; " << removed/1e9 << "b removed\n";
       std::string kmer = _revhash(i, _ksize);
-      size = 0;
-      calc_connected_graph_size(kmer.c_str(), size);
-      if (size && size < min_size) {
-	// std::cout << "removing: " << kmer << "; size: " << size << "\n";
-	zero_connected_graph(kmer.c_str());
+
+      // ASSUME: we are at the lowest-valued entry in the hashtable.
+      HashIntoType watermark = i;
+      unsigned long long clustersize = 0;
+      calc_connected_graph_size2(kmer.c_str(), clustersize, max_depth,
+				 watermark);
+
+      queried += 1;
+
+      if (clustersize >= min_size) {
+	if (clustersize >= max_depth) {
+	  clear_marks_for_connected_graph(kmer.c_str());
+	}
+      } else {
+	removed += zero_connected_graph(kmer.c_str());
       }
     }
   }
