@@ -892,7 +892,8 @@ void Hashtable::mark_connected_graph(const char * kmer)
   mark_connected_graph(new_kmer);
 }
 
-unsigned long long Hashtable::zero_connected_graph(const char * kmer)
+unsigned long long Hashtable::zero_connected_graph(const char * kmer,
+						   SeenSet& keeper)
 {
   HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
@@ -900,6 +901,13 @@ unsigned long long Hashtable::zero_connected_graph(const char * kmer)
   if (empty(val)) {
     return 0;
   }
+
+  SeenSet::iterator i = keeper.find(bin);
+  if (i == keeper.end()) {
+    return 0;
+  }
+  keeper.erase(bin);
+
   _counts[bin] = 0;
   unsigned long long removed = 1;
 
@@ -910,24 +918,24 @@ unsigned long long Hashtable::zero_connected_graph(const char * kmer)
   strncpy(new_kmer, kmer + 1, _ksize - 1);
 
   new_kmer[_ksize - 1] = 'A';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
   new_kmer[_ksize - 1] = 'C';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
   new_kmer[_ksize - 1] = 'G';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
   new_kmer[_ksize - 1] = 'T';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
 
   strncpy(new_kmer + 1, kmer, _ksize - 1);
 
   new_kmer[0] = 'A';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
   new_kmer[0] = 'C';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
   new_kmer[0] = 'G';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
   new_kmer[0] = 'T';
-  removed += zero_connected_graph(new_kmer);
+  removed += zero_connected_graph(new_kmer, keeper);
 
   return removed;
 }
@@ -939,11 +947,11 @@ void Hashtable::clear_marks_for_connected_graph(const char * kmer)
   HashIntoType bin = _hash(kmer, _ksize); // % _tablesize;
   const BoundedCounterType val = _counts[bin];
 
-  if (empty(val) || !(_counts[bin] & seen)) {
+  if (empty(val) || !(val & seen)) {
     return;
   }
   _counts[bin] &= 127;
-
+  
   // std::cout << kmer << std::endl;
 
   char new_kmer[_ksize + 1];
@@ -1018,6 +1026,7 @@ void Hashtable::calc_connected_graph_size(const char * kmer,
 
 void Hashtable::calc_connected_graph_size2(const char * kmer,
 					   unsigned long long& count,
+					   SeenSet& keeper,
 					   unsigned long long threshold,
 					   const HashIntoType watermark)
 {
@@ -1039,13 +1048,13 @@ void Hashtable::calc_connected_graph_size2(const char * kmer,
   }
 
   // have we already seen me? don't count; exit.
-  if (val & seen) {
-    // std::cout << "seen.\n";
+  SeenSet::iterator i = keeper.find(bin);
+  if (i != keeper.end()) {
     return;
   }
 
   // mark as seen, to prevent cycles... and increment count.
-  _counts[bin] |= seen;
+  keeper.insert(bin);
   count += 1;
 
   // now that we've counted you, are we above the threshold? if so, exit.
@@ -1056,27 +1065,28 @@ void Hashtable::calc_connected_graph_size2(const char * kmer,
     strncpy(new_kmer + 1, kmer, _ksize - 1);
 
     new_kmer[0] = 'A';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
     new_kmer[0] = 'C';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
     new_kmer[0] = 'G';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
     new_kmer[0] = 'T';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
 
     strncpy(new_kmer, kmer + 1, _ksize - 1);
 
     new_kmer[_ksize - 1] = 'T';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
     new_kmer[_ksize - 1] = 'A';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
     new_kmer[_ksize - 1] = 'C';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
     new_kmer[_ksize - 1] = 'G';
-    calc_connected_graph_size2(new_kmer, count, threshold, watermark);
+    calc_connected_graph_size2(new_kmer, count, keeper, threshold, watermark);
   }
 }
 
+// @CTB remove
 bool Hashtable::is_graph_size_larger(const char * kmer,
 				     const unsigned long long threshold)
 {
@@ -1122,7 +1132,8 @@ void Hashtable::trim_graphs(unsigned int min_size)
       // ASSUME: we are at the lowest-valued entry in the hashtable.
       HashIntoType watermark = i;
       unsigned long long clustersize = 0;
-      calc_connected_graph_size2(kmer.c_str(), clustersize, max_depth,
+      SeenSet keeper;
+      calc_connected_graph_size2(kmer.c_str(), clustersize, keeper, max_depth,
 				 watermark);
 
       queried += 1;
@@ -1130,9 +1141,10 @@ void Hashtable::trim_graphs(unsigned int min_size)
       if (clustersize >= min_size) {
 	if (clustersize >= max_depth) {
 	  clear_marks_for_connected_graph(kmer.c_str());
+	  // @CTB just do with keeper...
 	}
       } else {
-	removed += zero_connected_graph(kmer.c_str());
+	removed += zero_connected_graph(kmer.c_str(), keeper);
       }
     }
   }

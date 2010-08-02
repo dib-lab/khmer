@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <set>
 
 #include "khmer.hh"
 #include "storage.hh"
@@ -11,6 +12,8 @@
 #define marked(c) ((c) & (1<<7))
 
 namespace khmer {
+  typedef std::set<HashIntoType> SeenSet;
+
   class Hashtable {
   protected:
     const WordLength _ksize;
@@ -151,7 +154,8 @@ namespace khmer {
 				       void * callback_data = NULL);
 
     void mark_connected_graph(const char * kmer);
-    unsigned long long zero_connected_graph(const char * kmer);
+    unsigned long long zero_connected_graph(const char * kmer,
+					    SeenSet& keeper);
     void trim_graphs(unsigned int min_size);
 
     HashIntoType * graphsize_distribution(const unsigned int &max_size);
@@ -162,6 +166,7 @@ namespace khmer {
 				   unsigned long long threshold=0);
     void calc_connected_graph_size2(const char * kmer,
 				    unsigned long long& count,
+				    SeenSet& keeper,
 				    unsigned long long threshold=0,
 				    const HashIntoType watermark=0);
 
