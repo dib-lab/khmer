@@ -856,7 +856,7 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 void Hashtable::calc_connected_graph_size(const char * kmer,
 					  unsigned long long& count,
 					  SeenSet& keeper,
-					  unsigned long long threshold)
+					  const unsigned long long threshold)
 {
   HashIntoType bin = _hash(kmer, _ksize);
   HashIntoType truncbin = bin % _tablesize;

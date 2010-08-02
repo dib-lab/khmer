@@ -164,7 +164,7 @@ namespace khmer {
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
-				   unsigned long long threshold=0);
+				   const unsigned long long threshold=0);
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
     void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
