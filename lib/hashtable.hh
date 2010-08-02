@@ -153,9 +153,6 @@ namespace khmer {
 				       CallbackFn callback = NULL,
 				       void * callback_data = NULL);
 
-    void mark_connected_graph(const char * kmer);
-    unsigned long long zero_connected_graph(const char * kmer,
-					    SeenSet& keeper);
     void trim_graphs(const std::string infilename,
 		     const std::string outfilename,
 		     unsigned int min_size,
@@ -164,20 +161,10 @@ namespace khmer {
 
     HashIntoType * graphsize_distribution(const unsigned int &max_size);
 
-    void empty_bins(bool empty_marked=false);
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
 				   unsigned long long threshold=0);
-    void calc_connected_graph_size2(const char * kmer,
-				    unsigned long long& count,
-				    SeenSet& keeper,
-				    unsigned long long threshold=0,
-				    const HashIntoType watermark=0);
-
-    bool is_graph_size_larger(const char * kmer,
-			      const unsigned long long threshold);
-
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
     void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
@@ -192,15 +179,6 @@ namespace khmer {
 	}
       }
     }
-    void clear_marks() {
-      for (HashIntoType i = 0; i < _tablesize; i++) {
-	if (_counts[i]) {
-	  _counts[i] &= 127;
-	}
-      }
-    }
-
-    void clear_marks_for_connected_graph(const char * kmer);
   };
 
   class HashtableIntersect {

@@ -1128,48 +1128,6 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self, PyObject *
   return Py_None;
 }
 
-static PyObject * hash_mark_connected_graph(PyObject * self, PyObject * args)
-{
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
-
-  char * _kmer;
-  if (!PyArg_ParseTuple(args, "s", &_kmer)) {
-    return NULL;
-  }
-
-  hashtable->mark_connected_graph(_kmer);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * hash_empty_bins(PyObject * self, PyObject * args)
-{
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
-
-  PyObject * _empty_marked = NULL;
-  if (!PyArg_ParseTuple(args, "O", &_empty_marked)) {
-    return NULL;
-  }
-
-  if (!PyBool_Check(_empty_marked)) {
-    PyErr_SetString(PyExc_TypeError, "argument must be a boolean");
-    return NULL;
-  }
-
-  bool empty_marked = false;
-  if (_empty_marked == Py_True) {
-    empty_marked = true;
-  }
-
-  hashtable->empty_bins(empty_marked);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 // callback function to pass into dump function
 
 void _dump_report_fn(const char * info, unsigned int count, void * data)
@@ -1233,35 +1191,6 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
   return PyInt_FromLong(size);
 }
 
-static PyObject * hash_clear_marks_for_connected_graph(PyObject * self, PyObject * args)
-{
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
-
-  char * _kmer;
-  if (!PyArg_ParseTuple(args, "s", &_kmer)) {
-    return NULL;
-  }
-  hashtable->clear_marks_for_connected_graph(_kmer);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * hash_clear_marks(PyObject * self, PyObject * args)
-{
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-  hashtable->clear_marks();
-  
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 static PyObject * hash_trim_graphs(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1323,12 +1252,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
-  { "empty_bins", hash_empty_bins, METH_VARARGS, "" },
-  { "mark_connected_graph", hash_mark_connected_graph, METH_VARARGS, "" },
   { "dump_kmers_and_counts", hash_dump_kmers_and_counts, METH_VARARGS, "" },
   { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
-  { "clear_marks_for_connected_graph", hash_clear_marks_for_connected_graph, METH_VARARGS, "" },
-  { "clear_marks", hash_clear_marks, METH_VARARGS, "" },
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */

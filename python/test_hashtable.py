@@ -326,30 +326,30 @@ class Test_ExactGraphFu(object):
 
     def test_counts(self):
         ht = self.ht
-        ht.consume_fasta('test-graph.fa')
+        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
 
         kmer = "TTAGGACTGCAC"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 69, x
-        ht.clear_marks_for_connected_graph(kmer)
         
         kmer = "TGCGTTTCAATC"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 68, x
-        ht.clear_marks_for_connected_graph(kmer)
 
         kmer = "ATACTGTAAATA"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 36, x
-        ht.clear_marks_for_connected_graph(kmer)
 
     def test_trim(self):
         ht = self.ht
-        ht.consume_fasta('test-graph.fa')
-        ht.trim_graphs('test-graph.fa', 40, 'zfy.out')
+        
+        filename = os.path.join(thisdir, 'test-graph.fa')
+        outfile = os.path.join(thisdir, 'test-graph.fa.out')
+        ht.consume_fasta(filename)
+        ht.trim_graphs(filename, 40, outfile)
 
         ht = khmer.new_hashtable(12, 4**12)
-        ht.consume_fasta('zfy.out')
+        ht.consume_fasta(outfile)
 
         x = ht.calc_connected_graph_size("TTAGGACTGCAC")
         assert x == 69, x
@@ -362,7 +362,7 @@ class Test_ExactGraphFu(object):
 
     def test_graphsize_distrib(self):
         ht = self.ht
-        ht.consume_fasta('test-graph.fa')
+        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
         x = ht.graphsize_distribution(200)
 
         assert sum(x) == 3, x
@@ -376,11 +376,14 @@ class Test_InexactGraphFu(object):
 
     def test_trim(self):
         ht = self.ht
-        ht.consume_fasta('test-graph.fa')
-        ht.trim_graphs('test-graph.fa', 40, 'zfy.out')
+        filename = os.path.join(thisdir, 'test-graph.fa')
+        outfile = os.path.join(thisdir, 'test-graph.fa.out')
+        
+        ht.consume_fasta(filename)
+        ht.trim_graphs(filename, 40, outfile)
 
         ht = khmer.new_hashtable(12, 4**12)
-        ht.consume_fasta('zfy.out')
+        ht.consume_fasta(outfile)
 
         x = ht.calc_connected_graph_size("TTAGGACTGCAC")
         assert x >= 69, x
