@@ -1,6 +1,6 @@
 #define VERSION "0.3"
 
-#define MAX_COUNT 127
+#define MAX_COUNT 255
 
 namespace khmer {
   // largest number we can count up to, exactly. (8 bytes)

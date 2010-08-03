@@ -4,6 +4,8 @@ thisdir = os.path.abspath(thisdir)
 
 import khmer
 
+MAX_COUNT=255
+
 def test_no_collision():
     kh = khmer.new_hashtable(4, 86)
 
@@ -105,7 +107,7 @@ def test_maxcount():
         last_count = c
 
     assert c != 10000, "should not be able to count to 10000"
-    assert c == 127                     # this will depend on HashcountType...
+    assert c == MAX_COUNT       # this will depend on HashcountType...
 
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
@@ -115,7 +117,7 @@ def test_maxcount_consume():
     kh.consume(s)
 
     c = kh.get('AAAA')
-    assert c == 127, c          # this will depend on HashcountType...
+    assert c == MAX_COUNT, c    # this will depend on HashcountType...
 
 def test_get_mincount():
     kh = khmer.new_hashtable(4, 4**4)
@@ -213,7 +215,7 @@ class Test_ConsumeString(object):
         assert dist[4] == 1
         assert sum(dist) == 1
         
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 127)
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, MAX_COUNT)
         assert dist[0] == 1, dist[0]
         assert dist[2] == 1
         assert sum(dist) == 2
@@ -300,7 +302,7 @@ class Test_ConsumeString(object):
         self.kh.consume('AAAA')
 
         count = self.kh.get_min_count('AAAAA', 1, 4**4)
-        assert count == 127
+        assert count == MAX_COUNT
 
     def test_max_count(self):
         self.kh.consume('AAAA')
