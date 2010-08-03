@@ -525,12 +525,6 @@ unsigned int Hashtable::consume_string(const std::string &s,
   const unsigned int length = s.length();
   unsigned int n_consumed = 0;
 
-  HashIntoType mask = 0;
-  for (unsigned int i = 0; i < _ksize; i++) {
-    mask = mask << 2;
-    mask |= 3;
-  }
-
   HashIntoType h = 0, r = 0;
   bool bounded = true;
 
@@ -556,7 +550,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
     h |= twobit_repr(sp[i]);
 
     // mask off the 2 bits we shifted over.
-    h &= mask;
+    h &= bitmask;
 
     // now handle reverse complement
     r = r >> 2;
@@ -585,12 +579,6 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
   const char * sp = s.c_str();
   BoundedCounterType min_count = MAX_COUNT, count;
 
-  HashIntoType mask = 0;
-  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
-    mask = mask << 2;
-    mask |= 3;
-  }
-
   HashIntoType h = 0, r = 0;
   bool bounded = true;
 
@@ -613,7 +601,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
     h |= twobit_repr(sp[i]);
 
     // mask off the 2 bits we shifted over.
-    h &= mask;
+    h &= bitmask;
 
     // now handle reverse complement
     r = r >> 2;
@@ -640,12 +628,6 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
   const char * sp = s.c_str();
   BoundedCounterType max_count = 0, count;
 
-  HashIntoType mask = 0;
-  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
-    mask = mask << 2;
-    mask |= 3;
-  }
-
   HashIntoType h = 0, r = 0;
   bool bounded = true;
 
@@ -666,7 +648,7 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
     h |= twobit_repr(sp[i]);
 
     // mask off the 2 bits we shifted over.
-    h &= mask;
+    h &= bitmask;
 
     // now handle reverse complement
     r = r >> 2;
@@ -853,55 +835,77 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(HashIntoType kmer,
+void Hashtable::calc_connected_graph_size(HashIntoType kmer_f,
+					  HashIntoType kmer_r,
 					  unsigned long long& count,
 					  SeenSet& keeper,
 					  const unsigned long long threshold)
 const
 {
+  HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
   const BoundedCounterType val = _counts[kmer % _tablesize];
-
-  std::string kmer_s = _revhash(kmer, _ksize);
 
   if (val == 0) {
     return;
   }
+
+  std::string kmer_s = _revhash(kmer_f, _ksize);
+
   // have we already seen me? don't count; exit.
   SeenSet::iterator i = keeper.find(kmer);
   if (i != keeper.end()) {
     return;
   }
 
+  // keep track of both seen kmers, and counts.
   keeper.insert(kmer);
   count += 1;
 
+  // are we past the threshold? truncate search.
   if (threshold && count >= threshold) {
     return;
   }
 
-  char new_kmer[_ksize + 1];
-  new_kmer[_ksize] = 0;		// NULL terminate
-  strncpy(new_kmer, kmer_s.c_str() + 1, _ksize - 1);
+  // otherwise, explore in all directions.
 
-  new_kmer[_ksize - 1] = 'A';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
-  new_kmer[_ksize - 1] = 'C';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
-  new_kmer[_ksize - 1] = 'G';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
-  new_kmer[_ksize - 1] = 'T';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
+  // NEXT.
 
-  strncpy(new_kmer + 1, kmer_s.c_str(), _ksize - 1);
+  HashIntoType f, r;
+  const unsigned int rc_left_shift = _ksize*2 - 2;
 
-  new_kmer[0] = 'A';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
-  new_kmer[0] = 'C';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
-  new_kmer[0] = 'G';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
-  new_kmer[0] = 'T';
-  calc_connected_graph_size(new_kmer, count, keeper, threshold);
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  // PREVIOUS.
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
 }
 
 void Hashtable::trim_graphs(const std::string infilename,
@@ -1015,7 +1019,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
       SeenSet keeper;
       calc_connected_graph_size(kmer.c_str(), size, keeper, max_size);
       if (size) {
-	if (size > 5000) { std::cout << "GRAPH SIZE: " << size << "\n"; }
+	// if (size > 5000) { std::cout << "GRAPH SIZE: " << size << "\n"; }
 	if (size < max_size) {
 	  p[size] += 1;
 	}

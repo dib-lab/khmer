@@ -15,6 +15,7 @@ namespace khmer {
   protected:
     const WordLength _ksize;
     const HashIntoType _tablesize;
+    HashIntoType bitmask;
 
     BoundedCounterType * _counts;
 
@@ -26,6 +27,10 @@ namespace khmer {
   public:
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
+      bitmask = 0;
+      for (unsigned int i = 0; i < _ksize; i++) {
+	bitmask = (bitmask << 2) | 3;
+      }
       _allocate_counters();
     }
 
@@ -162,11 +167,13 @@ namespace khmer {
 				   unsigned long long& count,
 				   SeenSet& keeper,
 				   const unsigned long long threshold=0) const{
-      calc_connected_graph_size(_hash(kmer, _ksize),
-				count, keeper, threshold);
+      HashIntoType r, f;
+      _hash(kmer, _ksize, &f, &r);
+      calc_connected_graph_size(f, r, count, keeper, threshold);
     }
 
-    void calc_connected_graph_size(const HashIntoType kmer,
+    void calc_connected_graph_size(const HashIntoType kmer_f,
+				   const HashIntoType kmer_r,
 				   unsigned long long& count,
 				   SeenSet& keeper,
 				   const unsigned long long threshold=0) const;
