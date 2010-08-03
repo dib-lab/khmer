@@ -370,6 +370,78 @@ class Test_ExactGraphFu(object):
         assert x[68] == 1
         assert x[36] == 1
 
+    def test_graph_links_next_a(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "A")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_c(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "C")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_g(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "G")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_t(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "T")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+        
+    def test_graph_links_prev_a(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("A" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_c(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("C" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_g(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("G" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_t(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("T" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
 class Test_InexactGraphFu(object):
     def setup(self):
         self.ht = khmer.new_hashtable(12, 4**8+1)
