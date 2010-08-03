@@ -2,7 +2,7 @@ import khmer
 import sys
 
 K = 32
-HASHTABLE_SIZE=4**17+1
+HASHTABLE_SIZE=4**12+1
 
 infile = sys.argv[1]
 threshold = int(sys.argv[2])
