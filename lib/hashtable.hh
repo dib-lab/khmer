@@ -168,7 +168,7 @@ namespace khmer {
 				   SeenSet& keeper,
 				   const unsigned long long threshold=0) const{
       HashIntoType r, f;
-      _hash(kmer, _ksize, &f, &r);
+      _hash(kmer, _ksize, f, r);
       calc_connected_graph_size(f, r, count, keeper, threshold);
     }
 

@@ -14,7 +14,7 @@ using namespace khmer;
 //
 
 HashIntoType khmer::_hash(const char * kmer, const WordLength k, 
-			  HashIntoType * _h, HashIntoType *_r)
+			  HashIntoType& _h, HashIntoType& _r)
 {
   // sizeof(HashIntoType) * 8 bits / 2 bits/base  
   assert(k <= sizeof(HashIntoType)*4);
@@ -32,8 +32,8 @@ HashIntoType khmer::_hash(const char * kmer, const WordLength k,
     r |= twobit_comp(kmer[j]);
   }
 
-  *_h = h;
-  *_r = r;
+  _h = h;
+  _r = r;
 
   return uniqify_rc(h, r);
 }
@@ -45,7 +45,7 @@ HashIntoType khmer::_hash(const char * kmer, const WordLength k)
   HashIntoType h = 0;
   HashIntoType r = 0;
 
-  return _hash(kmer, k, &h, &r);
+  return _hash(kmer, k, h, r);
 }
 
 // _hash_forward: return the hash from the forward direction only.
@@ -56,7 +56,7 @@ HashIntoType khmer::_hash_forward(const char * kmer, WordLength k)
   HashIntoType r = 0;
 
   
-  _hash(kmer, k, &h, &r);
+  _hash(kmer, k, h, r);
   return h;			// return forward only
 }
 
@@ -107,7 +107,7 @@ void KTable::consume_string(const std::string &s)
   HashIntoType h;
   HashIntoType r;
 
-  _hash(sp, _ksize, &h, &r);
+  _hash(sp, _ksize, h, r);
   
   _counts[uniqify_rc(h, r)]++;
 
