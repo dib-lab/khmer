@@ -853,25 +853,26 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-void Hashtable::calc_connected_graph_size(const char * kmer,
+void Hashtable::calc_connected_graph_size(HashIntoType kmer,
 					  unsigned long long& count,
 					  SeenSet& keeper,
 					  const unsigned long long threshold)
+const
 {
-  HashIntoType bin = _hash(kmer, _ksize);
-  HashIntoType truncbin = bin % _tablesize;
-  const BoundedCounterType val = _counts[truncbin];
+  const BoundedCounterType val = _counts[kmer % _tablesize];
 
-  if (empty(val)) {
+  std::string kmer_s = _revhash(kmer, _ksize);
+
+  if (val == 0) {
     return;
   }
   // have we already seen me? don't count; exit.
-  SeenSet::iterator i = keeper.find(bin);
+  SeenSet::iterator i = keeper.find(kmer);
   if (i != keeper.end()) {
     return;
   }
 
-  keeper.insert(bin);
+  keeper.insert(kmer);
   count += 1;
 
   if (threshold && count >= threshold) {
@@ -880,7 +881,7 @@ void Hashtable::calc_connected_graph_size(const char * kmer,
 
   char new_kmer[_ksize + 1];
   new_kmer[_ksize] = 0;		// NULL terminate
-  strncpy(new_kmer, kmer + 1, _ksize - 1);
+  strncpy(new_kmer, kmer_s.c_str() + 1, _ksize - 1);
 
   new_kmer[_ksize - 1] = 'A';
   calc_connected_graph_size(new_kmer, count, keeper, threshold);
@@ -891,7 +892,7 @@ void Hashtable::calc_connected_graph_size(const char * kmer,
   new_kmer[_ksize - 1] = 'T';
   calc_connected_graph_size(new_kmer, count, keeper, threshold);
 
-  strncpy(new_kmer + 1, kmer, _ksize - 1);
+  strncpy(new_kmer + 1, kmer_s.c_str(), _ksize - 1);
 
   new_kmer[0] = 'A';
   calc_connected_graph_size(new_kmer, count, keeper, threshold);

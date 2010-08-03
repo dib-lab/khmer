@@ -8,9 +8,6 @@
 #include "khmer.hh"
 #include "storage.hh"
 
-#define empty(c) (!((c) & 127))
-#define marked(c) ((c) & (1<<7))
-
 namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
 
@@ -164,7 +161,16 @@ namespace khmer {
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
-				   const unsigned long long threshold=0);
+				   const unsigned long long threshold=0) const{
+      calc_connected_graph_size(_hash(kmer, _ksize),
+				count, keeper, threshold);
+    }
+
+    void calc_connected_graph_size(const HashIntoType kmer,
+				   unsigned long long& count,
+				   SeenSet& keeper,
+				   const unsigned long long threshold=0) const;
+
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
     void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
