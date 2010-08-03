@@ -861,6 +861,13 @@ const
   keeper.insert(kmer);
   count += 1;
 
+#if 0
+  // @@@
+  if (val != MAX_COUNT) {
+    _counts[kmer % _tablesize] = val - 1;
+  }
+#endif // 0
+
   // are we past the threshold? truncate search.
   if (threshold && count >= threshold) {
     return;
