@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   README
+   ktable
    methods
 
 Indices and tables
