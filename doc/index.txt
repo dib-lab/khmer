@@ -13,6 +13,7 @@ Contents:
 
    ktable
    methods
+   contributors
 
 Indices and tables
 ==================

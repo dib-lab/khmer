@@ -4,7 +4,7 @@ clean:
 	cd lib && make clean
 	cd python && rm -fr build khmer/*.so
 
-doc:
+doc: FORCE
 	cd doc && make html
 
 lib_files:
@@ -15,3 +15,5 @@ python_files:
 
 test: all
 	nosetests python
+
+FORCE:
