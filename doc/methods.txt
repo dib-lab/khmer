@@ -1,3 +1,7 @@
+===================================
+khmer objects and methods reference
+===================================
+
 ktable methods
 --------------
 

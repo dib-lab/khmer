@@ -1,23 +1,21 @@
 ======================================
-khmer, a simple k-mer counting library
+ktable, simple k-mer counting
 ======================================
 
-khmer is a simple C++ library for counting k-mers in DNA sequences.
-It has a complete Python wrapping and should be pretty darned fast;
-it's intended for genome-scale k-mer counting.
+khmer ktables are a simple C++ library for counting k-mers in DNA
+sequences.  There's a complete Python wrapping and it should be pretty
+darned fast; it's intended for genome-scale k-mer counting.
 
 The current version is **0.2**.  I haven't used it for much myself,
 but the test code functions & it should work as advertised.
 
-khmer operates by building a 'ktable', a table of 4**k counters.
-It then maps each k-mer into this table with a simple
-(and reversible) hash function.
+'ktable's are a table of 4**k counters.  khmer then maps each k-mer
+into this table with a simple (and reversible) hash function.
 
 Right now, only the Python interface is documented here.  The C++
 interface is essentially identical; if you need to use it and want
 it documented, drop me a line.
 
-===============================
 Counting Speed and Memory Usage
 ===============================
 
@@ -31,7 +29,6 @@ For a 12bp wordsize, this works out to 16384*1024; on an Intel-based
 processor running Linux, ``long long`` is 8 bytes, so memory usage
 is approximately 128 mb.
 
-================
 Python interface
 ================
 
@@ -92,7 +89,6 @@ And, finally, there are some set operations:
     only nonzero entries in both ktables are kept.  The count for ach
     entry is the sum of the counts in ``ktable`` and ``other``.
 
-==========
 An Example
 ==========
 
@@ -112,9 +108,6 @@ DNA sequence, and then print them all out along with their prevalence.
       n = ktable.get(i)
       if n:
          print ktable.reverse_hash(i), "is present", n, "times."
-
-And that's all, folks... Let me know if there's other functionality that
-you think is important.
 
 ::
 
