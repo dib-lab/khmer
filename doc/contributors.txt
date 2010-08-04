@@ -1,0 +1,13 @@
+=================================
+Contributors and Acknowledgements
+=================================
+
+C. Titus Brown <ctb@msu.edu> wrote the initial ktable and hashtable
+implementations.
+
+Jason Pell implemented many of the C++ k-mer filtering functions.
+
+Adina Howe and Arend Hintze contributed significantly to discussions
+of approaches and algorithms.
+
+CTB 8/10
