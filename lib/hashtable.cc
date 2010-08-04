@@ -5,7 +5,6 @@
 #include "hashtable.hh"
 
 #define CALLBACK_PERIOD 10000
-#define MAX_CLUSTER_EXPLORE 250
 
 using namespace khmer;
 using namespace std;
@@ -928,8 +927,6 @@ void Hashtable::trim_graphs(const std::string infilename,
 			    CallbackFn callback,
 			    void * callback_data)
 {
-  unsigned int max_depth = MAX_CLUSTER_EXPLORE;
-
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
 
@@ -939,10 +936,6 @@ void Hashtable::trim_graphs(const std::string infilename,
 
   if (!infile.is_open())  {
     return;
-  }
-
-  if (min_size > max_depth) {
-    max_depth = min_size + 2;
   }
 
    string currName = "";
@@ -971,7 +964,7 @@ void Hashtable::trim_graphs(const std::string infilename,
 	   unsigned long long clustersize = 0;
 	   SeenSet keeper;
 	   calc_connected_graph_size(first_kmer.c_str(), clustersize, keeper,
-				     max_depth);
+				     min_size);
 
 	   if (clustersize >= min_size) {
 	     outfile << ">" << currName << endl;
