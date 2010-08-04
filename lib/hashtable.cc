@@ -447,9 +447,9 @@ void Hashtable::consume_fasta(const std::string &filename,
 	  bool is_valid;
 
 	  this_n_consumed = check_and_process_read(currSeq,
-						     is_valid,
-						     lower_bound,
-						     upper_bound);
+						   is_valid,
+						   lower_bound,
+						   upper_bound);
 
 	  // was this an invalid sequence -> mark as bad?
 	  if (!is_valid && update_readmask) {
@@ -477,11 +477,11 @@ void Hashtable::consume_fasta(const std::string &filename,
 	  }
 	}
       }
+    }
 
-      // new sequence => new sequence name
-	if (line[0] == '>') {
-	  currName = line.substr(1, line.length()-1);
-	}
+    // new sequence => new sequence name
+    if (line[0] == '>') {
+      currName = line.substr(1, line.length()-1);
     }
     else  {			// additional line for sequence
       currSeq += line;
@@ -491,9 +491,8 @@ void Hashtable::consume_fasta(const std::string &filename,
     if (infile.eof()) {
       break;
     }
-
-    infile.close();
   }
+  infile.close();
 
   //
   // We've either updated the readmask in place, OR we need to create a
