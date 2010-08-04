@@ -3,17 +3,37 @@
 
 #include <fstream>
 #include <string>
+#include <set>
 
 #include "khmer.hh"
 #include "storage.hh"
 
 namespace khmer {
+  typedef std::set<HashIntoType> SeenSet;
+
   class Hashtable {
   protected:
     const WordLength _ksize;
     const HashIntoType _tablesize;
+    HashIntoType bitmask;
 
     BoundedCounterType * _counts;
+
+    void (*_writelock_acquire)(void * data);
+    void (*_writelock_release)(void * data);
+    void * _writelock_data;
+
+    void writelock_acquire() {
+      if (_writelock_acquire) {
+	_writelock_acquire(_writelock_data);
+      }
+    }
+
+    void writelock_release() {
+      if (_writelock_release) {
+	_writelock_release(_writelock_data);
+      }
+    }
 
     void _allocate_counters() {
       _counts = new BoundedCounterType[_tablesize];
@@ -23,12 +43,31 @@ namespace khmer {
   public:
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
+      bitmask = 0;
+      for (unsigned int i = 0; i < _ksize; i++) {
+	bitmask = (bitmask << 2) | 3;
+      }
       _allocate_counters();
+
+      _writelock_acquire = NULL;
+      _writelock_release = NULL;
+      _writelock_data = NULL;
     }
 
     ~Hashtable() {
       if (_counts) { delete _counts; _counts = NULL; }
     }
+
+#if 0
+    // setter to set the writelock functions.
+    void set_writelock_functions(void (*acquire)(void *),
+				 void (*release)(void *),
+				 void * data) {
+      _writelock_acquire = acquire;
+      _writelock_release = release;
+      _writelock_data = data;
+    }
+#endif //0
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -52,13 +91,27 @@ namespace khmer {
     void count(const char * kmer) {
       HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
-      _counts[bin]++;
+      writelock_acquire();
+      try {
+	_counts[bin]++;
+      } catch (...) {
+	writelock_release();
+	throw;
+      }
+      writelock_release();
     }
 
     void count(HashIntoType khash) {
       HashIntoType bin = khash % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
-      _counts[bin]++;
+      writelock_acquire();
+      try {
+	_counts[bin]++;
+      } catch (...) {
+	writelock_release();
+	throw;
+      }
+      writelock_release();
     }
 
     // get the count for the given k-mer.
@@ -154,6 +207,44 @@ namespace khmer {
 				       BoundedCounterType limit_by_count,
 				       CallbackFn callback = NULL,
 				       void * callback_data = NULL);
+
+    void trim_graphs(const std::string infilename,
+		     const std::string outfilename,
+		     unsigned int min_size,
+		     CallbackFn callback = NULL,
+		     void * callback_data = NULL);
+
+    HashIntoType * graphsize_distribution(const unsigned int &max_size);
+
+    void calc_connected_graph_size(const char * kmer,
+				   unsigned long long& count,
+				   SeenSet& keeper,
+				   const unsigned long long threshold=0) const{
+      HashIntoType r, f;
+      _hash(kmer, _ksize, f, r);
+      calc_connected_graph_size(f, r, count, keeper, threshold);
+    }
+
+    void calc_connected_graph_size(const HashIntoType kmer_f,
+				   const HashIntoType kmer_r,
+				   unsigned long long& count,
+				   SeenSet& keeper,
+				   const unsigned long long threshold=0) const;
+
+    typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
+
+    void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
+      for (HashIntoType i = 0; i < _tablesize; i++) {
+	BoundedCounterType count = _counts[i] & 127;
+	if (_counts[i]) {
+	  if (cb_fn) {
+	    cb_fn(_revhash(i, _ksize).c_str(), count, data);
+	  } else{
+	    std::cout << _revhash(i, _ksize) << " " << count << std::endl;
+	  }
+	}
+      }
+    }
   };
 
   class HashtableIntersect {

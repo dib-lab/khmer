@@ -27,14 +27,14 @@
                          (toupper(ch)) == 'C' ? 3LL : 2LL)
 
 // choose wisely between forward and rev comp.
-#define uniqify_rc(f, r) ((h) < (r) ? (h) : (r))
+#define uniqify_rc(f, r) ((f) < (r) ? (f) : (r))
 
 
 namespace khmer {
   // two-way hash functions.
   HashIntoType _hash(const char * kmer, const WordLength k);
   HashIntoType _hash(const char * kmer, const WordLength k,
-			      HashIntoType * h, HashIntoType * r);
+			      HashIntoType& h, HashIntoType& r);
   HashIntoType _hash_forward(const char * kmer, WordLength k);
 
   std::string _revhash(HashIntoType hash, WordLength k);

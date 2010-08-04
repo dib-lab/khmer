@@ -1176,6 +1176,122 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self, PyObject *
   return Py_None;
 }
 
+// callback function to pass into dump function
+
+void _dump_report_fn(const char * info, unsigned int count, void * data)
+{
+  // handle signals etc. (like CTRL-C)
+  if (PyErr_CheckSignals() != 0) {
+    throw _khmer_signal("PyErr_CheckSignals received a signal");
+  }
+
+  // if 'data' is set, it is a Python callable
+  if (data) {
+    PyObject * obj = (PyObject *) data;
+    if (obj != Py_None) {
+      PyObject * args = Py_BuildValue("si", info, count);
+
+      PyObject * r = PyObject_Call(obj, args, NULL);
+      Py_XDECREF(r);
+      Py_DECREF(args);
+    }
+  }
+
+  if (PyErr_Occurred()) {
+    throw _khmer_signal("PyErr_Occurred is set");
+  }
+
+  // ...allow other Python threads to do stuff...
+  Py_BEGIN_ALLOW_THREADS;
+  Py_END_ALLOW_THREADS;
+}
+
+
+static PyObject * hash_dump_kmers_and_counts(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * cb = NULL;
+  if (!PyArg_ParseTuple(args, "|O", &cb)) {
+    return NULL;
+  }
+  hashtable->dump_kmers_and_counts(_dump_report_fn, cb);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * _kmer;
+  unsigned int max_size = 0;
+  if (!PyArg_ParseTuple(args, "s|i", &_kmer, &max_size)) {
+    return NULL;
+  }
+
+  unsigned long long size = 0;
+
+  Py_BEGIN_ALLOW_THREADS
+  khmer::SeenSet keeper;
+  hashtable->calc_connected_graph_size(_kmer, size, keeper, max_size);
+  Py_END_ALLOW_THREADS
+
+  return PyInt_FromLong(size);
+}
+
+static PyObject * hash_trim_graphs(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  unsigned int threshold = 0;
+  char * filename = NULL;
+  char * outfile = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "sis|O", &filename, &threshold, &outfile,
+			&callback_obj)) {
+    return NULL;
+  }
+  
+  try {
+    hashtable->trim_graphs(filename, outfile, threshold, _report_fn,
+			   callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_graphsize_distribution(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  unsigned int threshold = 0;
+  if (!PyArg_ParseTuple(args, "i", &threshold)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType * p = hashtable->graphsize_distribution(threshold);
+  
+  PyObject * x = PyList_New(threshold);
+  for (unsigned int i = 0; i < threshold; i++) {
+    if (i > 0) { p[i] /= i; }
+    PyList_SET_ITEM(x, i, PyInt_FromLong(p[i]));
+  }
+
+  delete p;
+
+  return x;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1195,6 +1311,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
+  { "dump_kmers_and_counts", hash_dump_kmers_and_counts, METH_VARARGS, "" },
+  { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
+  { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
+  { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

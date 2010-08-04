@@ -4,6 +4,8 @@ thisdir = os.path.abspath(thisdir)
 
 import khmer
 
+MAX_COUNT=255
+
 def test_no_collision():
     kh = khmer.new_hashtable(4, 86)
 
@@ -105,7 +107,7 @@ def test_maxcount():
         last_count = c
 
     assert c != 10000, "should not be able to count to 10000"
-    assert c == 255                     # this will depend on HashcountType...
+    assert c == MAX_COUNT       # this will depend on HashcountType...
 
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
@@ -115,7 +117,7 @@ def test_maxcount_consume():
     kh.consume(s)
 
     c = kh.get('AAAA')
-    assert c == 255, c          # this will depend on HashcountType...
+    assert c == MAX_COUNT, c    # this will depend on HashcountType...
 
 def test_get_mincount():
     kh = khmer.new_hashtable(4, 4**4)
@@ -213,8 +215,8 @@ class Test_ConsumeString(object):
         assert dist[4] == 1
         assert sum(dist) == 1
         
-        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 255)
-        assert dist[0] == 1
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, MAX_COUNT)
+        assert dist[0] == 1, dist[0]
         assert dist[2] == 1
         assert sum(dist) == 2
 
@@ -300,7 +302,7 @@ class Test_ConsumeString(object):
         self.kh.consume('AAAA')
 
         count = self.kh.get_min_count('AAAAA', 1, 4**4)
-        assert count == 255
+        assert count == MAX_COUNT
 
     def test_max_count(self):
         self.kh.consume('AAAA')
@@ -319,6 +321,226 @@ class Test_ConsumeString(object):
 
         count = self.kh.get_max_count('AAAAA', 1, 4**4)
         assert count == 0
+
+class Test_ExactGraphFu(object):
+    def setup(self):
+        self.ht = khmer.new_hashtable(12, 4**12)
+
+    def test_counts(self):
+        ht = self.ht
+        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
+
+        kmer = "TTAGGACTGCAC"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 69, x
+        
+        kmer = "TGCGTTTCAATC"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 68, x
+
+        kmer = "ATACTGTAAATA"
+        x = ht.calc_connected_graph_size(kmer)
+        assert x == 36, x
+
+    def test_trim(self):
+        ht = self.ht
+        
+        filename = os.path.join(thisdir, 'test-graph.fa')
+        outfile = os.path.join(thisdir, 'test-graph.fa.out')
+        ht.consume_fasta(filename)
+        ht.trim_graphs(filename, 40, outfile)
+
+        ht = khmer.new_hashtable(12, 4**12)
+        ht.consume_fasta(outfile)
+
+        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
+        assert x == 69, x
+        
+        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
+        assert x == 68, x
+        
+        x = ht.calc_connected_graph_size("ATACTGTAAATA")
+        assert x == 0, x
+
+    def test_graphsize_distrib(self):
+        ht = self.ht
+        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
+        x = ht.graphsize_distribution(200)
+
+        assert sum(x) == 3, x
+        assert x[69] == 1
+        assert x[68] == 1
+        assert x[36] == 1
+
+    def test_graph_links_next_a(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "A")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_c(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "C")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_g(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "G")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_t(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "T")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+        
+    def test_graph_links_prev_a(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("A" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_c(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("C" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_g(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("G" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_t(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("T" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+class Test_InexactGraphFu(object):
+    def setup(self):
+        self.ht = khmer.new_hashtable(12, 4**8+1)
+
+    def test_trim(self):
+        ht = self.ht
+        filename = os.path.join(thisdir, 'test-graph.fa')
+        outfile = os.path.join(thisdir, 'test-graph.fa.out')
+        
+        ht.consume_fasta(filename)
+        ht.trim_graphs(filename, 40, outfile)
+
+        ht = khmer.new_hashtable(12, 4**12)
+        ht.consume_fasta(outfile)
+
+        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
+        assert x >= 69, x
+        
+        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
+        assert x >= 68, x               # @CTB why 69??
+        
+        x = ht.calc_connected_graph_size("ATACTGTAAATA")
+        assert x == 0, x
+
+    def test_graph_links_next_a(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "A")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_c(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "C")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_g(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "G")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_next_t(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume(word[1:] + "T")
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+        
+    def test_graph_links_prev_a(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("A" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_c(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("C" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_g(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("G" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+    def test_graph_links_prev_t(self):
+        ht = self.ht
+        word = "TGCGTTTCAATC"
+        ht.consume(word)
+        ht.consume("T" + word[:-1])
+
+        x = ht.calc_connected_graph_size(word)
+        assert x == 2
+
+####
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
 

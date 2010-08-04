@@ -477,114 +477,112 @@ void Hashtable::consume_fasta(const std::string &filename,
 			      CallbackFn callback,
 			      void * callback_data)
 {
-   total_reads = 0;
-   n_consumed = 0;
+  total_reads = 0;
+  n_consumed = 0;
 
-   string line;
-   ifstream infile(filename.c_str());
+  string line;
+  ifstream infile(filename.c_str());
 
-   if (!infile.is_open())  {
-     return;
-   }
+  if (!infile.is_open())  {
+    return;
+  }
+    
+  string currName = "";
+  string currSeq = "";
 
-   string currName = "";
-   string currSeq = "";
+  //
+  // readmask stuff: were we given one? do we want to update it?
+  // 
 
-   //
-   // readmask stuff: were we given one? do we want to update it?
-   // 
+  ReadMaskTable * readmask = NULL;
+  std::list<unsigned int> masklist;
 
-   ReadMaskTable * readmask = NULL;
-   std::list<unsigned int> masklist;
+  if (orig_readmask && *orig_readmask) {
+    readmask = *orig_readmask;
+  }
 
-   if (orig_readmask && *orig_readmask) {
-     readmask = *orig_readmask;
-   }
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
 
-   //
-   // iterate through the FASTA file & consume the reads.
-   //
+  while(1)  {
+    getline(infile, line);
+    
+    if (line[0] == '>' || infile.eof())  {
+	
+      // do we have a sequence to process?
+      if (currSeq != "")  {
 
-   while(1)  {
-     getline(infile, line);
+	// do we want to process it?
+	if (!readmask || readmask->get(total_reads)) {
 
-     if (line[0] == '>' || infile.eof())  {
+	  // yep! process.
+	  unsigned int this_n_consumed;
+	  bool is_valid;
 
-       // do we have a sequence to process?
-       if (currSeq != "")  {
+	  this_n_consumed = check_and_process_read(currSeq,
+						   is_valid,
+						   lower_bound,
+						   upper_bound);
 
-	 // do we want to process it?
-	 if (!readmask || readmask->get(total_reads)) {
-
-	   // yep! process.
-
-	   unsigned int this_n_consumed;
-	   bool is_valid;
-
-	   this_n_consumed = check_and_process_read(currSeq,
-						    is_valid,
-						    lower_bound,
-						    upper_bound);
-
-	   // was this an invalid sequence -> mark as bad?
-	   if (!is_valid && update_readmask) {
-	     if (readmask) {
-	       readmask->set(total_reads, false);
-	     } else {
-	       masklist.push_back(total_reads);
-	     }
-	   } else {		// nope -- count it!
-	     n_consumed += this_n_consumed;
-	   }
-	 }
+	  // was this an invalid sequence -> mark as bad?
+	  if (!is_valid && update_readmask) {
+	    if (readmask) {
+	      readmask->set(total_reads, false);
+	    } else {
+	      masklist.push_back(total_reads);
+	    }
+	  } else {		// nope -- count it!
+	    n_consumed += this_n_consumed;
+	  }
+	}
 	       
-	 // reset the sequence info, increment read number
-	 currSeq = "";
-	 total_reads++;
+	// reset the sequence info, increment read number
+	currSeq = "";
+	total_reads++;
 
-	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("consume_fasta", callback_data, total_reads, n_consumed);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
+	// run callback, if specified
+	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	  try {
+	    callback("consume_fasta", callback_data, total_reads, n_consumed);
+	  } catch (...) {
+	    infile.close();
+	    throw;
+	  }
+	}
+      }
+    }
 
-       // new sequence => new sequence name
-       if (line[0] == '>') {
-	 currName = line.substr(1, line.length()-1);
-       }
-     }
-     else  {			// additional line for sequence
-       currSeq += line;
-     }
+    // new sequence => new sequence name
+    if (line[0] == '>') {
+      currName = line.substr(1, line.length()-1);
+    }
+    else  {			// additional line for sequence
+      currSeq += line;
+    }
      
-     // @ end of file? break out.
-     if (infile.eof()) {
-       break;
-     }
-   }
+    // @ end of file? break out.
+    if (infile.eof()) {
+      break;
+    }
+  }
+  infile.close();
 
-   infile.close();
+  //
+  // We've either updated the readmask in place, OR we need to create a
+  // new one.
+  //
 
-   //
-   // We've either updated the readmask in place, OR we need to create a
-   // new one.
-   //
+  if (orig_readmask && update_readmask && readmask == NULL) {
+    // allocate, fill in from masklist
+    readmask = new ReadMaskTable(total_reads);
 
-   if (orig_readmask && update_readmask && readmask == NULL) {
-     // allocate, fill in from masklist
-     readmask = new ReadMaskTable(total_reads);
-
-     list<unsigned int>::const_iterator it;
-     for(it = masklist.begin(); it != masklist.end(); ++it) {
-       readmask->set(*it, false);
-     }
-     *orig_readmask = readmask;
-   }
+    list<unsigned int>::const_iterator it;
+    for(it = masklist.begin(); it != masklist.end(); ++it) {
+      readmask->set(*it, false);
+    }
+    *orig_readmask = readmask;
+  }
 }
 
 //
@@ -599,12 +597,6 @@ unsigned int Hashtable::consume_string(const std::string &s,
   const unsigned int length = s.length();
   unsigned int n_consumed = 0;
 
-  HashIntoType mask = 0;
-  for (unsigned int i = 0; i < _ksize; i++) {
-    mask = mask << 2;
-    mask |= 3;
-  }
-
   HashIntoType h = 0, r = 0;
   bool bounded = true;
 
@@ -612,32 +604,11 @@ unsigned int Hashtable::consume_string(const std::string &s,
     bounded = false;
   }
   
-  HashIntoType bin = _hash(sp, _ksize, &h, &r);
+  HashIntoType bin = _hash(sp, _ksize, h, r);
 
-  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-    bin = bin % _tablesize;
-    if (_counts[bin] != MAX_COUNT) {
-      _counts[bin]++;
-    }
-    n_consumed++;
-  }
+  writelock_acquire();
 
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= mask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
-
-    bin = uniqify_rc(h, r);
-
+  try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
       bin = bin % _tablesize;
       if (_counts[bin] != MAX_COUNT) {
@@ -645,7 +616,37 @@ unsigned int Hashtable::consume_string(const std::string &s,
       }
       n_consumed++;
     }
+
+    for (unsigned int i = _ksize; i < length; i++) {
+      // left-shift the previous hash over
+      h = h << 2;
+
+      // 'or' in the current nt
+      h |= twobit_repr(sp[i]);
+
+      // mask off the 2 bits we shifted over.
+      h &= bitmask;
+
+      // now handle reverse complement
+      r = r >> 2;
+      r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
+
+      bin = uniqify_rc(h, r);
+
+      if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+	bin = bin % _tablesize;
+	if (_counts[bin] != MAX_COUNT) {
+	  _counts[bin]++;
+	}
+	n_consumed++;
+      }
+    }
+  } catch (...) {
+    writelock_release();
+    throw;
   }
+
+  writelock_release();
 
   return n_consumed;
 }
@@ -657,13 +658,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
 {
   const unsigned int length = s.length();
   const char * sp = s.c_str();
-  BoundedCounterType min_count = 255, count;
-
-  HashIntoType mask = 0;
-  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
-    mask = mask << 2;
-    mask |= 3;
-  }
+  BoundedCounterType min_count = MAX_COUNT, count;
 
   HashIntoType h = 0, r = 0;
   bool bounded = true;
@@ -674,7 +669,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
 
   HashIntoType bin;
   
-  bin = _hash(sp, _ksize, &h, &r);
+  bin = _hash(sp, _ksize, h, r);
   if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
     min_count = this->get_count(bin);
   }
@@ -687,7 +682,7 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
     h |= twobit_repr(sp[i]);
 
     // mask off the 2 bits we shifted over.
-    h &= mask;
+    h &= bitmask;
 
     // now handle reverse complement
     r = r >> 2;
@@ -714,12 +709,6 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
   const char * sp = s.c_str();
   BoundedCounterType max_count = 0, count;
 
-  HashIntoType mask = 0;
-  for (unsigned int i = 0; i < (unsigned int) _ksize; i++) {
-    mask = mask << 2;
-    mask |= 3;
-  }
-
   HashIntoType h = 0, r = 0;
   bool bounded = true;
 
@@ -727,7 +716,7 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
     bounded = false;
   }
 
-  HashIntoType bin = _hash(sp, _ksize, &h, &r);
+  HashIntoType bin = _hash(sp, _ksize, h, r);
   if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
     max_count = this->get_count(bin);
   }
@@ -740,7 +729,7 @@ BoundedCounterType Hashtable::get_max_count(const std::string &s,
     h |= twobit_repr(sp[i]);
 
     // mask off the 2 bits we shifted over.
-    h &= mask;
+    h &= bitmask;
 
     // now handle reverse complement
     r = r >> 2;
@@ -922,4 +911,203 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
    }
   
    infile.close();
+}
+
+//////////////////////////////////////////////////////////////////////
+// graph stuff
+
+void Hashtable::calc_connected_graph_size(HashIntoType kmer_f,
+					  HashIntoType kmer_r,
+					  unsigned long long& count,
+					  SeenSet& keeper,
+					  const unsigned long long threshold)
+const
+{
+  HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+  const BoundedCounterType val = _counts[kmer % _tablesize];
+
+  if (val == 0) {
+    return;
+  }
+
+  std::string kmer_s = _revhash(kmer_f, _ksize);
+
+  // have we already seen me? don't count; exit.
+  SeenSet::iterator i = keeper.find(kmer);
+  if (i != keeper.end()) {
+    return;
+  }
+
+  // keep track of both seen kmers, and counts.
+  keeper.insert(kmer);
+  count += 1;
+
+#if 0
+  // @@@
+  if (val != MAX_COUNT) {
+    _counts[kmer % _tablesize] = val - 1;
+  }
+#endif // 0
+
+  // are we past the threshold? truncate search.
+  if (threshold && count >= threshold) {
+    return;
+  }
+
+  // otherwise, explore in all directions.
+
+  // NEXT.
+
+  HashIntoType f, r;
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  // PREVIOUS.
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  calc_connected_graph_size(f, r, count, keeper, threshold);
+}
+
+void Hashtable::trim_graphs(const std::string infilename,
+			    const std::string outfilename,
+			    unsigned int min_size,
+			    CallbackFn callback,
+			    void * callback_data)
+{
+  unsigned int total_reads = 0;
+  unsigned int reads_kept = 0;
+
+  string line;
+  ifstream infile(infilename.c_str());
+  ofstream outfile(outfilename.c_str());
+
+  if (!infile.is_open())  {
+    return;
+  }
+
+   string currName = "";
+   string currSeq = "";
+
+   //
+   // iterate through the FASTA file & consume the reads.
+   //
+
+   while(1)  {
+     getline(infile, line);
+
+     if (line[0] == '>' || infile.eof())  {
+
+       // do we have a sequence to process?
+       if (currSeq != "")  {
+
+	 // yep! process.
+
+	 bool is_valid;
+
+	 check_and_process_read(currSeq, is_valid);
+
+	 if (is_valid) {
+	   std::string first_kmer = currSeq.substr(0, _ksize);
+	   unsigned long long clustersize = 0;
+	   SeenSet keeper;
+	   calc_connected_graph_size(first_kmer.c_str(), clustersize, keeper,
+				     min_size);
+
+	   if (clustersize >= min_size) {
+	     outfile << ">" << currName << endl;
+	     outfile << currSeq << endl;
+	     reads_kept++;
+	   }
+	 }
+	       
+	 // reset the sequence info, increment read number
+	 currSeq = "";
+	 total_reads++;
+
+	 // run callback, if specified
+	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("trim_graphs", callback_data, total_reads, reads_kept);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
+       }
+
+       // new sequence => new sequence name
+       if (line[0] == '>') {
+	 currName = line.substr(1, line.length()-1);
+       }
+     }
+     else  {			// additional line for sequence
+       currSeq += line;
+     }
+     
+     // @ end of file? break out.
+     if (infile.eof()) {
+       break;
+     }
+   }
+
+   infile.close();
+
+}
+
+HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
+{
+  HashIntoType * p = new HashIntoType[max_size];
+  const unsigned char seen = 1 << 7;
+  unsigned long long size;
+
+  for (unsigned int i = 0; i < max_size; i++) {
+    p[i] = 0;
+  }
+
+  for (HashIntoType i = 0; i < _tablesize; i++) {
+    BoundedCounterType count = _counts[i];
+    if (count && !(count & seen)) {
+      std::string kmer = _revhash(i, _ksize);
+      size = 0;
+
+      SeenSet keeper;
+      calc_connected_graph_size(kmer.c_str(), size, keeper, max_size);
+      if (size) {
+	// if (size > 5000) { std::cout << "GRAPH SIZE: " << size << "\n"; }
+	if (size < max_size) {
+	  p[size] += 1;
+	}
+      }
+    }
+  }
+
+  return p;
 }

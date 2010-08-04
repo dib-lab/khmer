@@ -10,6 +10,9 @@ clean:
 bittest: bittest.o ktable.o
 	$(CXX) -o bittest bittest.o ktable.o
 
+graphtest: graphtest.o ktable.o hashtable.o
+	$(CXX) -o graphtest graphtest.o ktable.o hashtable.o
+
 consume_prof: consume_prof.o hashtable.o ktable.o
 	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
 
