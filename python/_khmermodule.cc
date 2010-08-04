@@ -1205,7 +1205,13 @@ static PyObject * hash_trim_graphs(PyObject * self, PyObject * args)
 			&callback_obj)) {
     return NULL;
   }
-  hashtable->trim_graphs(filename, outfile, threshold, _report_fn, callback_obj);
+  
+  try {
+    hashtable->trim_graphs(filename, outfile, threshold, _report_fn,
+			   callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
   
   Py_INCREF(Py_None);
   return Py_None;
