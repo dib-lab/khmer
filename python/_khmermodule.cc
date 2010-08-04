@@ -1184,9 +1184,13 @@ static PyObject * hash_calc_connected_graph_size(PyObject * self, PyObject * arg
   if (!PyArg_ParseTuple(args, "s|i", &_kmer, &max_size)) {
     return NULL;
   }
+
   unsigned long long size = 0;
+
+  Py_BEGIN_ALLOW_THREADS
   khmer::SeenSet keeper;
   hashtable->calc_connected_graph_size(_kmer, size, keeper, max_size);
+  Py_END_ALLOW_THREADS
 
   return PyInt_FromLong(size);
 }
