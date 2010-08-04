@@ -6,6 +6,9 @@ import threading, Queue
 K = 32
 HASHTABLE_SIZE=4**12+1
 
+GROUPSIZE=500
+WORKER_THREADS=10
+
 infile = sys.argv[1]
 threshold = int(sys.argv[2])
 outfile = sys.argv[3]
@@ -54,7 +57,7 @@ def write(outq):
 ## worker and writer threads
 
 worker_count = 0
-for i in range(10):
+for i in range(WORKER_THREADS):
     t = threading.Thread(target=process, args=(inqueue, outqueue))
     worker_count += 1
     t.start()
@@ -71,7 +74,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
     x.append(record)
     i += 1
 
-    if i > 1000:
+    if i > GROUPSIZE:
         inqueue.put(x)
         x = []
         i = 0
