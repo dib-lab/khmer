@@ -2,6 +2,6 @@
 
 'make test' to test.
 
-See doc/README.txt.
+'make doc' to build docs.  You'll need Sphinx installed.
 
-CTB 6/2010.
+CTB 8/2010.

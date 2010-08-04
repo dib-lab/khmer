@@ -4,6 +4,9 @@ clean:
 	cd lib && make clean
 	cd python && rm -fr build khmer/*.so
 
+doc:
+	cd doc && make html
+
 lib_files:
 	cd lib && make
 
