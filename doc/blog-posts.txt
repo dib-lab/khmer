@@ -22,7 +22,7 @@ Illumina read abundance profiles
 khmer can be used to look at systematic variations in k-mer statistics
 across Illumina reads; see, for example, this blog post:
 
-   @@
+   http://ivory.idyll.org/blog/jul-10/illumina-read-phenomenology
 
 The `fasta-to-abundance-hist
 <http://github.com/ctb/khmer/blob/master/scripts/fasta-to-abundance-hist.py>`__
