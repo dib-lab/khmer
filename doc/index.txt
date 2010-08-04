@@ -13,6 +13,7 @@ Contents:
 
    ktable
    methods
+   blog-posts
    contributors
 
 Indices and tables
