@@ -19,6 +19,22 @@ namespace khmer {
 
     BoundedCounterType * _counts;
 
+    void (*_writelock_acquire)(void * data);
+    void (*_writelock_release)(void * data);
+    void * _writelock_data;
+
+    void writelock_acquire() {
+      if (_writelock_acquire) {
+	_writelock_acquire(_writelock_data);
+      }
+    }
+
+    void writelock_release() {
+      if (_writelock_release) {
+	_writelock_release(_writelock_data);
+      }
+    }
+
     void _allocate_counters() {
       _counts = new BoundedCounterType[_tablesize];
       memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
@@ -32,11 +48,26 @@ namespace khmer {
 	bitmask = (bitmask << 2) | 3;
       }
       _allocate_counters();
+
+      _writelock_acquire = NULL;
+      _writelock_release = NULL;
+      _writelock_data = NULL;
     }
 
     ~Hashtable() {
       if (_counts) { delete _counts; _counts = NULL; }
     }
+
+#if 0
+    // setter to set the writelock functions.
+    void set_writelock_functions(void (*acquire)(void *),
+				 void (*release)(void *),
+				 void * data) {
+      _writelock_acquire = acquire;
+      _writelock_release = release;
+      _writelock_data = data;
+    }
+#endif //0
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -60,13 +91,27 @@ namespace khmer {
     void count(const char * kmer) {
       HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
-      _counts[bin]++;
+      writelock_acquire();
+      try {
+	_counts[bin]++;
+      } catch (...) {
+	writelock_release();
+	throw;
+      }
+      writelock_release();
     }
 
     void count(HashIntoType khash) {
       HashIntoType bin = khash % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
-      _counts[bin]++;
+      writelock_acquire();
+      try {
+	_counts[bin]++;
+      } catch (...) {
+	writelock_release();
+	throw;
+      }
+      writelock_release();
     }
 
     // get the count for the given k-mer.

@@ -403,114 +403,113 @@ void Hashtable::consume_fasta(const std::string &filename,
 			      CallbackFn callback,
 			      void * callback_data)
 {
-   total_reads = 0;
-   n_consumed = 0;
+  total_reads = 0;
+  n_consumed = 0;
 
-   string line;
-   ifstream infile(filename.c_str());
+  string line;
+  ifstream infile(filename.c_str());
 
-   if (!infile.is_open())  {
-     return;
-   }
+  if (!infile.is_open())  {
+    return;
+  }
+    
+  string currName = "";
+  string currSeq = "";
 
-   string currName = "";
-   string currSeq = "";
+  //
+  // readmask stuff: were we given one? do we want to update it?
+  // 
 
-   //
-   // readmask stuff: were we given one? do we want to update it?
-   // 
+  ReadMaskTable * readmask = NULL;
+  std::list<unsigned int> masklist;
 
-   ReadMaskTable * readmask = NULL;
-   std::list<unsigned int> masklist;
+  if (orig_readmask && *orig_readmask) {
+    readmask = *orig_readmask;
+  }
 
-   if (orig_readmask && *orig_readmask) {
-     readmask = *orig_readmask;
-   }
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
 
-   //
-   // iterate through the FASTA file & consume the reads.
-   //
+  while(1)  {
+    getline(infile, line);
+    
+    if (line[0] == '>' || infile.eof())  {
+	
+      // do we have a sequence to process?
+      if (currSeq != "")  {
 
-   while(1)  {
-     getline(infile, line);
+	// do we want to process it?
+	if (!readmask || readmask->get(total_reads)) {
 
-     if (line[0] == '>' || infile.eof())  {
+	  // yep! process.
+	  unsigned int this_n_consumed;
+	  bool is_valid;
 
-       // do we have a sequence to process?
-       if (currSeq != "")  {
+	  this_n_consumed = check_and_process_read(currSeq,
+						     is_valid,
+						     lower_bound,
+						     upper_bound);
 
-	 // do we want to process it?
-	 if (!readmask || readmask->get(total_reads)) {
-
-	   // yep! process.
-
-	   unsigned int this_n_consumed;
-	   bool is_valid;
-
-	   this_n_consumed = check_and_process_read(currSeq,
-						    is_valid,
-						    lower_bound,
-						    upper_bound);
-
-	   // was this an invalid sequence -> mark as bad?
-	   if (!is_valid && update_readmask) {
-	     if (readmask) {
-	       readmask->set(total_reads, false);
-	     } else {
-	       masklist.push_back(total_reads);
-	     }
-	   } else {		// nope -- count it!
-	     n_consumed += this_n_consumed;
-	   }
-	 }
+	  // was this an invalid sequence -> mark as bad?
+	  if (!is_valid && update_readmask) {
+	    if (readmask) {
+	      readmask->set(total_reads, false);
+	    } else {
+	      masklist.push_back(total_reads);
+	    }
+	  } else {		// nope -- count it!
+	    n_consumed += this_n_consumed;
+	  }
+	}
 	       
-	 // reset the sequence info, increment read number
-	 currSeq = "";
-	 total_reads++;
+	// reset the sequence info, increment read number
+	currSeq = "";
+	total_reads++;
 
-	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("consume_fasta", callback_data, total_reads, n_consumed);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
+	// run callback, if specified
+	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	  try {
+	    callback("consume_fasta", callback_data, total_reads, n_consumed);
+	  } catch (...) {
+	    infile.close();
+	    throw;
+	  }
+	}
+      }
 
-       // new sequence => new sequence name
-       if (line[0] == '>') {
-	 currName = line.substr(1, line.length()-1);
-       }
-     }
-     else  {			// additional line for sequence
-       currSeq += line;
-     }
+      // new sequence => new sequence name
+	if (line[0] == '>') {
+	  currName = line.substr(1, line.length()-1);
+	}
+    }
+    else  {			// additional line for sequence
+      currSeq += line;
+    }
      
-     // @ end of file? break out.
-     if (infile.eof()) {
-       break;
-     }
-   }
+    // @ end of file? break out.
+    if (infile.eof()) {
+      break;
+    }
 
-   infile.close();
+    infile.close();
+  }
 
-   //
-   // We've either updated the readmask in place, OR we need to create a
-   // new one.
-   //
+  //
+  // We've either updated the readmask in place, OR we need to create a
+  // new one.
+  //
 
-   if (orig_readmask && update_readmask && readmask == NULL) {
-     // allocate, fill in from masklist
-     readmask = new ReadMaskTable(total_reads);
+  if (orig_readmask && update_readmask && readmask == NULL) {
+    // allocate, fill in from masklist
+    readmask = new ReadMaskTable(total_reads);
 
-     list<unsigned int>::const_iterator it;
-     for(it = masklist.begin(); it != masklist.end(); ++it) {
-       readmask->set(*it, false);
-     }
-     *orig_readmask = readmask;
-   }
+    list<unsigned int>::const_iterator it;
+    for(it = masklist.begin(); it != masklist.end(); ++it) {
+      readmask->set(*it, false);
+    }
+    *orig_readmask = readmask;
+  }
 }
 
 //
@@ -534,30 +533,9 @@ unsigned int Hashtable::consume_string(const std::string &s,
   
   HashIntoType bin = _hash(sp, _ksize, h, r);
 
-  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-    bin = bin % _tablesize;
-    if (_counts[bin] != MAX_COUNT) {
-      _counts[bin]++;
-    }
-    n_consumed++;
-  }
+  writelock_acquire();
 
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
-
-    bin = uniqify_rc(h, r);
-
+  try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
       bin = bin % _tablesize;
       if (_counts[bin] != MAX_COUNT) {
@@ -565,7 +543,37 @@ unsigned int Hashtable::consume_string(const std::string &s,
       }
       n_consumed++;
     }
+
+    for (unsigned int i = _ksize; i < length; i++) {
+      // left-shift the previous hash over
+      h = h << 2;
+
+      // 'or' in the current nt
+      h |= twobit_repr(sp[i]);
+
+      // mask off the 2 bits we shifted over.
+      h &= bitmask;
+
+      // now handle reverse complement
+      r = r >> 2;
+      r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
+
+      bin = uniqify_rc(h, r);
+
+      if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
+	bin = bin % _tablesize;
+	if (_counts[bin] != MAX_COUNT) {
+	  _counts[bin]++;
+	}
+	n_consumed++;
+      }
+    }
+  } catch (...) {
+    writelock_release();
+    throw;
   }
+
+  writelock_release();
 
   return n_consumed;
 }
