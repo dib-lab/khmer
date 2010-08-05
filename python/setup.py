@@ -7,13 +7,15 @@ extension_mod = Extension("khmer._khmermodule",
                           include_dirs=['../lib',],
                           library_dirs=['../lib',],
                           extra_objects=['../lib/ktable.o',
-                                         '../lib/hashtable.o'],
+                                         '../lib/hashtable.o',
+                                         '../lib/parsers.o'],
                           depends=['../lib/storage.hh',
                                    '../lib/khmer.hh',
                                    '../lib/ktable.hh',
                                    '../lib/hashtable.hh',
                                    '../lib/hashtable.o',
-                                   '../lib/ktable.o']
+                                   '../lib/ktable.o',
+                                   ',,/lib/parsers.o']
                           )
 
 # python modules: only 'khmer'

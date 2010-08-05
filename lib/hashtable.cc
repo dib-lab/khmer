@@ -3,6 +3,7 @@
 
 #include "khmer.hh"
 #include "hashtable.hh"
+#include "parsers.h"
 
 #define CALLBACK_PERIOD 10000
 
@@ -15,68 +16,50 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 					      CallbackFn callback,
 					      void * callback_data)
 {
-   string line;
-   ifstream infile(inputfile.c_str());
-   string name = "";
+   FastaParser parser(inputfile.c_str());
+   Read read;
    string seq = "";
    unsigned int read_num = 0;
 
    MinMaxTable * mmt = new MinMaxTable(total_reads);
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
+   while(!parser.is_complete()) {
+     read = parser.get_next_read();
+     seq = read.seq;
 
-       if (line[0] == '>' || infile.eof()) {
-	 if (seq != "") {
-
-	   bool valid_read = true;
-	   if (!readmask || readmask->get(read_num)) {
-
-	     for (unsigned int i = 0; i < seq.length(); i++)  {
-	       if (!is_valid_dna(seq[i])) {
-		 valid_read = false;
-		 break;
-	       }
-	     }
-
-	     if (valid_read) {
-	       BoundedCounterType minval = get_min_count(seq);
-	       BoundedCounterType maxval = get_max_count(seq);
-
-	       mmt->add_min(read_num, minval);
-	       mmt->add_max(read_num, maxval);
-	     }
-	   }
-	   name.clear();
-	   seq.clear();
-
-	   read_num += 1;
-
-	   // run callback, if specified
-	   if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	     try {
-	       callback("fasta_file_to_minmax", callback_data, read_num, 0);
-	     } catch (...) {
-	       infile.close();
-	       delete mmt;
-	       throw;
-	     }
-	   }
-	 }
-	 if (line[0] == '>') {
-	   name = line.substr(1, line.length() - 1);
-	 }
+     bool valid_read = true;
+     if (!readmask || readmask->get(read_num)) {
+       for (unsigned int i = 0; i < seq.length(); i++)  {
+         if (!is_valid_dna(seq[i])) {
+           valid_read = false;
+           break;
+         }
        }
-       else {
-	 seq += line;
+
+       if (valid_read) {
+         BoundedCounterType minval = get_min_count(seq);
+	 BoundedCounterType maxval = get_max_count(seq);
+
+	 mmt->add_min(read_num, minval);
+	 mmt->add_max(read_num, maxval);
+       }
+     }
+
+     seq.clear();
+     read_num += 1;
+
+     // run callback, if specified
+     if (read_num % CALLBACK_PERIOD == 0 && callback) {
+       try {
+         callback("fasta_file_to_minmax", callback_data, read_num, 0);
+       } catch (...) {
+         delete mmt;
+	 throw;
        }
      }
    }
-  
-   infile.close();
 
-   return mmt;
+  return mmt;
 }
 
 //
@@ -135,12 +118,9 @@ ReadMaskTable * Hashtable::filter_fasta_file_limit_n(const std::string &readsfil
                                                      CallbackFn callback,
                                                      void * callback_data)
 {
-   string line;
-   ifstream infile(readsfile.c_str());
-   int isRead = 0;
-   string name;
+   FastaParser parser(readsfile.c_str());
    string seq;
-
+   Read read;
    unsigned int read_num = 0;
    const unsigned int tablesize = minmax.get_tablesize();
 
@@ -150,50 +130,39 @@ ReadMaskTable * Hashtable::filter_fasta_file_limit_n(const std::string &readsfil
      readmask->merge(*old_readmask);
    }
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-         break;
-       }
+   while(!parser.is_complete()) {
+      read = parser.get_next_read();
+      seq = read.seq;
+     
+      if (readmask->get(read_num)) {
+         int numPos = seq.length() - _ksize + 1;
+         unsigned int n_met = 0;
  
-       if (isRead) {
-         seq = line;
-         if (readmask->get(read_num)) {
-           int numPos = seq.length() - _ksize + 1;
-           unsigned int n_met = 0;
- 
-           for (int i = 0; i < numPos; i++)  {
-             string kmer = seq.substr(i, _ksize);
-             if ((int)this->get_count(kmer.c_str()) >= threshold)  {
+         for (int i = 0; i < numPos; i++)  {
+            string kmer = seq.substr(i, _ksize);
+            if ((int)this->get_count(kmer.c_str()) >= threshold)  {
                n_met++;
-             }
-           }
+            }
+         }
  
-           if (n_met < n)  {
-             readmask->set(read_num, false);
-           }
+         if (n_met < n)  {
+            readmask->set(read_num, false);
+         }
  
-           read_num++;
+         read_num++;
  
-           // run callback, if specified
-           if (read_num % CALLBACK_PERIOD == 0 && callback) {
-             try {
+         // run callback, if specified
+         if (read_num % CALLBACK_PERIOD == 0 && callback) {
+            try {
                callback("filter_fasta_file_limit_n", callback_data, read_num, 0);
-             } catch (...) {
+            } catch (...) {
                delete readmask;
                throw;
-             }
-           }
+            }
          }
-       }
- 
-       isRead = isRead? 0 : 1;
-     }
+      }
    }
-
-   infile.close();
-
+         
    return readmask;
 }
 
@@ -254,11 +223,9 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
 						 void * callback_data)
 
 {
-   string line;
-   ifstream infile(inputfile.c_str());
-   int isRead = 0;
-   string name;
+   FastaParser parser(inputfile.c_str());
    string seq;
+   Read read;
    unsigned int read_num = 0;
    unsigned int n_kept = 0;
    ReadMaskTable * readmask = new ReadMaskTable(total_reads);
@@ -267,64 +234,49 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
      readmask->merge(*old_readmask);
    }
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-	 break;
-       }
+   while(parser.is_complete()) {
+      read = parser.get_next_read();
+      seq = read.seq;
 
-       if (isRead) {
-	 seq = line;
-	 if (readmask->get(read_num)) {
-	   bool keep = false;
+      if (readmask->get(read_num)) {
+         bool keep = false;
 	   
-	   const unsigned int length = seq.length();
-	   const char * s = seq.c_str();
-	   unsigned int this_run = 0;
+         const unsigned int length = seq.length();
+         const char * s = seq.c_str();
+         unsigned int this_run = 0;
 
-	   for (unsigned int i = 0; i < length - _ksize + 1; i++) {
-	     HashIntoType count = this->get_count(s);
-	     this_run++;
-	     if (count < threshold) {
+         for (unsigned int i = 0; i < length - _ksize + 1; i++) {
+            HashIntoType count = this->get_count(s);
+	    this_run++;
+	    if (count < threshold) {
 	       this_run = 0;
-	     } else if (this_run >= runlength) {
+	    } else if (this_run >= runlength) {
 	       keep = true;
 	       break;
-	     }
-	     s++;
-	   }
+	    }
+	    s++;
+         }
 
-	   if (!keep) {
-	     readmask->set(read_num, false);
-	   } else {
-	     n_kept++;
-	   }
-	   name.clear();
-	   seq.clear();
-	 }
+         if (!keep) {
+            readmask->set(read_num, false);
+         } else {
+            n_kept++;
+         }
+      }
 
-	 read_num += 1;
+      seq.clear();
 
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("filter_fasta_file_run", callback_data, read_num,n_kept);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
-       else {
-	 name = line.substr(1, line.length()-1);
-       }
+      read_num += 1;
 
-       isRead = isRead ? 0 : 1;
-     }
+      // run callback, if specified
+      if (read_num % CALLBACK_PERIOD == 0 && callback) {
+         try {
+            callback("filter_fasta_file_run", callback_data, read_num,n_kept);
+         } catch (...) {
+            throw;
+         }
+      }
    }
-  
-   infile.close();
 
    return readmask;
 }
@@ -336,39 +288,26 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
 void Hashtable::output_fasta_kmer_pos_freq(const std::string &inputfile,
                                            const std::string &outputfile)
 {
-  string line;
-  ifstream infile(inputfile.c_str());
-  ofstream outfile;
-  outfile.open(outputfile.c_str());
-  int isRead = 0;
-  string name;
-  string seq;
+   FastaParser parser(inputfile.c_str());
+   ofstream outfile;
+   outfile.open(outputfile.c_str());
+   string seq;
+   Read read;
 
-  if (infile.is_open()) {
-    while(!infile.eof()) {
-      getline(infile, line);
-      if (line.length() == 0) {
-        break;
+   while(!parser.is_complete()) {
+      read = parser.get_next_read();
+      seq = read.seq;
+
+      int numPos = seq.length() - _ksize + 1;
+
+      for (int i = 0; i < numPos; i++)  {
+         string kmer = seq.substr(i, _ksize);
+         outfile << (int)get_count(kmer.c_str()) << " ";
       }
+      outfile << endl;
+   }
 
-      if (isRead) {
-        seq = line;
-
-        int numPos = seq.length() - _ksize + 1;
-
-        for (int i = 0; i < numPos; i++)  {
-          string kmer = seq.substr(i, _ksize);
-          outfile << (int)get_count(kmer.c_str()) << " ";
-        }
-        outfile << endl;
-      }
-
-      isRead = isRead? 0 : 1;
-    }
-  }
-
-  infile.close();
-  outfile.close();
+   outfile.close();
 }
 
 
@@ -378,60 +317,47 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       CallbackFn callback,
 					       void * callback_data)
 {
-   string line;
-   ifstream infile(inputfile.c_str());
+   FastaParser parser(inputfile.c_str());
    ofstream outfile;
    outfile.open(outputfile.c_str());
-   int isRead = 0;
+   Read read;
    string name;
    string seq;
    unsigned int n_kept = 0;
    unsigned int read_num = 0;
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-	 break;
-       }
 
-       if (isRead) {
-	 seq = line;
+   while(!parser.is_complete()) {
+      read = parser.get_next_read();
 
-	 if (readmask->get(read_num)) {
-	     outfile << ">" << name << endl;
-	     outfile << seq << endl;
+      seq = read.seq;
+      name = read.name;
 
-	     n_kept++;
-	 }
-	 name.clear();
-	 seq.clear();
+      if (readmask->get(read_num)) {
+         outfile << ">" << name << endl;
+	 outfile << seq << endl;
 
-	 read_num++;
+	 n_kept++;
+      }
 
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("output_filtered_fasta_file", callback_data,
+      name.clear();
+      seq.clear();
+
+      read_num++;
+
+      // run callback, if specified
+      if (read_num % CALLBACK_PERIOD == 0 && callback) {
+         try {
+            callback("output_filtered_fasta_file", callback_data,
 		      read_num, n_kept);
-	   } catch (...) {
-	     infile.close();
+	 } catch (...) {
 	     outfile.close();
 	     throw;
-	   }
 	 }
-
-       } else {
-	 name = line.substr(1, line.length()-1);
-       }
-
-       isRead = isRead? 0 : 1;
-     }
+      }
    }
   
-   infile.close();
    outfile.close();
-
    return n_kept;
 }
 
@@ -480,13 +406,9 @@ void Hashtable::consume_fasta(const std::string &filename,
   total_reads = 0;
   n_consumed = 0;
 
-  string line;
-  ifstream infile(filename.c_str());
+  FastaParser parser(filename.c_str());
+  Read read;
 
-  if (!infile.is_open())  {
-    return;
-  }
-    
   string currName = "";
   string currSeq = "";
 
@@ -505,68 +427,49 @@ void Hashtable::consume_fasta(const std::string &filename,
   // iterate through the FASTA file & consume the reads.
   //
 
-  while(1)  {
-    getline(infile, line);
-    
-    if (line[0] == '>' || infile.eof())  {
-	
-      // do we have a sequence to process?
-      if (currSeq != "")  {
+  while(!parser.is_complete())  {
+    read = parser.get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
 
-	// do we want to process it?
-	if (!readmask || readmask->get(total_reads)) {
+    // do we want to process it?
+    if (!readmask || readmask->get(total_reads)) {
 
-	  // yep! process.
-	  unsigned int this_n_consumed;
-	  bool is_valid;
+      // yep! process.
+      unsigned int this_n_consumed;
+      bool is_valid;
 
-	  this_n_consumed = check_and_process_read(currSeq,
-						   is_valid,
-						   lower_bound,
-						   upper_bound);
+      this_n_consumed = check_and_process_read(currSeq,
+					       is_valid,
+					       lower_bound,
+					       upper_bound);
 
-	  // was this an invalid sequence -> mark as bad?
-	  if (!is_valid && update_readmask) {
-	    if (readmask) {
-	      readmask->set(total_reads, false);
-	    } else {
-	      masklist.push_back(total_reads);
-	    }
-	  } else {		// nope -- count it!
-	    n_consumed += this_n_consumed;
-	  }
+      // was this an invalid sequence -> mark as bad?
+      if (!is_valid && update_readmask) {
+        if (readmask) {
+	  readmask->set(total_reads, false);
+	} else {
+	  masklist.push_back(total_reads);
 	}
-	       
-	// reset the sequence info, increment read number
-	currSeq = "";
-	total_reads++;
-
-	// run callback, if specified
-	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	  try {
-	    callback("consume_fasta", callback_data, total_reads, n_consumed);
-	  } catch (...) {
-	    infile.close();
-	    throw;
-	  }
-	}
+      } else {		// nope -- count it!
+        n_consumed += this_n_consumed;
       }
     }
+	       
+    // reset the sequence info, increment read number
+    currSeq = "";
+    total_reads++;
 
-    // new sequence => new sequence name
-    if (line[0] == '>') {
-      currName = line.substr(1, line.length()-1);
-    }
-    else  {			// additional line for sequence
-      currSeq += line;
-    }
-     
-    // @ end of file? break out.
-    if (infile.eof()) {
-      break;
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("consume_fasta", callback_data, total_reads, n_consumed);
+      } catch (...) {
+        throw;
+      }
     }
   }
-  infile.close();
+
 
   //
   // We've either updated the readmask in place, OR we need to create a
@@ -770,76 +673,62 @@ HashIntoType * Hashtable::fasta_count_kmers_by_position(const std::string &input
 					     CallbackFn callback,
 					     void * callback_data)
 {
-  unsigned long long *counts = new unsigned long long[max_read_len];
+   unsigned long long *counts = new unsigned long long[max_read_len];
 
-  for (unsigned int i = 0; i < max_read_len; i++) {
-    counts[i] = 0;
-  }
+   for (unsigned int i = 0; i < max_read_len; i++) {
+     counts[i] = 0;
+   }
 
-  string line;
-  ifstream infile(inputfile.c_str());
-  int isRead = 0;
-  string name;
-  string seq;
-  unsigned int read_num = 0;
+   Read read;
+   FastaParser parser(inputfile.c_str());
+   string name;
+   string seq;
+   unsigned int read_num = 0;
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-	 break;
-       }
+   while(!parser.is_complete()) {
+      read = parser.get_next_read();
 
-       if (isRead) {
-	 bool valid_read = true;
-	 seq = line;
-	 if (!readmask || readmask->get(read_num)) {
-	   for (unsigned int i = 0; i < seq.length(); i++)  {
-	     if (!is_valid_dna(seq[i])) {
+      seq = read.seq;
+      bool valid_read = true;
+	 
+      if (!readmask || readmask->get(read_num)) {
+         for (unsigned int i = 0; i < seq.length(); i++)  {
+	    if (!is_valid_dna(seq[i])) {
 	       valid_read = false;
 	       break;
-	     }
-	   }
+	    }
+	 }
 
-	   if (valid_read) {
-	     for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	 if (valid_read) {
+	    for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	       string kmer = seq.substr(i, i + _ksize);
 	       BoundedCounterType n = get_count(kmer.c_str());
 
 	       if (limit_by_count == 0 || n == limit_by_count) {
-		 if (i < max_read_len) {
-		   counts[i]++;
-		 }
+	          if (i < max_read_len) {
+		     counts[i]++;
+	          }
 	       }
-	     }
-	   }
-	   name.clear();
-	   seq.clear();
+	    }
 	 }
+ 
+	 name.clear();
+	 seq.clear();
+      }
 
-	 read_num += 1;
+      read_num += 1;
 
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("fasta_file_count_kmers_by_position", callback_data, read_num, 0);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
-       else {
-	 name = line.substr(1, line.length()-1);
-       }
-
-       isRead = isRead ? 0 : 1;
-     }
+      // run callback, if specified
+      if (read_num % CALLBACK_PERIOD == 0 && callback) {
+         try {
+	    callback("fasta_file_count_kmers_by_position", callback_data, read_num, 0);
+         } catch (...) {
+	    throw;
+         }
+      }
    }
-  
-   infile.close();
 
-  return counts;
+   return counts;
 }
 
 void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
@@ -848,69 +737,54 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 					      CallbackFn callback,
 					      void * callback_data)
 {
-  string line;
-  ifstream infile(inputfile.c_str());
-  int isRead = 0;
+  Read read;
+  FastaParser parser(inputfile.c_str());
   string name;
   string seq;
   unsigned int read_num = 0;
 
-   if (infile.is_open()) {
-     while(!infile.eof()) {
-       getline(infile, line);
-       if (line.length() == 0) {
-	 break;
-       }
+  while(!parser.is_complete()) {
+    read = parser.get_next_read();
+    bool valid_read = true;
+    seq = read.seq;
 
-       if (isRead) {
-	 bool valid_read = true;
-	 seq = line;
-	 if (!readmask || readmask->get(read_num)) {
-	   for (unsigned int i = 0; i < seq.length(); i++)  {
-	     if (!is_valid_dna(seq[i])) {
-	       valid_read = false;
-	       break;
-	     }
-	   }
+    if (!readmask || readmask->get(read_num)) {
+      for (unsigned int i = 0; i < seq.length(); i++)  {
+        if (!is_valid_dna(seq[i])) {
+	  valid_read = false;
+	  break;
+	}
+      }
 
-	   if (valid_read) {
-	     for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	       string kmer = seq.substr(i, i + _ksize);
-	       BoundedCounterType n = get_count(kmer.c_str());
-	       char ss[_ksize + 1];
-	       strncpy(ss, kmer.c_str(), _ksize);
-	       ss[_ksize] = 0;
+      if (valid_read) {
+        for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	  string kmer = seq.substr(i, i + _ksize);
+	  BoundedCounterType n = get_count(kmer.c_str());
+	  char ss[_ksize + 1];
+	  strncpy(ss, kmer.c_str(), _ksize);
+	  ss[_ksize] = 0;
 
-	       if (n == limit_by_count) {
-		 cout << ss << endl;
-	       }
-	     }
-	   }
-	   name.clear();
-	   seq.clear();
-	 }
+	  if (n == limit_by_count) {
+            cout << ss << endl;
+	  }
+	}
+      }
 
-	 read_num += 1;
+      name.clear();
+      seq.clear();
+    }
 
-	 // run callback, if specified
-	 if (read_num % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("fasta_file_dump_kmers_by_abundance", callback_data, read_num, 0);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
-       else {
-	 name = line.substr(1, line.length()-1);
-       }
+    read_num += 1;
 
-       isRead = isRead ? 0 : 1;
-     }
-   }
-  
-   infile.close();
+    // run callback, if specified
+    if (read_num % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("fasta_file_dump_kmers_by_abundance", callback_data, read_num, 0);
+      } catch (...) {
+        throw;
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////

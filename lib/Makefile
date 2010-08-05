@@ -1,11 +1,13 @@
 CXXFLAGS=-g -fPIC -O2 -Wall -pg
 
-all: ktable.o hashtable.o
+all: parsers.o ktable.o hashtable.o
 
 clean:
 	rm -f *.o
 
 #test: test.cc ktable.o hashtable.o
+
+parsers.o: parsers.cc parsers.h
 
 bittest: bittest.o ktable.o
 	$(CXX) -o bittest bittest.o ktable.o
