@@ -1,5 +1,21 @@
 #include "parsers.h"
 
+IParser* IParser::get_parser(const std::string &inputfile)
+{
+   std::string filename(inputfile);
+   int found = filename.find_last_of(".");
+
+   std::string type = filename.substr(found+1);
+
+   if (type == "fq" || type == "fastq") {
+      return new FastqParser(inputfile);
+   } else if (type == "fa" || type == "fasta") {
+      return new FastaParser(inputfile);
+   } else {
+      return new FastaParser(inputfile);
+   }
+}
+
 FastaParser::FastaParser(const std::string &inputfile) : 
                          infile(inputfile.c_str())
 {
@@ -76,21 +92,24 @@ Read FastqParser::get_next_read()
 }
 
 /*
-void test(IParser* parser)
+int main()
 {
+   IParser* parser = IParser::get_parser("test.fa");
+   
    while(!parser->is_complete())  {
       Read next_read = parser->get_next_read();
       std::cout << next_read.name << ": " << next_read.seq << std::endl;
    }
-}
 
-int main()
-{
-   FastaParser parser("test.fa");
-   test(&parser);
+   delete parser;
 
-   FastqParser parser2("test.fq");
-   test(&parser2);
+   IParser* parser2 = IParser::get_parser("test.fq");
+   while (!parser2->is_complete()) {
+      Read next_read = parser->get_next_read();
+      std::cout << next_read.name << ": " << next_read.seq << std::endl;
+   }
+
+   delete parser2;
 
    return 0;
 }

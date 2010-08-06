@@ -16,15 +16,15 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 					      CallbackFn callback,
 					      void * callback_data)
 {
-   FastaParser parser(inputfile.c_str());
+   IParser* parser = IParser::get_parser(inputfile.c_str());
    Read read;
    string seq = "";
    unsigned int read_num = 0;
 
    MinMaxTable * mmt = new MinMaxTable(total_reads);
 
-   while(!parser.is_complete()) {
-     read = parser.get_next_read();
+   while(!parser->is_complete()) {
+     read = parser->get_next_read();
      seq = read.seq;
 
      bool valid_read = true;
@@ -118,7 +118,7 @@ ReadMaskTable * Hashtable::filter_fasta_file_limit_n(const std::string &readsfil
                                                      CallbackFn callback,
                                                      void * callback_data)
 {
-   FastaParser parser(readsfile.c_str());
+   IParser* parser = IParser::get_parser(readsfile.c_str());
    string seq;
    Read read;
    unsigned int read_num = 0;
@@ -130,8 +130,8 @@ ReadMaskTable * Hashtable::filter_fasta_file_limit_n(const std::string &readsfil
      readmask->merge(*old_readmask);
    }
 
-   while(!parser.is_complete()) {
-      read = parser.get_next_read();
+   while(!parser->is_complete()) {
+      read = parser->get_next_read();
       seq = read.seq;
      
       if (readmask->get(read_num)) {
@@ -223,7 +223,7 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
 						 void * callback_data)
 
 {
-   FastaParser parser(inputfile.c_str());
+   IParser* parser = IParser::get_parser(inputfile.c_str());
    string seq;
    Read read;
    unsigned int read_num = 0;
@@ -234,8 +234,8 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
      readmask->merge(*old_readmask);
    }
 
-   while(parser.is_complete()) {
-      read = parser.get_next_read();
+   while(parser->is_complete()) {
+      read = parser->get_next_read();
       seq = read.seq;
 
       if (readmask->get(read_num)) {
@@ -288,14 +288,14 @@ ReadMaskTable * Hashtable::filter_fasta_file_run(const std::string &inputfile,
 void Hashtable::output_fasta_kmer_pos_freq(const std::string &inputfile,
                                            const std::string &outputfile)
 {
-   FastaParser parser(inputfile.c_str());
+   IParser* parser = IParser::get_parser(inputfile.c_str());
    ofstream outfile;
    outfile.open(outputfile.c_str());
    string seq;
    Read read;
 
-   while(!parser.is_complete()) {
-      read = parser.get_next_read();
+   while(!parser->is_complete()) {
+      read = parser->get_next_read();
       seq = read.seq;
 
       int numPos = seq.length() - _ksize + 1;
@@ -317,7 +317,7 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       CallbackFn callback,
 					       void * callback_data)
 {
-   FastaParser parser(inputfile.c_str());
+   IParser* parser = IParser::get_parser(inputfile.c_str());
    ofstream outfile;
    outfile.open(outputfile.c_str());
    Read read;
@@ -327,8 +327,8 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
    unsigned int read_num = 0;
 
 
-   while(!parser.is_complete()) {
-      read = parser.get_next_read();
+   while(!parser->is_complete()) {
+      read = parser->get_next_read();
 
       seq = read.seq;
       name = read.name;
@@ -406,7 +406,7 @@ void Hashtable::consume_fasta(const std::string &filename,
   total_reads = 0;
   n_consumed = 0;
 
-  FastaParser parser(filename.c_str());
+  IParser* parser = IParser::get_parser(filename.c_str());
   Read read;
 
   string currName = "";
@@ -427,8 +427,8 @@ void Hashtable::consume_fasta(const std::string &filename,
   // iterate through the FASTA file & consume the reads.
   //
 
-  while(!parser.is_complete())  {
-    read = parser.get_next_read();
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
     currSeq = read.seq;
     currName = read.name; 
 
@@ -680,13 +680,13 @@ HashIntoType * Hashtable::fasta_count_kmers_by_position(const std::string &input
    }
 
    Read read;
-   FastaParser parser(inputfile.c_str());
+   IParser* parser = IParser::get_parser(inputfile.c_str());
    string name;
    string seq;
    unsigned int read_num = 0;
 
-   while(!parser.is_complete()) {
-      read = parser.get_next_read();
+   while(!parser->is_complete()) {
+      read = parser->get_next_read();
 
       seq = read.seq;
       bool valid_read = true;
@@ -738,13 +738,13 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 					      void * callback_data)
 {
   Read read;
-  FastaParser parser(inputfile.c_str());
+  IParser* parser = IParser::get_parser(inputfile.c_str());
   string name;
   string seq;
   unsigned int read_num = 0;
 
-  while(!parser.is_complete()) {
-    read = parser.get_next_read();
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
     bool valid_read = true;
     seq = read.seq;
 

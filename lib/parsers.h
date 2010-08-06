@@ -19,6 +19,7 @@ public:
    virtual Read get_next_read() = 0;
    virtual bool is_complete() = 0;
    virtual ~IParser() { }
+   static IParser* get_parser(const std::string &inputfile);
 };
 
 
