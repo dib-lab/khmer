@@ -4,12 +4,14 @@
 #include <fstream>
 #include <string>
 #include <set>
+#include <map>
 
 #include "khmer.hh"
 #include "storage.hh"
 
 namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
+  typedef std::map<HashIntoType, unsigned int> PartitionMap;
 
   class Hashtable {
   protected:
@@ -245,6 +247,17 @@ namespace khmer {
 	}
       }
     }
+
+    void partition_set_id(const HashIntoType kmer_f,
+			  const HashIntoType kmer_r,
+			  SeenSet& keeper,
+			  const unsigned int partition_id,
+			  PartitionMap& partition_map);
+
+    void do_partition(const std::string infilename,
+				 CallbackFn callback,
+				 void * callback_data);
+    
   };
 
   class HashtableIntersect {

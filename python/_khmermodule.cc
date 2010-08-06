@@ -1292,6 +1292,29 @@ static PyObject * hash_graphsize_distribution(PyObject * self, PyObject * args)
   return x;
 }
 
+static PyObject * hash_do_partition(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  char * prefix = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &prefix, &callback_obj)) {
+    return NULL;
+  }
+  
+  try {
+    hashtable->do_partition(filename, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1315,6 +1338,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
+  { "do_partition", hash_do_partition, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
