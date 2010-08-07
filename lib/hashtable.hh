@@ -12,6 +12,7 @@
 namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
   typedef std::map<HashIntoType, unsigned int> PartitionMap;
+  typedef std::map<unsigned int, SeenSet*> ReversePartitionMap;
 
   class Hashtable {
   protected:
@@ -265,7 +266,9 @@ namespace khmer {
 			   const HashIntoType kmer_r,
 			   SeenSet& keeper,
 			   SeenSet& tagged_kmers,
-			   PartitionMap& partition_map);
+			   PartitionMap& partition_map,
+			   ReversePartitionMap& rev_pmap,
+			   bool& done);
   };
 
   class HashtableIntersect {
