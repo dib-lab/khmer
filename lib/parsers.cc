@@ -19,31 +19,69 @@ IParser* IParser::get_parser(const std::string &inputfile)
 FastaParser::FastaParser(const std::string &inputfile) : 
                          infile(inputfile.c_str())
 {
+   std::string line, seq = "";
+
    assert(infile.is_open());
 
-   getline(infile, current_read.name);
-   getline(infile, current_read.seq);
-
+   getline(infile, current_read.name); 
    assert(current_read.name[0] == '>');
-
    current_read.name = current_read.name.substr(1);
+   
+   while(line[0] != '>' && !infile.eof()) {
+      getline(infile, line);
+      if (line[0] != '>') {
+         seq += line;
+      }
+   }
+
+   if (line[0] == '>') {
+      next_name = line.substr(1);
+   } else {
+      seq += line;
+   }
+
+   one_read_left = false;
+
+   if (infile.eof())
+   {
+      one_read_left = true;
+   }
+
+   current_read.seq = seq;
 }
 
 Read FastaParser::get_next_read()
 {
+   std::string line = "", seq = "";
    Read next_read = current_read;
 
-   getline(infile, current_read.name);
-
-   if (infile.eof())  {
+   if (one_read_left)  {
+      one_read_left = false;
       return next_read;
    }
 
-   getline(infile, current_read.seq);
+   current_read.name = next_name;
+   next_name = "";
+   current_read.seq = "";
 
-   assert(current_read.name[0] == '>' || infile.eof());
+   while(line[0] != '>' && !infile.eof())
+   {
+      getline(infile, line);
 
-   current_read.name = current_read.name.substr(1);
+      if (line[0] != '>') {
+         seq += line;
+      }
+   }
+
+   if (line[0] == '>') {
+      next_name = line.substr(1);
+   }
+
+   current_read.seq = seq;
+
+   if (infile.eof()) {
+      one_read_left = true;
+   }
 
    return next_read;
 }

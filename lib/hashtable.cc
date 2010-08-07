@@ -790,6 +790,53 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
+ReadMaskTable * Hashtable::filter_file_connected(const std::string &est,
+                                                 const std::string &readsfile,
+                                                 unsigned int total_reads)
+{
+   unsigned int read_num = 0;
+   unsigned int n_kept = 0;
+   unsigned long long int cluster_size;
+   ReadMaskTable * readmask = new ReadMaskTable(total_reads);
+   IParser* parser = IParser::get_parser(readsfile.c_str());
+
+
+   std::string first_kmer = est.substr(0, _ksize);
+   SeenSet keeper;
+   calc_connected_graph_size(first_kmer.c_str(),
+                             cluster_size,
+                             keeper);
+
+   while(!parser->is_complete())
+   {
+      std::string seq = parser->get_next_read().seq;
+
+      if (readmask->get(read_num))
+      {
+         bool keep = false;
+
+         HashIntoType h = 0, r = 0, kmer;
+         kmer = _hash(seq.substr(0, _ksize).c_str(), _ksize, h, r);
+         kmer = uniqify_rc(h, r);
+
+         SeenSet::iterator i = keeper.find(kmer);
+         if (i != keeper.end()) {
+            keep = true;
+         }
+
+         if (!keep) {
+            readmask->set(read_num, false);
+         } else {
+            n_kept++;
+         }
+      }
+
+      read_num++;
+   }
+
+   return readmask;
+}
+
 void Hashtable::calc_connected_graph_size(HashIntoType kmer_f,
 					  HashIntoType kmer_r,
 					  unsigned long long& count,

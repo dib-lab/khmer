@@ -28,11 +28,13 @@ class FastaParser : public IParser
 private:
    std::ifstream infile;
    Read current_read;
+   std::string next_name;
+   bool one_read_left;
 public:
    FastaParser(const std::string &inputfile);
    ~FastaParser() { infile.close();  }
    Read get_next_read();
-   bool is_complete() { return infile.eof(); } 
+   bool is_complete() { return !one_read_left && infile.eof(); } 
 };
 
 class FastqParser : public IParser
