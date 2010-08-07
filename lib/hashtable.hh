@@ -257,7 +257,15 @@ namespace khmer {
     void do_partition(const std::string infilename,
 				 CallbackFn callback,
 				 void * callback_data);
-    
+    void do_partition2(const std::string infilename,
+				 CallbackFn callback,
+				 void * callback_data);
+
+    void partition_find_id(const HashIntoType kmer_f,
+			   const HashIntoType kmer_r,
+			   SeenSet& keeper,
+			   SeenSet& tagged_kmers,
+			   PartitionMap& partition_map);
   };
 
   class HashtableIntersect {
