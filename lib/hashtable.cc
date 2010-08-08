@@ -1316,7 +1316,7 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
 void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
 					 const HashIntoType kmer_r,
 					 SeenSet& keeper,
-					 SeenSet& tagged_kmers,
+					 HashIntoType& tagged_kmer,
 					 const PartitionMap& partition_map,
 					 bool& done,
 					 unsigned int depth)
@@ -1345,14 +1345,16 @@ void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
     bool found = false;
     PartitionMap::const_iterator fi = partition_map.find(kmer_f);
     if (fi != partition_map.end()) {
-      tagged_kmers.insert(kmer_f);
+      tagged_kmer = kmer_f;
       found = true;
     }
 
-    fi = partition_map.find(kmer_r);
-    if (!found && fi != partition_map.end()) {
-      tagged_kmers.insert(kmer_r);
-      found = true;
+    if (!found) {
+      fi = partition_map.find(kmer_r);
+      if (fi != partition_map.end()) {
+	tagged_kmer = kmer_r;
+	found = true;
+      }
     }
 
     if (found) {		// search is over!
@@ -1368,37 +1370,37 @@ void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
+  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
 }
 
 // do_truncated_partition: less truncated progressive partitioning.
@@ -1422,8 +1424,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   unsigned int reads_kept = 0;
   unsigned int next_partition_id = 1;
   SeenSet keeper;
-  SeenSet tagged_kmers;
-	   
+  HashIntoType tagged_kmer;
 
   string line;
   ifstream infile(infilename.c_str());
@@ -1457,15 +1458,14 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	   bool done = false;
 
 	   keeper.empty();
-	   tagged_kmers.empty();
-	   partition_find_first_tag(kmer_f, kmer_r, keeper, tagged_kmers,
+	   tagged_kmer = 0;
+	   partition_find_first_tag(kmer_f, kmer_r, keeper, tagged_kmer,
 				    partition_map, done,
 				    PARTITION_FIRST_TAG_DEPTH);
 
 	   unsigned int partition_id;
 
-	   if (tagged_kmers.size() == 0) {
-	     assert(!done);
+	   if (!done) {		// no tagged_kmer found.
 	     partition_id = next_partition_id;
 	     next_partition_id++;
 
@@ -1475,10 +1475,8 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	     x->insert(kmer_f);
 	     rev_pmap[partition_id] = x;
 	   } else {
-	     assert(tagged_kmers.size() == 1);
-	     SeenSet::iterator it = tagged_kmers.begin();
-	     partition_id = partition_map[*it]; // get graph ID of first tagged kmer
-
+	     // get graph ID of first tagged kmer
+	     partition_id = partition_map[tagged_kmer];
 	     partition_map[kmer_f] = partition_id;
 	     rev_pmap[partition_id]->insert(kmer_f);
 	   }

@@ -262,7 +262,7 @@ namespace khmer {
     void partition_find_first_tag(const HashIntoType kmer_f,
 				  const HashIntoType kmer_r,
 				  SeenSet& keeper,
-				  SeenSet& tagged_kmers,
+				  HashIntoType& tagged_kmer,
 				  const PartitionMap& partition_map,
 				  bool& done, unsigned int depth);
 
