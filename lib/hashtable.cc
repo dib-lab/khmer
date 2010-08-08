@@ -1593,15 +1593,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   }
 #endif
 
-  SeenSet unique_partitions;
-  unsigned int i = 0;
-  for (PartitionMap::iterator pi = partition_map.begin();
-       pi != partition_map.end(); ++pi, i++) {
-    unique_partitions.insert((*pi).second);
-    // std::cout << i << " - " << (*pi).second << "\n";
-  }
-
-  return unique_partitions.size();
+  return rev_pmap.size();
 }
 
 // used by do_truncated_partition
