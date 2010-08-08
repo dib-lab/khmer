@@ -1307,7 +1307,53 @@ static PyObject * hash_do_partition(PyObject * self, PyObject * args)
 
   unsigned int n_partitions = 0;
   try {
+    n_partitions = hashtable->do_partition(filename, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(n_partitions);
+}
+
+static PyObject * hash_do_partition2(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  char * prefix = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &prefix, &callback_obj)) {
+    return NULL;
+  }
+
+  unsigned int n_partitions = 0;
+  try {
     n_partitions = hashtable->do_partition2(filename, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(n_partitions);
+}
+
+static PyObject * hash_do_partition3(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  char * prefix = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &prefix, &callback_obj)) {
+    return NULL;
+  }
+
+  unsigned int n_partitions = 0;
+  try {
+    n_partitions = hashtable->do_partition3(filename, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1339,6 +1385,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
   { "do_partition", hash_do_partition, METH_VARARGS, "" },
+  { "do_partition2", hash_do_partition2, METH_VARARGS, "" },
+  { "do_partition3", hash_do_partition3, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
