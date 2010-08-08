@@ -280,7 +280,18 @@ namespace khmer {
 			    SeenSet& tagged_kmers,
 			    PartitionMap& partition_map,
 			    ReversePartitionMap& rev_pmap,
-			    bool& done);
+			    bool& done, bool first=false, unsigned int depth=0);
+    unsigned int do_partition4(const std::string infilename,
+			       CallbackFn callback,
+			       void * callback_data);
+
+    void partition_find_id4(const HashIntoType kmer_f,
+			    const HashIntoType kmer_r,
+			    SeenSet& keeper,
+			    SeenSet& tagged_kmers,
+			    PartitionMap& partition_map,
+			    ReversePartitionMap& rev_pmap,
+			    bool& done, bool first=false, unsigned int depth=0);
   };
 
   class HashtableIntersect {

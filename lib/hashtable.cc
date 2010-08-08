@@ -5,6 +5,8 @@
 #include "hashtable.hh"
 
 #define CALLBACK_PERIOD 10000
+#define ID3_DEPTH 500
+#define ID4_DEPTH 100
 
 using namespace khmer;
 using namespace std;
@@ -1295,6 +1297,8 @@ unsigned int Hashtable::do_partition(const std::string infilename,
      }
    }
 
+   
+
    return next_partition_id - 1;
 }
 
@@ -1334,8 +1338,6 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
 	 check_and_process_read(currSeq, is_valid);
 
 	 if (is_valid) {
-	   consume_string(currSeq);
-
 	   std::string first_kmer = currSeq.substr(0, _ksize);
 
 	   HashIntoType kmer_f, kmer_r;
@@ -1364,8 +1366,7 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
 	     std::cout << "assigning " << kmer_f << " / " << first_kmer << " to " << partition_id << "\n";
 #endif // PARTITION2_DEBUG
 	   } else {
-	     // @CTB why isn't this necessary??
-	     // rev_pmap[partition_id]->insert(kmer_f);
+	     rev_pmap[partition_id]->insert(kmer_f);
 
 	     SeenSet::iterator it = tagged_kmers.begin();
 	     partition_id = partition_map[*it]; // get graph ID of first tagged kmer
@@ -1375,7 +1376,7 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
 #endif // PARTITION2_DEBUG
 
 	     set<unsigned int> other_partition_ids;
-	     for (; it != tagged_kmers.end(); ++it) {
+	     for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
 	       unsigned int id = partition_map[*it];
 
 	       if (id != partition_id) {
@@ -1439,6 +1440,19 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
    }
 
    infile.close();
+
+   ReversePartitionMap::iterator ri;
+   for (ri = rev_pmap.begin(); ri != rev_pmap.end(); ri++) {
+     SeenSet * x = (*ri).second;
+     if (x->size() >= 2) {
+       std::cout << "partition: " << (*ri).first << "\n";
+       SeenSet::iterator j;
+       for (j = x->begin(); j != x->end(); j++) {
+	 HashIntoType kmer_f = *j;
+	 std::cout << x->size() << " <- " << _revhash(kmer_f, _ksize) << "\n";
+       }
+     }
+   }
 
    SeenSet unique_partitions;
    unsigned int i = 0;
@@ -1574,8 +1588,6 @@ unsigned int Hashtable::do_partition3(const std::string infilename,
 	 check_and_process_read(currSeq, is_valid);
 
 	 if (is_valid) {
-	   consume_string(currSeq);
-
 	   std::string first_kmer = currSeq.substr(0, _ksize);
 
 	   HashIntoType kmer_f, kmer_r;
@@ -1585,7 +1597,7 @@ unsigned int Hashtable::do_partition3(const std::string infilename,
 	   
 	   bool done = false;
 	   partition_find_id3(kmer_f, kmer_r, keeper, tagged_kmers,
-			     partition_map, rev_pmap, done);
+			      partition_map, rev_pmap, done, false, ID3_DEPTH);
 
 	   unsigned int partition_id;
 
@@ -1641,6 +1653,48 @@ unsigned int Hashtable::do_partition3(const std::string infilename,
 
    infile.close();
 
+   ///
+
+   PartitionMap::iterator pi;
+   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
+     std::string kmer = _revhash((*pi).first, _ksize);
+
+     HashIntoType kmer_f, kmer_r;
+     _hash(kmer.c_str(), _ksize, kmer_f, kmer_r);
+     SeenSet keeper;
+     SeenSet tagged_kmers;
+     bool done = false;
+
+     partition_find_id3(kmer_f, kmer_r, keeper, tagged_kmers, partition_map,
+			rev_pmap, done, true, ID3_DEPTH);
+
+     assert(tagged_kmers.size() <= 1);
+
+     if (tagged_kmers.size() == 1) {
+       HashIntoType tagged_kmer = *(tagged_kmers.begin());
+       unsigned int this_pid = partition_map[kmer_f];
+       unsigned int other_pid = partition_map[tagged_kmer];
+
+       if (this_pid != other_pid) {
+	 SeenSet * x = rev_pmap[other_pid];
+
+	 std::cout << "looking at opid: " << other_pid << " - " << x->size() << "\n";
+
+	 for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
+	   std::cout << "reassigning " << other_pid << " to " << this_pid << "\n";
+
+	   partition_map[*pi] = this_pid;
+	   rev_pmap[this_pid]->insert(*pi);
+	 }
+
+	 rev_pmap.erase(other_pid);
+	 delete x;
+       }
+     }
+   }
+
+   ///
+
    SeenSet unique_partitions;
    unsigned int i = 0;
    for (PartitionMap::iterator pi = partition_map.begin();
@@ -1658,9 +1712,11 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
 				   SeenSet& tagged_kmers,
 				   PartitionMap& partition_map,
 				   ReversePartitionMap& rev_pmap,
-				   bool& done)
+				   bool& done,
+				   bool first,
+				   unsigned int depth)
 {
-  if (done) return;
+  if (done || depth == 0) return;
 
   {
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
@@ -1679,23 +1735,25 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
     // keep track of seen kmers
     keeper.insert(kmer);
 
-    // Is this a kmer-to-tag, and have we tagged it already?
-    bool found = false;
-    PartitionMap::iterator fi = partition_map.find(kmer_f);
-    if (fi != partition_map.end()) {
-      tagged_kmers.insert(kmer_f);
-      found = true;
-    }
+    if (!first) {
+      // Is this a kmer-to-tag, and have we tagged it already?
+      bool found = false;
+      PartitionMap::iterator fi = partition_map.find(kmer_f);
+      if (fi != partition_map.end()) {
+	tagged_kmers.insert(kmer_f);
+	found = true;
+      }
 
-    fi = partition_map.find(kmer_r);
-    if (fi != partition_map.end()) {
-      tagged_kmers.insert(kmer_r);
-      found = true;
-    }
+      fi = partition_map.find(kmer_r);
+      if (!found && fi != partition_map.end()) {
+	tagged_kmers.insert(kmer_r);
+	found = true;
+      }
 
-    if (found) {
-      done = true;
-      return;
+      if (found) {
+	done = true;
+	return;
+      }
     }
   }
 
@@ -1706,35 +1764,326 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
+  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+}
+
+unsigned int Hashtable::do_partition4(const std::string infilename,
+				      CallbackFn callback,
+				      void * callback_data)
+{
+  PartitionMap partition_map;
+  ReversePartitionMap rev_pmap;
+
+  unsigned int total_reads = 0;
+  unsigned int reads_kept = 0;
+  unsigned int next_partition_id = 1;
+  SeenSet keeper;
+  SeenSet tagged_kmers;
+	   
+
+  string line;
+  ifstream infile(infilename.c_str());
+
+  if (!infile.is_open())  {
+    return 0;
+  }
+
+  string currName = "";
+  string currSeq = "";
+
+  while(1)  {
+     getline(infile, line);
+
+     if (line[0] == '>' || infile.eof())  {
+
+       // do we have a sequence to process?
+       if (currSeq != "")  {
+
+	 // yep! process.
+
+	 bool is_valid;
+
+	 check_and_process_read(currSeq, is_valid);
+
+	 if (is_valid) {
+	   std::string first_kmer = currSeq.substr(0, _ksize);
+
+	   HashIntoType kmer_f, kmer_r;
+	   _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+	   bool done = false;
+
+	   keeper.empty();
+	   tagged_kmers.empty();
+	   partition_find_id3(kmer_f, kmer_r, keeper, tagged_kmers,
+			      partition_map, rev_pmap, done);
+
+	   unsigned int partition_id;
+
+	   if (tagged_kmers.size() == 0) {
+	     assert(!done);
+	     partition_id = next_partition_id;
+	     next_partition_id++;
+
+	     partition_map[kmer_f] = partition_id;
+
+	     SeenSet * x = new SeenSet();
+	     x->insert(kmer_f);
+	     rev_pmap[partition_id] = x;
+	   } else {
+	     assert(tagged_kmers.size() == 1);
+	     SeenSet::iterator it = tagged_kmers.begin();
+	     partition_id = partition_map[*it]; // get graph ID of first tagged kmer
+
+	     partition_map[kmer_f] = partition_id;
+	     rev_pmap[partition_id]->insert(kmer_f);
+	   }
+	 }
+	       
+	 // reset the sequence info, increment read number
+	 currSeq = "";
+	 total_reads++;
+
+	 // run callback, if specified
+	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("AAAAA", callback_data, total_reads, reads_kept);
+	   } catch (...) {
+	     infile.close();
+	     throw;
+	   }
+	 }
+       }
+
+       // new sequence => new sequence name
+       if (line[0] == '>') {
+	 currName = line.substr(1, line.length()-1);
+       }
+     }
+     else  {			// additional line for sequence
+       currSeq += line;
+     }
+     
+     // @ end of file? break out.
+     if (infile.eof()) {
+       break;
+     }
+   }
+
+  infile.close();
+
+   ///
+
+   PartitionMap::iterator pi;
+   unsigned int n_done = 0;
+   unsigned int n = 0;
+   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
+     n++;
+     if (n % 10000 == 0) {
+       std::cout << "...fixing " << n << " of " << partition_map.size() << "\n";
+     }
+     std::string kmer = _revhash((*pi).first, _ksize);
+
+     HashIntoType kmer_f, kmer_r;
+     _hash(kmer.c_str(), _ksize, kmer_f, kmer_r);
+     SeenSet keeper;
+     SeenSet tagged_kmers;
+     bool done = false;
+
+     partition_find_id4(kmer_f, kmer_r, keeper, tagged_kmers, partition_map,
+			rev_pmap, done, true, ID4_DEPTH);
+
+     if (tagged_kmers.size() >= 1) {
+       unsigned int this_pid = partition_map[kmer_f];
+
+       set<unsigned int> other_partition_ids;
+       SeenSet::iterator it = tagged_kmers.begin();
+       for (; it != tagged_kmers.end(); ++it) {
+	 unsigned int id = partition_map[*it];
+
+	 if (id != this_pid) {
+#ifdef DEBUG_PRINT_4
+	   std::cout << "inserting " << id << "\n";
+#endif // DEBUG_PRINT_4
+	   other_partition_ids.insert(id);
+	 }
+       }
+
+       if (other_partition_ids.size()) {
+	 for (set<unsigned int>::iterator si = other_partition_ids.begin();
+	      si != other_partition_ids.end(); si++) {
+	   SeenSet * x = rev_pmap[*si];
+#ifdef DEBUG_PRINT_4
+	   std::cout << "looking at opid: " << *si << " - " << x->size() << "\n";	 
+#endif // DEBUG_PRINT_4
+	   for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
+#ifdef DEBUG_PRINT_4
+	     std::cout << "reassigning " << *pi << " to " << this_pid << "--" << n_done << "\n";
+#endif // DEBUG_PRINT_4
+
+	     partition_map[*pi] = this_pid;
+	     rev_pmap[this_pid]->insert(*pi);
+	   }
+
+	   rev_pmap.erase(*si);
+	   delete x;
+	 }
+       }
+     }
+     n_done++;
+   }
+
+   ///
+
+#if 0
+   ReversePartitionMap::iterator ri;
+   for (ri = rev_pmap.begin(); ri != rev_pmap.end(); ri++) {
+     SeenSet * x = (*ri).second;
+     if (x->size() >= 2) {
+#ifdef DEBUG_PRINT_4
+       std::cout << "partition: " << (*ri).first << "\n";
+#endif // DEBUG_PRINT_4
+       SeenSet::iterator j;
+       for (j = x->begin(); j != x->end(); j++) {
+	 HashIntoType kmer_f = *j;
+#ifdef DEBUG_PRINT_4
+	 std::cout << x->size() << " <- " << _revhash(kmer_f, _ksize) << "\n";
+#endif // DEBUG_PRINT_4
+       }
+     }
+   }
+#endif
+
+   SeenSet unique_partitions;
+   unsigned int i = 0;
+   for (PartitionMap::iterator pi = partition_map.begin();
+	pi != partition_map.end(); ++pi, i++) {
+     unique_partitions.insert((*pi).second);
+     // std::cout << i << " - " << (*pi).second << "\n";
+   }
+
+   return unique_partitions.size();
+}
+
+void Hashtable::partition_find_id4(const HashIntoType kmer_f,
+				   const HashIntoType kmer_r,
+				   SeenSet& keeper,
+				   SeenSet& tagged_kmers,
+				   PartitionMap& partition_map,
+				   ReversePartitionMap& rev_pmap,
+				   bool& done,
+				   bool first,
+				   unsigned int depth)
+{
+  // if (done) return;
+  if (depth == 0) return;
+
+  depth -= 1;
+
+  {
+    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+    const BoundedCounterType val = _counts[kmer % _tablesize];
+
+    if (val == 0) {
+      return;
+    }
+
+    // have we already seen me? don't count; exit.
+    SeenSet::iterator i = keeper.find(kmer);
+    if (i != keeper.end()) {
+      return;
+    }
+
+    // keep track of seen kmers
+    keeper.insert(kmer);
+
+    if (!first) {
+      // Is this a kmer-to-tag, and have we tagged it already?
+      bool found = false;
+      PartitionMap::iterator fi = partition_map.find(kmer_f);
+      if (fi != partition_map.end()) {
+	tagged_kmers.insert(kmer_f);
+	found = true;
+      }
+
+      fi = partition_map.find(kmer_r);
+      if (fi != partition_map.end()) {
+	tagged_kmers.insert(kmer_r);
+	found = true;
+      }
+
+      if (found) {
+	done = true;
+	return;
+      }
+    }
+  }
+
+  // NEXT.
+
+  HashIntoType f, r;
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  // PREVIOUS.
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
 }
