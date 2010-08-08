@@ -1292,7 +1292,7 @@ static PyObject * hash_graphsize_distribution(PyObject * self, PyObject * args)
   return x;
 }
 
-static PyObject * hash_do_partition(PyObject * self, PyObject * args)
+static PyObject * hash_do_exact_partition(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
@@ -1307,7 +1307,7 @@ static PyObject * hash_do_partition(PyObject * self, PyObject * args)
 
   unsigned int n_partitions = 0;
   try {
-    n_partitions = hashtable->do_partition(filename, _report_fn, callback_obj);
+    n_partitions = hashtable->do_exact_partition(filename, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1315,7 +1315,7 @@ static PyObject * hash_do_partition(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
-static PyObject * hash_do_partition4(PyObject * self, PyObject * args)
+static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
@@ -1330,7 +1330,7 @@ static PyObject * hash_do_partition4(PyObject * self, PyObject * args)
 
   unsigned int n_partitions = 0;
   try {
-    n_partitions = hashtable->do_partition4(filename, _report_fn, callback_obj);
+    n_partitions = hashtable->do_truncated_partition(filename, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1361,8 +1361,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
-  { "do_partition", hash_do_partition, METH_VARARGS, "" },
-  { "do_partition4", hash_do_partition4, METH_VARARGS, "" },
+  { "do_exact_partition", hash_do_exact_partition, METH_VARARGS, "" },
+  { "do_truncated_partition", hash_do_truncated_partition, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

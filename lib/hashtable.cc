@@ -1201,7 +1201,7 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
   partition_set_id(f, r, keeper, partition_id, partition_map);
 }
 
-// do_partition: simple partitioning, done once per cluster.
+// do_exact_partition: simple partitioning, done once per cluster.
 //   1) load in all the sequences, tagging the first kmer of each sequence.
 //   2) then, for each tag, explore entre cluster & set tag
 //         using partition_set_id.
@@ -1209,9 +1209,9 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
 // slow for big clusters, because it has to find all tagged k-mers in each
 // cluster.  no provision for giving up and retagging.
 
-unsigned int Hashtable::do_partition(const std::string infilename,
-				      CallbackFn callback,
-				      void * callback_data)
+unsigned int Hashtable::do_exact_partition(const std::string infilename,
+					   CallbackFn callback,
+					   void * callback_data)
 {
   PartitionMap partition_map;
 
@@ -1404,7 +1404,7 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
   partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 }
 
-// do_partition4: less truncated progressive partitioning.
+// do_truncated_partition: less truncated progressive partitioning.
 //   1) load all sequences, tagging first kmer of each
 //   2) do a truncated DFS search for the *first* tagged kmer; assign cluster
 //         (partition_find_id3, to ID3_DEPTH)
@@ -1414,9 +1414,9 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
 //
 // CTB note: for unlimited ID4_DEPTH, yields perfect clustering.
 
-unsigned int Hashtable::do_partition4(const std::string infilename,
-				      CallbackFn callback,
-				      void * callback_data)
+unsigned int Hashtable::do_truncated_partition(const std::string infilename,
+					       CallbackFn callback,
+					       void * callback_data)
 {
   PartitionMap partition_map;
   ReversePartitionMap rev_pmap;
