@@ -1112,6 +1112,9 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
   return p;
 }
 
+// used by do_partition to explore an entire graph and assign the tagged
+// kmers to a particular partition.
+
 void Hashtable::partition_set_id(const HashIntoType kmer_f,
 				 const HashIntoType kmer_r,
 				 SeenSet& keeper,
@@ -1197,6 +1200,14 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
   partition_set_id(f, r, keeper, partition_id, partition_map);
 }
+
+// do_partition: simple partitioning, done once per cluster.
+//   1) load in all the sequences, tagging the first kmer of each sequence.
+//   2) then, for each tag, explore entre cluster & set tag
+//         using partition_set_id.
+//
+// slow for big clusters, because it has to find all tagged k-mers in each
+// cluster.  no provision for giving up and retagging.
 
 unsigned int Hashtable::do_partition(const std::string infilename,
 				      CallbackFn callback,
@@ -1297,10 +1308,16 @@ unsigned int Hashtable::do_partition(const std::string infilename,
      }
    }
 
-   
-
    return next_partition_id - 1;
 }
+
+// do_partition2: progressive partitioning
+//   1) load in all sequences, tagging first kmer of each.
+//   2) while loading, find all tagged kmers by depth-first search
+//          (partition_find_id)
+//   3) reassign clusters based on tagged kmers.
+//
+// CTB note: broken rev_pmap that doesn't record everything!?
 
 unsigned int Hashtable::do_partition2(const std::string infilename,
 				     CallbackFn callback,
@@ -1441,6 +1458,7 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
 
    infile.close();
 
+#if 0
    ReversePartitionMap::iterator ri;
    for (ri = rev_pmap.begin(); ri != rev_pmap.end(); ri++) {
      SeenSet * x = (*ri).second;
@@ -1453,6 +1471,7 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
        }
      }
    }
+#endif // 0
 
    SeenSet unique_partitions;
    unsigned int i = 0;
@@ -1464,6 +1483,8 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
 
    return unique_partitions.size();
 }
+
+// used by do_partition2.
 
 void Hashtable::partition_find_id(const HashIntoType kmer_f,
 				  const HashIntoType kmer_r,
@@ -1551,6 +1572,15 @@ void Hashtable::partition_find_id(const HashIntoType kmer_f,
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
   partition_find_id(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done);
 }
+
+// do_partition3: truncated progressive partitioning.
+//   1) load all sequences, tagging first kmer of each
+//   2) do a truncated DFS search for the *first* tagged kmer; assign cluster
+//         (partition_find_id3, to ID3_DEPTH)
+//   3) after loading all sequences, repeat #2 and reassign now-connected
+//         clusters.
+//
+// CTB note: does a poor job of reassignment #3.
 
 unsigned int Hashtable::do_partition3(const std::string infilename,
 				      CallbackFn callback,
@@ -1706,6 +1736,8 @@ unsigned int Hashtable::do_partition3(const std::string infilename,
    return unique_partitions.size();
 }
 
+// used by do_partition3 and do_partition4.
+
 void Hashtable::partition_find_id3(const HashIntoType kmer_f,
 				   const HashIntoType kmer_r,
 				   SeenSet& keeper,
@@ -1796,6 +1828,16 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
   partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
 }
+
+// do_partition4: less truncated progressive partitioning.
+//   1) load all sequences, tagging first kmer of each
+//   2) do a truncated DFS search for the *first* tagged kmer; assign cluster
+//         (partition_find_id3, to ID3_DEPTH)
+//   3) after loading all sequences, do a truncated DFS search for *all* tagged
+//         kmers (partition_find_i4, to ID4_DEPTH), reassigning now-connected
+//         clusters.
+//
+// CTB note: for unlimited ID4_DEPTH, yields perfect clustering.
 
 unsigned int Hashtable::do_partition4(const std::string infilename,
 				      CallbackFn callback,
@@ -1993,6 +2035,8 @@ unsigned int Hashtable::do_partition4(const std::string infilename,
 
    return unique_partitions.size();
 }
+
+// used by do_partition4.
 
 void Hashtable::partition_find_id4(const HashIntoType kmer_f,
 				   const HashIntoType kmer_r,
