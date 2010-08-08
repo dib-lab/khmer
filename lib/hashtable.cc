@@ -1196,7 +1196,7 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
   partition_set_id(f, r, keeper, partition_id, partition_map);
 }
 
-unsigned int Hashtable::do_partition2(const std::string infilename,
+unsigned int Hashtable::do_partition(const std::string infilename,
 				      CallbackFn callback,
 				      void * callback_data)
 {
@@ -1283,18 +1283,22 @@ unsigned int Hashtable::do_partition2(const std::string infilename,
 
        _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
+#if PARTITION2_DEBUG
        std::cout << "traversing partition " << partition_id << "\n";
+#endif // PARTITION2_DEBUG
 
        SeenSet keeper;
        partition_set_id(kmer_f, kmer_r, keeper, partition_id, partition_map);
+#if PARTITION2_DEBUG
        std::cout << "graph size: " << keeper.size() << "\n";
+#endif // PARTITION2_DEBUG
      }
    }
 
    return next_partition_id - 1;
 }
 
-unsigned int Hashtable::do_partition(const std::string infilename,
+unsigned int Hashtable::do_partition2(const std::string infilename,
 				     CallbackFn callback,
 				     void * callback_data)
 {
@@ -1355,28 +1359,44 @@ unsigned int Hashtable::do_partition(const std::string infilename,
 	     SeenSet * x = new SeenSet();
 	     x->insert(kmer_f);
 	     rev_pmap[partition_id] = x;
+
+#if PARTITION2_DEBUG
+	     std::cout << "assigning " << kmer_f << " / " << first_kmer << " to " << partition_id << "\n";
+#endif // PARTITION2_DEBUG
 	   } else {
+	     // @CTB why isn't this necessary??
 	     // rev_pmap[partition_id]->insert(kmer_f);
 
 	     SeenSet::iterator it = tagged_kmers.begin();
 	     partition_id = partition_map[*it]; // get graph ID of first tagged kmer
+
+#if PARTITION2_DEBUG
+	     std::cout << "tagged k-mers size: " << tagged_kmers.size() << "\n";
+#endif // PARTITION2_DEBUG
 
 	     set<unsigned int> other_partition_ids;
 	     for (; it != tagged_kmers.end(); ++it) {
 	       unsigned int id = partition_map[*it];
 
 	       if (id != partition_id) {
+#if PARTITION2_DEBUG
+		 std::cout << "inserting " << id << "\n";
+#endif // PARTITION2_DEBUG
 		 other_partition_ids.insert(id);
 	       }
 	     }
 
 	     for (set<unsigned int>::iterator si = other_partition_ids.begin();
-		  si != other_partition_ids.end(); ++si) {
+		  si != other_partition_ids.end(); si++) {
 	       SeenSet * x = rev_pmap[*si];
+#if PARTITION2_DEBUG
 	       std::cout << "looking at opid: " << *si << " - " << x->size() << "\n";
+#endif // PARTITION2_DEBUG
 
 	       for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
+#if PARTITION2_DEBUG
 		 std::cout << "reassigning " << *pi << " to " << partition_id << "--" << total_reads << "--" << next_partition_id << "\n";
+#endif // PARTITION2_DEBUG
 
 		 partition_map[*pi] = partition_id;
 		 rev_pmap[partition_id]->insert(*pi);
