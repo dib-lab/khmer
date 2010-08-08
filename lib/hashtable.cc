@@ -5,7 +5,7 @@
 #include "hashtable.hh"
 
 #define CALLBACK_PERIOD 10000
-#define PARTITION_FIRST_TAG_DEPTH 500
+#define PARTITION_FIRST_TAG_DEPTH 50
 #define PARTITION_ALL_TAG_DEPTH 100
 
 using namespace khmer;
@@ -1523,7 +1523,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
     n++;
     if (n % 10000 == 0 && callback) {
-      callback("do_truncated_partition/b", callback_data, n, partition_map.size());
+      callback("do_truncated_partition/b", callback_data, n, rev_pmap.size());
      }
      std::string kmer = _revhash((*pi).first, _ksize);
 
