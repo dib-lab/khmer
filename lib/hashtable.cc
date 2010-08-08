@@ -450,19 +450,19 @@ unsigned int Hashtable::check_and_process_read(const std::string &read,
 
    is_valid = true;
 
+   if (read.length() < _ksize) {
+     is_valid = false;
+     return 0;
+   }
+
    for (i = 0; i < read.length(); i++)  {
      if (!is_valid_dna(read[i])) {
          is_valid = false;
-         break;
+	 return 0;
       }
    }
 
-   if (is_valid) {
-      return consume_string(read, lower_bound, upper_bound);
-   }
-   else  {
-      return 0;
-   }
+   return consume_string(read, lower_bound, upper_bound);
 }
 
 //
@@ -1411,9 +1411,16 @@ void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
 //         kmers (partition_find_i4, to PARTITION_ALL_TAG_DEPTH),
 //         reassigning now-connected clusters.
 //
+// #2 is technically not required, but for high-abundance clusters
+// with closely spaced tags, it should reduce the amount of
+// reassignment in #3.  Benchmarking on well-connected data sets is
+// needed.  @CTB
+//
 // CTB note: for unlimited PARTITION_ALL_TAG_DEPTH, yields perfect clustering.
 
 unsigned int Hashtable::do_truncated_partition(const std::string infilename,
+					       const std::string outputfile,
+					       const unsigned int threshold,
 					       CallbackFn callback,
 					       void * callback_data)
 {
@@ -1489,7 +1496,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	 // run callback, if specified
 	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	   try {
-	     callback("do_truncated_partition/a", callback_data, total_reads, reads_kept);
+	     callback("do_truncated_partition/read", callback_data, total_reads, reads_kept);
 	   } catch (...) {
 	     infile.close();
 	     throw;
@@ -1512,18 +1519,17 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
      }
   }
 
-  infile.close();
+  // infile.close();
 
   // join partitions that should overlap, based on discovery of *all* 
   // tagged kmers within given range (partition_find_all_tags).
 
   PartitionMap::iterator pi;
-  unsigned int n_done = 0;
   unsigned int n = 0;
   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
     n++;
     if (n % 10000 == 0 && callback) {
-      callback("do_truncated_partition/b", callback_data, n, rev_pmap.size());
+      callback("do_truncated_partition/dfs", callback_data, n, rev_pmap.size());
      }
      std::string kmer = _revhash((*pi).first, _ksize);
 
@@ -1570,30 +1576,75 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	 }
        }
      }
-     n_done++;
   }
 
-#if 0
-  // print thinsg out...
-  ReversePartitionMap::iterator ri;
-  for (ri = rev_pmap.begin(); ri != rev_pmap.end(); ri++) {
-    SeenSet * x = (*ri).second;
-    if (x->size() >= 2) {
-#ifdef DEBUG_PRINT_4
-      std::cout << "partition: " << (*ri).first << "\n";
-#endif // DEBUG_PRINT_4
-      SeenSet::iterator j;
-      for (j = x->begin(); j != x->end(); j++) {
-	HashIntoType kmer_f = *j;
-#ifdef DEBUG_PRINT_4
-	std::cout << x->size() << " <- " << _revhash(kmer_f, _ksize) << "\n";
-#endif // DEBUG_PRINT_4
-      }
-    }
-  }
-#endif
+  // rewind infile
+  infile.clear();
+  infile.seekg(0, ios::beg);
 
-  return rev_pmap.size();
+  ofstream outfile(outputfile.c_str());
+
+  currName = "";
+  currSeq = "";
+  total_reads = 0;
+  std::set<unsigned int> partitions;
+
+  while(1)  {
+     getline(infile, line);
+     if (line[0] == '>' || infile.eof())  {
+       // do we have a sequence to process?
+       if (currSeq != "")  {
+	 // yep! process.
+	 bool is_valid;
+	 check_and_process_read(currSeq, is_valid);
+
+	 if (is_valid) {
+	   std::string first_kmer = currSeq.substr(0, _ksize);
+
+	   HashIntoType kmer_f, kmer_r;
+	   _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+
+	   unsigned int partition_id = partition_map[kmer_f];
+	   unsigned int cluster_size = rev_pmap[partition_id]->size();
+	   if (cluster_size >= threshold) {
+	     outfile << ">" << currName << "\t" << partition_id << "\t" <<
+	       cluster_size << "\n" << currSeq << "\n";
+	     partitions.insert(partition_id);
+	   }
+	 }
+	       
+	 // reset the sequence info, increment read number
+	 currSeq = "";
+	 total_reads++;
+
+	 // run callback, if specified
+	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	   try {
+	     callback("do_truncated_partition/output", callback_data, total_reads, reads_kept);
+	   } catch (...) {
+	     infile.close();
+	     outfile.close();
+	     throw;
+	   }
+	 }
+       }
+
+       // new sequence => new sequence name
+       if (line[0] == '>') {
+	 currName = line.substr(1, line.length()-1);
+       }
+     }
+     else  {			// additional line for sequence
+       currSeq += line;
+     }
+     
+     // @ end of file? break out.
+     if (infile.eof()) {
+       break;
+     }
+  }
+
+  return partitions.size();
 }
 
 // used by do_truncated_partition

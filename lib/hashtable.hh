@@ -267,6 +267,8 @@ namespace khmer {
 				  bool& done, unsigned int depth);
 
     unsigned int do_truncated_partition(const std::string infilename,
+					const std::string outputfile,
+					const unsigned int threshold,
 					CallbackFn callback,
 					void * callback_data);
 

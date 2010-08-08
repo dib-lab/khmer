@@ -1298,10 +1298,9 @@ static PyObject * hash_do_exact_partition(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename = NULL;
-  char * prefix = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss|O", &filename, &prefix, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
     return NULL;
   }
 
@@ -1321,16 +1320,20 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename = NULL;
-  char * prefix = NULL;
+  char * output = NULL;
+  unsigned int threshold = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss|O", &filename, &prefix, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "ssi|O", &filename, &output, &threshold,
+			&callback_obj)) {
     return NULL;
   }
 
   unsigned int n_partitions = 0;
   try {
-    n_partitions = hashtable->do_truncated_partition(filename, _report_fn, callback_obj);
+    n_partitions = hashtable->do_truncated_partition(filename, output,
+						     threshold,
+						     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }

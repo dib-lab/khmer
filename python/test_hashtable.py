@@ -190,6 +190,19 @@ def test_64bitshift_2():
        substr = fullstr[i:i+25]
        assert kh.get(substr) > 0
 
+def test_very_short_read():
+    short_filename = os.path.join(thisdir, 'test-short.fa')
+    kh = khmer.new_hashtable(9, 4**4+1)
+    n_reads, n_kmers = kh.consume_fasta(short_filename)
+    assert n_reads == 1
+    assert n_kmers == 0
+
+    kh = khmer.new_hashtable(8, 4**4+1)
+    n_reads, n_kmers = kh.consume_fasta(short_filename)
+    assert n_reads == 1
+    assert n_kmers == 1
+    
+
 class Test_ConsumeString(object):
     def setup(self):
         self.kh = khmer.new_hashtable(4, 4**4)
