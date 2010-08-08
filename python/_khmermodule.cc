@@ -1304,15 +1304,15 @@ static PyObject * hash_do_partition(PyObject * self, PyObject * args)
   if (!PyArg_ParseTuple(args, "ss|O", &filename, &prefix, &callback_obj)) {
     return NULL;
   }
-  
+
+  unsigned int n_partitions = 0;
   try {
-    hashtable->do_partition(filename, _report_fn, callback_obj);
+    n_partitions = hashtable->do_partition2(filename, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
-  
-  Py_INCREF(Py_None);
-  return Py_None;
+
+  return PyInt_FromLong(n_partitions);
 }
 
 static PyMethodDef khmer_hashtable_methods[] = {

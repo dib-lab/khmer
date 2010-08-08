@@ -1196,9 +1196,9 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
   partition_set_id(f, r, keeper, partition_id, partition_map);
 }
 
-void Hashtable::do_partition2(const std::string infilename,
-			     CallbackFn callback,
-			     void * callback_data)
+unsigned int Hashtable::do_partition2(const std::string infilename,
+				      CallbackFn callback,
+				      void * callback_data)
 {
   PartitionMap partition_map;
 
@@ -1209,7 +1209,7 @@ void Hashtable::do_partition2(const std::string infilename,
   ifstream infile(infilename.c_str());
 
   if (!infile.is_open())  {
-    return;
+    return 0;
   }
 
   string currName = "";
@@ -1290,12 +1290,13 @@ void Hashtable::do_partition2(const std::string infilename,
        std::cout << "graph size: " << keeper.size() << "\n";
      }
    }
-   std::cout << next_partition_id - 1 << " partitions.\n";
+
+   return next_partition_id - 1;
 }
 
-void Hashtable::do_partition(const std::string infilename,
-			      CallbackFn callback,
-			      void * callback_data)
+unsigned int Hashtable::do_partition(const std::string infilename,
+				     CallbackFn callback,
+				     void * callback_data)
 {
   PartitionMap partition_map;
   ReversePartitionMap rev_pmap;
@@ -1308,7 +1309,7 @@ void Hashtable::do_partition(const std::string infilename,
   ifstream infile(infilename.c_str());
 
   if (!infile.is_open())  {
-    return;
+    return 0;
   }
 
   string currName = "";
@@ -1425,8 +1426,7 @@ void Hashtable::do_partition(const std::string infilename,
      // std::cout << i << " - " << (*pi).second << "\n";
    }
 
-   std::cout << unique_partitions.size() << " partitions.\n";
-
+   return unique_partitions.size();
 }
 
 void Hashtable::partition_find_id(const HashIntoType kmer_f,

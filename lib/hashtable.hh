@@ -255,10 +255,10 @@ namespace khmer {
 			  const unsigned int partition_id,
 			  PartitionMap& partition_map);
 
-    void do_partition(const std::string infilename,
-				 CallbackFn callback,
-				 void * callback_data);
-    void do_partition2(const std::string infilename,
+    unsigned int do_partition(const std::string infilename,
+			      CallbackFn callback,
+			      void * callback_data);
+    unsigned int do_partition2(const std::string infilename,
 				 CallbackFn callback,
 				 void * callback_data);
 
