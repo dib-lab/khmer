@@ -2,6 +2,7 @@
 #include <math.h>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #include "khmer.hh"
 #include "ktable.hh"
