@@ -277,7 +277,8 @@ namespace khmer {
 				 SeenSet& keeper,
 				 SeenSet& tagged_kmers,
 				 const PartitionMap& partition_map,
-				 bool& done, bool first, unsigned int depth);
+				 bool& done, bool first, unsigned int depth,
+				 bool& surrender);
   };
 
   class HashtableIntersect {
