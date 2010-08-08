@@ -1256,7 +1256,7 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
 	 // run callback, if specified
 	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	   try {
-	     callback("AAAAA", callback_data, total_reads, reads_kept);
+	     callback("do_exact_partition", callback_data, total_reads, reads_kept);
 	   } catch (...) {
 	     infile.close();
 	     throw;
@@ -1489,7 +1489,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	 // run callback, if specified
 	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	   try {
-	     callback("AAAAA", callback_data, total_reads, reads_kept);
+	     callback("do_truncated_partition/a", callback_data, total_reads, reads_kept);
 	   } catch (...) {
 	     infile.close();
 	     throw;
@@ -1510,19 +1510,20 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
      if (infile.eof()) {
        break;
      }
-   }
+  }
 
   infile.close();
 
-   ///
+  // join partitions that should overlap, based on discovery of *all* 
+  // tagged kmers within given range (partition_find_all_tags).
 
-   PartitionMap::iterator pi;
-   unsigned int n_done = 0;
-   unsigned int n = 0;
-   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
-     n++;
-     if (n % 10000 == 0) {
-       std::cout << "...fixing " << n << " of " << partition_map.size() << "\n";
+  PartitionMap::iterator pi;
+  unsigned int n_done = 0;
+  unsigned int n = 0;
+  for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
+    n++;
+    if (n % 10000 == 0 && callback) {
+      callback("do_truncated_partition/b", callback_data, n, partition_map.size());
      }
      std::string kmer = _revhash((*pi).first, _ksize);
 
@@ -1532,37 +1533,34 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
      SeenSet tagged_kmers;
      bool done = false;
 
+     // find all tagged kmers within range.
      partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
-			     partition_map, done, true, PARTITION_ALL_TAG_DEPTH);
+			     partition_map, done, true,
+			     PARTITION_ALL_TAG_DEPTH);
 
+     // did we find more than one tagged kmer?
      if (tagged_kmers.size() >= 1) {
        unsigned int this_pid = partition_map[kmer_f];
 
+       // collate the partitions from the tagged kmers
        set<unsigned int> other_partition_ids;
        SeenSet::iterator it = tagged_kmers.begin();
        for (; it != tagged_kmers.end(); ++it) {
 	 unsigned int id = partition_map[*it];
 
 	 if (id != this_pid) {
-#ifdef DEBUG_PRINT_4
-	   std::cout << "inserting " << id << "\n";
-#endif // DEBUG_PRINT_4
 	   other_partition_ids.insert(id);
 	 }
        }
 
+       // did we find a different partition id linked to this partition?
        if (other_partition_ids.size()) {
+
+	 // yep -- reassign.
 	 for (set<unsigned int>::iterator si = other_partition_ids.begin();
 	      si != other_partition_ids.end(); si++) {
 	   SeenSet * x = rev_pmap[*si];
-#ifdef DEBUG_PRINT_4
-	   std::cout << "looking at opid: " << *si << " - " << x->size() << "\n";	 
-#endif // DEBUG_PRINT_4
 	   for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
-#ifdef DEBUG_PRINT_4
-	     std::cout << "reassigning " << *pi << " to " << this_pid << "--" << n_done << "\n";
-#endif // DEBUG_PRINT_4
-
 	     partition_map[*pi] = this_pid;
 	     rev_pmap[this_pid]->insert(*pi);
 	   }
@@ -1573,38 +1571,37 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
        }
      }
      n_done++;
-   }
-
-   ///
+  }
 
 #if 0
-   ReversePartitionMap::iterator ri;
-   for (ri = rev_pmap.begin(); ri != rev_pmap.end(); ri++) {
-     SeenSet * x = (*ri).second;
-     if (x->size() >= 2) {
+  // print thinsg out...
+  ReversePartitionMap::iterator ri;
+  for (ri = rev_pmap.begin(); ri != rev_pmap.end(); ri++) {
+    SeenSet * x = (*ri).second;
+    if (x->size() >= 2) {
 #ifdef DEBUG_PRINT_4
-       std::cout << "partition: " << (*ri).first << "\n";
+      std::cout << "partition: " << (*ri).first << "\n";
 #endif // DEBUG_PRINT_4
-       SeenSet::iterator j;
-       for (j = x->begin(); j != x->end(); j++) {
-	 HashIntoType kmer_f = *j;
+      SeenSet::iterator j;
+      for (j = x->begin(); j != x->end(); j++) {
+	HashIntoType kmer_f = *j;
 #ifdef DEBUG_PRINT_4
-	 std::cout << x->size() << " <- " << _revhash(kmer_f, _ksize) << "\n";
+	std::cout << x->size() << " <- " << _revhash(kmer_f, _ksize) << "\n";
 #endif // DEBUG_PRINT_4
-       }
-     }
-   }
+      }
+    }
+  }
 #endif
 
-   SeenSet unique_partitions;
-   unsigned int i = 0;
-   for (PartitionMap::iterator pi = partition_map.begin();
-	pi != partition_map.end(); ++pi, i++) {
-     unique_partitions.insert((*pi).second);
-     // std::cout << i << " - " << (*pi).second << "\n";
-   }
+  SeenSet unique_partitions;
+  unsigned int i = 0;
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); ++pi, i++) {
+    unique_partitions.insert((*pi).second);
+    // std::cout << i << " - " << (*pi).second << "\n";
+  }
 
-   return unique_partitions.size();
+  return unique_partitions.size();
 }
 
 // used by do_truncated_partition
