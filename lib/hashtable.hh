@@ -259,24 +259,23 @@ namespace khmer {
 				    CallbackFn callback,
 				    void * callback_data);
 
-    void partition_find_id3(const HashIntoType kmer_f,
-			    const HashIntoType kmer_r,
-			    SeenSet& keeper,
-			    SeenSet& tagged_kmers,
-			    PartitionMap& partition_map,
-			    ReversePartitionMap& rev_pmap,
-			    bool& done, bool first=false, unsigned int depth=0);
+    void partition_find_first_tag(const HashIntoType kmer_f,
+				  const HashIntoType kmer_r,
+				  SeenSet& keeper,
+				  SeenSet& tagged_kmers,
+				  const PartitionMap& partition_map,
+				  bool& done, unsigned int depth);
+
     unsigned int do_truncated_partition(const std::string infilename,
 					CallbackFn callback,
 					void * callback_data);
 
-    void partition_find_id4(const HashIntoType kmer_f,
-			    const HashIntoType kmer_r,
-			    SeenSet& keeper,
-			    SeenSet& tagged_kmers,
-			    PartitionMap& partition_map,
-			    ReversePartitionMap& rev_pmap,
-			    bool& done, bool first=false, unsigned int depth=0);
+    void partition_find_all_tags(const HashIntoType kmer_f,
+				 const HashIntoType kmer_r,
+				 SeenSet& keeper,
+				 SeenSet& tagged_kmers,
+				 const PartitionMap& partition_map,
+				 bool& done, bool first, unsigned int depth);
   };
 
   class HashtableIntersect {

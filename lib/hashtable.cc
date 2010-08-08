@@ -5,8 +5,8 @@
 #include "hashtable.hh"
 
 #define CALLBACK_PERIOD 10000
-#define ID3_DEPTH 500
-#define ID4_DEPTH 100
+#define PARTITION_FIRST_TAG_DEPTH 500
+#define PARTITION_ALL_TAG_DEPTH 100
 
 using namespace khmer;
 using namespace std;
@@ -1311,19 +1311,18 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
    return next_partition_id - 1;
 }
 
-// used by do_partition3 and do_partition4.
+// used by do_truncated_partition
 
-void Hashtable::partition_find_id3(const HashIntoType kmer_f,
-				   const HashIntoType kmer_r,
-				   SeenSet& keeper,
-				   SeenSet& tagged_kmers,
-				   PartitionMap& partition_map,
-				   ReversePartitionMap& rev_pmap,
-				   bool& done,
-				   bool first,
-				   unsigned int depth)
+void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
+					 const HashIntoType kmer_r,
+					 SeenSet& keeper,
+					 SeenSet& tagged_kmers,
+					 const PartitionMap& partition_map,
+					 bool& done,
+					 unsigned int depth)
 {
   if (done || depth == 0) return;
+  depth -= 1;
 
   {
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
@@ -1342,25 +1341,23 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
     // keep track of seen kmers
     keeper.insert(kmer);
 
-    if (!first) {
-      // Is this a kmer-to-tag, and have we tagged it already?
-      bool found = false;
-      PartitionMap::iterator fi = partition_map.find(kmer_f);
-      if (fi != partition_map.end()) {
-	tagged_kmers.insert(kmer_f);
-	found = true;
-      }
+    // Is this a kmer-to-tag, and have we tagged it already?
+    bool found = false;
+    PartitionMap::const_iterator fi = partition_map.find(kmer_f);
+    if (fi != partition_map.end()) {
+      tagged_kmers.insert(kmer_f);
+      found = true;
+    }
 
-      fi = partition_map.find(kmer_r);
-      if (!found && fi != partition_map.end()) {
-	tagged_kmers.insert(kmer_r);
-	found = true;
-      }
+    fi = partition_map.find(kmer_r);
+    if (!found && fi != partition_map.end()) {
+      tagged_kmers.insert(kmer_r);
+      found = true;
+    }
 
-      if (found) {
-	done = true;
-	return;
-      }
+    if (found) {		// search is over!
+      done = true;
+      return;
     }
   }
 
@@ -1371,48 +1368,48 @@ void Hashtable::partition_find_id3(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_id3(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth - 1);
+  partition_find_first_tag(f, r, keeper, tagged_kmers, partition_map, done, depth);
 }
 
 // do_truncated_partition: less truncated progressive partitioning.
 //   1) load all sequences, tagging first kmer of each
 //   2) do a truncated DFS search for the *first* tagged kmer; assign cluster
-//         (partition_find_id3, to ID3_DEPTH)
+//         (partition_find_first_tag, to PARTITION_FIRST_TAG_DEPTH)
 //   3) after loading all sequences, do a truncated DFS search for *all* tagged
-//         kmers (partition_find_i4, to ID4_DEPTH), reassigning now-connected
-//         clusters.
+//         kmers (partition_find_i4, to PARTITION_ALL_TAG_DEPTH),
+//         reassigning now-connected clusters.
 //
-// CTB note: for unlimited ID4_DEPTH, yields perfect clustering.
+// CTB note: for unlimited PARTITION_ALL_TAG_DEPTH, yields perfect clustering.
 
 unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 					       CallbackFn callback,
@@ -1461,8 +1458,9 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 
 	   keeper.empty();
 	   tagged_kmers.empty();
-	   partition_find_id3(kmer_f, kmer_r, keeper, tagged_kmers,
-			      partition_map, rev_pmap, done);
+	   partition_find_first_tag(kmer_f, kmer_r, keeper, tagged_kmers,
+				    partition_map, done,
+				    PARTITION_FIRST_TAG_DEPTH);
 
 	   unsigned int partition_id;
 
@@ -1536,8 +1534,8 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
      SeenSet tagged_kmers;
      bool done = false;
 
-     partition_find_id4(kmer_f, kmer_r, keeper, tagged_kmers, partition_map,
-			rev_pmap, done, true, ID4_DEPTH);
+     partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
+			     partition_map, done, true, PARTITION_ALL_TAG_DEPTH);
 
      if (tagged_kmers.size() >= 1) {
        unsigned int this_pid = partition_map[kmer_f];
@@ -1611,21 +1609,18 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
    return unique_partitions.size();
 }
 
-// used by do_partition4.
+// used by do_truncated_partition
 
-void Hashtable::partition_find_id4(const HashIntoType kmer_f,
-				   const HashIntoType kmer_r,
-				   SeenSet& keeper,
-				   SeenSet& tagged_kmers,
-				   PartitionMap& partition_map,
-				   ReversePartitionMap& rev_pmap,
-				   bool& done,
-				   bool first,
-				   unsigned int depth)
+void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
+					const HashIntoType kmer_r,
+					SeenSet& keeper,
+					SeenSet& tagged_kmers,
+					const PartitionMap& partition_map,
+					bool& done,
+					bool first,
+					unsigned int depth)
 {
-  // if (done) return;
   if (depth == 0) return;
-
   depth -= 1;
 
   {
@@ -1648,7 +1643,7 @@ void Hashtable::partition_find_id4(const HashIntoType kmer_f,
     if (!first) {
       // Is this a kmer-to-tag, and have we tagged it already?
       bool found = false;
-      PartitionMap::iterator fi = partition_map.find(kmer_f);
+      PartitionMap::const_iterator fi = partition_map.find(kmer_f);
       if (fi != partition_map.end()) {
 	tagged_kmers.insert(kmer_f);
 	found = true;
@@ -1674,35 +1669,35 @@ void Hashtable::partition_find_id4(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_id4(f, r, keeper, tagged_kmers, partition_map, rev_pmap, done, false, depth);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth);
 }
