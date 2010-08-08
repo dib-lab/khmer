@@ -85,7 +85,7 @@ class Test_SimpleConnectMe4(object):
         ht = khmer.new_hashtable(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
-        outfile = os.path.join(thisdir, 'test-trunc.out')
+        outfile = os.path.join(thisdir, 'test-trunc.out') # @CTB use tempfile
         n = ht.do_truncated_partition(filename, outfile, 0)
         assert n == 1, n
         

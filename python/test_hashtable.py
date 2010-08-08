@@ -359,7 +359,7 @@ class Test_ExactGraphFu(object):
         ht = self.ht
         
         filename = os.path.join(thisdir, 'test-graph.fa')
-        outfile = os.path.join(thisdir, 'test-graph.fa.out')
+        outfile = os.path.join(thisdir, 'test-graph.fa.out') # @CTB use tempfile
         ht.consume_fasta(filename)
         ht.trim_graphs(filename, 40, outfile)
 

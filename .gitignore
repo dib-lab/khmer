@@ -5,3 +5,5 @@
 python/build
 lib/test
 doc/_build
+python/test-graph.fa.out
+python/test-trunc.out
