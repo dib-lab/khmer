@@ -6,7 +6,8 @@
 
 #define CALLBACK_PERIOD 10000
 #define PARTITION_FIRST_TAG_DEPTH 50
-#define PARTITION_ALL_TAG_DEPTH 10000
+#define PARTITION_ALL_TAG_DEPTH 500
+#define PARTITION_MAX_TAG_EXAMINED 1e6
 
 using namespace khmer;
 using namespace std;
@@ -1101,7 +1102,6 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
       SeenSet keeper;
       calc_connected_graph_size(kmer.c_str(), size, keeper, max_size);
       if (size) {
-	// if (size > 5000) { std::cout << "GRAPH SIZE: " << size << "\n"; }
 	if (size < max_size) {
 	  p[size] += 1;
 	}
@@ -1543,9 +1543,10 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
      bool surrender = false;
 
      // find all tagged kmers within range.
+     unsigned int total = 0;
      partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
 			     partition_map, done, true,
-			     PARTITION_ALL_TAG_DEPTH, surrender);
+			     PARTITION_ALL_TAG_DEPTH, surrender, total);
 
      unsigned int this_pid = partition_map[kmer_f];
      if (surrender) {
@@ -1673,13 +1674,15 @@ void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
 					bool& done,
 					bool first,
 					unsigned int depth,
-					bool& surrender)
+					bool& surrender,
+					unsigned int& total)
 {
-  if (depth == 0) {
+  if (depth == 0 || total > PARTITION_MAX_TAG_EXAMINED) {
     surrender = true;
     return;
   }
   depth -= 1;
+  total++;
 
   {
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
@@ -1727,35 +1730,35 @@ void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
 }
