@@ -626,6 +626,35 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
   return PyInt_FromLong(1);
 }
 
+static PyObject * hash_filter_file_connected(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * est;
+  char * readsfile;
+  unsigned int total_reads;
+
+  khmer::ReadMaskTable * readmask;
+
+  if (!PyArg_ParseTuple(args, "ssi", &est, &readsfile, &total_reads)) {
+    return NULL;
+  }
+
+  try {
+    readmask = hashtable->filter_file_connected(est, readsfile, total_reads);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
+    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
+
+  readmask_obj->mask = readmask;
+
+  return (PyObject *) readmask_obj;
+}
+
 static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1315,6 +1344,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
+  { "filter_file_connected", hash_filter_file_connected, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
