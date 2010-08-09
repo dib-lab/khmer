@@ -163,4 +163,4 @@ class Test_MoreConnectMe4(object):
         filename = os.path.join(thisdir, 'test-graph6.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
         n = ht.do_truncated_partition(filename, outfile, 0)
-        assert n == 106, n
+        assert n == 103, n
