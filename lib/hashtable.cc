@@ -1534,9 +1534,19 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       callback("do_truncated_partition/dfs", callback_data, n, rev_pmap.size());
      }
      std::string kmer = _revhash((*pi).first, _ksize);
+     unsigned int this_pid = (*pi).second;
+
+     std::set<unsigned int>::const_iterator ii;
+     ii = surrender_set.find(this_pid);
+	   
+     if (ii != surrender_set.end()) { // we've already surrendered!
+       continue;
+     }
+
 
      HashIntoType kmer_f, kmer_r;
      _hash(kmer.c_str(), _ksize, kmer_f, kmer_r);
+
      SeenSet keeper;
      SeenSet tagged_kmers;
      bool done = false;
@@ -1548,7 +1558,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 			     partition_map, done, true,
 			     PARTITION_ALL_TAG_DEPTH, surrender, total);
 
-     unsigned int this_pid = partition_map[kmer_f];
      if (surrender) {
        std::cout << "SURRENDER on partition: " << this_pid << "\n";
        surrender_set.insert(this_pid);
