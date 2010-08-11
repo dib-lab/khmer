@@ -943,8 +943,6 @@ void Hashtable::trim_graphs(const std::string infilename,
     // yep! process.
     bool is_valid;
 
-    check_and_process_read(seq, is_valid);
-
     if (is_valid) {
       std::string first_kmer = seq.substr(0, _ksize);
       unsigned long long clustersize = 0;
