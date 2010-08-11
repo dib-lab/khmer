@@ -7,7 +7,7 @@ clean:
 
 #test: test.cc ktable.o hashtable.o
 
-parsers.o: parsers.cc parsers.h
+parsers.o: parsers.cc parsers.hh
 
 bittest: bittest.o ktable.o
 	$(CXX) -o bittest bittest.o ktable.o

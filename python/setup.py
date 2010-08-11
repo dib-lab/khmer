@@ -15,7 +15,7 @@ extension_mod = Extension("khmer._khmermodule",
                                    '../lib/hashtable.hh',
                                    '../lib/hashtable.o',
                                    '../lib/ktable.o',
-                                   ',,/lib/parsers.o']
+                                   '../lib/parsers.o']
                           )
 
 # python modules: only 'khmer'

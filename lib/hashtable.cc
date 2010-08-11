@@ -3,7 +3,7 @@
 
 #include "khmer.hh"
 #include "hashtable.hh"
-#include "parsers.h"
+#include "parsers.hh"
 
 #define CALLBACK_PERIOD 10000
 #define PARTITION_FIRST_TAG_DEPTH 50
