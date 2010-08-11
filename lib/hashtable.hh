@@ -219,6 +219,10 @@ namespace khmer {
 
     HashIntoType * graphsize_distribution(const unsigned int &max_size);
 
+    ReadMaskTable * filter_file_connected(const std::string &est,
+                                          const std::string &readsfile,
+                                          unsigned int total_reads);
+
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
