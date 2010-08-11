@@ -460,7 +460,6 @@ void Hashtable::consume_fasta(const std::string &filename,
     }
 	       
     // reset the sequence info, increment read number
-    currSeq = "";
     total_reads++;
 
     // run callback, if specified
@@ -924,84 +923,56 @@ void Hashtable::trim_graphs(const std::string infilename,
 			    CallbackFn callback,
 			    void * callback_data)
 {
+  IParser* parser = IParser::get_parser(infilename.c_str());
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
+  Read read;
+  string seq;
 
   string line;
-  ifstream infile(infilename.c_str());
   ofstream outfile(outfilename.c_str());
 
-  if (!infile.is_open())  {
-    return;
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    // yep! process.
+    bool is_valid;
+
+    check_and_process_read(seq, is_valid);
+
+    if (is_valid) {
+      std::string first_kmer = seq.substr(0, _ksize);
+      unsigned long long clustersize = 0;
+      SeenSet keeper;
+      calc_connected_graph_size(first_kmer.c_str(), clustersize, keeper,
+				min_size);
+
+      if (clustersize >= min_size) {
+	outfile << ">" << read.name << endl;
+	outfile << seq << endl;
+	reads_kept++;
+      }
+    }
+	       
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+	callback("trim_graphs", callback_data, total_reads, reads_kept);
+      } catch (...) {
+	delete parser;
+	throw;
+      }
+    }
   }
 
-   string currName = "";
-   string currSeq = "";
-
-   //
-   // iterate through the FASTA file & consume the reads.
-   //
-
-   while(1)  {
-     getline(infile, line);
-
-     if (line[0] == '>' || infile.eof())  {
-
-       // do we have a sequence to process?
-       if (currSeq != "")  {
-
-	 // yep! process.
-
-	 bool is_valid;
-
-	 check_and_process_read(currSeq, is_valid);
-
-	 if (is_valid) {
-	   std::string first_kmer = currSeq.substr(0, _ksize);
-	   unsigned long long clustersize = 0;
-	   SeenSet keeper;
-	   calc_connected_graph_size(first_kmer.c_str(), clustersize, keeper,
-				     min_size);
-
-	   if (clustersize >= min_size) {
-	     outfile << ">" << currName << endl;
-	     outfile << currSeq << endl;
-	     reads_kept++;
-	   }
-	 }
-	       
-	 // reset the sequence info, increment read number
-	 currSeq = "";
-	 total_reads++;
-
-	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("trim_graphs", callback_data, total_reads, reads_kept);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
-
-       // new sequence => new sequence name
-       if (line[0] == '>') {
-	 currName = line.substr(1, line.length()-1);
-       }
-     }
-     else  {			// additional line for sequence
-       currSeq += line;
-     }
-     
-     // @ end of file? break out.
-     if (infile.eof()) {
-       break;
-     }
-   }
-
-   infile.close();
-
+  delete parser;
 }
 
 HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
@@ -1139,97 +1110,64 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
 
-  string line;
-  ifstream infile(infilename.c_str());
+  IParser* parser = IParser::get_parser(infilename);
+  Read read;
+  string seq;
 
-  if (!infile.is_open())  {
-    return 0;
+  while(!parser->is_complete())  {
+    bool is_valid;
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    check_and_process_read(seq, is_valid);
+
+    if (is_valid) {
+      std::string first_kmer = seq.substr(0, _ksize);
+      HashIntoType kmer_f = _hash_forward(first_kmer.c_str(), _ksize);
+
+      partition_map[kmer_f] = 0;
+    }
+	       
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+	callback("do_exact_partition", callback_data, total_reads, reads_kept);
+      } catch (...) {
+	delete parser;
+	throw;
+      }
+    }
+   }
+
+  delete parser;
+
+  // now, build the partition maps
+   
+  unsigned int next_partition_id = 1;
+  for(PartitionMap::iterator i=partition_map.begin();
+      i != partition_map.end();
+      ++i) {
+
+    HashIntoType kmer_f = (*i).first;
+    unsigned int partition_id = (*i).second;
+
+    if (partition_id == 0) {
+      HashIntoType kmer_r;
+      SeenSet keeper;
+
+      partition_id = next_partition_id;
+      next_partition_id++;
+
+      std::string kmer_s = _revhash(kmer_f, _ksize);
+
+      _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
+      partition_set_id(kmer_f, kmer_r, keeper, partition_id, partition_map);
+    }
   }
 
-  string currName = "";
-  string currSeq = "";
-
-  while(1)  {
-     getline(infile, line);
-
-     if (line[0] == '>' || infile.eof())  {
-
-       // do we have a sequence to process?
-       if (currSeq != "")  {
-
-	 // yep! process.
-
-	 bool is_valid;
-
-	 check_and_process_read(currSeq, is_valid);
-
-	 if (is_valid) {
-	   std::string first_kmer = currSeq.substr(0, _ksize);
-	   HashIntoType kmer_f = _hash_forward(first_kmer.c_str(), _ksize);
-
-	   partition_map[kmer_f] = 0;
-	 }
-	       
-	 // reset the sequence info, increment read number
-	 currSeq = "";
-	 total_reads++;
-
-	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("do_exact_partition", callback_data, total_reads, reads_kept);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
-
-       // new sequence => new sequence name
-       if (line[0] == '>') {
-	 currName = line.substr(1, line.length()-1);
-       }
-     }
-     else  {			// additional line for sequence
-       currSeq += line;
-     }
-     
-     // @ end of file? break out.
-     if (infile.eof()) {
-       break;
-     }
-   }
-
-   infile.close();
-   
-   unsigned int next_partition_id = 1;
-   for(PartitionMap::iterator i=partition_map.begin();
-       i != partition_map.end(); ++i) {
-     HashIntoType kmer_f = (*i).first;
-     unsigned int partition_id = (*i).second;
-
-     if (partition_id == 0) {
-       partition_id = next_partition_id;
-       next_partition_id++;
-
-       std::string kmer_s = _revhash(kmer_f, _ksize);
-       HashIntoType kmer_r;
-
-       _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-
-#if PARTITION2_DEBUG
-       std::cout << "traversing partition " << partition_id << "\n";
-#endif // PARTITION2_DEBUG
-
-       SeenSet keeper;
-       partition_set_id(kmer_f, kmer_r, keeper, partition_id, partition_map);
-#if PARTITION2_DEBUG
-       std::cout << "graph size: " << keeper.size() << "\n";
-#endif // PARTITION2_DEBUG
-     }
-   }
-
-   return next_partition_id - 1;
+  return next_partition_id - 1;
 }
 
 // used by do_truncated_partition
@@ -1354,93 +1292,63 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   SeenSet keeper;
   HashIntoType tagged_kmer;
 
-  string line;
-  ifstream infile(infilename.c_str());
+  IParser* parser = IParser::get_parser(infilename);
+  Read read;
+  string seq;
 
-  if (!infile.is_open())  {
-    return 0;
-  }
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
 
-  string currName = "";
-  string currSeq = "";
+    bool is_valid;
+    check_and_process_read(seq, is_valid);
 
-  while(1)  {
-     getline(infile, line);
+    if (is_valid) {
+      std::string first_kmer = seq.substr(0, _ksize);
 
-     if (line[0] == '>' || infile.eof())  {
+      HashIntoType kmer_f, kmer_r;
+      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+      bool done = false;
 
-       // do we have a sequence to process?
-       if (currSeq != "")  {
+      keeper.empty();
+      tagged_kmer = 0;
+      partition_find_first_tag(kmer_f, kmer_r, keeper, tagged_kmer,
+			       partition_map, done,
+			       PARTITION_FIRST_TAG_DEPTH);
 
-	 // yep! process.
+      unsigned int partition_id;
+      if (!done) {		// no tagged_kmer found.
+	partition_id = next_partition_id;
+	next_partition_id++;
 
-	 bool is_valid;
+	partition_map[kmer_f] = partition_id;
 
-	 check_and_process_read(currSeq, is_valid);
-
-	 if (is_valid) {
-	   std::string first_kmer = currSeq.substr(0, _ksize);
-
-	   HashIntoType kmer_f, kmer_r;
-	   _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
-	   bool done = false;
-
-	   keeper.empty();
-	   tagged_kmer = 0;
-	   partition_find_first_tag(kmer_f, kmer_r, keeper, tagged_kmer,
-				    partition_map, done,
-				    PARTITION_FIRST_TAG_DEPTH);
-
-	   unsigned int partition_id;
-
-	   if (!done) {		// no tagged_kmer found.
-	     partition_id = next_partition_id;
-	     next_partition_id++;
-
-	     partition_map[kmer_f] = partition_id;
-
-	     SeenSet * x = new SeenSet();
-	     x->insert(kmer_f);
-	     rev_pmap[partition_id] = x;
-	   } else {
-	     // get graph ID of first tagged kmer
-	     partition_id = partition_map[tagged_kmer];
-	     partition_map[kmer_f] = partition_id;
-	     rev_pmap[partition_id]->insert(kmer_f);
-	   }
-	 }
+	SeenSet * x = new SeenSet();
+	x->insert(kmer_f);
+	rev_pmap[partition_id] = x;
+      } else {
+	// get graph ID of first tagged kmer
+	partition_id = partition_map[tagged_kmer];
+	partition_map[kmer_f] = partition_id;
+	rev_pmap[partition_id]->insert(kmer_f);
+      }
 	       
-	 // reset the sequence info, increment read number
-	 currSeq = "";
-	 total_reads++;
+      // reset the sequence info, increment read number
+      total_reads++;
 
-	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("do_truncated_partition/read", callback_data, total_reads, reads_kept);
-	   } catch (...) {
-	     infile.close();
-	     throw;
-	   }
-	 }
-       }
-
-       // new sequence => new sequence name
-       if (line[0] == '>') {
-	 currName = line.substr(1, line.length()-1);
-       }
-     }
-     else  {			// additional line for sequence
-       currSeq += line;
-     }
-     
-     // @ end of file? break out.
-     if (infile.eof()) {
-       break;
-     }
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("do_truncated_partition/read", callback_data, total_reads,
+		   reads_kept);
+	} catch (...) {
+	  delete parser;
+	}
+      }
+    }
   }
 
-  // infile.close();
+  delete parser;
 
   // join partitions that should overlap, based on discovery of *all* 
   // tagged kmers within given range (partition_find_all_tags).
@@ -1452,144 +1360,128 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
     n++;
     if (n % 10000 == 0 && callback) {
-      callback("do_truncated_partition/dfs", callback_data, n, rev_pmap.size());
-     }
-     std::string kmer = _revhash((*pi).first, _ksize);
-     unsigned int this_pid = (*pi).second;
-
-     std::set<unsigned int>::const_iterator ii;
-     ii = surrender_set.find(this_pid);
+      callback("do_truncated_partition/dfs", callback_data, n,
+	       rev_pmap.size());
+    }
+    std::string kmer = _revhash((*pi).first, _ksize);
+    unsigned int this_pid = (*pi).second;
+    
+    std::set<unsigned int>::const_iterator ii;
+    ii = surrender_set.find(this_pid);
 	   
-     if (ii != surrender_set.end()) { // we've already surrendered!
-       continue;
-     }
+    if (ii != surrender_set.end()) { // we've already surrendered!
+      continue;
+    }
 
 
-     HashIntoType kmer_f, kmer_r;
-     _hash(kmer.c_str(), _ksize, kmer_f, kmer_r);
+    HashIntoType kmer_f, kmer_r;
+    _hash(kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-     SeenSet keeper;
-     SeenSet tagged_kmers;
-     bool done = false;
-     bool surrender = false;
+    SeenSet keeper;
+    SeenSet tagged_kmers;
+    bool done = false;
+    bool surrender = false;
 
-     // find all tagged kmers within range.
-     unsigned int total = 0;
-     partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
-			     partition_map, done, true,
-			     PARTITION_ALL_TAG_DEPTH, surrender, total);
+    // find all tagged kmers within range.
+    unsigned int total = 0;
+    partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
+			    partition_map, done, true,
+			    PARTITION_ALL_TAG_DEPTH, surrender, total);
 
-     if (surrender) {
-       std::cout << "SURRENDER on partition: " << this_pid << "\n";
-       surrender_set.insert(this_pid);
-     }
+    if (surrender) {
+      std::cout << "SURRENDER on partition: " << this_pid << "\n";
+      surrender_set.insert(this_pid);
+    }
 
-     // did we find more than one tagged kmer?
-     if (tagged_kmers.size() >= 1) {
-       // collate the partitions from the tagged kmers
-       set<unsigned int> other_partition_ids;
-       SeenSet::iterator it = tagged_kmers.begin();
-       for (; it != tagged_kmers.end(); ++it) {
-	 unsigned int id = partition_map[*it];
+    // did we find more than one tagged kmer?
+    if (tagged_kmers.size() >= 1) {
+      // collate the partitions from the tagged kmers
+      set<unsigned int> other_partition_ids;
+      SeenSet::iterator it = tagged_kmers.begin();
+      for (; it != tagged_kmers.end(); ++it) {
+	unsigned int id = partition_map[*it];
 
-	 if (id != this_pid) {
-	   other_partition_ids.insert(id);
-	 }
-       }
+	if (id != this_pid) {
+	  other_partition_ids.insert(id);
+	}
+      }
 
-       // did we find a different partition id linked to this partition?
-       if (other_partition_ids.size()) {
+      // did we find a different partition id linked to this partition?
+      if (other_partition_ids.size()) {
 
-	 // yep -- reassign.
-	 for (set<unsigned int>::iterator si = other_partition_ids.begin();
-	      si != other_partition_ids.end(); si++) {
-	   SeenSet * x = rev_pmap[*si];
-	   for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
-	     partition_map[*pi] = this_pid;
-	     rev_pmap[this_pid]->insert(*pi);
-	   }
+	// yep -- reassign.
+	for (set<unsigned int>::iterator si = other_partition_ids.begin();
+	     si != other_partition_ids.end(); si++) {
+	  SeenSet * x = rev_pmap[*si];
+	  for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
+	    partition_map[*pi] = this_pid;
+	    rev_pmap[this_pid]->insert(*pi);
+	  }
 
-	   rev_pmap.erase(*si);
-	   delete x;
-	 }
-       }
-     }
+	  rev_pmap.erase(*si);
+	  delete x;
+	}
+      }
+    }
   }
 
-  // rewind infile
-  infile.clear();
-  infile.seekg(0, ios::beg);
+  // restart!
+  parser = IParser::get_parser(infilename);
 
   ofstream outfile(outputfile.c_str());
 
-  currName = "";
-  currSeq = "";
   total_reads = 0;
   std::set<unsigned int> partitions;
 
-  while(1)  {
-     getline(infile, line);
-     if (line[0] == '>' || infile.eof())  {
-       // do we have a sequence to process?
-       if (currSeq != "")  {
-	 // yep! process.
-	 bool is_valid;
-	 check_and_process_read(currSeq, is_valid);
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
 
-	 if (is_valid) {
-	   std::string first_kmer = currSeq.substr(0, _ksize);
+    bool is_valid;
+    check_and_process_read(seq, is_valid);
 
-	   HashIntoType kmer_f, kmer_r;
-	   _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+    if (is_valid) {
+      std::string first_kmer = seq.substr(0, _ksize);
 
-	   unsigned int partition_id = partition_map[kmer_f];
-	   unsigned int cluster_size = rev_pmap[partition_id]->size();
+      HashIntoType kmer_f, kmer_r;
+      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-	   std::set<unsigned int>::const_iterator ii;
-	   ii = surrender_set.find(partition_id);
+      unsigned int partition_id = partition_map[kmer_f];
+      unsigned int cluster_size = rev_pmap[partition_id]->size();
+
+      std::set<unsigned int>::const_iterator ii;
+      ii = surrender_set.find(partition_id);
 	   
-	   char surrender_flag = ' ';
-	   if (ii != surrender_set.end()) {
-	     surrender_flag = '*';
-	   }
+      char surrender_flag = ' ';
+      if (ii != surrender_set.end()) {
+	surrender_flag = '*';
+      }
 
-	   if (cluster_size >= threshold) {
-	     outfile << ">" << currName << "\t" << partition_id << surrender_flag << "\t" <<
-	       cluster_size << "\n" << currSeq << "\n";
-	     partitions.insert(partition_id);
-	   }
-	 }
+      if (cluster_size >= threshold) {
+	outfile << ">" << read.name << "\t" << partition_id
+		<< surrender_flag << "\t" << cluster_size << "\n" 
+		<< seq << "\n";
+	partitions.insert(partition_id);
+      }
 	       
-	 // reset the sequence info, increment read number
-	 currSeq = "";
-	 total_reads++;
+      // reset the sequence info, increment read number
+      total_reads++;
 
-	 // run callback, if specified
-	 if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	   try {
-	     callback("do_truncated_partition/output", callback_data, total_reads, reads_kept);
-	   } catch (...) {
-	     infile.close();
-	     outfile.close();
-	     throw;
-	   }
-	 }
-       }
-
-       // new sequence => new sequence name
-       if (line[0] == '>') {
-	 currName = line.substr(1, line.length()-1);
-       }
-     }
-     else  {			// additional line for sequence
-       currSeq += line;
-     }
-     
-     // @ end of file? break out.
-     if (infile.eof()) {
-       break;
-     }
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("do_truncated_partition/output", callback_data,
+		   total_reads, reads_kept);
+	} catch (...) {
+	  delete parser; parser = NULL;
+	  outfile.close();
+	  throw;
+	}
+      }
+    }
   }
+
+  delete parser; parser = NULL;
 
   return partitions.size();
 }
