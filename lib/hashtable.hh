@@ -276,12 +276,20 @@ namespace khmer {
 					CallbackFn callback,
 					void * callback_data);
 
+    bool _is_tagged_kmer(const HashIntoType kmer_f,
+			 const HashIntoType kmer_r,
+			 SeenSet& tagged_kmers,
+			 const PartitionMap& partition_map);
+
+    bool _do_continue(const HashIntoType kmer,
+		      const SeenSet& keeper);
+
     void partition_find_all_tags(const HashIntoType kmer_f,
 				 const HashIntoType kmer_r,
 				 SeenSet& keeper,
 				 SeenSet& tagged_kmers,
 				 const PartitionMap& partition_map,
-				 bool& done, bool first, unsigned int depth,
+				 bool first, unsigned int depth,
 				 bool& surrender, unsigned int& total);
   };
 

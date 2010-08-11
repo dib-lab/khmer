@@ -1379,13 +1379,12 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 
     SeenSet keeper;
     SeenSet tagged_kmers;
-    bool done = false;
     bool surrender = false;
 
     // find all tagged kmers within range.
     unsigned int total = 0;
     partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
-			    partition_map, done, true,
+			    partition_map, true,
 			    PARTITION_ALL_TAG_DEPTH, surrender, total);
 
     if (surrender) {
@@ -1486,6 +1485,46 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   return partitions.size();
 }
 
+bool Hashtable::_do_continue(const HashIntoType kmer,
+			     const SeenSet& keeper)
+{
+  const BoundedCounterType val = _counts[kmer % _tablesize];
+
+  if (val == 0) {
+    return false;
+  }
+
+  // have we already seen me? don't count; exit.
+  SeenSet::iterator i = keeper.find(kmer);
+  if (i != keeper.end()) {
+    return false;
+  }
+
+  return true;
+}
+
+bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
+				const HashIntoType kmer_r,
+				SeenSet& tagged_kmers,
+				const PartitionMap& partition_map)
+{
+  bool found = false;
+  PartitionMap::const_iterator fi = partition_map.find(kmer_f);
+  if (fi != partition_map.end()) {
+    tagged_kmers.insert(kmer_f);
+    found = true;
+  }
+
+  fi = partition_map.find(kmer_r);
+  if (fi != partition_map.end()) {
+    tagged_kmers.insert(kmer_r);
+    found = true;
+  }
+
+  return found;
+}
+		     
+
 // used by do_truncated_partition
 
 void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
@@ -1493,7 +1532,6 @@ void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
 					SeenSet& keeper,
 					SeenSet& tagged_kmers,
 					const PartitionMap& partition_map,
-					bool& done,
 					bool first,
 					unsigned int depth,
 					bool& surrender,
@@ -1506,43 +1544,17 @@ void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
   depth -= 1;
   total++;
 
-  {
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    const BoundedCounterType val = _counts[kmer % _tablesize];
+  HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+  if (!_do_continue(kmer, keeper)) {
+    return;
+  }
 
-    if (val == 0) {
-      return;
-    }
+  // keep track of seen kmers
+  keeper.insert(kmer);
 
-    // have we already seen me? don't count; exit.
-    SeenSet::iterator i = keeper.find(kmer);
-    if (i != keeper.end()) {
-      return;
-    }
-
-    // keep track of seen kmers
-    keeper.insert(kmer);
-
-    if (!first) {
-      // Is this a kmer-to-tag, and have we tagged it already?
-      bool found = false;
-      PartitionMap::const_iterator fi = partition_map.find(kmer_f);
-      if (fi != partition_map.end()) {
-	tagged_kmers.insert(kmer_f);
-	found = true;
-      }
-
-      fi = partition_map.find(kmer_r);
-      if (fi != partition_map.end()) {
-	tagged_kmers.insert(kmer_r);
-	found = true;
-      }
-
-      if (found) {
-	done = true;
-	return;
-      }
-    }
+  // Is this a kmer-to-tag, and have we tagged it already? then exit.
+  if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmers, partition_map)) {
+    return;
   }
 
   // NEXT.
@@ -1552,35 +1564,35 @@ void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, done, false, depth, surrender, total);
+  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
 }
