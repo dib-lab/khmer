@@ -1044,21 +1044,25 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we tagged it already?
     PartitionMap::iterator fi = partition_map.find(kmer_f);
     if (fi != partition_map.end()) {
-      unsigned int existing = partition_map[kmer_f];
-      if (existing != 0) {	// can eliminate once it works :) @CTB
-	assert(existing == partition_id);
+      unsigned int * existing = partition_map[kmer_f];
+      if (existing != NULL) {	// can eliminate once it works :) @CTB
+	assert(*existing == partition_id);
       } else {
-	partition_map[kmer_f] = partition_id;
+	existing = new unsigned int;
+	*existing = partition_id;
+	partition_map[kmer_f] = existing;
       }
     }
 
     fi = partition_map.find(kmer_r);
     if (fi != partition_map.end()) {
-      unsigned int existing = partition_map[kmer_r];
-      if (existing != 0) {
-	assert(existing == partition_id);
+      unsigned int * existing = partition_map[kmer_r];
+      if (existing != NULL) {
+	assert(*existing == partition_id);
       } else {
-	partition_map[kmer_r] = partition_id;
+	existing = new unsigned int;
+	*existing = partition_id;
+	partition_map[kmer_r] = existing;
       }
     }
   }
@@ -1135,7 +1139,7 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
       std::string first_kmer = seq.substr(0, _ksize);
       HashIntoType kmer_f = _hash_forward(first_kmer.c_str(), _ksize);
 
-      partition_map[kmer_f] = 0;
+      partition_map[kmer_f] = NULL;
     }
 	       
     total_reads++;
@@ -1161,19 +1165,18 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
       ++i) {
 
     HashIntoType kmer_f = (*i).first;
-    unsigned int partition_id = (*i).second;
+    unsigned int * partition_id = (*i).second;
 
-    if (partition_id == 0) {
+    if (partition_id == NULL) {
       HashIntoType kmer_r;
       SeenSet keeper;
-
-      partition_id = next_partition_id;
-      next_partition_id++;
 
       std::string kmer_s = _revhash(kmer_f, _ksize);
 
       _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-      partition_set_id(kmer_f, kmer_r, keeper, partition_id, partition_map);
+      partition_set_id(kmer_f, kmer_r, keeper, next_partition_id,
+		       partition_map);
+      next_partition_id++;
     }
   }
 
@@ -1300,21 +1303,22 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 			       partition_map, done,
 			       PARTITION_FIRST_TAG_DEPTH);
 
-      unsigned int partition_id;
+      unsigned int *partition_id;
       if (!done) {		// no tagged_kmer found.
-	partition_id = next_partition_id;
+	partition_id = new unsigned int;
+	*partition_id = next_partition_id;
 	next_partition_id++;
 
 	partition_map[kmer_f] = partition_id;
 
 	SeenSet * x = new SeenSet();
 	x->insert(kmer_f);
-	rev_pmap[partition_id] = x;
+	rev_pmap[*partition_id] = x;
       } else {
 	// get graph ID of first tagged kmer
 	partition_id = partition_map[tagged_kmer];
 	partition_map[kmer_f] = partition_id;
-	rev_pmap[partition_id]->insert(kmer_f);
+	rev_pmap[*partition_id]->insert(kmer_f);
       }
 	       
       // reset the sequence info, increment read number
@@ -1348,7 +1352,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	       rev_pmap.size());
     }
     std::string kmer = _revhash((*pi).first, _ksize);
-    unsigned int this_pid = (*pi).second;
+    unsigned int this_pid = *((*pi).second);
     
     std::set<unsigned int>::const_iterator ii;
     ii = surrender_set.find(this_pid);
@@ -1382,7 +1386,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       set<unsigned int> other_partition_ids;
       SeenSet::iterator it = tagged_kmers.begin();
       for (; it != tagged_kmers.end(); ++it) {
-	unsigned int id = partition_map[*it];
+	unsigned int id = *(partition_map[*it]);
 
 	if (id != this_pid) {
 	  other_partition_ids.insert(id);
@@ -1396,9 +1400,9 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	for (set<unsigned int>::iterator si = other_partition_ids.begin();
 	     si != other_partition_ids.end(); si++) {
 	  SeenSet * x = rev_pmap[*si];
-	  for (SeenSet::iterator pi = x->begin(); pi != x->end(); ++pi){
-	    partition_map[*pi] = this_pid;
-	    rev_pmap[this_pid]->insert(*pi);
+	  for (SeenSet::iterator pp = x->begin(); pp != x->end(); ++pp){
+	    partition_map[*pp] = (*pi).second;
+	    rev_pmap[this_pid]->insert(*pp);
 	  }
 
 	  rev_pmap.erase(*si);
@@ -1429,7 +1433,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       HashIntoType kmer_f, kmer_r;
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-      unsigned int partition_id = partition_map[kmer_f];
+      unsigned int partition_id = *(partition_map[kmer_f]);
       unsigned int cluster_size = rev_pmap[partition_id]->size();
 
       std::set<unsigned int>::const_iterator ii;

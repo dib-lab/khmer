@@ -11,7 +11,7 @@
 
 namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
-  typedef std::map<HashIntoType, unsigned int> PartitionMap;
+  typedef std::map<HashIntoType, unsigned int*> PartitionMap;
   typedef std::map<unsigned int, SeenSet*> ReversePartitionMap;
 
   class Hashtable {
