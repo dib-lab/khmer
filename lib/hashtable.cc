@@ -941,7 +941,19 @@ void Hashtable::trim_graphs(const std::string infilename,
     seq = read.seq;
 
     // yep! process.
-    bool is_valid;
+    bool is_valid = true;
+
+    if (seq.length() < _ksize) {
+      is_valid = false;
+    }
+
+    if (is_valid) {
+      for (unsigned int i = 0; i < seq.length(); i++)  {
+	if (!is_valid_dna(seq[i])) {
+	  is_valid = false;
+	}
+      }
+    }
 
     if (is_valid) {
       std::string first_kmer = seq.substr(0, _ksize);
