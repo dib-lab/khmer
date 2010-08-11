@@ -1183,43 +1183,17 @@ void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
   if (done || depth == 0) return;
   depth -= 1;
 
-  {
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    const BoundedCounterType val = _counts[kmer % _tablesize];
+  HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+  if (!_do_continue(kmer, keeper)) {
+    return;
+  }
 
-    if (val == 0) {
-      return;
-    }
+  // keep track of seen kmers
+  keeper.insert(kmer);
 
-    // have we already seen me? don't count; exit.
-    SeenSet::iterator i = keeper.find(kmer);
-    if (i != keeper.end()) {
-      return;
-    }
-
-    // keep track of seen kmers
-    keeper.insert(kmer);
-
-    // Is this a kmer-to-tag, and have we tagged it already?
-    bool found = false;
-    PartitionMap::const_iterator fi = partition_map.find(kmer_f);
-    if (fi != partition_map.end()) {
-      tagged_kmer = kmer_f;
-      found = true;
-    }
-
-    if (!found) {
-      fi = partition_map.find(kmer_r);
-      if (fi != partition_map.end()) {
-	tagged_kmer = kmer_r;
-	found = true;
-      }
-    }
-
-    if (found) {		// search is over!
-      done = true;
-      return;
-    }
+  if (_is_tagged_kmer(kmer_f, kmer_r, partition_map, tagged_kmer)) {
+    done = true;
+    return;
   }
 
   // NEXT.
@@ -1505,20 +1479,22 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
 
 bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 				const HashIntoType kmer_r,
-				SeenSet& tagged_kmers,
-				const PartitionMap& partition_map)
+				const PartitionMap& partition_map,
+				HashIntoType& tagged_kmer)
 {
   bool found = false;
   PartitionMap::const_iterator fi = partition_map.find(kmer_f);
   if (fi != partition_map.end()) {
-    tagged_kmers.insert(kmer_f);
+    tagged_kmer = kmer_f;
     found = true;
   }
 
-  fi = partition_map.find(kmer_r);
-  if (fi != partition_map.end()) {
-    tagged_kmers.insert(kmer_r);
-    found = true;
+  if (!found) {
+    fi = partition_map.find(kmer_r);
+    if (fi != partition_map.end()) {
+      tagged_kmer = kmer_r;
+      found = true;
+    }
   }
 
   return found;
@@ -1553,7 +1529,9 @@ void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
   keeper.insert(kmer);
 
   // Is this a kmer-to-tag, and have we tagged it already? then exit.
-  if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmers, partition_map)) {
+  HashIntoType tagged_kmer;
+  if (!first && _is_tagged_kmer(kmer_f, kmer_r, partition_map, tagged_kmer)) {
+    tagged_kmers.insert(tagged_kmer);
     return;
   }
 

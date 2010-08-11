@@ -278,8 +278,8 @@ namespace khmer {
 
     bool _is_tagged_kmer(const HashIntoType kmer_f,
 			 const HashIntoType kmer_r,
-			 SeenSet& tagged_kmers,
-			 const PartitionMap& partition_map);
+			 const PartitionMap& partition_map,
+			 HashIntoType& tagged_kmer);
 
     bool _do_continue(const HashIntoType kmer,
 		      const SeenSet& keeper);
