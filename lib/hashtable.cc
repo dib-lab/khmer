@@ -1303,22 +1303,16 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 			       partition_map, done,
 			       PARTITION_FIRST_TAG_DEPTH);
 
-      unsigned int *partition_id;
+      unsigned int *partition_p;
       if (!done) {		// no tagged_kmer found.
-	partition_id = new unsigned int;
-	*partition_id = next_partition_id;
+	partition_p = new unsigned int;
+	*partition_p = next_partition_id;
 	next_partition_id++;
 
-	partition_map[kmer_f] = partition_id;
-
-	SeenSet * x = new SeenSet();
-	x->insert(kmer_f);
-	rev_pmap[*partition_id] = x;
+	partition_map[kmer_f] = partition_p;
       } else {
 	// get graph ID of first tagged kmer
-	partition_id = partition_map[tagged_kmer];
-	partition_map[kmer_f] = partition_id;
-	rev_pmap[*partition_id]->insert(kmer_f);
+	partition_map[kmer_f] = partition_map[tagged_kmer];
       }
 	       
       // reset the sequence info, increment read number
@@ -1352,7 +1346,8 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	       rev_pmap.size());
     }
     std::string kmer = _revhash((*pi).first, _ksize);
-    unsigned int this_pid = *((*pi).second);
+    unsigned int * this_partition_p = (*pi).second;
+    unsigned int this_pid = *this_partition_p;
     
     std::set<unsigned int>::const_iterator ii;
     ii = surrender_set.find(this_pid);
@@ -1382,32 +1377,26 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 
     // did we find more than one tagged kmer?
     if (tagged_kmers.size() >= 1) {
-      // collate the partitions from the tagged kmers
-      set<unsigned int> other_partition_ids;
-      SeenSet::iterator it = tagged_kmers.begin();
-      for (; it != tagged_kmers.end(); ++it) {
-	unsigned int id = *(partition_map[*it]);
 
-	if (id != this_pid) {
-	  other_partition_ids.insert(id);
+      SeenSet::iterator it = tagged_kmers.begin();
+      unsigned int min_partition_id = *(partition_map[*it]);
+      it++;
+
+      for (; it != tagged_kmers.end(); ++it) {
+	unsigned int pid = *(partition_map[*it]);
+	if (pid < min_partition_id) {
+	  min_partition_id = pid;
 	}
       }
 
-      // did we find a different partition id linked to this partition?
-      if (other_partition_ids.size()) {
-
-	// yep -- reassign.
-	for (set<unsigned int>::iterator si = other_partition_ids.begin();
-	     si != other_partition_ids.end(); si++) {
-	  SeenSet * x = rev_pmap[*si];
-	  for (SeenSet::iterator pp = x->begin(); pp != x->end(); ++pp){
-	    partition_map[*pp] = (*pi).second;
-	    rev_pmap[this_pid]->insert(*pp);
-	  }
-
-	  rev_pmap.erase(*si);
-	  delete x;
+      for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
+	unsigned int * partition_p = partition_map[*it];
+	if (*partition_p != min_partition_id) {
+	  *partition_p = min_partition_id;
 	}
+      }
+      if (*this_partition_p != min_partition_id) {
+	*this_partition_p = min_partition_id;
       }
     }
   }
@@ -1434,7 +1423,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
       unsigned int partition_id = *(partition_map[kmer_f]);
-      unsigned int cluster_size = rev_pmap[partition_id]->size();
 
       std::set<unsigned int>::const_iterator ii;
       ii = surrender_set.find(partition_id);
@@ -1444,12 +1432,10 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	surrender_flag = '*';
       }
 
-      if (cluster_size >= threshold) {
-	outfile << ">" << read.name << "\t" << partition_id
-		<< surrender_flag << "\t" << cluster_size << "\n" 
-		<< seq << "\n";
-	partitions.insert(partition_id);
-      }
+      outfile << ">" << read.name << "\t" << partition_id
+	      << surrender_flag << "\n" 
+	      << seq << "\n";
+      partitions.insert(partition_id);
 	       
       // reset the sequence info, increment read number
       total_reads++;
