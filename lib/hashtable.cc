@@ -1020,7 +1020,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
 void Hashtable::partition_set_id(const HashIntoType kmer_f,
 				 const HashIntoType kmer_r,
 				 SeenSet& keeper,
-				 const unsigned int partition_id,
+				 unsigned int * partition_id,
 				 PartitionMap& partition_map)
 
 {
@@ -1046,11 +1046,9 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
     if (fi != partition_map.end()) {
       unsigned int * existing = partition_map[kmer_f];
       if (existing != NULL) {	// can eliminate once it works :) @CTB
-	assert(*existing == partition_id);
+	assert(existing == partition_id);
       } else {
-	existing = new unsigned int;
-	*existing = partition_id;
-	partition_map[kmer_f] = existing;
+	partition_map[kmer_f] = partition_id;
       }
     }
 
@@ -1058,11 +1056,9 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
     if (fi != partition_map.end()) {
       unsigned int * existing = partition_map[kmer_r];
       if (existing != NULL) {
-	assert(*existing == partition_id);
+	assert(existing == partition_id);
       } else {
-	existing = new unsigned int;
-	*existing = partition_id;
-	partition_map[kmer_r] = existing;
+	partition_map[kmer_r] = partition_id;
       }
     }
   }
@@ -1174,9 +1170,13 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
       std::string kmer_s = _revhash(kmer_f, _ksize);
 
       _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-      partition_set_id(kmer_f, kmer_r, keeper, next_partition_id,
-		       partition_map);
+
+      partition_id = new unsigned int;
+      *partition_id = next_partition_id;
       next_partition_id++;
+
+      partition_set_id(kmer_f, kmer_r, keeper, partition_id,
+		       partition_map);
     }
   }
 

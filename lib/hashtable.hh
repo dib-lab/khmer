@@ -256,7 +256,7 @@ namespace khmer {
     void partition_set_id(const HashIntoType kmer_f,
 			  const HashIntoType kmer_r,
 			  SeenSet& keeper,
-			  const unsigned int partition_id,
+			  unsigned int * partition_id,
 			  PartitionMap& partition_map);
 
     unsigned int do_exact_partition(const std::string infilename,
