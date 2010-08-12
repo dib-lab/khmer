@@ -1278,7 +1278,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   unsigned int reads_kept = 0;
   unsigned int next_partition_id = 1;
   SeenSet keeper;
-  HashIntoType tagged_kmer;
 
   IParser* parser = IParser::get_parser(infilename);
   Read read;
@@ -1296,26 +1295,54 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 
       HashIntoType kmer_f, kmer_r;
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
-      bool done = false;
 
-      keeper.empty();
-      tagged_kmer = 0;
-      partition_find_first_tag(kmer_f, kmer_r, keeper, tagged_kmer,
-			       partition_map, done,
-			       PARTITION_FIRST_TAG_DEPTH);
+      SeenSet tagged_kmers;
+      bool surrender = false;
 
-      unsigned int *partition_p;
-      if (!done) {		// no tagged_kmer found.
-	partition_p = new unsigned int;
+      // find all tagged kmers within range.
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers,
+			      partition_map, surrender);
+
+      if (surrender) {
+	std::cout << "SURRENDER on kmer.\n";
+	// @@ surrender_set.insert(this_pid);
+      }
+
+      // did we find a tagged kmer?
+      if (tagged_kmers.size() >= 1) {
+
+	SeenSet::iterator it = tagged_kmers.begin();
+	unsigned int * this_partition_p = partition_map[*it];
+	partition_map[kmer_f] = this_partition_p;
+	unsigned int min_partition_id = *this_partition_p;
+	it++;
+
+	for (; it != tagged_kmers.end(); ++it) {
+	  unsigned int pid = *(partition_map[*it]);
+	  if (pid < min_partition_id) {
+	    min_partition_id = pid;
+	  }
+	}
+
+	for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
+	  unsigned int * partition_p = partition_map[*it];
+	  if (*partition_p != min_partition_id) {
+	    *partition_p = min_partition_id;
+	  }
+	}
+	if (*this_partition_p != min_partition_id) {
+	  *this_partition_p = min_partition_id;
+	}
+	
+      } else {
+	unsigned int * partition_p = new unsigned int;
 	*partition_p = next_partition_id;
 	next_partition_id++;
 
 	partition_map[kmer_f] = partition_p;
-      } else {
-	// get graph ID of first tagged kmer
-	partition_map[kmer_f] = partition_map[tagged_kmer];
       }
-	       
+
+
       // reset the sequence info, increment read number
       total_reads++;
 
