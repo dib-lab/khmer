@@ -1272,16 +1272,22 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 					       void * callback_data)
 {
   PartitionMap partition_map;
-  ReversePartitionMap rev_pmap;
 
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
   unsigned int next_partition_id = 1;
-  SeenSet keeper;
+  unsigned int removed_partitions = 0;
 
   IParser* parser = IParser::get_parser(infilename);
   Read read;
   string seq;
+
+  std::set<unsigned int> surrender_set;
+  std::string first_kmer;
+  HashIntoType kmer_f, kmer_r;
+  SeenSet tagged_kmers;
+  bool surrender;
+  unsigned int * this_partition_p;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -1291,28 +1297,22 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
     check_and_process_read(seq, is_valid);
 
     if (is_valid) {
-      std::string first_kmer = seq.substr(0, _ksize);
+      first_kmer = seq.substr(0, _ksize);
 
-      HashIntoType kmer_f, kmer_r;
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-      SeenSet tagged_kmers;
-      bool surrender = false;
+      tagged_kmers.clear();
+      surrender = false;
 
       // find all tagged kmers within range.
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers,
-			      partition_map, surrender);
-
-      if (surrender) {
-	std::cout << "SURRENDER on kmer.\n";
-	// @@ surrender_set.insert(this_pid);
-      }
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, partition_map,
+			      surrender);
 
       // did we find a tagged kmer?
       if (tagged_kmers.size() >= 1) {
 
 	SeenSet::iterator it = tagged_kmers.begin();
-	unsigned int * this_partition_p = partition_map[*it];
+	this_partition_p = partition_map[*it];
 	partition_map[kmer_f] = this_partition_p;
 	unsigned int min_partition_id = *this_partition_p;
 	it++;
@@ -1328,6 +1328,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	  unsigned int * partition_p = partition_map[*it];
 	  if (*partition_p != min_partition_id) {
 	    *partition_p = min_partition_id;
+	    removed_partitions++;
 	  }
 	}
 	if (*this_partition_p != min_partition_id) {
@@ -1335,13 +1336,17 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	}
 	
       } else {
-	unsigned int * partition_p = new unsigned int;
-	*partition_p = next_partition_id;
+	this_partition_p = new unsigned int;
+	*this_partition_p = next_partition_id;
 	next_partition_id++;
 
-	partition_map[kmer_f] = partition_p;
+	partition_map[kmer_f] = this_partition_p;
       }
 
+      if (surrender) {
+	std::cout << "SURRENDER on kmer.\n";
+	surrender_set.insert(*this_partition_p);
+      }
 
       // reset the sequence info, increment read number
       total_reads++;
@@ -1350,7 +1355,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
 	  callback("do_truncated_partition/read", callback_data, total_reads,
-		   reads_kept);
+		   next_partition_id - removed_partitions);
 	} catch (...) {
 	  delete parser;
 	}
@@ -1365,13 +1370,11 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 
   PartitionMap::iterator pi;
   unsigned int n = 0;
-  std::set<unsigned int> surrender_set;
 
   for (pi = partition_map.begin(); pi != partition_map.end(); ++pi) {
     n++;
     if (n % 10000 == 0 && callback) {
-      callback("do_truncated_partition/dfs", callback_data, n,
-	       rev_pmap.size());
+      callback("do_truncated_partition/dfs", callback_data, n, 0);
     }
     std::string kmer = _revhash((*pi).first, _ksize);
     unsigned int * this_partition_p = (*pi).second;
@@ -1490,14 +1493,12 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   const BoundedCounterType val = _counts[kmer % _tablesize];
 
   if (val == 0) {
-    // std::cout << "val is 0: " << kmer << "\n";
     return false;
   }
 
   // have we already seen me? don't count; exit.
   SeenSet::iterator i = keeper.find(kmer);
   if (i != keeper.end()) {
-    // std::cout << "found in keeper\n";
     return false;
   }
 
@@ -1562,11 +1563,8 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     kmer_r = node_q.front();
     node_q.pop();
 
-    // cout << "f " << kmer_f << " r " << kmer_r << "\n";
-
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
     if (!_do_continue(kmer, keeper)) {
-      // cout << "STOP.\n";
       continue;
     }
 
@@ -1621,6 +1619,4 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 
     first = false;
   }
-
-  // cout << "node_q size: "<< node_q.size() << "\n";
 }
