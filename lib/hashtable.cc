@@ -1168,84 +1168,10 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
   return next_partition_id - 1;
 }
 
-// used by do_truncated_partition
-
-void Hashtable::partition_find_first_tag(const HashIntoType kmer_f,
-					 const HashIntoType kmer_r,
-					 SeenSet& keeper,
-					 HashIntoType& tagged_kmer,
-					 const PartitionMap& partition_map,
-					 bool& done,
-					 unsigned int depth)
-{
-  if (done || depth == 0) return;
-  depth -= 1;
-
-  HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-  if (!_do_continue(kmer, keeper)) {
-    return;
-  }
-
-  // keep track of seen kmers
-  keeper.insert(kmer);
-
-  if (_is_tagged_kmer(kmer_f, kmer_r, partition_map, tagged_kmer)) {
-    done = true;
-    return;
-  }
-
-  // NEXT.
-
-  HashIntoType f, r;
-  const unsigned int rc_left_shift = _ksize*2 - 2;
-
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  // PREVIOUS.
-
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_first_tag(f, r, keeper, tagged_kmer, partition_map, done, depth);
-}
-
 // do_truncated_partition: less truncated progressive partitioning.
 //   1) load all sequences, tagging first kmer of each
-//   2) do a truncated DFS search for the *first* tagged kmer; assign cluster
-//         (partition_find_first_tag, to PARTITION_FIRST_TAG_DEPTH)
-//   3) after loading all sequences, do a truncated DFS search for *all* tagged
-//         kmers (partition_find_i4, to PARTITION_ALL_TAG_DEPTH),
-//         reassigning now-connected clusters.
-//
-// #2 is technically not required, but for high-abundance clusters
-// with closely spaced tags, it should reduce the amount of
-// reassignment in #3.  Benchmarking on well-connected data sets is
-// needed.  @CTB
+//   2) do a truncated BFS search for all connected tagged kmers & assign
+//      partition ID.
 //
 // CTB note: for unlimited PARTITION_ALL_TAG_DEPTH, yields perfect clustering.
 

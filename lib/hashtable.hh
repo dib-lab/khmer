@@ -267,13 +267,6 @@ namespace khmer {
 				    CallbackFn callback,
 				    void * callback_data);
 
-    void partition_find_first_tag(const HashIntoType kmer_f,
-				  const HashIntoType kmer_r,
-				  SeenSet& keeper,
-				  HashIntoType& tagged_kmer,
-				  const PartitionMap& partition_map,
-				  bool& done, unsigned int depth);
-
     unsigned int do_truncated_partition(const std::string infilename,
 					const std::string outputfile,
 					const unsigned int threshold,
