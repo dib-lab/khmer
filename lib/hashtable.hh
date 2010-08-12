@@ -286,6 +286,10 @@ namespace khmer {
 				 SeenSet& tagged_kmers,
 				 const PartitionMap& partition_map,
 				 bool& surrender);
+
+    void _reassign_partition_ids(SeenSet& tagged_kmers,
+				 PartitionMap& partition_map,
+				 const HashIntoType kmer_f);
   };
 
   class HashtableIntersect {

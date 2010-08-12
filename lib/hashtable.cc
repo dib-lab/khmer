@@ -1197,7 +1197,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
   bool surrender;
-  unsigned int * this_partition_p;
+  unsigned int * this_partition_p = NULL;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -1219,41 +1219,19 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 
       // did we find a tagged kmer?
       if (tagged_kmers.size() >= 1) {
-
-	SeenSet::iterator it = tagged_kmers.begin();
-	this_partition_p = partition_map[*it];
-	partition_map[kmer_f] = this_partition_p;
-	unsigned int min_partition_id = *this_partition_p;
-	it++;
-
-	for (; it != tagged_kmers.end(); ++it) {
-	  unsigned int pid = *(partition_map[*it]);
-	  if (pid < min_partition_id) {
-	    min_partition_id = pid;
-	  }
-	}
-
-	for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
-	  unsigned int * partition_p = partition_map[*it];
-	  if (*partition_p != min_partition_id) {
-	    *partition_p = min_partition_id;
-	  }
-	}
-
-	if (*this_partition_p != min_partition_id) {
-	  *this_partition_p = min_partition_id;
-	}
+	_reassign_partition_ids(tagged_kmers, partition_map, kmer_f);
       } else {
 	this_partition_p = new unsigned int;
 	*this_partition_p = next_partition_id;
 	next_partition_id++;
-
 	partition_map[kmer_f] = this_partition_p;
+
+	this_partition_p = NULL;
       }
 
       if (surrender) {
 	std::cout << "SURRENDER on kmer.\n";
-	surrender_set.insert(*this_partition_p);
+	surrender_set.insert(*(partition_map[kmer_f]));
       }
 
       // reset the sequence info, increment read number
@@ -1323,6 +1301,37 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   delete parser; parser = NULL;
 
   return partitions.size();
+}
+
+void Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
+					PartitionMap& partition_map,
+					const HashIntoType kmer_f)
+{
+  SeenSet::iterator it = tagged_kmers.begin();
+  unsigned int * this_partition_p = partition_map[*it];
+
+  partition_map[kmer_f] = this_partition_p;
+
+  unsigned int min_partition_id = *this_partition_p;
+  it++;
+
+  for (; it != tagged_kmers.end(); ++it) {
+    unsigned int pid = *(partition_map[*it]);
+    if (pid < min_partition_id) {
+      min_partition_id = pid;
+    }
+  }
+
+  for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
+    unsigned int * partition_p = partition_map[*it];
+    if (*partition_p != min_partition_id) {
+      *partition_p = min_partition_id;
+    }
+  }
+
+  if (*this_partition_p != min_partition_id) {
+    *this_partition_p = min_partition_id;
+  }
 }
 
 bool Hashtable::_do_continue(const HashIntoType kmer,
