@@ -5,6 +5,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <queue>
 
 #include "khmer.hh"
 #include "storage.hh"
@@ -13,6 +14,7 @@ namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
   typedef std::map<HashIntoType, unsigned int*> PartitionMap;
   typedef std::map<unsigned int, SeenSet*> ReversePartitionMap;
+  typedef std::queue<HashIntoType> NodeQueue;
 
   class Hashtable {
   protected:
@@ -284,13 +286,11 @@ namespace khmer {
     bool _do_continue(const HashIntoType kmer,
 		      const SeenSet& keeper);
 
-    void partition_find_all_tags(const HashIntoType kmer_f,
-				 const HashIntoType kmer_r,
-				 SeenSet& keeper,
+    void partition_find_all_tags(HashIntoType kmer_f,
+				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
 				 const PartitionMap& partition_map,
-				 bool first, unsigned int depth,
-				 bool& surrender, unsigned int& total);
+				 bool& surrender);
   };
 
   class HashtableIntersect {

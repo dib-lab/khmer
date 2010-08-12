@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include <queue>
 
 #include "khmer.hh"
 #include "hashtable.hh"
@@ -1360,15 +1361,12 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
     HashIntoType kmer_f, kmer_r;
     _hash(kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-    SeenSet keeper;
     SeenSet tagged_kmers;
     bool surrender = false;
 
     // find all tagged kmers within range.
-    unsigned int total = 0;
-    partition_find_all_tags(kmer_f, kmer_r, keeper, tagged_kmers,
-			    partition_map, true,
-			    PARTITION_ALL_TAG_DEPTH, surrender, total);
+    partition_find_all_tags(kmer_f, kmer_r, tagged_kmers,
+			    partition_map, surrender);
 
     if (surrender) {
       std::cout << "SURRENDER on partition: " << this_pid << "\n";
@@ -1465,12 +1463,14 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   const BoundedCounterType val = _counts[kmer % _tablesize];
 
   if (val == 0) {
+    // std::cout << "val is 0: " << kmer << "\n";
     return false;
   }
 
   // have we already seen me? don't count; exit.
   SeenSet::iterator i = keeper.find(kmer);
   if (i != keeper.end()) {
+    // std::cout << "found in keeper\n";
     return false;
   }
 
@@ -1503,74 +1503,97 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 
 // used by do_truncated_partition
 
-void Hashtable::partition_find_all_tags(const HashIntoType kmer_f,
-					const HashIntoType kmer_r,
-					SeenSet& keeper,
+void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
+					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
 					const PartitionMap& partition_map,
-					bool first,
-					unsigned int depth,
-					bool& surrender,
-					unsigned int& total)
+					bool& surrender)
 {
-  if (depth == 0 || total > PARTITION_MAX_TAG_EXAMINED) {
-    surrender = true;
-    return;
-  }
-  depth -= 1;
-  total++;
-
-  HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-  if (!_do_continue(kmer, keeper)) {
-    return;
-  }
-
-  // keep track of seen kmers
-  keeper.insert(kmer);
-
-  // Is this a kmer-to-tag, and have we tagged it already? then exit.
-  HashIntoType tagged_kmer;
-  if (!first && _is_tagged_kmer(kmer_f, kmer_r, partition_map, tagged_kmer)) {
-    tagged_kmers.insert(tagged_kmer);
-    return;
-  }
-
-  // NEXT.
-
+  bool first = true;
+  NodeQueue node_q;
   HashIntoType f, r;
   const unsigned int rc_left_shift = _ksize*2 - 2;
+  unsigned int total = 0;
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+  SeenSet keeper;
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+  node_q.push(kmer_f);
+  node_q.push(kmer_r);
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+  while(!node_q.empty() &&
+	node_q.size() < PARTITION_ALL_TAG_DEPTH) {
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+    total++;
 
-  // PREVIOUS.
+    if (total > PARTITION_MAX_TAG_EXAMINED) {
+      surrender = true;
+      break;
+    }
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+    kmer_f = node_q.front();
+    node_q.pop();
+    kmer_r = node_q.front();
+    node_q.pop();
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+    // cout << "f " << kmer_f << " r " << kmer_r << "\n";
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+    if (!_do_continue(kmer, keeper)) {
+      // cout << "STOP.\n";
+      continue;
+    }
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_find_all_tags(f, r, keeper, tagged_kmers, partition_map, false, depth, surrender, total);
+    // keep track of seen kmers
+    keeper.insert(kmer);
+
+    // Is this a kmer-to-tag, and have we put this tag in a partition already?
+    // Search no further in this direction.
+    HashIntoType tagged_kmer;
+    if (!first && _is_tagged_kmer(kmer_f, kmer_r, partition_map, tagged_kmer)) {
+      tagged_kmers.insert(tagged_kmer);
+      continue;
+    }
+
+    //
+    // Enqueue next set of nodes.
+    //
+
+    // NEXT.
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    // PREVIOUS.
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+    
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    node_q.push(f); node_q.push(r);
+
+    first = false;
+  }
+
+  // cout << "node_q size: "<< node_q.size() << "\n";
 }
