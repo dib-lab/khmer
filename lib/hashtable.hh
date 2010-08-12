@@ -142,6 +142,8 @@ namespace khmer {
 					HashIntoType lower_bound = 0,
 					HashIntoType upper_bound = 0);
 
+    bool check_read(const std::string &read);
+
     // count every k-mer in the FASTA file.
     void consume_fasta(const std::string &filename,
 		       unsigned int &total_reads,

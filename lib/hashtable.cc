@@ -33,12 +33,7 @@ MinMaxTable * Hashtable::fasta_file_to_minmax(const std::string &inputfile,
 
      bool valid_read = true;
      if (!readmask || readmask->get(read_num)) {
-       for (unsigned int i = 0; i < seq.length(); i++)  {
-         if (!is_valid_dna(seq[i])) {
-           valid_read = false;
-           break;
-         }
-       }
+       valid_read = check_read(seq);
 
        if (valid_read) {
          BoundedCounterType minval = get_min_count(seq);
@@ -374,9 +369,21 @@ unsigned int Hashtable::check_and_process_read(const std::string &read,
                                             HashIntoType lower_bound,
                                             HashIntoType upper_bound)
 {
-   unsigned int i;
+   is_valid = check_read(read);
 
-   is_valid = true;
+   if (!is_valid) { return 0; }
+
+   return consume_string(read, lower_bound, upper_bound);
+}
+
+//
+// check_read: checks for non-ACGT characters
+//
+
+bool Hashtable::check_read(const std::string &read)
+{
+   unsigned int i;
+   bool is_valid = true;
 
    if (read.length() < _ksize) {
      is_valid = false;
@@ -390,7 +397,7 @@ unsigned int Hashtable::check_and_process_read(const std::string &read,
       }
    }
 
-   return consume_string(read, lower_bound, upper_bound);
+   return is_valid;
 }
 
 //
@@ -695,28 +702,23 @@ HashIntoType * Hashtable::fasta_count_kmers_by_position(const std::string &input
       bool valid_read = true;
 	 
       if (!readmask || readmask->get(read_num)) {
-         for (unsigned int i = 0; i < seq.length(); i++)  {
-	    if (!is_valid_dna(seq[i])) {
-	       valid_read = false;
-	       break;
-	    }
-	 }
+	valid_read = check_read(seq);
 
-	 if (valid_read) {
-	    for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	       string kmer = seq.substr(i, i + _ksize);
-	       BoundedCounterType n = get_count(kmer.c_str());
-
-	       if (limit_by_count == 0 || n == limit_by_count) {
-	          if (i < max_read_len) {
-		     counts[i]++;
-	          }
-	       }
+	if (valid_read) {
+	  for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	    string kmer = seq.substr(i, i + _ksize);
+	    BoundedCounterType n = get_count(kmer.c_str());
+	    
+	    if (limit_by_count == 0 || n == limit_by_count) {
+	      if (i < max_read_len) {
+		counts[i]++;
+	      }
 	    }
-	 }
+	  }
+	}
  
-	 name.clear();
-	 seq.clear();
+	name.clear();
+	seq.clear();
       }
 
       read_num += 1;
@@ -752,12 +754,7 @@ void Hashtable::fasta_dump_kmers_by_abundance(const std::string &inputfile,
     seq = read.seq;
 
     if (!readmask || readmask->get(read_num)) {
-      for (unsigned int i = 0; i < seq.length(); i++)  {
-        if (!is_valid_dna(seq[i])) {
-	  valid_read = false;
-	  break;
-	}
-      }
+      valid_read = check_read(seq);
 
       if (valid_read) {
         for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -941,20 +938,7 @@ void Hashtable::trim_graphs(const std::string infilename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    // yep! process.
-    bool is_valid = true;
-
-    if (seq.length() < _ksize) {
-      is_valid = false;
-    }
-
-    if (is_valid) {
-      for (unsigned int i = 0; i < seq.length(); i++)  {
-	if (!is_valid_dna(seq[i])) {
-	  is_valid = false;
-	}
-      }
-    }
+    bool is_valid = check_read(seq);
 
     if (is_valid) {
       std::string first_kmer = seq.substr(0, _ksize);
@@ -1276,11 +1260,11 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
   unsigned int next_partition_id = 1;
-  unsigned int removed_partitions = 0;
 
   IParser* parser = IParser::get_parser(infilename);
   Read read;
   string seq;
+  bool is_valid;
 
   std::set<unsigned int> surrender_set;
   std::string first_kmer;
@@ -1293,7 +1277,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    bool is_valid;
     check_and_process_read(seq, is_valid);
 
     if (is_valid) {
@@ -1328,13 +1311,12 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 	  unsigned int * partition_p = partition_map[*it];
 	  if (*partition_p != min_partition_id) {
 	    *partition_p = min_partition_id;
-	    removed_partitions++;
 	  }
 	}
+
 	if (*this_partition_p != min_partition_id) {
 	  *this_partition_p = min_partition_id;
 	}
-	
       } else {
 	this_partition_p = new unsigned int;
 	*this_partition_p = next_partition_id;
@@ -1355,7 +1337,7 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
 	  callback("do_truncated_partition/read", callback_data, total_reads,
-		   next_partition_id - removed_partitions);
+		   next_partition_id);
 	} catch (...) {
 	  delete parser;
 	}
@@ -1377,20 +1359,14 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    bool is_valid;
-    check_and_process_read(seq, is_valid); // @@ no consume.
-
-    if (is_valid) {
-      std::string first_kmer = seq.substr(0, _ksize);
-
-      HashIntoType kmer_f, kmer_r;
+    if (check_read(seq)) {
+      first_kmer = seq.substr(0, _ksize);
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
       unsigned int partition_id = *(partition_map[kmer_f]);
 
       std::set<unsigned int>::const_iterator ii;
       ii = surrender_set.find(partition_id);
-	   
       char surrender_flag = ' ';
       if (ii != surrender_set.end()) {
 	surrender_flag = '*';
