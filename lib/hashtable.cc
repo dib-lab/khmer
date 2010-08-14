@@ -1352,6 +1352,13 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   return true;
 }
 
+void Hashtable::_checkpoint_partitionmap(string outfilename,
+					 const PartitionMap& partition_map)
+{
+  ofstream outfile(outfilename.c_str());
+}
+					 
+
 bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 				const HashIntoType kmer_r,
 				const PartitionMap& partition_map,

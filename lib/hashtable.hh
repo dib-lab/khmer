@@ -290,6 +290,9 @@ namespace khmer {
     void _reassign_partition_ids(SeenSet& tagged_kmers,
 				 PartitionMap& partition_map,
 				 const HashIntoType kmer_f);
+
+    void _checkpoint_partitionmap(std::string outfile,
+				  const PartitionMap& partition_map);
   };
 
   class HashtableIntersect {
