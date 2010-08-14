@@ -1200,7 +1200,8 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
+      bool overlap;
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, overlap);
 
       // assign the partition ID
       assign_partition_id(kmer_f, tagged_kmers, surrender);
@@ -1250,9 +1251,10 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
       first_kmer = seq.substr(0, _ksize);
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-      unsigned int partition_id = *(partition_map[kmer_f]);
+      PartitionID * partition_p = partition_map[kmer_f];
+      PartitionID partition_id = *partition_p;
 
-      std::set<unsigned int>::const_iterator ii;
+      PartitionSet::const_iterator ii;
       ii = surrender_set.find(partition_id);
       char surrender_flag = ' ';
       if (ii != surrender_set.end()) {
@@ -1289,6 +1291,7 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
 PartitionID Hashtable::assign_partition_id(HashIntoType kmer_f,
 					   SeenSet& tagged_kmers,
 					   bool surrender)
+
 {
   PartitionID * this_partition_p = NULL;
   PartitionID return_val = 0; 
@@ -1313,12 +1316,13 @@ PartitionID Hashtable::assign_partition_id(HashIntoType kmer_f,
 }
 
 PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
-					const HashIntoType kmer_f)
+					       const HashIntoType kmer_f)
 {
   SeenSet::iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = partition_map[*it];
 
   partition_map[kmer_f] = this_partition_p;
+  assert(this_partition_p != NULL);
 
   unsigned int min_partition_id = *this_partition_p;
   it++;
@@ -1345,7 +1349,8 @@ PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
 }
 
 bool Hashtable::_do_continue(const HashIntoType kmer,
-			     const SeenSet& keeper)
+			     const SeenSet& keeper,
+			     bool& overlap)
 {
   const BoundedCounterType val = _counts[kmer % _tablesize];
 
@@ -1357,6 +1362,10 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   SeenSet::iterator i = keeper.find(kmer);
   if (i != keeper.end()) {
     return false;
+  }
+
+  if (val > 1) {
+    overlap = true;
   }
 
   return true;
@@ -1396,7 +1405,8 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
-					bool& surrender)
+					bool& surrender,
+					bool& overlap)
 {
   HashIntoType f, r;
   bool first = true;
@@ -1427,7 +1437,7 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     node_q.pop();
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (!_do_continue(kmer, keeper)) {
+    if (!_do_continue(kmer, keeper, overlap)) {
       continue;
     }
 

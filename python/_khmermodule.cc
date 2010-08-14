@@ -36,9 +36,11 @@ public:
   khmer::HashIntoType kmer;
   khmer::SeenSet tagged_kmers;
   bool surrendered;
+  bool overlap;
 
   _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer),
-						   surrendered(false) {}
+						   surrendered(false),
+						   overlap(false) {}
 };
 
 // Python exception to raise
@@ -1401,12 +1403,20 @@ static PyObject * hash_find_all_tags(PyObject * self, PyObject *args)
     return NULL;
   }
 
+  _pre_partition_info * ppi = NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+
   khmer::HashIntoType kmer_f, kmer_r;
   khmer::_hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
 
-  _pre_partition_info * ppi = new _pre_partition_info(kmer_f);
+  ppi = new _pre_partition_info(kmer_f);
   hashtable->partition_find_all_tags(kmer_f, kmer_r,
-				     ppi->tagged_kmers, ppi->surrendered);
+				     ppi->tagged_kmers,
+				     ppi->surrendered,
+				     ppi->overlap);
+
+  Py_END_ALLOW_THREADS
 
   return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
 }
@@ -1427,6 +1437,44 @@ static PyObject * hash_assign_partition_id(PyObject * self, PyObject *args)
 
   _pre_partition_info * ppi;
   ppi = (_pre_partition_info *) PyCObject_AsVoidPtr(ppi_obj);
+  
+  khmer::PartitionID p;
+  p = hashtable->assign_partition_id(ppi->kmer,
+				     ppi->tagged_kmers,
+				     ppi->surrendered);
+
+  return PyInt_FromLong(p);
+}
+
+static PyObject * hash_assign_partition_id_th(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * ppi_obj;
+  if (!PyArg_ParseTuple(args, "O", &ppi_obj)) {
+    return NULL;
+  }
+
+  if (!PyCObject_Check(ppi_obj)) {
+    return NULL;
+  }
+
+  _pre_partition_info * ppi;
+  ppi = (_pre_partition_info *) PyCObject_AsVoidPtr(ppi_obj);
+
+  if (ppi->tagged_kmers.empty() && ppi->overlap) {
+    std::string kmer_s = khmer::_revhash(ppi->kmer, hashtable->ksize());
+    khmer::HashIntoType kmer_f, kmer_r;
+    khmer::_hash(kmer_s.c_str(), hashtable->ksize(), kmer_f, kmer_r);
+    assert (kmer_f == ppi->kmer);
+
+    hashtable->partition_find_all_tags(kmer_f, kmer_r,
+				       ppi->tagged_kmers,
+				       ppi->surrendered,
+				       ppi->overlap);
+  }
+
   
   khmer::PartitionID p;
   p = hashtable->assign_partition_id(ppi->kmer,
@@ -1462,43 +1510,6 @@ static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
-static PyObject * hash_consume_and_find_tags(PyObject * self, PyObject * args)
-{
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
-
-  char * long_str;
-
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
-    return NULL;
-  }
-  
-  if (strlen(long_str) < hashtable->ksize()) {
-    PyErr_SetString(PyExc_ValueError,
-		    "string length must >= the hashtable k-mer size");
-    return NULL;
-  }
-
-  unsigned int n_consumed;
-  n_consumed = hashtable->consume_string(long_str);
-
-  if (n_consumed > 0) {
-    khmer::HashIntoType kmer_f, kmer_r;
-    khmer::_hash(long_str, hashtable->ksize(), kmer_f, kmer_r);
-
-    _pre_partition_info * ppi = new _pre_partition_info(kmer_f);
-    hashtable->partition_find_all_tags(kmer_f, kmer_r,
-				       ppi->tagged_kmers, ppi->surrendered);
-
-    return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
-  }
-  else {
-    Py_INCREF(Py_None);
-    return Py_None;
-  }
-}
-
-
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1526,8 +1537,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "do_truncated_partition", hash_do_truncated_partition, METH_VARARGS, "" },
   { "filter_file_connected", hash_filter_file_connected, METH_VARARGS, "" },
   { "find_all_tags", hash_find_all_tags, METH_VARARGS, "" },
-  { "consume_and_find_tags", hash_consume_and_find_tags, METH_VARARGS, "" },
   { "assign_partition_id", hash_assign_partition_id, METH_VARARGS, "" },
+  { "assign_partition_id_th", hash_assign_partition_id_th, METH_VARARGS, "" },
   { "output_partitions", hash_output_partitions, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
