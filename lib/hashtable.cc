@@ -1164,21 +1164,18 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
   return next_partition_id - 1;
 }
 
-// do_truncated_partition: less truncated progressive partitioning.
+// do_truncated_partition: progressive partitioning.
 //   1) load all sequences, tagging first kmer of each
 //   2) do a truncated BFS search for all connected tagged kmers & assign
 //      partition ID.
 //
 // CTB note: for unlimited PARTITION_ALL_TAG_DEPTH, yields perfect clustering.
 
-unsigned int Hashtable::do_truncated_partition(const std::string infilename,
-					       const std::string outputfile,
-					       const unsigned int threshold,
-					       CallbackFn callback,
-					       void * callback_data)
+void Hashtable::do_truncated_partition(const std::string infilename,
+				       CallbackFn callback,
+				       void * callback_data)
 {
   unsigned int total_reads = 0;
-  unsigned int reads_kept = 0;
   unsigned int next_partition_id = 1;
 
   IParser* parser = IParser::get_parser(infilename);
@@ -1186,7 +1183,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   string seq;
   bool is_valid;
 
-  std::set<unsigned int> surrender_set;
   std::string first_kmer;
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
@@ -1243,14 +1239,26 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
   }
 
   delete parser;
+}
 
-  // restart!
-  parser = IParser::get_parser(infilename);
-
+unsigned int Hashtable::output_partitioned_file(const std::string infilename,
+						const std::string outputfile,
+						CallbackFn callback,
+						void * callback_data)
+{
+  IParser* parser = IParser::get_parser(infilename);
   ofstream outfile(outputfile.c_str());
 
-  total_reads = 0;
+  unsigned int total_reads = 0;
+  unsigned int reads_kept = 0;
+
   std::set<unsigned int> partitions;
+
+  Read read;
+  string seq;
+
+  std::string first_kmer;
+  HashIntoType kmer_f, kmer_r;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();

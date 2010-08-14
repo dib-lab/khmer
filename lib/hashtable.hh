@@ -12,6 +12,7 @@
 
 namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
+  typedef std::set<unsigned int> PartitionSet;
   typedef std::map<HashIntoType, unsigned int*> PartitionMap;
   typedef std::map<unsigned int, SeenSet*> ReversePartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
@@ -24,6 +25,7 @@ namespace khmer {
 
     BoundedCounterType * _counts;
     PartitionMap partition_map;
+    PartitionSet surrender_set;
 
     void (*_writelock_acquire)(void * data);
     void (*_writelock_release)(void * data);
@@ -267,11 +269,14 @@ namespace khmer {
 				    CallbackFn callback,
 				    void * callback_data);
 
-    unsigned int do_truncated_partition(const std::string infilename,
-					const std::string outputfile,
-					const unsigned int threshold,
-					CallbackFn callback,
-					void * callback_data);
+    void do_truncated_partition(const std::string infilename,
+				CallbackFn callback,
+				void * callback_data);
+
+    unsigned int output_partitioned_file(const std::string infilename,
+					 const std::string outputfilename,
+					 CallbackFn callback,
+					 void * callback_data);
 
     bool _is_tagged_kmer(const HashIntoType kmer_f,
 			 const HashIntoType kmer_r,
