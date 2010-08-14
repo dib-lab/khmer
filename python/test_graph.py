@@ -164,3 +164,28 @@ class Test_MoreConnectMe4(object):
         outfile = os.path.join(thisdir, 'test-trunc.out')
         n = ht.do_truncated_partition(filename, outfile, 0)
         assert n == 103, n
+
+###
+
+class Test_PythonAPI(object):
+    def test_ordered_connect(self):
+        ht = khmer.new_hashtable(20, 4**15+1)
+
+        a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
+        b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
+        c = "GGAGCACTTATCATGGAGATATATCCCGTGCTTAAACATCGCACTTTAACCCTGCAGAGT"
+
+        print ht.consume(a)
+        ppi = ht.find_all_tags(a[:20])
+        pid = ht.assign_partition_id(ppi)
+        assert pid == 1, pid
+        
+        print ht.consume(b)
+        ppi = ht.find_all_tags(b[:20])
+        pid = ht.assign_partition_id(ppi)
+        assert pid == 2, pid
+        
+        print ht.consume(c)
+        ppi = ht.find_all_tags(c[:20])
+        pid = ht.assign_partition_id(ppi)
+        assert pid == 1, pid

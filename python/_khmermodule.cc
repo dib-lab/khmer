@@ -31,6 +31,16 @@ public:
   _khmer_signal(std::string message) : _khmer_exception(message) { };
 };
 
+class _pre_partition_info {
+public:
+  khmer::HashIntoType kmer;
+  khmer::SeenSet tagged_kmers;
+  bool surrendered;
+
+  _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer),
+						   surrendered(false) {}
+};
+
 // Python exception to raise
 static PyObject *KhmerError;
 
@@ -1350,11 +1360,9 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
 
   char * filename = NULL;
   char * output = NULL;
-  unsigned int threshold = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &threshold,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
     return NULL;
   }
 
@@ -1371,6 +1379,125 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
 
   return PyInt_FromLong(n_partitions);
 }
+
+void free_pre_partition_info(void * p)
+{
+  _pre_partition_info * ppi = (_pre_partition_info *) p;
+  delete ppi;
+}
+
+static PyObject * hash_find_all_tags(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * kmer_s = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    return NULL;
+  }
+
+  if (strlen(kmer_s) < hashtable->ksize()) { // @@
+    return NULL;
+  }
+
+  khmer::HashIntoType kmer_f, kmer_r;
+  khmer::_hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
+
+  _pre_partition_info * ppi = new _pre_partition_info(kmer_f);
+  hashtable->partition_find_all_tags(kmer_f, kmer_r,
+				     ppi->tagged_kmers, ppi->surrendered);
+
+  return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
+}
+
+static PyObject * hash_assign_partition_id(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * ppi_obj;
+  if (!PyArg_ParseTuple(args, "O", &ppi_obj)) {
+    return NULL;
+  }
+
+  if (!PyCObject_Check(ppi_obj)) {
+    return NULL;
+  }
+
+  _pre_partition_info * ppi;
+  ppi = (_pre_partition_info *) PyCObject_AsVoidPtr(ppi_obj);
+  
+  khmer::PartitionID p;
+  p = hashtable->assign_partition_id(ppi->kmer,
+				     ppi->tagged_kmers,
+				     ppi->surrendered);
+
+  return PyInt_FromLong(p);
+}
+
+static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  char * output = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
+    return NULL;
+  }
+
+  unsigned int n_partitions = 0;
+  try {
+    n_partitions = hashtable->output_partitioned_file(filename,
+						      output,
+						      _report_fn,
+						      callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(n_partitions);
+}
+
+static PyObject * hash_consume_and_find_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * long_str;
+
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+    return NULL;
+  }
+  
+  if (strlen(long_str) < hashtable->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  unsigned int n_consumed;
+  n_consumed = hashtable->consume_string(long_str);
+
+  if (n_consumed > 0) {
+    khmer::HashIntoType kmer_f, kmer_r;
+    khmer::_hash(long_str, hashtable->ksize(), kmer_f, kmer_r);
+
+    _pre_partition_info * ppi = new _pre_partition_info(kmer_f);
+    hashtable->partition_find_all_tags(kmer_f, kmer_r,
+				       ppi->tagged_kmers, ppi->surrendered);
+
+    return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
+  }
+  else {
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+}
+
 
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
@@ -1398,6 +1525,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "do_exact_partition", hash_do_exact_partition, METH_VARARGS, "" },
   { "do_truncated_partition", hash_do_truncated_partition, METH_VARARGS, "" },
   { "filter_file_connected", hash_filter_file_connected, METH_VARARGS, "" },
+  { "find_all_tags", hash_find_all_tags, METH_VARARGS, "" },
+  { "consume_and_find_tags", hash_consume_and_find_tags, METH_VARARGS, "" },
+  { "assign_partition_id", hash_assign_partition_id, METH_VARARGS, "" },
+  { "output_partitions", hash_output_partitions, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

@@ -11,10 +11,10 @@
 #include "storage.hh"
 
 namespace khmer {
+  typedef unsigned int PartitionID;
   typedef std::set<HashIntoType> SeenSet;
-  typedef std::set<unsigned int> PartitionSet;
-  typedef std::map<HashIntoType, unsigned int*> PartitionMap;
-  typedef std::map<unsigned int, SeenSet*> ReversePartitionMap;
+  typedef std::set<PartitionID> PartitionSet;
+  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
 
   class Hashtable {
@@ -276,7 +276,7 @@ namespace khmer {
 				CallbackFn callback,
 				void * callback_data);
 
-    void assign_partition_id(HashIntoType kmer_f,
+    PartitionID assign_partition_id(HashIntoType kmer_f,
 			     SeenSet& tagged_kmers,
 			     bool surrender);
 
@@ -297,7 +297,7 @@ namespace khmer {
 				 SeenSet& tagged_kmers,
 				 bool& surrender);
 
-    void _reassign_partition_ids(SeenSet& tagged_kmers,
+    PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
 
     void _checkpoint_partitionmap(std::string outfile);

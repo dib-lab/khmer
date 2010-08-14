@@ -1286,31 +1286,33 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
   return partitions.size();
 }
 
-void Hashtable::assign_partition_id(HashIntoType kmer_f,
-				    SeenSet& tagged_kmers,
-				    bool surrender)
+PartitionID Hashtable::assign_partition_id(HashIntoType kmer_f,
+					   SeenSet& tagged_kmers,
+					   bool surrender)
 {
-  unsigned int * this_partition_p = NULL;
+  PartitionID * this_partition_p = NULL;
+  PartitionID return_val = 0; 
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1) {
-    _reassign_partition_ids(tagged_kmers, kmer_f);
+    return_val = _reassign_partition_ids(tagged_kmers, kmer_f);
   } else {
     this_partition_p = new unsigned int;
     *this_partition_p = next_partition_id;
     next_partition_id++;
     partition_map[kmer_f] = this_partition_p;
-    
-    this_partition_p = NULL;
+
+    return_val = *this_partition_p;
   }
 
   if (surrender) {
     std::cout << "SURRENDER on kmer.\n";
-    surrender_set.insert(*(partition_map[kmer_f]));
+    surrender_set.insert(return_val);
   }
+  return return_val;
 }
 
-void Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
+PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
 					const HashIntoType kmer_f)
 {
   SeenSet::iterator it = tagged_kmers.begin();
@@ -1338,6 +1340,8 @@ void Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
   if (*this_partition_p != min_partition_id) {
     *this_partition_p = min_partition_id;
   }
+
+  return *this_partition_p;
 }
 
 bool Hashtable::_do_continue(const HashIntoType kmer,
