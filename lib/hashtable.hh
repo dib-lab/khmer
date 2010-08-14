@@ -25,6 +25,7 @@ namespace khmer {
 
     BoundedCounterType * _counts;
     PartitionMap partition_map;
+    unsigned int next_partition_id;
     PartitionSet surrender_set;
 
     void (*_writelock_acquire)(void * data);
@@ -51,6 +52,8 @@ namespace khmer {
   public:
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
+      next_partition_id = 1;
+
       bitmask = 0;
       for (unsigned int i = 0; i < _ksize; i++) {
 	bitmask = (bitmask << 2) | 3;
@@ -272,6 +275,10 @@ namespace khmer {
     void do_truncated_partition(const std::string infilename,
 				CallbackFn callback,
 				void * callback_data);
+
+    void assign_partition_id(HashIntoType kmer_f,
+			     SeenSet& tagged_kmers,
+			     bool surrender);
 
     unsigned int output_partitioned_file(const std::string infilename,
 					 const std::string outputfilename,
