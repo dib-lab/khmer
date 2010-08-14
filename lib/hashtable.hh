@@ -23,6 +23,7 @@ namespace khmer {
     HashIntoType bitmask;
 
     BoundedCounterType * _counts;
+    PartitionMap partition_map;
 
     void (*_writelock_acquire)(void * data);
     void (*_writelock_release)(void * data);
@@ -260,8 +261,7 @@ namespace khmer {
     void partition_set_id(const HashIntoType kmer_f,
 			  const HashIntoType kmer_r,
 			  SeenSet& keeper,
-			  unsigned int * partition_id,
-			  PartitionMap& partition_map);
+			  unsigned int * partition_id);
 
     unsigned int do_exact_partition(const std::string infilename,
 				    CallbackFn callback,
@@ -275,7 +275,6 @@ namespace khmer {
 
     bool _is_tagged_kmer(const HashIntoType kmer_f,
 			 const HashIntoType kmer_r,
-			 const PartitionMap& partition_map,
 			 HashIntoType& tagged_kmer);
 
     bool _do_continue(const HashIntoType kmer,
@@ -284,15 +283,12 @@ namespace khmer {
     void partition_find_all_tags(HashIntoType kmer_f,
 				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
-				 const PartitionMap& partition_map,
 				 bool& surrender);
 
     void _reassign_partition_ids(SeenSet& tagged_kmers,
-				 PartitionMap& partition_map,
 				 const HashIntoType kmer_f);
 
-    void _checkpoint_partitionmap(std::string outfile,
-				  const PartitionMap& partition_map);
+    void _checkpoint_partitionmap(std::string outfile);
   };
 
   class HashtableIntersect {

@@ -1005,8 +1005,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
 void Hashtable::partition_set_id(const HashIntoType kmer_f,
 				 const HashIntoType kmer_r,
 				 SeenSet& keeper,
-				 unsigned int * partition_id,
-				 PartitionMap& partition_map)
+				 unsigned int * partition_id)
 
 {
   {
@@ -1055,37 +1054,37 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  partition_set_id(f, r, keeper, partition_id, partition_map);
+  partition_set_id(f, r, keeper, partition_id);
 }
 
 // do_exact_partition: simple partitioning, done once per cluster.
@@ -1100,8 +1099,6 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
 					   CallbackFn callback,
 					   void * callback_data)
 {
-  PartitionMap partition_map;
-
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
 
@@ -1160,8 +1157,7 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
       *partition_id = next_partition_id;
       next_partition_id++;
 
-      partition_set_id(kmer_f, kmer_r, keeper, partition_id,
-		       partition_map);
+      partition_set_id(kmer_f, kmer_r, keeper, partition_id);
     }
   }
 
@@ -1181,8 +1177,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 					       CallbackFn callback,
 					       void * callback_data)
 {
-  PartitionMap partition_map;
-
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
   unsigned int next_partition_id = 1;
@@ -1214,12 +1208,11 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
       surrender = false;
 
       // find all tagged kmers within range.
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, partition_map,
-			      surrender);
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
 
       // did we find a tagged kmer?
       if (tagged_kmers.size() >= 1) {
-	_reassign_partition_ids(tagged_kmers, partition_map, kmer_f);
+	_reassign_partition_ids(tagged_kmers, kmer_f);
       } else {
 	this_partition_p = new unsigned int;
 	*this_partition_p = next_partition_id;
@@ -1304,7 +1297,6 @@ unsigned int Hashtable::do_truncated_partition(const std::string infilename,
 }
 
 void Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
-					PartitionMap& partition_map,
 					const HashIntoType kmer_f)
 {
   SeenSet::iterator it = tagged_kmers.begin();
@@ -1352,8 +1344,7 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   return true;
 }
 
-void Hashtable::_checkpoint_partitionmap(string outfilename,
-					 const PartitionMap& partition_map)
+void Hashtable::_checkpoint_partitionmap(string outfilename)
 {
   ofstream outfile(outfilename.c_str());
 }
@@ -1361,7 +1352,6 @@ void Hashtable::_checkpoint_partitionmap(string outfilename,
 
 bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 				const HashIntoType kmer_r,
-				const PartitionMap& partition_map,
 				HashIntoType& tagged_kmer)
 {
   bool found = false;
@@ -1388,7 +1378,6 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
-					const PartitionMap& partition_map,
 					bool& surrender)
 {
   bool first = true;
@@ -1428,7 +1417,7 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.
     HashIntoType tagged_kmer;
-    if (!first && _is_tagged_kmer(kmer_f, kmer_r, partition_map, tagged_kmer)) {
+    if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
       tagged_kmers.insert(tagged_kmer);
       continue;
     }
