@@ -8,7 +8,7 @@
 
 #define CALLBACK_PERIOD 10000
 #define PARTITION_FIRST_TAG_DEPTH 50
-#define PARTITION_ALL_TAG_DEPTH 500
+#define PARTITION_ALL_TAG_DEPTH 1e6
 #define PARTITION_MAX_TAG_EXAMINED 1e6
 
 using namespace khmer;
@@ -1200,8 +1200,7 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      bool overlap;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, overlap);
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
 
       // assign the partition ID
       assign_partition_id(kmer_f, tagged_kmers, surrender);
@@ -1349,26 +1348,12 @@ PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
 }
 
 bool Hashtable::_do_continue(const HashIntoType kmer,
-			     const SeenSet& keeper,
-			     bool& overlap)
+			     const SeenSet& keeper)
 {
-  const BoundedCounterType val = _counts[kmer % _tablesize];
-
-  if (val == 0) {
-    return false;
-  }
-
   // have we already seen me? don't count; exit.
   SeenSet::iterator i = keeper.find(kmer);
-  if (i != keeper.end()) {
-    return false;
-  }
 
-  if (val > 1) {
-    overlap = true;
-  }
-
-  return true;
+  return (i == keeper.end());
 }
 
 void Hashtable::_checkpoint_partitionmap(string outfilename)
@@ -1405,8 +1390,7 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
-					bool& surrender,
-					bool& overlap)
+					bool& surrender)
 {
   HashIntoType f, r;
   bool first = true;
@@ -1421,12 +1405,11 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
   node_q.push(kmer_f);
   node_q.push(kmer_r);
 
-  while(!node_q.empty() &&
-	node_q.size() < PARTITION_ALL_TAG_DEPTH) {
-
+  while(!node_q.empty()) {
     total++;
 
-    if (total > PARTITION_MAX_TAG_EXAMINED) {
+    if (total > PARTITION_MAX_TAG_EXAMINED ||
+      node_q.size() > PARTITION_ALL_TAG_DEPTH) {
       surrender = true;
       break;
     }
@@ -1437,7 +1420,7 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     node_q.pop();
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (!_do_continue(kmer, keeper, overlap)) {
+    if (!_do_continue(kmer, keeper)) {
       continue;
     }
 
@@ -1459,36 +1442,52 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     // NEXT.
     f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
     r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
     r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
     r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
     r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     // PREVIOUS.
     r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
     f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
     f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
     
     r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
     f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
     f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-    node_q.push(f); node_q.push(r);
+    if (get_count(uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+    }
 
     first = false;
   }

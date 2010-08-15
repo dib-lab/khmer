@@ -290,13 +290,12 @@ namespace khmer {
 			 HashIntoType& tagged_kmer);
 
     bool _do_continue(const HashIntoType kmer,
-		      const SeenSet& keeper,
-		      bool& overlap);
+		      const SeenSet& keeper);
 
     void partition_find_all_tags(HashIntoType kmer_f,
 				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
-				 bool& surrender, bool& overlap);
+				 bool& surrender);
 
     PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);

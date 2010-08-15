@@ -36,11 +36,9 @@ public:
   khmer::HashIntoType kmer;
   khmer::SeenSet tagged_kmers;
   bool surrendered;
-  bool overlap;
 
   _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer),
-						   surrendered(false),
-						   overlap(false) {}
+						   surrendered(false) {};
 };
 
 // Python exception to raise
@@ -1413,8 +1411,7 @@ static PyObject * hash_find_all_tags(PyObject * self, PyObject *args)
   ppi = new _pre_partition_info(kmer_f);
   hashtable->partition_find_all_tags(kmer_f, kmer_r,
 				     ppi->tagged_kmers,
-				     ppi->surrendered,
-				     ppi->overlap);
+				     ppi->surrendered);
 
   Py_END_ALLOW_THREADS
 
@@ -1463,7 +1460,7 @@ static PyObject * hash_assign_partition_id_th(PyObject * self, PyObject *args)
   _pre_partition_info * ppi;
   ppi = (_pre_partition_info *) PyCObject_AsVoidPtr(ppi_obj);
 
-  if (ppi->tagged_kmers.empty() && ppi->overlap) {
+  if (ppi->tagged_kmers.empty()) {
     std::string kmer_s = khmer::_revhash(ppi->kmer, hashtable->ksize());
     khmer::HashIntoType kmer_f, kmer_r;
     khmer::_hash(kmer_s.c_str(), hashtable->ksize(), kmer_f, kmer_r);
@@ -1471,8 +1468,7 @@ static PyObject * hash_assign_partition_id_th(PyObject * self, PyObject *args)
 
     hashtable->partition_find_all_tags(kmer_f, kmer_r,
 				       ppi->tagged_kmers,
-				       ppi->surrendered,
-				       ppi->overlap);
+				       ppi->surrendered);
   }
 
   
