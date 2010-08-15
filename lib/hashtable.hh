@@ -15,6 +15,9 @@ namespace khmer {
   typedef std::set<HashIntoType> SeenSet;
   typedef std::set<PartitionID> PartitionSet;
   typedef std::map<HashIntoType, PartitionID*> PartitionMap;
+  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::set<PartitionID *> PartitionPtrSet;
+  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
 
   class Hashtable {
@@ -25,6 +28,7 @@ namespace khmer {
 
     BoundedCounterType * _counts;
     PartitionMap partition_map;
+    ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
     PartitionSet surrender_set;
 
@@ -273,8 +277,8 @@ namespace khmer {
 				    void * callback_data);
 
     void do_truncated_partition(const std::string infilename,
-				CallbackFn callback,
-				void * callback_data);
+				CallbackFn callback=0,
+				void * callback_data=0);
 
     PartitionID assign_partition_id(HashIntoType kmer_f,
 			     SeenSet& tagged_kmers,
@@ -282,8 +286,8 @@ namespace khmer {
 
     unsigned int output_partitioned_file(const std::string infilename,
 					 const std::string outputfilename,
-					 CallbackFn callback,
-					 void * callback_data);
+					 CallbackFn callback=0,
+					 void * callback_data=0);
 
     bool _is_tagged_kmer(const HashIntoType kmer_f,
 			 const HashIntoType kmer_r,
@@ -300,7 +304,10 @@ namespace khmer {
     PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
 
-    void _checkpoint_partitionmap(std::string outfile);
+    void _checkpoint_partitionmap(std::string outfile,
+				  std::string surrenderfile);
+    void _load_partitionmap(std::string infile,
+			    std::string surrenderfile);
   };
 
   class HashtableIntersect {

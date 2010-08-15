@@ -1371,7 +1371,7 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
     hashtable->do_truncated_partition(filename, _report_fn, callback_obj);
     n_partitions = hashtable->output_partitioned_file(filename,
 						      output,
-						      _report_fn,
+    						      _report_fn,
 						      callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -1506,6 +1506,42 @@ static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
+static PyObject * hash_save_checkpoint(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  char * filename2 = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss", &filename, &filename2)) {
+    return NULL;
+  }
+
+  hashtable->_checkpoint_partitionmap(filename, filename2);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_load_checkpoint(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  char * filename2 = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss", &filename, &filename2)) {
+    return NULL;
+  }
+
+  hashtable->_load_partitionmap(filename, filename2);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1536,6 +1572,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "assign_partition_id", hash_assign_partition_id, METH_VARARGS, "" },
   { "assign_partition_id_th", hash_assign_partition_id_th, METH_VARARGS, "" },
   { "output_partitions", hash_output_partitions, METH_VARARGS, "" },
+  { "load_checkpoint", hash_load_checkpoint, METH_VARARGS, "" },
+  { "save_checkpoint", hash_save_checkpoint, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

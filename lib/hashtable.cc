@@ -7,8 +7,7 @@
 #include "parsers.hh"
 
 #define CALLBACK_PERIOD 10000
-#define PARTITION_FIRST_TAG_DEPTH 50
-#define PARTITION_ALL_TAG_DEPTH 1e6
+#define PARTITION_ALL_TAG_DEPTH 500
 #define PARTITION_MAX_TAG_EXAMINED 1e6
 
 using namespace khmer;
@@ -1215,6 +1214,7 @@ void Hashtable::do_truncated_partition(const std::string infilename,
 		   next_partition_id);
 	} catch (...) {
 	  delete parser;
+	  throw;
 	}
       }
     }
@@ -1301,14 +1301,17 @@ PartitionID Hashtable::assign_partition_id(HashIntoType kmer_f,
   } else {
     this_partition_p = new unsigned int;
     *this_partition_p = next_partition_id;
-    next_partition_id++;
     partition_map[kmer_f] = this_partition_p;
 
-    return_val = *this_partition_p;
+    PartitionPtrSet * s = new PartitionPtrSet();
+    s->insert(this_partition_p);
+    reverse_pmap[next_partition_id] = s;
+
+    return_val = next_partition_id;
+    next_partition_id++;
   }
 
   if (surrender) {
-    std::cout << "SURRENDER on kmer.\n";
     surrender_set.insert(return_val);
   }
   return return_val;
@@ -1333,15 +1336,36 @@ PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
     }
   }
 
+  PartitionPtrSet * master = reverse_pmap[min_partition_id];
   for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
     unsigned int * partition_p = partition_map[*it];
     if (*partition_p != min_partition_id) {
-      *partition_p = min_partition_id;
+      PartitionPtrSet * s = reverse_pmap[*partition_p];
+      reverse_pmap.erase(*partition_p);
+      
+      PartitionID * pp2;
+      for (PartitionPtrSet::const_iterator si = s->begin();
+	   si != s->end(); si++) {
+	pp2 = (*si);
+	*pp2 = min_partition_id;
+	master->insert(pp2);
+      }
+      delete s;
     }
   }
 
   if (*this_partition_p != min_partition_id) {
-    *this_partition_p = min_partition_id;
+    PartitionPtrSet * s = reverse_pmap[*this_partition_p];
+    reverse_pmap.erase(*this_partition_p);
+      
+    PartitionID * pp2;
+    for (PartitionPtrSet::const_iterator si = s->begin();
+	 si != s->end(); si++) {
+      pp2 = (*si);
+      *pp2 = min_partition_id;
+      master->insert(pp2);
+    }
+    delete s;
   }
 
   return *this_partition_p;
@@ -1356,9 +1380,134 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   return (i == keeper.end());
 }
 
-void Hashtable::_checkpoint_partitionmap(string outfilename)
+void Hashtable::_checkpoint_partitionmap(string pmap_filename,
+					 string surrender_filename)
 {
-  ofstream outfile(outfilename.c_str());
+  ofstream outfile(pmap_filename.c_str(), ios::binary);
+  char buf[1000000];
+  unsigned int n_bytes = 0;
+
+  cout << "checkpointing..." << partition_map.size() << "\n";
+
+  PartitionMap::const_iterator pi = partition_map.begin();
+  for (; pi != partition_map.end(); pi++) {
+    HashIntoType kmer;
+    PartitionID p_id;
+
+    kmer = pi->first;
+    p_id = *(pi->second);
+
+    memcpy(&buf[n_bytes], &kmer, sizeof(HashIntoType));
+    n_bytes += sizeof(HashIntoType);
+    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+    n_bytes += sizeof(PartitionID);
+
+    if (n_bytes >= 1000000 - sizeof(HashIntoType) - sizeof(PartitionID)) {
+      outfile.write(buf, n_bytes);
+      n_bytes = 0;
+    }
+  }
+  if (n_bytes) {
+    outfile.write(buf, n_bytes);
+  }
+  outfile.close();
+
+  ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
+
+  n_bytes = 0;
+  for (PartitionSet::const_iterator ss = surrender_set.begin();
+       ss != surrender_set.end(); ss++) {
+    PartitionID p_id = *ss;
+    
+    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+    n_bytes += sizeof(PartitionID);
+
+    if (n_bytes >= 1000000 - sizeof(PartitionID)) {
+      surrenderfile.write(buf, n_bytes);
+      n_bytes = 0;
+    }
+  }
+  if (n_bytes) {
+    surrenderfile.write(buf, n_bytes);
+  }
+  surrenderfile.close();
+}
+					 
+
+void Hashtable::_load_partitionmap(string infilename,
+				   string surrenderfilename)
+{
+  ifstream infile(infilename.c_str(), ios::binary);
+  char buf[1000000];
+  unsigned int n_bytes = 0;
+  unsigned int loaded = 0;
+
+  cout << "loading... " << infilename << "\n";
+
+  HashIntoType kmer;
+  PartitionID p_id;
+  PartitionSet partitions;
+
+  while (!infile.eof()) {
+    infile.read(buf, 1000000);
+    n_bytes = infile.gcount();
+
+    for (unsigned int i = 0; i < n_bytes;) {
+      // memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      i += sizeof(HashIntoType);
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      partitions.insert(p_id);
+
+      loaded++;
+    }
+  }
+
+  PartitionPtrMap ppmap;
+  for (PartitionSet::const_iterator si = partitions.begin();
+      si != partitions.end(); si++) {
+    PartitionID * p = new PartitionID;
+    *p = *(si);
+    ppmap[*p] = p;
+
+    PartitionPtrSet * s = new PartitionPtrSet();
+    s->insert(p);
+    reverse_pmap[*p] = s;
+  }
+
+  infile.clear();
+  infile.seekg(0, ios::beg);
+
+  while (!infile.eof()) {
+    infile.read(buf, 1000000);
+    n_bytes = infile.gcount();
+
+    for (unsigned int i = 0; i < n_bytes;) {
+      memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      i += sizeof(HashIntoType);
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      partition_map[kmer] = ppmap[p_id];
+    }
+  }
+
+  cout << "loaded: " << loaded << "\n";
+
+  ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
+  n_bytes = 0;
+  while (!infile.eof()) {
+    infile.read(buf, 1000000);
+    n_bytes = infile.gcount();
+
+    for (unsigned int i = 0; i < n_bytes;) {
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      surrender_set.insert(p_id);
+    }
+  }
 }
 					 
 
@@ -1366,22 +1515,19 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 				const HashIntoType kmer_r,
 				HashIntoType& tagged_kmer)
 {
-  bool found = false;
   PartitionMap::const_iterator fi = partition_map.find(kmer_f);
   if (fi != partition_map.end()) {
     tagged_kmer = kmer_f;
-    found = true;
+    return true;
   }
 
-  if (!found) {
-    fi = partition_map.find(kmer_r);
-    if (fi != partition_map.end()) {
-      tagged_kmer = kmer_r;
-      found = true;
-    }
+  fi = partition_map.find(kmer_r);
+  if (fi != partition_map.end()) {
+    tagged_kmer = kmer_r;
+    return true;
   }
 
-  return found;
+  return false;
 }
 		     
 
@@ -1392,6 +1538,14 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					SeenSet& tagged_kmers,
 					bool& surrender)
 {
+  HashIntoType tagged_kmer;
+  if (_is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
+    //std::cout << "already tagged! " << kmer_f << "\n";
+    tagged_kmers.insert(tagged_kmer);
+    return;
+  }
+  //std::cout << "no find: " << kmer_f << "\n";
+
   HashIntoType f, r;
   bool first = true;
   NodeQueue node_q;
@@ -1429,7 +1583,6 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.
-    HashIntoType tagged_kmer;
     if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
       tagged_kmers.insert(tagged_kmer);
       continue;
