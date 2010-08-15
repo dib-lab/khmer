@@ -1,27 +1,42 @@
 #! /usr/bin/env python
 import khmer, sys
 
-def report_and_checkpoint(name, count1, count2):
-    global ht
-    print name, count1, count2
-
-    if name == 'do_truncated_partition/read' and count1 % 100000 == 0:
-        ht.save_checkpoint(sys.argv[1] + '.pmap',
-                           sys.argv[1] + '.surrender')
-
+CHECKPOINT_PERIOD=1000000
 K=32
-HASHTABLE_SIZE=int(4**16)+1
+HASHTABLE_SIZE=int(4**15)+1
 
-infile = sys.argv[1]
-outfile = sys.argv[2]
+def make_reporting_fn(ht, filename, period):
 
-ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
+    def _report(name, count1, count2,
+                ht=ht, f=filename, checkpoint_period=period):
+        print name, count1, count2
+        if name == 'do_truncated_partition/read' and \
+               count1 % checkpoint_period == 0:
+            ht.save_checkpoint(f + '.pmap',
+                               f + '.surrender')
 
-#ht.load_checkpoint('x/1m-filtered.fa.pmap.end', 'x/1m-filtered.fa.surrender.end')
+    return _report
 
-#n_partitions = ht.do_exact_partition(infile)
-n_partitions = ht.do_truncated_partition(infile, outfile, report_and_checkpoint)
-print n_partitions, 'partitions kept'
+def main():
+    infile = sys.argv[1]
+    outfile = sys.argv[2]
+    k = K
+    hashtable_size = HASHTABLE_SIZE
+    checkpoint_period = CHECKPOINT_PERIOD
 
-ht.save_checkpoint(sys.argv[1] + '.pmap.end',
-                   sys.argv[1] + '.surrender.end')
+    print 'making hashtable: k=%d, hashtable size=%dbn' % (k,
+                                                          hashtable_size / 1e9)
+    ht = khmer.new_hashtable(k, hashtable_size)
+
+    report_fn = make_reporting_fn(ht, outfile, checkpoint_period)
+    
+    n_partitions = ht.do_truncated_partition(infile, outfile, report_fn)
+    print n_partitions, 'partitions kept'
+
+    ht.save_checkpoint(infile + '.pmap.end',
+                       outfile + '.surrender.end')
+
+if __name__ == '__main__':
+    main()
+
+    
