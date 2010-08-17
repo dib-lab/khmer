@@ -1322,51 +1322,18 @@ PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
 {
   SeenSet::iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = partition_map[*it];
-
-  partition_map[kmer_f] = this_partition_p;
   assert(this_partition_p != NULL);
 
-  unsigned int min_partition_id = *this_partition_p;
   it++;
-
   for (; it != tagged_kmers.end(); ++it) {
-    unsigned int pid = *(partition_map[*it]);
-    if (pid < min_partition_id) {
-      min_partition_id = pid;
+    PartitionID * pp_id = partition_map[*it];
+    if (*pp_id != *this_partition_p) {
+      _add_partition_ptr(&this_partition_p, &pp_id);
     }
   }
 
-  PartitionPtrSet * master = reverse_pmap[min_partition_id];
-  for (it = tagged_kmers.begin(); it != tagged_kmers.end(); ++it) {
-    unsigned int * partition_p = partition_map[*it];
-    if (*partition_p != min_partition_id) {
-      PartitionPtrSet * s = reverse_pmap[*partition_p];
-      reverse_pmap.erase(*partition_p);
-      
-      PartitionID * pp2;
-      for (PartitionPtrSet::const_iterator si = s->begin();
-	   si != s->end(); si++) {
-	pp2 = (*si);
-	*pp2 = min_partition_id;
-	master->insert(pp2);
-      }
-      delete s;
-    }
-  }
-
-  if (*this_partition_p != min_partition_id) {
-    PartitionPtrSet * s = reverse_pmap[*this_partition_p];
-    reverse_pmap.erase(*this_partition_p);
-      
-    PartitionID * pp2;
-    for (PartitionPtrSet::const_iterator si = s->begin();
-	 si != s->end(); si++) {
-      pp2 = (*si);
-      *pp2 = min_partition_id;
-      master->insert(pp2);
-    }
-    delete s;
-  }
+  assert(this_partition_p != NULL);
+  partition_map[kmer_f] = this_partition_p;
 
   return *this_partition_p;
 }
@@ -1643,5 +1610,70 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     }
 
     first = false;
+  }
+}
+
+///
+
+void Hashtable::_add_partition_ptr(PartitionID **orig_pp, PartitionID **new_pp)
+{
+  if (*orig_pp == NULL) {
+    PartitionID p = next_partition_id;
+    *orig_pp = new PartitionID(p);
+
+    PartitionPtrSet * s = new PartitionPtrSet();
+    s->insert(*orig_pp);
+    reverse_pmap[p] = s;
+
+    next_partition_id++;
+  }
+
+  if (*new_pp == NULL) {
+    *new_pp = *orig_pp;
+    // done.
+  } else {
+    PartitionPtrSet * s = reverse_pmap[**orig_pp];
+    PartitionPtrSet * t = reverse_pmap[**new_pp];
+    reverse_pmap.erase(**new_pp);
+    
+    for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
+      PartitionID * iter_pp;
+      iter_pp = *pi;
+
+      *iter_pp = **orig_pp;
+      s->insert(iter_pp);
+    }
+    delete t;
+  }
+}
+
+void Hashtable::_validate_pmap()
+{
+  cout << "validating partition_map\n";
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    //HashIntoType kmer = (*pi).first;
+    PartitionID * pp_id = (*pi).second;
+
+    if (pp_id != NULL) {
+      assert(*pp_id >= 1);
+      assert(*pp_id < next_partition_id);
+    }
+  }
+
+  cout << "validating reverse_pmap -- st 1\n";
+  for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
+       ri != reverse_pmap.end(); ri++) {
+    PartitionID p = (*ri).first;
+    PartitionPtrSet *s = (*ri).second;
+
+    for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
+	 si++) {
+      PartitionID * pp;
+      pp = *si;
+
+      assert (p == *pp);
+    }
   }
 }
