@@ -1539,6 +1539,7 @@ static PyObject * hash_load_checkpoint(PyObject * self, PyObject * args)
   }
 
   hashtable->_load_partitionmap(filename, filename2);
+  hashtable->_validate_pmap();
 
   Py_INCREF(Py_None);
   return Py_None;

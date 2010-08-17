@@ -1431,6 +1431,7 @@ void Hashtable::_load_partitionmap(string infilename,
     }
   }
 
+  PartitionID max_p_id = 1;
   PartitionPtrMap ppmap;
   for (PartitionSet::const_iterator si = partitions.begin();
       si != partitions.end(); si++) {
@@ -1441,7 +1442,12 @@ void Hashtable::_load_partitionmap(string infilename,
     PartitionPtrSet * s = new PartitionPtrSet();
     s->insert(p);
     reverse_pmap[*p] = s;
+
+    if (max_p_id < *p) {
+      max_p_id = *p;
+    }
   }
+  next_partition_id = max_p_id + 1;
 
   infile.clear();
   infile.seekg(0, ios::beg);
