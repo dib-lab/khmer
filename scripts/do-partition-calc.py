@@ -18,8 +18,8 @@ parser.add_option("-s", "--size", dest="htsize4", help="hashtable size",
 parser.add_option("-c", "--checkpoint", dest="checkpoint",
                   help="checkpoint period", 
                   default=CHECKPOINT_PERIOD, type=int)
-parser.add_option("--load", dest="load_checkpoint_from",
-              help="load checkpoint data from <file>.pmap / <file>.surrender",
+parser.add_option("--load", dest="load_partitionmap_from",
+              help="load partitionmap data from <file>.pmap / <file>.surrender",
                   default=None)
 
 ###
@@ -31,8 +31,7 @@ def make_reporting_fn(ht, filename, period):
         print name, count1, count2
         if name == 'do_truncated_partition/read' and \
                count1 % checkpoint_period == 0:
-            ht.save_checkpoint(f + '.pmap',
-                               f + '.surrender')
+            ht.save_partitionmap(f + '.pmap', f + '.surrender')
 
     return _report
 
@@ -55,10 +54,11 @@ def main():
 
     ###
 
-    if options.load_checkpoint_from:
-        print '** loading checkpoint data from', options.load_checkpoint_from
-        f = options.load_checkpoint_from
-        ht.load_checkpoint(f + '.pmap', f + '.surrender')
+    if options.load_partitionmap_from:
+        print '** loading partitionmap data from', \
+              options.load_partitionmap_from
+        f = options.load_partitionmap_from
+        ht.load_partitionmap(f + '.pmap', f + '.surrender')
 
     ###
 
@@ -67,8 +67,8 @@ def main():
     n_partitions = ht.do_truncated_partition(infile, outfile, report_fn)
     print n_partitions, 'partitions kept'
 
-    ht.save_checkpoint(outfile + '.end.pmap',
-                       outfile + '.end.surrender')
+    ht.save_partitionmap(outfile + '.end.pmap',
+                         outfile + '.end.surrender')
 
 if __name__ == '__main__':
     main()
