@@ -55,6 +55,22 @@ namespace khmer {
 
     void _add_partition_ptr(PartitionID **orig_pp, PartitionID **new_pp);
 
+    void _clear_partitions() {
+      for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
+	   ri != reverse_pmap.end(); ri++) {
+	PartitionPtrSet * s = (*ri).second;
+
+	for (PartitionPtrSet::iterator pi = s->begin(); pi != s->end(); pi++) {
+	  PartitionID * pp = (*pi);
+	  delete pp;
+	}
+	delete s;
+      }
+      partition_map.clear();
+      surrender_set.clear();
+      next_partition_id = 1;
+    }
+
   public:
     void _validate_pmap();
 
@@ -75,6 +91,7 @@ namespace khmer {
 
     ~Hashtable() {
       if (_counts) { delete _counts; _counts = NULL; }
+      _clear_partitions();
     }
 
 #if 0
