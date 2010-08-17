@@ -1373,8 +1373,6 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
 						      output,
     						      _report_fn,
 						      callback_obj);
-
-    hashtable->_validate_pmap();
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1539,6 +1537,20 @@ static PyObject * hash_load_partitionmap(PyObject * self, PyObject * args)
   }
 
   hashtable->load_partitionmap(filename, filename2);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash__validate_partitionmap(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
   hashtable->_validate_pmap();
 
   Py_INCREF(Py_None);
@@ -1577,6 +1589,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "output_partitions", hash_output_partitions, METH_VARARGS, "" },
   { "load_partitionmap", hash_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
+  { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
