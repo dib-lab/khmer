@@ -1625,7 +1625,7 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 
 void Hashtable::_add_partition_ptr(PartitionID **orig_pp, PartitionID **new_pp)
 {
-  if (*orig_pp == NULL) {
+  if (*orig_pp == NULL) {	// create a new partition
     PartitionID p = next_partition_id;
     *orig_pp = new PartitionID(p);
 
@@ -1636,10 +1636,10 @@ void Hashtable::_add_partition_ptr(PartitionID **orig_pp, PartitionID **new_pp)
     next_partition_id++;
   }
 
-  if (*new_pp == NULL) {
+  if (*new_pp == NULL) {	// add tag to a pre-existing partition
     *new_pp = *orig_pp;
     // done.
-  } else {
+  } else {			// join two pre-existing partitions
     PartitionPtrSet * s = reverse_pmap[**orig_pp];
     PartitionPtrSet * t = reverse_pmap[**new_pp];
     reverse_pmap.erase(**new_pp);
