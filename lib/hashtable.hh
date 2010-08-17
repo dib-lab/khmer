@@ -53,7 +53,7 @@ namespace khmer {
       memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
     }
 
-    void _add_partition_ptr(PartitionID **orig_pp, PartitionID **new_pp);
+    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
 
     void _clear_partitions() {
       for (ReversePartitionMap::iterator ri = reverse_pmap.begin();

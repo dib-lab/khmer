@@ -194,12 +194,12 @@ class Test_PythonAPI(object):
         print ht.consume(a)
         ppi = ht.find_all_tags(a[:20])
         pid = ht.assign_partition_id(ppi)
-        assert pid == 1, pid
+        assert pid == 0, pid
         
         print ht.consume(b)
         ppi = ht.find_all_tags(b[:20])
         pid = ht.assign_partition_id(ppi)
-        assert pid == 2, pid
+        assert pid == 0, pid
         
         print ht.consume(c)
         ppi = ht.find_all_tags(c[:20])
