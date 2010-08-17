@@ -86,7 +86,7 @@ class Test_SimpleConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out') # @CTB use tempfile
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 1, n
         
     def test_simple_30_12(self):
@@ -94,7 +94,7 @@ class Test_SimpleConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 3, n
 
 class Test_NoConnectMe4(object):
@@ -103,7 +103,7 @@ class Test_NoConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph3.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 2, n
         
     def test_merge_32_12(self):
@@ -111,7 +111,7 @@ class Test_NoConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph3.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 4, n
 
 class Test_AnotherConnectMe4(object):
@@ -120,7 +120,7 @@ class Test_AnotherConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 2, n
 
     def test_complex_31_12(self):
@@ -128,7 +128,7 @@ class Test_AnotherConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 4, n
 
     def test_complex_32_12(self):
@@ -136,7 +136,7 @@ class Test_AnotherConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 5, n
 
 
@@ -146,7 +146,7 @@ class Test_MoreConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph5.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 1, n
 
     def test_complex5_24_12(self):
@@ -154,7 +154,7 @@ class Test_MoreConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph5.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 6, n
 
     def test_complex6_32_12(self):
@@ -162,7 +162,23 @@ class Test_MoreConnectMe4(object):
 
         filename = os.path.join(thisdir, 'test-graph6.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
-        n = ht.do_truncated_partition(filename, outfile, 0)
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 103, n
+
+    def test_complex6_32_12_save(self):
+        ht = khmer.new_hashtable(20, 4**12+1)
+
+        filename = os.path.join(thisdir, 'test-graph6.fa')
+        outfile = os.path.join(thisdir, 'test-trunc.out')
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 103, n
+
+        o1 = os.path.join(thisdir, 'xx.pmap')
+        o2 = os.path.join(thisdir, 'xx.surrender')
+        ht.save_partitionmap(o1, o2)
+        ht.load_partitionmap(o1, o2)
+
+        n = ht.do_truncated_partition(filename, outfile)
         assert n == 103, n
 
 ###

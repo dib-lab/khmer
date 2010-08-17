@@ -1508,7 +1508,7 @@ static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
-static PyObject * hash_save_checkpoint(PyObject * self, PyObject * args)
+static PyObject * hash_save_partitionmap(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
@@ -1526,7 +1526,7 @@ static PyObject * hash_save_checkpoint(PyObject * self, PyObject * args)
   return Py_None;
 }
 
-static PyObject * hash_load_checkpoint(PyObject * self, PyObject * args)
+static PyObject * hash_load_partitionmap(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
@@ -1575,8 +1575,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "assign_partition_id", hash_assign_partition_id, METH_VARARGS, "" },
   { "assign_partition_id_th", hash_assign_partition_id_th, METH_VARARGS, "" },
   { "output_partitions", hash_output_partitions, METH_VARARGS, "" },
-  { "load_checkpoint", hash_load_checkpoint, METH_VARARGS, "" },
-  { "save_checkpoint", hash_save_checkpoint, METH_VARARGS, "" },
+  { "load_partitionmap", hash_load_partitionmap, METH_VARARGS, "" },
+  { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
