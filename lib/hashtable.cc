@@ -1359,6 +1359,55 @@ PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
   return *this_partition_p;
 }
 
+///
+
+void Hashtable::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
+{
+  PartitionPtrSet * s = reverse_pmap[*orig_pp];
+  PartitionPtrSet * t = reverse_pmap[*new_pp];
+  reverse_pmap.erase(*new_pp);
+    
+  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
+    PartitionID * iter_pp;
+    iter_pp = *pi;
+
+    *iter_pp = *orig_pp;
+    s->insert(iter_pp);
+  }
+  delete t;
+}
+
+void Hashtable::_validate_pmap()
+{
+  // cout << "validating partition_map\n";
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    //HashIntoType kmer = (*pi).first;
+    PartitionID * pp_id = (*pi).second;
+
+    if (pp_id != NULL) {
+      assert(*pp_id >= 1);
+      assert(*pp_id < next_partition_id);
+    }
+  }
+
+  // cout << "validating reverse_pmap -- st 1\n";
+  for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
+       ri != reverse_pmap.end(); ri++) {
+    PartitionID p = (*ri).first;
+    PartitionPtrSet *s = (*ri).second;
+
+    for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
+	 si++) {
+      PartitionID * pp;
+      pp = *si;
+
+      assert (p == *pp);
+    }
+  }
+}
+
 bool Hashtable::_do_continue(const HashIntoType kmer,
 			     const SeenSet& keeper)
 {
@@ -1367,157 +1416,6 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
 
   return (i == keeper.end());
 }
-
-void Hashtable::save_partitionmap(string pmap_filename,
-				  string surrender_filename)
-{
-  ofstream outfile(pmap_filename.c_str(), ios::binary);
-  char buf[1000000];
-  unsigned int n_bytes = 0;
-
-  // cout << "checkpointing... " << partition_map.size() << "; " << reverse_pmap.size() << " non-unitary partitions\n";
-
-  PartitionMap::const_iterator pi = partition_map.begin();
-  for (; pi != partition_map.end(); pi++) {
-    HashIntoType kmer;
-    PartitionID p_id;
-
-    kmer = pi->first;
-    if (pi->second != NULL) {
-      p_id = *(pi->second);
-    } else {
-      p_id = 0;
-    }
-
-    memcpy(&buf[n_bytes], &kmer, sizeof(HashIntoType));
-    n_bytes += sizeof(HashIntoType);
-    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
-    n_bytes += sizeof(PartitionID);
-
-    if (n_bytes >= 1000000 - sizeof(HashIntoType) - sizeof(PartitionID)) {
-      outfile.write(buf, n_bytes);
-      n_bytes = 0;
-    }
-  }
-  if (n_bytes) {
-    outfile.write(buf, n_bytes);
-  }
-  outfile.close();
-
-  ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
-
-  n_bytes = 0;
-  for (PartitionSet::const_iterator ss = surrender_set.begin();
-       ss != surrender_set.end(); ss++) {
-    PartitionID p_id = *ss;
-    
-    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
-    n_bytes += sizeof(PartitionID);
-
-    if (n_bytes >= 1000000 - sizeof(PartitionID)) {
-      surrenderfile.write(buf, n_bytes);
-      n_bytes = 0;
-    }
-  }
-  if (n_bytes) {
-    surrenderfile.write(buf, n_bytes);
-  }
-  surrenderfile.close();
-}
-					 
-
-void Hashtable::load_partitionmap(string infilename,
-				  string surrenderfilename)
-{
-  _clear_partitions();
-
-  ifstream infile(infilename.c_str(), ios::binary);
-  char buf[1000000];
-  unsigned int n_bytes = 0;
-  unsigned int loaded = 0;
-
-  // cout << "loading... " << infilename << "\n";
-
-  HashIntoType kmer;
-  PartitionID p_id;
-  PartitionSet partitions;
-
-  while (!infile.eof()) {
-    infile.read(buf, 1000000);
-    n_bytes = infile.gcount();
-
-    for (unsigned int i = 0; i < n_bytes;) {
-      // memcpy(&kmer, &buf[i], sizeof(HashIntoType));
-      i += sizeof(HashIntoType);
-      memcpy(&p_id, &buf[i], sizeof(PartitionID));
-      i += sizeof(PartitionID);
-
-      partitions.insert(p_id);
-
-      loaded++;
-    }
-  }
-
-  PartitionID max_p_id = 1;
-  PartitionPtrMap ppmap;
-  for (PartitionSet::const_iterator si = partitions.begin();
-      si != partitions.end(); si++) {
-    if (*si == 0) {
-      continue;
-    }
-
-    PartitionID * p = new PartitionID;
-    *p = *(si);
-    ppmap[*p] = p;
-
-    PartitionPtrSet * s = new PartitionPtrSet();
-    s->insert(p);
-    reverse_pmap[*p] = s;
-
-    if (max_p_id < *p) {
-      max_p_id = *p;
-    }
-  }
-  next_partition_id = max_p_id + 1;
-
-  infile.clear();
-  infile.seekg(0, ios::beg);
-
-  while (!infile.eof()) {
-    infile.read(buf, 1000000);
-    n_bytes = infile.gcount();
-
-    for (unsigned int i = 0; i < n_bytes;) {
-      memcpy(&kmer, &buf[i], sizeof(HashIntoType));
-      i += sizeof(HashIntoType);
-      memcpy(&p_id, &buf[i], sizeof(PartitionID));
-      i += sizeof(PartitionID);
-
-      if (p_id == 0) {
-	partition_map[kmer] = NULL;
-      } else {
-	partition_map[kmer] = ppmap[p_id];
-      } 
-    }
-  }
-
-  // cout << "loaded: " << loaded << "; " << partitions.size() << " partitions\n";
-
-  ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
-  n_bytes = 0;
-  while (!infile.eof()) {
-    infile.read(buf, 1000000);
-    n_bytes = infile.gcount();
-
-    for (unsigned int i = 0; i < n_bytes;) {
-      memcpy(&p_id, &buf[i], sizeof(PartitionID));
-      i += sizeof(PartitionID);
-
-      surrender_set.insert(p_id);
-    }
-  }
-}
-					 
 
 bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 				const HashIntoType kmer_r,
@@ -1656,51 +1554,157 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
   }
 }
 
-///
+///////////////////////////////////////////////////////////////////////
 
-void Hashtable::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
+// load partition maps from & save to disk 
+
+void Hashtable::save_partitionmap(string pmap_filename,
+				  string surrender_filename)
 {
-  PartitionPtrSet * s = reverse_pmap[*orig_pp];
-  PartitionPtrSet * t = reverse_pmap[*new_pp];
-  reverse_pmap.erase(*new_pp);
+  ofstream outfile(pmap_filename.c_str(), ios::binary);
+  char buf[1000000];
+  unsigned int n_bytes = 0;
+
+  // cout << "checkpointing... " << partition_map.size() << "; " << reverse_pmap.size() << " non-unitary partitions\n";
+
+  PartitionMap::const_iterator pi = partition_map.begin();
+  for (; pi != partition_map.end(); pi++) {
+    HashIntoType kmer;
+    PartitionID p_id;
+
+    kmer = pi->first;
+    if (pi->second != NULL) {
+      p_id = *(pi->second);
+    } else {
+      p_id = 0;
+    }
+
+    memcpy(&buf[n_bytes], &kmer, sizeof(HashIntoType));
+    n_bytes += sizeof(HashIntoType);
+    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+    n_bytes += sizeof(PartitionID);
+
+    if (n_bytes >= 1000000 - sizeof(HashIntoType) - sizeof(PartitionID)) {
+      outfile.write(buf, n_bytes);
+      n_bytes = 0;
+    }
+  }
+  if (n_bytes) {
+    outfile.write(buf, n_bytes);
+  }
+  outfile.close();
+
+  ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
+
+  n_bytes = 0;
+  for (PartitionSet::const_iterator ss = surrender_set.begin();
+       ss != surrender_set.end(); ss++) {
+    PartitionID p_id = *ss;
     
-  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
-    PartitionID * iter_pp;
-    iter_pp = *pi;
+    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+    n_bytes += sizeof(PartitionID);
 
-    *iter_pp = *orig_pp;
-    s->insert(iter_pp);
+    if (n_bytes >= 1000000 - sizeof(PartitionID)) {
+      surrenderfile.write(buf, n_bytes);
+      n_bytes = 0;
+    }
   }
-  delete t;
+  if (n_bytes) {
+    surrenderfile.write(buf, n_bytes);
+  }
+  surrenderfile.close();
 }
-
-void Hashtable::_validate_pmap()
+					 
+void Hashtable::load_partitionmap(string infilename,
+				  string surrenderfilename)
 {
-  // cout << "validating partition_map\n";
+  _clear_partitions();
 
-  for (PartitionMap::const_iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    //HashIntoType kmer = (*pi).first;
-    PartitionID * pp_id = (*pi).second;
+  ifstream infile(infilename.c_str(), ios::binary);
+  char buf[1000000];
+  unsigned int n_bytes = 0;
+  unsigned int loaded = 0;
 
-    if (pp_id != NULL) {
-      assert(*pp_id >= 1);
-      assert(*pp_id < next_partition_id);
+  // cout << "loading... " << infilename << "\n";
+
+  HashIntoType kmer;
+  PartitionID p_id;
+  PartitionSet partitions;
+
+  while (!infile.eof()) {
+    infile.read(buf, 1000000);
+    n_bytes = infile.gcount();
+
+    for (unsigned int i = 0; i < n_bytes;) {
+      // memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      i += sizeof(HashIntoType);
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      partitions.insert(p_id);
+
+      loaded++;
     }
   }
 
-  // cout << "validating reverse_pmap -- st 1\n";
-  for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
-       ri != reverse_pmap.end(); ri++) {
-    PartitionID p = (*ri).first;
-    PartitionPtrSet *s = (*ri).second;
+  PartitionID max_p_id = 1;
+  PartitionPtrMap ppmap;
+  for (PartitionSet::const_iterator si = partitions.begin();
+      si != partitions.end(); si++) {
+    if (*si == 0) {
+      continue;
+    }
 
-    for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
-	 si++) {
-      PartitionID * pp;
-      pp = *si;
+    PartitionID * p = new PartitionID;
+    *p = *(si);
+    ppmap[*p] = p;
 
-      assert (p == *pp);
+    PartitionPtrSet * s = new PartitionPtrSet();
+    s->insert(p);
+    reverse_pmap[*p] = s;
+
+    if (max_p_id < *p) {
+      max_p_id = *p;
+    }
+  }
+  next_partition_id = max_p_id + 1;
+
+  infile.clear();
+  infile.seekg(0, ios::beg);
+
+  while (!infile.eof()) {
+    infile.read(buf, 1000000);
+    n_bytes = infile.gcount();
+
+    for (unsigned int i = 0; i < n_bytes;) {
+      memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      i += sizeof(HashIntoType);
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      if (p_id == 0) {
+	partition_map[kmer] = NULL;
+      } else {
+	partition_map[kmer] = ppmap[p_id];
+      } 
+    }
+  }
+
+  // cout << "loaded: " << loaded << "; " << partitions.size() << " partitions\n";
+
+  ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
+  n_bytes = 0;
+  while (!infile.eof()) {
+    infile.read(buf, 1000000);
+    n_bytes = infile.gcount();
+
+    for (unsigned int i = 0; i < n_bytes;) {
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      surrender_set.insert(p_id);
     }
   }
 }
+					 
+
