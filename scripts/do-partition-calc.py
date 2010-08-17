@@ -67,10 +67,7 @@ def main():
     n_partitions = ht.do_truncated_partition(infile, outfile, report_fn)
     print n_partitions, 'partitions kept'
 
-    ht.save_partitionmap(outfile + '.end.pmap',
-                         outfile + '.end.surrender')
+    ht.save_partitionmap(outfile + '.end.pmap', outfile + '.end.surrender')
 
 if __name__ == '__main__':
     main()
-
-    
