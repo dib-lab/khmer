@@ -172,6 +172,7 @@ class Test_MoreConnectMe4(object):
         outfile = os.path.join(thisdir, 'test-trunc.out')
         n = ht.do_truncated_partition(filename, outfile)
         assert n == 103, n
+        ht._validate_partitionmap()
 
         o1 = os.path.join(thisdir, 'xx.pmap')
         o2 = os.path.join(thisdir, 'xx.surrender')
@@ -180,6 +181,7 @@ class Test_MoreConnectMe4(object):
 
         n = ht.do_truncated_partition(filename, outfile)
         assert n == 103, n
+        ht._validate_partitionmap()
 
 ###
 

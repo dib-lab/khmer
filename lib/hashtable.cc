@@ -1375,7 +1375,7 @@ void Hashtable::save_partitionmap(string pmap_filename,
   char buf[1000000];
   unsigned int n_bytes = 0;
 
-  cout << "checkpointing... " << partition_map.size() << "; " << reverse_pmap.size() << " non-unitary partitions\n";
+  // cout << "checkpointing... " << partition_map.size() << "; " << reverse_pmap.size() << " non-unitary partitions\n";
 
   PartitionMap::const_iterator pi = partition_map.begin();
   for (; pi != partition_map.end(); pi++) {
@@ -1436,7 +1436,7 @@ void Hashtable::load_partitionmap(string infilename,
   unsigned int n_bytes = 0;
   unsigned int loaded = 0;
 
-  cout << "loading... " << infilename << "\n";
+  // cout << "loading... " << infilename << "\n";
 
   HashIntoType kmer;
   PartitionID p_id;
@@ -1501,7 +1501,7 @@ void Hashtable::load_partitionmap(string infilename,
     }
   }
 
-  cout << "loaded: " << loaded << "; " << partitions.size() << " partitions\n";
+  // cout << "loaded: " << loaded << "; " << partitions.size() << " partitions\n";
 
   ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
   n_bytes = 0;
@@ -1676,7 +1676,7 @@ void Hashtable::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
 
 void Hashtable::_validate_pmap()
 {
-  cout << "validating partition_map\n";
+  // cout << "validating partition_map\n";
 
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
@@ -1689,7 +1689,7 @@ void Hashtable::_validate_pmap()
     }
   }
 
-  cout << "validating reverse_pmap -- st 1\n";
+  // cout << "validating reverse_pmap -- st 1\n";
   for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
        ri != reverse_pmap.end(); ri++) {
     PartitionID p = (*ri).first;
