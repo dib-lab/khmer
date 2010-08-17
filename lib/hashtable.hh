@@ -53,7 +53,11 @@ namespace khmer {
       memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
     }
 
+    void _add_partition_ptr(PartitionID **orig_pp, PartitionID **new_pp);
+
   public:
+    void _validate_pmap();
+
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
       next_partition_id = 1;

@@ -1373,6 +1373,8 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
 						      output,
     						      _report_fn,
 						      callback_obj);
+
+    hashtable->_validate_pmap();
   } catch (_khmer_signal &e) {
     return NULL;
   }
