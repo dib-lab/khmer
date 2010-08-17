@@ -1347,8 +1347,8 @@ bool Hashtable::_do_continue(const HashIntoType kmer,
   return (i == keeper.end());
 }
 
-void Hashtable::_checkpoint_partitionmap(string pmap_filename,
-					 string surrender_filename)
+void Hashtable::save_partitionmap(string pmap_filename,
+				  string surrender_filename)
 {
   ofstream outfile(pmap_filename.c_str(), ios::binary);
   char buf[1000000];
@@ -1401,9 +1401,11 @@ void Hashtable::_checkpoint_partitionmap(string pmap_filename,
 }
 					 
 
-void Hashtable::_load_partitionmap(string infilename,
-				   string surrenderfilename)
+void Hashtable::load_partitionmap(string infilename,
+				  string surrenderfilename)
 {
+  _clear_partitions();
+
   ifstream infile(infilename.c_str(), ios::binary);
   char buf[1000000];
   unsigned int n_bytes = 0;
