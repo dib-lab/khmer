@@ -325,10 +325,8 @@ namespace khmer {
     PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
 
-    void _checkpoint_partitionmap(std::string outfile,
-				  std::string surrenderfile);
-    void _load_partitionmap(std::string infile,
-			    std::string surrenderfile);
+    void save_partitionmap(std::string outfile, std::string surrenderfile);
+    void load_partitionmap(std::string infile, std::string surrenderfile);
   };
 
   class HashtableIntersect {
