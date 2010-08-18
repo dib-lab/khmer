@@ -6,6 +6,7 @@
 #include "hashtable.hh"
 #include "parsers.hh"
 
+#define IO_BUF_SIZE 50*1000*1000
 #define CALLBACK_PERIOD 10000
 #define PARTITION_ALL_TAG_DEPTH 500
 #define PARTITION_MAX_TAG_EXAMINED 1e6
@@ -1562,7 +1563,8 @@ void Hashtable::save_partitionmap(string pmap_filename,
 				  string surrender_filename)
 {
   ofstream outfile(pmap_filename.c_str(), ios::binary);
-  char buf[1000000];
+  char * buf = NULL;
+  buf = new char[IO_BUF_SIZE];
   unsigned int n_bytes = 0;
 
   // cout << "checkpointing... " << partition_map.size() << "; " << reverse_pmap.size() << " non-unitary partitions\n";
@@ -1584,7 +1586,7 @@ void Hashtable::save_partitionmap(string pmap_filename,
     memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
     n_bytes += sizeof(PartitionID);
 
-    if (n_bytes >= 1000000 - sizeof(HashIntoType) - sizeof(PartitionID)) {
+    if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(PartitionID)) {
       outfile.write(buf, n_bytes);
       n_bytes = 0;
     }
@@ -1604,7 +1606,7 @@ void Hashtable::save_partitionmap(string pmap_filename,
     memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
     n_bytes += sizeof(PartitionID);
 
-    if (n_bytes >= 1000000 - sizeof(PartitionID)) {
+    if (n_bytes >= IO_BUF_SIZE - sizeof(PartitionID)) {
       surrenderfile.write(buf, n_bytes);
       n_bytes = 0;
     }
@@ -1621,21 +1623,29 @@ void Hashtable::load_partitionmap(string infilename,
   _clear_partitions();
 
   ifstream infile(infilename.c_str(), ios::binary);
-  char buf[1000000];
+  char * buf = NULL;
+  buf = new char[IO_BUF_SIZE];
+
   unsigned int n_bytes = 0;
   unsigned int loaded = 0;
+  unsigned int remainder;
 
-  // cout << "loading... " << infilename << "\n";
+  assert(infile.is_open());
 
   HashIntoType kmer;
   PartitionID p_id;
   PartitionSet partitions;
 
+  remainder = 0;
   while (!infile.eof()) {
-    infile.read(buf, 1000000);
-    n_bytes = infile.gcount();
+    unsigned int i;
 
-    for (unsigned int i = 0; i < n_bytes;) {
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
       // memcpy(&kmer, &buf[i], sizeof(HashIntoType));
       i += sizeof(HashIntoType);
       memcpy(&p_id, &buf[i], sizeof(PartitionID));
@@ -1645,6 +1655,8 @@ void Hashtable::load_partitionmap(string infilename,
 
       loaded++;
     }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
   }
 
   PartitionID max_p_id = 1;
@@ -1672,11 +1684,16 @@ void Hashtable::load_partitionmap(string infilename,
   infile.clear();
   infile.seekg(0, ios::beg);
 
+  remainder = 0;
   while (!infile.eof()) {
-    infile.read(buf, 1000000);
-    n_bytes = infile.gcount();
+    unsigned int i;
 
-    for (unsigned int i = 0; i < n_bytes;) {
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
       memcpy(&kmer, &buf[i], sizeof(HashIntoType));
       i += sizeof(HashIntoType);
       memcpy(&p_id, &buf[i], sizeof(PartitionID));
@@ -1688,23 +1705,38 @@ void Hashtable::load_partitionmap(string infilename,
 	partition_map[kmer] = ppmap[p_id];
       } 
     }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
   }
 
   // cout << "loaded: " << loaded << "; " << partitions.size() << " partitions\n";
 
   ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
-  n_bytes = 0;
-  while (!infile.eof()) {
-    infile.read(buf, 1000000);
-    n_bytes = infile.gcount();
 
-    for (unsigned int i = 0; i < n_bytes;) {
+  assert(surrenderfile.is_open());
+
+  n_bytes = 0;
+  remainder = 0;
+  while (!infile.eof()) {
+    unsigned int i;
+
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+
+    remainder = n_bytes % sizeof(PartitionID);
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
       memcpy(&p_id, &buf[i], sizeof(PartitionID));
       i += sizeof(PartitionID);
 
       surrender_set.insert(p_id);
     }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
   }
+
+  delete buf; buf = NULL;
 }
 					 
 
