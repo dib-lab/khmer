@@ -207,3 +207,54 @@ class Test_PythonAPI(object):
         ppi = ht.find_all_tags(c[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 1, pid
+
+###
+
+class Test_RandomData(object):
+    def test_random_20_a_succ(self):
+        ht = khmer.new_hashtable(20, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        outfile = filename + '.out'
+
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 1, n
+
+    def test_random_20_a_fail(self):
+        ht = khmer.new_hashtable(21, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        outfile = filename + '.out'
+
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 99, n
+
+    def test_random_20_b_succ(self):
+        ht = khmer.new_hashtable(20, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
+        outfile = filename + '.out'
+
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 1, n
+
+    def test_random_20_b_fail(self):
+        ht = khmer.new_hashtable(21, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
+        outfile = filename + '.out'
+
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 99, n
+
+    def test_random_31_a_succ(self):
+        ht = khmer.new_hashtable(31, 4**14+1)
+        filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
+        outfile = filename + '.out'
+
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 1, n
+
+    def test_random_31_b_fail(self):
+        ht = khmer.new_hashtable(32, 4**14+1)
+        filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
+        outfile = filename + '.out'
+
+        n = ht.do_truncated_partition(filename, outfile)
+        assert n == 999, n
