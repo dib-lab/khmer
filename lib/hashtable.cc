@@ -1448,10 +1448,9 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
   HashIntoType tagged_kmer;
   if (_is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
     //std::cout << "already tagged! " << kmer_f << "\n";
-    tagged_kmers.insert(tagged_kmer);
+    tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
     return;
   }
-  //std::cout << "no find: " << kmer_f << "\n";
 
   HashIntoType f, r;
   bool first = true;
