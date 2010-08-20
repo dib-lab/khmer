@@ -1758,8 +1758,7 @@ void Hashtable::do_subset_partition(const std::string infilename,
   SeenSet tagged_kmers;
   bool surrender;
 
-  SubsetPartition * subset_p = new SubsetPartition();
-  subset_p->fill(partition_map);
+  SubsetPartition * subset_p = new SubsetPartition(partition_map);
 
   while(!parser->is_complete()) {
     // increment read number
