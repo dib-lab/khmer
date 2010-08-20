@@ -19,6 +19,9 @@ namespace khmer {
   typedef std::set<PartitionID *> PartitionPtrSet;
   typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
+  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+
+  class Hashtable;
 
   class SubsetPartition {
     PartitionMap * master_map;
@@ -60,7 +63,8 @@ namespace khmer {
 				    SeenSet& tagged_kmers,
 				    bool surrender);
 
-    void merge(PartitionMap& master_map, PartitionSet& master_surrender);
+    void merge(PartitionMap& master_map, PartitionSet& master_surrender,
+	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
     void fill(PartitionMap& master_map);
   };
 
@@ -386,6 +390,12 @@ namespace khmer {
 			       unsigned long long &n_consumed,
 			       CallbackFn callback = NULL,
 			       void * callback_data = NULL);
+
+    PartitionID * get_new_partition() {
+      PartitionID* pp = new PartitionID(next_partition_id);
+      next_partition_id++;
+      return pp;
+    }
   };
 
   class HashtableIntersect {

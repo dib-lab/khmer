@@ -1804,7 +1804,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 
 void Hashtable::merge_subset_partition(SubsetPartition * subset_p)
 {
-  subset_p->merge(partition_map, surrender_set);
+  subset_p->merge(partition_map, surrender_set, this, reverse_pmap);
 }
 
 
@@ -1901,8 +1901,9 @@ void SubsetPartition::fill(PartitionMap& master_map)
   }
 }
 
-void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr)
+void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr, Hashtable * ht, ReversePartitionMap& reverse_pmap)
 {
+#if 0  
   for (PartitionSet::iterator si = surrender_set.begin();
        si != surrender_set.end(); si++) {
     master_surr.insert(*si);
@@ -1911,6 +1912,66 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr)
   for (PartitionMap::iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     master_map[pi->first] = pi->second;
+  }
+#endif // 0
+
+  PartitionToPartitionPMap mm;
+  PartitionID * pp;
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+
+    if (pi->second != NULL) {	// OK, it's labeled in our subset partition
+
+      pp = master_map[pi->first];
+      if (pp != NULL) {		// Ahh, and it's in our master table, too!
+
+	mm[*(pi->second)] = pp;	// @inefficient, yes? multiple assignment?
+
+      } else {			// OK, it's not in our master table yet.
+
+	// this means nothing until we've done the first sweep.
+
+      }
+    }
+  }
+
+  // second sweep.
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+
+    if (pi->second != NULL) {	// OK, it's labeled in our subset partition
+
+      pp = master_map[pi->first];
+      if (pp != NULL) {		// Ahh, and it's in our master table, too!
+
+	// do nothing; we've already provided a way to translate with mm.
+
+      } else {			// OK, it's not in our master table.
+
+	// is it in mm?
+	pp = mm[*(pi->second)];
+	if (pp != NULL) { // yep! translate.
+	  master_map[pi->first] = pp;
+	} else {		// nope! create/transfer/assign!
+	  pp = ht->get_new_partition();
+	  mm[*(pi->second)] = pp;
+	  master_map[pi->first] = pp;
+
+	  PartitionPtrSet * s = new PartitionPtrSet();
+	  s->insert(pp);
+	  reverse_pmap[*pp] = s;
+	}
+      }
+    }
+  }
+
+  for (PartitionSet::iterator si = surrender_set.begin();
+       si != surrender_set.end(); si++) {
+    PartitionID p = *si;
+    PartitionID translated_p = *(mm[p]);
+    master_surr.insert(translated_p);
   }
 }
 
