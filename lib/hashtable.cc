@@ -1741,7 +1741,7 @@ void Hashtable::load_partitionmap(string infilename,
   delete buf; buf = NULL;
 }
 
-void Hashtable::do_subset_partition(const std::string infilename,
+SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 				    unsigned int first_read_n,
 				    unsigned int last_read_n,
 				    CallbackFn callback,
@@ -1797,9 +1797,14 @@ void Hashtable::do_subset_partition(const std::string infilename,
     }
   }
 
-  subset_p->merge(partition_map, surrender_set);
-
   delete parser;
+
+  return subset_p;
+}
+
+void Hashtable::merge_subset_partition(SubsetPartition * subset_p)
+{
+  subset_p->merge(partition_map, surrender_set);
 }
 
 

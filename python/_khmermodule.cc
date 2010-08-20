@@ -1381,6 +1381,12 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
+void free_subset_partition_info(void * p)
+{
+  khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
+  delete subset_p;
+}
+
 static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1397,12 +1403,36 @@ static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
     return NULL;
   }
 
+  khmer::SubsetPartition * subset_p = NULL;
   try {
-    hashtable->do_subset_partition(filename, start_read_n, end_read_n,
-				   _report_fn, callback_obj);
+    subset_p = hashtable->do_subset_partition(filename,
+					      start_read_n, end_read_n,
+					      _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
+
+  return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+}
+
+static PyObject * hash_merge_subset(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * subset_obj;
+  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    return NULL;
+  }
+
+  if (!PyCObject_Check(subset_obj)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+  
+  hashtable->merge_subset_partition(subset_p);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1646,7 +1676,9 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "load_partitionmap", hash_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
-  { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },  {NULL, NULL, 0, NULL}           /* sentinel */
+  { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "merge_subset", hash_merge_subset, METH_VARARGS, "" },
+  {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
 static PyObject *

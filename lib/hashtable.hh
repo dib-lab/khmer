@@ -345,11 +345,13 @@ namespace khmer {
 				CallbackFn callback=0,
 				void * callback_data=0);
 
-    void do_subset_partition(const std::string infilename,
+    SubsetPartition * do_subset_partition(const std::string infilename,
 			     unsigned int first_read_n=0,
 			     unsigned int last_read_n=0,
 			     CallbackFn callback=0,
 			     void * callback_data=0);
+
+    void merge_subset_partition(SubsetPartition * subset_p);
 
     PartitionID assign_partition_id(HashIntoType kmer_f,
 			     SeenSet& tagged_kmers,
