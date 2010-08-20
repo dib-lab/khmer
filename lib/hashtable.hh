@@ -21,6 +21,7 @@ namespace khmer {
   typedef std::queue<HashIntoType> NodeQueue;
 
   class SubsetPartition {
+    PartitionMap * master_map;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
@@ -47,7 +48,10 @@ namespace khmer {
 					const HashIntoType kmer_f);
 
   public:
-    SubsetPartition() : next_partition_id(1) {}
+    SubsetPartition(PartitionMap& _master) : next_partition_id(1) {
+      master_map = &_master;
+      fill(_master);
+    }
     ~SubsetPartition() {
       _clear_partitions();
     }
