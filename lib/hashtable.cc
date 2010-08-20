@@ -1188,7 +1188,10 @@ void Hashtable::do_truncated_partition(const std::string infilename,
   bool surrender;
 
   while(!parser->is_complete()) {
+    // increment read number
     read = parser->get_next_read();
+    total_reads++;
+
     seq = read.seq;
 
     check_and_process_read(seq, is_valid);
@@ -1204,9 +1207,6 @@ void Hashtable::do_truncated_partition(const std::string infilename,
 
       // assign the partition ID
       assign_partition_id(kmer_f, tagged_kmers, surrender);
-
-      // reset the sequence info, increment read number
-      total_reads++;
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1448,8 +1448,10 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
   HashIntoType tagged_kmer;
   if (_is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
     //std::cout << "already tagged! " << kmer_f << "\n";
-    tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
-    return;
+    if (partition_map[kmer_f] != NULL) {
+      tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
+      return;
+    }
   }
 
   HashIntoType f, r;
@@ -1493,6 +1495,7 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     // Search no further in this direction.
     if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
       tagged_kmers.insert(tagged_kmer);
+      first = false;
       continue;
     }
 
@@ -1737,5 +1740,228 @@ void Hashtable::load_partitionmap(string infilename,
 
   delete buf; buf = NULL;
 }
-					 
+
+void Hashtable::do_subset_partition(const std::string infilename,
+				    unsigned int first_read_n,
+				    unsigned int last_read_n,
+				    CallbackFn callback,
+				    void * callback_data)
+{
+  unsigned int total_reads = 0;
+
+  IParser* parser = IParser::get_parser(infilename);
+  Read read;
+  string seq;
+
+  std::string first_kmer;
+  HashIntoType kmer_f, kmer_r;
+  SeenSet tagged_kmers;
+  bool surrender;
+
+  SubsetPartition * subset_p = new SubsetPartition();
+  subset_p->fill(partition_map);
+
+  while(!parser->is_complete()) {
+    // increment read number
+    read = parser->get_next_read();
+    total_reads++;
+
+    if (last_read_n && (total_reads < first_read_n ||
+			total_reads >= last_read_n)) {
+      continue;
+    }
+
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      first_kmer = seq.substr(0, _ksize);
+      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+
+      // find all tagged kmers within range.
+      tagged_kmers.clear();
+      surrender = false;
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
+
+      // assign the partition ID
+      subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("do_subset_partition/read", callback_data, total_reads,
+		   next_partition_id);
+	} catch (...) {
+	  delete parser;
+	  throw;
+	}
+      }
+    }
+  }
+
+  subset_p->merge(partition_map, surrender_set);
+
+  delete parser;
+}
+
+
+//
+
+PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
+						 SeenSet& tagged_kmers,
+						 bool surrender)
+
+{
+  PartitionID return_val = 0; 
+
+  // did we find a tagged kmer?
+  if (tagged_kmers.size() >= 1 || surrender) {
+    return_val = _reassign_partition_ids(tagged_kmers, kmer_f);
+  } else {
+    partition_map[kmer_f] = NULL;
+    return_val = 0;
+  }
+
+  if (surrender) {
+    assert(return_val != 0);
+    surrender_set.insert(return_val);
+  }
+  return return_val;
+}
+
+PartitionID SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
+						     const HashIntoType kmer_f)
+{
+  SeenSet::iterator it = tagged_kmers.begin();
+  unsigned int * this_partition_p = NULL;
+
+  // find first assigned partition ID in tagged set
+  while (it != tagged_kmers.end()) {
+    this_partition_p = partition_map[*it];
+    if (this_partition_p != NULL) {
+      break;
+    }
+    it++;
+  }
+
+  // none? allocate!
+  if (this_partition_p == NULL) {
+    this_partition_p = new PartitionID(next_partition_id);
+    next_partition_id++;
+
+    PartitionPtrSet * s = new PartitionPtrSet();
+    s->insert(this_partition_p);
+    reverse_pmap[*this_partition_p] = s;
+  }
+
+  it = tagged_kmers.begin();
+  for (; it != tagged_kmers.end(); ++it) {
+    PartitionID * pp_id = partition_map[*it];
+    if (pp_id == NULL) {
+      partition_map[*it] = this_partition_p;
+    } else {
+      if (*pp_id != *this_partition_p) { // join partitions
+	_add_partition_ptr(this_partition_p, pp_id);
+      }
+    }
+  }
+
+  assert(this_partition_p != NULL);
+  partition_map[kmer_f] = this_partition_p;
+
+  return *this_partition_p;
+}
+
+///
+
+void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
+{
+  PartitionPtrSet * s = reverse_pmap[*orig_pp];
+  PartitionPtrSet * t = reverse_pmap[*new_pp];
+  reverse_pmap.erase(*new_pp);
+    
+  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
+    PartitionID * iter_pp;
+    iter_pp = *pi;
+
+    *iter_pp = *orig_pp;
+    s->insert(iter_pp);
+  }
+  delete t;
+}
+
+void SubsetPartition::fill(PartitionMap& master_map)
+{
+  for (PartitionMap::iterator pi = master_map.begin();
+       pi != master_map.end(); pi++) {
+    partition_map[pi->first] = NULL;
+  }
+}
+
+void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr)
+{
+  for (PartitionSet::iterator si = surrender_set.begin();
+       si != surrender_set.end(); si++) {
+    master_surr.insert(*si);
+  }
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    master_map[pi->first] = pi->second;
+  }
+}
+
+//
+// consume_fasta: consume a FASTA file of reads
+//
+
+void Hashtable::consume_fasta_and_tag(const std::string &filename,
+				      unsigned int &total_reads,
+				      unsigned long long &n_consumed,
+				      CallbackFn callback,
+				      void * callback_data)
+{
+  total_reads = 0;
+  n_consumed = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string seq = "";
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    // yep! process.
+    unsigned int this_n_consumed = 0;
+    bool is_valid;
+
+    this_n_consumed = check_and_process_read(seq, is_valid);
+    n_consumed += this_n_consumed;
+    if (is_valid) {
+      string first_kmer = seq.substr(0, _ksize);
+      HashIntoType kmer_f, kmer_r;
+      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+
+      partition_map[kmer_f] = NULL;
+    }
+	       
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("consume_fasta_and_tag", callback_data, total_reads,
+		 n_consumed);
+      } catch (...) {
+        throw;
+      }
+    }
+  }
+}
 
