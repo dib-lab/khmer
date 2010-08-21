@@ -80,6 +80,7 @@ class Test_RandomData(object):
         ht.merge_subset(y)
 
         n_partitions = ht.output_partitions(filename, outfile)
+        assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_II(self):
         ht = khmer.new_hashtable(20, 4**13+1)
@@ -93,6 +94,7 @@ class Test_RandomData(object):
         ht.merge_subset(y)
 
         n_partitions = ht.output_partitions(filename, outfile)
+        assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_III(self):
         ht = khmer.new_hashtable(20, 4**13+1)
@@ -106,6 +108,24 @@ class Test_RandomData(object):
         ht.merge_subset(x)
 
         n_partitions = ht.output_partitions(filename, outfile)
+        assert n_partitions == 1, n_partitions
+
+    def test_random_20_a_succ_IV(self):
+        ht = khmer.new_hashtable(20, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        outfile = filename + '.out'
+
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        subsets = []
+        for i in range(total_reads):
+             x = ht.do_subset_partition(filename, i, i+1)
+             subsets.append(x)
+
+        for x in reversed(subsets):
+            ht.merge_subset(x)
+            
+        n_partitions = ht.output_partitions(filename, outfile)
+        assert n_partitions == 1, n_partitions
 
     def test_random_20_a_fail(self):
         ht = khmer.new_hashtable(21, 4**13+1)
