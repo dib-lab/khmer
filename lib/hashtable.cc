@@ -1901,20 +1901,8 @@ void SubsetPartition::fill(PartitionMap& master_map)
   }
 }
 
-void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr, Hashtable * ht, ReversePartitionMap& reverse_pmap)
+void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr, Hashtable * ht, ReversePartitionMap& master_reverse_pmap)
 {
-#if 0  
-  for (PartitionSet::iterator si = surrender_set.begin();
-       si != surrender_set.end(); si++) {
-    master_surr.insert(*si);
-  }
-
-  for (PartitionMap::iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    master_map[pi->first] = pi->second;
-  }
-#endif // 0
-
   PartitionToPartitionPMap mm;
   PartitionID * pp;
 
@@ -1926,8 +1914,16 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
       pp = master_map[pi->first];
       if (pp != NULL) {		// Ahh, and it's in our master table, too!
 
-	mm[*(pi->second)] = pp;	// @inefficient, yes? multiple assignment?
+	PartitionID * xx = mm[*(pi->second)];
 
+	if (xx == NULL) {
+	  mm[*(pi->second)] = pp;
+	} else {
+	  if (*xx != *pp) { // incompatibility!! master map sez != joined... but.
+	    ht->_add_partition_ptr(xx, pp);
+	    cout << "Doing it!\n";
+	  }
+	}
       } else {			// OK, it's not in our master table yet.
 
 	// this means nothing until we've done the first sweep.
@@ -1955,13 +1951,14 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 	if (pp != NULL) { // yep! translate.
 	  master_map[pi->first] = pp;
 	} else {		// nope! create/transfer/assign!
+	  cout << "creating new partition\n";
 	  pp = ht->get_new_partition();
 	  mm[*(pi->second)] = pp;
 	  master_map[pi->first] = pp;
 
 	  PartitionPtrSet * s = new PartitionPtrSet();
 	  s->insert(pp);
-	  reverse_pmap[*pp] = s;
+	  master_reverse_pmap[*pp] = s;
 	}
       }
     }
