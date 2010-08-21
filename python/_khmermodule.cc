@@ -1405,9 +1405,11 @@ static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
 
   khmer::SubsetPartition * subset_p = NULL;
   try {
+    Py_BEGIN_ALLOW_THREADS
     subset_p = hashtable->do_subset_partition(filename,
 					      start_read_n, end_read_n,
 					      _report_fn, callback_obj);
+    Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
     return NULL;
   }
