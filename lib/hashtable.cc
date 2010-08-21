@@ -1262,12 +1262,15 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
 	partitions.insert(partition_id);
       }
 
+      // @CTB BROKEN
+      char surrender_flag = ' ';
+#if 0
       PartitionSet::const_iterator ii;
       ii = surrender_set.find(partition_id);
-      char surrender_flag = ' ';
       if (ii != surrender_set.end()) {
 	surrender_flag = '*';
       }
+#endif // 0
 
       outfile << ">" << read.name << "\t" << partition_id
 	      << surrender_flag << "\n" 
@@ -1300,25 +1303,27 @@ PartitionID Hashtable::assign_partition_id(HashIntoType kmer_f,
 					   bool surrender)
 
 {
-  PartitionID return_val = 0; 
+  PartitionID return_val = 0;
+  PartitionID * pp = NULL;
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1 || surrender) {
-    return_val = _reassign_partition_ids(tagged_kmers, kmer_f);
+    pp = _reassign_partition_ids(tagged_kmers, kmer_f);
+    return_val = *pp;
   } else {
     partition_map[kmer_f] = NULL;
     return_val = 0;
   }
 
   if (surrender) {
-    assert(return_val != 0);
-    surrender_set.insert(return_val);
+    assert(pp != NULL);
+    surrender_set.insert(pp);
   }
   return return_val;
 }
 
-PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
-					       const HashIntoType kmer_f)
+PartitionID * Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
+						 const HashIntoType kmer_f)
 {
   SeenSet::iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = NULL;
@@ -1357,7 +1362,7 @@ PartitionID Hashtable::_reassign_partition_ids(SeenSet& tagged_kmers,
   assert(this_partition_p != NULL);
   partition_map[kmer_f] = this_partition_p;
 
-  return *this_partition_p;
+  return this_partition_p;
 }
 
 ///
@@ -1597,6 +1602,7 @@ void Hashtable::save_partitionmap(string pmap_filename,
   }
   outfile.close();
 
+#if 0
   ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
 
   n_bytes = 0;
@@ -1616,6 +1622,9 @@ void Hashtable::save_partitionmap(string pmap_filename,
     surrenderfile.write(buf, n_bytes);
   }
   surrenderfile.close();
+#endif // 0
+
+  delete buf;
 }
 					 
 void Hashtable::load_partitionmap(string infilename,
@@ -1710,6 +1719,7 @@ void Hashtable::load_partitionmap(string infilename,
     memcpy(buf, buf + n_bytes, remainder);
   }
 
+#if 0
   ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
 
   assert(surrenderfile.is_open());
@@ -1734,6 +1744,7 @@ void Hashtable::load_partitionmap(string infilename,
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
   }
+#endif // 0
 
   delete buf; buf = NULL;
 }
@@ -1780,8 +1791,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 			      &subset_p->partition_map, false);
 
       // assign the partition ID
-      PartitionID p;
-      p = subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1815,23 +1825,25 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 
 {
   PartitionID return_val = 0; 
+  PartitionID * pp = NULL;
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1 || surrender) {
-    return_val = _reassign_partition_ids(tagged_kmers, kmer_f);
+    pp = _reassign_partition_ids(tagged_kmers, kmer_f);
+    return_val = *pp;
   } else {
     partition_map[kmer_f] = NULL;
     return_val = 0;
   }
 
   if (surrender) {
-    assert(return_val != 0);
-    surrender_set.insert(return_val);
+    assert(pp != NULL);
+    surrender_set.insert(pp);
   }
   return return_val;
 }
 
-PartitionID SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
+PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
 						     const HashIntoType kmer_f)
 {
   SeenSet::iterator it = tagged_kmers.begin();
@@ -1871,7 +1883,7 @@ PartitionID SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
   assert(this_partition_p != NULL);
   partition_map[kmer_f] = this_partition_p;
 
-  return *this_partition_p;
+  return this_partition_p;
 }
 
 ///
@@ -1911,7 +1923,8 @@ static void get_partitions_for_tags(PartitionSet& partitions, SeenSet& tags,
   }
 }
 
-#if 0
+// #if 0
+
 static void print_partition_set(PartitionSet& p)
 {
   cout << "\tpartition set: ";
@@ -1930,7 +1943,7 @@ static void print_tag_set(SeenSet& p)
   cout << "\n";
 }
 
-#endif //0
+// #endif //0
 
 static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
 				     PartitionMap& pmap)
@@ -1947,7 +1960,7 @@ static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
   }
 }
 
-void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr, Hashtable * ht, ReversePartitionMap& master_reverse_pmap)
+void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_surr, Hashtable * ht, ReversePartitionMap& master_reverse_pmap)
 {
   PartitionToPartitionPMap mm;
   PartitionID * pp;
@@ -1982,6 +1995,9 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 
 	this_size = tags.size();
       }
+
+      // print_partition_set(subset_partitions);
+
       PartitionSet::iterator psi = master_partitions.begin();
       PartitionPtrSet * pp_set = NULL;
 
@@ -2028,12 +2044,28 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
     }
   }
 
-  for (PartitionSet::iterator si = surrender_set.begin();
+#if 0 // @CTB does not work
+  for (PartitionPtrSet::iterator si = surrender_set.begin();
        si != surrender_set.end(); si++) {
     PartitionID p = *si;
-    PartitionID translated_p = *(mm[p]);
-    master_surr.insert(translated_p);
+    pp = mm[p];
+    if (pp == NULL) {
+      cout << "FAIL converting " << p << "\n";
+
+
+      SeenSet tags;
+      PartitionSet partitions;
+      partitions.insert(p);
+      
+      get_tags_from_partitions(tags, partitions, partition_map);
+
+      print_tag_set(tags);
+
+    } else {
+      master_surr.insert(pp);
+    }
   }
+#endif //0
 }
 
 //
