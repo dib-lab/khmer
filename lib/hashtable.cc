@@ -1203,7 +1203,7 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, partition_map);
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
 
       // assign the partition ID
       assign_partition_id(kmer_f, tagged_kmers, surrender);
@@ -1439,20 +1439,24 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 		     
 
 // used by do_truncated_partition
+static void print_tag_set(SeenSet& k);
 
 void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
 					bool& surrender,
-					PartitionMap& pmap)
+					PartitionMap * pmap)
 {
-  // cout << "find all tags: starting with " << kmer_f << "\n";
+  if (pmap == NULL) { cout << "PMAP IS NULL\n"; pmap = &partition_map; }
+  cout << "partition ptr: " << (long long) pmap << "\n";
+
+  cout << "find all tags: starting with " << kmer_f << "\n";
   HashIntoType tagged_kmer;
   if (_is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
     //std::cout << "already tagged! " << kmer_f << "\n";
-    if (pmap[kmer_f] != NULL) {
+    if ((*pmap)[kmer_f] != NULL) {
       tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
-      // cout << "exiting early.\n";
+      cout << "exiting early.\n";
       return;
     }
   }
@@ -1559,6 +1563,10 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 
     first = false;
   }
+  
+    cout << "find all tags: starting with " << kmer_f << "\n";
+    cout << "found:\n";
+    print_tag_set(tagged_kmers);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1762,7 +1770,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
   SeenSet tagged_kmers;
   bool surrender;
 
-  SubsetPartition * subset_p = new SubsetPartition(partition_map);
+  SubsetPartition * subset_p = new SubsetPartition(this->partition_map);
 
   while(!parser->is_complete()) {
     // increment read number
@@ -1783,10 +1791,13 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, subset_p->partition_map);
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender,
+			      &subset_p->partition_map);
 
       // assign the partition ID
-      subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      PartitionID p;
+      p = subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      cout << "assigning (subset) partition ID: " << p << "\n";
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1950,6 +1961,9 @@ static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
 	tags.insert(pi->first);
       }
     }
+    else {
+      cout << "NULL tags " << pi->first << "\n";
+    }
   }
 }
 
@@ -1988,9 +2002,8 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 
 	get_partitions_for_tags(subset_partitions, tags, partition_map);
 	cout << "subset partitions:\n";
-	print_partition_set(subset_partitions);
-
 	get_tags_from_partitions(tags, subset_partitions, partition_map);
+	print_partition_set(subset_partitions);
 	print_tag_set(tags);
 
 	get_partitions_for_tags(master_partitions, tags, master_map);
@@ -2013,16 +2026,30 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 	pp_set = new PartitionPtrSet();
 	pp_set->insert(pp);
 	master_reverse_pmap[*pp] = pp_set;
+
+	cout << "new master partition: " << *pp << "\n";
       } else {
 	pp_set = master_reverse_pmap[*psi];
 	assert(pp_set != NULL);
 	pp = *(pp_set->begin());
+
+	cout << "existing master partition: " << *pp << "\n";
       }
 
       for (PartitionSet::iterator psi2 = subset_partitions.begin();
 	   psi2 != subset_partitions.end(); psi2++) {
 	mm[*psi2] = pp;
       }
+
+      PartitionPtrSet remove_me;
+      for (SeenSet::iterator si = tags.begin(); si != tags.end(); si++) {
+	PartitionID * old_pp = master_map[*si];
+	if (old_pp != pp) {
+	  remove_me.insert(old_pp);
+	  master_map[*si] = pp;
+	}
+      }
+      // @CTB dealloc stuff in remove me, & remove from reverse_pmap.
     }
   }
 
@@ -2102,4 +2129,3 @@ void Hashtable::consume_fasta_and_tag(const std::string &filename,
     }
   }
 }
-

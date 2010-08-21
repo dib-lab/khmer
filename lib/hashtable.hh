@@ -378,7 +378,7 @@ namespace khmer {
 				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
 				 bool& surrender,
-				 PartitionMap& pmap);
+				 PartitionMap * pmap = NULL);
 
     PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
