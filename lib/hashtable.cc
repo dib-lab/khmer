@@ -1445,18 +1445,15 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
 					bool& surrender,
-					PartitionMap * pmap)
+					PartitionMap * pmap,
+					bool do_initial_check)
 {
-  if (pmap == NULL) { cout << "PMAP IS NULL\n"; pmap = &partition_map; }
-  cout << "partition ptr: " << (long long) pmap << "\n";
+  if (pmap == NULL) { pmap = &partition_map; }
 
-  cout << "find all tags: starting with " << kmer_f << "\n";
   HashIntoType tagged_kmer;
-  if (_is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-    //std::cout << "already tagged! " << kmer_f << "\n";
+  if (do_initial_check && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
     if ((*pmap)[kmer_f] != NULL) {
       tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
-      cout << "exiting early.\n";
       return;
     }
   }
@@ -1479,8 +1476,6 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 
     if (total > PARTITION_MAX_TAG_EXAMINED ||
       node_q.size() > PARTITION_ALL_TAG_DEPTH) {
-      // cout << "TOTAL: " << total << "\n";
-      // cout << "SIZE: " << node_q.size() << "\n";
       surrender = true;
       break;
     }
@@ -1501,7 +1496,6 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.
     if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-      cout << "is tagged kmer! " << tagged_kmer << "\n";
       tagged_kmers.insert(tagged_kmer);
       first = false;
       continue;
@@ -1563,10 +1557,6 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 
     first = false;
   }
-  
-    cout << "find all tags: starting with " << kmer_f << "\n";
-    cout << "found:\n";
-    print_tag_set(tagged_kmers);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1580,8 +1570,6 @@ void Hashtable::save_partitionmap(string pmap_filename,
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
   unsigned int n_bytes = 0;
-
-  // cout << "checkpointing... " << partition_map.size() << "; " << reverse_pmap.size() << " non-unitary partitions\n";
 
   PartitionMap::const_iterator pi = partition_map.begin();
   for (; pi != partition_map.end(); pi++) {
@@ -1723,8 +1711,6 @@ void Hashtable::load_partitionmap(string infilename,
     memcpy(buf, buf + n_bytes, remainder);
   }
 
-  // cout << "loaded: " << loaded << "; " << partitions.size() << " partitions\n";
-
   ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
 
   assert(surrenderfile.is_open());
@@ -1792,12 +1778,11 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
       tagged_kmers.clear();
       surrender = false;
       partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender,
-			      &subset_p->partition_map);
+			      &subset_p->partition_map, false);
 
       // assign the partition ID
       PartitionID p;
       p = subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
-      cout << "assigning (subset) partition ID: " << p << "\n";
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1912,7 +1897,6 @@ void SubsetPartition::fill(PartitionMap& master_map)
 {
   for (PartitionMap::iterator pi = master_map.begin();
        pi != master_map.end(); pi++) {
-    cout << "initializing: " << pi->first << "\n";
     partition_map[pi->first] = NULL;
   }
 }
@@ -1953,16 +1937,10 @@ static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
   for (PartitionMap::iterator pi = pmap.begin(); pi != pmap.end(); pi++) {
     if (pi->second) {
       PartitionID p = *(pi->second);
-      cout << "getting tags... " << pi->first << " -> " << p << "\n";
-      
       PartitionSet::iterator ps = partitions.find(p);
       if (ps != partitions.end()) {
-	cout << "(saving)\n";
 	tags.insert(pi->first);
       }
-    }
-    else {
-      cout << "NULL tags " << pi->first << "\n";
     }
   }
 }
@@ -1975,10 +1953,8 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
   for (PartitionMap::iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     if (pi->second) {
-      cout << "merge: " << pi->first << " -> " << *(pi->second) << "\n";
       PartitionToPartitionPMap::iterator mi = mm.find(*(pi->second));
       if (mi != mm.end()) {
-	cout << "in mm already\n";
 	continue;
       }
 
@@ -1992,31 +1968,18 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 
       subset_partitions.insert(*(pi->second));
       get_tags_from_partitions(tags, subset_partitions, partition_map);
-      cout << "starting tags: \n";
-      print_tag_set(tags);
-      cout << "===\n";
 
       while(last_size != this_size) {
-	cout << "iteration...\n";
 	last_size = this_size;
 
 	get_partitions_for_tags(subset_partitions, tags, partition_map);
-	cout << "subset partitions:\n";
 	get_tags_from_partitions(tags, subset_partitions, partition_map);
-	print_partition_set(subset_partitions);
-	print_tag_set(tags);
 
 	get_partitions_for_tags(master_partitions, tags, master_map);
 	get_tags_from_partitions(tags, master_partitions, master_map);
 
-	cout << "master partitions:\n";
-	print_partition_set(master_partitions);
-	print_tag_set(tags);
-	cout << "---\n";
-
 	this_size = tags.size();
       }
-      cout << "collected " << this_size << " tags for " << *(pi->second) << "\n";
       PartitionSet::iterator psi = master_partitions.begin();
       PartitionPtrSet * pp_set = NULL;
 
@@ -2026,14 +1989,10 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 	pp_set = new PartitionPtrSet();
 	pp_set->insert(pp);
 	master_reverse_pmap[*pp] = pp_set;
-
-	cout << "new master partition: " << *pp << "\n";
       } else {
 	pp_set = master_reverse_pmap[*psi];
 	assert(pp_set != NULL);
 	pp = *(pp_set->begin());
-
-	cout << "existing master partition: " << *pp << "\n";
       }
 
       for (PartitionSet::iterator psi2 = subset_partitions.begin();
