@@ -1404,6 +1404,8 @@ void Hashtable::_validate_pmap()
     PartitionID p = (*ri).first;
     PartitionPtrSet *s = (*ri).second;
 
+    assert(s != NULL);
+
     for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
 	 si++) {
       PartitionID * pp;
@@ -1974,8 +1976,16 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
       if (mi != mm.end()) {
 	continue;
       }
-
       // this partition has not yet been transferred.  DEAL.
+
+      //
+      // Here, we want to get all of the partitions connected to this
+      // one in the master map and the subset map.  Loop until no more
+      // are found.
+      //
+      // This is sloooooooooooooooooooow...
+      //
+
       SeenSet tags;
       PartitionSet subset_partitions;
       PartitionSet master_partitions;
@@ -1986,7 +1996,9 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
       subset_partitions.insert(*(pi->second));
       get_tags_from_partitions(tags, subset_partitions, partition_map);
 
+      unsigned int n = 0;
       while(last_size != this_size) {
+	cout << "iterate " << *(pi->second) << " #" << n << "\n";
 	last_size = this_size;
 
 	get_partitions_for_tags(subset_partitions, tags, partition_map);
@@ -1996,14 +2008,16 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
 	get_tags_from_partitions(tags, master_partitions, master_map);
 
 	this_size = tags.size();
+	n += 1;
       }
 
-      // print_partition_set(subset_partitions);
+      // All right!  We've now got all the tags that we want to be part of
+      // the master map partition; create or merge.
 
       PartitionSet::iterator psi = master_partitions.begin();
       PartitionPtrSet * pp_set = NULL;
 
-      if (psi == master_partitions.end()) { // nothing there in master_parts.
+      if (psi == master_partitions.end()) { // nothing there in master ptn.
 	pp = ht->get_new_partition();
 	
 	pp_set = new PartitionPtrSet();
@@ -2015,34 +2029,54 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
 	pp = *(pp_set->begin());
       }
 
+      // Go over all of the subset partitions we've mapped into the master,
+      // and put them in the mm table, pointing at the correct master ptn.
+
+      // This will also stop us from exploring any other of the merged ptns
+      // on the subset side; see if statement at top of loop.
+
       for (PartitionSet::iterator psi2 = subset_partitions.begin();
 	   psi2 != subset_partitions.end(); psi2++) {
 	mm[*psi2] = pp;
       }
 
+      // Remap all of the tags in the master map. This has the side
+      // benefit of condensing pretty much everything into a single
+      // pointer...
+
       PartitionPtrSet remove_me;
       for (SeenSet::iterator si = tags.begin(); si != tags.end(); si++) {
 	PartitionID * old_pp = master_map[*si];
-	if (old_pp != pp) {
+
+	if (old_pp == NULL) {
+	  master_map[*si] = pp;
+	} else if (old_pp != pp) {
 	  remove_me.insert(old_pp);
 	  master_map[*si] = pp;
 	}
+
+	// also set them to NULL so we don't go over them.
+	partition_map[*si] = NULL;
       }
-      // @CTB dealloc stuff in remove me, & remove from reverse_pmap.
-    }
-  }
 
-  // second sweep.
+      // reset the reverse_pmap for this entry, too.
+      if (master_reverse_pmap[*pp]->size() > 1) {
+	pp_set = new PartitionPtrSet();
+	pp_set->insert(pp);
+	master_reverse_pmap[*pp] = pp_set;
+      }
 
-  for (PartitionMap::iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-
-    if (pi->second != NULL) {	// OK, it's labeled in our subset partition
-
-      // is it in mm? it better be.
-      pp = mm[*(pi->second)];
-      assert (pp != NULL);	// @@CTB
-      master_map[pi->first] = pp;
+      // finally: remove remove_me & associated master_reverse_pmap entries.
+      for (PartitionPtrSet::iterator si = remove_me.begin();
+	   si != remove_me.end(); si++) {
+	PartitionID p = *(*si);
+	pp_set = master_reverse_pmap[p];
+	if (pp_set) {
+	  delete pp_set;
+	  master_reverse_pmap.erase(p);
+	}
+	delete *si;
+      }
     }
   }
 
