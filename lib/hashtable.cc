@@ -1795,6 +1795,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+#if 0
 	try {
 	  callback("do_subset_partition/read", callback_data, total_reads,
 		   next_partition_id);
@@ -1802,6 +1803,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 	  delete parser;
 	  throw;
 	}
+#endif // 0
       }
     }
   }
