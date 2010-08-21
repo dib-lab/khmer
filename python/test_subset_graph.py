@@ -73,8 +73,39 @@ class Test_RandomData(object):
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
-        n = ht.do_truncated_partition(filename, outfile)
-        assert n == 1, n
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        x = ht.do_subset_partition(filename, 0, total_reads/2)
+        ht.merge_subset(x)
+        y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+        ht.merge_subset(y)
+
+        n_partitions = ht.output_partitions(filename, outfile)
+
+    def test_random_20_a_succ_II(self):
+        ht = khmer.new_hashtable(20, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        outfile = filename + '.out'
+
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        x = ht.do_subset_partition(filename, 0, total_reads/2)
+        y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+        ht.merge_subset(x)
+        ht.merge_subset(y)
+
+        n_partitions = ht.output_partitions(filename, outfile)
+
+    def test_random_20_a_succ_III(self):
+        ht = khmer.new_hashtable(20, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        outfile = filename + '.out'
+
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        x = ht.do_subset_partition(filename, 0, total_reads/2)
+        y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+        ht.merge_subset(y)
+        ht.merge_subset(x)
+
+        n_partitions = ht.output_partitions(filename, outfile)
 
     def test_random_20_a_fail(self):
         ht = khmer.new_hashtable(21, 4**13+1)
