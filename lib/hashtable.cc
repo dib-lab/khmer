@@ -1439,7 +1439,6 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 		     
 
 // used by do_truncated_partition
-static void print_tag_set(SeenSet& k);
 
 void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
@@ -1912,6 +1911,7 @@ static void get_partitions_for_tags(PartitionSet& partitions, SeenSet& tags,
   }
 }
 
+#if 0
 static void print_partition_set(PartitionSet& p)
 {
   cout << "\tpartition set: ";
@@ -1929,6 +1929,8 @@ static void print_tag_set(SeenSet& p)
   }
   cout << "\n";
 }
+
+#endif //0
 
 static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
 				     PartitionMap& pmap)
