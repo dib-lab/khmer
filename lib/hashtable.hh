@@ -29,7 +29,7 @@ namespace khmer {
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
-    PartitionSet surrender_set;
+    PartitionPtrSet surrender_set;
 
     void _clear_partitions() {
       for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
@@ -48,7 +48,7 @@ namespace khmer {
     }
 
     void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
-    PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
+    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
 					const HashIntoType kmer_f);
 
   public:
@@ -64,7 +64,7 @@ namespace khmer {
 				    SeenSet& tagged_kmers,
 				    bool surrender);
 
-    void merge(PartitionMap& master_map, PartitionSet& master_surrender,
+    void merge(PartitionMap& master_map, PartitionPtrSet& master_surrender,
 	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
     void fill(PartitionMap& master_map);
   };
@@ -79,7 +79,7 @@ namespace khmer {
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
-    PartitionSet surrender_set;
+    PartitionPtrSet surrender_set;
 
     void (*_writelock_acquire)(void * data);
     void (*_writelock_release)(void * data);
@@ -381,7 +381,7 @@ namespace khmer {
 				 PartitionMap * pmap = NULL,
 				 bool do_initial_check=true);
 
-    PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
+    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
 
     void save_partitionmap(std::string outfile, std::string surrenderfile);
