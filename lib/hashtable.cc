@@ -1203,7 +1203,7 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, partition_map);
 
       // assign the partition ID
       assign_partition_id(kmer_f, tagged_kmers, surrender);
@@ -1443,13 +1443,16 @@ bool Hashtable::_is_tagged_kmer(const HashIntoType kmer_f,
 void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					SeenSet& tagged_kmers,
-					bool& surrender)
+					bool& surrender,
+					PartitionMap& pmap)
 {
+  // cout << "find all tags: starting with " << kmer_f << "\n";
   HashIntoType tagged_kmer;
   if (_is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
     //std::cout << "already tagged! " << kmer_f << "\n";
-    if (partition_map[kmer_f] != NULL) {
+    if (pmap[kmer_f] != NULL) {
       tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
+      // cout << "exiting early.\n";
       return;
     }
   }
@@ -1494,6 +1497,7 @@ void Hashtable::partition_find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.
     if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
+      cout << "is tagged kmer! " << tagged_kmer << "\n";
       tagged_kmers.insert(tagged_kmer);
       first = false;
       continue;
@@ -1779,7 +1783,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender);
+      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, subset_p->partition_map);
 
       // assign the partition ID
       subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
@@ -1897,7 +1901,55 @@ void SubsetPartition::fill(PartitionMap& master_map)
 {
   for (PartitionMap::iterator pi = master_map.begin();
        pi != master_map.end(); pi++) {
+    cout << "initializing: " << pi->first << "\n";
     partition_map[pi->first] = NULL;
+  }
+}
+
+static void get_partitions_for_tags(PartitionSet& partitions, SeenSet& tags,
+				    PartitionMap& pmap)
+{
+  for (SeenSet::iterator si = tags.begin(); si != tags.end(); si++) {
+    PartitionID * pp = pmap[*si];
+    if (pp != NULL) {
+      partitions.insert(*pp);
+    }
+  }
+}
+
+static void print_partition_set(PartitionSet& p)
+{
+  cout << "\tpartition set: ";
+  for (PartitionSet::iterator pi = p.begin(); pi != p.end(); pi++) {
+    cout << *pi << ", ";
+  }
+  cout << "\n";
+}
+
+static void print_tag_set(SeenSet& p)
+{
+  cout << "\ttag set: ";
+  for (SeenSet::iterator si = p.begin(); si != p.end(); si++) {
+    cout << *si << ", ";
+  }
+  cout << "\n";
+}
+
+static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
+				     PartitionMap& pmap)
+
+{
+  for (PartitionMap::iterator pi = pmap.begin(); pi != pmap.end(); pi++) {
+    if (pi->second) {
+      PartitionID p = *(pi->second);
+      cout << "getting tags... " << pi->first << " -> " << p << "\n";
+      
+      PartitionSet::iterator ps = partitions.find(p);
+      if (ps != partitions.end()) {
+	cout << "(saving)\n";
+	tags.insert(pi->first);
+      }
+    }
   }
 }
 
@@ -1908,26 +1960,68 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 
   for (PartitionMap::iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      cout << "merge: " << pi->first << " -> " << *(pi->second) << "\n";
+      PartitionToPartitionPMap::iterator mi = mm.find(*(pi->second));
+      if (mi != mm.end()) {
+	cout << "in mm already\n";
+	continue;
+      }
 
-    if (pi->second != NULL) {	// OK, it's labeled in our subset partition
+      // this partition has not yet been transferred.  DEAL.
+      SeenSet tags;
+      PartitionSet subset_partitions;
+      PartitionSet master_partitions;
 
-      pp = master_map[pi->first];
-      if (pp != NULL) {		// Ahh, and it's in our master table, too!
+      unsigned int last_size = 0;
+      unsigned int this_size = 1;
 
-	PartitionID * xx = mm[*(pi->second)];
+      subset_partitions.insert(*(pi->second));
+      get_tags_from_partitions(tags, subset_partitions, partition_map);
+      cout << "starting tags: \n";
+      print_tag_set(tags);
+      cout << "===\n";
 
-	if (xx == NULL) {
-	  mm[*(pi->second)] = pp;
-	} else {
-	  if (*xx != *pp) { // incompatibility!! master map sez != joined... but.
-	    ht->_add_partition_ptr(xx, pp);
-	    cout << "Doing it!\n";
-	  }
-	}
-      } else {			// OK, it's not in our master table yet.
+      while(last_size != this_size) {
+	cout << "iteration...\n";
+	last_size = this_size;
 
-	// this means nothing until we've done the first sweep.
+	get_partitions_for_tags(subset_partitions, tags, partition_map);
+	cout << "subset partitions:\n";
+	print_partition_set(subset_partitions);
 
+	get_tags_from_partitions(tags, subset_partitions, partition_map);
+	print_tag_set(tags);
+
+	get_partitions_for_tags(master_partitions, tags, master_map);
+	get_tags_from_partitions(tags, master_partitions, master_map);
+
+	cout << "master partitions:\n";
+	print_partition_set(master_partitions);
+	print_tag_set(tags);
+	cout << "---\n";
+
+	this_size = tags.size();
+      }
+      cout << "collected " << this_size << " tags for " << *(pi->second) << "\n";
+      PartitionSet::iterator psi = master_partitions.begin();
+      PartitionPtrSet * pp_set = NULL;
+
+      if (psi == master_partitions.end()) { // nothing there in master_parts.
+	pp = ht->get_new_partition();
+	
+	pp_set = new PartitionPtrSet();
+	pp_set->insert(pp);
+	master_reverse_pmap[*pp] = pp_set;
+      } else {
+	pp_set = master_reverse_pmap[*psi];
+	assert(pp_set != NULL);
+	pp = *(pp_set->begin());
+      }
+
+      for (PartitionSet::iterator psi2 = subset_partitions.begin();
+	   psi2 != subset_partitions.end(); psi2++) {
+	mm[*psi2] = pp;
       }
     }
   }
@@ -1939,28 +2033,10 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionSet& master_surr,
 
     if (pi->second != NULL) {	// OK, it's labeled in our subset partition
 
-      pp = master_map[pi->first];
-      if (pp != NULL) {		// Ahh, and it's in our master table, too!
-
-	// do nothing; we've already provided a way to translate with mm.
-
-      } else {			// OK, it's not in our master table.
-
-	// is it in mm?
-	pp = mm[*(pi->second)];
-	if (pp != NULL) { // yep! translate.
-	  master_map[pi->first] = pp;
-	} else {		// nope! create/transfer/assign!
-	  cout << "creating new partition\n";
-	  pp = ht->get_new_partition();
-	  mm[*(pi->second)] = pp;
-	  master_map[pi->first] = pp;
-
-	  PartitionPtrSet * s = new PartitionPtrSet();
-	  s->insert(pp);
-	  master_reverse_pmap[*pp] = s;
-	}
-      }
+      // is it in mm? it better be.
+      pp = mm[*(pi->second)];
+      assert (pp != NULL);	// @@CTB
+      master_map[pi->first] = pp;
     }
   }
 
