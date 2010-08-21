@@ -24,6 +24,7 @@ namespace khmer {
   class Hashtable;
 
   class SubsetPartition {
+  public:
     PartitionMap * master_map;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
@@ -376,7 +377,8 @@ namespace khmer {
     void partition_find_all_tags(HashIntoType kmer_f,
 				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
-				 bool& surrender);
+				 bool& surrender,
+				 PartitionMap& pmap);
 
     PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
