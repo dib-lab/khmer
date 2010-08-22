@@ -1812,6 +1812,8 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 
   delete parser;
 
+  cout << "AAA " << subset_p->partition_map.size() << "\n";
+
   return subset_p;
 }
 
@@ -1830,6 +1832,8 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 {
   PartitionID return_val = 0; 
   PartitionID * pp = NULL;
+
+  cout << "ASSIGN " << tagged_kmers.size() << "\n";
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1 || surrender) {
@@ -1886,6 +1890,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
 
   assert(this_partition_p != NULL);
   partition_map[kmer_f] = this_partition_p;
+  cout << "assign " << kmer_f << " " << *this_partition_p << "\n";
 
   return this_partition_p;
 }
@@ -1927,6 +1932,43 @@ static void get_partitions_for_tags(PartitionSet& partitions, SeenSet& tags,
   }
 }
 
+static void make_partitions_to_tags(PartitionMap& pmap,
+				    PartitionsToTagsMap& pttmap)
+{
+  SeenSet * sp;
+  HashIntoType tag;
+  PartitionID p;
+
+  cout << "XYZ\n";
+  for (PartitionMap::const_iterator pi = pmap.begin(); pi != pmap.end();
+       pi++) {
+    cout << "YZA " << pi->second << "\n";
+    if (pi->second) {
+      tag = pi->first;
+      p = *(pi->second);
+
+      sp = pttmap[p];
+      cout << "XXX " << (long long) sp << "\n";
+      if (sp == NULL) {
+	sp = new SeenSet();
+	pttmap[p] = sp;
+      }
+      sp->insert(tag);
+    }
+  }
+}
+
+static void del_partitions_to_tags(PartitionsToTagsMap& pttmap)
+{
+  for (PartitionsToTagsMap::iterator pt = pttmap.begin();
+       pt != pttmap.end(); pt++) {
+    SeenSet * sp = pt->second;
+    assert (sp != NULL);
+    delete sp;
+    pt->second = NULL;
+  }
+}
+
 // #if 0
 
 static void print_partition_set(PartitionSet& p)
@@ -1964,119 +2006,196 @@ static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
   }
 }
 
+static void get_new_tags_from_partitions(SeenSet& old_tags,
+					 SeenSet& new_tags,
+					 PartitionSet& new_partitions,
+					 PartitionsToTagsMap& pttm)
+{
+  for (PartitionSet::const_iterator psi = new_partitions.begin();
+       psi != new_partitions.end(); psi++) {
+    PartitionID p = *psi;
+    SeenSet * s = pttm[p];
+    
+    for (SeenSet::const_iterator si = s->begin(); si != s->end(); si++) {
+      SeenSet::const_iterator test = old_tags.find(*si);
+      if (test == old_tags.end()) {
+	new_tags.insert(*si);
+      }
+    }
+  }
+}
+
+static void get_new_partitions_from_tags(PartitionSet& old_parts,
+					 PartitionSet& new_parts,
+					 SeenSet& new_tags,
+					 PartitionMap& pmap)
+{
+  for (SeenSet::const_iterator si = new_tags.begin(); si != new_tags.end();
+       si++) {
+    PartitionID * pp = pmap[*si];
+    if (pp != NULL) {
+      PartitionID p = *pp;
+
+      PartitionSet::const_iterator test = old_parts.find(p);
+      if (test == old_parts.end()) {
+	new_parts.insert(p);
+      }
+    }
+  }
+}
+
+static void transfer_tags(SeenSet& from, SeenSet& to)
+{
+  for (SeenSet::const_iterator si = from.begin(); si != from.end(); si++) {
+    to.insert(*si);
+  }
+  from.clear();
+}
+
+static void transfer_partitions(PartitionSet& from, PartitionSet& to)
+{
+  for (PartitionSet::const_iterator pi = from.begin(); pi != from.end();
+       pi++) {
+    to.insert(*pi);
+  }
+  from.clear();
+}
+
 void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_surr, Hashtable * ht, ReversePartitionMap& master_reverse_pmap)
 {
   PartitionToPartitionPMap mm;
+  PartitionsToTagsMap subset_pttm, master_pttm;
   PartitionID * pp;
+  PartitionID p;
 
-  for (PartitionMap::iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    if (pi->second) {
-      PartitionToPartitionPMap::iterator mi = mm.find(*(pi->second));
-      if (mi != mm.end()) {
-	continue;
-      }
-      // this partition has not yet been transferred.  DEAL.
+  cout << "making pttms\n";
+  cout << subset_pttm.size() << "\n";
+  cout << master_pttm.size() << "\n";
 
-      //
-      // Here, we want to get all of the partitions connected to this
-      // one in the master map and the subset map.  Loop until no more
-      // are found.
-      //
-      // This is sloooooooooooooooooooow...
-      //
+  make_partitions_to_tags(partition_map, subset_pttm);
+  make_partitions_to_tags(master_map, master_pttm);
 
-      SeenSet tags;
-      PartitionSet subset_partitions;
-      PartitionSet master_partitions;
+  for (PartitionsToTagsMap::iterator ptti = subset_pttm.begin();
+       ptti != subset_pttm.end(); ptti++) {
+    cout << "hi!\n";
+    p = ptti->first;
+    SeenSet * these_tags = ptti->second;
 
-      unsigned int last_size = 0;
-      unsigned int this_size = 1;
+    PartitionToPartitionPMap::iterator mi = mm.find(p);
+    if (mi != mm.end()) {
+      cout << "abort!\n";
+      continue;
+    }
 
-      subset_partitions.insert(*(pi->second));
-      get_tags_from_partitions(tags, subset_partitions, partition_map);
+    // this partition has not yet been transferred.  DEAL.
 
-      unsigned int n = 0;
-      while(last_size != this_size) {
-	cout << "iterate " << *(pi->second) << " #" << n << "\n";
-	last_size = this_size;
+    //
+    // Here, we want to get all of the partitions connected to this
+    // one in the master map and the subset map.  Loop until no more
+    // are found.
+    //
 
-	get_partitions_for_tags(subset_partitions, tags, partition_map);
-	get_tags_from_partitions(tags, subset_partitions, partition_map);
+    SeenSet old_tags;
+    SeenSet new_tags;
 
-	get_partitions_for_tags(master_partitions, tags, master_map);
-	get_tags_from_partitions(tags, master_partitions, master_map);
+    PartitionSet old_subset_partitions, new_subset_partitions;
+    PartitionSet old_master_partitions, new_master_partitions;
 
-	this_size = tags.size();
-	n += 1;
-      }
+    old_subset_partitions.insert(p);
+    transfer_tags(*these_tags, new_tags);
 
-      // All right!  We've now got all the tags that we want to be part of
-      // the master map partition; create or merge.
+    cout << "new tags size: " << new_tags.size() << "\n";
 
-      PartitionSet::iterator psi = master_partitions.begin();
-      PartitionPtrSet * pp_set = NULL;
+    while(new_tags.size()) {
+      cout << "iteration\n";
+      get_new_partitions_from_tags(old_master_partitions,
+				   new_master_partitions,
+				   new_tags,
+				   master_map);
+      cout << new_master_partitions.size() << "new master parts\n";
+      transfer_tags(new_tags, old_tags);
+      get_new_tags_from_partitions(old_tags, new_tags,
+				   new_master_partitions, master_pttm);
+      cout << new_tags.size() << "new master tags\n";
+      transfer_partitions(new_master_partitions, old_master_partitions);
 
-      if (psi == master_partitions.end()) { // nothing there in master ptn.
-	pp = ht->get_new_partition();
+      get_new_partitions_from_tags(old_subset_partitions,
+				   new_subset_partitions,
+				   new_tags,
+				   partition_map);
+      cout << new_subset_partitions.size() << "new subset parts\n";
+      transfer_tags(new_tags, old_tags);
+      get_new_tags_from_partitions(old_tags, new_tags,
+				   new_subset_partitions, subset_pttm);
+      cout << new_tags.size() << "new subset tags\n";
+      transfer_partitions(new_subset_partitions, old_subset_partitions);
+    }
+
+    // All right!  We've now got all the tags that we want to be part of
+    // the master map partition; create or merge.
+
+    PartitionSet::iterator psi = old_master_partitions.begin();
+    PartitionPtrSet * pp_set = NULL;
+
+    if (psi == old_master_partitions.end()) { // nothing there in master ptn.
+      pp = ht->get_new_partition();
 	
-	pp_set = new PartitionPtrSet();
-	pp_set->insert(pp);
-	master_reverse_pmap[*pp] = pp_set;
-      } else {
-	pp_set = master_reverse_pmap[*psi];
-	assert(pp_set != NULL);
-	pp = *(pp_set->begin());
+      pp_set = new PartitionPtrSet();
+      pp_set->insert(pp);
+      master_reverse_pmap[*pp] = pp_set;
+    } else {
+      pp_set = master_reverse_pmap[*psi];
+      assert(pp_set != NULL);
+      pp = *(pp_set->begin());
+    }
+
+    // Go over all of the subset partitions we've mapped into the master,
+    // and put them in the mm table, pointing at the correct master ptn.
+
+    // This will also stop us from exploring any other of the merged ptns
+    // on the subset side; see if statement at top of loop.
+
+    for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
+	 psi2 != old_subset_partitions.end(); psi2++) {
+      mm[*psi2] = pp;
+    }
+
+    // Remap all of the tags in the master map. This has the side
+    // benefit of condensing pretty much everything into a single
+    // pointer...
+
+    PartitionPtrSet remove_me;
+    for (SeenSet::iterator si = old_tags.begin(); si != old_tags.end(); si++) {
+      PartitionID * old_pp = master_map[*si];
+
+      if (old_pp == NULL) {
+	master_map[*si] = pp;
+      } else if (old_pp != pp) {
+	remove_me.insert(old_pp);
+	master_map[*si] = pp;
       }
 
-      // Go over all of the subset partitions we've mapped into the master,
-      // and put them in the mm table, pointing at the correct master ptn.
+      // also set them to NULL so we don't go over them.
+      partition_map[*si] = NULL;
+    }
 
-      // This will also stop us from exploring any other of the merged ptns
-      // on the subset side; see if statement at top of loop.
+    // reset the reverse_pmap for this entry, too.
+    if (master_reverse_pmap[*pp]->size() > 1) {
+      pp_set = new PartitionPtrSet();
+      pp_set->insert(pp);
+      master_reverse_pmap[*pp] = pp_set;
+    }
 
-      for (PartitionSet::iterator psi2 = subset_partitions.begin();
-	   psi2 != subset_partitions.end(); psi2++) {
-	mm[*psi2] = pp;
+    // finally: remove remove_me & associated master_reverse_pmap entries.
+    for (PartitionPtrSet::iterator si = remove_me.begin();
+	 si != remove_me.end(); si++) {
+      PartitionID p = *(*si);
+      pp_set = master_reverse_pmap[p];
+      if (pp_set) {
+	delete pp_set;
+	master_reverse_pmap.erase(p);
       }
-
-      // Remap all of the tags in the master map. This has the side
-      // benefit of condensing pretty much everything into a single
-      // pointer...
-
-      PartitionPtrSet remove_me;
-      for (SeenSet::iterator si = tags.begin(); si != tags.end(); si++) {
-	PartitionID * old_pp = master_map[*si];
-
-	if (old_pp == NULL) {
-	  master_map[*si] = pp;
-	} else if (old_pp != pp) {
-	  remove_me.insert(old_pp);
-	  master_map[*si] = pp;
-	}
-
-	// also set them to NULL so we don't go over them.
-	partition_map[*si] = NULL;
-      }
-
-      // reset the reverse_pmap for this entry, too.
-      if (master_reverse_pmap[*pp]->size() > 1) {
-	pp_set = new PartitionPtrSet();
-	pp_set->insert(pp);
-	master_reverse_pmap[*pp] = pp_set;
-      }
-
-      // finally: remove remove_me & associated master_reverse_pmap entries.
-      for (PartitionPtrSet::iterator si = remove_me.begin();
-	   si != remove_me.end(); si++) {
-	PartitionID p = *(*si);
-	pp_set = master_reverse_pmap[p];
-	if (pp_set) {
-	  delete pp_set;
-	  master_reverse_pmap.erase(p);
-	}
-	delete *si;
-      }
+      delete *si;
     }
   }
 
@@ -2102,6 +2221,9 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
     }
   }
 #endif //0
+
+  del_partitions_to_tags(subset_pttm);
+  del_partitions_to_tags(master_pttm);
 }
 
 //

@@ -16,6 +16,7 @@ namespace khmer {
   typedef std::set<PartitionID> PartitionSet;
   typedef std::map<HashIntoType, PartitionID*> PartitionMap;
   typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
   typedef std::set<PartitionID *> PartitionPtrSet;
   typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
