@@ -1,6 +1,8 @@
 import khmer, sys
 import threading
 import Queue
+import gc
+import os.path
 ht = khmer.new_hashtable(32, 4**15+1)
 
 FILENAME=sys.argv[1]
@@ -15,6 +17,11 @@ def worker(q):
             print 'exiting'
             return
 
+        outfile = filename + '.subset.%d-%d' % (start, stop)
+        if os.path.exists(outfile + '.pmap'):
+            print 'SKIPPING', filename, start, stop
+            continue
+        
         print 'starting:', filename, start, stop
         subset = ht.do_subset_partition(filename, start, stop)
         print 'saving:', filename, start, stop
@@ -23,6 +30,8 @@ def worker(q):
         ht.save_subset_partitionmap(subset,
                                     outfile + '.pmap',
                                     outfile + '.surr')
+        del subset
+        gc.collect()
 
 (total_reads, total_kmers) = ht.consume_fasta_and_tag(FILENAME)
 n_subsets = total_reads / SUBSET_SIZE + 1
