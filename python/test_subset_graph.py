@@ -166,3 +166,20 @@ class Test_RandomData(object):
 
         n = ht.do_truncated_partition(filename, outfile)
         assert n == 999, n
+
+class Test_Surrendered(object):
+    def test_surrendered_subset(self):
+        ht = khmer.new_hashtable(32, 4**15+1)
+
+        filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        subset = ht.do_subset_partition(filename, 0, total_reads)
+        ht.merge_subset(subset)
+
+        n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
+
+        assert n_partitions == 16, n_partitions
+        assert n_unassigned == 0, n_unassigned
+        assert n_surrendered == 16, n_surrendered
+
+    

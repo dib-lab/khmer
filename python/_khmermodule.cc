@@ -1646,6 +1646,21 @@ static PyObject * hash__validate_partitionmap(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * hash_count_partitions(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+  
+  unsigned int n_partitions, n_unassigned, n_surrendered;
+  hashtable->count_partitions(n_partitions, n_unassigned, n_surrendered);
+
+  return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
+}
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1682,6 +1697,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
   { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hash_merge_subset, METH_VARARGS, "" },
+  { "count_partitions", hash_count_partitions, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

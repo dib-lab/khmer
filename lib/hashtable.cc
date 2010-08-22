@@ -1217,6 +1217,47 @@ void Hashtable::do_truncated_partition(const std::string infilename,
   delete parser;
 }
 
+void Hashtable::count_partitions(unsigned int& n_partitions,
+				 unsigned int& n_unassigned,
+				 unsigned int& n_surrendered)
+{
+  n_partitions = 0;
+  n_unassigned = 0;
+  n_surrendered = 0;
+
+  PartitionSet partitions;
+  PartitionSet surrendered;
+
+  //
+  // go through the surrender_set and convert the PartitionID* into
+  // PartitionID.
+  //
+
+  for (PartitionPtrSet::const_iterator si = surrender_set.begin();
+       si != surrender_set.end(); si++) {
+    PartitionID * pp = *si;
+    surrendered.insert(*pp);
+  }
+  n_surrendered = surrendered.size();
+
+  //
+  // now, go through all the reads, and take those with assigned partitions
+  // and output them.
+  //
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    PartitionID * partition_p = pi->second;
+    if (partition_p) {
+      partitions.insert(*partition_p);
+    }
+    else {
+      n_unassigned++;
+    }
+  }
+  n_partitions = partitions.size();
+}
+
 unsigned int Hashtable::output_partitioned_file(const std::string infilename,
 						const std::string outputfile,
 						bool output_unassigned,
