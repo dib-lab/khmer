@@ -183,3 +183,20 @@ class Test_Surrendered(object):
         assert n_surrendered == 16, n_surrendered
 
     
+    def test_surrendered_subset_2(self):
+        ht = khmer.new_hashtable(32, 4**15+1)
+
+        filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        subset1 = ht.do_subset_partition(filename, 0, total_reads / 2)
+        subset2 = ht.do_subset_partition(filename, total_reads / 2, total_reads)
+        ht.merge_subset(subset1)
+        ht.merge_subset(subset2)
+
+        n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
+
+        assert n_partitions == 16, n_partitions
+        assert n_unassigned == 0, n_unassigned
+        assert n_surrendered == 16, n_surrendered
+
+    
