@@ -1372,6 +1372,7 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
     hashtable->do_truncated_partition(filename, _report_fn, callback_obj);
     n_partitions = hashtable->output_partitioned_file(filename,
 						      output,
+						      true,
     						      _report_fn,
 						      callback_obj);
   } catch (_khmer_signal &e) {
@@ -1584,6 +1585,7 @@ static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
   try {
     n_partitions = hashtable->output_partitioned_file(filename,
 						      output,
+						      true,
 						      _report_fn,
 						      callback_obj);
   } catch (_khmer_signal &e) {

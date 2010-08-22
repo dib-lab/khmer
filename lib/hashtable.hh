@@ -365,6 +365,7 @@ namespace khmer {
 
     unsigned int output_partitioned_file(const std::string infilename,
 					 const std::string outputfilename,
+					 bool output_unassigned=false,
 					 CallbackFn callback=0,
 					 void * callback_data=0);
 
