@@ -203,4 +203,52 @@ class Test_Surrendered(object):
         assert n_unassigned == 0, n_unassigned
         assert n_surrendered == 16, n_surrendered
 
-    
+    def test_save_load_merge(self):
+        ht = khmer.new_hashtable(20, 4**14+1)
+        filename = os.path.join(thisdir, 'test-graph2.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
+        
+        n_partitions = ht.output_partitions(filename, filename + '.out')
+        assert n_partitions == 3, n_partitions        # all singular
+        
+        x = ht.do_subset_partition(filename, 0, 1)
+        ht.save_subset_partitionmap(x, 'x.pmap', 'x.surrender')
+        del x
+
+        y = ht.do_subset_partition(filename, 1, 3)
+        ht.save_subset_partitionmap(y, 'y.pmap', 'y.surrender')
+        del y
+
+        a = ht.load_subset_partitionmap('x.pmap', 'x.surrender')
+        b = ht.load_subset_partitionmap('y.pmap', 'y.surrender')
+
+        ht.merge_subset(a)
+        ht.merge_subset(b)
+        
+        n_partitions = ht.output_partitions(filename, filename + '.out')
+        assert n_partitions == 1, n_partitions        # combined.
+        
+    def test_save_load_merge_2(self):
+        ht = khmer.new_hashtable(20, 4**14+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        
+        x = ht.do_subset_partition(filename, 0, total_reads / 2)
+        ht.save_subset_partitionmap(x, 'x.pmap', 'x.surrender')
+        del x
+
+        y = ht.do_subset_partition(filename, total_reads / 2, total_reads)
+        ht.save_subset_partitionmap(y, 'y.pmap', 'y.surrender')
+        del y
+
+        a = ht.load_subset_partitionmap('x.pmap', 'x.surrender')
+        b = ht.load_subset_partitionmap('y.pmap', 'y.surrender')
+
+        ht.merge_subset(a)
+        ht.merge_subset(b)
+        
+        n_partitions = ht.output_partitions(filename, filename + '.out')
+        assert n_partitions == 1, n_partitions        # combined.
