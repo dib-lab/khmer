@@ -369,6 +369,10 @@ namespace khmer {
 					 CallbackFn callback=0,
 					 void * callback_data=0);
 
+    void count_partitions(unsigned int& n_partitions,
+			  unsigned int& n_unassigned,
+			  unsigned int& n_surrendered);
+
     bool _is_tagged_kmer(const HashIntoType kmer_f,
 			 const HashIntoType kmer_r,
 			 HashIntoType& tagged_kmer);
