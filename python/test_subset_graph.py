@@ -104,6 +104,10 @@ class Test_RandomData(object):
         total_reads, _ = ht.consume_fasta_and_tag(filename)
         x = ht.do_subset_partition(filename, 0, total_reads/2)
         y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+
+        ht._validate_subset_partitionmap(x)
+        ht._validate_subset_partitionmap(y)
+        
         ht.merge_subset(y)
         ht.merge_subset(x)
 

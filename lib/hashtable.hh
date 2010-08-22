@@ -53,10 +53,8 @@ namespace khmer {
 					const HashIntoType kmer_f);
 
   public:
-    SubsetPartition(PartitionMap& _master) : next_partition_id(1) {
-      master_map = &_master;
-      fill(_master);
-    }
+    SubsetPartition(Hashtable * ht);
+
     ~SubsetPartition() {
       _clear_partitions();
     }
@@ -68,9 +66,15 @@ namespace khmer {
     void merge(PartitionMap& master_map, PartitionPtrSet& master_surrender,
 	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
     void fill(PartitionMap& master_map);
+
+    void save_partitionmap(std::string outfile, std::string surrenderfile);
+    void load_partitionmap(std::string infile, std::string surrenderfile);
+    void _validate_pmap();
+
   };
 
   class Hashtable {
+    friend class SubsetPartition;
   protected:
     const WordLength _ksize;
     const HashIntoType _tablesize;

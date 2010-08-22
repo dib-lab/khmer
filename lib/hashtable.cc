@@ -1798,6 +1798,14 @@ void Hashtable::load_partitionmap(string infilename,
   delete buf; buf = NULL;
 }
 
+SubsetPartition::SubsetPartition(Hashtable * ht)
+{
+  next_partition_id = 1;
+
+  master_map = &(ht->partition_map);
+  fill(*master_map);
+}
+
 SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 				    unsigned int first_read_n,
 				    unsigned int last_read_n,
@@ -1815,7 +1823,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
   SeenSet tagged_kmers;
   bool surrender;
 
-  SubsetPartition * subset_p = new SubsetPartition(this->partition_map);
+  SubsetPartition * subset_p = new SubsetPartition(this);
 
   while(!parser->is_complete()) {
     // increment read number
@@ -2289,3 +2297,214 @@ void Hashtable::consume_fasta_and_tag(const std::string &filename,
     }
   }
 }
+
+// load partition maps from & save to disk 
+
+void SubsetPartition::save_partitionmap(string pmap_filename,
+					string surrender_filename)
+{
+  ofstream outfile(pmap_filename.c_str(), ios::binary);
+  char * buf = NULL;
+  buf = new char[IO_BUF_SIZE];
+  unsigned int n_bytes = 0;
+
+  PartitionMap::const_iterator pi = partition_map.begin();
+  for (; pi != partition_map.end(); pi++) {
+    HashIntoType kmer;
+    PartitionID p_id;
+
+    kmer = pi->first;
+    if (pi->second != NULL) {
+      p_id = *(pi->second);
+
+      memcpy(&buf[n_bytes], &kmer, sizeof(HashIntoType));
+      n_bytes += sizeof(HashIntoType);
+      memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+      n_bytes += sizeof(PartitionID);
+
+      if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(PartitionID)) {
+	outfile.write(buf, n_bytes);
+	n_bytes = 0;
+      }
+    }
+  }
+  if (n_bytes) {
+    outfile.write(buf, n_bytes);
+  }
+  outfile.close();
+
+  ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
+
+  n_bytes = 0;
+  for (PartitionPtrSet::const_iterator ss = surrender_set.begin();
+       ss != surrender_set.end(); ss++) {
+    PartitionID p_id = *(*ss);
+    
+    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+    n_bytes += sizeof(PartitionID);
+
+    if (n_bytes >= IO_BUF_SIZE - sizeof(PartitionID)) {
+      surrenderfile.write(buf, n_bytes);
+      n_bytes = 0;
+    }
+  }
+  if (n_bytes) {
+    surrenderfile.write(buf, n_bytes);
+  }
+  surrenderfile.close();
+
+  delete buf;
+}
+					 
+void SubsetPartition::load_partitionmap(string infilename,
+					string surrenderfilename)
+{
+  ifstream infile(infilename.c_str(), ios::binary);
+  char * buf = NULL;
+  buf = new char[IO_BUF_SIZE];
+
+  unsigned int n_bytes = 0;
+  unsigned int loaded = 0;
+  unsigned int remainder;
+
+  assert(infile.is_open());
+
+  HashIntoType kmer;
+  PartitionID p_id;
+  PartitionSet partitions;
+
+  remainder = 0;
+  while (!infile.eof()) {
+    unsigned int i;
+
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
+      // memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      i += sizeof(HashIntoType);
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      partitions.insert(p_id);
+
+      loaded++;
+    }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
+  }
+
+  PartitionID max_p_id = 1;
+  PartitionPtrMap ppmap;
+  for (PartitionSet::const_iterator si = partitions.begin();
+      si != partitions.end(); si++) {
+    if (*si == 0) {
+      continue;
+    }
+
+    PartitionID * p = new PartitionID;
+    *p = *(si);
+    ppmap[*p] = p;
+
+    PartitionPtrSet * s = new PartitionPtrSet();
+    s->insert(p);
+    reverse_pmap[*p] = s;
+
+    if (max_p_id < *p) {
+      max_p_id = *p;
+    }
+  }
+  next_partition_id = max_p_id + 1;
+
+  infile.clear();
+  infile.seekg(0, ios::beg);
+
+  remainder = 0;
+  while (!infile.eof()) {
+    unsigned int i;
+
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
+      memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      i += sizeof(HashIntoType);
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      if (p_id == 0) {
+	partition_map[kmer] = NULL;
+      } else {
+	partition_map[kmer] = ppmap[p_id];
+      } 
+    }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
+  }
+
+  ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
+
+  assert(surrenderfile.is_open());
+
+  n_bytes = 0;
+  remainder = 0;
+  while (!infile.eof()) {
+    unsigned int i;
+
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+
+    remainder = n_bytes % sizeof(PartitionID);
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
+      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      i += sizeof(PartitionID);
+
+      surrender_set.insert(ppmap[p_id]);
+    }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
+  }
+
+  delete buf; buf = NULL;
+}
+
+
+void SubsetPartition::_validate_pmap()
+{
+  // cout << "validating partition_map\n";
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    //HashIntoType kmer = (*pi).first;
+    PartitionID * pp_id = (*pi).second;
+
+    if (pp_id != NULL) {
+      assert(*pp_id >= 1);
+      assert(*pp_id < next_partition_id);
+    }
+  }
+
+  // cout << "validating reverse_pmap -- st 1\n";
+  for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
+       ri != reverse_pmap.end(); ri++) {
+    PartitionID p = (*ri).first;
+    PartitionPtrSet *s = (*ri).second;
+
+    assert(s != NULL);
+
+    for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
+	 si++) {
+      PartitionID * pp;
+      pp = *si;
+
+      assert (p == *pp);
+    }
+  }
+}
+

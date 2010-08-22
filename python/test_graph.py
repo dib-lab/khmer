@@ -200,6 +200,7 @@ class Test_MoreConnectMe4(object):
         assert n == 103, n
 
     def test_complex6_32_12_save(self):
+        # this succeeds if save/load are null, or implemented. oops. @@CTB.
         ht = khmer.new_hashtable(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph6.fa')
