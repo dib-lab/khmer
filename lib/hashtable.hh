@@ -16,9 +16,59 @@ namespace khmer {
   typedef std::set<PartitionID> PartitionSet;
   typedef std::map<HashIntoType, PartitionID*> PartitionMap;
   typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
   typedef std::set<PartitionID *> PartitionPtrSet;
   typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
+  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+
+  class Hashtable;
+
+  class SubsetPartition {
+  public:
+    PartitionMap * master_map;
+    PartitionMap partition_map;
+    ReversePartitionMap reverse_pmap;
+    unsigned int next_partition_id;
+    PartitionPtrSet surrender_set;
+
+    void _clear_partitions() {
+      for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
+	   ri != reverse_pmap.end(); ri++) {
+	PartitionPtrSet * s = (*ri).second;
+
+	for (PartitionPtrSet::iterator pi = s->begin(); pi != s->end(); pi++) {
+	  PartitionID * pp = (*pi);
+	  delete pp;
+	}
+	delete s;
+      }
+      partition_map.clear();
+      surrender_set.clear();
+      next_partition_id = 1;
+    }
+
+    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
+    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
+					const HashIntoType kmer_f);
+
+  public:
+    SubsetPartition(PartitionMap& _master) : next_partition_id(1) {
+      master_map = &_master;
+      fill(_master);
+    }
+    ~SubsetPartition() {
+      _clear_partitions();
+    }
+
+    PartitionID assign_partition_id(HashIntoType kmer_f,
+				    SeenSet& tagged_kmers,
+				    bool surrender);
+
+    void merge(PartitionMap& master_map, PartitionPtrSet& master_surrender,
+	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
+    void fill(PartitionMap& master_map);
+  };
 
   class Hashtable {
   protected:
@@ -30,7 +80,7 @@ namespace khmer {
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
-    PartitionSet surrender_set;
+    PartitionPtrSet surrender_set;
 
     void (*_writelock_acquire)(void * data);
     void (*_writelock_release)(void * data);
@@ -53,8 +103,6 @@ namespace khmer {
       memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
     }
 
-    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
-
     void _clear_partitions() {
       for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
 	   ri != reverse_pmap.end(); ri++) {
@@ -72,6 +120,8 @@ namespace khmer {
     }
 
   public:
+    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
+
     void _validate_pmap();
 
     Hashtable(WordLength ksize, HashIntoType tablesize) :
@@ -301,6 +351,14 @@ namespace khmer {
 				CallbackFn callback=0,
 				void * callback_data=0);
 
+    SubsetPartition * do_subset_partition(const std::string infilename,
+			     unsigned int first_read_n=0,
+			     unsigned int last_read_n=0,
+			     CallbackFn callback=0,
+			     void * callback_data=0);
+
+    void merge_subset_partition(SubsetPartition * subset_p);
+
     PartitionID assign_partition_id(HashIntoType kmer_f,
 			     SeenSet& tagged_kmers,
 			     bool surrender);
@@ -320,13 +378,28 @@ namespace khmer {
     void partition_find_all_tags(HashIntoType kmer_f,
 				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
-				 bool& surrender);
+				 bool& surrender,
+				 PartitionMap * pmap = NULL,
+				 bool do_initial_check=true);
 
-    PartitionID _reassign_partition_ids(SeenSet& tagged_kmers,
+    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
 				 const HashIntoType kmer_f);
 
     void save_partitionmap(std::string outfile, std::string surrenderfile);
     void load_partitionmap(std::string infile, std::string surrenderfile);
+
+    // count every k-mer in the FASTA file.
+    void consume_fasta_and_tag(const std::string &filename,
+			       unsigned int &total_reads,
+			       unsigned long long &n_consumed,
+			       CallbackFn callback = NULL,
+			       void * callback_data = NULL);
+
+    PartitionID * get_new_partition() {
+      PartitionID* pp = new PartitionID(next_partition_id);
+      next_partition_id++;
+      return pp;
+    }
   };
 
   class HashtableIntersect {
