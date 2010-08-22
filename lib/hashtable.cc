@@ -861,13 +861,6 @@ const
   keeper.insert(kmer);
   count += 1;
 
-#if 0
-  // @@@
-  if (val != MAX_COUNT) {
-    _counts[kmer % _tablesize] = val - 1;
-  }
-#endif // 0
-
   // are we past the threshold? truncate search.
   if (threshold && count >= threshold) {
     return;
@@ -1238,12 +1231,24 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
   unsigned int n_singletons = 0;
 
   PartitionSet partitions;
+  PartitionSet surrendered;
 
   Read read;
   string seq;
 
   std::string first_kmer;
   HashIntoType kmer_f, kmer_r;
+
+  //
+  // first, go through the surrender_set and convert the PartitionID* into
+  // PartitionID.
+  //
+
+  for (PartitionPtrSet::const_iterator si = surrender_set.begin();
+       si != surrender_set.end(); si++) {
+    PartitionID * pp = *si;
+    surrendered.insert(*pp);
+  }
 
   //
   // now, go through all the reads, and take those with assigned partitions
@@ -1268,15 +1273,13 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
 	partitions.insert(partition_id);
       }
 
-      // @CTB BROKEN
+      // Is this a partition that has not been entirely explored? If so,
+      // mark it.
       char surrender_flag = ' ';
-#if 0
-      PartitionSet::const_iterator ii;
-      ii = surrender_set.find(partition_id);
-      if (ii != surrender_set.end()) {
+      PartitionSet::const_iterator ii = surrendered.find(partition_id);
+      if (ii != surrendered.end()) {
 	surrender_flag = '*';
       }
-#endif // 0
 
       if (partition_id > 0 || output_unassigned) {
 	outfile << ">" << read.name << "\t" << partition_id
@@ -1284,7 +1287,6 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
 		<< seq << "\n";
       }
 	       
-      // reset the sequence info, increment read number
       total_reads++;
 
       // run callback, if specified
