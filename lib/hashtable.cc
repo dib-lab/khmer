@@ -1226,6 +1226,7 @@ void Hashtable::do_truncated_partition(const std::string infilename,
 
 unsigned int Hashtable::output_partitioned_file(const std::string infilename,
 						const std::string outputfile,
+						bool output_unassigned,
 						CallbackFn callback,
 						void * callback_data)
 {
@@ -1236,13 +1237,18 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
   unsigned int reads_kept = 0;
   unsigned int n_singletons = 0;
 
-  std::set<unsigned int> partitions;
+  PartitionSet partitions;
 
   Read read;
   string seq;
 
   std::string first_kmer;
   HashIntoType kmer_f, kmer_r;
+
+  //
+  // now, go through all the reads, and take those with assigned partitions
+  // and output them.
+  //
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -1272,9 +1278,11 @@ unsigned int Hashtable::output_partitioned_file(const std::string infilename,
       }
 #endif // 0
 
-      outfile << ">" << read.name << "\t" << partition_id
-	      << surrender_flag << "\n" 
-	      << seq << "\n";
+      if (partition_id > 0 || output_unassigned) {
+	outfile << ">" << read.name << "\t" << partition_id
+		<< surrender_flag << "\n" 
+		<< seq << "\n";
+      }
 	       
       // reset the sequence info, increment read number
       total_reads++;
