@@ -1614,13 +1614,12 @@ void Hashtable::save_partitionmap(string pmap_filename,
   }
   outfile.close();
 
-#if 0
   ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
 
   n_bytes = 0;
-  for (PartitionSet::const_iterator ss = surrender_set.begin();
+  for (PartitionPtrSet::const_iterator ss = surrender_set.begin();
        ss != surrender_set.end(); ss++) {
-    PartitionID p_id = *ss;
+    PartitionID p_id = *(*ss);
     
     memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
     n_bytes += sizeof(PartitionID);
@@ -1634,7 +1633,6 @@ void Hashtable::save_partitionmap(string pmap_filename,
     surrenderfile.write(buf, n_bytes);
   }
   surrenderfile.close();
-#endif // 0
 
   delete buf;
 }
@@ -1731,7 +1729,6 @@ void Hashtable::load_partitionmap(string infilename,
     memcpy(buf, buf + n_bytes, remainder);
   }
 
-#if 0
   ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
 
   assert(surrenderfile.is_open());
@@ -1751,12 +1748,11 @@ void Hashtable::load_partitionmap(string infilename,
       memcpy(&p_id, &buf[i], sizeof(PartitionID));
       i += sizeof(PartitionID);
 
-      surrender_set.insert(p_id);
+      surrender_set.insert(ppmap[p_id]);
     }
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
   }
-#endif // 0
 
   delete buf; buf = NULL;
 }
@@ -2168,26 +2164,6 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
       delete *si;
     }
   }
-
-#if 0 // @CTB does not work
-  for (PartitionPtrSet::iterator si = surrender_set.begin();
-       si != surrender_set.end(); si++) {
-    PartitionID p = *si;
-    pp = mm[p];
-    if (pp == NULL) {
-      SeenSet tags;
-      PartitionSet partitions;
-      partitions.insert(p);
-      
-      get_tags_from_partitions(tags, partitions, partition_map);
-
-      print_tag_set(tags);
-
-    } else {
-      master_surr.insert(pp);
-    }
-  }
-#endif //0
 
   del_partitions_to_tags(subset_pttm);
   del_partitions_to_tags(master_pttm);
