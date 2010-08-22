@@ -1950,9 +1950,10 @@ static void del_partitions_to_tags(PartitionsToTagsMap& pttmap)
   for (PartitionsToTagsMap::iterator pt = pttmap.begin();
        pt != pttmap.end(); pt++) {
     SeenSet * sp = pt->second;
-    assert (sp != NULL);
-    delete sp;
-    pt->second = NULL;
+    if (sp != NULL) {
+      delete sp;
+      pt->second = NULL;
+    }
   }
 }
 
@@ -2035,10 +2036,26 @@ static void transfer_partitions(PartitionSet& from, PartitionSet& to)
 
 void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_surr, Hashtable * ht, ReversePartitionMap& master_reverse_pmap)
 {
-  PartitionToPartitionPMap mm;
   PartitionsToTagsMap subset_pttm, master_pttm;
   PartitionID * pp;
   PartitionID p;
+
+
+  //
+  // first, go through the surrender_set and convert the PartitionID* into
+  // PartitionID.
+  //
+
+  PartitionSet surrendered;
+  for (PartitionPtrSet::const_iterator si = surrender_set.begin();
+       si != surrender_set.end(); si++) {
+    PartitionID * pp = *si;
+    surrendered.insert(*pp);
+  }
+
+  //
+  // now, convert the partition maps.
+  //
 
   make_partitions_to_tags(partition_map, subset_pttm);
   make_partitions_to_tags(master_map, master_pttm);
@@ -2048,8 +2065,7 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
     p = ptti->first;
     SeenSet * these_tags = ptti->second;
 
-    PartitionToPartitionPMap::iterator mi = mm.find(p);
-    if (mi != mm.end()) {
+    if (these_tags == NULL) {
       continue;
     }
 
@@ -2116,14 +2132,26 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
     }
 
     // Go over all of the subset partitions we've mapped into the master,
-    // and put them in the mm table, pointing at the correct master ptn.
-
-    // This will also stop us from exploring any other of the merged ptns
-    // on the subset side; see if statement at top of loop.
+    // and see if any are marked as surrendered.  If so, put them into
+    // the master 'surrender' table, pointing at the correct master ptn.
 
     for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
 	 psi2 != old_subset_partitions.end(); psi2++) {
-      mm[*psi2] = pp;
+      PartitionSet::iterator xx = surrendered.find(*psi2);
+      if (xx != surrendered.end()) {
+	master_surr.insert(pp);
+	break;
+      }
+    }
+
+    // Remove all of the SeenSets in the subset_pttm map for these
+    // now-connected partitions.
+    for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
+	 psi2 != old_subset_partitions.end(); psi2++) {
+      SeenSet * sp = subset_pttm[*psi2];
+      assert(sp != NULL);
+      subset_pttm[*psi2] = NULL;
+      delete sp;
     }
 
     // Remap all of the tags in the master map. This has the side
@@ -2140,9 +2168,6 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
 	remove_me.insert(old_pp);
 	master_map[*si] = pp;
       }
-
-      // also set them to NULL so we don't go over them.
-      partition_map[*si] = NULL;
     }
 
     // reset the reverse_pmap for this entry, too.
