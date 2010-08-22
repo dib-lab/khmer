@@ -1812,8 +1812,6 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 
   delete parser;
 
-  cout << "AAA " << subset_p->partition_map.size() << "\n";
-
   return subset_p;
 }
 
@@ -1832,8 +1830,6 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 {
   PartitionID return_val = 0; 
   PartitionID * pp = NULL;
-
-  cout << "ASSIGN " << tagged_kmers.size() << "\n";
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1 || surrender) {
@@ -1890,7 +1886,6 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
 
   assert(this_partition_p != NULL);
   partition_map[kmer_f] = this_partition_p;
-  cout << "assign " << kmer_f << " " << *this_partition_p << "\n";
 
   return this_partition_p;
 }
@@ -1921,17 +1916,6 @@ void SubsetPartition::fill(PartitionMap& master_map)
   }
 }
 
-static void get_partitions_for_tags(PartitionSet& partitions, SeenSet& tags,
-				    PartitionMap& pmap)
-{
-  for (SeenSet::iterator si = tags.begin(); si != tags.end(); si++) {
-    PartitionID * pp = pmap[*si];
-    if (pp != NULL) {
-      partitions.insert(*pp);
-    }
-  }
-}
-
 static void make_partitions_to_tags(PartitionMap& pmap,
 				    PartitionsToTagsMap& pttmap)
 {
@@ -1939,16 +1923,13 @@ static void make_partitions_to_tags(PartitionMap& pmap,
   HashIntoType tag;
   PartitionID p;
 
-  cout << "XYZ\n";
   for (PartitionMap::const_iterator pi = pmap.begin(); pi != pmap.end();
        pi++) {
-    cout << "YZA " << pi->second << "\n";
     if (pi->second) {
       tag = pi->first;
       p = *(pi->second);
 
       sp = pttmap[p];
-      cout << "XXX " << (long long) sp << "\n";
       if (sp == NULL) {
 	sp = new SeenSet();
 	pttmap[p] = sp;
@@ -1969,7 +1950,7 @@ static void del_partitions_to_tags(PartitionsToTagsMap& pttmap)
   }
 }
 
-// #if 0
+#if 0
 
 static void print_partition_set(PartitionSet& p)
 {
@@ -1989,22 +1970,7 @@ static void print_tag_set(SeenSet& p)
   cout << "\n";
 }
 
-// #endif //0
-
-static void get_tags_from_partitions(SeenSet& tags, PartitionSet& partitions,
-				     PartitionMap& pmap)
-
-{
-  for (PartitionMap::iterator pi = pmap.begin(); pi != pmap.end(); pi++) {
-    if (pi->second) {
-      PartitionID p = *(pi->second);
-      PartitionSet::iterator ps = partitions.find(p);
-      if (ps != partitions.end()) {
-	tags.insert(pi->first);
-      }
-    }
-  }
-}
+#endif //0
 
 static void get_new_tags_from_partitions(SeenSet& old_tags,
 					 SeenSet& new_tags,
@@ -2068,22 +2034,16 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
   PartitionID * pp;
   PartitionID p;
 
-  cout << "making pttms\n";
-  cout << subset_pttm.size() << "\n";
-  cout << master_pttm.size() << "\n";
-
   make_partitions_to_tags(partition_map, subset_pttm);
   make_partitions_to_tags(master_map, master_pttm);
 
   for (PartitionsToTagsMap::iterator ptti = subset_pttm.begin();
        ptti != subset_pttm.end(); ptti++) {
-    cout << "hi!\n";
     p = ptti->first;
     SeenSet * these_tags = ptti->second;
 
     PartitionToPartitionPMap::iterator mi = mm.find(p);
     if (mi != mm.end()) {
-      cout << "abort!\n";
       continue;
     }
 
@@ -2091,8 +2051,8 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
 
     //
     // Here, we want to get all of the partitions connected to this
-    // one in the master map and the subset map.  Loop until no more
-    // are found.
+    // one in the master map and the subset map -- and do
+    // transitively.  Loop until no more are found.
     //
 
     SeenSet old_tags;
@@ -2104,31 +2064,31 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
     old_subset_partitions.insert(p);
     transfer_tags(*these_tags, new_tags);
 
-    cout << "new tags size: " << new_tags.size() << "\n";
-
     while(new_tags.size()) {
-      cout << "iteration\n";
+      // first, get partitions (and then tags) for partitions in the *master*
+      // that overlap with any of the tags in this subset partition.
       get_new_partitions_from_tags(old_master_partitions,
 				   new_master_partitions,
 				   new_tags,
 				   master_map);
-      cout << new_master_partitions.size() << "new master parts\n";
       transfer_tags(new_tags, old_tags);
       get_new_tags_from_partitions(old_tags, new_tags,
 				   new_master_partitions, master_pttm);
-      cout << new_tags.size() << "new master tags\n";
       transfer_partitions(new_master_partitions, old_master_partitions);
+
+      // ok, now get partitions (and then tags) for partitions in *subset*
+      // that overlap with any of the tags from the master.
 
       get_new_partitions_from_tags(old_subset_partitions,
 				   new_subset_partitions,
 				   new_tags,
 				   partition_map);
-      cout << new_subset_partitions.size() << "new subset parts\n";
       transfer_tags(new_tags, old_tags);
       get_new_tags_from_partitions(old_tags, new_tags,
 				   new_subset_partitions, subset_pttm);
-      cout << new_tags.size() << "new subset tags\n";
       transfer_partitions(new_subset_partitions, old_subset_partitions);
+
+      // aaaaaand.... iterate until no more tags show up!
     }
 
     // All right!  We've now got all the tags that we want to be part of
@@ -2205,9 +2165,6 @@ void SubsetPartition::merge(PartitionMap& master_map, PartitionPtrSet& master_su
     PartitionID p = *si;
     pp = mm[p];
     if (pp == NULL) {
-      cout << "FAIL converting " << p << "\n";
-
-
       SeenSet tags;
       PartitionSet partitions;
       partitions.insert(p);
