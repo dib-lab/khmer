@@ -1362,7 +1362,8 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
   char * output = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output,
+			&callback_obj)) {
     return NULL;
   }
 
@@ -1378,6 +1379,92 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
   }
 
   return PyInt_FromLong(n_partitions);
+}
+
+void free_subset_partition_info(void * p)
+{
+  khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
+  delete subset_p;
+}
+
+static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  PyObject * callback_obj = NULL;
+
+  unsigned int start_read_n = 0, end_read_n = 0;
+
+  if (!PyArg_ParseTuple(args, "s|iiO", &filename,
+			&start_read_n, &end_read_n,
+			&callback_obj)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset_p = NULL;
+  try {
+    Py_BEGIN_ALLOW_THREADS
+    subset_p = hashtable->do_subset_partition(filename,
+					      start_read_n, end_read_n,
+					      _report_fn, callback_obj);
+    Py_END_ALLOW_THREADS
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+}
+
+static PyObject * hash_merge_subset(PyObject * self, PyObject *args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * subset_obj;
+  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    return NULL;
+  }
+
+  if (!PyCObject_Check(subset_obj)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+  
+  hashtable->merge_subset_partition(subset_p);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashtable->consume_fasta_and_tag(filename, total_reads, n_consumed,
+				     _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
 void free_pre_partition_info(void * p)
@@ -1582,6 +1669,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
   { "do_exact_partition", hash_do_exact_partition, METH_VARARGS, "" },
   { "do_truncated_partition", hash_do_truncated_partition, METH_VARARGS, "" },
+  { "do_subset_partition", hash_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hash_filter_file_connected, METH_VARARGS, "" },
   { "find_all_tags", hash_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hash_assign_partition_id, METH_VARARGS, "" },
@@ -1590,6 +1678,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "load_partitionmap", hash_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
+  { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "merge_subset", hash_merge_subset, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
