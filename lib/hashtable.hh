@@ -26,7 +26,6 @@ namespace khmer {
 
   class SubsetPartition {
   public:
-    PartitionMap * master_map;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
@@ -65,7 +64,6 @@ namespace khmer {
 
     void merge(PartitionMap& master_map, PartitionPtrSet& master_surrender,
 	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
-    void fill(PartitionMap& master_map);
 
     void save_partitionmap(std::string outfile, std::string surrenderfile);
     void load_partitionmap(std::string infile, std::string surrenderfile);

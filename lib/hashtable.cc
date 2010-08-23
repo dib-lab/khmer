@@ -1802,8 +1802,7 @@ SubsetPartition::SubsetPartition(Hashtable * ht)
 {
   next_partition_id = 1;
 
-  master_map = &(ht->partition_map);
-  fill(*master_map);
+  // master_map = &(ht->partition_map);
 }
 
 SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
@@ -1961,14 +1960,6 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
     s->insert(iter_pp);
   }
   delete t;
-}
-
-void SubsetPartition::fill(PartitionMap& master_map)
-{
-  for (PartitionMap::iterator pi = master_map.begin();
-       pi != master_map.end(); pi++) {
-    partition_map[pi->first] = NULL;
-  }
 }
 
 static void make_partitions_to_tags(PartitionMap& pmap,
