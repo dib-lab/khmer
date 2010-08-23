@@ -2283,6 +2283,7 @@ void Hashtable::consume_fasta_and_tag(const std::string &filename,
         callback("consume_fasta_and_tag", callback_data, total_reads,
 		 n_consumed);
       } catch (...) {
+	delete parser;
         throw;
       }
     }
