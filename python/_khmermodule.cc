@@ -1673,7 +1673,12 @@ static PyObject * hash_save_subset_partitionmap(PyObject * self, PyObject * args
 
   khmer::SubsetPartition * subset_p;
   subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  Py_BEGIN_ALLOW_THREADS
+
   subset_p->save_partitionmap(filename, filename2);
+
+  Py_END_ALLOW_THREADS
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1693,7 +1698,12 @@ static PyObject * hash_load_subset_partitionmap(PyObject * self, PyObject * args
 
   khmer::SubsetPartition * subset_p;
   subset_p = new khmer::SubsetPartition(hashtable);
+
+  Py_BEGIN_ALLOW_THREADS
+
   subset_p->load_partitionmap(filename, filename2);
+
+  Py_END_ALLOW_THREADS
 
   return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
 }
