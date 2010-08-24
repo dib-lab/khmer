@@ -1081,7 +1081,7 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
   partition_set_id(f, r, keeper, partition_id);
 }
 
-// do_exact_partition: simple partitioning, done once per cluster.
+// do_partition: simple partitioning, done once per cluster.
 //   1) load in all the sequences, tagging the first kmer of each sequence.
 //   2) then, for each tag, explore entre cluster & set tag
 //         using partition_set_id.
@@ -1089,7 +1089,7 @@ void Hashtable::partition_set_id(const HashIntoType kmer_f,
 // slow for big clusters, because it has to find all tagged k-mers in each
 // cluster.  no provision for giving up and retagging.
 
-unsigned int Hashtable::do_exact_partition(const std::string infilename,
+unsigned int Hashtable::do_partition(const std::string infilename,
 					   CallbackFn callback,
 					   void * callback_data)
 {
@@ -1119,7 +1119,7 @@ unsigned int Hashtable::do_exact_partition(const std::string infilename,
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
       try {
-	callback("do_exact_partition", callback_data, total_reads, reads_kept);
+	callback("do_partition", callback_data, total_reads, reads_kept);
       } catch (...) {
 	delete parser;
 	throw;
@@ -1183,8 +1183,8 @@ void Hashtable::do_truncated_partition(const std::string infilename,
   SeenSet tagged_kmers;
   bool surrender;
 
-  if (!exact_partition) {
-    exact_partition = new SubsetPartition(this);
+  if (!partition) {
+    partition = new SubsetPartition(this);
   }
 
   while(!parser->is_complete()) {
@@ -1203,19 +1203,19 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      exact_partition->partition_find_all_tags(kmer_f, kmer_r,
-					       tagged_kmers, surrender,
-					       &this->all_tags,
-					       true);
+      partition->partition_find_all_tags(kmer_f, kmer_r,
+					 tagged_kmers, surrender,
+					 &this->all_tags,
+					 true);
 
       // assign the partition ID
-      exact_partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
 	  callback("do_truncated_partition/read", callback_data, total_reads,
-		   exact_partition->next_partition_id);
+		   partition->next_partition_id);
 	} catch (...) {
 	  delete parser;
 	  throw;
@@ -1376,14 +1376,15 @@ bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
 				      const HashIntoType kmer_r,
 				      HashIntoType& tagged_kmer)
 {
-  PartitionMap::const_iterator fi = partition_map.find(kmer_f);
-  if (fi != partition_map.end()) {
+  PartitionMap * tags = &_ht->all_tags;
+  PartitionMap::const_iterator fi = tags->find(kmer_f);
+  if (fi != tags->end()) {
     tagged_kmer = kmer_f;
     return true;
   }
 
-  fi = partition_map.find(kmer_r);
-  if (fi != partition_map.end()) {
+  fi = tags->find(kmer_r);
+  if (fi != tags->end()) {
     tagged_kmer = kmer_r;
     return true;
   }
@@ -1516,8 +1517,7 @@ void SubsetPartition::partition_find_all_tags(HashIntoType kmer_f,
 
 ///////////////////////////////////////////////////////////////////////
 
-void SubsetPartition::do_partition(Hashtable * ht,
-				   const std::string infilename,
+void SubsetPartition::do_partition(const std::string infilename,
 				   unsigned int first_read_n,
 				   unsigned int last_read_n,
 				   CallbackFn callback,
@@ -1533,7 +1533,7 @@ void SubsetPartition::do_partition(Hashtable * ht,
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
   bool surrender;
-  const unsigned char ksize = ht->ksize();
+  const unsigned char ksize = _ht->ksize();
 
   while(!parser->is_complete()) {
     // increment read number
@@ -1547,7 +1547,7 @@ void SubsetPartition::do_partition(Hashtable * ht,
 
     seq = read.seq;
 
-    if (ht->check_read(seq)) {
+    if (_ht->check_read(seq)) {
       first_kmer = seq.substr(0, ksize);
       _hash(first_kmer.c_str(), ksize, kmer_f, kmer_r);
 
@@ -1577,15 +1577,6 @@ void SubsetPartition::do_partition(Hashtable * ht,
 
   delete parser;
 }
-
-void Hashtable::merge_subset_partition(SubsetPartition * subset_p)
-{
-  if (!exact_partition) {	// @CTB could just replace...?
-    exact_partition = new SubsetPartition(this);
-  }
-  exact_partition->merge(subset_p);
-}
-
 
 //
 
