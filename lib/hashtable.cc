@@ -519,8 +519,6 @@ unsigned int Hashtable::consume_string(const std::string &s,
   
   HashIntoType bin = _hash(sp, _ksize, h, r);
 
-  writelock_acquire();
-
   try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
       bin = bin % _tablesize;
@@ -555,11 +553,8 @@ unsigned int Hashtable::consume_string(const std::string &s,
       }
     }
   } catch (...) {
-    writelock_release();
     throw;
   }
-
-  writelock_release();
 
   return n_consumed;
 }
@@ -2029,3 +2024,21 @@ void SubsetPartition::_validate_pmap()
     }
   }
 }
+
+void SubsetPartition::_clear_partitions()
+{
+  for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
+       ri != reverse_pmap.end(); ri++) {
+    PartitionPtrSet * s = (*ri).second;
+
+    for (PartitionPtrSet::iterator pi = s->begin(); pi != s->end(); pi++) {
+      PartitionID * pp = (*pi);
+      delete pp;
+    }
+    delete s;
+  }
+  partition_map.clear();
+  surrender_set.clear();
+  next_partition_id = 1;
+}
+

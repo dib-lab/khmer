@@ -25,42 +25,31 @@ namespace khmer {
   class Hashtable;
 
   class SubsetPartition {
-  public:
+    friend class Hashtable;
+  protected:
+    unsigned int next_partition_id;
     Hashtable * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
-    unsigned int next_partition_id;
     PartitionPtrSet surrender_set;
 
-    void _clear_partitions() {
-      for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
-	   ri != reverse_pmap.end(); ri++) {
-	PartitionPtrSet * s = (*ri).second;
-
-	for (PartitionPtrSet::iterator pi = s->begin(); pi != s->end(); pi++) {
-	  PartitionID * pp = (*pi);
-	  delete pp;
-	}
-	delete s;
-      }
-      partition_map.clear();
-      surrender_set.clear();
-      next_partition_id = 1;
-    }
+    void _clear_partitions();
 
     void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
 					const HashIntoType kmer_f);
 
-  public:
-    SubsetPartition(Hashtable * ht) {
-      next_partition_id = 1;
-      _ht = ht;
-    }
+    bool _is_tagged_kmer(const HashIntoType kmer_f,
+			 const HashIntoType kmer_r,
+			 HashIntoType& tagged_kmer);
 
-    ~SubsetPartition() {
-      _clear_partitions();
-    }
+    bool _do_continue(const HashIntoType kmer,
+		      const SeenSet& keeper);
+
+  public:
+    SubsetPartition(Hashtable * ht) : next_partition_id(1), _ht(ht) { };
+
+    ~SubsetPartition() { _clear_partitions(); }
 
     PartitionID assign_partition_id(HashIntoType kmer_f,
 				    SeenSet& tagged_kmers,
@@ -78,18 +67,9 @@ namespace khmer {
     void load_partitionmap(std::string infile, std::string surrenderfile);
     void _validate_pmap();
 
-    void find_all_tags(HashIntoType kmer_f,
-		       HashIntoType kmer_r,
+    void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
 		       SeenSet& tagged_kmers,
-		       bool& surrender,
-		       bool do_initial_check);
-
-    bool _is_tagged_kmer(const HashIntoType kmer_f,
-			 const HashIntoType kmer_r,
-			 HashIntoType& tagged_kmer);
-
-    bool _do_continue(const HashIntoType kmer,
-		      const SeenSet& keeper);
+		       bool& surrender, bool do_initial_check);
 
     void do_partition(const std::string infilename,
 		      unsigned int first_read_n=0,
@@ -119,22 +99,6 @@ namespace khmer {
 
     PartitionMap all_tags;
 
-    void (*_writelock_acquire)(void * data);
-    void (*_writelock_release)(void * data);
-    void * _writelock_data;
-
-    void writelock_acquire() {
-      if (_writelock_acquire) {
-	_writelock_acquire(_writelock_data);
-      }
-    }
-
-    void writelock_release() {
-      if (_writelock_release) {
-	_writelock_release(_writelock_data);
-      }
-    }
-
     void _allocate_counters() {
       _counts = new BoundedCounterType[_tablesize];
       memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
@@ -162,27 +126,12 @@ namespace khmer {
 	bitmask = (bitmask << 2) | 3;
       }
       _allocate_counters();
-
-      _writelock_acquire = NULL;
-      _writelock_release = NULL;
-      _writelock_data = NULL;
     }
 
     ~Hashtable() {
       if (_counts) { delete _counts; _counts = NULL; }
       _clear_partitions();
     }
-
-#if 0
-    // setter to set the writelock functions.
-    void set_writelock_functions(void (*acquire)(void *),
-				 void (*release)(void *),
-				 void * data) {
-      _writelock_acquire = acquire;
-      _writelock_release = release;
-      _writelock_data = data;
-    }
-#endif //0
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -206,27 +155,13 @@ namespace khmer {
     void count(const char * kmer) {
       HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
-      writelock_acquire();
-      try {
-	_counts[bin]++;
-      } catch (...) {
-	writelock_release();
-	throw;
-      }
-      writelock_release();
+      _counts[bin]++;
     }
 
     void count(HashIntoType khash) {
       HashIntoType bin = khash % _tablesize;
       if (_counts[bin] == MAX_COUNT) { return; }
-      writelock_acquire();
-      try {
-	_counts[bin]++;
-      } catch (...) {
-	writelock_release();
-	throw;
-      }
-      writelock_release();
+      _counts[bin]++;
     }
 
     // get the count for the given k-mer.
@@ -371,8 +306,7 @@ namespace khmer {
     // Partitioning stuff.
 
     void add_kmer_to_tags(HashIntoType kmer) {
-      PartitionID * pp = all_tags[kmer];
-      if (!pp) { pp = NULL; }	// redundant?
+      PartitionID * pp = all_tags[kmer]; // sets to NULL if not already set.
     }
 
     void consume_fasta_and_tag(const std::string &filename,
