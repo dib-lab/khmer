@@ -1,0 +1,15 @@
+get callback from partitioning working again!
+
+extract and subset-ize the first k-mers, rather than the read #s.
+  - if we can save them, too, this would make merging much cheaper.
+
+also 1 bit/hash table entry, for basic partitioning?  (REDUCE MEM USAGE/FP)
+
+replace memory structures for map, set to be cheaper.
+
+run velvet??
+
+TODO in the future
+----
+
+put locks around the I/O functions.
