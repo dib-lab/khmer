@@ -1805,11 +1805,12 @@ SubsetPartition::SubsetPartition(Hashtable * ht)
   // master_map = &(ht->partition_map);
 }
 
-SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
-				    unsigned int first_read_n,
-				    unsigned int last_read_n,
-				    CallbackFn callback,
-				    void * callback_data)
+void SubsetPartition::do_partition(Hashtable * ht,
+				   const std::string infilename,
+				   unsigned int first_read_n,
+				   unsigned int last_read_n,
+				   CallbackFn callback,
+				   void * callback_data)
 {
   unsigned int total_reads = 0;
 
@@ -1821,8 +1822,7 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
   bool surrender;
-
-  SubsetPartition * subset_p = new SubsetPartition(this);
+  const unsigned char ksize = ht->ksize();
 
   while(!parser->is_complete()) {
     // increment read number
@@ -1836,22 +1836,22 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
 
     seq = read.seq;
 
-    if (check_read(seq)) {
-      first_kmer = seq.substr(0, _ksize);
-      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+    if (ht->check_read(seq)) {
+      first_kmer = seq.substr(0, ksize);
+      _hash(first_kmer.c_str(), ksize, kmer_f, kmer_r);
 
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender,
-			      &subset_p->partition_map, false);
+      ht->partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender,
+				  &partition_map, false);
 
       // assign the partition ID
-      subset_p->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      assign_partition_id(kmer_f, tagged_kmers, surrender);
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-#if 0
+#if 0 // @CTB
 	try {
 	  callback("do_subset_partition/read", callback_data, total_reads,
 		   next_partition_id);
@@ -1865,8 +1865,6 @@ SubsetPartition * Hashtable::do_subset_partition(const std::string infilename,
   }
 
   delete parser;
-
-  return subset_p;
 }
 
 void Hashtable::merge_subset_partition(SubsetPartition * subset_p)

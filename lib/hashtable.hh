@@ -77,6 +77,20 @@ namespace khmer {
     void load_partitionmap(std::string infile, std::string surrenderfile);
     void _validate_pmap();
 
+    void partition_find_all_tags(Hashtable * ht,
+				 HashIntoType kmer_f,
+				 HashIntoType kmer_r,
+				 SeenSet& tagged_kmers,
+				 bool& surrender,
+				 PartitionMap * pmap = NULL,
+				 bool do_initial_check=true);
+
+    void do_partition(Hashtable * ht,
+		      const std::string infilename,
+		      unsigned int first_read_n=0,
+		      unsigned int last_read_n=0,
+		      CallbackFn callback=0,
+		      void * callback_data=0);
   };
 
   class Hashtable {
@@ -362,10 +376,16 @@ namespace khmer {
 				void * callback_data=0);
 
     SubsetPartition * do_subset_partition(const std::string infilename,
-			     unsigned int first_read_n=0,
-			     unsigned int last_read_n=0,
-			     CallbackFn callback=0,
-			     void * callback_data=0);
+					  unsigned int first_read_n=0,
+					  unsigned int last_read_n=0,
+					  CallbackFn callback=0,
+					  void * callback_data=0) {
+      SubsetPartition * subset_p = new SubsetPartition(this);
+      subset_p->do_partition(this,
+			     infilename, first_read_n, last_read_n,
+			     callback, callback_data);
+      return subset_p;
+    }
 
     void merge_subset_partition(SubsetPartition * subset_p);
 
