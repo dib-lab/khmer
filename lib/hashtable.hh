@@ -92,8 +92,7 @@ namespace khmer {
     bool _do_continue(const HashIntoType kmer,
 		      const SeenSet& keeper);
 
-    void do_partition(Hashtable * ht,
-		      const std::string infilename,
+    void do_partition(const std::string infilename,
 		      unsigned int first_read_n=0,
 		      unsigned int last_read_n=0,
 		      CallbackFn callback=0,
@@ -119,8 +118,6 @@ namespace khmer {
 
     BoundedCounterType * _counts;
 
-    SubsetPartition * exact_partition;
-
     PartitionMap all_tags;
 
     void (*_writelock_acquire)(void * data);
@@ -145,19 +142,21 @@ namespace khmer {
     }
 
     void _clear_partitions() {
-      if (exact_partition != NULL) {
-	exact_partition->_clear_partitions();
+      if (partition != NULL) {
+	partition->_clear_partitions();
       }
     }
 
   public:
+    SubsetPartition * partition;
+
     void _validate_pmap() {
-      if (exact_partition) { exact_partition->_validate_pmap(); }
+      if (partition) { partition->_validate_pmap(); }
     }
 
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
-      exact_partition = NULL;
+      partition = new SubsetPartition(this);
 
       bitmask = 0;
       for (unsigned int i = 0; i < _ksize; i++) {
@@ -376,7 +375,7 @@ namespace khmer {
 			  const HashIntoType kmer_r,
 			  SeenSet& keeper,
 			  unsigned int * partition_id);
-    unsigned int do_exact_partition(const std::string infilename,
+    unsigned int do_partition(const std::string infilename,
 				    CallbackFn callback,
 				    void * callback_data);
 #endif
@@ -390,60 +389,6 @@ namespace khmer {
     void do_truncated_partition(const std::string infilename,
 				CallbackFn callback=0,
 				void * callback_data=0);
-
-    SubsetPartition * do_subset_partition(const std::string infilename,
-					  unsigned int first_read_n=0,
-					  unsigned int last_read_n=0,
-					  CallbackFn callback=0,
-					  void * callback_data=0) {
-      SubsetPartition * subset_p = new SubsetPartition(this);
-      subset_p->do_partition(this,
-			     infilename, first_read_n, last_read_n,
-			     callback, callback_data);
-      return subset_p;
-    }
-
-    void merge_subset_partition(SubsetPartition * subset_p);
-
-    unsigned int output_partitioned_file(const std::string infilename,
-					 const std::string outputfilename,
-					 bool output_unassigned=false,
-					 CallbackFn callback=0,
-					 void * callback_data=0) {
-      unsigned int n = 0;
-      if (exact_partition) {
-	n = exact_partition->output_partitioned_file(infilename,
-						     outputfilename,
-						     output_unassigned,
-						     callback,
-						     callback_data);
-      }
-      return n;
-    }
-
-    void count_partitions(unsigned int& n_partitions,
-			  unsigned int& n_unassigned,
-			  unsigned int& n_surrendered) {
-      n_partitions = 0;
-      n_unassigned = 0;
-      n_surrendered = 0;
-
-      if (exact_partition) {
-	exact_partition->count_partitions(n_partitions, n_unassigned,
-					  n_surrendered);
-      }
-    }
-
-    void save_partitionmap(std::string outfile, std::string surrenderfile) {
-      if (exact_partition) {
-	exact_partition->save_partitionmap(outfile, surrenderfile);
-      }
-    }
-    void load_partitionmap(std::string infile, std::string surrenderfile) {
-      if (exact_partition) {
-	exact_partition->load_partitionmap(infile, surrenderfile);
-      }
-    }
   };
 
   class HashtableIntersect {

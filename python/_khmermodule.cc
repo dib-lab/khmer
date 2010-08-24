@@ -1373,11 +1373,11 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
   unsigned int n_partitions = 0;
   try {
     hashtable->do_truncated_partition(filename, _report_fn, callback_obj);
-    n_partitions = hashtable->output_partitioned_file(filename,
-						      output,
-						      true,
-    						      _report_fn,
-						      callback_obj);
+    n_partitions = hashtable->partition->output_partitioned_file(filename,
+								 output,
+								 true,
+								 _report_fn,
+								 callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1410,9 +1410,10 @@ static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
   khmer::SubsetPartition * subset_p = NULL;
   try {
     Py_BEGIN_ALLOW_THREADS
-    subset_p = hashtable->do_subset_partition(filename,
-					      start_read_n, end_read_n,
-					      _report_fn, callback_obj);
+    subset_p = new khmer::SubsetPartition(hashtable);
+    subset_p->do_partition(filename,
+			   start_read_n, end_read_n,
+			   _report_fn, callback_obj);
     Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
     return NULL;
@@ -1437,8 +1438,8 @@ static PyObject * hash_merge_subset(PyObject * self, PyObject *args)
 
   khmer::SubsetPartition * subset_p;
   subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
-  
-  hashtable->merge_subset_partition(subset_p);
+
+  hashtable->partition->merge(subset_p);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1585,12 +1586,14 @@ static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
   }
 
   unsigned int n_partitions = 0;
+
   try {
-    n_partitions = hashtable->output_partitioned_file(filename,
-						      output,
-						      true,
-						      _report_fn,
-						      callback_obj);
+    khmer::SubsetPartition * subset_p = hashtable->partition;
+    n_partitions = subset_p->output_partitioned_file(filename,
+						     output,
+						     true,
+						     _report_fn,
+						     callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1610,7 +1613,7 @@ static PyObject * hash_save_partitionmap(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  hashtable->save_partitionmap(filename, filename2);
+  hashtable->partition->save_partitionmap(filename, filename2);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1628,7 +1631,7 @@ static PyObject * hash_load_partitionmap(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  hashtable->load_partitionmap(filename, filename2);
+  hashtable->partition->load_partitionmap(filename, filename2);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1643,7 +1646,7 @@ static PyObject * hash__validate_partitionmap(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  hashtable->_validate_pmap();
+  hashtable->partition->_validate_pmap();
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1658,8 +1661,9 @@ static PyObject * hash_count_partitions(PyObject * self, PyObject * args)
     return NULL;
   }
   
-  unsigned int n_partitions, n_unassigned, n_surrendered;
-  hashtable->count_partitions(n_partitions, n_unassigned, n_surrendered);
+  unsigned int n_partitions = 0, n_unassigned = 0, n_surrendered = 0;
+  hashtable->partition->count_partitions(n_partitions, n_unassigned,
+					 n_surrendered);
 
   return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
 }
