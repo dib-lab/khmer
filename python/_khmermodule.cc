@@ -1708,6 +1708,32 @@ static PyObject * hash_load_subset_partitionmap(PyObject * self, PyObject * args
   return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
 }
 
+static PyObject * hash_merge2_subset(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * subset1_obj, * subset2_obj;
+
+  if (!PyArg_ParseTuple(args, "OO", &subset1_obj, &subset2_obj)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset1_p;
+  khmer::SubsetPartition * subset2_p;
+  subset1_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
+  subset2_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset2_obj);
+
+  Py_BEGIN_ALLOW_THREADS
+
+    subset1_p->merge2(subset2_p);
+
+  Py_END_ALLOW_THREADS
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject * hash__validate_subset_partitionmap(PyObject * self, PyObject * args)
 {
   PyObject * subset_obj = NULL;
@@ -1763,6 +1789,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "count_partitions", hash_count_partitions, METH_VARARGS, "" },
   { "save_subset_partitionmap", hash_save_subset_partitionmap, METH_VARARGS },
   { "load_subset_partitionmap", hash_load_subset_partitionmap, METH_VARARGS },
+  { "merge2_subset", hash_merge2_subset, METH_VARARGS },
   { "_validate_subset_partitionmap", hash__validate_subset_partitionmap, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };

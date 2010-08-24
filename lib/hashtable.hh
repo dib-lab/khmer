@@ -62,8 +62,16 @@ namespace khmer {
 				    SeenSet& tagged_kmers,
 				    bool surrender);
 
+    PartitionID * get_new_partition() {
+      PartitionID* pp = new PartitionID(next_partition_id);
+      next_partition_id++;
+      return pp;
+    }
+
     void merge(PartitionMap& master_map, PartitionPtrSet& master_surrender,
 	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
+
+    void merge2(SubsetPartition *);
 
     void save_partitionmap(std::string outfile, std::string surrenderfile);
     void load_partitionmap(std::string infile, std::string surrenderfile);
