@@ -1,0 +1,63 @@
+200m reads / 20gb of Iowa prairie GPGC reads.
+Started Aug 23, with commit 69b71c1de56, using do-th-subset-save.py.
+
+real    1188m36.685s   (20 hrs)
+user    2489m9.995s    (41 hrs)
+sys     38m56.133s
+
+K=32
+HTSIZE=4**17 + 1
+N_THREADS=4
+SUBSET_SIZE=1m
+
+One major slowdown for the subset calculation was that the subset-save
+I/O functions did not release the GIL; that was the next commit!
+
+Used approximately 30gb of RAM (2x x-large EC2)
+
+---
+
+FAILURE!
+
+iowa corn:
+
+520340000 reads, 21837974692 k-mers
+hashtable occupancy: 0.290823292997
+
+started Aug 24, with commit cb65c122edc, using do-th-subset-save.py.
+
+K=32
+HTSIZE=2 * 4**17 + 1
+N_THREADS = 8
+SUBSET_SIZE = 5m
+
+busted 68gb of RAM (4x x-large EC2)
+
+--
+
+FAILURE!
+
+iowa prairie:
+
+641190000 reads, 27472734843 k-mers
+hashtable occupancy: 0.318750168071
+
+started Aug 24, with commit cb65c122edc, using do-th-subset-save.py.
+
+K=32
+HTSIZE=2 * 4**17 + 1
+N_THREADS = 8
+SUBSET_SIZE = 5m
+
+busted 68gb of RAM (4x x-large EC2)
+
+--
+
+iowa corn / all reads
+subset size 1m
+htsize = 2* 4**17 + 1
+
+64gb of ram standing!!
+
+--
+
