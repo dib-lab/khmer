@@ -1035,13 +1035,11 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition->partition_find_all_tags(kmer_f, kmer_r,
-					 tagged_kmers, surrender,
-					 &this->all_tags,
-					 true);
+      partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, true);
 
       // assign the partition ID
       partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      all_tags[kmer_f] = NULL;
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1227,20 +1225,17 @@ bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
 
 // used by do_truncated_partition
 
-void SubsetPartition::partition_find_all_tags(HashIntoType kmer_f,
-					      HashIntoType kmer_r,
-					      SeenSet& tagged_kmers,
-					      bool& surrender,
-					      PartitionMap * pmap,
-					      bool do_initial_check)
+void SubsetPartition::find_all_tags(HashIntoType kmer_f,
+				    HashIntoType kmer_r,
+				    SeenSet& tagged_kmers,
+				    bool& surrender,
+				    bool do_initial_check)
 {
   const HashIntoType bitmask = _ht->bitmask;
 
-  if (pmap == NULL) { pmap = &partition_map; }
-
   HashIntoType tagged_kmer;
   if (do_initial_check && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-    if ((*pmap)[kmer_f] != NULL) {
+    if (partition_map[kmer_f] != NULL) {
       tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
       return;
     }
@@ -1386,8 +1381,7 @@ void SubsetPartition::do_partition(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       surrender = false;
-      partition_find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender,
-			      &partition_map, false);
+      find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, false);
 
       // assign the partition ID
       assign_partition_id(kmer_f, tagged_kmers, surrender);

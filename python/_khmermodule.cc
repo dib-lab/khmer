@@ -1476,9 +1476,11 @@ static PyObject * hash_find_all_tags(PyObject * self, PyObject *args)
   khmer::_hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
 
   ppi = new _pre_partition_info(kmer_f);
-  hashtable->partition->partition_find_all_tags(kmer_f, kmer_r,
-						ppi->tagged_kmers,
-						ppi->surrendered);
+  hashtable->partition->find_all_tags(kmer_f, kmer_r,
+				      ppi->tagged_kmers,
+				      ppi->surrendered,
+				      false);
+  hashtable->add_kmer_to_tags(kmer_f);
 
   Py_END_ALLOW_THREADS
 
