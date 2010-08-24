@@ -370,16 +370,6 @@ namespace khmer {
 
     // Partitioning stuff.
 
-#if 0
-    void partition_set_id(const HashIntoType kmer_f,
-			  const HashIntoType kmer_r,
-			  SeenSet& keeper,
-			  unsigned int * partition_id);
-    unsigned int do_partition(const std::string infilename,
-				    CallbackFn callback,
-				    void * callback_data);
-#endif
-
     void consume_fasta_and_tag(const std::string &filename,
 			       unsigned int &total_reads,
 			       unsigned long long &n_consumed,
