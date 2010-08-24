@@ -1331,6 +1331,7 @@ static PyObject * hash_graphsize_distribution(PyObject * self, PyObject * args)
   return x;
 }
 
+#if 0
 static PyObject * hash_do_exact_partition(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1352,6 +1353,8 @@ static PyObject * hash_do_exact_partition(PyObject * self, PyObject * args)
 
   return PyInt_FromLong(n_partitions);
 }
+
+#endif // 0
 
 static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
 {
@@ -1497,9 +1500,9 @@ static PyObject * hash_find_all_tags(PyObject * self, PyObject *args)
   khmer::_hash(kmer_s, hashtable->ksize(), kmer_f, kmer_r);
 
   ppi = new _pre_partition_info(kmer_f);
-  hashtable->partition_find_all_tags(kmer_f, kmer_r,
-				     ppi->tagged_kmers,
-				     ppi->surrendered);
+  //hashtable->partition_find_all_tags(kmer_f, kmer_r,
+  //				     ppi->tagged_kmers,
+  //				     ppi->surrendered);
 
   Py_END_ALLOW_THREADS
 
@@ -1524,9 +1527,9 @@ static PyObject * hash_assign_partition_id(PyObject * self, PyObject *args)
   ppi = (_pre_partition_info *) PyCObject_AsVoidPtr(ppi_obj);
   
   khmer::PartitionID p;
-  p = hashtable->assign_partition_id(ppi->kmer,
-				     ppi->tagged_kmers,
-				     ppi->surrendered);
+  //  p = hashtable->assign_partition_id(ppi->kmer,
+  //				     ppi->tagged_kmers,
+  //				     ppi->surrendered);
 
   return PyInt_FromLong(p);
 }
@@ -1554,16 +1557,16 @@ static PyObject * hash_assign_partition_id_th(PyObject * self, PyObject *args)
     khmer::_hash(kmer_s.c_str(), hashtable->ksize(), kmer_f, kmer_r);
     assert (kmer_f == ppi->kmer);
 
-    hashtable->partition_find_all_tags(kmer_f, kmer_r,
-				       ppi->tagged_kmers,
-				       ppi->surrendered);
+    //    hashtable->partition_find_all_tags(kmer_f, kmer_r,
+    //				       ppi->tagged_kmers,
+    //				       ppi->surrendered);
   }
 
   
   khmer::PartitionID p;
-  p = hashtable->assign_partition_id(ppi->kmer,
-				     ppi->tagged_kmers,
-				     ppi->surrendered);
+  //  p = hashtable->assign_partition_id(ppi->kmer,
+  //				     ppi->tagged_kmers,
+  //				     ppi->surrendered);
 
   return PyInt_FromLong(p);
 }
@@ -1726,7 +1729,7 @@ static PyObject * hash_merge2_subset(PyObject * self, PyObject * args)
 
   Py_BEGIN_ALLOW_THREADS
 
-    subset1_p->merge2(subset2_p);
+    subset1_p->merge(subset2_p);
 
   Py_END_ALLOW_THREADS
 
@@ -1773,7 +1776,9 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "calc_connected_graph_size", hash_calc_connected_graph_size, METH_VARARGS, "" },
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
+#if 0
   { "do_exact_partition", hash_do_exact_partition, METH_VARARGS, "" },
+#endif // 0
   { "do_truncated_partition", hash_do_truncated_partition, METH_VARARGS, "" },
   { "do_subset_partition", hash_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hash_filter_file_connected, METH_VARARGS, "" },

@@ -26,6 +26,7 @@ namespace khmer {
 
   class SubsetPartition {
   public:
+    Hashtable * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
@@ -52,7 +53,10 @@ namespace khmer {
 					const HashIntoType kmer_f);
 
   public:
-    SubsetPartition(Hashtable * ht);
+    SubsetPartition(Hashtable * ht) {
+      next_partition_id = 1;
+      _ht = ht;
+    }
 
     ~SubsetPartition() {
       _clear_partitions();
@@ -68,22 +72,25 @@ namespace khmer {
       return pp;
     }
 
-    void merge(PartitionMap& master_map, PartitionPtrSet& master_surrender,
-	       Hashtable * ht, ReversePartitionMap& reverse_pmap);
-
-    void merge2(SubsetPartition *);
+    void merge(SubsetPartition *);
 
     void save_partitionmap(std::string outfile, std::string surrenderfile);
     void load_partitionmap(std::string infile, std::string surrenderfile);
     void _validate_pmap();
 
-    void partition_find_all_tags(Hashtable * ht,
-				 HashIntoType kmer_f,
+    void partition_find_all_tags(HashIntoType kmer_f,
 				 HashIntoType kmer_r,
 				 SeenSet& tagged_kmers,
 				 bool& surrender,
 				 PartitionMap * pmap = NULL,
 				 bool do_initial_check=true);
+
+    bool _is_tagged_kmer(const HashIntoType kmer_f,
+			 const HashIntoType kmer_r,
+			 HashIntoType& tagged_kmer);
+
+    bool _do_continue(const HashIntoType kmer,
+		      const SeenSet& keeper);
 
     void do_partition(Hashtable * ht,
 		      const std::string infilename,
@@ -91,6 +98,16 @@ namespace khmer {
 		      unsigned int last_read_n=0,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
+
+    void count_partitions(unsigned int& n_partitions,
+			  unsigned int& n_unassigned,
+			  unsigned int& n_surrendered);
+
+    unsigned int output_partitioned_file(const std::string infilename,
+					 const std::string outputfilename,
+					 bool output_unassigned=false,
+					 CallbackFn callback=0,
+					 void * callback_data=0);
   };
 
   class Hashtable {
@@ -104,10 +121,7 @@ namespace khmer {
 
     SubsetPartition * exact_partition;
 
-    PartitionMap partition_map;
-    ReversePartitionMap reverse_pmap;
-    unsigned int next_partition_id;
-    PartitionPtrSet surrender_set;
+    PartitionMap all_tags;
 
     void (*_writelock_acquire)(void * data);
     void (*_writelock_release)(void * data);
@@ -144,7 +158,6 @@ namespace khmer {
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
       exact_partition = NULL;
-      next_partition_id = 1;
 
       bitmask = 0;
       for (unsigned int i = 0; i < _ksize; i++) {
@@ -358,16 +371,21 @@ namespace khmer {
 
     // Partitioning stuff.
 
-    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
-
+#if 0
     void partition_set_id(const HashIntoType kmer_f,
 			  const HashIntoType kmer_r,
 			  SeenSet& keeper,
 			  unsigned int * partition_id);
-
     unsigned int do_exact_partition(const std::string infilename,
 				    CallbackFn callback,
 				    void * callback_data);
+#endif
+
+    void consume_fasta_and_tag(const std::string &filename,
+			       unsigned int &total_reads,
+			       unsigned long long &n_consumed,
+			       CallbackFn callback = 0,
+			       void * callback_data = 0);
 
     void do_truncated_partition(const std::string infilename,
 				CallbackFn callback=0,
@@ -387,51 +405,44 @@ namespace khmer {
 
     void merge_subset_partition(SubsetPartition * subset_p);
 
-    PartitionID assign_partition_id(HashIntoType kmer_f,
-			     SeenSet& tagged_kmers,
-			     bool surrender);
-
     unsigned int output_partitioned_file(const std::string infilename,
 					 const std::string outputfilename,
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
-					 void * callback_data=0);
+					 void * callback_data=0) {
+      unsigned int n = 0;
+      if (exact_partition) {
+	n = exact_partition->output_partitioned_file(infilename,
+						     outputfilename,
+						     output_unassigned,
+						     callback,
+						     callback_data);
+      }
+      return n;
+    }
 
     void count_partitions(unsigned int& n_partitions,
 			  unsigned int& n_unassigned,
-			  unsigned int& n_surrendered);
+			  unsigned int& n_surrendered) {
+      n_partitions = 0;
+      n_unassigned = 0;
+      n_surrendered = 0;
 
-    bool _is_tagged_kmer(const HashIntoType kmer_f,
-			 const HashIntoType kmer_r,
-			 HashIntoType& tagged_kmer);
+      if (exact_partition) {
+	exact_partition->count_partitions(n_partitions, n_unassigned,
+					  n_surrendered);
+      }
+    }
 
-    bool _do_continue(const HashIntoType kmer,
-		      const SeenSet& keeper);
-
-    void partition_find_all_tags(HashIntoType kmer_f,
-				 HashIntoType kmer_r,
-				 SeenSet& tagged_kmers,
-				 bool& surrender,
-				 PartitionMap * pmap = NULL,
-				 bool do_initial_check=true);
-
-    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
-				 const HashIntoType kmer_f);
-
-    void save_partitionmap(std::string outfile, std::string surrenderfile);
-    void load_partitionmap(std::string infile, std::string surrenderfile);
-
-    // count every k-mer in the FASTA file.
-    void consume_fasta_and_tag(const std::string &filename,
-			       unsigned int &total_reads,
-			       unsigned long long &n_consumed,
-			       CallbackFn callback = NULL,
-			       void * callback_data = NULL);
-
-    PartitionID * get_new_partition() {
-      PartitionID* pp = new PartitionID(next_partition_id);
-      next_partition_id++;
-      return pp;
+    void save_partitionmap(std::string outfile, std::string surrenderfile) {
+      if (exact_partition) {
+	exact_partition->save_partitionmap(outfile, surrenderfile);
+      }
+    }
+    void load_partitionmap(std::string infile, std::string surrenderfile) {
+      if (exact_partition) {
+	exact_partition->load_partitionmap(infile, surrenderfile);
+      }
     }
   };
 
