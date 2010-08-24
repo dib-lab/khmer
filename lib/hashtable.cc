@@ -1434,39 +1434,6 @@ void Hashtable::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
   delete t;
 }
 
-void Hashtable::_validate_pmap()
-{
-  // cout << "validating partition_map\n";
-
-  for (PartitionMap::const_iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    //HashIntoType kmer = (*pi).first;
-    PartitionID * pp_id = (*pi).second;
-
-    if (pp_id != NULL) {
-      assert(*pp_id >= 1);
-      assert(*pp_id < next_partition_id);
-    }
-  }
-
-  // cout << "validating reverse_pmap -- st 1\n";
-  for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
-       ri != reverse_pmap.end(); ri++) {
-    PartitionID p = (*ri).first;
-    PartitionPtrSet *s = (*ri).second;
-
-    assert(s != NULL);
-
-    for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
-	 si++) {
-      PartitionID * pp;
-      pp = *si;
-
-      assert (p == *pp);
-    }
-  }
-}
-
 bool Hashtable::_do_continue(const HashIntoType kmer,
 			     const SeenSet& keeper)
 {

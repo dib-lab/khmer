@@ -101,6 +101,9 @@ namespace khmer {
     HashIntoType bitmask;
 
     BoundedCounterType * _counts;
+
+    SubsetPartition * exact_partition;
+
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
     unsigned int next_partition_id;
@@ -128,28 +131,19 @@ namespace khmer {
     }
 
     void _clear_partitions() {
-      for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
-	   ri != reverse_pmap.end(); ri++) {
-	PartitionPtrSet * s = (*ri).second;
-
-	for (PartitionPtrSet::iterator pi = s->begin(); pi != s->end(); pi++) {
-	  PartitionID * pp = (*pi);
-	  delete pp;
-	}
-	delete s;
+      if (exact_partition != NULL) {
+	exact_partition->_clear_partitions();
       }
-      partition_map.clear();
-      surrender_set.clear();
-      next_partition_id = 1;
     }
 
   public:
-    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
-
-    void _validate_pmap();
+    void _validate_pmap() {
+      if (exact_partition) { exact_partition->_validate_pmap(); }
+    }
 
     Hashtable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
+      exact_partition = NULL;
       next_partition_id = 1;
 
       bitmask = 0;
@@ -361,6 +355,10 @@ namespace khmer {
 	}
       }
     }
+
+    // Partitioning stuff.
+
+    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
 
     void partition_set_id(const HashIntoType kmer_f,
 			  const HashIntoType kmer_r,
