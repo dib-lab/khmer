@@ -3,7 +3,11 @@ import threading
 import Queue
 import gc
 import os.path
-ht = khmer.new_hashtable(32, 4**15+1)
+
+K=32
+HASHTABLE_SIZE=4**15+1
+
+ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
 
 FILENAME=sys.argv[1]
 SUBSET_SIZE = 100000
@@ -35,6 +39,10 @@ def worker(q):
 
 (total_reads, total_kmers) = ht.consume_fasta_and_tag(FILENAME)
 n_subsets = total_reads / SUBSET_SIZE + 1
+
+print '---'
+print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
+print '---'
 
 worker_q = Queue.Queue()
 
