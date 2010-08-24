@@ -78,12 +78,11 @@ namespace khmer {
     void load_partitionmap(std::string infile, std::string surrenderfile);
     void _validate_pmap();
 
-    void partition_find_all_tags(HashIntoType kmer_f,
-				 HashIntoType kmer_r,
-				 SeenSet& tagged_kmers,
-				 bool& surrender,
-				 PartitionMap * pmap = NULL,
-				 bool do_initial_check=true);
+    void find_all_tags(HashIntoType kmer_f,
+		       HashIntoType kmer_r,
+		       SeenSet& tagged_kmers,
+		       bool& surrender,
+		       bool do_initial_check);
 
     bool _is_tagged_kmer(const HashIntoType kmer_f,
 			 const HashIntoType kmer_r,
@@ -248,12 +247,13 @@ namespace khmer {
 				HashIntoType upper_bound = 0);
 
     // checks each read for non-ACGT characters
+    bool check_read(const std::string &read);
+
+    // check each read for non-ACGT characters, and then consume it.
     unsigned int check_and_process_read(const std::string &read,
 					bool &is_valid,
 					HashIntoType lower_bound = 0,
 					HashIntoType upper_bound = 0);
-
-    bool check_read(const std::string &read);
 
     // count every k-mer in the FASTA file.
     void consume_fasta(const std::string &filename,
@@ -369,6 +369,11 @@ namespace khmer {
     }
 
     // Partitioning stuff.
+
+    void add_kmer_to_tags(HashIntoType kmer) {
+      PartitionID * pp = all_tags[kmer];
+      if (!pp) { pp = NULL; }	// redundant?
+    }
 
     void consume_fasta_and_tag(const std::string &filename,
 			       unsigned int &total_reads,
