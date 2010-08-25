@@ -5,8 +5,6 @@ also 1 bit/hash table entry, for basic partitioning?  (REDUCE MEM USAGE/FP)
 replace memory structures for map, set to be cheaper; see Matt Austern's
   treatise.
 
-implement hierarchical, threaded merge.
-
 run velvet??
 
 TODO in the future
