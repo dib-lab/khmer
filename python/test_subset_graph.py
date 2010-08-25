@@ -14,13 +14,15 @@ class Test_RandomData(object):
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
+
+        (a, b, c) = ht.divide_tags_into_subsets(1)
         
-        x = ht.do_subset_partition(filename, 0, 1)
+        x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
         
-        y = ht.do_subset_partition(filename, 1, 3)
+        y = ht.do_subset_partition(b, 0)
         ht.merge_subset(y)
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
@@ -35,13 +37,15 @@ class Test_RandomData(object):
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
+
+        (a, b, c) = ht.divide_tags_into_subsets(1)
         
-        x = ht.do_subset_partition(filename, 0, 2)
+        x = ht.do_subset_partition(a, b)
         ht.merge_subset(x)
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 2, n_partitions        # all singular
 
-        y = ht.do_subset_partition(filename, 2, 3)
+        y = ht.do_subset_partition(b, c)
         ht.merge_subset(y)
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
@@ -56,13 +60,15 @@ class Test_RandomData(object):
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == total_reads, n_partitions # all singular
+
+        divvy = ht.divide_tags_into_subsets(1)
         
-        x = ht.do_subset_partition(filename, 0, 4)
+        x = ht.do_subset_partition(divvy[0], divvy[4])
         ht.merge_subset(x)
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 2, n_partitions
 
-        y = ht.do_subset_partition(filename, 4, 6)
+        y = ht.do_subset_partition(divvy[4], 0)
         ht.merge_subset(y)
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
@@ -74,9 +80,14 @@ class Test_RandomData(object):
         outfile = filename + '.out'
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
-        x = ht.do_subset_partition(filename, 0, total_reads/2)
+
+        subset_size = total_reads / 2 + total_reads % 2;
+        divvy = ht.divide_tags_into_subsets(subset_size)
+        assert len(divvy) == 2
+
+        x = ht.do_subset_partition(divvy[0], divvy[1])
         ht.merge_subset(x)
-        y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+        y = ht.do_subset_partition(divvy[0], 0)
         ht.merge_subset(y)
 
         n_partitions = ht.output_partitions(filename, outfile)
@@ -88,8 +99,13 @@ class Test_RandomData(object):
         outfile = filename + '.out'
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
-        x = ht.do_subset_partition(filename, 0, total_reads/2)
-        y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+
+        subset_size = total_reads / 2 + total_reads % 2;
+        divvy = ht.divide_tags_into_subsets(subset_size)
+        assert len(divvy) == 2
+
+        x = ht.do_subset_partition(divvy[0], divvy[1])
+        y = ht.do_subset_partition(divvy[1], 0)
         ht.merge_subset(x)
         ht.merge_subset(y)
 
@@ -102,8 +118,13 @@ class Test_RandomData(object):
         outfile = filename + '.out'
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
-        x = ht.do_subset_partition(filename, 0, total_reads/2)
-        y = ht.do_subset_partition(filename, total_reads/2, total_reads)
+
+        subset_size = total_reads / 2 + total_reads % 2;
+        divvy = ht.divide_tags_into_subsets(subset_size)
+        assert len(divvy) == 2
+
+        x = ht.do_subset_partition(divvy[0], divvy[1])
+        y = ht.do_subset_partition(divvy[1], 0)
 
         ht._validate_subset_partitionmap(x)
         ht._validate_subset_partitionmap(y)
@@ -121,9 +142,12 @@ class Test_RandomData(object):
 
         total_reads, _ = ht.consume_fasta_and_tag(filename)
         subsets = []
-        for i in range(total_reads):
-             x = ht.do_subset_partition(filename, i, i+1)
-             subsets.append(x)
+
+        divvy = ht.divide_tags_into_subsets(1)
+        divvy.append(0)
+        for i in range(len(divvy) - 1):
+            x = ht.do_subset_partition(divvy[i], divvy[i+1])
+            subsets.append(x)
 
         for x in reversed(subsets):
             ht.merge_subset(x)
@@ -149,10 +173,13 @@ class Test_RandomData(object):
         ht.load(savefile_ht);
         ht.load_tagset(savefile_tags);
         
+        divvy = ht.divide_tags_into_subsets(1)
+        divvy.append(0)
+        
         subsets = []
-        for i in range(total_reads):
-             x = ht.do_subset_partition(filename, i, i+1)
-             subsets.append(x)
+        for i in range(len(divvy) - 1):
+            x = ht.do_subset_partition(divvy[i], divvy[i+1])
+            subsets.append(x)
 
         for x in reversed(subsets):
             ht.merge_subset(x)
@@ -166,7 +193,7 @@ class Test_Surrendered(object):
 
         filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
         total_reads, _ = ht.consume_fasta_and_tag(filename)
-        subset = ht.do_subset_partition(filename, 0, total_reads)
+        subset = ht.do_subset_partition(0, total_reads)
         ht.merge_subset(subset)
 
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
@@ -181,8 +208,8 @@ class Test_Surrendered(object):
 
         filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
         total_reads, _ = ht.consume_fasta_and_tag(filename)
-        subset1 = ht.do_subset_partition(filename, 0, total_reads / 2)
-        subset2 = ht.do_subset_partition(filename, total_reads / 2, total_reads)
+        subset1 = ht.do_subset_partition(0, total_reads / 2)
+        subset2 = ht.do_subset_partition(total_reads / 2, total_reads)
         ht.merge_subset(subset1)
         ht.merge_subset(subset2)
 
@@ -198,15 +225,18 @@ class Test_Surrendered(object):
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
+
+        divvy = ht.divide_tags_into_subsets(1)
+        (a, b, c) = divvy
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
         
-        x = ht.do_subset_partition(filename, 0, 1)
+        x = ht.do_subset_partition(a, b)
         ht.save_subset_partitionmap(x, 'x.pmap', 'x.surrender')
         del x
 
-        y = ht.do_subset_partition(filename, 1, 3)
+        y = ht.do_subset_partition(b, 0)
         ht.save_subset_partitionmap(y, 'y.pmap', 'y.surrender')
         del y
 
@@ -224,12 +254,15 @@ class Test_Surrendered(object):
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+
+        subset_size = total_reads / 2 + total_reads % 2;
+        divvy = ht.divide_tags_into_subsets(subset_size)
         
-        x = ht.do_subset_partition(filename, 0, total_reads / 2)
+        x = ht.do_subset_partition(divvy[0], divvy[1])
         ht.save_subset_partitionmap(x, 'x.pmap', 'x.surrender')
         del x
 
-        y = ht.do_subset_partition(filename, total_reads / 2, total_reads)
+        y = ht.do_subset_partition(divvy[1], 0)
         ht.save_subset_partitionmap(y, 'y.pmap', 'y.surrender')
         del y
 
