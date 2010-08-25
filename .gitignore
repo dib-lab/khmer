@@ -10,3 +10,10 @@ python/test-trunc.out
 python/test-data/random-20-a.fa.out
 python/test-data/random-20-b.fa.out
 python/test-data/random-31-c.fa.out
+*.ht
+*.tags
+*.pmap
+*.surr
+*.surrender
+*.out
+*.part
