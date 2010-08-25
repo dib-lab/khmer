@@ -2033,6 +2033,8 @@ void SubsetPartition::load_partitionmap(string infilename,
     memcpy(buf, buf + n_bytes, remainder);
   }
 
+  infile.close();
+
   ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
 
   assert(surrenderfile.is_open());
@@ -2059,6 +2061,8 @@ void SubsetPartition::load_partitionmap(string infilename,
   }
 
   delete buf; buf = NULL;
+
+  surrenderfile.close();
 }
 
 
