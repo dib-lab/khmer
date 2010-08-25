@@ -6,6 +6,9 @@ extract and subset-ize the first k-mers, rather than the read #s.
 also 1 bit/hash table entry, for basic partitioning?  (REDUCE MEM USAGE/FP)
 
 replace memory structures for map, set to be cheaper.
+  - use set for all_tags
+
+implement hierarchical, threaded merge.
 
 run velvet??
 

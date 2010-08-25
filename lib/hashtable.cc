@@ -987,6 +987,85 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
   return p;
 }
 
+void Hashtable::save(std::string outfilename)
+{
+  assert(_counts);
+
+  unsigned int save_ksize = _ksize;
+  unsigned long long save_tablesize = _tablesize;
+
+  ofstream outfile(outfilename.c_str(), ios::binary);
+
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+  outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
+
+  outfile.write((const char *) _counts,
+		sizeof(BoundedCounterType) * _tablesize);
+  outfile.close();
+}
+
+void Hashtable::load(std::string infilename)
+{
+  if (_counts) { delete _counts; _counts = NULL; }
+  
+  unsigned int save_ksize = 0;
+  unsigned long long save_tablesize = 0;
+
+  ifstream infile(infilename.c_str(), ios::binary);
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+
+  _ksize = (WordLength) save_ksize;
+  _tablesize = (HashIntoType) save_tablesize;
+  _counts = new BoundedCounterType[_tablesize];
+
+  unsigned long long loaded = 0;
+  while (loaded != _tablesize) {
+    infile.read((char *) _counts, _tablesize - loaded);
+    loaded += infile.gcount();	// do I need to do this loop?
+  }
+  infile.close();
+}
+
+void Hashtable::save_tagset(std::string outfilename)
+{
+  ofstream outfile(outfilename.c_str(), ios::binary);
+  const unsigned int tagset_size = all_tags.size();
+  HashIntoType * buf = new HashIntoType[tagset_size];
+
+  outfile.write((const char *) &tagset_size, sizeof(tagset_size));
+
+  unsigned int i = 0;
+  for (PartitionMap::iterator pi = all_tags.begin(); pi != all_tags.end();
+	 pi++, i++) {
+    buf[i] = pi->first;
+  }
+
+  outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+  outfile.close();
+
+  delete buf;
+}
+
+void Hashtable::load_tagset(std::string infilename)
+{
+  ifstream infile(infilename.c_str(), ios::binary);
+  all_tags.clear();
+
+  unsigned int tagset_size = 0;
+  infile.read((char *) &tagset_size, sizeof(tagset_size));
+  HashIntoType * buf = new HashIntoType[tagset_size];
+
+  infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+
+  for (unsigned int i = 0; i < tagset_size; i++) {
+    all_tags[buf[i]] = NULL;
+  }
+  
+  delete buf;
+}
+
+
 // do_truncated_partition: progressive partitioning.
 //   1) load all sequences, tagging first kmer of each
 //   2) do a truncated BFS search for all connected tagged kmers & assign

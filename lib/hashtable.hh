@@ -91,8 +91,8 @@ namespace khmer {
   class Hashtable {
     friend class SubsetPartition;
   protected:
-    const WordLength _ksize;
-    const HashIntoType _tablesize;
+    WordLength _ksize;
+    HashIntoType _tablesize;
     HashIntoType bitmask;
 
     BoundedCounterType * _counts;
@@ -132,6 +132,11 @@ namespace khmer {
       if (_counts) { delete _counts; _counts = NULL; }
       _clear_partitions();
     }
+
+    void save(std::string);
+    void load(std::string);
+    void save_tagset(std::string);
+    void load_tagset(std::string);
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -306,7 +311,7 @@ namespace khmer {
     // Partitioning stuff.
 
     void add_kmer_to_tags(HashIntoType kmer) {
-      PartitionID * pp = all_tags[kmer]; // sets to NULL if not already set.
+      all_tags[kmer]; // sets to NULL if not already set.
     }
 
     void consume_fasta_and_tag(const std::string &filename,
