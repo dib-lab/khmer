@@ -130,6 +130,35 @@ class Test_RandomData(object):
             
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions
+        
+    def test_random_20_a_succ_IV_save(self):
+        ht = khmer.new_hashtable(20, 4**13+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        savefile_ht = filename + '.ht'
+        savefile_tags = filename + '.tags'
+        outfile = filename + '.out'
+
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+
+        ht.save(savefile_ht);
+        ht.save_tagset(savefile_tags);
+
+        del ht
+        ht = khmer.new_hashtable(20, 4**13+1)
+
+        ht.load(savefile_ht);
+        ht.load_tagset(savefile_tags);
+        
+        subsets = []
+        for i in range(total_reads):
+             x = ht.do_subset_partition(filename, i, i+1)
+             subsets.append(x)
+
+        for x in reversed(subsets):
+            ht.merge_subset(x)
+            
+        n_partitions = ht.output_partitions(filename, outfile)
+        assert n_partitions == 1, n_partitions
 
 class Test_Surrendered(object):
     def test_surrendered_subset(self):

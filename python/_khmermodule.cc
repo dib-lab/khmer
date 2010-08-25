@@ -1608,6 +1608,73 @@ static PyObject * hash_count_partitions(PyObject * self, PyObject * args)
   return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
 }
 
+static PyObject * hash_load(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashtable->load(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_save(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashtable->save(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+static PyObject * hash_load_tagset(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashtable->load_tagset(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_save_tagset(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashtable->save_tagset(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hash_save_subset_partitionmap(PyObject * self, PyObject * args)
 {
   char * filename = NULL;
@@ -1726,6 +1793,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "find_all_tags", hash_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hash_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hash_output_partitions, METH_VARARGS, "" },
+  { "load", hash_load, METH_VARARGS, "" },
+  { "save", hash_save, METH_VARARGS, "" },
+  { "load_tagset", hash_load_tagset, METH_VARARGS, "" },
+  { "save_tagset", hash_save_tagset, METH_VARARGS, "" },
   { "load_partitionmap", hash_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
