@@ -97,7 +97,7 @@ namespace khmer {
 
     BoundedCounterType * _counts;
 
-    PartitionMap all_tags;
+    SeenSet all_tags;
 
     void _allocate_counters() {
       _counts = new BoundedCounterType[_tablesize];
@@ -311,7 +311,7 @@ namespace khmer {
     // Partitioning stuff.
 
     void add_kmer_to_tags(HashIntoType kmer) {
-      all_tags[kmer]; // sets to NULL if not already set.
+      all_tags.insert(kmer);
     }
 
     void consume_fasta_and_tag(const std::string &filename,

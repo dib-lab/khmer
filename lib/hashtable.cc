@@ -1036,9 +1036,9 @@ void Hashtable::save_tagset(std::string outfilename)
   outfile.write((const char *) &tagset_size, sizeof(tagset_size));
 
   unsigned int i = 0;
-  for (PartitionMap::iterator pi = all_tags.begin(); pi != all_tags.end();
+  for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
 	 pi++, i++) {
-    buf[i] = pi->first;
+    buf[i] = *pi;
   }
 
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
@@ -1059,7 +1059,7 @@ void Hashtable::load_tagset(std::string infilename)
   infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
 
   for (unsigned int i = 0; i < tagset_size; i++) {
-    all_tags[buf[i]] = NULL;
+    all_tags.insert(buf[i]);
   }
   
   delete buf;
@@ -1113,7 +1113,7 @@ void Hashtable::do_truncated_partition(const std::string infilename,
 
       // assign the partition ID
       partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
-      all_tags[kmer_f] = NULL;
+      all_tags.insert(kmer_f);
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1280,8 +1280,8 @@ bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
 				      const HashIntoType kmer_r,
 				      HashIntoType& tagged_kmer)
 {
-  PartitionMap * tags = &_ht->all_tags;
-  PartitionMap::const_iterator fi = tags->find(kmer_f);
+  SeenSet * tags = &_ht->all_tags;
+  SeenSet::const_iterator fi = tags->find(kmer_f);
   if (fi != tags->end()) {
     tagged_kmer = kmer_f;
     return true;
@@ -1875,7 +1875,7 @@ void Hashtable::consume_fasta_and_tag(const std::string &filename,
       HashIntoType kmer_f, kmer_r;
       _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-      all_tags[kmer_f] = NULL;
+      all_tags.insert(kmer_f);
     }
 	       
     // reset the sequence info, increment read number
