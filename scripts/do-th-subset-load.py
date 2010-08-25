@@ -1,27 +1,30 @@
 import khmer, sys
-import threading
 import gc
-ht = khmer.new_hashtable(32, 1)
+import glob
 
-filename=sys.argv[1]
+K = 32
 SUBSET_SIZE = 100000
 
-def load(filename, ht, start, stop):
-    outfile = filename + '.subset.%d-%d' % (start, stop)
-    subset = ht.load_subset_partitionmap(outfile + '.pmap', outfile + '.surr')
+filename=sys.argv[1]
+
+def load(filename, ht):
+    pmap_filename = filename
+    surr_filename = filename[:-4] + 'surr'
+    subset = ht.load_subset_partitionmap(pmap_filename, surr_filename)
     ht.merge_subset(subset)
-    del subset
-    gc.collect()
 
-(total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
-n_subsets = total_reads / SUBSET_SIZE + 1
+# create a fake-ish ht; K matters, but not hashtable size.
+ht = khmer.new_hashtable(32, 1)
 
-for i in range(0, n_subsets):
-    print '<-', i
-    start = i*SUBSET_SIZE
-    stop = (i + 1)*SUBSET_SIZE
+# detect all of the relevant partitionmap files
+subset_filenames = glob.glob(filename + '.subset.*.pmap')
 
-    load(filename, ht, start, stop)
+# load & merge
+for subset_file in subset_filenames:
+    print '<-', subset_file
+    load(subset_file, ht)
 
+# partition!
 n_partitions = ht.output_partitions(filename, filename + '.part')
+print n_partitions
 print ht.count_partitions()
