@@ -61,3 +61,40 @@ htsize = 2* 4**17 + 1
 
 --
 
+RUNNING:
+
+iowa corn
+
+started August 25th, with commit 6d2eaab378, using do-th-subset-save.py.
+(subsets, independently saved, using set for all_tags).
+
+K=32
+HTSIZE=2 * 4**17 + 1
+N_THREADS = 8
+SUBSET_SIZE = 1m
+
+=> 447 subsets of 1m (i.e. 447m tags)
+
+ht & tags saved.
+
+holding steady at 56.5gb.
+
+---
+
+RUNNING:
+
+iowa prairie
+
+started August 25th, with commit 6d2eaab378, using do-th-subset-save.py.
+(subsets, independently saved, using set for all_tags).
+
+K=32
+HTSIZE=2 * 4**17 + 1
+N_THREADS = 8
+SUBSET_SIZE = 1m
+
+=> 532 subsets of 1m (i.e. 532m tags)
+
+ht & tags saved.
+
+holding steady at 60.7gb.
