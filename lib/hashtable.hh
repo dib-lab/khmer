@@ -71,9 +71,8 @@ namespace khmer {
 		       SeenSet& tagged_kmers,
 		       bool& surrender, bool do_initial_check);
 
-    void do_partition(const std::string infilename,
-		      unsigned int first_read_n=0,
-		      unsigned int last_read_n=0,
+    void do_partition(HashIntoType first_kmer,
+		      HashIntoType last_kmer,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
 
@@ -309,6 +308,10 @@ namespace khmer {
     }
 
     // Partitioning stuff.
+
+    unsigned int n_tags() const { return all_tags.size(); }
+
+    void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
     void add_kmer_to_tags(HashIntoType kmer) {
       all_tags.insert(kmer);

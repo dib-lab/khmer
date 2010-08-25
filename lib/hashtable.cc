@@ -1418,50 +1418,44 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
 ///////////////////////////////////////////////////////////////////////
 
-void SubsetPartition::do_partition(const std::string infilename,
-				   unsigned int first_read_n,
-				   unsigned int last_read_n,
+void SubsetPartition::do_partition(HashIntoType first_kmer,
+				   HashIntoType last_kmer,
 				   CallbackFn callback,
 				   void * callback_data)
 {
   unsigned int total_reads = 0;
 
-  IParser* parser = IParser::get_parser(infilename);
-  Read read;
-  string seq;
-
-  std::string first_kmer;
+  std::string kmer_s;
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
   bool surrender;
   const unsigned char ksize = _ht->ksize();
 
-  while(!parser->is_complete()) {
-    // increment read number
-    read = parser->get_next_read();
+  SeenSet::const_iterator si, end;
+
+  si = _ht->all_tags.find(first_kmer);
+  if (last_kmer) {
+    end = _ht->all_tags.find(last_kmer);
+  } else {
+    end = _ht->all_tags.end();
+  }
+
+  for (; si != end; si++) {
     total_reads++;
 
-    if (last_read_n && (total_reads < first_read_n ||
-			total_reads >= last_read_n)) {
-      continue;
-    }
+    kmer_s = _revhash(*si, ksize);
+    _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
-    seq = read.seq;
+    // find all tagged kmers within range.
+    tagged_kmers.clear();
+    surrender = false;
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, false);
 
-    if (_ht->check_read(seq)) {
-      first_kmer = seq.substr(0, ksize);
-      _hash(first_kmer.c_str(), ksize, kmer_f, kmer_r);
+    // assign the partition ID
+    assign_partition_id(kmer_f, tagged_kmers, surrender);
 
-      // find all tagged kmers within range.
-      tagged_kmers.clear();
-      surrender = false;
-      find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, false);
-
-      // assign the partition ID
-      assign_partition_id(kmer_f, tagged_kmers, surrender);
-
-      // run callback, if specified
-      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 #if 0 // @CTB
 	try {
 	  callback("do_subset_partition/read", callback_data, total_reads,
@@ -1472,10 +1466,7 @@ void SubsetPartition::do_partition(const std::string infilename,
 	}
 #endif // 0
       }
-    }
   }
-
-  delete parser;
 }
 
 //
@@ -2121,3 +2112,18 @@ void SubsetPartition::_clear_partitions()
   next_partition_id = 1;
 }
 
+
+void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
+					 SeenSet& divvy)
+{
+  unsigned int i = 0;
+
+  for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
+       si++) {
+    if (i % subset_size == 0) {
+      divvy.insert(*si);
+      i = 0;
+    }
+    i++;
+  }
+}

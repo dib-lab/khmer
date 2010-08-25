@@ -614,6 +614,19 @@ static PyObject * hash_n_entries(PyObject * self, PyObject * args)
 }
 
 
+static PyObject * hash_n_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(hashtable->n_tags());
+}
+
+
 static PyObject * hash_count(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -1371,13 +1384,10 @@ static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
   khmer::Hashtable * hashtable = me->hashtable;
 
-  char * filename = NULL;
   PyObject * callback_obj = NULL;
+  khmer::HashIntoType start_kmer = 0, end_kmer = 0;
 
-  unsigned int start_read_n = 0, end_read_n = 0;
-
-  if (!PyArg_ParseTuple(args, "s|iiO", &filename,
-			&start_read_n, &end_read_n,
+  if (!PyArg_ParseTuple(args, "|llO", &start_kmer, &end_kmer,
 			&callback_obj)) {
     return NULL;
   }
@@ -1386,9 +1396,7 @@ static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
   try {
     Py_BEGIN_ALLOW_THREADS
     subset_p = new khmer::SubsetPartition(hashtable);
-    subset_p->do_partition(filename,
-			   start_read_n, end_read_n,
-			   _report_fn, callback_obj);
+    subset_p->do_partition(start_kmer, end_kmer, _report_fn, callback_obj);
     Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
     return NULL;
@@ -1764,6 +1772,31 @@ static PyObject * hash__validate_subset_partitionmap(PyObject * self, PyObject *
   return Py_None;
 }
 
+static PyObject * hash_divide_tags_into_subsets(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  unsigned int subset_size = 0;
+
+  if (!PyArg_ParseTuple(args, "i", &subset_size)) {
+    return NULL;
+  }
+
+  khmer::SeenSet divvy;
+  hashtable->divide_tags_into_subsets(subset_size, divvy);
+
+  PyObject * x = PyList_New(divvy.size());
+  unsigned int i = 0;
+  for (khmer::SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
+       si++, i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(*si));
+  }
+
+  return x;
+}
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1797,6 +1830,8 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "save", hash_save, METH_VARARGS, "" },
   { "load_tagset", hash_load_tagset, METH_VARARGS, "" },
   { "save_tagset", hash_save_tagset, METH_VARARGS, "" },
+  { "n_tags", hash_n_tags, METH_VARARGS, "" },
+  { "divide_tags_into_subsets", hash_divide_tags_into_subsets, METH_VARARGS, "" },
   { "load_partitionmap", hash_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
