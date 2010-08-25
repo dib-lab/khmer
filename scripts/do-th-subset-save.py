@@ -16,21 +16,21 @@ N_THREADS = 4
 def worker(q):
     while 1:
         try:
-            (ht, filename, start, stop) = q.get(False)
+            (ht, n, start, stop) = q.get(False)
         except Queue.Empty:
             print 'exiting'
             return
 
-        outfile = filename + '.subset.%d-%d' % (start, stop)
+        outfile = FILENAME + '.subset.%d' % (n,)
         if os.path.exists(outfile + '.pmap'):
-            print 'SKIPPING', filename, start, stop
+            print 'SKIPPING', FILENAME, start, stop
             continue
         
-        print 'starting:', filename, start, stop
-        subset = ht.do_subset_partition(filename, start, stop)
-        print 'saving:', filename, start, stop
+        print 'starting:', FILENAME, n
+        subset = ht.do_subset_partition(start, stop)
+        print 'saving:', FILENAME, n
         
-        outfile = filename + '.subset.%d-%d' % (start, stop)
+        outfile = FILENAME + '.subset.%d' % (n,)
         ht.save_subset_partitionmap(subset,
                                     outfile + '.pmap',
                                     outfile + '.surr')
@@ -38,7 +38,9 @@ def worker(q):
         gc.collect()
 
 (total_reads, total_kmers) = ht.consume_fasta_and_tag(FILENAME)
-n_subsets = total_reads / SUBSET_SIZE + 1
+divvy = ht.divide_tags_into_subsets(SUBSET_SIZE)
+n_subsets = len(divvy)
+divvy.append(0)
 
 print '---'
 print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
@@ -48,9 +50,9 @@ worker_q = Queue.Queue()
 
 for i in range(0, n_subsets):
     print '->', i
-    start = i*SUBSET_SIZE
-    end = (i + 1)*SUBSET_SIZE
-    worker_q.put((ht, FILENAME, start, end))
+    start = divvy[i]
+    end = divvy[i+1]
+    worker_q.put((ht, i, start, end))
 
 threads = []
 for n in range(N_THREADS):

@@ -119,7 +119,7 @@ static PyObject * ktable_forward_hash(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(khmer::_hash(kmer, ktable->ksize()));
+  return PyLong_FromUnsignedLongLong(khmer::_hash(kmer, ktable->ksize()));
 }
 
 //
@@ -143,7 +143,7 @@ static PyObject * ktable_forward_hash_no_rc(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(khmer::_hash_forward(kmer, ktable->ksize()));
+  return PyLong_FromUnsignedLongLong(khmer::_hash_forward(kmer, ktable->ksize()));
 }
 
 //
@@ -1387,7 +1387,7 @@ static PyObject * hash_do_subset_partition(PyObject * self, PyObject * args)
   PyObject * callback_obj = NULL;
   khmer::HashIntoType start_kmer = 0, end_kmer = 0;
 
-  if (!PyArg_ParseTuple(args, "|llO", &start_kmer, &end_kmer,
+  if (!PyArg_ParseTuple(args, "K|KO", &start_kmer, &end_kmer,
 			&callback_obj)) {
     return NULL;
   }
@@ -1790,7 +1790,7 @@ static PyObject * hash_divide_tags_into_subsets(PyObject * self, PyObject * args
   unsigned int i = 0;
   for (khmer::SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
        si++, i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(*si));
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(*si));
   }
 
   return x;
@@ -2370,7 +2370,7 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(khmer::_hash(kmer, ksize));
+  return PyLong_FromUnsignedLongLong(khmer::_hash(kmer, ksize));
 }
 
 static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
@@ -2393,7 +2393,7 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(khmer::_hash_forward(kmer, ksize));
+  return PyLong_FromUnsignedLongLong(khmer::_hash_forward(kmer, ksize));
 }
 
 static PyObject * reverse_hash(PyObject * self, PyObject * args)
