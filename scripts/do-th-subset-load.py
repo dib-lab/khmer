@@ -6,18 +6,21 @@ K = 32
 SUBSET_SIZE = 100000
 
 filename=sys.argv[1]
+subset_filenames=sys.argv[2:]
 
 def load(filename, ht):
     pmap_filename = filename
     surr_filename = filename[:-4] + 'surr'
+    print 'loading', filename
     subset = ht.load_subset_partitionmap(pmap_filename, surr_filename)
+    print 'merging', filename
     ht.merge_subset(subset)
 
 # create a fake-ish ht; K matters, but not hashtable size.
 ht = khmer.new_hashtable(32, 1)
 
 # detect all of the relevant partitionmap files
-subset_filenames = glob.glob(filename + '.subset.*.pmap')
+#subset_filenames = glob.glob(filename + '.subset.*.pmap')
 
 # load & merge
 for subset_file in subset_filenames:
