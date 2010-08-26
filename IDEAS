@@ -5,6 +5,8 @@ also 1 bit/hash table entry, for basic partitioning?  (REDUCE MEM USAGE/FP)
 replace memory structures for map, set to be cheaper; see Matt Austern's
   treatise.
 
+test surrenderfile/merge stuff; something wrong there.  (0 size)
+
 run velvet??
 
 TODO in the future
