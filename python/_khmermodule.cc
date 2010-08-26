@@ -1796,6 +1796,94 @@ static PyObject * hash_divide_tags_into_subsets(PyObject * self, PyObject * args
   return x;
 }
 
+void free_tag_map(void * p)
+{
+  khmer::TagCountMap * m = (khmer::TagCountMap *) p;
+  delete m;
+}
+
+static PyObject * hash_load_tagmap(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  assert(hashtable.n_tags() == 0);
+  hashtable->load_tagset(filename);
+  
+  khmer::TagCountMap * tag_map = new khmer::TagCountMap();
+  hashtable->tags_to_map(*tag_map);
+  hashtable->clear_tags();
+
+  return PyCObject_FromVoidPtr(tag_map, free_tag_map);
+}
+
+static PyObject * hash_subset_maxify_partition_size(PyObject * self, PyObject * args)
+{
+  PyObject * subset_obj = NULL;
+  PyObject * tagmap_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "OO", &subset_obj, &tagmap_obj)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  khmer::TagCountMap * tag_count;
+  tag_count = (khmer::TagCountMap *) PyCObject_AsVoidPtr(tagmap_obj);
+
+  subset_p->maxify_partition_size(*tag_count);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_discard_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  PyObject * tagmap_obj = NULL;
+  unsigned int threshold = 0;
+
+  if (!PyArg_ParseTuple(args, "Oi", &tagmap_obj, &threshold)) {
+    return NULL;
+  }
+
+  khmer::TagCountMap * tag_count;
+  tag_count = (khmer::TagCountMap *) PyCObject_AsVoidPtr(tagmap_obj);
+
+  hashtable->discard_tags(*tag_count, threshold);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_subset_filter_against_tags(PyObject * self, PyObject * args)
+{
+  PyObject * subset_obj = NULL;
+  PyObject * tagmap_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "OO", &subset_obj, &tagmap_obj)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  khmer::TagCountMap * tag_count;
+  tag_count = (khmer::TagCountMap *) PyCObject_AsVoidPtr(tagmap_obj);
+
+  subset_p->filter_against_tags(*tag_count);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
 
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
@@ -1842,6 +1930,10 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "load_subset_partitionmap", hash_load_subset_partitionmap, METH_VARARGS },
   { "merge2_subset", hash_merge2_subset, METH_VARARGS },
   { "_validate_subset_partitionmap", hash__validate_subset_partitionmap, METH_VARARGS, "" },
+  { "load_tagmap", hash_load_tagmap, METH_VARARGS, "" },
+  { "subset_filter_against_tags", hash_subset_filter_against_tags, METH_VARARGS, "" },
+  { "discard_tags", hash_discard_tags, METH_VARARGS, "" },
+  { "subset_maxify_partition_size", hash_subset_maxify_partition_size, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
