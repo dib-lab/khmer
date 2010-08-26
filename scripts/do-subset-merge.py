@@ -6,12 +6,13 @@ import Queue
 import threading
 import glob
 import os.path
+import shutil
 
-filename = sys.argv[1]
+dir1 = sys.argv[1]
+dir2 = sys.argv[2]
 
 K=32
-N_THREADS = 4
-TEMPDIR='./temp/'
+N_THREADS = 1
 
 ht = khmer.new_hashtable(K, 1)
 
@@ -38,7 +39,7 @@ def pull_pair(q):
             return
         
         merge_file = merge(filename1, filename2, ht)
-        q.put((ht, merge_file))
+        #q.put((ht, merge_file))   # @CTB
 
 def load(filename):
     pmap_filename = filename
@@ -49,30 +50,30 @@ def load(filename):
 def merge(filename1, filename2, ht):
     global output_n, lock
 
-    print 'load:', filename1
-    subset1 = load(filename1)
-    print 'load:', filename2
-    subset2 = load(filename2)
-    print 'merge:', filename1, filename2
-    ht.merge2_subset(subset1, subset2)
-
     lock.acquire()
     next_n = output_n
     output_n += 1
     lock.release()
 
-    merge_filename = TEMPDIR + 'merge.%d' % next_n
+    merge_filename = os.path.join(dir2, '%s.merge.%d' % (dir2, next_n))
+    print 'merge: %s = %s + %s' % (merge_filename, filename1, filename2)
+    subset1 = load(filename1)
+    subset2 = load(filename2)
+    ht.merge2_subset(subset1, subset2)
+
     ht.save_subset_partitionmap(subset1, merge_filename + '.pmap',
                                 merge_filename + '.surr')
     return merge_filename + '.pmap'
 
 # detect all of the relevant partitionmap files
-subset_filenames = glob.glob(filename + '.subset.*.pmap')
+subset_filenames = glob.glob(os.path.join(dir1, '*.pmap'))
 
 # put on queue
 merge_queue = Queue.Queue()
 for filename in subset_filenames:
     merge_queue.put((ht, filename))
+
+print 'starting threads'
 
 threads = []
 for n in range(N_THREADS):
@@ -80,14 +81,18 @@ for n in range(N_THREADS):
     threads.append(t)
     t.start()
 
-print 'started threads'
-
 # wait for threads
 for t in threads:
     t.join()
 
 # done!
 
-assert merge_queue.qsize() == 1
-ht, merge_file = merge_queue.get()
-print 'final subset in:', merge_file
+if merge_queue.qsize() == 1:
+    ht, merge_file = merge_queue.get()
+    shutil.copy(merge_file, os.path.join(dir2, os.path.basename(merge_file)))
+    surr_file = merge_file[:-4] + 'surr'
+    shutil.copy(surr_file, os.path.join(dir2, os.path.basename(surr_file)))
+    
+assert merge_queue.qsize() == 0
+#ht, merge_file = merge_queue.get()
+#print 'final subset in:', merge_file
