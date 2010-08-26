@@ -21,6 +21,8 @@ namespace khmer {
   typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
   typedef std::queue<HashIntoType> NodeQueue;
   typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+  typedef std::map<HashIntoType, unsigned int> TagCountMap;
+  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
 
   class Hashtable;
 
@@ -85,6 +87,9 @@ namespace khmer {
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
 					 void * callback_data=0);
+
+    void maxify_partition_size(TagCountMap& tag_map);
+    void filter_against_tags(TagCountMap& tag_map);
   };
 
   class Hashtable {
@@ -317,6 +322,8 @@ namespace khmer {
       all_tags.insert(kmer);
     }
 
+    void clear_tags() { all_tags.clear(); }
+
     void consume_fasta_and_tag(const std::string &filename,
 			       unsigned int &total_reads,
 			       unsigned long long &n_consumed,
@@ -326,6 +333,9 @@ namespace khmer {
     void do_truncated_partition(const std::string infilename,
 				CallbackFn callback=0,
 				void * callback_data=0);
+
+    void tags_to_map(TagCountMap& tag_map);
+    void discard_tags(TagCountMap& tag_map, unsigned int threshold);
   };
 
   class HashtableIntersect {

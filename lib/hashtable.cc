@@ -2137,3 +2137,69 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
     i++;
   }
 }
+
+void Hashtable::tags_to_map(TagCountMap& tag_map)
+{
+  for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
+       si++) {
+    tag_map[*si] = 0;
+  }
+  cout << "TM size: " << tag_map.size() << "\n";
+}
+
+void SubsetPartition::maxify_partition_size(TagCountMap& tag_map)
+{
+  PartitionCountMap partition_count;
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    PartitionID * pp = pi->second;
+    if (pp) {
+      partition_count[*pp]++;
+    }
+  }
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    PartitionID * pp = pi->second;
+    if (pp) {    
+      if (tag_map[pi->first] < partition_count[*pp]) {
+	tag_map[pi->first] = partition_count[*pp];
+      }
+    }
+  }
+}
+
+void Hashtable::discard_tags(TagCountMap& tag_map,
+				   unsigned int threshold)
+{
+  SeenSet delete_me;
+
+  for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
+       ti++) {
+    if (ti->second < threshold) {
+      delete_me.insert(ti->first);
+    }
+  }
+
+  for (SeenSet::const_iterator si = delete_me.begin(); si != delete_me.end();
+       si++) {
+    tag_map.erase(*si);
+  }
+}
+
+void SubsetPartition::filter_against_tags(TagCountMap& tag_map)
+{
+  PartitionMap new_pmap;
+
+  for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
+       ti++) {
+    new_pmap[ti->first] = partition_map[ti->first];
+  }
+
+  cout << "OLD partition map size: " << partition_map.size() << "\n";
+  cout << "NEW partition map size: " << new_pmap.size() << "\n";
+
+  partition_map.swap(new_pmap);
+  new_pmap.clear();
+}
