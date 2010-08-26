@@ -1895,18 +1895,22 @@ void SubsetPartition::save_partitionmap(string pmap_filename,
   buf = new char[IO_BUF_SIZE];
   unsigned int n_bytes = 0;
 
+  HashIntoType * kmer_p = NULL;
+  PartitionID * pp;
+
   PartitionMap::const_iterator pi = partition_map.begin();
   for (; pi != partition_map.end(); pi++) {
-    HashIntoType kmer;
     PartitionID p_id;
 
-    kmer = pi->first;
+    HashIntoType kmer = pi->first;
     if (pi->second != NULL) {
       p_id = *(pi->second);
 
-      memcpy(&buf[n_bytes], &kmer, sizeof(HashIntoType));
+      kmer_p = (HashIntoType *) (buf + n_bytes);
+      *kmer_p = kmer;
       n_bytes += sizeof(HashIntoType);
-      memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+      pp = (PartitionID *) (buf + n_bytes);
+      *pp = p_id;
       n_bytes += sizeof(PartitionID);
 
       if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(PartitionID)) {
@@ -1926,8 +1930,9 @@ void SubsetPartition::save_partitionmap(string pmap_filename,
   for (PartitionPtrSet::const_iterator ss = surrender_set.begin();
        ss != surrender_set.end(); ss++) {
     PartitionID p_id = *(*ss);
-    
-    memcpy(&buf[n_bytes], &p_id, sizeof(PartitionID));
+
+    pp = (PartitionID *) (buf + n_bytes);
+    *pp = p_id;
     n_bytes += sizeof(PartitionID);
 
     if (n_bytes >= IO_BUF_SIZE - sizeof(PartitionID)) {
@@ -1956,9 +1961,10 @@ void SubsetPartition::load_partitionmap(string infilename,
 
   assert(infile.is_open());
 
-  HashIntoType kmer;
-  PartitionID p_id;
   PartitionSet partitions;
+
+  HashIntoType * kmer_p = NULL;
+  PartitionID * pp = NULL;
 
   remainder = 0;
   while (!infile.eof()) {
@@ -1970,12 +1976,12 @@ void SubsetPartition::load_partitionmap(string infilename,
     n_bytes -= remainder;
 
     for (i = 0; i < n_bytes;) {
-      // memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      // ignore kmer for this loop.
       i += sizeof(HashIntoType);
-      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      pp = (PartitionID *) (buf + i);
       i += sizeof(PartitionID);
 
-      partitions.insert(p_id);
+      partitions.insert(*pp);
 
       loaded++;
     }
@@ -2018,15 +2024,15 @@ void SubsetPartition::load_partitionmap(string infilename,
     n_bytes -= remainder;
 
     for (i = 0; i < n_bytes;) {
-      memcpy(&kmer, &buf[i], sizeof(HashIntoType));
+      kmer_p = (HashIntoType *) (buf + i);
       i += sizeof(HashIntoType);
-      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      pp = (PartitionID *) (buf + i);
       i += sizeof(PartitionID);
 
-      if (p_id == 0) {
-	partition_map[kmer] = NULL;
+      if (*pp == 0) {
+	partition_map[*kmer_p] = NULL;
       } else {
-	partition_map[kmer] = ppmap[p_id];
+	partition_map[*kmer_p] = ppmap[*pp];
       } 
     }
     assert(i == n_bytes);
@@ -2051,10 +2057,10 @@ void SubsetPartition::load_partitionmap(string infilename,
     n_bytes -= remainder;
 
     for (i = 0; i < n_bytes;) {
-      memcpy(&p_id, &buf[i], sizeof(PartitionID));
+      pp = (PartitionID *) (buf + i);
       i += sizeof(PartitionID);
 
-      surrender_set.insert(ppmap[p_id]);
+      surrender_set.insert(ppmap[*pp]);
     }
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
