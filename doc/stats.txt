@@ -79,6 +79,29 @@ ht & tags saved.
 
 holding steady at 56.5gb.
 
+447 subsets => 224 (pairwise merge) in 8 threads/~8gb of RAM (1gb/thread),
+real    29m24.087s
+user    93m54.879s
+sys     4m32.190s
+
+224 subsets => 117 (pairwise merge) in 8 threads/17gb of RAM (2gb/thread)
+real    30m27.233s
+user    98m54.571s
+sys     5m48.366s
+
+117 subsets => 59 in 8 threads/36gb of RAM (4.5gb/thread)
+real    32m34.097s
+user    91m50.299s
+sys     4m18.347s
+
+59 subsets => 28 (??) in 6 threads/??gb of RAM
+real    35m30.460s
+user    85m20.804s
+sys     4m57.506s
+
+28 subsets => 14 in 2 threads/40 gb of RAM (20gb/thread)
+...
+
 ---
 
 RUNNING:
@@ -98,3 +121,34 @@ SUBSET_SIZE = 1m
 ht & tags saved.
 
 holding steady at 60.7gb.
+
+532 subsets => 266 (pairwise merge) in 8 threads/~8gb of RAM (1gb/thread),
+real    34m56.468s
+user    115m54.872s
+sys     6m26.410s
+
+266 subsets => 133 in 8 threads/22gb of RAM (2.5gb/thread)
+real    36m50.139s
+user    119m41.566s
+sys     6m3.270s
+
+133 subsets => 67 in 8 threads/40 gb of RAM (~5 gb/thread)
+real    37m51.513s
+user    104m36.663s
+sys     6m30.359s
+
+** update to 7e0948bd835, removed memcpy in favor of pointer manipulation
+
+67 subsets => 34 subsets in 6 threads/55 gb of RAM (~10gb/thread)
+real    45m43.421s
+user    121m8.939s
+sys     7m50.598s
+
+34 subsets => 17 subsets in 3 threads/?? gb of RAM
+real    50m18.937s
+user    89m19.661s
+sys     4m8.407s
+
+17 subset => 9 in 1 thread/36 gb of RAM
+
+---
