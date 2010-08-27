@@ -102,6 +102,49 @@ sys     4m57.506s
 28 subsets => 14 in 2 threads/40 gb of RAM (20gb/thread)
 ...
 
+Get it down to seven, then:
+
+  % python ~/khmer/scripts/filter-subsets-by-partsize.py /mnt/iowa-corn-*.tagset m7.merge.*.pmap
+
+which runs in 46gb of RAM in about 3 hours.
+
+To quote,
+
+TM size: 446639081
+maxifying: m7.merge.0.pmap
+maxifying: m7.merge.1.pmap
+maxifying: m7.merge.2.pmap
+maxifying: m7.merge.3.pmap
+maxifying: m7.merge.4.pmap
+maxifying: m7.merge.5.pmap
+maxifying: m7.merge.6.pmap
+discarding
+filtering: m7.merge.0.pmap
+OLD partition map size: 149326590
+NEW partition map size: 93784167
+filtering: m7.merge.1.pmap
+OLD partition map size: 149508451
+NEW partition map size: 93784167
+filtering: m7.merge.2.pmap
+OLD partition map size: 149639032
+NEW partition map size: 93784167
+^R
+filtering: m7.merge.3.pmap
+OLD partition map size: 148603585
+NEW partition map size: 93784167
+filtering: m7.merge.4.pmap
+OLD partition map size: 149595619
+NEW partition map size: 93784167
+filtering: m7.merge.5.pmap
+OLD partition map size: 149625331
+NEW partition map size: 93784167
+filtering: m7.merge.6.pmap
+OLD partition map size: 149455440
+NEW partition map size: 93784167
+
+Now doing merge, in about 22gb of RAM, with do-th-subset-load (id
+4e15e692de6); ~2 hrs.
+
 ---
 
 RUNNING:
