@@ -274,3 +274,30 @@ class Test_Surrendered(object):
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 1, n_partitions        # combined.
+
+    def test_surrendered_save_load(self):
+        ht = khmer.new_hashtable(32, 4**15+1)
+
+        filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
+        total_reads, _ = ht.consume_fasta_and_tag(filename)
+        subset = ht.do_subset_partition(0, 0)
+
+        ht.save_subset_partitionmap(subset, 'aaa.pmap', 'aaa.surr')
+        del subset
+        
+        subset = ht.load_subset_partitionmap('aaa.pmap', 'aaa.surr')
+        ht.merge_subset(subset)
+
+        n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
+
+        assert n_partitions == 16, n_partitions
+        assert n_unassigned == 0, n_unassigned
+        assert n_surrendered == 16, n_surrendered
+
+        ht.output_partitions(filename, filename + '.out')
+
+        for line in open(filename + '.out'):
+            line = line.strip()
+            if line.startswith('>'):
+                assert line.endswith('*'), line
+

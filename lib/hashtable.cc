@@ -2047,11 +2047,11 @@ void SubsetPartition::load_partitionmap(string infilename,
 
   n_bytes = 0;
   remainder = 0;
-  while (!infile.eof()) {
+  while (!surrenderfile.eof()) {
     unsigned int i;
 
-    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-    n_bytes = infile.gcount() + remainder;
+    surrenderfile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = surrenderfile.gcount() + remainder;
 
     remainder = n_bytes % sizeof(PartitionID);
     n_bytes -= remainder;
