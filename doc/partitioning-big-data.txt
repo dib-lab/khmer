@@ -1,0 +1,76 @@
+=========================================
+Partitioning large data sets (50m+ reads)
+=========================================
+
+We've successfully used khmer to partition extremely large data sets.
+These are challenging because of the data size, the memory
+constraints, and the time involved.  You'll probably need 60-80gb of
+RAM to follow this process; we usually just rent EC2 machines at
+http://aws.amazon.com/.
+
+Here's a rough guide.
+
+Step 1: Load the reads into a hashtable and tagset
+==================================================
+
+Load all of the k-mers in all of the reads in memory.
+
+This builds the basic data structure (a fixed-size hash table), which
+we can traverse as a probabilistic de Bruijn graph; and a set of
+k-mers that are tagged at a minimum density within that graph (the
+tag set).  In terms of memory consumption, the hashtable is fixed size
+and the tag set is linear with the number of reads (one tagged k-mer
+per read).
+
+Implemented in do-th-subset-save.py (first part).
+
+Make the hashtable as big as possible.  Use large K.
+
+Note: hashtable occupancy should be less than 50%, rule of thumb.
+
+Optional: save the hashtable and tagset; then you won't need to parse
+again.  See ht.save(filename) and ht.save_tagset(filename).
+
+Step 2: Do subset partitioning
+==============================
+
+Break the set of all tags into smaller subsets (1-5m in size is a good
+low-memory choice) and do a tabu search from each tag to all possible
+connected tags (stopping at the first connected tag in each
+path). Then label all connected tags with a partition ID. These
+subsets can be evaluated in parallel, then saved to disk when finished.
+
+Implemented in do-th-subset-save.py (second part).
+
+The smaller the subset size, the less memory used and the more threads
+can be used to partition subsets in parallel.  We would suggest
+using a subset size of 1m with 8 threads, which is small enough to be
+evaluated and saved quickly, without using much memory.
+
+After subset partitioning, neither the hashtable nor the original tagset
+is needed.
+
+Step 3: Merge subsets
+=====================
+
+Do a pairwise merge of as many subsets as possible.  This is memory-
+and CPU- and disk-intensive.  Keep the number of parallel threads as
+high as possible without running out of memory.
+
+Implemented in do-subset-merge.py.
+
+Repeat step #3 until you can't do any more merges.
+
+Step 4: Filter the subsets
+==========================
+
+Now do a filtering of partitions that are less than L in size in all
+of the subsets.  I use L=3.
+
+@@ wax philosophic
+
+Step 5: Output the reads with their partitions
+==============================================
+
+Step 6: Group the sequences into separate groups, based on partition size
+=========================================================================

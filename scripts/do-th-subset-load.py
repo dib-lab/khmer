@@ -3,7 +3,6 @@ import gc
 import glob
 
 K = 32
-SUBSET_SIZE = 100000
 
 filename=sys.argv[1]
 subset_filenames=sys.argv[2:]
