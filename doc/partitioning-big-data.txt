@@ -10,7 +10,7 @@ http://aws.amazon.com/.
 
 Here's a rough guide.
 
-Step 1: Load the reads into a hashtable and tagset
+Step 1a: Load the reads into a hashtable and tagset
 ==================================================
 
 Load all of the k-mers in all of the reads in memory.
@@ -31,7 +31,11 @@ Note: hashtable occupancy should be less than 50%, rule of thumb.
 Optional: save the hashtable and tagset; then you won't need to parse
 again.  See ht.save(filename) and ht.save_tagset(filename).
 
-Step 2: Do subset partitioning
+Example: ::
+
+  %% python ./scripts/do-th-subset-save.py data/25k.fa
+
+Step 1b: Do subset partitioning
 ==============================
 
 Break the set of all tags into smaller subsets (1-5m in size is a good
@@ -50,7 +54,7 @@ evaluated and saved quickly, without using much memory.
 After subset partitioning, neither the hashtable nor the original tagset
 is needed.
 
-Step 3: Merge subsets
+Step 2: Merge subsets
 =====================
 
 Do a pairwise merge of as many subsets as possible.  This is memory-
@@ -61,7 +65,7 @@ Implemented in do-subset-merge.py.
 
 Repeat step #3 until you can't do any more merges.
 
-Step 4: Filter the subsets
+Step 3: Filter the subsets
 ==========================
 
 Now do a filtering of partitions that are less than L in size in all
@@ -69,8 +73,28 @@ of the subsets.  I use L=3.
 
 @@ wax philosophic
 
-Step 5: Output the reads with their partitions
+Step 4: Output the reads with their partitions
 ==============================================
 
-Step 6: Group the sequences into separate groups, based on partition size
+Next, load/merge all the subsets (either as in step 4, or in memory),
+and run through the entire original read file. Output any read that
+has been assigned a partition.
+
+Implemented in do-th-subset-save.py.
+
+Step 5: Group the sequences into separate groups, based on partition size
 =========================================================================
+
+Finally, we want to produce some files feed to the assembler.  While
+we *could* assemble each partition individually, in practice
+there will 10s of thousands to millions of partitions in a single large
+data set.  So instead we want to group them.
+
+The strategy we use is to go through the partitions, counting the number
+of reads in each; then order the partitions by size, smallest to largest;
+then output all the reads into a series of group files, each of a particular
+minimum size (containing a set of reads).  (There's no particular logic
+as to why to do it this way; you could just as easily randomly assign
+partitions to groups.)
+
+Implemented in extract-partitions.py.
