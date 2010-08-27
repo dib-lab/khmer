@@ -7,6 +7,8 @@ replace memory structures for map, set to be cheaper; see Matt Austern's
 
 run velvet??
 
+probably want to randomize which group files different partitions go into...?
+
 TODO in the future
 ----
 
