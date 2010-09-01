@@ -9,7 +9,6 @@
 #define IO_BUF_SIZE 50*1000*1000
 #define CALLBACK_PERIOD 10000
 #define PARTITION_ALL_TAG_DEPTH 500
-#define PARTITION_MAX_TAG_EXAMINED 1e6
 
 using namespace khmer;
 using namespace std;
@@ -1329,10 +1328,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   node_q.push(kmer_r);
 
   while(!node_q.empty()) {
-    total++;
-
-    if (total > PARTITION_MAX_TAG_EXAMINED ||
-      node_q.size() > PARTITION_ALL_TAG_DEPTH) {
+    if (total > PARTITION_ALL_TAG_DEPTH) {
       surrender = true;
       break;
     }
@@ -1349,6 +1345,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     // keep track of seen kmers
     keeper.insert(kmer);
+    //    cout << "INSERT: " << _revhash(kmer, _ht->ksize()) << "=" << (int) (_ht->get_count(kmer)) << " xx " << kmer % _ht->n_entries() << " =\n";
+    total++;
 
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.
