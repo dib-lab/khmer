@@ -1,4 +1,4 @@
-CXXFLAGS=-g -fPIC -O2 -Wall
+CXXFLAGS=-g -fPIC -Wall # -O2
 
 all: parsers.o ktable.o hashtable.o
 

@@ -2045,6 +2045,8 @@ void SubsetPartition::load_partitionmap(string infilename,
 
   n_bytes = 0;
   remainder = 0;
+
+  unsigned int count = 0;
   while (!surrenderfile.eof()) {
     unsigned int i;
 
@@ -2055,10 +2057,18 @@ void SubsetPartition::load_partitionmap(string infilename,
     n_bytes -= remainder;
 
     for (i = 0; i < n_bytes;) {
+      count += 1;
+
       pp = (PartitionID *) (buf + i);
       i += sizeof(PartitionID);
 
-      surrender_set.insert(ppmap[*pp]);
+      cout << "loading " << *pp << " " << count << "-" << i << "=" << n_bytes << "\n";
+
+      PartitionID *p2 = ppmap[*pp];
+      if (p2 != NULL) {
+      // assert(p2 != NULL);
+	surrender_set.insert(ppmap[*pp]);
+      }
     }
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
