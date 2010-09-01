@@ -194,4 +194,18 @@ sys     4m8.407s
 
 17 subset => 9 in 1 thread/36 gb of RAM
 
+...
+
+
+filtering: subsets-merge6.merge.12.pmap
+OLD partition map size: 157617196
+NEW partition map size: 130577864
+filtering: subsets-merge7.merge.0.pmap
+OLD partition map size: 184833576
+NEW partition map size: 130577864
+
+...
+
+28gb to load 7+ of 9 subsets with do-th-subset-load.py.
+
 ---
