@@ -198,9 +198,9 @@ class Test_Surrendered(object):
 
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
 
-        assert n_partitions == 15, n_partitions
+        assert n_partitions == 1, n_partitions
         assert n_unassigned == 0, n_unassigned
-        assert n_surrendered == 15, n_surrendered
+        assert n_surrendered == 16, n_surrendered
 
     
     def test_surrendered_subset_2(self):
@@ -215,9 +215,9 @@ class Test_Surrendered(object):
 
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
 
-        assert n_partitions == 15, n_partitions
+        assert n_partitions == 1, n_partitions
         assert n_unassigned == 0, n_unassigned
-        assert n_surrendered == 15, n_surrendered
+        assert n_surrendered == 16, n_surrendered
 
     def test_save_load_merge(self):
         ht = khmer.new_hashtable(20, 4**14+1)
@@ -290,9 +290,9 @@ class Test_Surrendered(object):
 
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
 
-        assert n_partitions == 15, n_partitions
+        assert n_partitions == 1, n_partitions
         assert n_unassigned == 0, n_unassigned
-        assert n_surrendered == 15, n_surrendered
+        assert n_surrendered == 16, n_surrendered
 
         ht.output_partitions(filename, filename + '.out')
 

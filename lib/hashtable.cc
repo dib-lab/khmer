@@ -1152,6 +1152,7 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
     surrendered.insert(*pp);
   }
   n_surrendered = surrendered.size();
+  n_surrendered = 0;
 
   //
   // now, go through all the reads, and take those with assigned partitions
@@ -1163,6 +1164,10 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
     PartitionID * partition_p = pi->second;
     if (partition_p) {
       partitions.insert(*partition_p);
+
+      if (*partition_p == SURRENDER_PARTITION) {
+	n_surrendered++;
+      }
     }
     else {
       n_unassigned++;
@@ -1170,6 +1175,7 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
   }
   n_partitions = partitions.size();
 }
+
 
 unsigned int SubsetPartition::output_partitioned_file(const std::string infilename,
 						      const std::string outputfile,
@@ -1232,8 +1238,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
       // Is this a partition that has not been entirely explored? If so,
       // mark it.
       char surrender_flag = ' ';
-      PartitionSet::const_iterator ii = surrendered.find(partition_id);
-      if (ii != surrendered.end()) {
+      if (partition_id == SURRENDER_PARTITION) {
 	surrender_flag = '*';
       }
 
@@ -1477,8 +1482,36 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
   PartitionID return_val = 0; 
   PartitionID * pp = NULL;
 
+  for (SeenSet::iterator si = tagged_kmers.begin(); si != tagged_kmers.end();
+       si++) {
+    PartitionID * pp = partition_map[*si];
+    if (pp && *pp == SURRENDER_PARTITION) {
+      surrender = true;
+    }
+  }
+
   // did we find a tagged kmer?
-  if (tagged_kmers.size() >= 1 || surrender) {
+  if (surrender) {
+    PartitionPtrSet * s = reverse_pmap[SURRENDER_PARTITION];
+    PartitionPtrSet::iterator si = s->begin();
+
+    PartitionID * surrender_pp = *si;
+    
+
+    SeenSet::iterator ii = tagged_kmers.begin();
+    for (; ii != tagged_kmers.end(); ii++) {
+      PartitionID * pp = partition_map[*ii];
+      if (pp) {
+	if (*pp != SURRENDER_PARTITION) {
+	  _add_partition_ptr(surrender_pp, pp);
+	}
+      } else {
+	partition_map[*ii] = surrender_pp;
+      }
+    }
+    partition_map[kmer_f] = surrender_pp;
+  }
+  else if (tagged_kmers.size() >= 1) {
     pp = _reassign_partition_ids(tagged_kmers, kmer_f);
     return_val = *pp;
   } else {
@@ -1486,10 +1519,6 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
     return_val = 0;
   }
 
-  if (surrender) {
-    assert(pp != NULL);
-    surrender_set.insert(pp);
-  }
   return return_val;
 }
 
@@ -1675,19 +1704,7 @@ void SubsetPartition::merge(SubsetPartition * other)
   PartitionID p;
 
   //
-  // first, go through the surrender_set and convert the PartitionID* into
-  // PartitionID.
-  //
-
-  PartitionSet surrendered;
-  for (PartitionPtrSet::const_iterator si = other->surrender_set.begin();
-       si != other->surrender_set.end(); si++) {
-    PartitionID * pp = *si;
-    surrendered.insert(*pp);
-  }
-
-  //
-  // now, convert the partition maps.
+  // Convert the partition maps.
   //
 
   make_partitions_to_tags(other->partition_map, subset_pttm);
@@ -1746,35 +1763,41 @@ void SubsetPartition::merge(SubsetPartition * other)
       // aaaaaand.... iterate until no more tags show up!
     }
 
+    // Deal with SURRENDER_PARTITION...
+
+    bool surrender = false;
+    if (old_subset_partitions.find(SURRENDER_PARTITION) != 
+	old_subset_partitions.end() ||
+	old_master_partitions.find(SURRENDER_PARTITION) != 
+	old_master_partitions.end()) {
+      surrender = true;
+    }
+
     // All right!  We've now got all the tags that we want to be part of
     // the master map partition; create or merge.
 
-    PartitionSet::iterator psi = old_master_partitions.begin();
     PartitionPtrSet * pp_set = NULL;
 
-    if (psi == old_master_partitions.end()) { // nothing there in master ptn.
+    if (old_master_partitions.size() == 0 && !surrender) {
       pp = this->get_new_partition();
 	
       pp_set = new PartitionPtrSet();
       pp_set->insert(pp);
       this->reverse_pmap[*pp] = pp_set;
     } else {
-      pp_set = this->reverse_pmap[*psi];
+      if (surrender) {
+	pp_set = this->reverse_pmap[SURRENDER_PARTITION];
+	assert(pp_set->size() == 1);
+      } else {
+	PartitionSet::iterator psi = old_master_partitions.begin();
+	pp_set = this->reverse_pmap[*psi];
+      }
       assert(pp_set != NULL);
       pp = *(pp_set->begin());
     }
 
-    // Go over all of the subset partitions we've mapped into the master,
-    // and see if any are marked as surrendered.  If so, put them into
-    // the master 'surrender' table, pointing at the correct master ptn.
-
-    for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
-	 psi2 != old_subset_partitions.end(); psi2++) {
-      PartitionSet::iterator xx = surrendered.find(*psi2);
-      if (xx != surrendered.end()) {
-	this->surrender_set.insert(pp);
-	break;
-      }
+    if (surrender) {
+      assert(*pp == SURRENDER_PARTITION);
     }
 
     // Remove all of the SeenSets in the subset_pttm map for these

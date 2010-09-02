@@ -34,9 +34,9 @@ class Test_PartitionCount(object):
         ht.do_truncated_partition(filename, filename + '.out')
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
 
-        assert n_partitions == 15, n_partitions
+        assert n_partitions == 1, n_partitions
         assert n_unassigned == 1, n_unassigned
-        assert n_surrendered == 15, n_surrendered
+        assert n_surrendered == 16, n_surrendered
 
 ### do_truncated_partition
 
@@ -167,7 +167,7 @@ class Test_PythonAPI(object):
         print ht.consume(c)
         ppi = ht.find_all_tags(c[:20])
         pid = ht.assign_partition_id(ppi)
-        assert pid == 1, pid
+        assert pid == 2, pid
 
 ###
 
