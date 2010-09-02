@@ -1539,7 +1539,7 @@ static PyObject * hash_output_partitions(PyObject * self, PyObject * args)
     khmer::SubsetPartition * subset_p = hashtable->partition;
     n_partitions = subset_p->output_partitioned_file(filename,
 						     output,
-						     true,
+						     false,
 						     _report_fn,
 						     callback_obj);
   } catch (_khmer_signal &e) {
