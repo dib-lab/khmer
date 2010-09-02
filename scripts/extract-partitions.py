@@ -8,7 +8,7 @@ def read_partition_file(fp):
     for n, line in enumerate(fp):
         if n % 2 == 0:
             surrendered = False
-            name, partition_id = line[1:].strip().split('\t')
+            name, partition_id = line[1:].strip().rsplit('\t', 1)
 
             if '*' in partition_id:
                 partition_id = int(partition_id[:-1])
@@ -32,7 +32,7 @@ for n, record in enumerate(fasta_iter(open(sys.argv[1]))):
     if n % 10000 == 0:
         print '...', n
 
-    partition = int(record['name'].split('\t')[1].rstrip('*'))
+    partition = int(record['name'].rsplit('\t', 1)[1].rstrip('*'))
     count[partition] = count.get(partition, 0) + 1
 
 # develop histogram of partition sizes
@@ -41,7 +41,7 @@ for n, record in enumerate(fasta_iter(open(sys.argv[1]))):
     if n % 10000 == 0:
         print '...x2', n
 
-    partition = int(record['name'].split('\t')[1].rstrip('*'))
+    partition = int(record['name'].rsplit('\t', 1)[1].rstrip('*'))
     if partition not in count:
         continue
     
@@ -63,7 +63,9 @@ for c, n in sorted(dist.items()):
     distfp.write('%d %d %d\n' % (c, n, total))
 
 # separate
-del count[0]
+if 0 in count:
+   del count[0]
+
 divvy = sorted(count.items(), key=lambda y:y[1])
 
 ## divvy up into different groups, based on having MAX_SIZE sequences
