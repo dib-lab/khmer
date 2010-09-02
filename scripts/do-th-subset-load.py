@@ -9,9 +9,8 @@ subset_filenames=sys.argv[2:]
 
 def load(filename, ht):
     pmap_filename = filename
-    surr_filename = filename[:-4] + 'surr'
     print 'loading', filename
-    subset = ht.load_subset_partitionmap(pmap_filename, surr_filename)
+    subset = ht.load_subset_partitionmap(pmap_filename)
     print 'merging', filename
     ht.merge_subset(subset)
 

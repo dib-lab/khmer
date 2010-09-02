@@ -31,9 +31,7 @@ def worker(q, basename):
         print 'saving:', basename, n
         
         outfile = basename + '.subset.%d' % (n,)
-        ht.save_subset_partitionmap(subset,
-                                    outfile + '.pmap',
-                                    outfile + '.surr')
+        ht.save_subset_partitionmap(subset, outfile + '.pmap')
         del subset
         gc.collect()
 
@@ -86,7 +84,7 @@ def main(filename):
     for t in threads:
         t.join()
 
-    print 'done! see %s.subset.*.pmap and %s.subset.*.surr' % (basename, basename)
+    print 'done! see %s.subset.*.pmap' % (basename,)
 
 if __name__ == '__main__':
     main(sys.argv[1])

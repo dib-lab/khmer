@@ -35,7 +35,6 @@ namespace khmer {
     Hashtable * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
-    PartitionPtrSet surrender_set;
 
     void _clear_partitions();
 
@@ -72,8 +71,8 @@ namespace khmer {
 
     void merge(SubsetPartition *);
 
-    void save_partitionmap(std::string outfile, std::string surrenderfile);
-    void load_partitionmap(std::string infile, std::string surrenderfile);
+    void save_partitionmap(std::string outfile);
+    void load_partitionmap(std::string infile);
     void _validate_pmap();
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
