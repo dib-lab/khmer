@@ -10,6 +10,8 @@
 #include "khmer.hh"
 #include "storage.hh"
 
+#define SURRENDER_PARTITION 1
+
 namespace khmer {
   typedef unsigned int PartitionID;
   typedef std::set<HashIntoType> SeenSet;
@@ -49,7 +51,12 @@ namespace khmer {
 		      const SeenSet& keeper);
 
   public:
-    SubsetPartition(Hashtable * ht) : next_partition_id(1), _ht(ht) { };
+    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht) {
+      PartitionPtrSet * s = new PartitionPtrSet();
+      PartitionID * p = new PartitionID(SURRENDER_PARTITION);
+      s->insert(p);
+      reverse_pmap[SURRENDER_PARTITION] = s;
+    };
 
     ~SubsetPartition() { _clear_partitions(); }
 
