@@ -233,15 +233,15 @@ class Test_Surrendered(object):
         assert n_partitions == 3, n_partitions        # all singular
         
         x = ht.do_subset_partition(a, b)
-        ht.save_subset_partitionmap(x, 'x.pmap', 'x.surrender')
+        ht.save_subset_partitionmap(x, 'x.pmap')
         del x
 
         y = ht.do_subset_partition(b, 0)
-        ht.save_subset_partitionmap(y, 'y.pmap', 'y.surrender')
+        ht.save_subset_partitionmap(y, 'y.pmap')
         del y
 
-        a = ht.load_subset_partitionmap('x.pmap', 'x.surrender')
-        b = ht.load_subset_partitionmap('y.pmap', 'y.surrender')
+        a = ht.load_subset_partitionmap('x.pmap')
+        b = ht.load_subset_partitionmap('y.pmap')
 
         ht.merge_subset(a)
         ht.merge_subset(b)
@@ -259,15 +259,15 @@ class Test_Surrendered(object):
         divvy = ht.divide_tags_into_subsets(subset_size)
         
         x = ht.do_subset_partition(divvy[0], divvy[1])
-        ht.save_subset_partitionmap(x, 'x.pmap', 'x.surrender')
+        ht.save_subset_partitionmap(x, 'x.pmap')
         del x
 
         y = ht.do_subset_partition(divvy[1], 0)
-        ht.save_subset_partitionmap(y, 'y.pmap', 'y.surrender')
+        ht.save_subset_partitionmap(y, 'y.pmap')
         del y
 
-        a = ht.load_subset_partitionmap('x.pmap', 'x.surrender')
-        b = ht.load_subset_partitionmap('y.pmap', 'y.surrender')
+        a = ht.load_subset_partitionmap('x.pmap')
+        b = ht.load_subset_partitionmap('y.pmap')
 
         ht.merge_subset(a)
         ht.merge_subset(b)
@@ -282,10 +282,10 @@ class Test_Surrendered(object):
         total_reads, _ = ht.consume_fasta_and_tag(filename)
         subset = ht.do_subset_partition(0, 0)
 
-        ht.save_subset_partitionmap(subset, 'aaa.pmap', 'aaa.surr')
+        ht.save_subset_partitionmap(subset, 'aaa.pmap')
         del subset
         
-        subset = ht.load_subset_partitionmap('aaa.pmap', 'aaa.surr')
+        subset = ht.load_subset_partitionmap('aaa.pmap')
         ht.merge_subset(subset)
 
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()

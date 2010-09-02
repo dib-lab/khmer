@@ -43,8 +43,7 @@ def pull_pair(q):
 
 def load(filename):
     pmap_filename = filename
-    surr_filename = filename[:-4] + 'surr'
-    subset = ht.load_subset_partitionmap(pmap_filename, surr_filename)
+    subset = ht.load_subset_partitionmap(pmap_filename)
     return subset
 
 def merge(filename1, filename2, ht):
@@ -61,8 +60,7 @@ def merge(filename1, filename2, ht):
     subset2 = load(filename2)
     ht.merge2_subset(subset1, subset2)
 
-    ht.save_subset_partitionmap(subset1, merge_filename + '.pmap',
-                                merge_filename + '.surr')
+    ht.save_subset_partitionmap(subset1, merge_filename + '.pmap')
     return merge_filename + '.pmap'
 
 # detect all of the relevant partitionmap files
@@ -90,8 +88,6 @@ for t in threads:
 if merge_queue.qsize() == 1:
     ht, merge_file = merge_queue.get()
     shutil.copy(merge_file, os.path.join(dir2, os.path.basename(merge_file)))
-    surr_file = merge_file[:-4] + 'surr'
-    shutil.copy(surr_file, os.path.join(dir2, os.path.basename(surr_file)))
     
 assert merge_queue.qsize() == 0
 #ht, merge_file = merge_queue.get()

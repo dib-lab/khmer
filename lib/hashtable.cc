@@ -1139,20 +1139,6 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
   n_surrendered = 0;
 
   PartitionSet partitions;
-  PartitionSet surrendered;
-
-  //
-  // go through the surrender_set and convert the PartitionID* into
-  // PartitionID.
-  //
-
-  for (PartitionPtrSet::const_iterator si = surrender_set.begin();
-       si != surrender_set.end(); si++) {
-    PartitionID * pp = *si;
-    surrendered.insert(*pp);
-  }
-  n_surrendered = surrendered.size();
-  n_surrendered = 0;
 
   //
   // now, go through all the reads, and take those with assigned partitions
@@ -1191,7 +1177,6 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   unsigned int n_singletons = 0;
 
   PartitionSet partitions;
-  PartitionSet surrendered;
 
   Read read;
   string seq;
@@ -1202,18 +1187,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   const unsigned char ksize = _ht->ksize();
 
   //
-  // first, go through the surrender_set and convert the PartitionID* into
-  // PartitionID.
-  //
-
-  for (PartitionPtrSet::const_iterator si = surrender_set.begin();
-       si != surrender_set.end(); si++) {
-    PartitionID * pp = *si;
-    surrendered.insert(*pp);
-  }
-
-  //
-  // now, go through all the reads, and take those with assigned partitions
+  // go through all the reads, and take those with assigned partitions
   // and output them.
   //
 
@@ -1908,8 +1882,7 @@ void Hashtable::consume_fasta_and_tag(const std::string &filename,
 
 // load partition maps from & save to disk 
 
-void SubsetPartition::save_partitionmap(string pmap_filename,
-					string surrender_filename)
+void SubsetPartition::save_partitionmap(string pmap_filename)
 {
   ofstream outfile(pmap_filename.c_str(), ios::binary);
   char * buf = NULL;
@@ -1945,32 +1918,10 @@ void SubsetPartition::save_partitionmap(string pmap_filename,
   }
   outfile.close();
 
-  ofstream surrenderfile(surrender_filename.c_str(), ios::binary);
-
-  n_bytes = 0;
-  for (PartitionPtrSet::const_iterator ss = surrender_set.begin();
-       ss != surrender_set.end(); ss++) {
-    PartitionID p_id = *(*ss);
-
-    pp = (PartitionID *) (buf + n_bytes);
-    *pp = p_id;
-    n_bytes += sizeof(PartitionID);
-
-    if (n_bytes >= IO_BUF_SIZE - sizeof(PartitionID)) {
-      surrenderfile.write(buf, n_bytes);
-      n_bytes = 0;
-    }
-  }
-  if (n_bytes) {
-    surrenderfile.write(buf, n_bytes);
-  }
-  surrenderfile.close();
-
   delete buf;
 }
 					 
-void SubsetPartition::load_partitionmap(string infilename,
-					string surrenderfilename)
+void SubsetPartition::load_partitionmap(string infilename)
 {
   ifstream infile(infilename.c_str(), ios::binary);
   char * buf = NULL;
@@ -2061,45 +2012,7 @@ void SubsetPartition::load_partitionmap(string infilename,
   }
 
   infile.close();
-
-  ifstream surrenderfile(surrenderfilename.c_str(), ios::binary);
-
-  assert(surrenderfile.is_open());
-
-  n_bytes = 0;
-  remainder = 0;
-
-  unsigned int count = 0;
-  while (!surrenderfile.eof()) {
-    unsigned int i;
-
-    surrenderfile.read(buf + remainder, IO_BUF_SIZE - remainder);
-    n_bytes = surrenderfile.gcount() + remainder;
-
-    remainder = n_bytes % sizeof(PartitionID);
-    n_bytes -= remainder;
-
-    for (i = 0; i < n_bytes;) {
-      count += 1;
-
-      pp = (PartitionID *) (buf + i);
-      i += sizeof(PartitionID);
-
-      cout << "loading " << *pp << " " << count << "-" << i << "=" << n_bytes << "\n";
-
-      PartitionID *p2 = ppmap[*pp];
-      if (p2 != NULL) {
-      // assert(p2 != NULL);
-	surrender_set.insert(ppmap[*pp]);
-      }
-    }
-    assert(i == n_bytes);
-    memcpy(buf, buf + n_bytes, remainder);
-  }
-
   delete buf; buf = NULL;
-
-  surrenderfile.close();
 }
 
 
@@ -2149,7 +2062,6 @@ void SubsetPartition::_clear_partitions()
     delete s;
   }
   partition_map.clear();
-  surrender_set.clear();
   next_partition_id = 1;
 }
 

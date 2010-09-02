@@ -13,7 +13,5 @@ python/test-data/random-31-c.fa.out
 *.ht
 *.tags
 *.pmap
-*.surr
-*.surrender
 *.out
 *.part

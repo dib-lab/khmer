@@ -1555,13 +1555,12 @@ static PyObject * hash_save_partitionmap(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename = NULL;
-  char * filename2 = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss", &filename, &filename2)) {
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
     return NULL;
   }
 
-  hashtable->partition->save_partitionmap(filename, filename2);
+  hashtable->partition->save_partitionmap(filename);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1573,13 +1572,12 @@ static PyObject * hash_load_partitionmap(PyObject * self, PyObject * args)
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename = NULL;
-  char * filename2 = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss", &filename, &filename2)) {
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
     return NULL;
   }
 
-  hashtable->partition->load_partitionmap(filename, filename2);
+  hashtable->partition->load_partitionmap(filename);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1686,10 +1684,9 @@ static PyObject * hash_save_tagset(PyObject * self, PyObject * args)
 static PyObject * hash_save_subset_partitionmap(PyObject * self, PyObject * args)
 {
   char * filename = NULL;
-  char * filename2 = NULL;
   PyObject * subset_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "Oss", &subset_obj, &filename, &filename2)) {
+  if (!PyArg_ParseTuple(args, "Os", &subset_obj, &filename)) {
     return NULL;
   }
 
@@ -1698,7 +1695,7 @@ static PyObject * hash_save_subset_partitionmap(PyObject * self, PyObject * args
 
   Py_BEGIN_ALLOW_THREADS
 
-  subset_p->save_partitionmap(filename, filename2);
+  subset_p->save_partitionmap(filename);
 
   Py_END_ALLOW_THREADS
 
@@ -1712,9 +1709,8 @@ static PyObject * hash_load_subset_partitionmap(PyObject * self, PyObject * args
   khmer::Hashtable * hashtable = me->hashtable;
 
   char * filename = NULL;
-  char * filename2 = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss", &filename, &filename2)) {
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
     return NULL;
   }
 
@@ -1723,7 +1719,7 @@ static PyObject * hash_load_subset_partitionmap(PyObject * self, PyObject * args
 
   Py_BEGIN_ALLOW_THREADS
 
-  subset_p->load_partitionmap(filename, filename2);
+  subset_p->load_partitionmap(filename);
 
   Py_END_ALLOW_THREADS
 
