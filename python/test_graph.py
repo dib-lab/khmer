@@ -35,8 +35,8 @@ class Test_PartitionCount(object):
         n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
 
         assert n_partitions == 1, n_partitions
-        assert n_unassigned == 1, n_unassigned
-        assert n_surrendered == 16, n_surrendered
+        assert n_unassigned == 2, n_unassigned
+        assert n_surrendered == 15, n_surrendered
 
 ### do_truncated_partition
 
