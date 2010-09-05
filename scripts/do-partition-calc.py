@@ -68,6 +68,7 @@ def main():
     
     n_partitions = ht.do_truncated_partition(infile, outfile, report_fn)
     print n_partitions, 'partitions kept'
+    print 'n surrendered:', ht.count_partitions()[2]
 
     ht.save_partitionmap(outfile + '.end.pmap')
 
