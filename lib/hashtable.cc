@@ -1571,12 +1571,14 @@ static void make_partitions_to_tags(PartitionMap& pmap,
       tag = pi->first;
       p = *(pi->second);
 
-      sp = pttmap[p];
-      if (sp == NULL) {
-	sp = new SeenSet();
-	pttmap[p] = sp;
+      if (p != SURRENDER_PARTITION) {
+	sp = pttmap[p];
+	if (sp == NULL) {
+	  sp = new SeenSet();
+	  pttmap[p] = sp;
+	}
+	sp->insert(tag);
       }
-      sp->insert(tag);
     }
   }
 }
@@ -1624,6 +1626,12 @@ static void get_new_tags_from_partitions(SeenSet& old_tags,
        psi != new_partitions.end(); psi++) {
     PartitionID p = *psi;
     SeenSet * s = pttm[p];
+
+    // should only happen for the incompletely traversed sets
+    if (s == NULL) {
+      assert(p == SURRENDER_PARTITION);
+      continue;
+    }
     
     for (SeenSet::const_iterator si = s->begin(); si != s->end(); si++) {
       SeenSet::const_iterator test = old_tags.find(*si);
@@ -1738,7 +1746,7 @@ void SubsetPartition::merge(SubsetPartition * other)
       // aaaaaand.... iterate until no more tags show up!
     }
 
-    // Deal with SURRENDER_PARTITION...
+    // Deal with merging incompletely traversed sets...
 
     bool surrender = false;
     if (old_subset_partitions.find(SURRENDER_PARTITION) != 
@@ -1762,7 +1770,6 @@ void SubsetPartition::merge(SubsetPartition * other)
     } else {
       if (surrender) {
 	pp_set = this->reverse_pmap[SURRENDER_PARTITION];
-	assert(pp_set->size() == 1);
       } else {
 	PartitionSet::iterator psi = old_master_partitions.begin();
 	pp_set = this->reverse_pmap[*psi];
@@ -1780,9 +1787,10 @@ void SubsetPartition::merge(SubsetPartition * other)
     for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
 	 psi2 != old_subset_partitions.end(); psi2++) {
       SeenSet * sp = subset_pttm[*psi2];
-      assert(sp != NULL);
-      subset_pttm[*psi2] = NULL;
-      delete sp;
+      if (sp != NULL) {
+	subset_pttm[*psi2] = NULL;
+	delete sp;
+      }
     }
 
     // Remap all of the tags in the master map. This has the side
@@ -1792,6 +1800,11 @@ void SubsetPartition::merge(SubsetPartition * other)
     PartitionPtrSet remove_me;
     for (SeenSet::iterator si = old_tags.begin(); si != old_tags.end(); si++) {
       PartitionID * old_pp = this->partition_map[*si];
+
+      if (old_pp && *old_pp == SURRENDER_PARTITION) {
+	assert(surrender);
+	continue;
+      }
 
       if (old_pp == NULL) {
 	this->partition_map[*si] = pp;
@@ -1812,6 +1825,7 @@ void SubsetPartition::merge(SubsetPartition * other)
     for (PartitionPtrSet::iterator si = remove_me.begin();
 	 si != remove_me.end(); si++) {
       PartitionID p = *(*si);
+      assert (p != SURRENDER_PARTITION);
       pp_set = this->reverse_pmap[p];
       if (pp_set) {
 	delete pp_set;
@@ -1823,6 +1837,23 @@ void SubsetPartition::merge(SubsetPartition * other)
 
   del_partitions_to_tags(subset_pttm);
   del_partitions_to_tags(master_pttm);
+
+  // @CTB deal with surrender partitions
+  PartitionID * surr_pp = *(this->reverse_pmap[SURRENDER_PARTITION]->begin());
+
+  for (PartitionMap::iterator pi = other->partition_map.begin();
+       pi != other->partition_map.end(); pi++) {
+    if (pi->second && *(pi->second) == SURRENDER_PARTITION) {
+      PartitionID * this_pp = this->partition_map[pi->first];
+      if (!this_pp) {
+	this->partition_map[pi->first] = surr_pp;
+      } else if (this_pp) {
+	if (*this_pp != SURRENDER_PARTITION) {
+	  this->_add_partition_ptr(surr_pp, this_pp);
+	}
+      }
+    }
+  }
 }
 
 //
