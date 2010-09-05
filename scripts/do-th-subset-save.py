@@ -6,12 +6,12 @@ import os.path
 
 K=32
 HASHTABLE_SIZE=4**14+1
+SUBSET_SIZE = 750000
+N_THREADS = 2
 
 ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
 
-FILENAME=sys.argv[1]
-SUBSET_SIZE = 1000
-N_THREADS = 4
+###
 
 def worker(q, basename):
     while 1:

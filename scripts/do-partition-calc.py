@@ -38,7 +38,9 @@ def make_reporting_fn(ht, filename, period):
 def main():
     (options, args) = parser.parse_args()
 
-    (infile, outfile) = args
+    (infile,) = args
+    outfile = infile + '.part'
+
     k = options.ksize
     hashtable_size = 4**options.htsize4 + 1
     checkpoint_period = options.checkpoint
