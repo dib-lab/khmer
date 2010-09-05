@@ -1307,7 +1307,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   node_q.push(kmer_r);
 
   while(!node_q.empty()) {
-    if (total > PARTITION_ALL_TAG_DEPTH) {
+    if (total > PARTITION_ALL_TAG_DEPTH && \
+	node_q.size() > PARTITION_ALL_TAG_DEPTH) {
       surrender = true;
       break;
     }
