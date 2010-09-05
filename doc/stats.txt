@@ -209,3 +209,21 @@ NEW partition map size: 130577864
 28gb to load 7+ of 9 subsets with do-th-subset-load.py.
 
 ---
+
+Sep 4, 2010; Iowa corn.  Initial partitioning (32gb ht, 1m subset size)
+
+54gb RAM standing
+
+real    3107m47.636s
+user    23305m52.488s
+sys     3m39.383s
+
+Sep 4 , 2010: Iowa prairie.  Initial partitioning (32gb ht, 1m subset size)
+
+58gb RAM standing
+
+real    3734m7.595s
+user    27826m49.692s
+sys     3m23.419s
+
+---
