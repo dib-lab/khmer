@@ -1455,6 +1455,33 @@ static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hash_consume_partitioned_fasta(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashtable->consume_partitioned_fasta(filename, total_reads, n_consumed,
+					 _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
 void free_pre_partition_info(void * p)
 {
   _pre_partition_info * ppi = (_pre_partition_info *) p;
@@ -1920,6 +1947,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "save_partitionmap", hash_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hash__validate_partitionmap, METH_VARARGS, "" },
   { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_partitioned_fasta", hash_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hash_merge_subset, METH_VARARGS, "" },
   { "count_partitions", hash_count_partitions, METH_VARARGS, "" },
   { "save_subset_partitionmap", hash_save_subset_partitionmap, METH_VARARGS },

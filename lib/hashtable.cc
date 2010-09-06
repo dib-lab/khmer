@@ -1449,6 +1449,25 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
 //
 
+void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
+{
+  PartitionPtrSet * s = reverse_pmap[p];
+  PartitionID * pp = NULL;
+  if (s == NULL) {
+    s = new PartitionPtrSet();
+    pp = new unsigned int(p);
+    s->insert(pp);
+    reverse_pmap[p] = s;
+  } else {
+    pp = *(s->begin());
+  }
+  partition_map[kmer_f] = pp;
+
+  if (next_partition_id <= p) {
+    next_partition_id = p + 1;
+  }
+}
+
 PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 						 SeenSet& tagged_kmers,
 						 bool surrender)
@@ -1945,6 +1964,7 @@ void Hashtable::consume_fasta_and_tag(const std::string &filename,
       }
     }
   }
+  delete parser;
 }
 
 // load partition maps from & save to disk 
@@ -2241,4 +2261,82 @@ void SubsetPartition::filter_against_tags(TagCountMap& tag_map)
 
   partition_map.swap(new_pmap);
   new_pmap.clear();
+}
+
+//
+// consume_partitioned_fasta: consume a FASTA file of reads
+//
+
+void Hashtable::consume_partitioned_fasta(const std::string &filename,
+					  unsigned int &total_reads,
+					  unsigned long long &n_consumed,
+					  CallbackFn callback,
+					  void * callback_data)
+{
+  total_reads = 0;
+  n_consumed = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string seq = "";
+
+  // reset the master subset partition
+  delete partition;
+  partition = new SubsetPartition(this);
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    // yep! process.
+    unsigned int this_n_consumed = 0;
+    bool is_valid;
+
+    this_n_consumed = check_and_process_read(seq, is_valid);
+    n_consumed += this_n_consumed;
+    if (is_valid) {
+      // First, compute the tag (first k-mer)
+      string first_kmer = seq.substr(0, _ksize);
+      HashIntoType kmer_f, kmer_r;
+      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+
+      all_tags.insert(kmer_f);
+
+      // Next, figure out the partition is (if non-zero), and save that.
+      const char * s = read.name.c_str() + read.name.length() - 1;
+      assert(*(s + 1) == (unsigned int) NULL);
+
+      while(*s != '\t' && s >= read.name.c_str()) {
+	s--;
+      }
+
+      if (*s == '\t') {
+	PartitionID p = (PartitionID) atoi(s + 1);
+	if (p > 0) {
+	  partition->set_partition_id(kmer_f, p);
+	}
+      }
+    }
+	       
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("consume_partitioned_fasta", callback_data, total_reads,
+		 n_consumed);
+      } catch (...) {
+	delete parser;
+        throw;
+      }
+    }
+  }
+
+  delete parser;
 }

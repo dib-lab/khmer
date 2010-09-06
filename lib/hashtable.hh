@@ -63,6 +63,8 @@ namespace khmer {
 				    SeenSet& tagged_kmers,
 				    bool surrender);
 
+    void set_partition_id(HashIntoType kmer_f, PartitionID p);
+
     PartitionID * get_new_partition() {
       PartitionID* pp = new PartitionID(next_partition_id);
       next_partition_id++;
@@ -335,6 +337,12 @@ namespace khmer {
 			       unsigned long long &n_consumed,
 			       CallbackFn callback = 0,
 			       void * callback_data = 0);
+
+    void consume_partitioned_fasta(const std::string &filename,
+				   unsigned int &total_reads,
+				   unsigned long long &n_consumed,
+				   CallbackFn callback = 0,
+				   void * callback_data = 0);
 
     void do_truncated_partition(const std::string infilename,
 				CallbackFn callback=0,
