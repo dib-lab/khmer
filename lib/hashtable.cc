@@ -1632,6 +1632,8 @@ static void get_new_tags_from_partitions(SeenSet& old_tags,
       assert(p == SURRENDER_PARTITION);
       continue;
     }
+
+    assert(p != SURRENDER_PARTITION);
     
     for (SeenSet::const_iterator si = s->begin(); si != s->end(); si++) {
       SeenSet::const_iterator test = old_tags.find(*si);
@@ -1687,27 +1689,31 @@ void SubsetPartition::merge(SubsetPartition * other)
   PartitionID p;
 
   //
-  // Convert the partition maps.
+  // Convert the partition maps into something where we can do reverse
+  // lookups of what tags belong to a given partition.
   //
 
   make_partitions_to_tags(other->partition_map, subset_pttm);
   make_partitions_to_tags(this->partition_map, master_pttm);
+
+  // Run through all of the unique partitions in 'other' and find the
+  // transitive overlaps with sets in 'this'.
 
   for (PartitionsToTagsMap::iterator ptti = subset_pttm.begin();
        ptti != subset_pttm.end(); ptti++) {
     p = ptti->first;
     SeenSet * these_tags = ptti->second;
 
-    if (these_tags == NULL) {
+    if (these_tags == NULL) {	// We NULL the values as we deal with parts.
       continue;
     }
 
-    // this partition has not yet been transferred.  DEAL.
+    // OK, this partition has not yet been transferred.  DEAL.
 
     //
     // Here, we want to get all of the partitions connected to this
     // one in the master map and the subset map -- and do
-    // transitively.  Loop until no more are found.
+    // transitively.  Loop until no more additional tags/partitions are found.
     //
 
     SeenSet old_tags;
@@ -1761,6 +1767,7 @@ void SubsetPartition::merge(SubsetPartition * other)
 
     PartitionPtrSet * pp_set = NULL;
 
+    // No overlapping master partitions?  Create new.
     if (old_master_partitions.size() == 0 && !surrender) {
       pp = this->get_new_partition();
 	
@@ -1768,6 +1775,7 @@ void SubsetPartition::merge(SubsetPartition * other)
       pp_set->insert(pp);
       this->reverse_pmap[*pp] = pp_set;
     } else {
+      // Overlapping?  Great!  Get the first master partition.
       if (surrender) {
 	pp_set = this->reverse_pmap[SURRENDER_PARTITION];
       } else {
@@ -1783,7 +1791,7 @@ void SubsetPartition::merge(SubsetPartition * other)
     }
 
     // Remove all of the SeenSets in the subset_pttm map for these
-    // now-connected partitions.
+    // now-connected partitions.  (Also see NULL check at beginning of loop.)
     for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
 	 psi2 != old_subset_partitions.end(); psi2++) {
       SeenSet * sp = subset_pttm[*psi2];
@@ -1806,26 +1814,35 @@ void SubsetPartition::merge(SubsetPartition * other)
 	continue;
       }
 
-      if (old_pp == NULL) {
+      if (old_pp == NULL) {	// no previously assigned partition? assign!
 	this->partition_map[*si] = pp;
-      } else if (old_pp != pp) {
+      } else if (old_pp != pp) { // Overwrite, but keep track of those to free.
 	remove_me.insert(old_pp);
 	this->partition_map[*si] = pp;
+
+	// Note: even though there may be multiple PartitionID*s for
+	// this partition that need reassignin, we don't need to
+	// handle that in this loop; we're doing this systematically (and
+	// the 'remove_me' set will clear out with duplicates).
       }
     }
 
-    // reset the reverse_pmap for this entry, too.
+    // Condense & reset the reverse_pmap for *this* entry, too.  These
+    // PartitionID*s will have been added to 'remove_me' in the previous loop
+    // already.
     if (this->reverse_pmap[*pp]->size() > 1) {
       pp_set = new PartitionPtrSet();
       pp_set->insert(pp);
       this->reverse_pmap[*pp] = pp_set;
     }
 
-    // finally: remove remove_me & associated reverse_pmap entries.
+    // Finally: remove contents of remove_me & associated (obsolete)
+    // reverse_pmap entries.
     for (PartitionPtrSet::iterator si = remove_me.begin();
 	 si != remove_me.end(); si++) {
       PartitionID p = *(*si);
       assert (p != SURRENDER_PARTITION);
+
       pp_set = this->reverse_pmap[p];
       if (pp_set) {
 	delete pp_set;
@@ -1835,19 +1852,37 @@ void SubsetPartition::merge(SubsetPartition * other)
     }
   }
 
+  // OK, clean up the reverse maps.
+
   del_partitions_to_tags(subset_pttm);
   del_partitions_to_tags(master_pttm);
 
-  // @CTB deal with surrender partitions
+  //
+  // Deal with the surrender partition!
+  //
+
+  // At this point, any partition in subset that overlapped with a surrendered
+  // tag in master has already been surrendered.  Moreover, this has been
+  // done transitively, so that if subset partition A connected master
+  // partition B to another surrendered partition in the master, both A and
+  // B were surrendered.
+  //
+  // What's left is to mark those tags present only in subset as
+  // 'surrendered' -- they weren't in the subset_pttm to be transferred
+  // as normal.  We also want to make sure that tags that are marked as
+  // 'surrendered' in the subset partitionmap transfer that status to
+  // the master partitionmap.
+  // 
+
   PartitionID * surr_pp = *(this->reverse_pmap[SURRENDER_PARTITION]->begin());
 
   for (PartitionMap::iterator pi = other->partition_map.begin();
        pi != other->partition_map.end(); pi++) {
     if (pi->second && *(pi->second) == SURRENDER_PARTITION) {
       PartitionID * this_pp = this->partition_map[pi->first];
-      if (!this_pp) {
+      if (!this_pp) {		// not present in master; copy
 	this->partition_map[pi->first] = surr_pp;
-      } else if (this_pp) {
+      } else if (this_pp) {	// present in master; reassign.
 	if (*this_pp != SURRENDER_PARTITION) {
 	  this->_add_partition_ptr(surr_pp, this_pp);
 	}
