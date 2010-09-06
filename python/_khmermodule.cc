@@ -1908,6 +1908,59 @@ static PyObject * hash_subset_filter_against_tags(PyObject * self, PyObject * ar
   return Py_None;
 }
 
+static PyObject * hash_set_partition_id(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * kmer = NULL;
+  khmer::PartitionID p = 0;
+
+  if (!PyArg_ParseTuple(args, "si", &kmer, &p)) {
+    return NULL;
+  }
+
+  hashtable->partition->set_partition_id(kmer, p);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_join_partitions(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  khmer::PartitionID p1 = 0, p2 = 0;
+
+  if (!PyArg_ParseTuple(args, "ii", &p1, &p2)) {
+    return NULL;
+  }
+
+  p1 = hashtable->partition->join_partitions(p1, p2);
+
+  return PyInt_FromLong(p1);
+}
+
+static PyObject * hash_get_partition_id(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * kmer = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer)) {
+    return NULL;
+  }
+
+  khmer::PartitionID partition_id;
+  partition_id = hashtable->partition->get_partition_id(kmer);
+
+  return PyInt_FromLong(partition_id);
+}
+
+
+
 static PyMethodDef khmer_hashtable_methods[] = {
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
@@ -1958,6 +2011,9 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "subset_filter_against_tags", hash_subset_filter_against_tags, METH_VARARGS, "" },
   { "discard_tags", hash_discard_tags, METH_VARARGS, "" },
   { "subset_maxify_partition_size", hash_subset_maxify_partition_size, METH_VARARGS, "" },
+  { "set_partition_id", hash_set_partition_id, METH_VARARGS, "" },
+  { "join_partitions", hash_join_partitions, METH_VARARGS, "" },
+  { "get_partition_id", hash_get_partition_id, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

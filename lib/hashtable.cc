@@ -1449,6 +1449,15 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
 //
 
+void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
+{
+  HashIntoType kmer_f, kmer_r;
+  assert(kmer_s.length() >= _ht->ksize());
+  _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+
+  set_partition_id(kmer_f, p);
+}
+
 void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
 {
   PartitionPtrSet * s = reverse_pmap[p];
@@ -1576,6 +1585,47 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
   }
   delete t;
 }
+
+PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
+{
+  if (orig == join) { return orig; }
+  if (orig == 0 || join == 0) { return 0; }
+
+  if (join == SURRENDER_PARTITION) {
+    PartitionID tmp = join;
+    join = orig;
+    orig = tmp;
+  }
+    
+  PartitionID * orig_pp = *(reverse_pmap[orig]->begin());
+  PartitionID * join_pp = *(reverse_pmap[join]->begin());
+
+  _add_partition_ptr(orig_pp, join_pp);
+
+  return orig;
+}
+
+PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
+{
+  HashIntoType kmer_f, kmer_r;
+  assert(kmer_s.length() >= _ht->ksize());
+  _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+
+  return get_partition_id(kmer_f);
+}
+
+PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
+{
+  if (partition_map.find(kmer_f) != partition_map.end()) {
+    PartitionID * pp = partition_map[kmer_f];
+    if (pp == NULL) {
+      return 0;
+    }
+    return *pp;
+  }
+  return NULL;
+}
+
 
 static void make_partitions_to_tags(PartitionMap& pmap,
 				    PartitionsToTagsMap& pttmap)
