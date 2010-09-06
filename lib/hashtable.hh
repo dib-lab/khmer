@@ -64,6 +64,10 @@ namespace khmer {
 				    bool surrender);
 
     void set_partition_id(HashIntoType kmer_f, PartitionID p);
+    void set_partition_id(std::string kmer_s, PartitionID p);
+    PartitionID join_partitions(PartitionID orig, PartitionID join);
+    PartitionID get_partition_id(std::string kmer_s);
+    PartitionID get_partition_id(HashIntoType kmer);
 
     PartitionID * get_new_partition() {
       PartitionID* pp = new PartitionID(next_partition_id);
