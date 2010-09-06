@@ -9,7 +9,6 @@ import os.path
 import shutil
 
 K=32
-ht = khmer.new_hashtable(K, 1)
 
 ###
 
@@ -57,7 +56,10 @@ def main(dir1, dir2, n_threads):
     # detect all of the relevant partitionmap files
     subset_filenames = glob.glob(os.path.join(dir1, '*.pmap'))
 
-    # put on queue
+    # create empty hashtable structure
+    ht = khmer.new_hashtable(K, 1)
+
+    # put jobs on queue
     merge_queue = Queue.Queue()
     for filename in subset_filenames:
         merge_queue.put((ht, filename))
