@@ -2097,6 +2097,10 @@ void SubsetPartition::_clear_partitions()
   next_partition_id = 1;
 }
 
+//
+// divide_tags_into_subsets - take all of the tags in 'all_tags', and
+//   divide them into subsets (based on starting tag) of <= given size.
+//
 
 void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
 					 SeenSet& divvy)
@@ -2113,6 +2117,11 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
   }
 }
 
+//
+// tags_to_map - convert the 'all_tags' set into a TagCountMap, connecting
+//    each tag to a number (defaulting to zero).
+//
+
 void Hashtable::tags_to_map(TagCountMap& tag_map)
 {
   for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
@@ -2121,6 +2130,14 @@ void Hashtable::tags_to_map(TagCountMap& tag_map)
   }
   cout << "TM size: " << tag_map.size() << "\n";
 }
+
+//
+// maxify_partition_size -- build a PartitionCountMap (tracking the number
+//   of tags included in each partition, by tag) and then check to see if
+//   this particular subset has a larger partition size for that tag then
+//   indicated in the TagCountMap.  Used to find the maximum included
+//   partition size for a tag across multiple subsets.
+//
 
 void SubsetPartition::maxify_partition_size(TagCountMap& tag_map)
 {
@@ -2145,8 +2162,13 @@ void SubsetPartition::maxify_partition_size(TagCountMap& tag_map)
   }
 }
 
-void Hashtable::discard_tags(TagCountMap& tag_map,
-				   unsigned int threshold)
+//
+// discard_tags - remove tags from a TagCountMap if they have fewer than
+//   threshold count tags in their partition.  Used to eliminate tags belonging
+//   to small partitions.
+//
+
+void Hashtable::discard_tags(TagCountMap& tag_map, unsigned int threshold)
 {
   SeenSet delete_me;
 
@@ -2163,13 +2185,20 @@ void Hashtable::discard_tags(TagCountMap& tag_map,
   }
 }
 
+//
+// filter_against_tags - throw out elements of the partition map not present
+//   in the TagCountMap.  Used to throw out tags belonging to small partitions.
+//
+
 void SubsetPartition::filter_against_tags(TagCountMap& tag_map)
 {
   PartitionMap new_pmap;
 
   for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
        ti++) {
-    new_pmap[ti->first] = partition_map[ti->first];
+    if (partition_map.find(ti->first) != partition_map.end()) {
+      new_pmap[ti->first] = partition_map[ti->first];
+    }
   }
 
   cout << "OLD partition map size: " << partition_map.size() << "\n";
