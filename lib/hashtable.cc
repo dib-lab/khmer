@@ -517,6 +517,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
   }
   
   HashIntoType bin = _hash(sp, _ksize, h, r);
+  bin = uniqify_rc(h, r);	// @@CTB test this.
 
   try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
@@ -577,6 +578,8 @@ BoundedCounterType Hashtable::get_min_count(const std::string &s,
   HashIntoType bin;
   
   bin = _hash(sp, _ksize, h, r);
+  bin = uniqify_rc(h, r);	// @@CTB test this.
+
   if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
     min_count = this->get_count(bin);
   }
