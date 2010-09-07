@@ -80,7 +80,7 @@ Next, load/merge all the subsets (either as in step 4, or in memory),
 and run through the entire original read file. Output any read that
 has been assigned a partition.
 
-Implemented in do-th-subset-save.py.
+Implemented in do-th-subset-load.py.
 
 Step 5: Group the sequences into separate groups, based on partition size
 =========================================================================
