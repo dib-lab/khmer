@@ -1161,20 +1161,35 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 
     seq = read.seq;
 
-    check_and_process_read(seq, is_valid);
-
+    is_valid = check_read(seq);
     if (is_valid) {
-      first_kmer = seq.substr(0, _ksize);
-      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+      char * kmer_s;
+      HashIntoType kmer;
 
-      // find all tagged kmers within range.
+      SeenSet intersected;
       tagged_kmers.clear();
-      surrender = false;
-      partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, true);
 
-      // assign the partition ID
-      partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
-      all_tags.insert(kmer_f);
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	_hash(seq.c_str() + i, _ksize, kmer_f, kmer_r);
+	kmer = uniqify_rc(kmer_f, kmer_r);
+
+	if (get_count(kmer)) {
+	  if (all_tags.find(kmer) != all_tags.end()) {
+	    // cout << "INTERSECT.\n";
+	    tagged_kmers.insert(kmer);
+	    break;
+	  }
+
+	  //cout << "size: " << all_tags.size() << " read " << total_reads << "\n";
+	} else {		// no overlap
+	  count(kmer);
+	}
+      }
+
+      _hash(seq.c_str(), _ksize, kmer_f, kmer_r);
+      kmer = uniqify_rc(kmer_f, kmer);
+      partition->assign_partition_id(kmer, tagged_kmers, false);
+      all_tags.insert(kmer);
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1610,7 +1625,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
     s->insert(this_partition_p);
     reverse_pmap[*this_partition_p] = s;
   }
-
+  
   it = tagged_kmers.begin();
   for (; it != tagged_kmers.end(); ++it) {
     PartitionID * pp_id = partition_map[*it];
