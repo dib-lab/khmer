@@ -23,21 +23,30 @@ FastaParser::FastaParser(const std::string &inputfile) :
 
    assert(infile.is_open());
 
-   getline(infile, current_read.name); 
-   assert(current_read.name[0] == '>');
-   current_read.name = current_read.name.substr(1);
+   bool valid_read = 0;
+
+   while (!valid_read)  {
+      getline(infile, current_read.name); 
+      assert(current_read.name[0] == '>');
+      current_read.name = current_read.name.substr(1);
    
-   while(line[0] != '>' && !infile.eof()) {
-      getline(infile, line);
-      if (line[0] != '>') {
+      while(line[0] != '>' && !infile.eof()) {
+         getline(infile, line);
+         if (line[0] != '>') {
+            seq += line;
+         }
+      }
+
+      if ((int)seq.find('N') == -1)  {
+         valid_read = 1;
+      }
+
+      if (line[0] == '>') {
+         next_name = line.substr(1);
+      } else {
          seq += line;
       }
-   }
 
-   if (line[0] == '>') {
-      next_name = line.substr(1);
-   } else {
-      seq += line;
    }
 
    one_read_left = false;
@@ -60,27 +69,42 @@ Read FastaParser::get_next_read()
       return next_read;
    }
 
-   current_read.name = next_name;
-   next_name = "";
-   current_read.seq = "";
+   bool valid_read = 0;
 
-   while(line[0] != '>' && !infile.eof())
-   {
+   while (!valid_read)  {
+      current_read.name = next_name;
+      next_name = "";
+      current_read.seq = "";
+
       getline(infile, line);
 
-      if (line[0] != '>') {
-         seq += line;
+      while(line[0] != '>' && !infile.eof())
+      {
+   
+         if (line[0] != '>')  {
+            seq += line;
+         }
+         getline(infile, line);
       }
-   }
 
-   if (line[0] == '>') {
-      next_name = line.substr(1);
-   }
+      if (line[0] == '>')  {
+         next_name = line.substr(1);
+      }
 
-   current_read.seq = seq;
+      if ((int)seq.find('N') == -1)  {
+         valid_read = 1;
+      }  else if (infile.eof())  {
+         one_read_left = false;
+         break;
+      }
 
-   if (infile.eof()) {
-      one_read_left = true;
+      current_read.seq = seq;
+      seq = "";
+
+      if (infile.eof()) {
+         one_read_left = true;
+      }
+
    }
 
    return next_read;
@@ -93,16 +117,24 @@ FastqParser::FastqParser(const std::string &inputfile) :
 
    assert(infile.is_open());
 
-   getline(infile, current_read.name);
-   getline(infile, current_read.seq);
-   getline(infile, line_three); 
-   getline(infile, quality_scores);
+   bool valid_read = 0;
 
-   assert(current_read.name[0] == '@');
-   assert(line_three[0] == '+');
-   assert(quality_scores.length() == current_read.seq.length());
+   while (!valid_read && !infile.eof())  {
+      getline(infile, current_read.name);
+      getline(infile, current_read.seq);
+      getline(infile, line_three); 
+      getline(infile, quality_scores);
 
-   current_read.name = current_read.name.substr(1);
+      assert(current_read.name[0] == '@');
+      assert(line_three[0] == '+');
+      assert(quality_scores.length() == current_read.seq.length());
+   
+      current_read.name = current_read.name.substr(1);
+
+      if ((int)current_read.seq.find('N') == -1)  {
+         valid_read = 1;
+      }
+   }
 }
 
 Read FastqParser::get_next_read()
@@ -110,21 +142,30 @@ Read FastqParser::get_next_read()
    Read next_read = current_read;
    std::string line_three, quality_scores;
 
-   getline(infile, current_read.name);
+   bool valid_read = 0;
 
-   if (infile.eof())  {
-      return next_read;
-   }
+   while (!valid_read && !infile.eof())  {
 
-   getline(infile, current_read.seq);
-   getline(infile, line_three);
-   getline(infile, quality_scores);
+      getline(infile, current_read.name);
+
+      if (infile.eof())  {
+         return next_read;
+      }
+
+      getline(infile, current_read.seq);
+      getline(infile, line_three);
+      getline(infile, quality_scores);
    
-   assert(current_read.name[0] == '@');
-   assert(line_three[0] == '+');
-   assert(quality_scores.length() == current_read.seq.length());
+      assert(current_read.name[0] == '@');
+      assert(line_three[0] == '+');
+      assert(quality_scores.length() == current_read.seq.length());
 
-   current_read.name = current_read.name.substr(1);
+      current_read.name = current_read.name.substr(1);
+
+      if ((int)current_read.seq.find('N') == -1)  {
+         valid_read = 1;
+      }
+   }
 
    return next_read;
 }
