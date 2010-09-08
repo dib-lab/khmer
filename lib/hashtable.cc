@@ -1144,8 +1144,7 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
   PartitionSet partitions;
 
   //
-  // now, go through all the reads, and take those with assigned partitions
-  // and output them.
+  // go through all the tagged kmers and count partitions/surrendered/orphan.
   //
 
   for (PartitionMap::const_iterator pi = partition_map.begin();

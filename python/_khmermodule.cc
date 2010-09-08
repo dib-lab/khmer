@@ -1641,6 +1641,24 @@ static PyObject * hash_count_partitions(PyObject * self, PyObject * args)
   return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
 }
 
+static PyObject * hash_subset_count_partitions(PyObject * self,
+					       PyObject * args)
+{
+  PyObject * subset_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    return NULL;
+  }
+  
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  unsigned int n_partitions = 0, n_unassigned = 0, n_surrendered = 0;
+  subset_p->count_partitions(n_partitions, n_unassigned, n_surrendered);
+
+  return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
+}
+
 static PyObject * hash_load(PyObject * self, PyObject * args)
 {
   khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
@@ -2003,6 +2021,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "consume_partitioned_fasta", hash_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hash_merge_subset, METH_VARARGS, "" },
   { "count_partitions", hash_count_partitions, METH_VARARGS, "" },
+  { "subset_count_partitions", hash_subset_count_partitions, METH_VARARGS, "" },
   { "save_subset_partitionmap", hash_save_subset_partitionmap, METH_VARARGS },
   { "load_subset_partitionmap", hash_load_subset_partitionmap, METH_VARARGS },
   { "merge2_subset", hash_merge2_subset, METH_VARARGS },
