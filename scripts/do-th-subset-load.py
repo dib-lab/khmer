@@ -11,6 +11,7 @@ def load(filename, ht):
     pmap_filename = filename
     print 'loading', filename
     subset = ht.load_subset_partitionmap(pmap_filename)
+    print ht.subset_count_partitions(subset)
     print 'merging', filename
     ht.merge_subset(subset)
 
