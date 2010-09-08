@@ -521,10 +521,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
 
   try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      bin = bin % _tablesize;
-      if (_counts[bin] != MAX_COUNT) {
-	_counts[bin]++;
-      }
+      count(bin);
       n_consumed++;
     }
 
@@ -545,10 +542,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
       bin = uniqify_rc(h, r);
 
       if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-	bin = bin % _tablesize;
-	if (_counts[bin] != MAX_COUNT) {
-	  _counts[bin]++;
-	}
+	count(bin);
 	n_consumed++;
       }
     }
@@ -667,7 +661,11 @@ HashIntoType * Hashtable::abundance_distribution() const
   }
 
   for (i = 0; i < _tablesize; i++) {
-    dist[_counts[i]]++;
+    if (get_count(i)) {
+      dist[1]++;
+    } else {
+      dist[0]++;
+    }
   }
 
   return dist;
@@ -842,7 +840,7 @@ void Hashtable::calc_connected_graph_size(const HashIntoType kmer_f,
 const
 {
   HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-  const BoundedCounterType val = _counts[kmer % _tablesize];
+  const BoundedCounterType val = get_count(kmer);
 
   if (val == 0) {
     return;
@@ -971,7 +969,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
   }
 
   for (HashIntoType i = 0; i < _tablesize; i++) {
-    BoundedCounterType count = _counts[i];
+    BoundedCounterType count = get_count(i);
     if (count && !(count & seen)) {
       std::string kmer = _revhash(i, _ksize);
       size = 0;
@@ -1002,7 +1000,7 @@ void Hashtable::save(std::string outfilename)
   outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
 
   outfile.write((const char *) _counts,
-		sizeof(BoundedCounterType) * _tablesize);
+		sizeof(BoundedCounterType) * _tablebytes);
   outfile.close();
 }
 
@@ -1019,11 +1017,12 @@ void Hashtable::load(std::string infilename)
 
   _ksize = (WordLength) save_ksize;
   _tablesize = (HashIntoType) save_tablesize;
-  _counts = new BoundedCounterType[_tablesize];
+  _tablebytes = _tablesize / 8 + 1;
+  _counts = new BoundedCounterType[_tablebytes];
 
   unsigned long long loaded = 0;
-  while (loaded != _tablesize) {
-    infile.read((char *) _counts, _tablesize - loaded);
+  while (loaded != _tablebytes) {
+    infile.read((char *) _counts, _tablebytes - loaded);
     loaded += infile.gcount();	// do I need to do this loop?
   }
   infile.close();

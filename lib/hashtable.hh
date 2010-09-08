@@ -109,6 +109,7 @@ namespace khmer {
   protected:
     WordLength _ksize;
     HashIntoType _tablesize;
+    HashIntoType _tablebytes;
     HashIntoType bitmask;
 
     BoundedCounterType * _counts;
@@ -116,8 +117,9 @@ namespace khmer {
     SeenSet all_tags;
 
     void _allocate_counters() {
-      _counts = new BoundedCounterType[_tablesize];
-      memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
+      _tablebytes = _tablesize / 8 + 1;
+      _counts = new BoundedCounterType[_tablebytes];
+      memset(_counts, 0, _tablebytes * sizeof(BoundedCounterType));
     }
 
     void _clear_partitions() {
@@ -166,7 +168,9 @@ namespace khmer {
       HashIntoType n = 0;
       if (stop == 0) { stop = _tablesize; }
       for (HashIntoType i = start; i < stop; i++) {
-	if (_counts[i]) {
+	unsigned int byte = i / 8;
+	unsigned char bit = i % 8;
+	if (_counts[byte] & (1 << bit)) {
 	  n++;
 	}
       }
@@ -175,26 +179,42 @@ namespace khmer {
 
     void count(const char * kmer) {
       HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
-      if (_counts[bin] == MAX_COUNT) { return; }
-      _counts[bin]++;
+      unsigned int byte = bin / 8;
+      unsigned char bit = bin % 8;
+
+      _counts[byte] |= (1 << bit);
     }
 
     void count(HashIntoType khash) {
       HashIntoType bin = khash % _tablesize;
-      if (_counts[bin] == MAX_COUNT) { return; }
-      _counts[bin]++;
+      unsigned int byte = bin / 8;
+      unsigned char bit = bin % 8;
+
+      _counts[byte] |= (1 << bit);
     }
 
     // get the count for the given k-mer.
     const BoundedCounterType get_count(const char * kmer) const {
       HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
-      return _counts[bin];
+      unsigned int byte = bin / 8;
+      unsigned char bit = bin % 8;
+      
+      if (_counts[byte] & (1 << bit)) {
+	return 1;
+      }
+      return 0;
     }
 
     // get the count for the given k-mer hash.
     const BoundedCounterType get_count(HashIntoType khash) const {
       HashIntoType bin = khash % _tablesize;
-      return _counts[bin];
+      unsigned int byte = bin / 8;
+      unsigned char bit = bin % 8;
+      
+      if (_counts[byte] & (1 << bit)) {
+	return 1;
+      }
+      return 0;
     }
 
     // count every k-mer in the string.
