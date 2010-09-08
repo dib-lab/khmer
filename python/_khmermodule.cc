@@ -1373,6 +1373,28 @@ static PyObject * hash_do_truncated_partition(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
+static PyObject * hash_do_threaded_partition(PyObject * self, PyObject * args)
+{
+  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
+  khmer::Hashtable * hashtable = me->hashtable;
+
+  char * filename = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  try {
+    hashtable->do_threaded_partition(filename, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 void free_subset_partition_info(void * p)
 {
   khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
@@ -2003,6 +2025,7 @@ static PyMethodDef khmer_hashtable_methods[] = {
   { "trim_graphs", hash_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hash_graphsize_distribution, METH_VARARGS, "" },
   { "do_truncated_partition", hash_do_truncated_partition, METH_VARARGS, "" },
+  { "do_threaded_partition", hash_do_threaded_partition, METH_VARARGS, "" },
   { "do_subset_partition", hash_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hash_filter_file_connected, METH_VARARGS, "" },
   { "find_all_tags", hash_find_all_tags, METH_VARARGS, "" },
