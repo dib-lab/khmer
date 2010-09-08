@@ -42,7 +42,7 @@ def main():
     outfile = infile + '.part'
 
     k = options.ksize
-    hashtable_size = 4**options.htsize4 + 1
+    hashtable_size = 4**options.htsize4 + 11
     checkpoint_period = options.checkpoint
 
     if k > 32:
