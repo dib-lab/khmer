@@ -371,6 +371,9 @@ namespace khmer {
     void do_truncated_partition(const std::string infilename,
 				CallbackFn callback=0,
 				void * callback_data=0);
+    void do_threaded_partition(const std::string infilename,
+			       CallbackFn callback=0,
+			       void * callback_data=0);
 
     void tags_to_map(TagCountMap& tag_map);
     void discard_tags(TagCountMap& tag_map, unsigned int threshold);

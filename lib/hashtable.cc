@@ -1119,7 +1119,67 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
-	  callback("do_truncated_partition/read", callback_data, total_reads,
+	  callback("do_truncated_partition", callback_data, total_reads,
+		   partition->next_partition_id);
+	} catch (...) {
+	  delete parser;
+	  throw;
+	}
+      }
+    }
+  }
+
+  delete parser;
+}
+
+// do_threaded_partition:
+
+void Hashtable::do_threaded_partition(const std::string infilename,
+				      CallbackFn callback,
+				      void * callback_data)
+{
+  unsigned int total_reads = 0;
+
+  IParser* parser = IParser::get_parser(infilename);
+  Read read;
+  string seq;
+  bool is_valid;
+
+  std::string first_kmer;
+  HashIntoType kmer_f, kmer_r;
+  SeenSet tagged_kmers;
+  bool surrender;
+
+  if (!partition) {
+    partition = new SubsetPartition(this);
+  }
+
+  while(!parser->is_complete()) {
+    // increment read number
+    read = parser->get_next_read();
+    total_reads++;
+
+    seq = read.seq;
+
+    check_and_process_read(seq, is_valid);
+
+    if (is_valid) {
+      first_kmer = seq.substr(0, _ksize);
+      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+
+      // find all tagged kmers within range.
+      tagged_kmers.clear();
+      surrender = false;
+      partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, true);
+
+      // assign the partition ID
+      partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
+      all_tags.insert(kmer_f);
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("do_threaded_partition", callback_data, total_reads,
 		   partition->next_partition_id);
 	} catch (...) {
 	  delete parser;
