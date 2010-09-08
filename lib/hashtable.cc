@@ -1858,6 +1858,8 @@ void SubsetPartition::merge(SubsetPartition * other)
 
     if (surrender) {
       assert(*pp == SURRENDER_PARTITION);
+    } else {
+      assert(*pp != SURRENDER_PARTITION);
     }
 
     // Remove all of the SeenSets in the subset_pttm map for these
@@ -1891,7 +1893,7 @@ void SubsetPartition::merge(SubsetPartition * other)
 	this->partition_map[*si] = pp;
 
 	// Note: even though there may be multiple PartitionID*s for
-	// this partition that need reassignin, we don't need to
+	// this partition that need reassigning, we don't need to
 	// handle that in this loop; we're doing this systematically (and
 	// the 'remove_me' set will clear out with duplicates).
       }
