@@ -246,7 +246,7 @@ class Test_ThreadedMoreConnectMe4(object):
         ht.do_threaded_partition(filename)
         subset = ht.do_subset_partition(0, 0)
         n = ht.subset_count_partitions(subset)
-        assert n == (103, 1, 0), n      # @@CTB?
+        assert n == (102, 1, 0), n      # @@CTB?
 
 ###
 
