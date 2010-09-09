@@ -1260,7 +1260,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   string seq;
 
   std::string first_kmer;
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer_f, kmer_r, kmer;
 
   const unsigned char ksize = _ht->ksize();
 
@@ -1274,30 +1274,40 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
     seq = read.seq;
 
     if (_ht->check_read(seq)) {
-      first_kmer = seq.substr(0, ksize);
-      _hash(first_kmer.c_str(), ksize, kmer_f, kmer_r);
+      const char * kmer_s = seq.c_str();
+      
+      for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
+	_hash(kmer_s + i, ksize, kmer_f, kmer_r);
+	kmer = uniqify_rc(kmer_f, kmer_r);
 
-      PartitionID * partition_p = partition_map[kmer_f];
-      PartitionID partition_id;
-      if (partition_p == NULL ){
-	partition_id = 0;
-	n_singletons++;
-      } else {
-	partition_id = *partition_p;
-	partitions.insert(partition_id);
-      }
+	if (partition_map.find(kmer) == partition_map.end()) {
+	  continue;
+	}
 
-      // Is this a partition that has not been entirely explored? If so,
-      // mark it.
-      char surrender_flag = ' ';
-      if (partition_id == SURRENDER_PARTITION) {
-	surrender_flag = '*';
-      }
+	PartitionID * partition_p = partition_map[kmer];
+	PartitionID partition_id;
+	if (partition_p == NULL ){
+	  partition_id = 0;
+	  n_singletons++;
+	} else {
+	  partition_id = *partition_p;
+	  partitions.insert(partition_id);
+	}
 
-      if (partition_id > 0 || output_unassigned) {
-	outfile << ">" << read.name << "\t" << partition_id
-		<< surrender_flag << "\n" 
-		<< seq << "\n";
+
+	// Is this a partition that has not been entirely explored? If so,
+	// mark it.
+	char surrender_flag = ' ';
+	if (partition_id == SURRENDER_PARTITION) {
+	  surrender_flag = '*';
+	}
+
+	if (partition_id > 0 || output_unassigned) {
+	  outfile << ">" << read.name << "\t" << partition_id
+		  << surrender_flag << "\n" 
+		  << seq << "\n";
+	}
+	break;
       }
 	       
       total_reads++;
