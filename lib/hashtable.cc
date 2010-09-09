@@ -1148,7 +1148,6 @@ void Hashtable::do_threaded_partition(const std::string infilename,
   std::string first_kmer;
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
-  bool surrender;
 
   if (!partition) {
     partition = new SubsetPartition(this);
@@ -1163,10 +1162,10 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 
     is_valid = check_read(seq);
     if (is_valid) {
-      char * kmer_s;
       HashIntoType kmer;
+      HashIntoType tagged_kmer, last_overlap;
 
-      SeenSet intersected;
+      bool found = false;
       tagged_kmers.clear();
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -1174,28 +1173,34 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 	kmer = uniqify_rc(kmer_f, kmer_r);
 
 	if (get_count(kmer)) {
-	  if (all_tags.find(kmer) != all_tags.end()) {
-	    // cout << "INTERSECT.\n";
-	    tagged_kmers.insert(kmer);
-	    break;
+	  if (!found) {
+	    if (all_tags.find(kmer) == all_tags.end()) {
+	      all_tags.insert(kmer);
+	      tagged_kmer = kmer;
+	      last_overlap = tagged_kmer;
+	    }
+	    found = true;
+	  } else {
+	    last_overlap = kmer;
 	  }
-
-	  //cout << "size: " << all_tags.size() << " read " << total_reads << "\n";
 	} else {		// no overlap
 	  count(kmer);
 	}
       }
 
-      _hash(seq.c_str(), _ksize, kmer_f, kmer_r);
-      kmer = uniqify_rc(kmer_f, kmer);
-      partition->assign_partition_id(kmer, tagged_kmers, false);
-      all_tags.insert(kmer);
+      if (found) {
+	all_tags.insert(last_overlap);
+      } else {
+	_hash(seq.c_str(), _ksize, kmer_f, kmer_r);
+	kmer = uniqify_rc(kmer_f, kmer_r);
+	all_tags.insert(kmer);
+      }
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
 	  callback("do_threaded_partition", callback_data, total_reads,
-		   partition->next_partition_id);
+		   all_tags.size());
 	} catch (...) {
 	  delete parser;
 	  throw;
@@ -1315,6 +1320,8 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   }
 
   delete parser; parser = NULL;
+
+  // cout << partitions.size() << " + " << n_singletons << "\n";
 
   return partitions.size() + n_singletons;
 }
@@ -1487,7 +1494,11 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
   SeenSet::const_iterator si, end;
 
-  si = _ht->all_tags.find(first_kmer);
+  if (first_kmer) {
+    si = _ht->all_tags.find(first_kmer);
+  } else {
+    si = _ht->all_tags.begin();
+  }
   if (last_kmer) {
     end = _ht->all_tags.find(last_kmer);
   } else {
