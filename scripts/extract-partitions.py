@@ -2,7 +2,7 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=50000
+MAX_SIZE=5000
 
 def read_partition_file(fp):
     for n, line in enumerate(fp):
@@ -81,7 +81,7 @@ for partition_id, n_reads in divvy:
     if total > MAX_SIZE:
         for partition_id in group:
             group_d[partition_id] = group_n
-            print 'gorup_d', partition_id, group_n
+            print 'group_d', partition_id, group_n
 
         group_n += 1
         group = set()
