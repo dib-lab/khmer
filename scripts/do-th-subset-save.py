@@ -5,8 +5,8 @@ import gc
 import os.path
 
 K=32
-#HASHTABLE_SIZE=128000000069
-HASHTABLE_SIZE=4000000007
+HASHTABLE_SIZE=128000000069
+#HASHTABLE_SIZE=4000000007
 
 SUBSET_SIZE = 1000000
 N_THREADS = 4
@@ -47,12 +47,14 @@ def main(filename):
     print '--'
 
     # populate the hash table and tag set
-    print 'reading sequences and loading tagset from %s...' % (filename,)
-    (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    #print 'reading sequences and loading tagset from %s...' % (filename,)
+    #(total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
 
     # save to a file (optional)
-    ht.save(basename + '.ht')
-    ht.save_tagset(basename + '.tagset')
+    print 'loading...'
+    ht.load(basename + '.ht')
+    print 'loading tagset...'
+    ht.load_tagset(basename + '.tagset')
 
     # calculate the hashtable occupancy
     print '---'

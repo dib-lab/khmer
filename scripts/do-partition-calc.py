@@ -42,7 +42,8 @@ def main():
     outfile = infile + '.part'
 
     k = options.ksize
-    hashtable_size = 128000000069 #4**options.htsize4 + 1
+#    hashtable_size = 128000000069 #4**options.htsize4 + 1
+    hashtable_size = 8000000011
     checkpoint_period = options.checkpoint
 
     if k > 32:
@@ -68,7 +69,8 @@ def main():
     
     n_partitions = ht.do_truncated_partition(infile, outfile, report_fn)
     print n_partitions, 'partitions kept'
-    print 'n surrendered:', ht.count_partitions()[2]
+    print ht.count_partitions()
+    #print 'n surrendered:', ht.count_partitions()[2]
 
     ht.save_partitionmap(outfile + '.end.pmap')
 
