@@ -47,14 +47,14 @@ def main(filename):
     print '--'
 
     # populate the hash table and tag set
-    #print 'reading sequences and loading tagset from %s...' % (filename,)
-    #(total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    print 'reading sequences and loading tagset from %s...' % (filename,)
+    ht.do_threaded_partition(filename)
 
     # save to a file (optional)
-    print 'loading...'
-    ht.load(basename + '.ht')
-    print 'loading tagset...'
-    ht.load_tagset(basename + '.tagset')
+    #print 'saving...'
+    #ht.save(basename + '.ht')
+    #print 'saving tagset...'
+    #ht.save_tagset(basename + '.tagset')
 
     # calculate the hashtable occupancy
     print '---'
