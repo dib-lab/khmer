@@ -42,12 +42,8 @@ def main():
     outfile = infile + '.part'
 
     k = options.ksize
-<<<<<<< HEAD:scripts/do-partition-calc.py
-    hashtable_size = 4**options.htsize4 + 11
-=======
-#    hashtable_size = 128000000069 #4**options.htsize4 + 1
-    hashtable_size = 8000000011
->>>>>>> 278ad576ed7131c03a7e7cb0b4df872e05604d1c:scripts/do-partition-calc.py
+    hashtable_size = 8000000011 #4**options.htsize4 + 1
+#    hashtable_size = 4**12+1
     checkpoint_period = options.checkpoint
 
     if k > 32:
@@ -71,12 +67,17 @@ def main():
 
     report_fn = make_reporting_fn(ht, outfile, checkpoint_period)
     
-    n_partitions = ht.do_truncated_partition(infile, outfile, report_fn)
-    print n_partitions, 'partitions kept'
-    print ht.count_partitions()
-    #print 'n surrendered:', ht.count_partitions()[2]
+    n_partitions = ht.do_threaded_partition(infile, report_fn)
+    print 'calculating partitions...'
+    x = ht.do_subset_partition(0, 0)
 
-    ht.save_partitionmap(outfile + '.end.pmap')
+    print ht.subset_count_partitions(x)
+    print 'n surrendered:', ht.subset_count_partitions(x)[2]
+
+    ht.merge_subset(x)
+    print ht.output_partitions(infile, outfile)
+
+    #ht.save_partitionmap(outfile + '.end.pmap')
 
 if __name__ == '__main__':
     main()
