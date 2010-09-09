@@ -1145,7 +1145,6 @@ void Hashtable::do_threaded_partition(const std::string infilename,
   string seq;
   bool is_valid;
 
-  std::string first_kmer;
   HashIntoType kmer_f, kmer_r;
 
   if (!partition) {
@@ -1161,22 +1160,21 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 
     is_valid = check_read(seq);
     if (is_valid) {
+      const char * kmer_s = seq.c_str();
       HashIntoType kmer;
-      HashIntoType tagged_kmer, last_overlap;
-      SeenSet to_add;
+      HashIntoType last_overlap;
 
       bool found = false;
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	_hash(seq.c_str() + i, _ksize, kmer_f, kmer_r);
+	_hash(kmer_s + i, _ksize, kmer_f, kmer_r);
 	kmer = uniqify_rc(kmer_f, kmer_r);
 
 	if (get_count(kmer)) {
 	  if (!found) {
-	    if (all_tags.find(kmer) == all_tags.end()) {
+	    if (all_tags.find(kmer) == all_tags.end()) { // tag first intersect
 	      all_tags.insert(kmer);
-	      tagged_kmer = kmer;
-	      last_overlap = tagged_kmer;
+	      last_overlap = kmer;
 	    }
 	    found = true;
 	  } else {
@@ -1187,10 +1185,10 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 	}
       }
 
-      if (found) {		// insert last
+      if (found) {		// tag last intersect
 	all_tags.insert(last_overlap);
-      } else {			// insert first kmer
-	_hash(seq.c_str(), _ksize, kmer_f, kmer_r);
+      } else {			// no intersect? insert first kmer.
+	_hash(kmer_s, _ksize, kmer_f, kmer_r);
 	kmer = uniqify_rc(kmer_f, kmer_r);
 	all_tags.insert(kmer);
       }
