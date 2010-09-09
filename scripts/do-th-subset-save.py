@@ -5,9 +5,11 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=4**14+1
-SUBSET_SIZE = 750000
-N_THREADS = 2
+HASHTABLE_SIZE=128000000069
+#HASHTABLE_SIZE=4000000007
+
+SUBSET_SIZE = 1000000
+N_THREADS = 4
 
 ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
 
@@ -46,11 +48,13 @@ def main(filename):
 
     # populate the hash table and tag set
     print 'reading sequences and loading tagset from %s...' % (filename,)
-    (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+    ht.do_threaded_partition(filename)
 
     # save to a file (optional)
-    ht.save(basename + '.ht')
-    ht.save_tagset(basename + '.tagset')
+    #print 'saving...'
+    #ht.save(basename + '.ht')
+    #print 'saving tagset...'
+    #ht.save_tagset(basename + '.tagset')
 
     # calculate the hashtable occupancy
     print '---'

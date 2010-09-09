@@ -521,10 +521,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
 
   try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      bin = bin % _tablesize;
-      if (_counts[bin] != MAX_COUNT) {
-	_counts[bin]++;
-      }
+      count(bin);
       n_consumed++;
     }
 
@@ -545,10 +542,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
       bin = uniqify_rc(h, r);
 
       if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-	bin = bin % _tablesize;
-	if (_counts[bin] != MAX_COUNT) {
-	  _counts[bin]++;
-	}
+	count(bin);
 	n_consumed++;
       }
     }
@@ -667,7 +661,11 @@ HashIntoType * Hashtable::abundance_distribution() const
   }
 
   for (i = 0; i < _tablesize; i++) {
-    dist[_counts[i]]++;
+    if (get_count(i)) {
+      dist[1]++;
+    } else {
+      dist[0]++;
+    }
   }
 
   return dist;
@@ -842,7 +840,7 @@ void Hashtable::calc_connected_graph_size(const HashIntoType kmer_f,
 const
 {
   HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-  const BoundedCounterType val = _counts[kmer % _tablesize];
+  const BoundedCounterType val = get_count(kmer);
 
   if (val == 0) {
     return;
@@ -971,7 +969,7 @@ HashIntoType * Hashtable::graphsize_distribution(const unsigned int &max_size)
   }
 
   for (HashIntoType i = 0; i < _tablesize; i++) {
-    BoundedCounterType count = _counts[i];
+    BoundedCounterType count = get_count(i);
     if (count && !(count & seen)) {
       std::string kmer = _revhash(i, _ksize);
       size = 0;
@@ -1002,7 +1000,7 @@ void Hashtable::save(std::string outfilename)
   outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
 
   outfile.write((const char *) _counts,
-		sizeof(BoundedCounterType) * _tablesize);
+		sizeof(BoundedCounterType) * _tablebytes);
   outfile.close();
 }
 
@@ -1019,11 +1017,12 @@ void Hashtable::load(std::string infilename)
 
   _ksize = (WordLength) save_ksize;
   _tablesize = (HashIntoType) save_tablesize;
-  _counts = new BoundedCounterType[_tablesize];
+  _tablebytes = _tablesize / 8 + 1;
+  _counts = new BoundedCounterType[_tablebytes];
 
   unsigned long long loaded = 0;
-  while (loaded != _tablesize) {
-    infile.read((char *) _counts, _tablesize - loaded);
+  while (loaded != _tablebytes) {
+    infile.read((char *) _counts, _tablebytes - loaded);
     loaded += infile.gcount();	// do I need to do this loop?
   }
   infile.close();
@@ -1120,8 +1119,85 @@ void Hashtable::do_truncated_partition(const std::string infilename,
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
-	  callback("do_truncated_partition/read", callback_data, total_reads,
+	  callback("do_truncated_partition", callback_data, total_reads,
 		   partition->next_partition_id);
+	} catch (...) {
+	  delete parser;
+	  throw;
+	}
+      }
+    }
+  }
+
+  delete parser;
+}
+
+// do_threaded_partition:
+
+void Hashtable::do_threaded_partition(const std::string infilename,
+				      CallbackFn callback,
+				      void * callback_data)
+{
+  unsigned int total_reads = 0;
+
+  IParser* parser = IParser::get_parser(infilename);
+  Read read;
+  string seq;
+  bool is_valid;
+
+  HashIntoType kmer_f, kmer_r;
+
+  if (!partition) {
+    partition = new SubsetPartition(this);
+  }
+
+  while(!parser->is_complete()) {
+    // increment read number
+    read = parser->get_next_read();
+    total_reads++;
+
+    seq = read.seq;
+
+    is_valid = check_read(seq);
+    if (is_valid) {
+      const char * kmer_s = seq.c_str();
+      HashIntoType kmer;
+      HashIntoType last_overlap;
+
+      bool found = false;
+
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	_hash(kmer_s + i, _ksize, kmer_f, kmer_r);
+	kmer = uniqify_rc(kmer_f, kmer_r);
+
+	if (get_count(kmer)) {
+	  if (!found) {
+	    if (all_tags.find(kmer) == all_tags.end()) { // tag first intersect
+	      all_tags.insert(kmer);
+	      last_overlap = kmer;
+	    }
+	    found = true;
+	  } else {
+	    last_overlap = kmer;
+	  }
+	} else {		// no overlap
+	  count(kmer);
+	}
+      }
+
+      if (found) {		// tag last intersect
+	all_tags.insert(last_overlap);
+      } else {			// no intersect? insert first kmer.
+	_hash(kmer_s, _ksize, kmer_f, kmer_r);
+	kmer = uniqify_rc(kmer_f, kmer_r);
+	all_tags.insert(kmer);
+      }
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("do_threaded_partition", callback_data, total_reads,
+		   all_tags.size());
 	} catch (...) {
 	  delete parser;
 	  throw;
@@ -1241,6 +1317,8 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   }
 
   delete parser; parser = NULL;
+
+  // cout << partitions.size() << " + " << n_singletons << "\n";
 
   return partitions.size() + n_singletons;
 }
@@ -1413,7 +1491,11 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
   SeenSet::const_iterator si, end;
 
-  si = _ht->all_tags.find(first_kmer);
+  if (first_kmer) {
+    si = _ht->all_tags.find(first_kmer);
+  } else {
+    si = _ht->all_tags.begin();
+  }
   if (last_kmer) {
     end = _ht->all_tags.find(last_kmer);
   } else {
@@ -1551,7 +1633,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
     s->insert(this_partition_p);
     reverse_pmap[*this_partition_p] = s;
   }
-
+  
   it = tagged_kmers.begin();
   for (; it != tagged_kmers.end(); ++it) {
     PartitionID * pp_id = partition_map[*it];
@@ -1625,7 +1707,7 @@ PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
     }
     return *pp;
   }
-  return NULL;
+  return 0;
 }
 
 
@@ -1859,6 +1941,8 @@ void SubsetPartition::merge(SubsetPartition * other)
 
     if (surrender) {
       assert(*pp == SURRENDER_PARTITION);
+    } else {
+      assert(*pp != SURRENDER_PARTITION);
     }
 
     // Remove all of the SeenSets in the subset_pttm map for these
@@ -1892,7 +1976,7 @@ void SubsetPartition::merge(SubsetPartition * other)
 	this->partition_map[*si] = pp;
 
 	// Note: even though there may be multiple PartitionID*s for
-	// this partition that need reassignin, we don't need to
+	// this partition that need reassigning, we don't need to
 	// handle that in this loop; we're doing this systematically (and
 	// the 'remove_me' set will clear out with duplicates).
       }
