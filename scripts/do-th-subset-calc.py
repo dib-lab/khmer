@@ -2,7 +2,7 @@ import khmer, sys
 import threading
 
 K = 32
-HASHTABLE_SIZE=128000000069
+HASHTABLE_SIZE=8000000011
 N_THREADS=4
 
 ht = khmer.new_hashtable(K, HASHTABLE_SIZE)

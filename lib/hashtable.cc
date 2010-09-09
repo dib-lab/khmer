@@ -1147,7 +1147,6 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 
   std::string first_kmer;
   HashIntoType kmer_f, kmer_r;
-  SeenSet tagged_kmers;
 
   if (!partition) {
     partition = new SubsetPartition(this);
@@ -1164,9 +1163,9 @@ void Hashtable::do_threaded_partition(const std::string infilename,
     if (is_valid) {
       HashIntoType kmer;
       HashIntoType tagged_kmer, last_overlap;
+      SeenSet to_add;
 
       bool found = false;
-      tagged_kmers.clear();
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	_hash(seq.c_str() + i, _ksize, kmer_f, kmer_r);
@@ -1188,9 +1187,9 @@ void Hashtable::do_threaded_partition(const std::string infilename,
 	}
       }
 
-      if (found) {
+      if (found) {		// insert last
 	all_tags.insert(last_overlap);
-      } else {
+      } else {			// insert first kmer
 	_hash(seq.c_str(), _ksize, kmer_f, kmer_r);
 	kmer = uniqify_rc(kmer_f, kmer_r);
 	all_tags.insert(kmer);
@@ -1710,7 +1709,7 @@ PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
     }
     return *pp;
   }
-  return NULL;
+  return 0;
 }
 
 
