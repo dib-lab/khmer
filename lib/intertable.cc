@@ -63,18 +63,23 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
 	}
       }
 
+      // Did we intersection something?  If no, just label this intersection.
       if (crossed.size() == 0) {
 	iid = get_next_iid();
 
+	// @CTB could probably defer this until merge/overlap, and set to NULL.
 	IntersectionSet * s = new IntersectionSet();
 	s->insert(iid);
 	revmap[iid] = s;
-
-	assert(partitions[iid] == iid); // pid == iid
       } else if (crossed.size() >= 1) {
-	iid = *(crossed.begin()); // no merging or anything; just take one.
+
+	// Yes!  we intersected.
+	iid = *(crossed.begin()); // no merging or anything; just label isect.
       }
 
+      // now, lay down tracks so that any read intersecting with any of these
+      // k-mers in the future knows that it has intersected with this read/
+      // partition.
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	set(kmer, iid);
@@ -84,7 +89,7 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0) {
       try {
-	cout << "..." << total_reads << "\n";
+	cout << "..." << total_reads << " " << next_intersection_id << " " << total_reads - next_intersection_id << "\n";
       } catch (...) {
 	delete parser;
 	throw;
@@ -123,17 +128,8 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
       if (crossed.size() > 1) {
 	IntersectionSet::const_iterator is = crossed.begin();
 
-#if 0
-	cout << "overlap: ";
-	for (; is != crossed.end(); is++) {
-	  cout << *is << " ";
-	}
-	cout << "\n";
-#endif
-
 	is = crossed.begin();
 	IntersectionID first_pid = *(is); // will be LOWEST.
-	// cout << "starting at: " << first_pid;
 
 	IntersectionSet * s = revmap[first_pid];
 	assert (s != NULL);
@@ -147,11 +143,9 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
 
 	    s->insert(*ti);
 	    partitions[*ti] = first_pid;
-	    // cout << "ASSIGN " << *ti << " " << first_pid << "\n";
 	  }
 	  revmap.erase(*is);
 	  delete t;
-	  // cout << "merged: " << *is << " into " << first_pid << "\n";
 	}
       }
     }
@@ -159,7 +153,7 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0) {
       try {
-	cout << "..." << total_reads << " x2\n";
+	cout << "..." << total_reads << " " << next_intersection_id << " " << revmap.size() << " x2\n";
       } catch (...) {
 	delete parser;
 	throw;
@@ -190,19 +184,22 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
       const char * kmer_s = seq.c_str();
       HashIntoType kmer;
 
-      IntersectionSet crossed;
       IntersectionID iid;
 
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+      kmer = _hash(kmer_s, _ksize);
+      iid = get(kmer);
+      PartitionID pid = partitions[iid];
+
+      // @CTB for testing purposes only.
+      for (unsigned int i = 1; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	iid = get(kmer);
-	crossed.insert(partitions[iid]);
+	if (partitions[iid] != pid) {
+	  assert(false);
+	}
       }
 
-      assert(crossed.size() == 1);
-
-      outfp << ">" << read.name << "\t" << *(crossed.begin()) << "\n"
-	      << seq << "\n";
+      outfp << ">" << read.name << "\t" << pid << "\n" << seq << "\n";
     }
 
     // run callback, if specified

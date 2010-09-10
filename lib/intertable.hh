@@ -9,8 +9,7 @@
 
 #include "khmer.hh"
 
-// #define MAX_IID 4294967295
-#define MAX_IID 50*1000*1000
+#define MAX_IID 50*1000*1000	// times 4 bytes for mem consumption
 
 namespace khmer {
   typedef unsigned int IntersectionID;
@@ -49,7 +48,9 @@ namespace khmer {
       memset(_table, 0, _tablesize * sizeof(IntersectionID));
 
       partitions = new PartitionID[MAX_IID];
-      memset(partitions, 0, MAX_IID * sizeof(PartitionID));
+      for (unsigned int i = 0; i < MAX_IID; i++) {
+	partitions[i] = i;
+      }
     }
 
     // accessor to get 'k'
@@ -60,14 +61,10 @@ namespace khmer {
 
     IntersectionID get_next_iid() {
       IntersectionID iid = next_intersection_id;
-      if (!rolled) {
-	partitions[iid] = iid;
-      }
 
       next_intersection_id++;
       if (next_intersection_id == MAX_IID) {
 	next_intersection_id = 1;
-	rolled = true;
       }
       return iid;
     }
