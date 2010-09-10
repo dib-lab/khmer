@@ -59,31 +59,25 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
 	kmer = _hash(kmer_s + i, _ksize);
 	iid = get(kmer);
 	if (iid) {
-	  crossed.insert(iid);
+	  crossed.insert(partitions[iid]);
 	}
       }
 
       if (crossed.size() == 0) {
-	cout << "no crossing.\n";
 	iid = get_next_iid();
-      } else {
-	iid = find_min_iid(crossed);
-	cout << "crossed! " << iid << "\n";
 
-	for (IntersectionSet::const_iterator si = crossed.begin();
-	     si != crossed.end(); si++ ){
-	  if (*si != iid) {
-	    intermap[*si] = iid;
-	  }
-	}
+	IntersectionSet * s = new IntersectionSet();
+	s->insert(iid);
+	revmap[iid] = s;
+
+	assert(partitions[iid] == iid); // pid == iid
+      } else if (crossed.size() >= 1) {
+	iid = *(crossed.begin()); // no merging or anything; just take one.
       }
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	set(kmer, iid);
-	// cout << "SET: "<< kmer << " " << iid << "\n";
-	std::string s = seq.substr(i, _ksize);
-	// cout << "S is " << s << "\n";
       }
     }
 
@@ -99,12 +93,6 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
   }
 
   delete parser;
-
-  return;
-
-  cout << "remapping...\n";
-  remap();
-  cout << "done\n";
 
   total_reads = 0;
 
@@ -128,17 +116,42 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	iid = get(kmer);
-	crossed.insert(iid);
+	crossed.insert(partitions[iid]);
+	assert(partitions[iid] <= iid); // pid <= iid
       }
 
-
       if (crossed.size() > 1) {
-	iid = find_min_iid(crossed);
-	for (IntersectionSet::const_iterator si = crossed.begin();
-	     si != crossed.end(); si++ ){
-	  if (*si != iid) {
-	    intermap[*si] = iid;
+	IntersectionSet::const_iterator is = crossed.begin();
+
+#if 0
+	cout << "overlap: ";
+	for (; is != crossed.end(); is++) {
+	  cout << *is << " ";
+	}
+	cout << "\n";
+#endif
+
+	is = crossed.begin();
+	IntersectionID first_pid = *(is); // will be LOWEST.
+	// cout << "starting at: " << first_pid;
+
+	IntersectionSet * s = revmap[first_pid];
+	assert (s != NULL);
+
+	IntersectionSet * t;
+	is++;
+	for (; is != crossed.end(); is++) {
+	  t = revmap[*is];
+	  for (IntersectionSet::const_iterator ti = t->begin(); ti != t->end();
+	       ti++) {
+
+	    s->insert(*ti);
+	    partitions[*ti] = first_pid;
+	    // cout << "ASSIGN " << *ti << " " << first_pid << "\n";
 	  }
+	  revmap.erase(*is);
+	  delete t;
+	  // cout << "merged: " << *is << " into " << first_pid << "\n";
 	}
       }
     }
@@ -183,7 +196,7 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	iid = get(kmer);
-	crossed.insert(iid);
+	crossed.insert(partitions[iid]);
       }
 
       assert(crossed.size() == 1);
@@ -195,7 +208,7 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0) {
       try {
-	cout << "..." << total_reads << " x2\n";
+	cout << "..." << total_reads << " x3\n";
       } catch (...) {
 	delete parser;
 	throw;
@@ -206,29 +219,6 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
   delete parser;
 }
 
-IntersectionID IntersectTable::find_min_iid(IntersectionSet s)
-{
-  IntersectionSet::const_iterator si = s.begin();
-  IntersectionInterMap::const_iterator pi;
-
-  IntersectionID min_iid = *si;
-
-  si++;
-  for (; si != s.end(); si++) {
-    IntersectionID iid = *si;
-	
-    while (1) {
-      pi = intermap.find(iid);
-      if (pi == intermap.end()) { break; }
-      iid = intermap[iid];
-    }
-	
-    if (iid < min_iid) { min_iid = iid; }
-  }
-
-  return min_iid;
-}
-
 void IntersectTable::remap()
 {
   IntersectionSet seen;
@@ -236,13 +226,25 @@ void IntersectTable::remap()
   for (HashIntoType i = 0; i < _tablesize; i++) {
     IntersectionID iid = _table[i];
     if (iid) {
-      if (intermap.find(iid) != intermap.end()) {
-	_table[i] = intermap[iid];
-      }
-      seen.insert(_table[i]);
+      _table[i] = partitions[iid];
+      
+      seen.insert(partitions[_table[i]]);
     }
   }
-  intermap.clear();
+
+  for (ReverseIntersectionMap::iterator ri = revmap.begin();
+       ri != revmap.end(); ri++) {
+    if (ri->second->size() > 1) {
+      delete ri->second;
+    
+      IntersectionSet * s = new IntersectionSet();
+      s->insert(ri->first);
+      ri->second = s;
+    }
+  }
 
   cout << "total intersection IDs seen: " << seen.size() << "\n";
+
+  cout << "revmap: " << revmap.size() << "\n";
+  //assert(seen.size() == revmap.size());
 }

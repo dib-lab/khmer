@@ -2643,15 +2643,14 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
   Py_INCREF(Py_None);
   return Py_None;
 }
-
 static PyObject * do_intersection_partition(PyObject * self, PyObject * args)
 {
   int ksize;
-  int tablesize;
+  khmer::HashIntoType tablesize;
   char * infile = NULL;
   char * outfile = NULL;
   
-  if (!PyArg_ParseTuple(args, "iiss", &ksize, &tablesize, &infile,
+  if (!PyArg_ParseTuple(args, "iLss", &ksize, &tablesize, &infile,
 			&outfile)) {
     return NULL;
   }
