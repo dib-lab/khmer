@@ -9,12 +9,15 @@
 
 #include "khmer.hh"
 
-#define MAX_IID 4294967295
+// #define MAX_IID 4294967295
+#define MAX_IID 50*1000*1000
 
 namespace khmer {
   typedef unsigned int IntersectionID;
+  typedef unsigned int PartitionID;
   typedef std::map <IntersectionID, IntersectionID> IntersectionInterMap;
   typedef std::set<IntersectionID> IntersectionSet;
+  typedef std::map<IntersectionID, IntersectionSet*> ReverseIntersectionMap;
   
   class IntersectTable {
   protected:
@@ -22,14 +25,19 @@ namespace khmer {
     HashIntoType _tablesize;
 
     IntersectionID * _table;
-    IntersectionID next_intersection_id;
-  public:
-    IntersectionInterMap intermap;
+    PartitionID * partitions;
 
+    IntersectionID next_intersection_id;
+    ReverseIntersectionMap revmap;
+
+    bool rolled;
+  public:
     IntersectTable(WordLength ksize, HashIntoType tablesize) :
       _ksize(ksize), _tablesize(tablesize) {
       next_intersection_id = 1;
       _allocate_counters();
+
+      rolled = false;
     }
 
     ~IntersectTable() {
@@ -39,6 +47,9 @@ namespace khmer {
     void _allocate_counters() {
       _table = new IntersectionID[_tablesize];
       memset(_table, 0, _tablesize * sizeof(IntersectionID));
+
+      partitions = new PartitionID[MAX_IID];
+      memset(partitions, 0, MAX_IID * sizeof(PartitionID));
     }
 
     // accessor to get 'k'
@@ -49,7 +60,15 @@ namespace khmer {
 
     IntersectionID get_next_iid() {
       IntersectionID iid = next_intersection_id;
+      if (!rolled) {
+	partitions[iid] = iid;
+      }
+
       next_intersection_id++;
+      if (next_intersection_id == MAX_IID) {
+	next_intersection_id = 1;
+	rolled = true;
+      }
       return iid;
     }
 
@@ -63,8 +82,6 @@ namespace khmer {
 
     bool check_read(const std::string &read);
     void do_partition(const std::string infile, const std::string outfile);
-
-    IntersectionID find_min_iid(IntersectionSet s);
 
     void remap();
   };
