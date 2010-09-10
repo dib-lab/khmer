@@ -53,28 +53,26 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
       HashIntoType kmer;
 
       IntersectionSet crossed;
-      IntersectionID iid;
+      IntersectionID iid = 0;
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	iid = get(kmer);
 	if (iid) {
-	  crossed.insert(partitions[iid]);
+	  break;
 	}
       }
 
-      // Did we intersection something?  If no, just label this intersection.
-      if (crossed.size() == 0) {
+      // Did we intersect something?  If no, just label this intersection.
+      if (iid == 0) {
 	iid = get_next_iid();
 
 	// @CTB could probably defer this until merge/overlap, and set to NULL.
 	IntersectionSet * s = new IntersectionSet();
 	s->insert(iid);
 	revmap[iid] = s;
-      } else if (crossed.size() >= 1) {
-
-	// Yes!  we intersected.
-	iid = *(crossed.begin()); // no merging or anything; just label isect.
+      } else {
+	; 			// keep whatever we intersected
       }
 
       // now, lay down tracks so that any read intersecting with any of these
@@ -191,6 +189,7 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
       PartitionID pid = partitions[iid];
 
       // @CTB for testing purposes only.
+#if 0
       for (unsigned int i = 1; i < seq.length() - _ksize + 1; i++) {
 	kmer = _hash(kmer_s + i, _ksize);
 	iid = get(kmer);
@@ -198,6 +197,7 @@ void IntersectTable::do_partition(const std::string infile, const std::string ou
 	  assert(false);
 	}
       }
+#endif // 0
 
       outfp << ">" << read.name << "\t" << pid << "\n" << seq << "\n";
     }
