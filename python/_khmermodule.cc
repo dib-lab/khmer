@@ -9,6 +9,7 @@
 #include "ktable.hh"
 #include "hashtable.hh"
 #include "storage.hh"
+#include "intertable.hh"
 
 //
 // Function necessary for Python loading:
@@ -2643,6 +2644,29 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * do_intersection_partition(PyObject * self, PyObject * args)
+{
+  int ksize;
+  int tablesize;
+  char * infile = NULL;
+  char * outfile = NULL;
+  
+  if (!PyArg_ParseTuple(args, "iiss", &ksize, &tablesize, &infile,
+			&outfile)) {
+    return NULL;
+  }
+
+  khmer::IntersectTable * iitable;
+  iitable = new khmer::IntersectTable(ksize, tablesize);
+  iitable->do_partition(infile, outfile);
+
+  delete iitable;
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+
 //
 // Module machinery.
 //
@@ -2657,6 +2681,7 @@ static PyMethodDef KhmerMethods[] = {
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
   { "reverse_hash", reverse_hash, METH_VARARGS, "", },
   { "set_reporting_callback", set_reporting_callback, METH_VARARGS, "" },
+  { "do_intersection_partition", do_intersection_partition, METH_VARARGS, "" },
   { NULL, NULL, 0, NULL }
 };
 

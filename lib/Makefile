@@ -1,6 +1,6 @@
 CXXFLAGS=-g -fPIC -Wall -O2
 
-all: parsers.o ktable.o hashtable.o
+all: parsers.o ktable.o hashtable.o intertable.o
 
 clean:
 	rm -f *.o
@@ -21,3 +21,5 @@ consume_prof: consume_prof.o hashtable.o ktable.o
 ktable.o: ktable.cc ktable.hh
 
 hashtable.o: hashtable.cc hashtable.hh
+
+intertable.o: intertable.cc intertable.hh
