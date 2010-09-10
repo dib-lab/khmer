@@ -15,3 +15,4 @@ python/test-data/random-31-c.fa.out
 *.pmap
 *.out
 *.part
+*.ipart
