@@ -12,6 +12,8 @@
 
 #define SURRENDER_PARTITION 1
 
+#define N_TABLES 8
+
 namespace khmer {
   typedef unsigned int PartitionID;
   typedef std::set<HashIntoType> SeenSet;
@@ -26,6 +28,7 @@ namespace khmer {
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
 
+  extern HashIntoType primes[N_TABLES];
   class Hashtable;
 
   class SubsetPartition {
@@ -112,14 +115,18 @@ namespace khmer {
     HashIntoType _tablebytes;
     HashIntoType bitmask;
 
-    BoundedCounterType * _counts;
+    BoundedCounterType * _counts[N_TABLES];
 
     SeenSet all_tags;
 
     void _allocate_counters() {
-      _tablebytes = _tablesize / 8 + 1;
-      _counts = new BoundedCounterType[_tablebytes];
-      memset(_counts, 0, _tablebytes * sizeof(BoundedCounterType));
+      for (unsigned int i = 0; i < N_TABLES; i++) {
+	_tablesize = primes[i];
+	_tablebytes = _tablesize / 8 + 1;
+
+	_counts[i] = new BoundedCounterType[_tablebytes];
+	memset(_counts[i], 0, _tablebytes * sizeof(BoundedCounterType));
+      }
     }
 
     void _clear_partitions() {
@@ -147,7 +154,12 @@ namespace khmer {
     }
 
     ~Hashtable() {
-      if (_counts) { delete _counts; _counts = NULL; }
+      if (_counts[0]) {
+	for (unsigned int i = 0; i < N_TABLES; i++) {
+	  delete _counts[i];
+	  _counts[i] = NULL;
+	}
+      }
       _clear_partitions();
     }
 
@@ -170,7 +182,7 @@ namespace khmer {
       for (HashIntoType i = start; i < stop; i++) {
 	unsigned int byte = i / 8;
 	unsigned char bit = i % 8;
-	if (_counts[byte] & (1 << bit)) {
+	if (_counts[0][byte] & (1 << bit)) {
 	  n++;
 	}
       }
@@ -178,43 +190,55 @@ namespace khmer {
     }
 
     void count(const char * kmer) {
-      HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
+      HashIntoType hash = _hash(kmer, _ksize);
 
-      _counts[byte] |= (1 << bit);
+      for (unsigned int i = 0; i < N_TABLES; i++) {
+	HashIntoType bin = hash % primes[i];
+	unsigned int byte = bin / 8;
+	unsigned char bit = bin % 8;
+
+	_counts[i][byte] |= (1 << bit);
+      }
     }
 
     void count(HashIntoType khash) {
-      HashIntoType bin = khash % _tablesize;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
+      for (unsigned int i = 0; i < N_TABLES; i++) {
+	HashIntoType bin = khash % primes[i];
+	unsigned int byte = bin / 8;
+	unsigned char bit = bin % 8;
 
-      _counts[byte] |= (1 << bit);
+	_counts[i][byte] |= (1 << bit);
+      }
     }
 
     // get the count for the given k-mer.
     const BoundedCounterType get_count(const char * kmer) const {
-      HashIntoType bin = _hash(kmer, _ksize) % _tablesize;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
+      HashIntoType hash = _hash(kmer, _ksize);
+
+      for (unsigned int i = 0; i < N_TABLES; i++) {
+	HashIntoType bin = hash % primes[i];
+	unsigned int byte = bin / 8;
+	unsigned char bit = bin % 8;
       
-      if (_counts[byte] & (1 << bit)) {
-	return 1;
+	if (!(_counts[i][byte] & (1 << bit))) {
+	  return 0;
+	}
       }
-      return 0;
+      return 1;
     }
 
     // get the count for the given k-mer hash.
     const BoundedCounterType get_count(HashIntoType khash) const {
-      HashIntoType bin = khash % _tablesize;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
+      for (unsigned int i = 0; i < N_TABLES; i++) {
+	HashIntoType bin = khash % primes[i];
+	unsigned int byte = bin / 8;
+	unsigned char bit = bin % 8;
       
-      if (_counts[byte] & (1 << bit)) {
-	return 1;
+	if (!(_counts[i][byte] & (1 << bit))) {
+	  return 0;
+	}
       }
-      return 0;
+      return 1;
     }
 
     // count every k-mer in the string.
@@ -333,8 +357,8 @@ namespace khmer {
 
     void dump_kmers_and_counts(kmer_cb cb_fn = NULL, void * data = NULL) const {
       for (HashIntoType i = 0; i < _tablesize; i++) {
-	BoundedCounterType count = _counts[i] & 127;
-	if (_counts[i]) {
+	BoundedCounterType count = _counts[0][i] & 127;
+	if (_counts[0][i]) {
 	  if (cb_fn) {
 	    cb_fn(_revhash(i, _ksize).c_str(), count, data);
 	  } else{
