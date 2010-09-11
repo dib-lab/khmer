@@ -3,7 +3,7 @@ import threading
 
 K = 32
 HASHTABLE_SIZE=22906493
-N_THREADS=8
+N_THREADS=8                             # @CTB
 
 ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
 
@@ -27,6 +27,11 @@ def main(filename):
     subset_size = total_reads / N_THREADS + total_reads % N_THREADS
 
     results = []
+
+    #ht.save(filename + '.ht')                # @CTB
+    #ht.save_tagset(filename + '.tagset')     # @CTB
+    #ht.load(filename + '.ht')
+    #ht.load_tagset(filename + '.tagset')
 
     # calculate the hashtable occupancy
     print '---'
