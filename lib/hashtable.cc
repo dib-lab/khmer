@@ -24,7 +24,7 @@ HashIntoType khmer::primes[] = { 22906493,
 				 22906661 };
 #endif
 
-#if 1
+#if 0
 HashIntoType khmer::primes[] = { 32000000017,
 				 32000000023,
 				 32000000059,
@@ -35,7 +35,15 @@ HashIntoType khmer::primes[] = { 32000000017,
 				 32000000237 };
 #endif
 
-#if 0
+#if 1
+HashIntoType khmer::primes[] = { 16000000039,
+				 16000000067,
+				 16000000091,
+				 16000000097,
+				 16000000103,
+				 16000000127,
+				 16000000157,
+				 16000000201 };
 #endif
 
 
