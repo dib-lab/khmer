@@ -116,7 +116,6 @@ namespace khmer {
   protected:
     WordLength _ksize;
     HashIntoType _tablesize;
-    HashIntoType _tablebytes;
     HashIntoType bitmask;
 
     BoundedCounterType * _counts;
@@ -124,9 +123,8 @@ namespace khmer {
     SeenSet all_tags;
 
     virtual void _allocate_counters() {
-      _tablebytes = _tablesize / 8 + 1;
-      _counts = new BoundedCounterType[_tablebytes];
-      memset(_counts, 0, _tablebytes * sizeof(BoundedCounterType));
+      _counts = new BoundedCounterType[_tablesize];
+      memset(_counts, 0, _tablesize * sizeof(BoundedCounterType));
     }
 
     void _clear_partitions() {
@@ -174,13 +172,11 @@ namespace khmer {
 
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
-				  HashIntoType stop=0) const {
+					  HashIntoType stop=0) const {
       HashIntoType n = 0;
       if (stop == 0) { stop = _tablesize; }
       for (HashIntoType i = start; i < stop; i++) {
-	unsigned int byte = i / 8;
-	unsigned char bit = i % 8;
-	if (_counts[byte] & (1 << bit)) {
+	if (_counts[i % _tablesize]) {
 	  n++;
 	}
       }
@@ -189,46 +185,34 @@ namespace khmer {
 
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
+      HashIntoType bin = hash % _tablesize;
 
-      HashIntoType bin = hash % _tablebytes;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
-
-      _counts[byte] |= (1 << bit);
+      if (_counts[bin] < MAX_COUNT) {
+	_counts[bin] += 1;
+      }
     }
 
     virtual void count(HashIntoType khash) {
-      HashIntoType bin = khash % _tablebytes;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
+      HashIntoType bin = khash % _tablesize;
 
-      _counts[byte] |= (1 << bit);
+      if (_counts[bin] < MAX_COUNT) {
+	_counts[bin] += 1;
+      }
     }
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
       HashIntoType hash = _hash(kmer, _ksize);
 
-      HashIntoType bin = hash % _tablebytes;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
-      
-      if (!(_counts[byte] & (1 << bit))) {
-	return 0;
-      }
-      return 1;
+      HashIntoType bin = hash % _tablesize;
+      return _counts[bin];
     }
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-      HashIntoType bin = khash % _tablebytes;
-      unsigned int byte = bin / 8;
-      unsigned char bit = bin % 8;
-      
-      if (!(_counts[byte] & (1 << bit))) {
-	return 0;
-      }
-      return 1;
+      HashIntoType bin = khash % _tablesize;
+
+      return _counts[bin];
     }
 
     // count every k-mer in the string.

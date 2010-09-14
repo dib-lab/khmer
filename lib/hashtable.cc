@@ -1030,7 +1030,7 @@ void Hashtable::save(std::string outfilename)
 
   outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
   outfile.write((const char *) _counts,
-		sizeof(BoundedCounterType) * _tablebytes);
+		sizeof(BoundedCounterType) * _tablesize);
   outfile.close();
 }
 
@@ -1050,12 +1050,11 @@ void Hashtable::load(std::string infilename)
   infile.read((char *) &save_tablesize, sizeof(save_tablesize));
 
   _tablesize = (HashIntoType) save_tablesize;
-  _tablebytes = _tablesize / 8 + 1;
-  _counts = new BoundedCounterType[_tablebytes];
+  _counts = new BoundedCounterType[_tablesize];
 
   unsigned long long loaded = 0;
-  while (loaded != _tablebytes) {
-    infile.read((char *) _counts, _tablebytes - loaded);
+  while (loaded != _tablesize) {
+    infile.read((char *) _counts, _tablesize - loaded);
     loaded += infile.gcount();	// do I need to do this loop?
   }
   infile.close();

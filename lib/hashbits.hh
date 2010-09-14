@@ -7,6 +7,7 @@ namespace khmer {
   class Hashbits : public Hashtable {
   protected:
     BoundedCounterType * _counts[N_TABLES];
+    HashIntoType _tablebytes;
 
     virtual void _allocate_counters() {
       for (unsigned int i = 0; i < N_TABLES; i++) {
