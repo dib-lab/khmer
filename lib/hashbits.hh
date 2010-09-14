@@ -3,7 +3,11 @@
 
 #include "hashtable.hh"
 
+#define N_TABLES 2
+
 namespace khmer {
+  extern HashIntoType primes[];
+
   class Hashbits : public Hashtable {
   protected:
     BoundedCounterType * _counts[N_TABLES];
