@@ -16,8 +16,6 @@
 
 #define SURRENDER_PARTITION 1
 
-#define N_TABLES 2
-
 namespace khmer {
   typedef unsigned int PartitionID;
   typedef std::set<HashIntoType> SeenSet;
@@ -32,7 +30,6 @@ namespace khmer {
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
 
-  extern HashIntoType primes[];
   class Hashtable;
 
   class SubsetPartition {
