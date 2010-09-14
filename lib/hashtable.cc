@@ -1280,34 +1280,39 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 	_hash(kmer_s + i, ksize, kmer_f, kmer_r);
 	kmer = uniqify_rc(kmer_f, kmer_r);
 
-	if (partition_map.find(kmer) == partition_map.end()) {
-	  continue;
-	}
+	// some partitioning schemes tag the first kmer_f; others label
+	// *some* kmer in the read.  Output properly for both.
 
-	PartitionID * partition_p = partition_map[kmer];
-	PartitionID partition_id;
-	if (partition_p == NULL ){
-	  partition_id = 0;
-	  n_singletons++;
-	} else {
-	  partition_id = *partition_p;
-	  partitions.insert(partition_id);
+	if (partition_map.find(kmer_f) != partition_map.end()) {
+	  kmer = kmer_f;
+	  break;
 	}
-
-
-	// Is this a partition that has not been entirely explored? If so,
-	// mark it.
-	char surrender_flag = ' ';
-	if (partition_id == SURRENDER_PARTITION) {
-	  surrender_flag = '*';
+	if (partition_map.find(kmer) != partition_map.end()) {
+	  break;
 	}
+      }
 
-	if (partition_id > 0 || output_unassigned) {
-	  outfile << ">" << read.name << "\t" << partition_id
-		  << surrender_flag << "\n" 
-		  << seq << "\n";
-	}
-	break;
+      PartitionID * partition_p = partition_map[kmer];
+      PartitionID partition_id;
+      if (partition_p == NULL ){
+	partition_id = 0;
+	n_singletons++;
+      } else {
+	partition_id = *partition_p;
+	partitions.insert(partition_id);
+      }
+
+      // Is this a partition that has not been entirely explored? If so,
+      // mark it.
+      char surrender_flag = ' ';
+      if (partition_id == SURRENDER_PARTITION) {
+	surrender_flag = '*';
+      }
+
+      if (partition_id > 0 || output_unassigned) {
+	outfile << ">" << read.name << "\t" << partition_id
+		<< surrender_flag << "\n" 
+		<< seq << "\n";
       }
 	       
       total_reads++;
