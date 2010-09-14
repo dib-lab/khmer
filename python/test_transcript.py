@@ -12,7 +12,7 @@ def test_get_transcript():
    filename = os.path.join(thisdir, 'test-transcript.fa')
    estfile = os.path.join(thisdir, 'test-est.fa')
 
-   ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
+   ht = khmer.new_hashbits(K, HASHTABLE_SIZE)
 
    ht.consume_fasta(estfile)
    total_reads, n_consumed = ht.consume_fasta(filename)

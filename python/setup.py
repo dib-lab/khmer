@@ -10,7 +10,8 @@ extension_mod = Extension("khmer._khmermodule",
                                          '../lib/hashtable.o',
                                          '../lib/parsers.o',
                                          '../lib/intertable.o',
-                                         '../lib/hashbits.o'],
+                                         '../lib/hashbits.o',
+                                         '../lib/subset.o'],
                           depends=['../lib/storage.hh',
                                    '../lib/khmer.hh',
                                    '../lib/ktable.hh',
@@ -20,7 +21,8 @@ extension_mod = Extension("khmer._khmermodule",
                                    '../lib/ktable.o',
                                    '../lib/parsers.o',
                                    '../lib/intertable.o',
-                                   '../lib/hashbits.o']
+                                   '../lib/hashbits.o',
+                                   '../lib/subset.o']
                           )
 
 # python modules: only 'khmer'

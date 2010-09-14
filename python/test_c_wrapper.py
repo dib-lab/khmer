@@ -43,7 +43,7 @@ def test_raise_in_consume_fasta():
         raise
 
 def test_raise_in_trim_graphs():
-    kh = khmer.new_hashtable(4, 4**4)
+    kh = khmer.new_hashbits(4, 4**4)
 
     n, _ = kh.consume_fasta(reads_filename, 0, 0, None, False)
     try:
