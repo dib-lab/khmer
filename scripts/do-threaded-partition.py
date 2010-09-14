@@ -53,7 +53,7 @@ def main():
 
     print 'making hashtable: k=%d, hashtable size=%.2f bn' % (k,
                                                  hashtable_size / float(1e9))
-    ht = khmer.new_hashtable(k, hashtable_size)
+    ht = khmer.new_hashbits(k, hashtable_size)
 
     ###
 
