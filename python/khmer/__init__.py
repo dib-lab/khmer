@@ -3,7 +3,7 @@ __version__ = "0.2"
 import _khmer
 from _khmer import new_ktable
 from _khmer import new_hashtable
-from _khmer import new_hashbits
+from _khmer import _new_hashbits
 from _khmer import new_readmask
 from _khmer import new_minmax
 from _khmer import consume_genome
@@ -14,6 +14,14 @@ from _khmer import do_intersection_partition
 from filter_utils import filter_fasta_file_any, filter_fasta_file_all, filter_fasta_file_limit_n
 
 ###
+
+def new_hashbits(k, starting_size, n_tables=8):
+    primes = get_n_primes_above_x(n_tables, starting_size)
+    print primes
+#    primes = [ 22906493, 22906519, 22906561, 22906567,
+#               22906619, 22906649, 22906657, 22906661 ]
+    
+    return _new_hashbits(k, primes)
 
 def _default_reporting_callback(info, n_reads, other):
     print '...', info, n_reads, other
@@ -76,6 +84,21 @@ def get_n_primes_near_x(n, x):
       if is_prime(i):
          primes.append(i)
       i -= 2
+   return primes
+
+def get_n_primes_above_x(n, x):
+   '''
+   steps forward until n primes (other than 2) have been
+   found that are smaller than x.
+   '''
+   primes = []
+   i = x+1
+   if i % 2 == 0:
+      i += 1
+   while len(primes) != n and i > 0:
+      if is_prime(i):
+         primes.append(i)
+      i += 2
    return primes
 
 # from http://www.rsok.com/~jrm/printprimes.html
