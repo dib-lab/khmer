@@ -1,6 +1,10 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
+#include <iostream>
+#include <list>
+#include <queue>
+
 #include <fstream>
 #include <string>
 #include <set>
@@ -119,7 +123,7 @@ namespace khmer {
 
     SeenSet all_tags;
 
-    void _allocate_counters() {
+    virtual void _allocate_counters() {
       for (unsigned int i = 0; i < N_TABLES; i++) {
 	_tablesize = primes[i];
 	_tablebytes = _tablesize / 8 + 1;
@@ -153,7 +157,7 @@ namespace khmer {
       _allocate_counters();
     }
 
-    ~Hashtable() {
+    virtual ~Hashtable() {
       if (_counts[0]) {
 	for (unsigned int i = 0; i < N_TABLES; i++) {
 	  delete _counts[i];
@@ -163,10 +167,10 @@ namespace khmer {
       _clear_partitions();
     }
 
-    void save(std::string);
-    void load(std::string);
-    void save_tagset(std::string);
-    void load_tagset(std::string);
+    virtual void save(std::string);
+    virtual void load(std::string);
+    virtual void save_tagset(std::string);
+    virtual void load_tagset(std::string);
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -175,7 +179,7 @@ namespace khmer {
     const HashIntoType n_entries() const { return _tablesize; }
 
     // count number of occupied bins
-    const HashIntoType n_occupied(HashIntoType start=0,
+    virtual const HashIntoType n_occupied(HashIntoType start=0,
 				  HashIntoType stop=0) const {
       HashIntoType n = 0;
       if (stop == 0) { stop = _tablesize; }
@@ -189,7 +193,7 @@ namespace khmer {
       return n;
     }
 
-    void count(const char * kmer) {
+    virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
 
       for (unsigned int i = 0; i < N_TABLES; i++) {
@@ -201,7 +205,7 @@ namespace khmer {
       }
     }
 
-    void count(HashIntoType khash) {
+    virtual void count(HashIntoType khash) {
       for (unsigned int i = 0; i < N_TABLES; i++) {
 	HashIntoType bin = khash % primes[i];
 	unsigned int byte = bin / 8;
@@ -212,7 +216,7 @@ namespace khmer {
     }
 
     // get the count for the given k-mer.
-    const BoundedCounterType get_count(const char * kmer) const {
+    virtual const BoundedCounterType get_count(const char * kmer) const {
       HashIntoType hash = _hash(kmer, _ksize);
 
       for (unsigned int i = 0; i < N_TABLES; i++) {
@@ -228,7 +232,7 @@ namespace khmer {
     }
 
     // get the count for the given k-mer hash.
-    const BoundedCounterType get_count(HashIntoType khash) const {
+    virtual const BoundedCounterType get_count(HashIntoType khash) const {
       for (unsigned int i = 0; i < N_TABLES; i++) {
 	HashIntoType bin = khash % primes[i];
 	unsigned int byte = bin / 8;

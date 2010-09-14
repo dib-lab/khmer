@@ -1,7 +1,3 @@
-#include <iostream>
-#include <list>
-#include <queue>
-
 #include "khmer.hh"
 #include "hashtable.hh"
 #include "parsers.hh"
@@ -13,7 +9,7 @@
 using namespace khmer;
 using namespace std;
 
-#if 0
+#if 1
 HashIntoType khmer::primes[] = { 22906493,
 				 22906519,
 				 22906561,
@@ -35,7 +31,7 @@ HashIntoType khmer::primes[] = { 32000000017,
 				 32000000237 };
 #endif
 
-#if 1
+#if 0
 HashIntoType khmer::primes[] = { 16000000039,
 				 16000000067,
 				 16000000091,
