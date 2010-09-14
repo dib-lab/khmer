@@ -6,7 +6,7 @@ import khmer
 
 class Test_RandomData(object):
     def test_3_merge_013(self):
-        ht = khmer.new_hashtable(20, 4**14+1)
+        ht = khmer.new_hashbits(20, 4**14+1)
         filename = os.path.join(thisdir, 'test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -29,7 +29,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
     
     def test_3_merge_023(self):
-        ht = khmer.new_hashtable(20, 4**14+1)
+        ht = khmer.new_hashbits(20, 4**14+1)
         filename = os.path.join(thisdir, 'test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -52,7 +52,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
     
     def test_5_merge_046(self):
-        ht = khmer.new_hashtable(20, 4**14+1)
+        ht = khmer.new_hashbits(20, 4**14+1)
         filename = os.path.join(thisdir, 'test-graph5.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -75,7 +75,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
     
     def test_random_20_a_succ(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -94,7 +94,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_II(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -113,7 +113,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_III(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -136,7 +136,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
 
     def test_random_20_a_succ_IV(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -156,7 +156,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions
         
     def test_random_20_a_succ_IV_save(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         savefile_ht = filename + '.ht'
         savefile_tags = filename + '.tags'
@@ -168,7 +168,7 @@ class Test_RandomData(object):
         ht.save_tagset(savefile_tags);
 
         del ht
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
 
         ht.load(savefile_ht);
         ht.load_tagset(savefile_tags);
@@ -189,7 +189,7 @@ class Test_RandomData(object):
 
 class Test_Surrendered(object):
     def test_surrendered_subset(self):
-        ht = khmer.new_hashtable(32, 4**15+1)
+        ht = khmer.new_hashbits(32, 4**15+1)
 
         filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
         total_reads, _ = ht.consume_fasta_and_tag(filename)
@@ -204,7 +204,7 @@ class Test_Surrendered(object):
 
     
     def test_surrendered_subset_2(self):
-        ht = khmer.new_hashtable(32, 4**15+1)
+        ht = khmer.new_hashbits(32, 4**15+1)
 
         filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
         total_reads, _ = ht.consume_fasta_and_tag(filename)
@@ -220,7 +220,7 @@ class Test_Surrendered(object):
         assert n_surrendered == 16, n_surrendered
 
     def test_save_load_merge(self):
-        ht = khmer.new_hashtable(20, 4**14+1)
+        ht = khmer.new_hashbits(20, 4**14+1)
         filename = os.path.join(thisdir, 'test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -250,7 +250,7 @@ class Test_Surrendered(object):
         assert n_partitions == 1, n_partitions        # combined.
         
     def test_save_load_merge_2(self):
-        ht = khmer.new_hashtable(20, 4**14+1)
+        ht = khmer.new_hashbits(20, 4**14+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -276,7 +276,7 @@ class Test_Surrendered(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_surrendered_save_load(self):
-        ht = khmer.new_hashtable(32, 4**15+1)
+        ht = khmer.new_hashbits(32, 4**15+1)
 
         filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
         total_reads, _ = ht.consume_fasta_and_tag(filename)
