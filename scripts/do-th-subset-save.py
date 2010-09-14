@@ -5,10 +5,9 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=128000000069
-#HASHTABLE_SIZE=4000000007
+HASHTABLE_SIZE=1
 
-SUBSET_SIZE = 1000000
+SUBSET_SIZE = 100000
 N_THREADS = 4
 
 ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
@@ -30,6 +29,13 @@ def worker(q, basename):
         
         print 'starting:', basename, n
         subset = ht.do_subset_partition(start, stop)
+
+        # filtering:
+#        print 'filtering'
+#        tagmap = ht.load_tagmap(basename + '.tagset')
+#        ht.subset_maxify_partition_size(subset, tagmap)
+#        ht.discard_tags(
+        
         print 'saving:', basename, n
         
         outfile = basename + '.subset.%d' % (n,)
