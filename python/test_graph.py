@@ -6,7 +6,7 @@ import khmer
 
 class Test_PartitionCount(object):
     def test_simple_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         ht.do_truncated_partition(filename, filename + '.out')
@@ -17,7 +17,7 @@ class Test_PartitionCount(object):
         assert n_surrendered == 0
         
     def test_simple_30_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         ht.do_truncated_partition(filename, filename + '.out')
@@ -28,7 +28,7 @@ class Test_PartitionCount(object):
         assert n_surrendered == 0
 
     def test_surrendered(self):
-        ht = khmer.new_hashtable(32, 4**15+1)
+        ht = khmer.new_hashbits(32, 4**15+1)
 
         filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
         ht.do_truncated_partition(filename, filename + '.out')
@@ -42,7 +42,7 @@ class Test_PartitionCount(object):
 
 class Test_SimpleConnectMe4(object):
     def test_simple_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out') # @CTB use tempfile
@@ -50,7 +50,7 @@ class Test_SimpleConnectMe4(object):
         assert n == 1, n
         
     def test_simple_30_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -59,7 +59,7 @@ class Test_SimpleConnectMe4(object):
 
 class Test_NoConnectMe4(object):
     def test_merge_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph3.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -67,7 +67,7 @@ class Test_NoConnectMe4(object):
         assert n == 2, n
         
     def test_merge_32_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph3.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -76,7 +76,7 @@ class Test_NoConnectMe4(object):
 
 class Test_AnotherConnectMe4(object):
     def test_complex_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -84,7 +84,7 @@ class Test_AnotherConnectMe4(object):
         assert n == 2, n
 
     def test_complex_31_12(self):
-        ht = khmer.new_hashtable(31, 4**12+1)
+        ht = khmer.new_hashbits(31, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -92,7 +92,7 @@ class Test_AnotherConnectMe4(object):
         assert n == 4, n
 
     def test_complex_32_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -102,7 +102,7 @@ class Test_AnotherConnectMe4(object):
 
 class Test_MoreConnectMe4(object):
     def test_complex5_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph5.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -110,7 +110,7 @@ class Test_MoreConnectMe4(object):
         assert n == 1, n
 
     def test_complex5_24_12(self):
-        ht = khmer.new_hashtable(30, 4**12+1)
+        ht = khmer.new_hashbits(30, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph5.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -118,7 +118,7 @@ class Test_MoreConnectMe4(object):
         assert n == 6, n
 
     def test_complex6_32_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph6.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -127,7 +127,7 @@ class Test_MoreConnectMe4(object):
 
     def test_complex6_32_12_save(self):
         # this succeeds if save/load are null, or implemented. oops. @@CTB.
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph6.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -145,7 +145,7 @@ class Test_MoreConnectMe4(object):
 
 class Test_ThreadedSimpleConnectMe4(object):
     def test_simple_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out') # @CTB use tempfile
@@ -155,7 +155,7 @@ class Test_ThreadedSimpleConnectMe4(object):
         assert n == 1, n
         
     def test_simple_30_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph2.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -166,7 +166,7 @@ class Test_ThreadedSimpleConnectMe4(object):
 
 class Test_ThreadedNoConnectMe4(object):
     def test_merge_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph3.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -176,7 +176,7 @@ class Test_ThreadedNoConnectMe4(object):
         assert n == (1, 1, 0), n
         
     def test_merge_32_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph3.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -187,7 +187,7 @@ class Test_ThreadedNoConnectMe4(object):
 
 class Test_ThreadedAnotherConnectMe4(object):
     def test_complex_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -197,7 +197,7 @@ class Test_ThreadedAnotherConnectMe4(object):
         assert n == 2, n
 
     def test_complex_31_12(self):
-        ht = khmer.new_hashtable(31, 4**12+1)
+        ht = khmer.new_hashbits(31, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -207,7 +207,7 @@ class Test_ThreadedAnotherConnectMe4(object):
         assert n == 4, n
 
     def test_complex_32_12(self):
-        ht = khmer.new_hashtable(32, 4**12+1)
+        ht = khmer.new_hashbits(32, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph4.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -219,7 +219,7 @@ class Test_ThreadedAnotherConnectMe4(object):
 
 class Test_ThreadedMoreConnectMe4(object):
     def test_complex5_20_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph5.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -229,7 +229,7 @@ class Test_ThreadedMoreConnectMe4(object):
         assert n == (1, 0, 0), n
 
     def test_complex5_24_12(self):
-        ht = khmer.new_hashtable(30, 4**12+1)
+        ht = khmer.new_hashbits(30, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph5.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -239,7 +239,7 @@ class Test_ThreadedMoreConnectMe4(object):
         assert n == (0, 6, 0), n
 
     def test_complex6_32_12(self):
-        ht = khmer.new_hashtable(20, 4**12+1)
+        ht = khmer.new_hashbits(20, 4**12+1)
 
         filename = os.path.join(thisdir, 'test-graph6.fa')
         outfile = os.path.join(thisdir, 'test-trunc.out')
@@ -252,7 +252,7 @@ class Test_ThreadedMoreConnectMe4(object):
 
 class Test_PythonAPI(object):
     def test_ordered_connect(self):
-        ht = khmer.new_hashtable(20, 4**15+1)
+        ht = khmer.new_hashbits(20, 4**15+1)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
@@ -277,7 +277,7 @@ class Test_PythonAPI(object):
 
 class Test_RandomData(object):
     def test_random_20_a_succ(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -285,7 +285,7 @@ class Test_RandomData(object):
         assert n == 1, n
 
     def test_random_20_a_fail(self):
-        ht = khmer.new_hashtable(21, 4**13+1)
+        ht = khmer.new_hashbits(21, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -293,7 +293,7 @@ class Test_RandomData(object):
         assert n == 99, n
 
     def test_random_20_b_succ(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
         outfile = filename + '.out'
 
@@ -301,7 +301,7 @@ class Test_RandomData(object):
         assert n == 1, n
 
     def test_random_20_b_fail(self):
-        ht = khmer.new_hashtable(21, 4**13+1)
+        ht = khmer.new_hashbits(21, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
         outfile = filename + '.out'
 
@@ -309,7 +309,7 @@ class Test_RandomData(object):
         assert n == 99, n
 
     def test_random_31_a_succ(self):
-        ht = khmer.new_hashtable(31, 4**14+1)
+        ht = khmer.new_hashbits(31, 4**14+1)
         filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
         outfile = filename + '.out'
 
@@ -317,7 +317,7 @@ class Test_RandomData(object):
         assert n == 1, n
 
     def test_random_31_b_fail(self):
-        ht = khmer.new_hashtable(32, 4**14+1)
+        ht = khmer.new_hashbits(32, 4**14+1)
         filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
         outfile = filename + '.out'
 
@@ -326,7 +326,7 @@ class Test_RandomData(object):
 
 class Test_Threaded_RandomData(object):
     def test_random_20_a_succ(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -336,7 +336,7 @@ class Test_Threaded_RandomData(object):
         assert n == (1, 0, 0), n
 
     def test_random_20_a_fail(self):
-        ht = khmer.new_hashtable(21, 4**13+1)
+        ht = khmer.new_hashbits(21, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
         outfile = filename + '.out'
 
@@ -346,7 +346,7 @@ class Test_Threaded_RandomData(object):
         assert n == (0, 99, 0), n
 
     def test_random_20_b_succ(self):
-        ht = khmer.new_hashtable(20, 4**13+1)
+        ht = khmer.new_hashbits(20, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
         outfile = filename + '.out'
 
@@ -356,7 +356,7 @@ class Test_Threaded_RandomData(object):
         assert n == (1, 0, 0), n
 
     def test_random_20_b_fail(self):
-        ht = khmer.new_hashtable(21, 4**13+1)
+        ht = khmer.new_hashbits(21, 4**13+1)
         filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
         outfile = filename + '.out'
 
@@ -366,7 +366,7 @@ class Test_Threaded_RandomData(object):
         assert n == (0, 99, 0), n
 
     def test_random_31_a_succ(self):
-        ht = khmer.new_hashtable(31, 4**14+1)
+        ht = khmer.new_hashbits(31, 4**14+1)
         filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
         outfile = filename + '.out'
 
@@ -376,7 +376,7 @@ class Test_Threaded_RandomData(object):
         assert n == (1, 0, 0), n
 
     def test_random_31_b_fail(self):
-        ht = khmer.new_hashtable(32, 4**14+1)
+        ht = khmer.new_hashbits(32, 4**14+1)
         filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
         outfile = filename + '.out'
 
