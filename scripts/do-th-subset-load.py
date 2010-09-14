@@ -16,7 +16,7 @@ def load(filename, ht):
     ht.merge_subset(subset)
 
 # create a fake-ish ht; K matters, but not hashtable size.
-ht = khmer.new_hashtable(32, 1)
+ht = khmer.new_hashbits(32, 1)
 
 # detect all of the relevant partitionmap files
 #subset_filenames = glob.glob(filename + '.subset.*.pmap')

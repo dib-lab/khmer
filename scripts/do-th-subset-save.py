@@ -10,7 +10,7 @@ HASHTABLE_SIZE=1
 SUBSET_SIZE = 100000
 N_THREADS = 4
 
-ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE)
 
 ###
 
