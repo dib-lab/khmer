@@ -42,8 +42,12 @@ def main():
     outfile = infile + '.part'
 
     k = options.ksize
+<<<<<<< HEAD:scripts/do-partition-calc.py
+    hashtable_size = 4**options.htsize4 + 11
+=======
 #    hashtable_size = 128000000069 #4**options.htsize4 + 1
     hashtable_size = 8000000011
+>>>>>>> 278ad576ed7131c03a7e7cb0b4df872e05604d1c:scripts/do-partition-calc.py
     checkpoint_period = options.checkpoint
 
     if k > 32:
