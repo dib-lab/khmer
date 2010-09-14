@@ -5,7 +5,7 @@ K = 32
 HASHTABLE_SIZE=22906493
 N_THREADS=4                             # @CTB
 
-ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE)
 
 ###
 
