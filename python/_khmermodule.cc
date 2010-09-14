@@ -2349,19 +2349,25 @@ static PyTypeObject khmer_KHashbitsType = {
 // new_hashbits
 //
 
-static PyObject* new_hashbits(PyObject * self, PyObject * args)
+static PyObject* _new_hashbits(PyObject * self, PyObject * args)
 {
   unsigned int k = 0;
-  unsigned long long size = 0;
+  PyObject* sizes_list_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "IL", &k, &size)) {
+  if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
     return NULL;
+  }
+
+  std::vector<khmer::HashIntoType> sizes;
+  for (unsigned int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+    PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+    sizes.push_back(PyLong_AsLongLong(size_o));
   }
 
   khmer_KHashbitsObject * khashbits_obj = (khmer_KHashbitsObject *) \
     PyObject_New(khmer_KHashbitsObject, &khmer_KHashbitsType);
 
-  khashbits_obj->hashbits = new khmer::Hashbits(k, size);
+  khashbits_obj->hashbits = new khmer::Hashbits(k, sizes);
 
   return (PyObject *) khashbits_obj;
 }
@@ -2939,7 +2945,7 @@ static PyObject * do_intersection_partition(PyObject * self, PyObject * args)
 static PyMethodDef KhmerMethods[] = {
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty hashtable" },
-  { "new_hashbits", new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
+  { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
   { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
   { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },

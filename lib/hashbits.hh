@@ -1,29 +1,36 @@
 #ifndef HASHBITS_HH
 #define HASHBITS_HH
 
+#include <vector>
 #include "hashtable.hh"
 #include "subset.hh"
 
-#define N_TABLES 2
 #define PARTITION_ALL_TAG_DEPTH 500
 
 namespace khmer {
-  extern HashIntoType primes[];
-
   class Hashbits : public Hashtable {
     friend class SubsetPartition;
   protected:
-    BoundedCounterType * _counts[N_TABLES];
-    HashIntoType _tablebytes;
+    std::vector<HashIntoType> _tablesizes;
+    unsigned int n_tables;
+
+    BoundedCounterType ** _counts;
     SeenSet all_tags;
 
     virtual void _allocate_counters() {
-      for (unsigned int i = 0; i < N_TABLES; i++) {
-	_tablesize = primes[i];
-	_tablebytes = _tablesize / 8 + 1;
+      n_tables = _tablesizes.size();
 
-	_counts[i] = new BoundedCounterType[_tablebytes];
-	memset(_counts[i], 0, _tablebytes * sizeof(BoundedCounterType));
+      HashIntoType tablebytes;
+      HashIntoType tablesize;
+
+      _counts = new BoundedCounterType*[n_tables];
+
+      for (unsigned int i = 0; i < n_tables; i++) {
+	tablesize = _tablesizes[i];
+	tablebytes = tablesize / 8 + 1;
+
+	_counts[i] = new BoundedCounterType[tablebytes];
+	memset(_counts[i], 0, tablebytes * sizeof(BoundedCounterType));
       }
     }
 
@@ -40,20 +47,22 @@ namespace khmer {
       if (partition) { partition->_validate_pmap(); }
     }
 
-    Hashbits(WordLength ksize, HashIntoType tablesize) :
-      Hashtable(ksize, tablesize) {
+    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
+      Hashtable(ksize, 1), _tablesizes(tablesizes) {
       partition = new SubsetPartition(this);
 
       _allocate_counters();
     }
 
     ~Hashbits() {
-      if (_counts[0]) {
-	for (unsigned int i = 0; i < N_TABLES; i++) {
+      if (_counts) {
+	for (unsigned int i = 0; i < n_tables; i++) {
 	  delete _counts[i];
 	  _counts[i] = NULL;
 	}
       }
+      n_tables = 0;
+
       _clear_partitions();
     }
 
@@ -143,8 +152,8 @@ namespace khmer {
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
 
-      for (unsigned int i = 0; i < N_TABLES; i++) {
-	HashIntoType bin = hash % primes[i];
+      for (unsigned int i = 0; i < n_tables; i++) {
+	HashIntoType bin = hash % _tablesizes[i];
 	unsigned int byte = bin / 8;
 	unsigned char bit = bin % 8;
 
@@ -153,8 +162,8 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
-      for (unsigned int i = 0; i < N_TABLES; i++) {
-	HashIntoType bin = khash % primes[i];
+      for (unsigned int i = 0; i < n_tables; i++) {
+	HashIntoType bin = khash % _tablesizes[i];
 	unsigned int byte = bin / 8;
 	unsigned char bit = bin % 8;
 
@@ -166,8 +175,8 @@ namespace khmer {
     virtual const BoundedCounterType get_count(const char * kmer) const {
       HashIntoType hash = _hash(kmer, _ksize);
 
-      for (unsigned int i = 0; i < N_TABLES; i++) {
-	HashIntoType bin = hash % primes[i];
+      for (unsigned int i = 0; i < n_tables; i++) {
+	HashIntoType bin = hash % _tablesizes[i];
 	unsigned int byte = bin / 8;
 	unsigned char bit = bin % 8;
       
@@ -180,8 +189,8 @@ namespace khmer {
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-      for (unsigned int i = 0; i < N_TABLES; i++) {
-	HashIntoType bin = khash % primes[i];
+      for (unsigned int i = 0; i < n_tables; i++) {
+	HashIntoType bin = khash % _tablesizes[i];
 	unsigned int byte = bin / 8;
 	unsigned char bit = bin % 8;
       
