@@ -19,17 +19,26 @@ IParser* IParser::get_parser(const std::string &inputfile)
 FastaParser::FastaParser(const std::string &inputfile) : 
                          infile(inputfile.c_str())
 {
-   std::string line, seq = "";
-
+   std::string line, seq;
+   next_name = "";
+   
    assert(infile.is_open());
 
    bool valid_read = 0;
 
    while (!valid_read)  {
-      getline(infile, current_read.name); 
-      assert(current_read.name[0] == '>');
-      current_read.name = current_read.name.substr(1);
-   
+      line = "";
+      seq = "";
+      if (next_name == "")  {
+        getline(infile, current_read.name);
+        assert(current_read.name[0] == '>');
+        current_read.name = current_read.name.substr(1);
+      }
+      else  {
+         current_read.name = next_name;
+         next_name = "";
+      }
+      
       while(line[0] != '>' && !infile.eof()) {
          getline(infile, line);
          if (line[0] != '>') {
