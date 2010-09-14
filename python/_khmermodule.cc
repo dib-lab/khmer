@@ -1656,6 +1656,68 @@ static PyObject * hashbits_merge_subset(PyObject * self, PyObject *args)
   return Py_None;
 }
 
+static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  PyObject * readmask_obj = NULL;
+  PyObject * update_readmask_bool = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|iiOOO", &filename, &lower_bound, &upper_bound,
+			&readmask_obj, &update_readmask_bool,
+			&callback_obj)) {
+    return NULL;
+  }
+
+  // make sure update_readmask_bool is the right type of object
+  if (update_readmask_bool && !PyBool_Check(update_readmask_bool)) {
+    PyErr_SetString(PyExc_TypeError, "fifth argument must be True/False");
+    return NULL;
+  }
+
+  // set C++ parameters accordingly
+  bool update_readmask = false;
+  khmer::ReadMaskTable * readmask = NULL;
+
+  if (readmask_obj && readmask_obj != Py_None) {
+    if (update_readmask_bool == Py_True) {
+      update_readmask = true;
+    }
+
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fourth argument must be None or a readmask object");
+      return NULL;
+    }
+    
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashbits->consume_fasta(filename, total_reads, n_consumed,
+			     lower_bound, upper_bound, &readmask,
+			     update_readmask, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  // error checking -- this should still be null!
+  if (!update_readmask && !readmask_obj) {
+    assert(readmask == NULL);
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
 static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2231,6 +2293,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "load_partitionmap", hashbits_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hashbits_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hashbits__validate_partitionmap, METH_VARARGS, "" },
+  { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
