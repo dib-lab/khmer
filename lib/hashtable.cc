@@ -658,7 +658,7 @@ HashIntoType * Hashtable::abundance_distribution() const
 
   for (i = 0; i < _tablesize; i++) {
     if (get_count(i)) {
-      dist[1]++;
+      dist[get_count(i)]++;
     } else {
       dist[0]++;
     }

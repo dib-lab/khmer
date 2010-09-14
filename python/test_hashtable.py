@@ -242,7 +242,7 @@ class Test_ConsumeString(object):
         n = self.kh.consume('AACT')
         
         dist = self.kh.abundance_distribution()
-        assert sum(dist[1:]) == 2
+        assert sum(dist[1:]) == 2, dist
         assert dist[1] == 2
 
         n = self.kh.consume('AAAA')
