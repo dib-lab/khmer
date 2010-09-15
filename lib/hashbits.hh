@@ -131,6 +131,11 @@ namespace khmer {
 			       CallbackFn callback=0,
 			       void * callback_data=0);
 
+    void connectivity_distribution(const std::string infilename,
+				   HashIntoType dist[9],
+				   CallbackFn callback=0,
+				   void * callback_data=0);
+
     void tags_to_map(TagCountMap& tag_map);
     void discard_tags(TagCountMap& tag_map, unsigned int threshold);
 

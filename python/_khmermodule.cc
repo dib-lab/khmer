@@ -1601,6 +1601,33 @@ static PyObject * hashbits_do_threaded_partition(PyObject * self, PyObject * arg
   return Py_None;
 }
 
+static PyObject * hashbits_connectivity_distribution(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType dist[9];
+  try {
+    hashbits->connectivity_distribution(filename, dist, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  PyObject * x = PyList_New(9);
+  for (unsigned int i = 0; i < 9; i++) {
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+  }
+
+  return x;
+}
+
 void free_subset_partition_info(void * p)
 {
   khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
@@ -2278,7 +2305,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "trim_graphs", hashbits_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hashbits_graphsize_distribution, METH_VARARGS, "" },
   { "do_truncated_partition", hashbits_do_truncated_partition, METH_VARARGS, "" },
-  { "do_threaded_partition", hashbits_do_threaded_partition, METH_VARARGS, "" },
+  { "do_threaded_partition", hashbits_do_threaded_partition, METH_VARARGS, "" }, 
+  { "connectivity_distribution", hashbits_connectivity_distribution, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hashbits_filter_file_connected, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },

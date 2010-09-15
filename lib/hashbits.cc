@@ -453,6 +453,93 @@ void Hashbits::do_threaded_partition(const std::string infilename,
   delete parser;
 }
 
+void Hashbits::connectivity_distribution(const std::string infilename,
+					 HashIntoType dist[9],
+					 CallbackFn callback,
+					 void * callback_data)
+{
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+  unsigned int total_reads = 0;
+  for (unsigned int i = 0; i < 9; i++) {
+    dist[i] = 0;
+  }
+
+  IParser* parser = IParser::get_parser(infilename);
+  Read read;
+  string seq;
+  bool is_valid;
+
+  HashIntoType kmer_f, kmer_r;
+
+  while(!parser->is_complete()) {
+    // increment read number
+    read = parser->get_next_read();
+    total_reads++;
+
+    seq = read.seq;
+
+    is_valid = check_read(seq);
+    if (is_valid) {
+      const char * kmer_s = seq.c_str();
+
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	unsigned int neighbors = 0;
+	_hash(kmer_s + i, _ksize, kmer_f, kmer_r);
+
+	HashIntoType f, r;
+
+	// NEXT.
+	f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+	r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+	  
+	f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+	r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+	f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+	r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+	f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+	r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+	// PREVIOUS.
+	r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+	f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+	r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+	f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+    
+	r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+	f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+	r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+	f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+	if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+	dist[neighbors]++;
+      }
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("connectivity_dist", callback_data, total_reads, 0);
+	} catch (...) {
+	  delete parser;
+	  throw;
+	}
+      }
+    }
+  }
+
+  delete parser;
+}
+
 //
 // consume_fasta: consume a FASTA file of reads
 //
