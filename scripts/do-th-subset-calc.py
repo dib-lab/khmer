@@ -2,7 +2,7 @@ import khmer, sys
 import threading
 
 K = 32
-HASHTABLE_SIZE=22906493
+HASHTABLE_SIZE=4**15 + 11
 N_THREADS=4                             # @CTB
 
 ht = khmer.new_hashbits(K, HASHTABLE_SIZE)
@@ -67,7 +67,7 @@ def main(filename):
     
     n_partitions = ht.output_partitions(filename, filename + '.part')
     print n_partitions, 'partitions kept'
-    print 'n surrendered:', ht.count_partitions()[2]
+    print ht.count_partitions()
 
 if __name__ == '__main__':
     main(sys.argv[1])
