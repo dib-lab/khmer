@@ -335,11 +335,6 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     breadth = breadth_q.front();
     breadth_q.pop();
 
-    assert(breadth >= cur_breadth);
-    if (breadth > cur_breadth) { cur_breadth = breadth; }
-
-    if (breadth >= MAX_BREADTH) { continue; }
-
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
     if (!_do_continue(kmer, keeper)) {
       continue;
@@ -358,6 +353,11 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
       continue;
     }
 
+    assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+    if (breadth > cur_breadth) { cur_breadth = breadth; }
+
+    if (breadth >= MAX_BREADTH) { continue; } // truncate search
+
     //
     // Enqueue next set of nodes.
     //
@@ -365,28 +365,32 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // NEXT.
     f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
     r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
     r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
     r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
     r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -394,28 +398,32 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // PREVIOUS.
     r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
     f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
     f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
     r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
     f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
     f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r))) {
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
