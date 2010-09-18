@@ -27,6 +27,6 @@ intertable.o: intertable.cc intertable.hh
 
 hashbits.o: hashbits.cc hashbits.hh subset.hh
 
-subset.o: subset.cc subset.hh
+subset.o: subset.cc subset.hh hashbits.hh
 
 
