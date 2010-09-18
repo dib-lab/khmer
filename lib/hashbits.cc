@@ -578,11 +578,12 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     this_n_consumed = check_and_process_read(seq, is_valid);
     n_consumed += this_n_consumed;
     if (is_valid) {
-      string first_kmer = seq.substr(0, _ksize);
-      HashIntoType kmer_f, kmer_r;
-      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
-
-      all_tags.insert(kmer_f);
+      const char * first_kmer = seq.c_str();
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1;
+	   i += TAG_DENSITY) {
+	HashIntoType kmer = _hash(first_kmer + i, _ksize);
+	all_tags.insert(kmer);
+      }
     }
 	       
     // reset the sequence info, increment read number
