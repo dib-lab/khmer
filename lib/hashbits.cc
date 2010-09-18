@@ -5,6 +5,8 @@
 using namespace std;
 using namespace khmer;
 
+#define TAG_DENSITY 40
+
 void Hashbits::save(std::string outfilename)
 {
   assert(_counts[0]);
@@ -348,17 +350,20 @@ void Hashbits::do_truncated_partition(const std::string infilename,
     check_and_process_read(seq, is_valid);
 
     if (is_valid) {
-      first_kmer = seq.substr(0, _ksize);
-      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1;
+	   i += TAG_DENSITY) {
+	first_kmer = seq.substr(i, _ksize);
+	_hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-      // find all tagged kmers within range.
-      tagged_kmers.clear();
-      surrender = false;
-      partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, true);
+	// find all tagged kmers within range.
+	tagged_kmers.clear();
+	surrender = false;
+	partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, true);
 
-      // assign the partition ID
-      partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
-      all_tags.insert(kmer_f);
+	// assign the partition ID
+	partition->assign_partition_id(kmer_f, tagged_kmers, surrender);
+	all_tags.insert(kmer_f);
+      }
 
       // run callback, if specified
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
