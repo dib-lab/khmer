@@ -3,7 +3,7 @@
 #include "parsers.hh"
 
 #define IO_BUF_SIZE 50*1000*1000
-#define MAX_BREADTH 180
+#define MAX_BREADTH 90
 
 using namespace khmer;
 using namespace std;
