@@ -3,6 +3,7 @@
 #include "parsers.hh"
 
 #define IO_BUF_SIZE 50*1000*1000
+#define MAX_BREADTH 180
 
 using namespace khmer;
 using namespace std;
@@ -311,6 +312,10 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   HashIntoType f, r;
   bool first = true;
   NodeQueue node_q;
+  std::queue<unsigned int> breadth_q;
+  unsigned int cur_breadth = 0;
+  unsigned int breadth = 0;
+
   const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
   unsigned int total = 0;
 
@@ -320,18 +325,20 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
   node_q.push(kmer_f);
   node_q.push(kmer_r);
+  breadth_q.push(0);
 
   while(!node_q.empty()) {
-    if (total > PARTITION_ALL_TAG_DEPTH && \
-	node_q.size() > PARTITION_ALL_TAG_DEPTH) {
-      surrender = true;
-      break;
-    }
-
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
     node_q.pop();
+    breadth = breadth_q.front();
+    breadth_q.pop();
+
+    assert(breadth >= cur_breadth);
+    if (breadth > cur_breadth) { cur_breadth = breadth; }
+
+    if (breadth >= MAX_BREADTH) { continue; }
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
     if (!_do_continue(kmer, keeper)) {
@@ -360,24 +367,28 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
     r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
     r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
     r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     // PREVIOUS.
@@ -385,28 +396,34 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
     f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
     
     r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
     f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
     f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
     if (_ht->get_count(uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
     }
 
     first = false;
   }
+
+  // cout << "XX " << total << " - " << cur_breadth << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////
