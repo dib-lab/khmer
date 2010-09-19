@@ -49,6 +49,7 @@ namespace khmer {
 
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
       Hashtable(ksize, 1), _tablesizes(tablesizes) {
+      _tablesize = 0;
       partition = new SubsetPartition(this);
 
       _allocate_counters();
@@ -143,7 +144,7 @@ namespace khmer {
     virtual const HashIntoType n_occupied(HashIntoType start=0,
 				  HashIntoType stop=0) const {
       HashIntoType n = 0;
-      if (stop == 0) { stop = _tablesize; }
+      if (stop == 0) { stop = _tablesizes[0]; }
       for (HashIntoType i = start; i < stop; i++) {
 	unsigned int byte = i / 8;
 	unsigned char bit = i % 8;
