@@ -2,7 +2,7 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=5000
+MAX_SIZE=5
 
 def read_partition_file(fp):
     for n, line in enumerate(fp):
@@ -21,38 +21,37 @@ def read_partition_file(fp):
             yield name, partition_id, surrendered, sequence
 
 
-threshold = int(sys.argv[3])
+(filename, prefix, distfilename) = sys.argv[1:]
 
-prefix = sys.argv[2]
-distfp = open(sys.argv[4], 'w')
+distfp = open(distfilename, 'w')
+surrendered_exist = False
+
 count = {}
-filename = sys.argv[1]
 
-for n, record in enumerate(fasta_iter(open(sys.argv[1]))):
+###
+
+for n, (name, pid, surr, seq) in enumerate(read_partition_file(open(filename))):
     if n % 10000 == 0:
         print '...', n
 
-    partition = int(record['name'].rsplit('\t', 1)[1].rstrip('*'))
-    count[partition] = count.get(partition, 0) + 1
+    count[pid] = count.get(pid, 0) + 1
+    if surr:
+        surrendered_exist = True
 
 # develop histogram of partition sizes
 dist = {}
-for n, record in enumerate(fasta_iter(open(sys.argv[1]))):
+for n, (name, pid, surr, seq) in enumerate(read_partition_file(open(filename))):
     if n % 10000 == 0:
         print '...x2', n
 
-    partition = int(record['name'].rsplit('\t', 1)[1].rstrip('*'))
-    if partition not in count:
+    if pid not in count:
         continue
     
-    c = count[partition]
-    if partition == 0:
+    c = count[pid]
+    if pid == 0:
         c = 0
 
     dist[c] = dist.get(c, 0) + 1
-
-#    if c >= threshold:
-#        outfp.write('>%s\n%s\n' % (record['name'], record['sequence']))
 
 # output histogram
 total = 0
@@ -102,13 +101,14 @@ for n in range(group_n):
     fp = open('%s.group%d.fa' % (prefix, n), 'w')
     group_fps[n] = fp
 
-surrendered_fp = open('%s.surrender.fa' % prefix, 'w')
+if surrendered_exist:
+    surrendered_fp = open('%s.surrender.fa' % prefix, 'w')
 
 ## write 'em all out!
 fp = open(filename)
 for n, x in enumerate(read_partition_file(fp)):
     if n % 100000 == 0:
-        print '...x2', n
+        print '...x3', n
 
     name, partition_id, surrendered, seq = x
     if partition_id == 0:
