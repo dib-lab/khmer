@@ -231,9 +231,11 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
       }
 
       if (partition_id > 0 || output_unassigned) {
-	outfile << ">" << read.name << "\t" << partition_id
-		<< surrender_flag << "\n" 
-		<< seq << "\n";
+	outfile << ">" << read.name << "\t" << partition_id;
+	if (partition_id == SURRENDER_PARTITION) {
+	  outfile << surrender_flag;
+	}
+	outfile << "\n" << seq << "\n";
       }
 	       
       total_reads++;
@@ -641,7 +643,14 @@ PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
     join = orig;
     orig = tmp;
   }
-    
+
+  if (reverse_pmap.find(orig) == reverse_pmap.end() ||
+      reverse_pmap.find(join) == reverse_pmap.end() ||
+      reverse_pmap[orig] == NULL ||
+      reverse_pmap[join] == NULL) {
+    return 0;
+  }
+
   PartitionID * orig_pp = *(reverse_pmap[orig]->begin());
   PartitionID * join_pp = *(reverse_pmap[join]->begin());
 
