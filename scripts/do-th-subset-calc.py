@@ -2,10 +2,10 @@ import khmer, sys
 import threading
 
 K = 32
-HASHTABLE_SIZE=4**15 + 11
+HASHTABLE_SIZE=int(32e9)
 N_THREADS=4                             # @CTB
 
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 4)
 
 ###
 
@@ -35,7 +35,7 @@ def main(filename):
 
     # calculate the hashtable occupancy
     print '---'
-    #print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
+    print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
     print '---'
 
     divvy = ht.divide_tags_into_subsets(subset_size)
