@@ -350,7 +350,6 @@ void Hashbits::do_truncated_partition(const std::string infilename,
     check_and_process_read(seq, is_valid);
 
     if (is_valid) {
-      cout << "-----\n";
       tagged_kmers.clear();
       for (unsigned int i = 0; i < seq.length() - _ksize + 1;
 	   i += TAG_DENSITY) {
@@ -358,8 +357,6 @@ void Hashbits::do_truncated_partition(const std::string infilename,
 	_hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 	HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 	tagged_kmers.insert(kmer);
-
-	cout << "TAGK: " << read.name << " - " << kmer << "\n";
       }
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1;
@@ -367,17 +364,13 @@ void Hashbits::do_truncated_partition(const std::string infilename,
 	first_kmer = seq.substr(i, _ksize);
 	_hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
 
-	cout << "SEARCH: " << read.name << " - " << uniqify_rc(kmer_f, kmer_r) << "\n";
-
 	// find all tagged kmers within range.
 	surrender = false;
 	partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, false);
-	cout << "found: " << tagged_kmers.size() << "\n";
 	for (SeenSet::iterator si = tagged_kmers.begin(); si != tagged_kmers.end(); si++) {
 	  PartitionID * pmap = partition->partition_map[*si];
 	  PartitionID pid = 0;
 	  if (pmap) pid = *pmap;
-	  cout << "   " << *si << " in " << pid << "\n";
 	}
 
 	// assign the partition ID
