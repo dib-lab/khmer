@@ -2,7 +2,8 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=5
+MAX_SIZE=500000
+THRESHOLD=1
 
 def read_partition_file(fp):
     for n, line in enumerate(fp):
@@ -66,6 +67,7 @@ if 0 in count:
    del count[0]
 
 divvy = sorted(count.items(), key=lambda y:y[1])
+divvy = filter(lambda y:y[1] > THRESHOLD, divvy)
 
 ## divvy up into different groups, based on having MAX_SIZE sequences
 ## in each group.
@@ -119,7 +121,10 @@ for n, x in enumerate(read_partition_file(fp)):
         outfp = surrendered_fp
     else:
         surrender_ch = ' '
-        group_n = group_d[partition_id]
+        try:
+            group_n = group_d[partition_id]
+        except KeyError:
+            continue
         outfp = group_fps[group_n]
 
     outfp.write('>%s\t%s%s\n%s\n' % (name, partition_id, surrender_ch, seq))
