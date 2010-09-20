@@ -5,12 +5,12 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=4**15
+HASHTABLE_SIZE=int(32e9)
 
-SUBSET_SIZE = 100000
+SUBSET_SIZE = 1000000
 N_THREADS = 4
 
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 4)
 
 ###
 
