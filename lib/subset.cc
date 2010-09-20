@@ -465,7 +465,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
   for (; si != end; si++) {
     total_reads++;
 
-    kmer_s = _revhash(*si, ksize);
+    kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
     _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
     // find all tagged kmers within range.
