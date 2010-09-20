@@ -2,7 +2,7 @@
 import sys, time
 import subprocess
 
-COMMAND="ABYSS -k45 %(filename)s -o %(filename)s.k41"
+COMMAND="ABYSS -k45 %(filename)s -o %(filename)s.k45"
 
 N_PROCESSES = 4
 
