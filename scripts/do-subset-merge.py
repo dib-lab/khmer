@@ -57,7 +57,7 @@ def main(dir1, dir2, n_threads):
     subset_filenames = glob.glob(os.path.join(dir1, '*.pmap'))
 
     # create empty hashtable structure
-    ht = khmer.new_hashtable(K, 1)
+    ht = khmer.new_hashbits(K, 1, 1)
 
     # put jobs on queue
     merge_queue = Queue.Queue()
