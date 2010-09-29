@@ -29,7 +29,7 @@ def pull_pair(q):
             ht, filename2 = q.get(False)
         except Queue.Empty:
             print 'pushing, then exiting'
-            q.put(ht, filename1)
+            q.put((ht, filename1))
             return
         
         merge_file = merge(filename1, filename2, ht)
@@ -57,7 +57,7 @@ def main(dir1, dir2, n_threads):
     subset_filenames = glob.glob(os.path.join(dir1, '*.pmap'))
 
     # create empty hashtable structure
-    ht = khmer.new_hashtable(K, 1)
+    ht = khmer.new_hashbits(K, 1, 1)
 
     # put jobs on queue
     merge_queue = Queue.Queue()
@@ -80,6 +80,7 @@ def main(dir1, dir2, n_threads):
 
     if merge_queue.qsize() == 1:
         ht, merge_file = merge_queue.get()
+        print 'copying', merge_file
         shutil.copy(merge_file, os.path.join(dir2,
                                              os.path.basename(merge_file)))
 
