@@ -11,6 +11,7 @@ namespace khmer {
   protected:
     std::vector<HashIntoType> _tablesizes;
     unsigned int n_tables;
+    unsigned int _tag_density;
 
     BoundedCounterType ** _counts;
     SeenSet all_tags;
@@ -48,6 +49,7 @@ namespace khmer {
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
       Hashtable(ksize, 1), _tablesizes(tablesizes) {
       _tablesize = 0;
+      _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
 
       _allocate_counters();

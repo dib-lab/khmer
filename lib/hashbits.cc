@@ -275,9 +275,11 @@ void Hashbits::save_tagset(std::string outfilename)
 {
   ofstream outfile(outfilename.c_str(), ios::binary);
   const unsigned int tagset_size = all_tags.size();
+
   HashIntoType * buf = new HashIntoType[tagset_size];
 
   outfile.write((const char *) &tagset_size, sizeof(tagset_size));
+  outfile.write((const char *) &_tag_density, sizeof(_tag_density));
 
   unsigned int i = 0;
   for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
@@ -298,6 +300,8 @@ void Hashbits::load_tagset(std::string infilename)
 
   unsigned int tagset_size = 0;
   infile.read((char *) &tagset_size, sizeof(tagset_size));
+  infile.read((char *) &_tag_density, sizeof(_tag_density));
+
   HashIntoType * buf = new HashIntoType[tagset_size];
 
   infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
@@ -432,7 +436,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     if (is_valid) {
       const char * first_kmer = seq.c_str();
       for (unsigned int i = 0; i < seq.length() - _ksize + 1;
-	   i += TAG_DENSITY) {
+	   i += _tag_density) {
 	HashIntoType kmer = _hash(first_kmer + i, _ksize);
 	all_tags.insert(kmer);
       }
@@ -549,14 +553,9 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
     this_n_consumed = check_and_process_read(seq, is_valid);
     n_consumed += this_n_consumed;
     if (is_valid) {
-      // First, compute the tag (first k-mer)
-      string first_kmer = seq.substr(0, _ksize);
-      HashIntoType kmer_f, kmer_r;
-      _hash(first_kmer.c_str(), _ksize, kmer_f, kmer_r);
+      // First, figure out what the partition is (if non-zero), and save that.
+      PartitionID p = 0;
 
-      all_tags.insert(kmer_f);
-
-      // Next, figure out the partition is (if non-zero), and save that.
       const char * s = read.name.c_str() + read.name.length() - 1;
       assert(*(s + 1) == (unsigned int) NULL);
 
@@ -565,9 +564,17 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
       }
 
       if (*s == '\t') {
-	PartitionID p = (PartitionID) atoi(s + 1);
+	p = (PartitionID) atoi(s + 1);
+      }
+
+      // Next, compute the tags & set the partition, if nonzero
+      const char * first_kmer = seq.c_str();
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1;
+	   i += _tag_density) {
+	HashIntoType kmer = _hash(first_kmer + i, _ksize);
+	all_tags.insert(kmer);
 	if (p > 0) {
-	  partition->set_partition_id(kmer_f, p);
+	  partition->set_partition_id(kmer, p);
 	}
       }
     }
