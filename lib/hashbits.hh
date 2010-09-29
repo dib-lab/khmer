@@ -123,13 +123,6 @@ namespace khmer {
 				   CallbackFn callback = 0,
 				   void * callback_data = 0);
 
-    void do_truncated_partition(const std::string infilename,
-				CallbackFn callback=0,
-				void * callback_data=0);
-    void do_threaded_partition(const std::string infilename,
-			       CallbackFn callback=0,
-			       void * callback_data=0);
-
     void connectivity_distribution(const std::string infilename,
 				   HashIntoType dist[9],
 				   CallbackFn callback=0,
