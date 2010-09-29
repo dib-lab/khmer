@@ -3,7 +3,7 @@
 #include "parsers.hh"
 
 #define IO_BUF_SIZE 50*1000*1000
-#define MAX_BREADTH 90
+#define MAX_BREADTH 20
 
 using namespace khmer;
 using namespace std;
@@ -256,8 +256,6 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
   delete parser; parser = NULL;
 
-  // cout << partitions.size() << " + " << n_singletons << "\n";
-
   return partitions.size() + n_singletons;
 }
 
@@ -432,8 +430,6 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     first = false;
   }
-
-  // cout << "XX " << total << " - " << cur_breadth << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1031,8 +1027,6 @@ void SubsetPartition::load_partitionmap(string infilename)
 
 void SubsetPartition::_validate_pmap()
 {
-  // cout << "validating partition_map\n";
-
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     //HashIntoType kmer = (*pi).first;
@@ -1044,7 +1038,6 @@ void SubsetPartition::_validate_pmap()
     }
   }
 
-  // cout << "validating reverse_pmap -- st 1\n";
   for (ReversePartitionMap::const_iterator ri = reverse_pmap.begin();
        ri != reverse_pmap.end(); ri++) {
     PartitionID p = (*ri).first;
