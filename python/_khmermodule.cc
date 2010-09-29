@@ -1550,57 +1550,6 @@ static PyObject * hashbits_graphsize_distribution(PyObject * self, PyObject * ar
   return x;
 }
 
-static PyObject * hashbits_do_truncated_partition(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * filename = NULL;
-  char * output = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output,
-			&callback_obj)) {
-    return NULL;
-  }
-
-  unsigned int n_partitions = 0;
-  try {
-    hashbits->do_truncated_partition(filename, _report_fn, callback_obj);
-    n_partitions = hashbits->partition->output_partitioned_file(filename,
-								 output,
-								 false,
-								 _report_fn,
-								 callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(n_partitions);
-}
-
-static PyObject * hashbits_do_threaded_partition(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * filename = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
-    return NULL;
-  }
-
-  try {
-    hashbits->do_threaded_partition(filename, _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 static PyObject * hashbits_connectivity_distribution(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2304,8 +2253,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "trim_graphs", hashbits_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hashbits_graphsize_distribution, METH_VARARGS, "" },
-  { "do_truncated_partition", hashbits_do_truncated_partition, METH_VARARGS, "" },
-  { "do_threaded_partition", hashbits_do_threaded_partition, METH_VARARGS, "" }, 
   { "connectivity_distribution", hashbits_connectivity_distribution, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hashbits_filter_file_connected, METH_VARARGS, "" },
