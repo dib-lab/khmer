@@ -3,7 +3,6 @@
 #include "parsers.hh"
 
 #define IO_BUF_SIZE 50*1000*1000
-#define MAX_BREADTH (2*TAG_DENSITY)
 
 using namespace khmer;
 using namespace std;
@@ -315,6 +314,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   std::queue<unsigned int> breadth_q;
   unsigned int cur_breadth = 0;
   unsigned int breadth = 0;
+  const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
 
   const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
   unsigned int total = 0;
@@ -356,7 +356,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     if (breadth > cur_breadth) { cur_breadth = breadth; }
 
-    if (breadth >= MAX_BREADTH) { continue; } // truncate search
+    if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
 
     //
     // Enqueue next set of nodes.
