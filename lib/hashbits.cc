@@ -5,8 +5,6 @@
 using namespace std;
 using namespace khmer;
 
-#define TAG_DENSITY 10
-
 void Hashbits::save(std::string outfilename)
 {
   assert(_counts[0]);

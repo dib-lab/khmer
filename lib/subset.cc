@@ -3,7 +3,7 @@
 #include "parsers.hh"
 
 #define IO_BUF_SIZE 50*1000*1000
-#define MAX_BREADTH 20
+#define MAX_BREADTH (2*TAG_DENSITY)
 
 using namespace khmer;
 using namespace std;

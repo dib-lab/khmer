@@ -5,8 +5,6 @@
 #include "hashtable.hh"
 #include "subset.hh"
 
-#define PARTITION_ALL_TAG_DEPTH 500
-
 namespace khmer {
   class Hashbits : public Hashtable {
     friend class SubsetPartition;
