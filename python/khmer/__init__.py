@@ -15,11 +15,9 @@ from filter_utils import filter_fasta_file_any, filter_fasta_file_all, filter_fa
 
 ###
 
-def new_hashbits(k, starting_size, n_tables=8):
+def new_hashbits(k, starting_size, n_tables=2):
     primes = get_n_primes_above_x(n_tables, starting_size)
     print primes
-#    primes = [ 22906493, 22906519, 22906561, 22906567,
-#               22906619, 22906649, 22906657, 22906661 ]
     
     return _new_hashbits(k, primes)
 
