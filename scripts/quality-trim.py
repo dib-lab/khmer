@@ -8,8 +8,6 @@ from screed import fastq
 # MINLENGTH is the minimum lenth of read desired.  NCALLS is the percentage of a read with 'N' base calls for which if read has greater, it will be removed. 
 
 MINLENGTH = 30
-NCALLS = 0.70
-
 
 filein = sys.argv[1]
 fileout = sys.argv[2]
@@ -22,10 +20,12 @@ for n, record in enumerate(fastq.fastq_iter(fp)):
     name = record['name']
     sequence = record['sequence']
     accuracy = record['accuracy']
-    
-    if float(sequence.count('N')) / len(sequence) > NCALLS:
-        continue
 
+    sequence = sequence.rstrip('N')
+    accuracy = accuracy[:len(sequence)]
+
+    if 'N' in sequence:
+       continue
     else:
         trim = accuracy.find('B')
 
