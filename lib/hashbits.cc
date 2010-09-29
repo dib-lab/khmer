@@ -5,7 +5,7 @@
 using namespace std;
 using namespace khmer;
 
-#define TAG_DENSITY 40
+#define TAG_DENSITY 10
 
 void Hashbits::save(std::string outfilename)
 {
@@ -20,12 +20,11 @@ void Hashbits::save(std::string outfilename)
 
   for (unsigned int i = 0; i < n_tables; i++) {
     save_tablesize = _tablesizes[i];
-    unsigned int tablebytes = save_tablesize / 8 + 1;
+    unsigned long long tablebytes = save_tablesize / 8 + 1;
 
     outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
 
-    outfile.write((const char *) _counts[i],
-		  sizeof(BoundedCounterType) * tablebytes);
+    outfile.write((const char *) _counts[i], tablebytes);
   }
   outfile.close();
 }
@@ -50,7 +49,7 @@ void Hashbits::load(std::string infilename)
   _counts = new BoundedCounterType*[n_tables];
   for (unsigned int i = 0; i < n_tables; i++) {
     HashIntoType tablesize;
-    unsigned int tablebytes;
+    unsigned long long tablebytes;
 
     infile.read((char *) &save_tablesize, sizeof(save_tablesize));
 
