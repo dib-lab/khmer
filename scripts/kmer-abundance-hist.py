@@ -1,17 +1,23 @@
 #! /usr/bin/env python
 import sys, khmer
 
-K = int(sys.argv[1])
-output = sys.argv[2]
-fa_files = sys.argv[3:]
+K = 32
 
-HT_SIZE = min(4**K, 4**17+1)
+###
+
+output = sys.argv[1]
+fa_files = sys.argv[2:]
+
+HT_SIZE = int(1e9)
+HT_SIZE = khmer.get_n_primes_above_x(1, HT_SIZE)[0]
+print HT_SIZE
 
 ht = khmer.new_hashtable(K, HT_SIZE)
 
 for filename in fa_files:
     ht.consume_fasta(filename)
 
+print 'preparing hist...'
 z = ht.abundance_distribution()
 fp = open(output, 'w')
 for n, i in enumerate(z[1:]):
