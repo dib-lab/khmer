@@ -328,6 +328,10 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
+    if (tagged_kmers.size() > CONNECTED_THRESHOLD) {
+      break;
+    }
+
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
@@ -460,6 +464,11 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     end = _ht->all_tags.end();
   }
 
+  HashIntoType counters[65535];
+  for (unsigned int i = 0; i < 65535; i++) {
+    counters[i] = 0;
+  }
+
   for (; si != end; si++) {
     total_reads++;
 
@@ -471,8 +480,14 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     surrender = false;
     find_all_tags(kmer_f, kmer_r, tagged_kmers, surrender, false);
 
+    HashIntoType cnt = tagged_kmers.size();
+    if (cnt >= 65535) { cnt = 65534; }
+    counters[cnt]++;
+
     // assign the partition ID
-    assign_partition_id(kmer_f, tagged_kmers, surrender);
+    if (CONNECTED_THRESHOLD == 0 || cnt <= CONNECTED_THRESHOLD) {
+      assign_partition_id(kmer_f, tagged_kmers, surrender);
+    }
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -487,6 +502,12 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 	}
 #endif // 0
       }
+  }
+
+  for (unsigned int i = 0; i < 65535; i++) {
+    if (counters[i]) {
+      cout << "N:" << i << " " << counters[i] << "\n";
+    }
   }
 }
 
