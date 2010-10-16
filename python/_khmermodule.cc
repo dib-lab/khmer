@@ -1721,6 +1721,33 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * arg
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hashbits_thread_fasta(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashbits->thread_fasta(filename, total_reads, n_consumed,
+			   _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
 static PyObject * hashbits_consume_partitioned_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2270,6 +2297,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_validate_partitionmap", hashbits__validate_partitionmap, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "thread_fasta", hashbits_thread_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
   { "count_partitions", hashbits_count_partitions, METH_VARARGS, "" },
