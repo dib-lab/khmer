@@ -121,7 +121,7 @@ class Test_RandomData(object):
 
         subset_size = total_reads / 2 + total_reads % 2;
         divvy = ht.divide_tags_into_subsets(subset_size)
-        assert len(divvy) == 2
+        assert len(divvy) == 2, len(divvy)
 
         x = ht.do_subset_partition(divvy[0], divvy[1])
         y = ht.do_subset_partition(divvy[1], 0)
