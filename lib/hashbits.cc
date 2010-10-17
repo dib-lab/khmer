@@ -447,6 +447,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
 	if (since >= _tag_density) {
 	  all_tags.insert(kmer);
+	  since = 0;
 	}
       }
     }
