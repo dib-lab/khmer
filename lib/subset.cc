@@ -328,7 +328,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
-    if (tagged_kmers.size() > CONNECTED_THRESHOLD) {
+    if (CONNECTED_THRESHOLD && tagged_kmers.size() > CONNECTED_THRESHOLD) {
       break;
     }
 
