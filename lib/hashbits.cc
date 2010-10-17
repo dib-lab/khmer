@@ -435,10 +435,11 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     n_consumed += this_n_consumed;
     if (is_valid) {
       const char * first_kmer = seq.c_str();
+      HashIntoType kmer;
 
       unsigned char since = _tag_density;
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	HashIntoType kmer = _hash(first_kmer + i, _ksize);
+	kmer = _hash(first_kmer + i, _ksize);
 	if (all_tags.find(kmer) != all_tags.end()) {
 	  since = 0;
 	} else {
@@ -450,6 +451,8 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  since = 0;
 	}
       }
+
+      all_tags.insert(kmer);	// insert the last k-mer, too.
     }
 	       
     // reset the sequence info, increment read number
@@ -492,6 +495,7 @@ void Hashbits::thread_fasta(const std::string &filename,
   //
 
   while(!parser->is_complete())  {
+    HashIntoType kmer;
     SeenSet tags_to_join;
 
     read = parser->get_next_read();
@@ -505,16 +509,16 @@ void Hashbits::thread_fasta(const std::string &filename,
       const char * first_kmer = seq.c_str();
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	HashIntoType kmer = _hash(first_kmer + i, _ksize);
+	kmer = _hash(first_kmer + i, _ksize);
 	if (all_tags.find(kmer) != all_tags.end()) {
 	  tags_to_join.insert(kmer);
 	}
       }
     }
 
-    HashIntoType kmer = *(tags_to_join.begin());
+    kmer = *(tags_to_join.begin());
     partition->assign_partition_id(kmer, tags_to_join, false);
-	       
+
     // reset the sequence info, increment read number
     total_reads++;
 
