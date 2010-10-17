@@ -506,7 +506,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
   for (unsigned int i = 0; i < 65535; i++) {
     if (counters[i]) {
-      cout << "N:" << i << " " << counters[i] << "\n";
+      // cout << "N:" << i << " " << counters[i] << "\n";
     }
   }
 }
