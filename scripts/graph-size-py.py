@@ -1,25 +1,38 @@
 import khmer
 import sys
 import screed
+import glob
+import os
+import subprocess
+import zlib
+import gzip
 
 K = 32
-HASHTABLE_SIZE=int(256e9)
+HASHTABLE_SIZE=4**17+1
 THRESHOLD=100
 
-print 'creating ht'
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 2)
+print 'creating ht with size ' + str(HASHTABLE_SIZE)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
 
-for filename in sys.argv[1:]:
-    print 'eating fa', filename
-    total_reads, n_consumed = ht.consume_fasta(filename)
+read_count = 0
 
-#ht.save(sys.argv[1] + '.graphsize.ht')
+fd = open(sys.argv[1], 'w')
 
-for filename in sys.argv[1:]:
+files = glob.glob(sys.argv[2])
+
+for filename in files:
     outfp = open(filename + '.graphsize', 'w')
-
+    
+    print 'processing file: ' + filename + ' reads processed: ' + str(read_count)
     n_kept = 0
-    for n, record in enumerate(screed.fastq.fastq_iter(open(filename))):
+    for n, record in enumerate(screed.fastq.fastq_iter(gzip.open(filename))):
+        read_count += 1
+        ht.consume(record['sequence'])
+
+        if read_count % 10000 == 0:
+            fd.write(str(read_count) + " " + str(ht.n_occupied()) + " " + str(ht.n_occupied() / float(HASHTABLE_SIZE)) +'\n')
+            fd.flush()
+
         kmer = record['sequence'][:K]
         size = ht.calc_connected_graph_size(kmer, THRESHOLD)
         if size >= THRESHOLD:
@@ -27,6 +40,4 @@ for filename in sys.argv[1:]:
             n_kept += 1
 
         if n % 10000 == 0:
-            print '...', n, n_kept, n - n_kept
-
-    
+            print '...', n, n_kept, n - n_kept + 1
