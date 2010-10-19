@@ -517,7 +517,7 @@ void Hashbits::thread_fasta(const std::string &filename,
     }
 
     kmer = *(tags_to_join.begin());
-    partition->assign_partition_id(kmer, tags_to_join, false);
+    partition->assign_partition_id(kmer, tags_to_join);
 
     // reset the sequence info, increment read number
     total_reads++;

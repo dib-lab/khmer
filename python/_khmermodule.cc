@@ -37,10 +37,8 @@ class _pre_partition_info {
 public:
   khmer::HashIntoType kmer;
   khmer::SeenSet tagged_kmers;
-  bool surrendered;
 
-  _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer),
-						   surrendered(false) {};
+  _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer) {};
 };
 
 // Python exception to raise
@@ -1805,9 +1803,8 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
 
   ppi = new _pre_partition_info(kmer_f);
   hashbits->partition->find_all_tags(kmer_f, kmer_r,
-				      ppi->tagged_kmers,
-				      ppi->surrendered,
-				      false);
+				     ppi->tagged_kmers,
+				     false);
   hashbits->add_kmer_to_tags(kmer_f);
 
   Py_END_ALLOW_THREADS
@@ -1834,8 +1831,7 @@ static PyObject * hashbits_assign_partition_id(PyObject * self, PyObject *args)
   
   khmer::PartitionID p;
   p = hashbits->partition->assign_partition_id(ppi->kmer,
-						ppi->tagged_kmers,
-						ppi->surrendered);
+					       ppi->tagged_kmers);
 
   return PyInt_FromLong(p);
 }
@@ -1927,11 +1923,10 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
     return NULL;
   }
   
-  unsigned int n_partitions = 0, n_unassigned = 0, n_surrendered = 0;
-  hashbits->partition->count_partitions(n_partitions, n_unassigned,
-					 n_surrendered);
+  unsigned int n_partitions = 0, n_unassigned = 0;
+  hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
-  return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
+  return Py_BuildValue("ii", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -1946,10 +1941,10 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
   khmer::SubsetPartition * subset_p;
   subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
 
-  unsigned int n_partitions = 0, n_unassigned = 0, n_surrendered = 0;
-  subset_p->count_partitions(n_partitions, n_unassigned, n_surrendered);
+  unsigned int n_partitions = 0, n_unassigned = 0;
+  subset_p->count_partitions(n_partitions, n_unassigned);
 
-  return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
+  return Py_BuildValue("ii", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_load(PyObject * self, PyObject * args)
