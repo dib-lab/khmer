@@ -2,10 +2,10 @@ import sys
 import khmer
 
 K=32
-HASHTABLE_SIZE=int(1e9)
+HASHTABLE_SIZE=int(116e9)
 N_HT = 2
 
-ht = khmer.new_hashbits(32, 8e9, 2)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 
 print 'loading mask from', sys.argv[1]
 ht.consume_fasta(sys.argv[1])
