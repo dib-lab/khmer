@@ -84,6 +84,11 @@ namespace khmer {
                                           const std::string &readsfile,
                                           unsigned int total_reads);
 
+    void filter_if_present(const std::string infilename,
+			   const std::string outputfilename,
+			   CallbackFn callback=0,
+			   void * callback_data=0);
+
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,

@@ -1865,6 +1865,29 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
+static PyObject * hashbits_filter_if_present(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+  char * output = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
+    return NULL;
+  }
+
+  try {
+    hashbits->filter_if_present(filename, output, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_save_partitionmap(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2281,6 +2304,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
+  { "filter_if_present", hashbits_filter_if_present, METH_VARARGS, "" },
   { "load", hashbits_load, METH_VARARGS, "" },
   { "save", hashbits_save, METH_VARARGS, "" },
   { "load_tagset", hashbits_load_tagset, METH_VARARGS, "" },
