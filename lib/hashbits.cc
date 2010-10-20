@@ -673,3 +673,64 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 
   delete parser;
 }
+
+void Hashbits::filter_if_present(const std::string infilename,
+				 const std::string outputfile,
+				 CallbackFn callback,
+				 void * callback_data)
+{
+  IParser* parser = IParser::get_parser(infilename);
+  ofstream outfile(outputfile.c_str());
+
+  unsigned int total_reads = 0;
+  unsigned int reads_kept = 0;
+
+  Read read;
+  string seq;
+
+  std::string first_kmer;
+  HashIntoType kmer;
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      const char * kmer_s = seq.c_str();
+      bool keep = true;
+      
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	kmer = _hash(kmer_s + i, _ksize);
+
+	if (get_count(kmer)) {
+	  keep = false;
+	  break;
+	}
+      }
+
+      if (keep) {
+	outfile << ">" << read.name;
+	outfile << "\n" << seq << "\n";
+	reads_kept++;
+      }
+	       
+      total_reads++;
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("filter_if_present", callback_data,total_reads, reads_kept);
+	} catch (...) {
+	  delete parser; parser = NULL;
+	  outfile.close();
+	  throw;
+	}
+      }
+    }
+  }
+
+  delete parser; parser = NULL;
+
+  return;
+}
+
