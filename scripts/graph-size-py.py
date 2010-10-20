@@ -22,7 +22,7 @@ for filename in sys.argv[2:]:
     print 'processing file: ' + filename + ' reads processed: ' + str(read_count)
 
     for n, record in enumerate(screed.fastq.fastq_iter(gzip.open(filename))):
-        print n
+
         read_count += 1
         ht.consume(record['sequence'])
     
