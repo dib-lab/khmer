@@ -2,6 +2,7 @@
 
 #define MAX_COUNT 255
 #define TAG_DENSITY 90
+#define CONNECTED_THRESHOLD 0
 
 namespace khmer {
   // largest number we can count up to, exactly. (8 bytes)

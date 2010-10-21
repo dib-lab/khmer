@@ -435,11 +435,24 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     n_consumed += this_n_consumed;
     if (is_valid) {
       const char * first_kmer = seq.c_str();
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1;
-	   i += _tag_density) {
-	HashIntoType kmer = _hash(first_kmer + i, _ksize);
-	all_tags.insert(kmer);
+      HashIntoType kmer;
+
+      unsigned char since = _tag_density;
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	kmer = _hash(first_kmer + i, _ksize);
+	if (all_tags.find(kmer) != all_tags.end()) {
+	  since = 0;
+	} else {
+	  since++;
+	}
+
+	if (since >= _tag_density) {
+	  all_tags.insert(kmer);
+	  since = 0;
+	}
       }
+
+      all_tags.insert(kmer);	// insert the last k-mer, too.
     }
 	       
     // reset the sequence info, increment read number
@@ -449,6 +462,70 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
       try {
         callback("consume_fasta_and_tag", callback_data, total_reads,
+		 n_consumed);
+      } catch (...) {
+	delete parser;
+        throw;
+      }
+    }
+  }
+  delete parser;
+}
+
+//
+// thread_fasta: thread tags using a FASTA file of reads
+//
+
+void Hashbits::thread_fasta(const std::string &filename,
+			    unsigned int &total_reads,
+			    unsigned long long &n_consumed,
+			    CallbackFn callback,
+			    void * callback_data)
+{
+  total_reads = 0;
+  n_consumed = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string seq = "";
+
+  //
+  // iterate through the FASTA file
+  //
+
+  while(!parser->is_complete())  {
+    HashIntoType kmer;
+    SeenSet tags_to_join;
+
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    bool is_valid;
+
+    is_valid = check_read(seq);
+
+    if (is_valid) {
+      const char * first_kmer = seq.c_str();
+
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	kmer = _hash(first_kmer + i, _ksize);
+	if (all_tags.find(kmer) != all_tags.end()) {
+	  tags_to_join.insert(kmer);
+	}
+      }
+    }
+
+    kmer = *(tags_to_join.begin());
+    partition->assign_partition_id(kmer, tags_to_join);
+
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("thread_fasta", callback_data, total_reads,
 		 n_consumed);
       } catch (...) {
 	delete parser;
@@ -596,3 +673,64 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 
   delete parser;
 }
+
+void Hashbits::filter_if_present(const std::string infilename,
+				 const std::string outputfile,
+				 CallbackFn callback,
+				 void * callback_data)
+{
+  IParser* parser = IParser::get_parser(infilename);
+  ofstream outfile(outputfile.c_str());
+
+  unsigned int total_reads = 0;
+  unsigned int reads_kept = 0;
+
+  Read read;
+  string seq;
+
+  std::string first_kmer;
+  HashIntoType kmer;
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      const char * kmer_s = seq.c_str();
+      bool keep = true;
+      
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	kmer = _hash(kmer_s + i, _ksize);
+
+	if (get_count(kmer)) {
+	  keep = false;
+	  break;
+	}
+      }
+
+      if (keep) {
+	outfile << ">" << read.name;
+	outfile << "\n" << seq << "\n";
+	reads_kept++;
+      }
+	       
+      total_reads++;
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("filter_if_present", callback_data,total_reads, reads_kept);
+	} catch (...) {
+	  delete parser; parser = NULL;
+	  outfile.close();
+	  throw;
+	}
+      }
+    }
+  }
+
+  delete parser; parser = NULL;
+
+  return;
+}
+

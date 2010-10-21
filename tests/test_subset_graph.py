@@ -15,7 +15,7 @@ class Test_RandomData(object):
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
 
-        (a, b, c) = ht.divide_tags_into_subsets(1)
+        (a, b, _, _, c) = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
@@ -38,7 +38,7 @@ class Test_RandomData(object):
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
 
-        (a, b, c) = ht.divide_tags_into_subsets(1)
+        (a, b, _, _, c) = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(a, b)
         ht.merge_subset(x)
@@ -83,11 +83,11 @@ class Test_RandomData(object):
 
         subset_size = total_reads / 2 + total_reads % 2;
         divvy = ht.divide_tags_into_subsets(subset_size)
-        assert len(divvy) == 2
+        assert len(divvy) == 4
 
-        x = ht.do_subset_partition(divvy[0], divvy[1])
+        x = ht.do_subset_partition(divvy[0], divvy[2])
         ht.merge_subset(x)
-        y = ht.do_subset_partition(divvy[0], 0)
+        y = ht.do_subset_partition(divvy[2], 0)
         ht.merge_subset(y)
 
         n_partitions = ht.output_partitions(filename, outfile)
@@ -102,10 +102,10 @@ class Test_RandomData(object):
 
         subset_size = total_reads / 2 + total_reads % 2;
         divvy = ht.divide_tags_into_subsets(subset_size)
-        assert len(divvy) == 2
+        assert len(divvy) == 4
 
-        x = ht.do_subset_partition(divvy[0], divvy[1])
-        y = ht.do_subset_partition(divvy[1], 0)
+        x = ht.do_subset_partition(divvy[0], divvy[2])
+        y = ht.do_subset_partition(divvy[2], 0)
         ht.merge_subset(x)
         ht.merge_subset(y)
 
@@ -121,10 +121,10 @@ class Test_RandomData(object):
 
         subset_size = total_reads / 2 + total_reads % 2;
         divvy = ht.divide_tags_into_subsets(subset_size)
-        assert len(divvy) == 2
+        assert len(divvy) == 4, len(divvy)
 
-        x = ht.do_subset_partition(divvy[0], divvy[1])
-        y = ht.do_subset_partition(divvy[1], 0)
+        x = ht.do_subset_partition(divvy[0], divvy[2])
+        y = ht.do_subset_partition(divvy[2], 0)
 
         ht._validate_subset_partitionmap(x)
         ht._validate_subset_partitionmap(y)
@@ -229,7 +229,8 @@ class Test_Surrendered(object):
         assert total_reads == 3, total_reads
 
         divvy = ht.divide_tags_into_subsets(1)
-        (a, b, c) = divvy
+        print divvy
+        (a, _, b, _, c) = divvy
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
