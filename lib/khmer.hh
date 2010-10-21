@@ -1,7 +1,7 @@
 #define VERSION "0.3"
 
 #define MAX_COUNT 255
-#define TAG_DENSITY 90
+#define TAG_DENSITY 40
 #define CONNECTED_THRESHOLD 0
 
 namespace khmer {
