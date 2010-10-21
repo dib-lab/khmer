@@ -17,3 +17,7 @@ tests/test-data/filter-test-C.fa
 *.out
 *.part
 *.ipart
+lib/zlib-1.2.3/example
+lib/zlib-1.2.3/libz.so.1
+lib/zlib-1.2.3/libz.so.1.2.3
+lib/zlib-1.2.3/minigzip
