@@ -9,7 +9,8 @@ try:
    import screed
    from screed.fasta import fasta_iter
 except ImportError:
-   pass
+   import nose
+   raise nose.SkipTest
 
 def test_filter_if_present():
     ht = khmer.new_hashbits(32, 1e6, 2)
