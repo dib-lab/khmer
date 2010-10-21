@@ -6,11 +6,13 @@ Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 all: zlib parsers.o ktable.o hashtable.o intertable.o hashbits.o subset.o
 
 clean:
-	rm -f *.o
+	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz.so.1.2.3
 
 #test: test.cc ktable.o hashtable.o
 
-zlib:
+zlib: $(Z_LIB_DIR)/libz.so.1.2.3
+
+$(Z_LIB_DIR)/libz.so.1.2.3:
 	cd $(Z_LIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
 
 parsetest: parsers.o 
@@ -25,7 +27,7 @@ graphtest: graphtest.o ktable.o hashtable.o
 consume_prof: consume_prof.o hashtable.o ktable.o
 	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
 
-parsers.o: parsers.cc parsers.hh zlib
+parsers.o: parsers.cc parsers.hh
 
 ktable.o: ktable.cc ktable.hh
 
