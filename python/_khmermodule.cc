@@ -1692,6 +1692,11 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+void sig(unsigned int total_reads, unsigned int n_consumed)
+{
+   std::cout << total_reads << " " << n_consumed << std::endl;
+}
+
 static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
