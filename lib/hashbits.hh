@@ -12,6 +12,7 @@ namespace khmer {
     std::vector<HashIntoType> _tablesizes;
     unsigned int n_tables;
     unsigned int _tag_density;
+    HashIntoType occupied_bins;
 
     BoundedCounterType ** _counts;
     SeenSet all_tags;
@@ -51,6 +52,7 @@ namespace khmer {
       _tablesize = 0;
       _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
+      occupied_bins = 0;
 
       _allocate_counters();
     }
@@ -136,18 +138,7 @@ namespace khmer {
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
 				  HashIntoType stop=0) const {
-      HashIntoType n = 0, byte;
-      unsigned char bit;
-
-      if (stop == 0) { stop = _tablesizes[0]; }
-      for (HashIntoType i = start; i < stop; i++) {
-	byte = i / 8;
-	bit = i % 8;
-	if (_counts[0][byte] & (1 << bit)) {
-	  n++;
-	}
-      }
-      return n;
+      return occupied_bins/n_tables;
     }
 
     virtual void count(const char * kmer) {
@@ -160,6 +151,10 @@ namespace khmer {
 	byte = bin / 8;
 	bit = bin % 8;
 
+        if (!( _counts[i][byte] & (1<<bit))) {
+           occupied_bins += 1;
+        }
+
 	_counts[i][byte] |= (1 << bit);
       }
     }
@@ -169,6 +164,10 @@ namespace khmer {
 	HashIntoType bin = khash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
+
+        if (!( _counts[i][byte] & (1<<bit))) {
+           occupied_bins += 1;
+        }
 
 	_counts[i][byte] |= (1 << bit);
       }
