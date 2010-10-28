@@ -616,11 +616,11 @@ PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
 
 PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
 {
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer;
   assert(kmer_s.length() >= _ht->ksize());
-  _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+  kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
-  return get_partition_id(kmer_f);
+  return get_partition_id(kmer);
 }
 
 PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)

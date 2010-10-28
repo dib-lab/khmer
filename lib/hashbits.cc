@@ -642,6 +642,8 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 
       if (*s == '\t') {
 	p = (PartitionID) atoi(s + 1);
+      } else {
+	assert(0);		// this should be a partitioned file!
       }
 
       // Next, compute the tags & set the partition, if nonzero
