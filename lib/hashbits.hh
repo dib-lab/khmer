@@ -53,8 +53,8 @@ namespace khmer {
       _tablesize = 0;
       _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
-          occupied_bins = 0;
-          n_unique_kmers = 0;
+      occupied_bins = 0;
+      n_unique_kmers = 0;
 
       _allocate_counters();
     }
@@ -168,8 +168,8 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
-        int flag = 1;
-        for (unsigned int i = 0; i < n_tables; i++) {
+      int flag = 1;
+      for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
 	unsigned int byte = bin / 8;
 	unsigned char bit = bin % 8;

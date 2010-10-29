@@ -1356,8 +1356,6 @@ static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
   return PyInt_FromLong(n);
 }
 
-
-
 static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
 {
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -1370,22 +1368,6 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     }
     
     khmer::HashIntoType n = hashbits->n_kmers(start, stop);
-    
-    return PyInt_FromLong(n);
-}
-
-static PyObject * hashbits_ (PyObject * self, PyObject * args)
-{
-    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    khmer::Hashbits * hashbits = me->hashbits;
-    
-    khmer::HashIntoType start = 0, stop = 0;
-    
-    if (!PyArg_ParseTuple(args, "|LL", &start, &stop)) {
-        return NULL;
-    }
-    
-    khmer::HashIntoType n = hashbits->n_occupied(start, stop);
     
     return PyInt_FromLong(n);
 }
