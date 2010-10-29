@@ -24,3 +24,4 @@ for n, record in enumerate(fasta_iter(open(filename))):
         
 print n_unique
 print ht.n_occupied()
+print ht.n_unique_kmers()
