@@ -46,7 +46,10 @@ print filename2,'has been consumed.'
 print '# of unique kmers:',n_unique
 print '# of occupied bin:',ht2.n_occupied()
 
-print n_overlap,'unique kmers also appears in ',filename2
+print n_overlap,'unique kmers appears in both ',filename1,' and ',filename2
+
+
+
 
 
 
