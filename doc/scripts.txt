@@ -1,0 +1,151 @@
+========================
+Ready-made khmer scripts
+========================
+
+While khmer is research software (and will probably remain research
+software for a while!) there are a bunch of scripts that can be used
+out of the box.  Below is a quick-n-dirty guide to these scripts.
+
+Basic k-mer filtering
+=====================
+
+filter-exact.py
+filter-inexact-any.py
+filter-inexact-once.py
+filter-inexact-run.py
+
+Quality trimming
+~~~~~~~~~~~~~~~~
+
+quality-trim.py
+
+Removing reads by k-mer match
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+filter-if-present.py
+
+Abundance filtering
+~~~~~~~~~~~~~~~~~~~
+
+To use a probabilistic counting hash table to filter out reads
+containing low-abundance k-mers, see 'scripts/filter-inexact-all.py'.
+By default, this script eliminates all reads containing any k-mer with
+an abundance of 1 (technically, < 2 ;).
+
+A few points: 
+
+ - this code uses only a few hundred megabytes beyond the hash table,
+   so make the hashtable size as close to your available physical memory
+   as you can.
+
+ - the one-sided counting error means that some reads with low-abundance
+   k-mers *might* be kept, but no reads will erroneously be removed.  You
+   can run it iteratively, with different hash table sizes each time, to
+   decrease the error rate.
+
+ - increase MIN_ABUNDANCE beyond 2 to eliminate higher abundance reads.
+   For example, setting MIN_ABUNDANCE to 5 will eliminate reads that
+   contain k-mers with 4 or fewer abundance across the data set.
+
+ - this is an all-by-all process; filter **all your data** together in one
+   go, or else you will erroneously eliminate reads.
+
+De Bruijn graph analysis and manipulation
+=========================================
+
+Graph size filtering
+~~~~~~~~~~~~~~~~~~~~
+
+graph-size-py.py - eliminate reads belonging to small de Bruijn graphs
+
+Partitioning
+~~~~~~~~~~~~
+
+do-th-subset-calc.py (-save, -load below, but in memory)
+
+Pipeline:
+
+do-th-subset-save.py - to do local graph traversal and produce partition maps
+
+do-subset-merge.py - to merge partition maps
+
+(optional, inexact) filter-subsets-by-partsize.py - to eliminate small partitions
+
+do-th-subset-load.py - to annotate sequences with their partition ID
+
+(optional) combine-pe.py - to combine partitions that are joined by paired ends
+
+extract-partitions.py - to extract reads into groups, grouped by partition
+
+(utility) multi-abyss.py / multi-velvet.py - to assemble
+
+(reporting) subset-report.py
+
+Hashtable/tagset utilities
+==========================
+
+load-ht-and-tags.py
+
+
+Miscellaneous utilities
+=======================
+
+assemstats.py
+
+assemstats2.py
+
+fastq-to-fasta.py
+
+strip-partition.py
+
+join_pe.py
+
+Miscellaneous read analysis
+===========================
+
+abundance-hist-by-position.py
+hi-lo-abundance-by-position.py
+
+To remove?
+==========
+
+agglom.py
+
+ctb-iterative-bench*
+
+do-intertable-part.py
+
+extract-surrender.py
+
+To classify
+===========
+
+extract-long-sequences.py
+extract-partitions.py
+extract-single-partition.py
+fasta-to-abundance-hist.py
+
+get-occupancy.py
+
+graph-partition-separate.py
+
+graph-size-py-th.py
+graph-size.py
+
+kmer-abundance-hist.py
+
+length-dist.py
+
+make-random.py
+
+occupy.py
+
+partition-size-dist.py
+
+readmask-do-filter.py
+
+test.sh
+
+test_scripts.py
+
+velvet-assemble.sh

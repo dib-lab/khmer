@@ -13,6 +13,7 @@ Contents:
 
    ktable
    methods
+   scripts
    blog-posts
    contributors
 
