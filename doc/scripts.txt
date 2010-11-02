@@ -10,27 +10,54 @@ Basic k-mer filtering
 =====================
 
 filter-exact.py
-filter-inexact-any.py
-filter-inexact-once.py
-filter-inexact-run.py
 
 Quality trimming
 ~~~~~~~~~~~~~~~~
 
-quality-trim.py
+quality-trim.py -- Filter Illumina data sets by removing reads
+containing too many Ns, and truncate reads at QV=2 bases.
+Preprocessing before any further steps.
+
+Usage::
+
+   %% quality-trim.py <fastq input filename> <fastq output filename>
+
+This script can be applied to multiple data sets in parallel or in series.
 
 Removing reads by k-mer match
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-filter-if-present.py
+filter-if-present.py -- Remove reads from a FASTA/FASTQ file that contain
+any of the k-mers present in another FASTA/FASTQ file.  Used to remove
+rRNA, repeats, Illumina primers, etc.
+
+Usage::
+
+   %% filter-if-present.py <mask FASTA/FASTQ filename> <FASTA/FASTQ to filter>
+
+Output is placed in a file named after the FASTA/FASTQ file filtered,
+with the suffix '.masked'.
+
+This script can be applied to multiple data sets in parallel or in series,
+as long as the same mask file is used.
 
 Abundance filtering
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 To use a probabilistic counting hash table to filter out reads
-containing low-abundance k-mers, see 'scripts/filter-inexact-all.py'.
-By default, this script eliminates all reads containing any k-mer with
+containing low-abundance k-mers, see the scripts 'filter-inexact-*.py'.
+
+An "All k-mers" filter
+~~~~~~~~~~~~~~~~~~~~~~
+
+filter-inexact-all.py -- removes reads containing any k-mer with
 an abundance of 1 (technically, < 2 ;).
+
+This is an all-by-all process; filter **all your data** together in
+one go, or else you will erroneously eliminate reads.  (Consider the
+situation where a k-mer is present in precisely two reads, one in
+`file1` and one in `file2`.  Both reads will be eliminated if `file1`
+and `file2` are filtered separately.
 
 A few points: 
 
@@ -47,8 +74,26 @@ A few points:
    For example, setting MIN_ABUNDANCE to 5 will eliminate reads that
    contain k-mers with 4 or fewer abundance across the data set.
 
- - this is an all-by-all process; filter **all your data** together in one
-   go, or else you will erroneously eliminate reads.
+ - if you run this script iteratively on a data set, it will continue
+   to eliminate reads.  Consider the situation where a k-mer A is
+   present in the same read as a k-mer B, but k-mer B is also in
+   another read.  If the first read (containing both k-mers A and B)
+   is eliminated because k-mer A is low-abundance, then in the
+   filtered data set, k-mer B will now be low-abundance and the second
+   read will be eliminated in the next pass.  In comparison,
+   'filter-inexact-any.py' (below) is invariant.
+   
+Other k-mer filters
+~~~~~~~~~~~~~~~~~~~
+
+We have not found these filters to be as useful as 'filter-inexact-all.py',
+but they should work:
+
+filter-inexact-any.py -- remove 
+
+filter-inexact-once.py
+
+filter-inexact-run.py
 
 De Bruijn graph analysis and manipulation
 =========================================
@@ -100,11 +145,24 @@ strip-partition.py
 
 join_pe.py
 
+extract-long-sequences.py
+
 Miscellaneous read analysis
 ===========================
 
 abundance-hist-by-position.py
+
 hi-lo-abundance-by-position.py
+
+Support code
+============
+
+test_scripts.py
+
+velvet-assemble.sh
+
+make-random.py
+
 
 To remove?
 ==========
@@ -120,9 +178,8 @@ extract-surrender.py
 To classify
 ===========
 
-extract-long-sequences.py
-extract-partitions.py
 extract-single-partition.py
+
 fasta-to-abundance-hist.py
 
 get-occupancy.py
@@ -136,8 +193,6 @@ kmer-abundance-hist.py
 
 length-dist.py
 
-make-random.py
-
 occupy.py
 
 partition-size-dist.py
@@ -146,6 +201,3 @@ readmask-do-filter.py
 
 test.sh
 
-test_scripts.py
-
-velvet-assemble.sh
