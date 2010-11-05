@@ -2,7 +2,7 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=500000
+MAX_SIZE=50000
 THRESHOLD=1
 
 def read_partition_file(fp):

@@ -10,9 +10,14 @@ python/test-trunc.out
 python/test-data/random-20-a.fa.out
 python/test-data/random-20-b.fa.out
 python/test-data/random-31-c.fa.out
+tests/test-data/filter-test-C.fa
 *.ht
 *.tags
 *.pmap
 *.out
 *.part
 *.ipart
+lib/zlib-1.2.3/example
+lib/zlib-1.2.3/libz.so.1
+lib/zlib-1.2.3/libz.so.1.2.3
+lib/zlib-1.2.3/minigzip
