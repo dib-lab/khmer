@@ -29,17 +29,13 @@ namespace khmer {
 
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
-      PartitionPtrSet * s = new PartitionPtrSet();
-      PartitionID * p = new PartitionID(SURRENDER_PARTITION);
-      s->insert(p);
-      reverse_pmap[SURRENDER_PARTITION] = s;
+      ;
     };
 
     ~SubsetPartition() { _clear_partitions(); }
 
     PartitionID assign_partition_id(HashIntoType kmer_f,
-				    SeenSet& tagged_kmers,
-				    bool surrender);
+				    SeenSet& tagged_kmers);
 
     void set_partition_id(HashIntoType kmer_f, PartitionID p);
     void set_partition_id(std::string kmer_s, PartitionID p);
@@ -60,8 +56,7 @@ namespace khmer {
     void _validate_pmap();
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
-		       SeenSet& tagged_kmers,
-		       bool& surrender, bool do_initial_check);
+		       SeenSet& tagged_kmers, bool do_initial_check);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
@@ -69,8 +64,7 @@ namespace khmer {
 		      void * callback_data=0);
 
     void count_partitions(unsigned int& n_partitions,
-			  unsigned int& n_unassigned,
-			  unsigned int& n_surrendered);
+			  unsigned int& n_unassigned);
 
     unsigned int output_partitioned_file(const std::string infilename,
 					 const std::string outputfilename,

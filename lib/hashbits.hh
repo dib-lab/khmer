@@ -136,11 +136,13 @@ namespace khmer {
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
 				  HashIntoType stop=0) const {
-      HashIntoType n = 0;
+      HashIntoType n = 0, byte;
+      unsigned char bit;
+
       if (stop == 0) { stop = _tablesizes[0]; }
       for (HashIntoType i = start; i < stop; i++) {
-	unsigned int byte = i / 8;
-	unsigned char bit = i % 8;
+	byte = i / 8;
+	bit = i % 8;
 	if (_counts[0][byte] & (1 << bit)) {
 	  n++;
 	}
@@ -150,11 +152,13 @@ namespace khmer {
 
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
+      HashIntoType byte;
+      unsigned char bit;
 
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
-	unsigned int byte = bin / 8;
-	unsigned char bit = bin % 8;
+	byte = bin / 8;
+	bit = bin % 8;
 
 	_counts[i][byte] |= (1 << bit);
       }
@@ -163,7 +167,7 @@ namespace khmer {
     virtual void count(HashIntoType khash) {
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
-	unsigned int byte = bin / 8;
+	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
 
 	_counts[i][byte] |= (1 << bit);
@@ -176,7 +180,7 @@ namespace khmer {
 
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
-	unsigned int byte = bin / 8;
+	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
       
 	if (!(_counts[i][byte] & (1 << bit))) {
@@ -190,7 +194,7 @@ namespace khmer {
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
-	unsigned int byte = bin / 8;
+	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
       
 	if (!(_counts[i][byte] & (1 << bit))) {
@@ -199,8 +203,18 @@ namespace khmer {
       }
       return 1;
     }
-  };
 
+    void filter_if_present(const std::string infilename,
+			   const std::string outputfilename,
+			   CallbackFn callback=0,
+			   void * callback_data=0);
+
+    void thread_fasta(const std::string &filename,
+		      unsigned int &total_reads,
+		      unsigned long long &n_consumed,
+		      CallbackFn callback = 0,
+		      void * callback_data = 0);
+  };
 };
 
 #endif // HASHBITS_HH
