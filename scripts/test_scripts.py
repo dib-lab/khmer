@@ -90,3 +90,18 @@ def test_quick_do_th_subset_load():
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
+
+def test_quick_graph_size_py():
+    script = os.path.join(scriptsdir, 'graph-size-py.py')
+    datafile = os.path.join(datadir, "*.gz")
+    
+    x = [sys.executable, script, 'occ.out', datafile]
+    print 'running', x
+
+    p = subprocess.Popen(x, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (out, err) = p.communicate()
+
+    print '---\n', out
+    print '---\n', err
+    assert p.returncode == 0
+
