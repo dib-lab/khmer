@@ -643,6 +643,8 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
       if (*s == '\t') {
 	p = (PartitionID) atoi(s + 1);
       } else {
+	cerr << "consume_partitioned_fasta barfed on read " << total_reads
+	     << "\nread name: " << read.name << "\n";
 	assert(0);		// this should be a partitioned file!
       }
 
