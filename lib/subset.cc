@@ -179,7 +179,8 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
     if (_ht->check_read(seq)) {
       const char * kmer_s = seq.c_str();
-      
+
+      bool found_tag = false;
       for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
 	_hash(kmer_s + i, ksize, kmer_f, kmer_r);
 	kmer = uniqify_rc(kmer_f, kmer_r);
@@ -187,14 +188,18 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 	// some partitioning schemes tag the first kmer_f; others label
 	// *some* kmer in the read.  Output properly for both.
 
-	if (partition_map.find(kmer_f) != partition_map.end()) {
+	if (_ht->all_tags.find(kmer_f) != _ht->all_tags.end()) {
 	  kmer = kmer_f;
+	  found_tag = true;
 	  break;
 	}
-	if (partition_map.find(kmer) != partition_map.end()) {
+	if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+	  found_tag = true;
 	  break;
 	}
       }
+
+      assert(found_tag);
 
       PartitionID * partition_p = partition_map[kmer];
       PartitionID partition_id;
