@@ -808,27 +808,34 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
   HashIntoType * kmer_p = NULL;
   PartitionID * pp;
 
+  // For each tag in the partition map, save the tag and the associated
+  // partition ID.
+
   PartitionMap::const_iterator pi = partition_map.begin();
   for (; pi != partition_map.end(); pi++) {
     PartitionID p_id;
 
     HashIntoType kmer = pi->first;
-    if (pi->second != NULL) {
+    if (pi->second != NULL) {	// if a partition ID has been assigned... save.
       p_id = *(pi->second);
 
+      // each record consists of one tag followed by one PartitionID.
       kmer_p = (HashIntoType *) (buf + n_bytes);
       *kmer_p = kmer;
       n_bytes += sizeof(HashIntoType);
+
       pp = (PartitionID *) (buf + n_bytes);
       *pp = p_id;
       n_bytes += sizeof(PartitionID);
 
+      // flush to disk
       if (n_bytes >= IO_BUF_SIZE - sizeof(HashIntoType) - sizeof(PartitionID)) {
 	outfile.write(buf, n_bytes);
 	n_bytes = 0;
       }
     }
   }
+  // save remainder.
   if (n_bytes) {
     outfile.write(buf, n_bytes);
   }
@@ -854,6 +861,11 @@ void SubsetPartition::load_partitionmap(string infilename)
   HashIntoType * kmer_p = NULL;
   PartitionID * pp = NULL;
 
+  //
+  // Run through the entire partitionmap file, figuring out what partition IDs
+  // are present.  Put the partition IDs into a set (PartitionSet).
+  //
+
   remainder = 0;
   while (!infile.eof()) {
     unsigned int i;
@@ -877,12 +889,16 @@ void SubsetPartition::load_partitionmap(string infilename)
     memcpy(buf, buf + n_bytes, remainder);
   }
 
+  // Now, go through and allocate space for all of the partition IDs,
+  // for the 2-level indirection structure that's used to keep track
+  // of tags -> partition IDs.
+
   PartitionID max_p_id = 1;
   PartitionPtrMap ppmap;
   for (PartitionSet::const_iterator si = partitions.begin();
       si != partitions.end(); si++) {
-    if (*si == 0) {
-      continue;
+    if (*si == 0) {		// ignore tags with unassigned partitions
+      continue;			// (should never happen; see save_, above.)
     }
 
     PartitionID * p = new PartitionID;
@@ -897,11 +913,16 @@ void SubsetPartition::load_partitionmap(string infilename)
       max_p_id = *p;
     }
   }
+  
+  // Be sure to set the next partition ID appropriately.
   next_partition_id = max_p_id + 1;
 
+  // Restart.
   infile.clear();
   infile.seekg(0, ios::beg);
 
+  // Go through the entire file again, but this time assign partition IDs
+  // to tags.
   remainder = 0;
   while (!infile.eof()) {
     unsigned int i;
@@ -990,6 +1011,7 @@ void SubsetPartition::maxify_partition_size(TagCountMap& tag_map)
 {
   PartitionCountMap partition_count;
 
+  // Run through and count the number of tags in each partition.
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     PartitionID * pp = pi->second;
@@ -998,6 +1020,9 @@ void SubsetPartition::maxify_partition_size(TagCountMap& tag_map)
     }
   }
 
+  // Now, for each tag, see if the partition it belongs to for this
+  // subset is bigger than for any other subset; if so, set the TagCountMap
+  // to the new partition size.
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     PartitionID * pp = pi->second;
@@ -1018,6 +1043,8 @@ void SubsetPartition::filter_against_tags(TagCountMap& tag_map)
 {
   PartitionMap new_pmap;
 
+  // Run through the TagCountMap and transfer only those tags in it
+  // into the new partition map.
   for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
        ti++) {
     if (partition_map.find(ti->first) != partition_map.end()) {
