@@ -580,6 +580,7 @@ void Hashbits::discard_tags(TagCountMap& tag_map, unsigned int threshold)
 {
   SeenSet delete_me;
 
+  // Go through and find all tags that belong to small partitions.
   for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
        ti++) {
     if (ti->second < threshold) {
@@ -587,6 +588,7 @@ void Hashbits::discard_tags(TagCountMap& tag_map, unsigned int threshold)
     }
   }
 
+  // Remove 'em from the tag_map.
   for (SeenSet::const_iterator si = delete_me.begin(); si != delete_me.end();
        si++) {
     tag_map.erase(*si);
@@ -642,6 +644,10 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 
       if (*s == '\t') {
 	p = (PartitionID) atoi(s + 1);
+      } else {
+	cerr << "consume_partitioned_fasta barfed on read " << total_reads
+	     << "\nread name: " << read.name << "\n";
+	assert(0);		// this should be a partitioned file!
       }
 
       // Next, compute the tags & set the partition, if nonzero
