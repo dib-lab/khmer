@@ -7,14 +7,14 @@ import os
 MIN_PARTITION_SIZE = 5          # 3 is the smallest reasonable threshold
 K = 32
 
-def main(tagset_filename, subset_filenames):
+def main(subset_filenames):
     print 'K', K
     print 'MIN SIZE', MIN_PARTITION_SIZE
     print '--'
 
     # create an empty hashtable & load in the tags
     ht = khmer.new_hashbits(32, 1, 1)
-    tagmap = ht.load_tagmap(tagset_filename)
+    tagmap = ht.new_tagmap()
 
     # find the maximum partition size for each tag, across all subsets
     for filename in subset_filenames:
@@ -46,6 +46,5 @@ def main(tagset_filename, subset_filenames):
         gc.collect()
 
 if __name__ == '__main__':
-    tagset_filename = sys.argv[1]
-    subset_filenames = sys.argv[2:]
-    main(tagset_filename, subset_filenames)
+    subset_filenames = sys.argv[1:]
+    main(subset_filenames)
