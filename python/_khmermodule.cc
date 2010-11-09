@@ -2160,22 +2160,16 @@ void free_tag_map(void * p)
   delete m;
 }
 
-static PyObject * hashbits_load_tagmap(PyObject * self, PyObject * args)
+static PyObject * hashbits_new_tagmap(PyObject * self, PyObject * args)
 {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
+  // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  // khmer::Hashbits * hashbits = me->hashbits;
 
-  char * filename = NULL;
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
+  if (!PyArg_ParseTuple(args, "")) {
     return NULL;
   }
 
-  assert(hashbits.n_tags() == 0);
-  hashbits->load_tagset(filename);
-  
   khmer::TagCountMap * tag_map = new khmer::TagCountMap();
-  hashbits->tags_to_map(*tag_map);
-  hashbits->clear_tags();
 
   return PyCObject_FromVoidPtr(tag_map, free_tag_map);
 }
@@ -2330,7 +2324,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },
   { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },
   { "_validate_subset_partitionmap", hashbits__validate_subset_partitionmap, METH_VARARGS, "" },
-  { "load_tagmap", hashbits_load_tagmap, METH_VARARGS, "" },
+  { "new_tagmap", hashbits_new_tagmap, METH_VARARGS, "" },
   { "subset_filter_against_tags", hashbits_subset_filter_against_tags, METH_VARARGS, "" },
   { "discard_tags", hashbits_discard_tags, METH_VARARGS, "" },
   { "subset_maxify_partition_size", hashbits_subset_maxify_partition_size, METH_VARARGS, "" },
