@@ -168,20 +168,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
     }
 
     for (unsigned int i = _ksize; i < length; i++) {
-      // left-shift the previous hash over
-      h = h << 2;
-
-      // 'or' in the current nt
-      h |= twobit_repr(sp[i]);
-
-      // mask off the 2 bits we shifted over.
-      h &= bitmask;
-
-      // now handle reverse complement
-      r = r >> 2;
-      r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
-
-      bin = uniqify_rc(h, r);
+      bin = _next_hash(sp[i], h, r);
 
       if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
 	count(bin);

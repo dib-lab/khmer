@@ -34,15 +34,38 @@ namespace khmer {
   protected:
     WordLength _ksize;
     HashIntoType bitmask;
+    unsigned int _nbits_sub_1;
 
     Hashtable(WordLength ksize) : _ksize(ksize) {
+      _init_bitstuff();
+    }
+
+    virtual ~Hashtable() {}
+
+    void _init_bitstuff() {
       bitmask = 0;
       for (unsigned int i = 0; i < _ksize; i++) {
 	bitmask = (bitmask << 2) | 3;
       }
+      _nbits_sub_1 = (_ksize*2 - 2);
     }
 
-    virtual ~Hashtable() {}
+    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const {
+      // left-shift the previous hash over
+      h = h << 2;
+
+      // 'or' in the current nt
+      h |= twobit_repr(ch);
+
+      // mask off the 2 bits we shifted over.
+      h &= bitmask;
+
+      // now handle reverse complement
+      r = r >> 2;
+      r |= (twobit_comp(ch) << _nbits_sub_1);
+
+      return uniqify_rc(h, r);
+    }
 
   public:
 
@@ -84,6 +107,8 @@ namespace khmer {
 		       CallbackFn callback = NULL,
 		       void * callback_data = NULL);
   };
+
+			  
 
 };
 

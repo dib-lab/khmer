@@ -43,6 +43,7 @@ void Hashbits::load(std::string infilename)
   ifstream infile(infilename.c_str(), ios::binary);
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   _ksize = (WordLength) save_ksize;
+  _init_bitstuff();
 
   _counts = new Byte*[_n_tables];
   for (unsigned int i = 0; i < _n_tables; i++) {
