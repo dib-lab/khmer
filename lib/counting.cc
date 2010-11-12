@@ -448,7 +448,8 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
   return max_count;
 }
 
-HashIntoType * CountingHash::abundance_distribution() const
+HashIntoType * CountingHash::abundance_distribution(unsigned int table_i)
+const
 {
   HashIntoType * dist = new HashIntoType[256];
   HashIntoType i;
@@ -457,7 +458,7 @@ HashIntoType * CountingHash::abundance_distribution() const
     dist[i] = 0;
   }
 
-  for (i = 0; i < _tablesize; i++) {
+  for (i = 0; i < _tablesizes[table_i]; i++) {
     if (get_count(i)) {
       dist[get_count(i)]++;
     } else {
@@ -582,7 +583,7 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 void CountingHash::save(std::string outfilename)
 {
   assert(_counts);
-
+#if 0				// @CTB
   unsigned int save_ksize = _ksize;
   unsigned long long save_tablesize = _tablesize;
 
@@ -594,10 +595,12 @@ void CountingHash::save(std::string outfilename)
   outfile.write((const char *) _counts,
 		sizeof(BoundedCounterType) * _tablesize);
   outfile.close();
+#endif // 0
 }
 
 void CountingHash::load(std::string infilename)
 {
+#if 0				// @CTB
   if (_counts) {
     delete _counts; _counts = NULL;
   }
@@ -620,4 +623,5 @@ void CountingHash::load(std::string infilename)
     loaded += infile.gcount();	// do I need to do this loop?
   }
   infile.close();
+#endif // 0
 }
