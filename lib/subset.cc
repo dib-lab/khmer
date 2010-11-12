@@ -199,7 +199,9 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 	}
       }
 
-      assert(found_tag);
+      // @CTB this should be a WARNING, or OPTIONAL, not a FAILURE,
+      // because it is triggered if you do tagsize filtering.
+      // assert(found_tag);
 
       PartitionID * partition_p = partition_map[kmer];
       PartitionID partition_id;
