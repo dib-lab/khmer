@@ -160,7 +160,6 @@ unsigned int Hashtable::consume_string(const std::string &s,
   }
   
   HashIntoType bin = _hash(sp, _ksize, h, r);
-  bin = uniqify_rc(h, r);	// @@CTB test this.
 
   try {
     if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
