@@ -7,7 +7,7 @@
 namespace khmer {
   class CountingHashIntersect;
 
-  class CountingHash : public Hashtable {
+  class CountingHash : public khmer::Hashtable {
     friend class CountingHashIntersect;
 
   protected:
@@ -22,7 +22,7 @@ namespace khmer {
 
   public:
     CountingHash(WordLength ksize, HashIntoType tablesize) :
-      Hashtable(ksize), _tablesize(tablesize) {
+      khmer::Hashtable(ksize), _tablesize(tablesize) {
 
       _allocate_counters();
     }

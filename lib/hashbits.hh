@@ -6,7 +6,7 @@
 #include "subset.hh"
 
 namespace khmer {
-  class Hashbits : public Hashtable {
+  class Hashbits : public khmer::Hashtable {
     friend class SubsetPartition;
   protected:
     std::vector<HashIntoType> _tablesizes;
@@ -47,7 +47,7 @@ namespace khmer {
     }
 
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      Hashtable(ksize), _tablesizes(tablesizes) {
+      khmer::Hashtable(ksize), _tablesizes(tablesizes) {
       _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
 
