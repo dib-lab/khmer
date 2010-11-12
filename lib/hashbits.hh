@@ -10,21 +10,21 @@ namespace khmer {
     friend class SubsetPartition;
   protected:
     std::vector<HashIntoType> _tablesizes;
-    unsigned int n_tables;
+    unsigned int _n_tables;
     unsigned int _tag_density;
 
     Byte ** _counts;
     SeenSet all_tags;
 
     virtual void _allocate_counters() {
-      n_tables = _tablesizes.size();
+      _n_tables = _tablesizes.size();
 
       HashIntoType tablebytes;
       HashIntoType tablesize;
 
-      _counts = new Byte*[n_tables];
+      _counts = new Byte*[_n_tables];
 
-      for (unsigned int i = 0; i < n_tables; i++) {
+      for (unsigned int i = 0; i < _n_tables; i++) {
 	tablesize = _tablesizes[i];
 	tablebytes = tablesize / 8 + 1;
 
@@ -56,12 +56,14 @@ namespace khmer {
 
     ~Hashbits() {
       if (_counts) {
-	for (unsigned int i = 0; i < n_tables; i++) {
+	for (unsigned int i = 0; i < _n_tables; i++) {
 	  delete _counts[i];
 	  _counts[i] = NULL;
 	}
 	delete _counts;
 	_counts = NULL;
+
+	_n_tables = 0;
       }
 
       _clear_partitions();
@@ -155,7 +157,7 @@ namespace khmer {
       HashIntoType byte;
       unsigned char bit;
 
-      for (unsigned int i = 0; i < n_tables; i++) {
+      for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
 	byte = bin / 8;
 	bit = bin % 8;
@@ -165,7 +167,7 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
-      for (unsigned int i = 0; i < n_tables; i++) {
+      for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
@@ -178,7 +180,7 @@ namespace khmer {
     virtual const BoundedCounterType get_count(const char * kmer) const {
       HashIntoType hash = _hash(kmer, _ksize);
 
-      for (unsigned int i = 0; i < n_tables; i++) {
+      for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
@@ -192,7 +194,7 @@ namespace khmer {
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-      for (unsigned int i = 0; i < n_tables; i++) {
+      for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;

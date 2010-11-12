@@ -16,7 +16,7 @@ void Hashbits::save(std::string outfilename)
 
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
 
-  for (unsigned int i = 0; i < n_tables; i++) {
+  for (unsigned int i = 0; i < _n_tables; i++) {
     save_tablesize = _tablesizes[i];
     unsigned long long tablebytes = save_tablesize / 8 + 1;
 
@@ -30,7 +30,7 @@ void Hashbits::save(std::string outfilename)
 void Hashbits::load(std::string infilename)
 {
   if (_counts) {
-    for (unsigned int i = 0; i < n_tables; i++) {
+    for (unsigned int i = 0; i < _n_tables; i++) {
       delete _counts[i]; _counts[i] = NULL;
     }
     delete _counts; _counts = NULL;
@@ -44,8 +44,8 @@ void Hashbits::load(std::string infilename)
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   _ksize = (WordLength) save_ksize;
 
-  _counts = new Byte*[n_tables];
-  for (unsigned int i = 0; i < n_tables; i++) {
+  _counts = new Byte*[_n_tables];
+  for (unsigned int i = 0; i < _n_tables; i++) {
     HashIntoType tablesize;
     unsigned long long tablebytes;
 
