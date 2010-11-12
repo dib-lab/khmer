@@ -13,7 +13,7 @@ namespace khmer {
     unsigned int n_tables;
     unsigned int _tag_density;
 
-    BoundedCounterType ** _counts;
+    Byte ** _counts;
     SeenSet all_tags;
 
     virtual void _allocate_counters() {
@@ -22,14 +22,14 @@ namespace khmer {
       HashIntoType tablebytes;
       HashIntoType tablesize;
 
-      _counts = new BoundedCounterType*[n_tables];
+      _counts = new Byte*[n_tables];
 
       for (unsigned int i = 0; i < n_tables; i++) {
 	tablesize = _tablesizes[i];
 	tablebytes = tablesize / 8 + 1;
 
-	_counts[i] = new BoundedCounterType[tablebytes];
-	memset(_counts[i], 0, tablebytes * sizeof(BoundedCounterType));
+	_counts[i] = new Byte[tablebytes];
+	memset(_counts[i], 0, tablebytes);
       }
     }
 
@@ -60,8 +60,9 @@ namespace khmer {
 	  delete _counts[i];
 	  _counts[i] = NULL;
 	}
+	delete _counts;
+	_counts = NULL;
       }
-      n_tables = 0;
 
       _clear_partitions();
     }

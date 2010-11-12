@@ -44,7 +44,7 @@ void Hashbits::load(std::string infilename)
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   _ksize = (WordLength) save_ksize;
 
-  _counts = new BoundedCounterType*[n_tables];
+  _counts = new Byte*[n_tables];
   for (unsigned int i = 0; i < n_tables; i++) {
     HashIntoType tablesize;
     unsigned long long tablebytes;
@@ -55,7 +55,7 @@ void Hashbits::load(std::string infilename)
     _tablesizes.push_back(tablesize);
 
     tablebytes = tablesize / 8 + 1;
-    _counts[i] = new BoundedCounterType[tablebytes];
+    _counts[i] = new Byte[tablebytes];
 
     unsigned long long loaded = 0;
     while (loaded != tablebytes) {
