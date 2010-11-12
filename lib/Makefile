@@ -36,7 +36,7 @@ hashtable.o: hashtable.cc hashtable.hh
 
 intertable.o: intertable.cc intertable.hh
 
-hashbits.o: hashbits.cc hashbits.hh subset.hh
+hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh
 
 subset.o: subset.cc subset.hh hashbits.hh
 

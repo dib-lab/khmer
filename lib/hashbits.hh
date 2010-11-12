@@ -47,8 +47,7 @@ namespace khmer {
     }
 
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      Hashtable(ksize, 1), _tablesizes(tablesizes) {
-      _tablesize = 0;
+      Hashtable(ksize), _tablesizes(tablesizes) {
       _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
 
