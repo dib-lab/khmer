@@ -29,22 +29,17 @@ unsigned int Hashtable::check_and_process_read(const std::string &read,
 
 bool Hashtable::check_read(const std::string &read)
 {
-   unsigned int i;
-   bool is_valid = true;
+  if (read.length() < _ksize) {
+    return false;
+  }
 
-   if (read.length() < _ksize) {
-     is_valid = false;
-     return 0;
-   }
+  for (unsigned int i = 0; i < read.length(); i++)  {
+    if (!is_valid_dna(read[i])) {
+      return false;
+    }
+  }
 
-   for (i = 0; i < read.length(); i++)  {
-     if (!is_valid_dna(read[i])) {
-         is_valid = false;
-	 return 0;
-      }
-   }
-
-   return is_valid;
+  return true;
 }
 
 //
