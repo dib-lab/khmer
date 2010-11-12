@@ -7,8 +7,8 @@
 #include "Python.h"
 #include "khmer.hh"
 #include "ktable.hh"
-#include "hashtable.hh"
 #include "hashbits.hh"
+#include "counting.hh"
 #include "storage.hh"
 #include "intertable.hh"
 
@@ -504,13 +504,13 @@ PyObject * consume_genome(PyObject * self, PyObject * args)
 /***********************************************************************/
 
 //
-// KHashtable object
+// KCountingHash object
 //
 
 typedef struct {
   PyObject_HEAD
-  khmer::Hashtable * hashtable;
-} khmer_KHashtableObject;
+  khmer::CountingHash * hashtable;
+} khmer_KCountingHashObject;
 
 typedef struct {
   PyObject_HEAD
@@ -593,8 +593,8 @@ static void khmer_hashbits_dealloc(PyObject *);
 
 static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   khmer::HashIntoType start = 0, stop = 0;
 
@@ -609,8 +609,8 @@ static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
 
 static PyObject * hash_n_entries(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   if (!PyArg_ParseTuple(args, "")) {
     return NULL;
@@ -621,8 +621,8 @@ static PyObject * hash_n_entries(PyObject * self, PyObject * args)
 
 static PyObject * hash_count(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * kmer;
 
@@ -643,8 +643,8 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
 
 static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * infile;
   char * outfile;
@@ -660,8 +660,8 @@ static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *arg
 
 static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * filename;
   unsigned int total_reads;
@@ -701,8 +701,8 @@ static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
 
 static PyObject * hash_filter_fasta_file_limit_n(PyObject * self, PyObject *args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   unsigned int threshold, n;
   char * filename;
@@ -750,8 +750,8 @@ static PyObject * hash_filter_fasta_file_limit_n(PyObject * self, PyObject *args
 
 static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   unsigned int threshold;
 
@@ -798,8 +798,8 @@ static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
 
 static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   unsigned int threshold;
 
@@ -846,8 +846,8 @@ static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
 
 static PyObject * hash_filter_fasta_file_run(PyObject * self, PyObject *args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * filename;
   unsigned int threshold;
@@ -892,8 +892,8 @@ static PyObject * hash_filter_fasta_file_run(PyObject * self, PyObject *args)
 
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * filename;
   PyObject * readmask_obj = NULL;
@@ -954,8 +954,8 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
 static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * filename;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
@@ -994,8 +994,8 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
 
 static PyObject * hash_consume(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * long_str;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
@@ -1018,8 +1018,8 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
 
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
@@ -1044,8 +1044,8 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 
 static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
@@ -1070,8 +1070,8 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
 
 static PyObject * hash_get(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   PyObject * arg;
 
@@ -1094,8 +1094,8 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
 
 static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   if (!PyArg_ParseTuple(args, "")) {
     return NULL;
@@ -1116,8 +1116,8 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 
 static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * inputfile;
   int max_read_len;
@@ -1158,8 +1158,8 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
 
 static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * inputfile;
   int limit_by = 0;
@@ -1224,8 +1224,8 @@ void _dump_report_fn(const char * info, unsigned int count, void * data)
 
 static PyObject * hash_load(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * filename = NULL;
 
@@ -1241,8 +1241,8 @@ static PyObject * hash_load(PyObject * self, PyObject * args)
 
 static PyObject * hash_save(PyObject * self, PyObject * args)
 {
-  khmer_KHashtableObject * me = (khmer_KHashtableObject *) self;
-  khmer::Hashtable * hashtable = me->hashtable;
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * hashtable = me->hashtable;
 
   char * filename = NULL;
 
@@ -1287,12 +1287,12 @@ khmer_hashtable_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_hashtable_methods, obj, name);
 }
 
-#define is_hashtable_obj(v)  ((v)->ob_type == &khmer_KHashtableType)
+#define is_hashtable_obj(v)  ((v)->ob_type == &khmer_KCountingHashType)
 
-static PyTypeObject khmer_KHashtableType = {
+static PyTypeObject khmer_KCountingHashType = {
     PyObject_HEAD_INIT(NULL)
     0,
-    "KHashtable", sizeof(khmer_KHashtableObject),
+    "KCountingHash", sizeof(khmer_KCountingHashObject),
     0,
     khmer_hashtable_dealloc,	/*tp_dealloc*/
     0,				/*tp_print*/
@@ -1326,10 +1326,10 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer_KHashtableObject * khashtable_obj = (khmer_KHashtableObject *) \
-    PyObject_New(khmer_KHashtableObject, &khmer_KHashtableType);
+  khmer_KCountingHashObject * khashtable_obj = (khmer_KCountingHashObject *) \
+    PyObject_New(khmer_KCountingHashObject, &khmer_KCountingHashType);
 
-  khashtable_obj->hashtable = new khmer::Hashtable(k, size);
+  khashtable_obj->hashtable = new khmer::CountingHash(k, size);
 
   return (PyObject *) khashtable_obj;
 }
@@ -1352,18 +1352,6 @@ static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
   khmer::HashIntoType n = hashbits->n_occupied(start, stop);
 
   return PyInt_FromLong(n);
-}
-
-static PyObject * hashbits_n_entries(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(hashbits->n_entries());
 }
 
 static PyObject * hashbits_n_tags(PyObject * self, PyObject * args)
@@ -2285,7 +2273,6 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
 
 static PyMethodDef khmer_hashbits_methods[] = {
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
-  { "n_entries", hashbits_n_entries, METH_VARARGS, "" },
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
@@ -2394,7 +2381,7 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
 
 static void khmer_hashtable_dealloc(PyObject* self)
 {
-  khmer_KHashtableObject * obj = (khmer_KHashtableObject *) self;
+  khmer_KCountingHashObject * obj = (khmer_KCountingHashObject *) self;
   delete obj->hashtable;
   obj->hashtable = NULL;
   
@@ -2976,7 +2963,7 @@ static PyMethodDef KhmerMethods[] = {
 DL_EXPORT(void) init_khmer(void)
 {
   khmer_KTableType.ob_type = &PyType_Type;
-  khmer_KHashtableType.ob_type = &PyType_Type;
+  khmer_KCountingHashType.ob_type = &PyType_Type;
 
   PyObject * m;
   m = Py_InitModule("_khmer", KhmerMethods);
