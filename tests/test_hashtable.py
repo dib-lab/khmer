@@ -109,6 +109,16 @@ def test_maxcount():
     assert c != 10000, "should not be able to count to 10000"
     assert c == MAX_COUNT       # this will depend on HashcountType...
 
+def test_consume_uniqify_first():
+    kh = khmer.new_hashtable(4, 4**4)
+    
+    s = "TTTT"
+    s_rc = "AAAA"
+
+    kh.consume(s)
+    n = kh.get(s_rc)
+    assert n == 1
+
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
     kh = khmer.new_hashtable(4, 4**4)
