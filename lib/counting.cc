@@ -1,3 +1,4 @@
+#include "hashtable.hh"
 #include "counting.hh"
 #include "parsers.hh"
 
