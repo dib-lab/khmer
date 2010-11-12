@@ -608,6 +608,26 @@ void Hashbits::discard_tags(TagCountMap& tag_map, unsigned int threshold)
   }
 }
 
+static PartitionID _parse_partition_id(string name)
+{
+  PartitionID p = 0;
+  const char * s = name.c_str() + name.length() - 1;
+  assert(*(s + 1) == (unsigned int) NULL);
+
+  while(*s != '\t' && s >= name.c_str()) {
+    s--;
+  }
+
+  if (*s == '\t') {
+    p = (PartitionID) atoi(s + 1);
+  } else {
+    cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
+    assert(0);
+  }
+
+  return p;
+}
+
 //
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
@@ -638,40 +658,18 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    // yep! process.
-    unsigned int this_n_consumed = 0;
-    bool is_valid;
-
-    this_n_consumed = check_and_process_read(seq, is_valid);
-    n_consumed += this_n_consumed;
-    if (is_valid) {
+    if (check_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
-      PartitionID p = 0;
+      PartitionID p = _parse_partition_id(read.name);
 
-      const char * s = read.name.c_str() + read.name.length() - 1;
-      assert(*(s + 1) == (unsigned int) NULL);
+      // Then consume the sequence
+      n_consumed += consume_string(seq);
 
-      while(*s != '\t' && s >= read.name.c_str()) {
-	s--;
-      }
-
-      if (*s == '\t') {
-	p = (PartitionID) atoi(s + 1);
-      } else {
-	cerr << "consume_partitioned_fasta barfed on read " << total_reads
-	     << "\nread name: " << read.name << "\n";
-	assert(0);		// this should be a partitioned file!
-      }
-
-      // Next, compute the tags & set the partition, if nonzero
-      const char * first_kmer = seq.c_str();
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1;
-	   i += _tag_density) {
-	HashIntoType kmer = _hash(first_kmer + i, _ksize);
-	all_tags.insert(kmer);
-	if (p > 0) {
-	  partition->set_partition_id(kmer, p);
-	}
+      // Next, compute the tag & set the partition, if nonzero
+      HashIntoType kmer = _hash(seq.c_str(), _ksize);
+      all_tags.insert(kmer);
+      if (p > 0) {
+	partition->set_partition_id(kmer, p);
       }
     }
 	       

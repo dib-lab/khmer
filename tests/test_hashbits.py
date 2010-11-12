@@ -49,3 +49,19 @@ def test_combine_pe():
 
    assert pid1 == pid2
    assert ht.count_partitions() == (1, 0)
+
+def test_load_partitioned():
+   inpfile = os.path.join(thisdir, 'test-data', 'combine_parts_1.fa')
+   ht = khmer.new_hashbits(32, 1, 1)
+
+   ht.consume_partitioned_fasta(inpfile)
+   assert ht.count_partitions() == (2, 0)
+
+   s1 = "CATGCAGAAGTTCCGCAACCATACCGTTCAGT"
+   assert ht.get(s1)
+   
+   s2 = "CAAATGTACATGCACTTAAAATCATCCAGCCG"
+   assert ht.get(s2)
+
+   s3 = "CATGCAGAAGTTCCGCAACCATACCGTTCAGTTCCTGGTGGCTA"[-32:]
+   assert ht.get(s3)
