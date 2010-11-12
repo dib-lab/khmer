@@ -17,6 +17,8 @@ namespace khmer {
     BoundedCounterType ** _counts;
 
     virtual void _allocate_counters() {
+      _n_tables = _tablesizes.size();
+
       _counts = new BoundedCounterType*[_n_tables];
       for (unsigned int i = 0; i < _n_tables; i++) {
 	_counts[i] = new BoundedCounterType[_tablesizes[i]];
@@ -32,10 +34,8 @@ namespace khmer {
       _allocate_counters();
     }
 
-    CountingHash(WordLength ksize,
-		 std::vector<HashIntoType>& tablesizes, 
-		 unsigned int n_tables) :
-      khmer::Hashtable(ksize), _tablesizes(tablesizes), _n_tables(n_tables) {
+    CountingHash(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
+      khmer::Hashtable(ksize), _tablesizes(tablesizes) {
 
       _allocate_counters();
     }
@@ -49,6 +49,8 @@ namespace khmer {
 
 	delete _counts;
 	_counts = NULL;
+
+	_n_tables = 0;
       }
     }
 

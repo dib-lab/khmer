@@ -1336,6 +1336,33 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
 }
 
 //
+// new_counting_hash
+//
+
+static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
+{
+  unsigned int k = 0;
+  PyObject* sizes_list_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+    return NULL;
+  }
+
+  std::vector<khmer::HashIntoType> sizes;
+  for (unsigned int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+    PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+    sizes.push_back(PyLong_AsLongLong(size_o));
+  }
+
+  khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
+    PyObject_New(khmer_KCountingHashObject, &khmer_KCountingHashType);
+
+  kcounting_obj->counting = new khmer::CountingHash(k, sizes);
+
+  return (PyObject *) kcounting_obj;
+}
+
+//
 // hashbits stuff
 //
 
@@ -2948,7 +2975,8 @@ static PyObject * do_intersection_partition(PyObject * self, PyObject * args)
 
 static PyMethodDef KhmerMethods[] = {
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
-  { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty counting hashtable" },
+  { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty single-table counting hash" },
+  { "_new_counting_hash", _new_counting_hash, METH_VARARGS, "Create an empty counting hash" },
   { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
   { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
   { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
