@@ -436,11 +436,11 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     n_consumed += this_n_consumed;
     if (is_valid) {
       const char * first_kmer = seq.c_str();
-      HashIntoType kmer;
+      HashIntoType kmer_f = 0, kmer_r = 0;
+      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
 
       unsigned char since = _tag_density;
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	kmer = _hash(first_kmer + i, _ksize);
+      for (unsigned int i = _ksize; i < seq.length(); i++) {
 	if (all_tags.find(kmer) != all_tags.end()) {
 	  since = 0;
 	} else {
@@ -451,6 +451,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  all_tags.insert(kmer);
 	  since = 0;
 	}
+	kmer = _next_hash(seq[i], kmer_f, kmer_r);
       }
 
       all_tags.insert(kmer);	// insert the last k-mer, too.
