@@ -3,7 +3,8 @@ CXXFLAGS=-g -fPIC -Wall -O2
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
-all: zlib parsers.o ktable.o hashtable.o intertable.o hashbits.o subset.o
+all: zlib parsers.o ktable.o hashtable.o intertable.o hashbits.o subset.o \
+	counting.o
 
 clean:
 	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz.so.1.2.3
@@ -39,4 +40,4 @@ hashbits.o: hashbits.cc hashbits.hh subset.hh
 
 subset.o: subset.cc subset.hh hashbits.hh
 
-
+counting.o: counting.cc counting.hh hashtable.hh
