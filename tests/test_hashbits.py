@@ -3,13 +3,17 @@
 # 2. n_unique_kmers : using bloom filter to count unique kmers ( use multiple hashtables)
 
 import khmer
-import sys
-import screed
-from screed.fasta import fasta_iter
+
+try:
+   import screed
+   from screed.fasta import fasta_iter
+except ImportError:
+   import nose
+   raise nose.SkipTest
+
 import os
 thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
-
 
 def test_n_occupied_1():
     filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
@@ -90,8 +94,8 @@ def test_n_occupied_2(): # simple one
 def test_bloom_c_2(): # simple one
     K=4
     HT_SIZE = 10 # use 11
-    N_HT1 = 1   # hashtable size = 11
-    N_HT2 = 2  # hashtable size = 11,13
+    N_HT1 = 1    # hashtable size = 11
+    N_HT2 = 2    # hashtable size = 11,13
     
     # use only 1 hashtable, no bloom filter
     ht1 = khmer.new_hashbits(K, HT_SIZE, N_HT1) 
@@ -114,8 +118,40 @@ def test_bloom_c_2(): # simple one
     ht2.count('AGAC')   # 00  11 00 10  3*16 +2 = 50 # collision with both 2nd and 3rd kmers
     assert ht2.n_unique_kmers() == 3
     
-test_n_occupied_1()
-test_n_occupied_2()
-test_bloom_python_1()
-test_bloom_c_1()
-test_bloom_c_2()
+def test_filter_if_present():
+   ht = khmer.new_hashbits(32, 1e6, 2)
+
+   maskfile = os.path.join(thisdir, 'test-data', 'filter-test-A.fa')
+   inputfile = os.path.join(thisdir, 'test-data', 'filter-test-B.fa')
+   outfile = os.path.join(thisdir, 'test-data', 'filter-test-C.fa')
+
+   ht.consume_fasta(maskfile)
+   ht.filter_if_present(inputfile, outfile)
+
+   records = list(fasta_iter(open(outfile)))
+   assert len(records) == 1
+   assert records[0]['name'] == '3'
+
+def test_combine_pe():
+   inpfile = os.path.join(thisdir, 'test-data', 'combine_parts_1.fa')
+   ht = khmer.new_hashbits(32, 1, 1)
+
+   ht.consume_partitioned_fasta(inpfile)
+   assert ht.count_partitions() == (2, 0)
+
+   s1 = "CATGCAGAAGTTCCGCAACCATACCGTTCAGT"
+   pid1 = ht.get_partition_id(s1)
+   
+   s2 = "CAAATGTACATGCACTTAAAATCATCCAGCCG"
+   pid2 = ht.get_partition_id(s2)
+
+   assert pid1 == 2
+   assert pid2 == 80293
+
+   ht.join_partitions(pid1, pid2)
+   
+   pid1 = ht.get_partition_id(s1)
+   pid2 = ht.get_partition_id(s2)
+
+   assert pid1 == pid2
+   assert ht.count_partitions() == (1, 0)

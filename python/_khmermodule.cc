@@ -37,10 +37,8 @@ class _pre_partition_info {
 public:
   khmer::HashIntoType kmer;
   khmer::SeenSet tagged_kmers;
-  bool surrendered;
 
-  _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer),
-						   surrendered(false) {};
+  _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer) {};
 };
 
 // Python exception to raise
@@ -1737,6 +1735,33 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * arg
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hashbits_thread_fasta(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashbits->thread_fasta(filename, total_reads, n_consumed,
+			   _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
 static PyObject * hashbits_consume_partitioned_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -1794,9 +1819,8 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
 
   ppi = new _pre_partition_info(kmer_f);
   hashbits->partition->find_all_tags(kmer_f, kmer_r,
-				      ppi->tagged_kmers,
-				      ppi->surrendered,
-				      false);
+				     ppi->tagged_kmers,
+				     false);
   hashbits->add_kmer_to_tags(kmer_f);
 
   Py_END_ALLOW_THREADS
@@ -1823,8 +1847,7 @@ static PyObject * hashbits_assign_partition_id(PyObject * self, PyObject *args)
   
   khmer::PartitionID p;
   p = hashbits->partition->assign_partition_id(ppi->kmer,
-						ppi->tagged_kmers,
-						ppi->surrendered);
+					       ppi->tagged_kmers);
 
   return PyInt_FromLong(p);
 }
@@ -1856,6 +1879,29 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
   }
 
   return PyInt_FromLong(n_partitions);
+}
+
+static PyObject * hashbits_filter_if_present(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+  char * output = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
+    return NULL;
+  }
+
+  try {
+    hashbits->filter_if_present(filename, output, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 static PyObject * hashbits_save_partitionmap(PyObject * self, PyObject * args)
@@ -1916,11 +1962,10 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
     return NULL;
   }
   
-  unsigned int n_partitions = 0, n_unassigned = 0, n_surrendered = 0;
-  hashbits->partition->count_partitions(n_partitions, n_unassigned,
-					 n_surrendered);
+  unsigned int n_partitions = 0, n_unassigned = 0;
+  hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
-  return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
+  return Py_BuildValue("ii", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -1935,10 +1980,10 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
   khmer::SubsetPartition * subset_p;
   subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
 
-  unsigned int n_partitions = 0, n_unassigned = 0, n_surrendered = 0;
-  subset_p->count_partitions(n_partitions, n_unassigned, n_surrendered);
+  unsigned int n_partitions = 0, n_unassigned = 0;
+  subset_p->count_partitions(n_partitions, n_unassigned);
 
-  return Py_BuildValue("iii", n_partitions, n_unassigned, n_surrendered);
+  return Py_BuildValue("ii", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_load(PyObject * self, PyObject * args)
@@ -2126,22 +2171,16 @@ void free_tag_map(void * p)
   delete m;
 }
 
-static PyObject * hashbits_load_tagmap(PyObject * self, PyObject * args)
+static PyObject * hashbits_new_tagmap(PyObject * self, PyObject * args)
 {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
+  // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  // khmer::Hashbits * hashbits = me->hashbits;
 
-  char * filename = NULL;
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
+  if (!PyArg_ParseTuple(args, "")) {
     return NULL;
   }
 
-  assert(hashbits.n_tags() == 0);
-  hashbits->load_tagset(filename);
-  
   khmer::TagCountMap * tag_map = new khmer::TagCountMap();
-  hashbits->tags_to_map(*tag_map);
-  hashbits->clear_tags();
 
   return PyCObject_FromVoidPtr(tag_map, free_tag_map);
 }
@@ -2276,6 +2315,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
+  { "filter_if_present", hashbits_filter_if_present, METH_VARARGS, "" },
   { "load", hashbits_load, METH_VARARGS, "" },
   { "save", hashbits_save, METH_VARARGS, "" },
   { "load_tagset", hashbits_load_tagset, METH_VARARGS, "" },
@@ -2287,6 +2327,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_validate_partitionmap", hashbits__validate_partitionmap, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "thread_fasta", hashbits_thread_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
   { "count_partitions", hashbits_count_partitions, METH_VARARGS, "" },
@@ -2295,7 +2336,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },
   { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },
   { "_validate_subset_partitionmap", hashbits__validate_subset_partitionmap, METH_VARARGS, "" },
-  { "load_tagmap", hashbits_load_tagmap, METH_VARARGS, "" },
+  { "new_tagmap", hashbits_new_tagmap, METH_VARARGS, "" },
   { "subset_filter_against_tags", hashbits_subset_filter_against_tags, METH_VARARGS, "" },
   { "discard_tags", hashbits_discard_tags, METH_VARARGS, "" },
   { "subset_maxify_partition_size", hashbits_subset_maxify_partition_size, METH_VARARGS, "" },
