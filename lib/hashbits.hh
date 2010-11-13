@@ -150,16 +150,19 @@ namespace khmer {
 
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
+      HashIntoType byte;
+      unsigned char bit;
+
       int flag = 1; // if the kmer appears in any hashtable
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
-	unsigned int byte = bin / 8;
-	unsigned char bit = bin % 8;
-    if (!( _counts[i][byte] & (1<<bit))) {
-        occupied_bins += 1;
-        flag = 0; // change the value
-    }
+	byte = bin / 8;
+	bit = bin % 8;
 
+	if (!( _counts[i][byte] & (1<<bit))) {
+	  occupied_bins += 1;
+	  flag = 0; // change the value
+	}
 	_counts[i][byte] |= (1 << bit);
       }
       if (flag == 0) {
@@ -171,7 +174,7 @@ namespace khmer {
       int flag = 1;
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
-	unsigned int byte = bin / 8;
+	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
     if (!( _counts[i][byte] & (1<<bit))) {
         occupied_bins += 1;
@@ -191,7 +194,7 @@ namespace khmer {
 
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
-	unsigned int byte = bin / 8;
+	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
       
 	if (!(_counts[i][byte] & (1 << bit))) {
@@ -205,7 +208,7 @@ namespace khmer {
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
-	unsigned int byte = bin / 8;
+	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
       
 	if (!(_counts[i][byte] & (1 << bit))) {
@@ -214,8 +217,18 @@ namespace khmer {
       }
       return 1;
     }
-  };
 
+    void filter_if_present(const std::string infilename,
+			   const std::string outputfilename,
+			   CallbackFn callback=0,
+			   void * callback_data=0);
+
+    void thread_fasta(const std::string &filename,
+		      unsigned int &total_reads,
+		      unsigned long long &n_consumed,
+		      CallbackFn callback = 0,
+		      void * callback_data = 0);
+  };
 };
 
 #endif // HASHBITS_HH
