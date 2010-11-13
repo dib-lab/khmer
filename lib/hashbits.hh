@@ -13,6 +13,7 @@ namespace khmer {
     unsigned int n_tables;
     unsigned int _tag_density;
     HashIntoType occupied_bins;
+    HashIntoType n_unique_kmers;
 
     BoundedCounterType ** _counts;
     SeenSet all_tags;
@@ -53,6 +54,7 @@ namespace khmer {
       _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
       occupied_bins = 0;
+      n_unique_kmers = 0;
 
       _allocate_counters();
     }
@@ -140,36 +142,48 @@ namespace khmer {
 				  HashIntoType stop=0) const {
       return occupied_bins/n_tables;
     }
+      
+    virtual const HashIntoType n_kmers(HashIntoType start=0,
+                  HashIntoType stop=0) const {
+      return n_unique_kmers;
+    }
 
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
       HashIntoType byte;
       unsigned char bit;
 
+      int flag = 1; // if the kmer appears in any hashtable
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
 	byte = bin / 8;
 	bit = bin % 8;
 
-        if (!( _counts[i][byte] & (1<<bit))) {
-           occupied_bins += 1;
-        }
-
+	if (!( _counts[i][byte] & (1<<bit))) {
+	  occupied_bins += 1;
+	  flag = 0; // change the value
+	}
 	_counts[i][byte] |= (1 << bit);
+      }
+      if (flag == 0) {
+          n_unique_kmers +=1;
       }
     }
 
     virtual void count(HashIntoType khash) {
+      int flag = 1;
       for (unsigned int i = 0; i < n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
-
-        if (!( _counts[i][byte] & (1<<bit))) {
-           occupied_bins += 1;
-        }
-
+	if (!( _counts[i][byte] & (1<<bit))) {
+	  occupied_bins += 1;
+	  flag = 0;
+	}
 	_counts[i][byte] |= (1 << bit);
+      }
+      if (flag == 0) {
+	n_unique_kmers +=1;
       }
     }
 
