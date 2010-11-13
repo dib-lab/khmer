@@ -28,8 +28,11 @@
                          (toupper(ch)) == 'C' ? 3LL : 2LL)
 
 // choose wisely between forward and rev comp.
+#if !NO_UNIQUE_RC
 #define uniqify_rc(f, r) ((f) < (r) ? (f) : (r))
-// #define uniqify_rc(f,r)(f)
+#else
+#define uniqify_rc(f,r)(f)
+#endif
 
 
 namespace khmer {
