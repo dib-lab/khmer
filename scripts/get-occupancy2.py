@@ -10,10 +10,10 @@ def callback(name, total_reads, n_consumed):
    print name, total_reads, n_consumed, ht.n_occupied()
 
 def main(filename):
-    basename = os.path.basename(filename)
+   basename = os.path.basename(filename)
 
-    # populate the hash table and tag set
-    ht.consume_fasta_and_tag(filename, callback)
+   # populate the hash table and tag set
+   ht.consume_fasta(filename, 0, 0, None, True, callback)
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+   main(sys.argv[1])
