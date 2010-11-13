@@ -16,14 +16,16 @@ ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
 read_count = 0
 
 for filename in sys.argv[1:]:
+    ht.consume_fasta(filename)
 
-    print 'processing file: ' + filename + ' reads processed: ' + str(read_count)
-    for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):
-        read_count += 1
-        ht.consume(record['sequence'])
-        
-        if n % 10000 == 0:
-            print '...', n
+    if 0:
+        print 'processing file: ' + filename + ' reads processed: ' + str(read_count)
+        for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):
+            read_count += 1
+            ht.consume(record['sequence'])
+
+            if n % 10000 == 0:
+                print '...', n
 
 for filename in sys.argv[1:]:
     outfp = open(filename[:-3] + '.graphsize', 'w')
