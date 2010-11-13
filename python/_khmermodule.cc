@@ -1366,6 +1366,22 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
 // hashbits stuff
 //
 
+static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
+{
+    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+    khmer::Hashbits * hashbits = me->hashbits;
+    
+    khmer::HashIntoType start = 0, stop = 0;
+    
+    if (!PyArg_ParseTuple(args, "|LL", &start, &stop)) {
+        return NULL;
+    }
+    
+    khmer::HashIntoType n = hashbits->n_kmers(start, stop);
+    
+    return PyInt_FromLong(n);
+}
+
 static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -1706,6 +1722,11 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   }
 
   return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
+void sig(unsigned int total_reads, unsigned int n_consumed)
+{
+   std::cout << total_reads << " " << n_consumed << std::endl;
 }
 
 static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * args)
@@ -2301,6 +2322,7 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
 
 static PyMethodDef khmer_hashbits_methods[] = {
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
+  { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
