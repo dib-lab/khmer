@@ -12,6 +12,8 @@ namespace khmer {
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
     unsigned int _tag_density;
+    HashIntoType _occupied_bins;
+    HashIntoType _n_unique_kmers;
 
     Byte ** _counts;
     SeenSet all_tags;
@@ -50,6 +52,8 @@ namespace khmer {
       khmer::Hashtable(ksize), _tablesizes(tablesizes) {
       _tag_density = TAG_DENSITY;
       partition = new SubsetPartition(this);
+      _occupied_bins = 0;
+      _n_unique_kmers = 0;
 
       _allocate_counters();
     }
@@ -138,18 +142,12 @@ namespace khmer {
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
 				  HashIntoType stop=0) const {
-      HashIntoType n = 0, byte;
-      unsigned char bit;
-
-      if (stop == 0) { stop = _tablesizes[0]; }
-      for (HashIntoType i = start; i < stop; i++) {
-	byte = i / 8;
-	bit = i % 8;
-	if (_counts[0][byte] & (1 << bit)) {
-	  n++;
-	}
-      }
-      return n;
+      return _occupied_bins/_n_tables;
+    }
+      
+    virtual const HashIntoType n_kmers(HashIntoType start=0,
+                  HashIntoType stop=0) const {
+      return _n_unique_kmers;
     }
 
     virtual void count(const char * kmer) {
@@ -157,22 +155,37 @@ namespace khmer {
       HashIntoType byte;
       unsigned char bit;
 
+      int flag = 1; // if the kmer appears in any hashtable
       for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
 	byte = bin / 8;
 	bit = bin % 8;
 
+	if (!( _counts[i][byte] & (1<<bit))) {
+	  _occupied_bins += 1;
+	  flag = 0; // change the value
+	}
 	_counts[i][byte] |= (1 << bit);
+      }
+      if (flag == 0) {
+	_n_unique_kmers +=1;
       }
     }
 
     virtual void count(HashIntoType khash) {
+      int flag = 1;
       for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
-
+	if (!( _counts[i][byte] & (1<<bit))) {
+	  _occupied_bins += 1;
+	  flag = 0;
+	}
 	_counts[i][byte] |= (1 << bit);
+      }
+      if (flag == 0) {
+	_n_unique_kmers +=1;
       }
     }
 
