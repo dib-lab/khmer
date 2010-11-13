@@ -155,7 +155,7 @@ namespace khmer {
       HashIntoType byte;
       unsigned char bit;
 
-      int flag = 1; // if the kmer appears in any hashtable
+      bool is_new_kmer = false;
       for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = hash % _tablesizes[i];
 	byte = bin / 8;
@@ -163,28 +163,29 @@ namespace khmer {
 
 	if (!( _counts[i][byte] & (1<<bit))) {
 	  _occupied_bins += 1;
-	  flag = 0; // change the value
+	  is_new_kmer = true;
 	}
 	_counts[i][byte] |= (1 << bit);
       }
-      if (flag == 0) {
+      if (is_new_kmer) {
 	_n_unique_kmers +=1;
       }
     }
 
     virtual void count(HashIntoType khash) {
-      int flag = 1;
+      bool is_new_kmer = false;
+
       for (unsigned int i = 0; i < _n_tables; i++) {
 	HashIntoType bin = khash % _tablesizes[i];
 	HashIntoType byte = bin / 8;
 	unsigned char bit = bin % 8;
 	if (!( _counts[i][byte] & (1<<bit))) {
 	  _occupied_bins += 1;
-	  flag = 0;
+	  is_new_kmer = true;
 	}
 	_counts[i][byte] |= (1 << bit);
       }
-      if (flag == 0) {
+      if (is_new_kmer) {
 	_n_unique_kmers +=1;
       }
     }
