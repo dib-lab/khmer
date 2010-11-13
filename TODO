@@ -1,3 +1,11 @@
+put in logging.
+
+fix tests and test cases to properly isolate/remove temp files.
+
+###
+
+Semi-obsolete comments, pre partitioning:
+
 also, can probably arrange parallelization split & hash table size so
 that modulus exactly fills split portion of table.
 
