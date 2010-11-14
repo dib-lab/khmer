@@ -16,7 +16,7 @@ void Hashbits::save(std::string outfilename)
 
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
 
-  for (unsigned int i = 0; i < n_tables; i++) {
+  for (unsigned int i = 0; i < _n_tables; i++) {
     save_tablesize = _tablesizes[i];
     unsigned long long tablebytes = save_tablesize / 8 + 1;
 
@@ -30,7 +30,7 @@ void Hashbits::save(std::string outfilename)
 void Hashbits::load(std::string infilename)
 {
   if (_counts) {
-    for (unsigned int i = 0; i < n_tables; i++) {
+    for (unsigned int i = 0; i < _n_tables; i++) {
       delete _counts[i]; _counts[i] = NULL;
     }
     delete _counts; _counts = NULL;
@@ -43,9 +43,10 @@ void Hashbits::load(std::string infilename)
   ifstream infile(infilename.c_str(), ios::binary);
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   _ksize = (WordLength) save_ksize;
+  _init_bitstuff();
 
-  _counts = new BoundedCounterType*[n_tables];
-  for (unsigned int i = 0; i < n_tables; i++) {
+  _counts = new Byte*[_n_tables];
+  for (unsigned int i = 0; i < _n_tables; i++) {
     HashIntoType tablesize;
     unsigned long long tablebytes;
 
@@ -55,7 +56,7 @@ void Hashbits::load(std::string infilename)
     _tablesizes.push_back(tablesize);
 
     tablebytes = tablesize / 8 + 1;
-    _counts[i] = new BoundedCounterType[tablebytes];
+    _counts[i] = new Byte[tablebytes];
 
     unsigned long long loaded = 0;
     while (loaded != tablebytes) {
@@ -427,20 +428,24 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    // yep! process.
-    unsigned int this_n_consumed = 0;
-    bool is_valid;
+    // n_consumed += this_n_consumed;
 
-    this_n_consumed = check_and_process_read(seq, is_valid);
-    n_consumed += this_n_consumed;
-    if (is_valid) {
+    if (check_read(seq)) {	// process?
+      bool is_new_kmer;
       const char * first_kmer = seq.c_str();
-      HashIntoType kmer;
+      HashIntoType kmer_f = 0, kmer_r = 0;
+      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
 
       unsigned char since = _tag_density;
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	kmer = _hash(first_kmer + i, _ksize);
-	if (all_tags.find(kmer) != all_tags.end()) {
+      for (unsigned int i = _ksize; i < seq.length(); i++) {
+
+	is_new_kmer = (bool) !get_count(kmer);
+	if (is_new_kmer) {
+	  count(kmer);
+	  n_consumed++;
+	}
+
+	if (!is_new_kmer && all_tags.find(kmer) != all_tags.end()) {
 	  since = 0;
 	} else {
 	  since++;
@@ -450,6 +455,14 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  all_tags.insert(kmer);
 	  since = 0;
 	}
+
+	kmer = _next_hash(seq[i], kmer_f, kmer_r);
+      }
+
+      is_new_kmer = (bool) !get_count(kmer);
+      if (is_new_kmer) {
+	count(kmer);
+	n_consumed++;
       }
 
       all_tags.insert(kmer);	// insert the last k-mer, too.
@@ -580,6 +593,7 @@ void Hashbits::discard_tags(TagCountMap& tag_map, unsigned int threshold)
 {
   SeenSet delete_me;
 
+  // Go through and find all tags that belong to small partitions.
   for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
        ti++) {
     if (ti->second < threshold) {
@@ -587,10 +601,31 @@ void Hashbits::discard_tags(TagCountMap& tag_map, unsigned int threshold)
     }
   }
 
+  // Remove 'em from the tag_map.
   for (SeenSet::const_iterator si = delete_me.begin(); si != delete_me.end();
        si++) {
     tag_map.erase(*si);
   }
+}
+
+static PartitionID _parse_partition_id(string name)
+{
+  PartitionID p = 0;
+  const char * s = name.c_str() + name.length() - 1;
+  assert(*(s + 1) == (unsigned int) NULL);
+
+  while(*s != '\t' && s >= name.c_str()) {
+    s--;
+  }
+
+  if (*s == '\t') {
+    p = (PartitionID) atoi(s + 1);
+  } else {
+    cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
+    assert(0);
+  }
+
+  return p;
 }
 
 //
@@ -623,38 +658,18 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    // yep! process.
-    unsigned int this_n_consumed = 0;
-    bool is_valid;
-
-    this_n_consumed = check_and_process_read(seq, is_valid);
-    n_consumed += this_n_consumed;
-    if (is_valid) {
+    if (check_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
-      PartitionID p = 0;
+      PartitionID p = _parse_partition_id(read.name);
 
-      const char * s = read.name.c_str() + read.name.length() - 1;
-      assert(*(s + 1) == (unsigned int) NULL);
+      // Then consume the sequence
+      n_consumed += consume_string(seq);
 
-      while(*s != '\t' && s >= read.name.c_str()) {
-	s--;
-      }
-
-      if (*s == '\t') {
-	p = (PartitionID) atoi(s + 1);
-      } else {
-	assert(0);		// this should be a partitioned file!
-      }
-
-      // Next, compute the tags & set the partition, if nonzero
-      const char * first_kmer = seq.c_str();
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1;
-	   i += _tag_density) {
-	HashIntoType kmer = _hash(first_kmer + i, _ksize);
-	all_tags.insert(kmer);
-	if (p > 0) {
-	  partition->set_partition_id(kmer, p);
-	}
+      // Next, compute the tag & set the partition, if nonzero
+      HashIntoType kmer = _hash(seq.c_str(), _ksize);
+      all_tags.insert(kmer);
+      if (p > 0) {
+	partition->set_partition_id(kmer, p);
       }
     }
 	       

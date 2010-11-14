@@ -109,6 +109,16 @@ def test_maxcount():
     assert c != 10000, "should not be able to count to 10000"
     assert c == MAX_COUNT       # this will depend on HashcountType...
 
+def test_consume_uniqify_first():
+    kh = khmer.new_hashtable(4, 4**4)
+    
+    s = "TTTT"
+    s_rc = "AAAA"
+
+    kh.consume(s)
+    n = kh.get(s_rc)
+    assert n == 1
+
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
     kh = khmer.new_hashtable(4, 4**4)
@@ -334,81 +344,3 @@ class Test_ConsumeString(object):
 
         count = self.kh.get_max_count('AAAAA', 1, 4**4)
         assert count == 0
-
-####
-
-DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
-
-class Test_HashtableIntersect(object):
-    def setup(self):
-        self.hi = khmer.HashtableIntersect(10, *khmer.PRIMES_1m)
-
-    def test_basic(self):
-        hi = self.hi
-        hi.consume(DNA)
-
-        x = hi.get_min_count(DNA)
-        assert x == 1, x
-
-        x = hi.get_max_count(DNA)
-        assert x == 1, x
-
-        hi.consume('ATTCTGACTG')
-
-        x = hi.get_min_count(DNA)
-        assert x == 1, x
-
-        x = hi.get_max_count(DNA)
-        assert x == 2, x
-
-    def test_collision_1(self):
-        return                          # @CTB
-        kt = khmer.new_ktable(10)
-        
-        GG = 'G' * 10                   # forward_hash: 1048575
-        assert kt.forward_hash(GG) == 1048575
-
-        collision_1 = 'AACGGTCGGA'      # forward_hash: 48572
-        assert kt.forward_hash(collision_1) == 48572
-
-        collision_2 = 'AACTTGTTAC'      # forward_hash: 38738
-        assert kt.forward_hash(collision_2) == 38738
-
-        # note, hash(GG) % 1000003 == hash(collision_1)
-        # note, hash(GG) % 1009837 == hash(collision_2)
-
-        hi = self.hi
-        hi.consume(GG)
-        hi.consume(collision_1)
-
-        assert hi._kh1.get(GG) == 2
-        assert hi._kh2.get(GG) == 1
-
-        assert hi.get_min_count(GG) == 1
-        assert hi.get_max_count(GG) == 1
-
-    def test_collision_2(self):
-        return                          # @CTB
-        kt = khmer.new_ktable(10)
-        
-        GG = 'G' * 10                   # forward_hash: 1048575
-        assert kt.forward_hash(GG) == 1048575
-
-        collision_1 = 'AACGGTCGGA'      # forward_hash: 48572
-        assert kt.forward_hash(collision_1) == 48572
-
-        collision_2 = 'AACTTGTTAC'      # forward_hash: 38738
-        assert kt.forward_hash(collision_2) == 38738
-
-        # note, hash(GG) % 1000003 == hash(collision_1)
-        # note, hash(GG) % 1009837 == hash(collision_2)
-
-        hi = self.hi
-        hi.consume(GG)
-        hi.consume(collision_2)
-
-        assert hi._kh1.get(GG) == 1
-        assert hi._kh2.get(GG) == 2
-
-        assert hi.get_min_count(GG) == 1
-        assert hi.get_max_count(GG) == 1
