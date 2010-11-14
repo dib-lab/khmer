@@ -4,7 +4,7 @@
 #include "intertable.hh"
 #include "parsers.hh"
 
-#define CALLBACK_PERIOD 10000
+#define CALLBACK_PERIOD 1000000
 
 using namespace std;
 using namespace khmer;

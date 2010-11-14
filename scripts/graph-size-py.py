@@ -1,3 +1,5 @@
+assert 0, "don't use this script -- use graph-size.py instead"
+
 import khmer
 import sys
 import screed

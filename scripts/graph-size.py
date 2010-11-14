@@ -1,34 +1,88 @@
 import khmer
 import sys
+import screed
+import threading, Queue
 
-K = 32
-HASHTABLE_SIZE=4**12+1
+K = 14
+HASHTABLE_SIZE=int(1e9)
+THRESHOLD=100
 
-infile = sys.argv[1]
-threshold = int(sys.argv[2])
-outfile = sys.argv[3]
+GROUPSIZE=100
+WORKER_THREADS=4
 
-print 'creating ht'
-ht = khmer.new_hashtable(K, HASHTABLE_SIZE)
-print 'eating fa', infile
-total_reads, n_consumed = ht.consume_fasta(infile)
+def process(inq, outq, ht):
+    global worker_count
+    
+    while not done or not inq.empty():
+        try:
+            recordlist = inq.get(True, 1)
+        except Queue.Empty:
+            continue
 
-#print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
-#fp = open('aaa.1', 'w')
-#total = 0
-#for n, i in enumerate(ht.graphsize_distribution(10000)):
-#    total += i
-#    print >>fp, n, i, total
-#fp.close()
+        x = []
+        for record in recordlist:
+            kmer = record['sequence'][:K]
+            size = ht.calc_connected_graph_size(kmer, THRESHOLD)
+            if size >= THRESHOLD:
+                x.append(record)
 
-print 'trimming to', threshold
-ht.trim_graphs(infile, threshold, outfile)
+        outq.put(x)
 
-#print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
+    worker_count -= 1
 
-#fp = open('aaa.2', 'w')
-#total = 0
-#for n, i in enumerate(ht.graphsize_distribution(5000)):
-#    total += i
-#    print >>fp, n, i, total
-#fp.close()
+def write(outq, outfp):
+    global worker_count
+    while worker_count > 0 or not outq.empty():
+        try:
+            recordlist = outq.get(True, 1)
+        except Queue.Empty:
+            continue
+
+        for record in recordlist:
+            outfp.write('>%s\n%s\n' % (record['name'], record['sequence']))
+
+def main():
+    global done, worker_count
+    done = False
+    worker_count = 0
+    
+    infile = sys.argv[1]
+    outfile = infile + '.graphsize'
+
+    print 'creating ht'
+    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
+    print 'eating fa', infile
+    total_reads, n_consumed = ht.consume_fasta(infile)
+    outfp = open(outfile, 'w')
+
+    inqueue = Queue.Queue(50)
+    outqueue = Queue.Queue(50)
+
+    ## worker and writer threads
+    for i in range(WORKER_THREADS):
+        t = threading.Thread(target=process, args=(inqueue, outqueue, ht))
+        worker_count += 1
+        t.start()
+
+    threading.Thread(target=write, args=(outqueue, outfp)).start()
+
+    ### main thread
+    x = []
+    i = 0
+    for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
+        if n % 10000 == 0:
+            print '...', n
+
+        x.append(record)
+        i += 1
+
+        if i > GROUPSIZE:
+            inqueue.put(x)
+            x = []
+            i = 0
+    inqueue.put(x)
+
+    done = True
+
+if __name__ == '__main__':
+    main()
