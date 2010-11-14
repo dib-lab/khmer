@@ -28,7 +28,7 @@ namespace khmer {
 
   public:
     CountingHash(WordLength ksize, HashIntoType single_tablesize) :
-      khmer::Hashtable(ksize), _n_tables(1) {
+      khmer::Hashtable(ksize) {
       _tablesizes.push_back(single_tablesize);
       
       _allocate_counters();
