@@ -1662,6 +1662,22 @@ static PyObject * hashbits_merge_subset(PyObject * self, PyObject *args)
   return Py_None;
 }
 
+static PyObject * hashbits_merge_from_disk(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashbits->partition->merge_from_disk(filename);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2146,6 +2162,31 @@ static PyObject * hashbits_merge2_subset(PyObject * self, PyObject * args)
     return Py_None;
 }
 
+static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
+{
+  // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  // khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * subset1_obj;
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "Os", &subset1_obj, &filename)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset1_p;
+  subset1_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
+
+  Py_BEGIN_ALLOW_THREADS
+
+    subset1_p->merge_from_disk(filename);
+
+  Py_END_ALLOW_THREADS
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject * hashbits__validate_subset_partitionmap(PyObject * self, PyObject * args)
 {
   PyObject * subset_obj = NULL;
@@ -2350,11 +2391,13 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "thread_fasta", hashbits_thread_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
+  { "merge_subset_from_disk", hashbits_merge_from_disk, METH_VARARGS, "" },
   { "count_partitions", hashbits_count_partitions, METH_VARARGS, "" },
   { "subset_count_partitions", hashbits_subset_count_partitions, METH_VARARGS, "" },
   { "save_subset_partitionmap", hashbits_save_subset_partitionmap, METH_VARARGS },
   { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },
   { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },
+  { "merge2_subset_from_disk", hashbits_merge2_from_disk, METH_VARARGS },
   { "_validate_subset_partitionmap", hashbits__validate_subset_partitionmap, METH_VARARGS, "" },
   { "new_tagmap", hashbits_new_tagmap, METH_VARARGS, "" },
   { "subset_filter_against_tags", hashbits_subset_filter_against_tags, METH_VARARGS, "" },

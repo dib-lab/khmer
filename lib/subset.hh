@@ -50,6 +50,7 @@ namespace khmer {
     }
 
     void merge(SubsetPartition *);
+    void merge_from_disk(std::string);
 
     void save_partitionmap(std::string outfile);
     void load_partitionmap(std::string infile);
