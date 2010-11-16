@@ -798,6 +798,52 @@ void SubsetPartition::merge(SubsetPartition * other)
   del_partitions_to_tags(master_pttm);
 }
 
+void SubsetPartition::merge_from_disk(string other_filename)
+{
+  ifstream infile(other_filename.c_str(), ios::binary);
+  char * buf = NULL;
+  buf = new char[IO_BUF_SIZE];
+
+  unsigned int n_bytes = 0;
+  unsigned int loaded = 0;
+  unsigned int remainder;
+
+  assert(infile.is_open());
+
+  PartitionSet partitions;
+
+  HashIntoType * kmer_p = NULL;
+  PartitionID * pp = NULL;
+
+  //
+  // Run through the entire partitionmap file, figuring out what partition IDs
+  // are present.  Put the partition IDs into a set (PartitionSet).
+  //
+
+  remainder = 0;
+  while (!infile.eof()) {
+    unsigned int i;
+
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+    n_bytes -= remainder;
+
+    for (i = 0; i < n_bytes;) {
+      // ignore kmer for this loop.
+      i += sizeof(HashIntoType);
+      pp = (PartitionID *) (buf + i);
+      i += sizeof(PartitionID);
+
+      // @@ partitions.insert(*pp);
+
+      loaded++;
+    }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
+  }
+}
+
 // load partition maps from & save to disk 
 
 void SubsetPartition::save_partitionmap(string pmap_filename)
