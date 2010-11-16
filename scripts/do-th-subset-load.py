@@ -8,18 +8,11 @@ filename=sys.argv[1]
 subset_filenames=sys.argv[2:]
 
 def load(filename, ht):
-    pmap_filename = filename
     print 'loading', filename
-    subset = ht.load_subset_partitionmap(pmap_filename)
-    print ht.subset_count_partitions(subset)
-    print 'merging', filename
-    ht.merge_subset(subset)
+    subset = ht.merge_subset_from_disk(filename)
 
 # create a fake-ish ht; K matters, but not hashtable size.
 ht = khmer.new_hashbits(32, 1, 1)
-
-# detect all of the relevant partitionmap files
-#subset_filenames = glob.glob(filename + '.subset.*.pmap')
 
 # load & merge
 for subset_file in subset_filenames:
