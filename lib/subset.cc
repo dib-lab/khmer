@@ -800,6 +800,11 @@ void SubsetPartition::merge(SubsetPartition * other)
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
+  SubsetPartition other(_ht);
+  other.load_partitionmap(other_filename);
+  merge(&other);
+
+#if 0
   ifstream infile(other_filename.c_str(), ios::binary);
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
@@ -842,6 +847,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
   }
+#endif
 }
 
 // load partition maps from & save to disk 

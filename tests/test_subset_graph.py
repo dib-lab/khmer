@@ -187,40 +187,7 @@ class Test_RandomData(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions
 
-class Test_Surrendered(object):
-    def test_surrendered_subset(self):
-        return                          # @@CTB
-        ht = khmer.new_hashbits(32, 4**15+1)
-
-        filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
-        subset = ht.do_subset_partition(0, total_reads)
-        ht.merge_subset(subset)
-
-        n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
-
-        assert n_partitions == 1, n_partitions
-        assert n_unassigned == 0, n_unassigned
-        assert n_surrendered == 16, n_surrendered
-
-    
-    def test_surrendered_subset_2(self):
-        return                          # @@CTB
-        ht = khmer.new_hashbits(32, 4**15+1)
-
-        filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
-        subset1 = ht.do_subset_partition(0, total_reads / 2)
-        subset2 = ht.do_subset_partition(total_reads / 2, total_reads)
-        ht.merge_subset(subset1)
-        ht.merge_subset(subset2)
-
-        n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
-
-        assert n_partitions == 1, n_partitions
-        assert n_unassigned == 0, n_unassigned
-        assert n_surrendered == 16, n_surrendered
-
+class Test_SaveLoadPmap(object):
     def test_save_load_merge(self):
         ht = khmer.new_hashbits(20, 4**14+1)
         filename = os.path.join(thisdir, 'test-graph2.fa')
@@ -278,33 +245,53 @@ class Test_Surrendered(object):
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 1, n_partitions        # combined.
 
-    def test_surrendered_save_load(self):
-        return                          # @@CTB
-        ht = khmer.new_hashbits(32, 4**15+1)
+    def test_save_merge_from_disk(self):
+        ht = khmer.new_hashbits(20, 4**14+1)
+        filename = os.path.join(thisdir, 'test-graph2.fa')
 
-        filename = os.path.join(thisdir, '../data/100k-surrendered.fa')
-        total_reads, _ = ht.consume_fasta_and_tag(filename)
-        subset = ht.do_subset_partition(0, 0)
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
 
-        ht.save_subset_partitionmap(subset, 'aaa.pmap')
-        del subset
+        divvy = ht.divide_tags_into_subsets(1)
+        print divvy
+        (a, _, b, _, c) = divvy
         
-        subset = ht.load_subset_partitionmap('aaa.pmap')
-        ht.merge_subset(subset)
+        n_partitions = ht.output_partitions(filename, filename + '.out')
+        assert n_partitions == 3, n_partitions        # all singular
+        
+        x = ht.do_subset_partition(a, b)
+        ht.save_subset_partitionmap(x, 'x.pmap')
+        del x
 
-        n_partitions, n_unassigned, n_surrendered = ht.count_partitions()
+        y = ht.do_subset_partition(b, 0)
+        ht.save_subset_partitionmap(y, 'y.pmap')
+        del y
 
-        assert n_partitions == 1, n_partitions
-        assert n_unassigned == 0, n_unassigned
-        assert n_surrendered == 16, n_surrendered
+        ht.merge_subset_from_disk('x.pmap')
+        ht.merge_subset_from_disk('y.pmap')
+        
+        n_partitions = ht.output_partitions(filename, filename + '.out')
+        assert n_partitions == 1, n_partitions        # combined.
+        
+    def test_save_merge_from_disk_2(self):
+        ht = khmer.new_hashbits(20, 4**14+1)
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
 
-        ht.output_partitions(filename, filename + '.out')
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
 
-        for line in open(filename + '.out'):
-            line = line.strip()
-            if line.startswith('>'):
-                if not line.endswith('*'):
-                    assert line.endswith('0'), line
-                else:
-                    assert line.endswith('*'), line
+        subset_size = total_reads / 2 + total_reads % 2;
+        divvy = ht.divide_tags_into_subsets(subset_size)
+        
+        x = ht.do_subset_partition(divvy[0], divvy[1])
+        ht.save_subset_partitionmap(x, 'x.pmap')
+        del x
 
+        y = ht.do_subset_partition(divvy[1], 0)
+        ht.save_subset_partitionmap(y, 'y.pmap')
+        del y
+
+        ht.merge_subset_from_disk('x.pmap')
+        ht.merge_subset_from_disk('y.pmap')
+        
+        n_partitions = ht.output_partitions(filename, filename + '.out')
+        assert n_partitions == 1, n_partitions        # combined.
