@@ -949,6 +949,9 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 					 
 void SubsetPartition::load_partitionmap(string infilename)
 {
+#if 1
+  merge_from_disk(infilename);
+#else
   ifstream infile(infilename.c_str(), ios::binary);
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
@@ -1053,6 +1056,7 @@ void SubsetPartition::load_partitionmap(string infilename)
 
   infile.close();
   delete buf; buf = NULL;
+#endif
 }
 
 
