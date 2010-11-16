@@ -800,12 +800,6 @@ void SubsetPartition::merge(SubsetPartition * other)
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
-#if 0				// for stub testing purposes
-  SubsetPartition other(_ht);
-  other.load_partitionmap(other_filename);
-  merge(&other);
-#else
-
   ifstream infile(other_filename.c_str(), ios::binary);
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
@@ -896,7 +890,6 @@ void SubsetPartition::merge_from_disk(string other_filename)
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
   }
-#endif
 }
 
 // load partition maps from & save to disk 
@@ -949,114 +942,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 					 
 void SubsetPartition::load_partitionmap(string infilename)
 {
-#if 1
   merge_from_disk(infilename);
-#else
-  ifstream infile(infilename.c_str(), ios::binary);
-  char * buf = NULL;
-  buf = new char[IO_BUF_SIZE];
-
-  unsigned int n_bytes = 0;
-  unsigned int loaded = 0;
-  unsigned int remainder;
-
-  assert(infile.is_open());
-
-  PartitionSet partitions;
-
-  HashIntoType * kmer_p = NULL;
-  PartitionID * pp = NULL;
-
-  //
-  // Run through the entire partitionmap file, figuring out what partition IDs
-  // are present.  Put the partition IDs into a set (PartitionSet).
-  //
-
-  remainder = 0;
-  while (!infile.eof()) {
-    unsigned int i;
-
-    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-    n_bytes = infile.gcount() + remainder;
-    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
-    n_bytes -= remainder;
-
-    for (i = 0; i < n_bytes;) {
-      // ignore kmer for this loop.
-      i += sizeof(HashIntoType);
-      pp = (PartitionID *) (buf + i);
-      i += sizeof(PartitionID);
-
-      partitions.insert(*pp);
-
-      loaded++;
-    }
-    assert(i == n_bytes);
-    memcpy(buf, buf + n_bytes, remainder);
-  }
-
-  // Now, go through and allocate space for all of the partition IDs,
-  // for the 2-level indirection structure that's used to keep track
-  // of tags -> partition IDs.
-
-  PartitionID max_p_id = 1;
-  PartitionPtrMap ppmap;
-  for (PartitionSet::const_iterator si = partitions.begin();
-      si != partitions.end(); si++) {
-    if (*si == 0) {		// ignore tags with unassigned partitions
-      continue;			// (should never happen; see save_, above.)
-    }
-
-    PartitionID * p = new PartitionID;
-    *p = *(si);
-    ppmap[*p] = p;
-
-    PartitionPtrSet * s = new PartitionPtrSet();
-    s->insert(p);
-    reverse_pmap[*p] = s;
-
-    if (max_p_id < *p) {
-      max_p_id = *p;
-    }
-  }
-  
-  // Be sure to set the next partition ID appropriately.
-  next_partition_id = max_p_id + 1;
-
-  // Restart.
-  infile.clear();
-  infile.seekg(0, ios::beg);
-
-  // Go through the entire file again, but this time assign partition IDs
-  // to tags.
-  remainder = 0;
-  while (!infile.eof()) {
-    unsigned int i;
-
-    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-    n_bytes = infile.gcount() + remainder;
-    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
-    n_bytes -= remainder;
-
-    for (i = 0; i < n_bytes;) {
-      kmer_p = (HashIntoType *) (buf + i);
-      i += sizeof(HashIntoType);
-      pp = (PartitionID *) (buf + i);
-      i += sizeof(PartitionID);
-
-      if (*pp == 0) {
-	partition_map[*kmer_p] = NULL;
-      } else {
-	partition_map[*kmer_p] = ppmap[*pp];
-      } 
-    }
-    assert(i == n_bytes);
-    memcpy(buf, buf + n_bytes, remainder);
-  }
-
-  infile.close();
-  delete buf; buf = NULL;
-#endif
 }
 
 
