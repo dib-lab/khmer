@@ -800,11 +800,12 @@ void SubsetPartition::merge(SubsetPartition * other)
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
+#if 0				// for stub testing purposes
   SubsetPartition other(_ht);
   other.load_partitionmap(other_filename);
   merge(&other);
+#else
 
-#if 0
   ifstream infile(other_filename.c_str(), ios::binary);
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
@@ -815,14 +816,14 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
   assert(infile.is_open());
 
-  PartitionSet partitions;
+  PartitionPtrMap diskp_to_pp;
 
   HashIntoType * kmer_p = NULL;
-  PartitionID * pp = NULL;
+  PartitionID * diskp = NULL;
 
   //
   // Run through the entire partitionmap file, figuring out what partition IDs
-  // are present.  Put the partition IDs into a set (PartitionSet).
+  // are present.
   //
 
   remainder = 0;
@@ -835,12 +836,60 @@ void SubsetPartition::merge_from_disk(string other_filename)
     n_bytes -= remainder;
 
     for (i = 0; i < n_bytes;) {
-      // ignore kmer for this loop.
+      kmer_p = (HashIntoType *) (buf + i);
       i += sizeof(HashIntoType);
-      pp = (PartitionID *) (buf + i);
+      diskp = (PartitionID *) (buf + i);
       i += sizeof(PartitionID);
 
+      assert(*diskp != 0);		// sanity check.
+
       // @@ partitions.insert(*pp);
+
+      // OK.  Does our current partitionmap have this?
+      PartitionID * pp_0;
+      pp_0 = partition_map[*kmer_p];
+
+      if (pp_0 == NULL) {	// No!  OK, map to new 'un.
+	PartitionID * existing_pp_0 = diskp_to_pp[*diskp];
+
+	if (existing_pp_0) {	// already seen this *diskp
+	  // cout << "This diskp already seen -- " << *diskp << " to " << *existing_pp_0 << "\n";
+	  partition_map[*kmer_p] = existing_pp_0;
+	}
+	else {			// new *diskp! create a new partition.
+	  pp_0 = get_new_partition();
+
+	  PartitionPtrSet * pp_set = new PartitionPtrSet();
+	  pp_set->insert(pp_0);
+	  reverse_pmap[*pp_0] = pp_set;
+	  partition_map[*kmer_p] = pp_0;
+
+	  diskp_to_pp[*diskp] = pp_0;
+	  // cout << "New partition! " << *diskp << " mapped to " << *pp_0 << "\n";
+	}
+      }
+      else {			// yes, we've seen this tag before...
+	PartitionID * existing_pp_0 = diskp_to_pp[*diskp];
+
+	if (existing_pp_0) {	// mapping exists.  copacetic?
+	  if (*pp_0 == *existing_pp_0) {
+	    ;			// yep! nothing to do, yay!
+	  } else {
+	    // remapping must be done... we need to merge!
+	    // the two partitions to merge are *pp_0 and *existing_pp_0.
+	    // we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
+	    //	    cout << "Remapping/merging: " << *existing_pp_0 << "=>" << *pp_0 << "\n";
+	    _add_partition_ptr(pp_0, existing_pp_0);
+	    assert(*pp_0 == *existing_pp_0);
+	  }
+	}
+	else {
+	  // no, does not exist in our mapping yet.  but that's ok,
+	  // we can fix that.
+	  // cout << "First time/existing mapping: " << *diskp << "->" << *pp_0 << "\n";
+	  diskp_to_pp[*diskp] = pp_0;
+	}
+      }
 
       loaded++;
     }
