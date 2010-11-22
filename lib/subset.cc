@@ -2,7 +2,7 @@
 #include "subset.hh"
 #include "parsers.hh"
 
-#define IO_BUF_SIZE 10*1000*1000
+#define IO_BUF_SIZE 1000*1000*1000
 
 using namespace khmer;
 using namespace std;
@@ -601,6 +601,34 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
   delete t;
 }
 
+PartitionID * SubsetPartition::_add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp)
+{
+  PartitionPtrSet * s = reverse_pmap[*orig_pp];
+  PartitionPtrSet * t = reverse_pmap[*new_pp];
+
+  if (s->size() < t->size()) {
+    PartitionPtrSet * tmp = s;  s = t; t = tmp;
+    PartitionID * tmp2 = orig_pp; orig_pp = new_pp; new_pp = tmp2;
+  }
+
+  reverse_pmap.erase(*new_pp);
+
+  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
+    PartitionID * iter_pp;
+    iter_pp = *pi;
+
+    *iter_pp = *orig_pp;
+    s->insert(iter_pp);
+  }
+  delete t;
+
+  if (s->size() == 100 || s->size() % 10000 == 0) {
+    cout << "Big un: " << *orig_pp << "; size " << s->size() << "\n";
+  }
+
+  return orig_pp;
+}
+
 PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
 {
   if (orig == join) { return orig; }
@@ -870,7 +898,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
     n_bytes -= remainder;
 
     cout << "Read " << n_bytes + remainder << " (" << iteration << ")\n";
-    cout << diskp_to_pp.size() << "\n";
+    cout << other_filename << "; mapping: " << diskp_to_pp.size()
+	 << "; partitions: " << reverse_pmap.size() << "\n";
     iteration++;
 
     for (i = 0; i < n_bytes;) {
@@ -917,7 +946,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 	    // the two partitions to merge are *pp_0 and *existing_pp_0.
 	    // we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
 	    //	    cout << "Remapping/merging: " << *existing_pp_0 << "=>" << *pp_0 << "\n";
-	    _add_partition_ptr(pp_0, existing_pp_0);
+	    pp_0 = _add_partition_ptr2(pp_0, existing_pp_0);
 	    diskp_to_pp[*diskp] = pp_0;
 	  }
 	}
@@ -934,7 +963,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
 
-    _merge_from_disk_consolidate(diskp_to_pp);
+    // _merge_from_disk_consolidate(diskp_to_pp);
   }
 }
 
