@@ -1,4 +1,4 @@
-import khmer, sys
+import khmer, sys, os
 import gc
 import glob
 
@@ -6,6 +6,10 @@ K = 32
 
 filename=sys.argv[1]
 subset_filenames=sys.argv[2:]
+
+if not os.path.exists(filename):
+    print '%s doesn\'t exist! dying.' % filename
+    sys.exit(0)
 
 # create a fake-ish ht; K matters, but not hashtable size.
 ht = khmer.new_hashbits(32, 1, 1)
