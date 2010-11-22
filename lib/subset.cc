@@ -2,7 +2,7 @@
 #include "subset.hh"
 #include "parsers.hh"
 
-#define IO_BUF_SIZE 50*1000*1000
+#define IO_BUF_SIZE 1000*1000*1000
 
 using namespace khmer;
 using namespace std;
@@ -590,7 +590,7 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
   PartitionPtrSet * s = reverse_pmap[*orig_pp];
   PartitionPtrSet * t = reverse_pmap[*new_pp];
   reverse_pmap.erase(*new_pp);
-    
+
   for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
     PartitionID * iter_pp;
     iter_pp = *pi;
@@ -599,6 +599,34 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
     s->insert(iter_pp);
   }
   delete t;
+}
+
+PartitionID * SubsetPartition::_add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp)
+{
+  PartitionPtrSet * s = reverse_pmap[*orig_pp];
+  PartitionPtrSet * t = reverse_pmap[*new_pp];
+
+  if (s->size() < t->size()) {
+    PartitionPtrSet * tmp = s;  s = t; t = tmp;
+    PartitionID * tmp2 = orig_pp; orig_pp = new_pp; new_pp = tmp2;
+  }
+
+  reverse_pmap.erase(*new_pp);
+
+  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
+    PartitionID * iter_pp;
+    iter_pp = *pi;
+
+    *iter_pp = *orig_pp;
+    s->insert(iter_pp);
+  }
+  delete t;
+
+  if (s->size() == 100 || s->size() % 10000 == 0) {
+    cout << "Big un: " << *orig_pp << "; size " << s->size() << "\n";
+  }
+
+  return orig_pp;
 }
 
 PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
@@ -798,6 +826,45 @@ void SubsetPartition::merge(SubsetPartition * other)
   del_partitions_to_tags(master_pttm);
 }
 
+
+void SubsetPartition::_merge_from_disk_consolidate(PartitionPtrMap& diskp_to_pp)
+{
+  for (PartitionPtrMap::iterator pp = diskp_to_pp.begin();
+       pp != diskp_to_pp.end(); pp++) {
+    PartitionPtrSet * s = reverse_pmap[*(pp->second)];
+    if (s->size() > 1) {
+      pp->second = *(s->begin());
+    }
+  }
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      PartitionPtrSet * s = reverse_pmap[*(pi->second)];
+      if (s->size() > 1) {
+	pi->second = *(s->begin());
+      }
+    }
+  }
+
+  return;
+
+  for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
+       ri != reverse_pmap.end(); ri++) {
+    PartitionPtrSet * s = ri->second;
+    if (s->size() > 1) {
+      PartitionPtrSet::iterator si = s->begin();
+      si++;
+
+      while(si != s->end()) { free(*si); si++; }
+      
+      si = s->begin();
+      si++;
+      s->erase(si, s->end());
+    }
+  }
+}
+
 void SubsetPartition::merge_from_disk(string other_filename)
 {
   ifstream infile(other_filename.c_str(), ios::binary);
@@ -821,6 +888,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
   //
 
   remainder = 0;
+  unsigned int iteration = 0;
   while (!infile.eof()) {
     unsigned int i;
 
@@ -828,6 +896,11 @@ void SubsetPartition::merge_from_disk(string other_filename)
     n_bytes = infile.gcount() + remainder;
     remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
     n_bytes -= remainder;
+
+    cout << "Read " << n_bytes + remainder << " (" << iteration << ")\n";
+    cout << other_filename << "; mapping: " << diskp_to_pp.size()
+	 << "; partitions: " << reverse_pmap.size() << "\n";
+    iteration++;
 
     for (i = 0; i < n_bytes;) {
       kmer_p = (HashIntoType *) (buf + i);
@@ -873,8 +946,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
 	    // the two partitions to merge are *pp_0 and *existing_pp_0.
 	    // we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
 	    //	    cout << "Remapping/merging: " << *existing_pp_0 << "=>" << *pp_0 << "\n";
-	    _add_partition_ptr(pp_0, existing_pp_0);
-	    assert(*pp_0 == *existing_pp_0);
+	    pp_0 = _add_partition_ptr2(pp_0, existing_pp_0);
+	    diskp_to_pp[*diskp] = pp_0;
 	  }
 	}
 	else {
@@ -889,6 +962,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
     }
     assert(i == n_bytes);
     memcpy(buf, buf + n_bytes, remainder);
+
+    // _merge_from_disk_consolidate(diskp_to_pp);
   }
 }
 
