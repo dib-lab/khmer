@@ -17,6 +17,7 @@ namespace khmer {
     void _clear_partitions();
 
     void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
+    PartitionID * _add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
 					const HashIntoType kmer_f);
 
@@ -51,6 +52,7 @@ namespace khmer {
 
     void merge(SubsetPartition *);
     void merge_from_disk(std::string);
+    void _merge_from_disk_consolidate(PartitionPtrMap&);
 
     void save_partitionmap(std::string outfile);
     void load_partitionmap(std::string infile);
