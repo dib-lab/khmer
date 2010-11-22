@@ -1,7 +1,10 @@
 #! /bin/bash
-filename=$1
-K=$2
+scriptpath=$1
+filename=$2
+K=$3
 
-python ~/khmer/scripts/strip-partition.py $filename | \
-    velveth $filename.ass.$K $K -fasta -short - && \
-velvetg $filename.ass.$K -read_trkg yes -exp_cov 3 -cov_cutoff 0
+BASE=`basename $filename`
+python $scriptpath/strip-and-split-for-assembly.py $filename `basename $filename`
+
+velveth $BASE.ass.$K $K -fasta -short ${BASE}.se -shortPaired ${BASE}.pe && \
+velvetg $BASE.ass.$K -read_trkg yes -exp_cov 3 -cov_cutoff 0
