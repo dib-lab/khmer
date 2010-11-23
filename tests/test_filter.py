@@ -56,7 +56,7 @@ class Test_Filter(object):
     def test_filter_limit_n(self):
         ht = khmer.new_hashtable(4, 4**4)
 
-        filename = os.path.join(thisdir, 'test_data/simple_3.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_3.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         (total_reads, n_consumed) = ht.consume_fasta(filename)
@@ -84,7 +84,7 @@ class Test_Filter(object):
     def test_filter(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test_data/simple_1.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_1.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         (total_reads, n_consumed) = ht.consume_fasta(filename)
@@ -102,7 +102,7 @@ class Test_Filter(object):
     def test_filter_n(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         (total_reads, n_consumed) = ht.consume_fasta(filename)
@@ -120,7 +120,7 @@ class Test_Filter(object):
     def test_consume_build_readmask(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         # sequence #4 (index 3) is bad; the new readmask should have that.
@@ -137,7 +137,7 @@ class Test_Filter(object):
     def test_consume_update_readmask(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         readmask = khmer.new_readmask(4)
@@ -155,7 +155,7 @@ class Test_Filter(object):
     def test_consume_no_update_readmask(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         readmask = khmer.new_readmask(4)
@@ -171,7 +171,7 @@ class Test_Filter(object):
         assert readmask.get(3)          # NOT updated
 
     def test_readmask_1(self):
-        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         readmask = khmer.new_readmask(4)
@@ -185,7 +185,7 @@ class Test_Filter(object):
         assert names == ['1'], names
 
     def test_readmask_2(self):
-        filename = os.path.join(thisdir, 'test_data/simple_2.fa')
+        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
         outname = os.path.join(self.tempdir, 'test_filter.out')
 
         readmask = khmer.new_readmask(4)
