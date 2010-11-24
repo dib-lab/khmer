@@ -12,7 +12,8 @@ localdir = os.path.abspath(localdir)
 COMMAND="%(localdir)s/velvet-assemble.sh %(localdir)s %(filename)s 31"
 
 
-N_PROCESSES = 1
+N_PROCESSES = 8
+print '** running with %d concurrent processes' % N_PROCESSES
 
 filenames = sys.argv[1:]
 
@@ -49,4 +50,4 @@ while filenames or running:
 
     time.sleep(1)
 
-print '\n\n** done **\n'
+print '\n** done **\n'
