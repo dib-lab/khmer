@@ -29,3 +29,14 @@ Run the tests::
 
  easy_install nose
  make test
+
+To run khmer scripts, you will need to either install the Python
+package by running::
+
+ easy_install /path/to/khmer
+
+OR by setting the PYTHONPATH::
+
+ export PYTHONPATH=/path/to/khmer/python
+
+The scripts are all located in khmer/scripts.
