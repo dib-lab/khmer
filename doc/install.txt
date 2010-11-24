@@ -1,0 +1,31 @@
+============================
+Installing and running khmer
+============================
+
+You'll need git, Python and `virtualenv
+<http://pypi.python.org/pypi/virtualenv>`__.
+
+Then, check out screed and khmer::
+
+  git clone git://github.com/ctb/screed.git
+  git clone git://github.com/ctb/khmer.git
+
+Create and activae a virtualenv working environment::
+
+ python -m virtualenv env
+ . env/bin/activate
+
+Install 'screed' (note, the argument to 'easy_install' here is the directory
+containing screed)::
+
+ easy_install screed
+
+Build khmer::
+
+ cd khmer
+ make clean all
+
+Run the tests::
+
+ easy_install nose
+ make test

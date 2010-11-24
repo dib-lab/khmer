@@ -11,10 +11,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   install
    ktable
    methods
    scripts
    blog-posts
+   partitioning-big-data
    contributors
 
 Indices and tables
