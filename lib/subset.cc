@@ -897,9 +897,9 @@ void SubsetPartition::merge_from_disk(string other_filename)
     remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
     n_bytes -= remainder;
 
-    cout << "Read " << n_bytes + remainder << " (" << iteration << ")\n";
-    cout << other_filename << "; mapping: " << diskp_to_pp.size()
-	 << "; partitions: " << reverse_pmap.size() << "\n";
+    //    cout << "Read " << n_bytes + remainder << " (" << iteration << ")\n";
+    // cout << other_filename << "; mapping: " << diskp_to_pp.size()
+    //	 << "; partitions: " << reverse_pmap.size() << "\n";
     iteration++;
 
     for (i = 0; i < n_bytes;) {
