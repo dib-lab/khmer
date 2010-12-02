@@ -448,22 +448,43 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
   return max_count;
 }
 
-HashIntoType * CountingHash::abundance_distribution(unsigned int table_i)
+HashIntoType * CountingHash::abundance_distribution(std::string filename)
 const
 {
-  HashIntoType * dist = new HashIntoType[256];
+  HashIntoType * dist = new HashIntoType[MAX_COUNT + 1];
   HashIntoType i;
   
-  for (i = 0; i < 256; i++) {
+  for (i = 0; i <= MAX_COUNT; i++) {
     dist[i] = 0;
   }
 
-  for (i = 0; i < _tablesizes[table_i]; i++) {
-    if (get_count(i)) {
-      dist[get_count(i)]++;
-    } else {
-      dist[0]++;
+  Read read;
+  IParser* parser = IParser::get_parser(filename.c_str());
+  string name;
+  string seq;
+  unsigned int read_num = 0;
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	string kmer = seq.substr(i, i + _ksize);
+	BoundedCounterType n = get_count(kmer.c_str());
+
+	dist[n]++;
+      }
+
+      name.clear();
+      seq.clear();
     }
+
+    read_num += 1;
+  }
+
+  for (i = 2; i <= MAX_COUNT; i++) {
+    dist[i] /= i;
   }
 
   return dist;

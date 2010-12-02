@@ -88,7 +88,7 @@ namespace khmer {
 				HashIntoType upper_bound = 0);
 
     // checks each read for non-ACGT characters
-    bool check_read(const std::string &read);
+    bool check_read(const std::string &read) const;
 
     // check each read for non-ACGT characters, and then consume it.
     unsigned int check_and_process_read(const std::string &read,

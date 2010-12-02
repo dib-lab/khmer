@@ -243,25 +243,6 @@ class Test_ConsumeString(object):
         assert dist[2] == 1
         assert sum(dist) == 2
 
-    def test_abundance_dist(self):
-        dist = self.kh.abundance_distribution()
-        assert dist[0] == 4**4
-        assert sum(dist[1:]) == 0
-        
-        n = self.kh.consume('AAAA')
-        n = self.kh.consume('AACT')
-        
-        dist = self.kh.abundance_distribution()
-        assert sum(dist[1:]) == 2, dist
-        assert dist[1] == 2
-
-        n = self.kh.consume('AAAA')
-        n = self.kh.consume('AACT')
-
-        dist = self.kh.abundance_distribution()
-        assert sum(dist[1:]) == 2
-        assert dist[2] == 2, dist
-
     def test_n_occupied_args(self):
         assert self.kh.n_occupied() == 0
         n = self.kh.consume('AAAA')
@@ -344,3 +325,16 @@ class Test_ConsumeString(object):
 
         count = self.kh.get_max_count('AAAAA', 1, 4**4)
         assert count == 0
+
+class Test_AbundanceDistribution(object):
+    def setup(self):
+        self.kh = khmer.new_hashtable(4, 4**4)
+        A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
+        self.kh.consume_fasta(A_filename)
+
+    def test_count_A(self):
+        A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
+        dist = self.kh.abundance_distribution(A_filename)
+
+        assert sum(dist) == 1
+        assert dist[10] == 1
