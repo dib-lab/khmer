@@ -27,7 +27,7 @@ unsigned int Hashtable::check_and_process_read(const std::string &read,
 // check_read: checks for non-ACGT characters
 //
 
-bool Hashtable::check_read(const std::string &read)
+bool Hashtable::check_read(const std::string &read) const
 {
   if (read.length() < _ksize) {
     return false;

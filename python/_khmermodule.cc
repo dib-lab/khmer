@@ -1098,12 +1098,13 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting = me->counting;
 
-  if (!PyArg_ParseTuple(args, "")) {
+  char * filename = NULL;
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
     return NULL;
   }
 
   khmer::HashIntoType * dist;
-  dist = counting->abundance_distribution();
+  dist = counting->abundance_distribution(filename);
   
   PyObject * x = PyList_New(256);
   for (int i = 0; i < 256; i++) {
