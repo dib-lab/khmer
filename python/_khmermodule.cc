@@ -46,7 +46,7 @@ public:
 static PyObject *KhmerError;
 
 // default callback obj;
-static PyObject *callback_obj = NULL;
+static PyObject *_callback_obj = NULL;
 
 // callback function to pass into C++ functions
 
@@ -59,8 +59,8 @@ void _report_fn(const char * info, void * data, unsigned int n_reads,
   }
 
   // set data to default?
-  if (!data && callback_obj) {
-    data = callback_obj;
+  if (!data && _callback_obj) {
+    data = _callback_obj;
   }
 
   // if 'data' is set, it is None, or a Python callable
@@ -1099,12 +1099,13 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * filename = NULL;
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
+  PyObject * callback_obj = NULL;
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
     return NULL;
   }
 
   khmer::HashIntoType * dist;
-  dist = counting->abundance_distribution(filename);
+  dist = counting->abundance_distribution(filename, _report_fn, callback_obj);
   
   PyObject * x = PyList_New(256);
   for (int i = 0; i < 256; i++) {
@@ -3005,9 +3006,9 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  Py_XDECREF(callback_obj);
+  Py_XDECREF(_callback_obj);
   Py_INCREF(o);
-  callback_obj = o;
+  _callback_obj = o;
 
   Py_INCREF(Py_None);
   return Py_None;

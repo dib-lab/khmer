@@ -448,8 +448,9 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
   return max_count;
 }
 
-HashIntoType * CountingHash::abundance_distribution(std::string filename)
-const
+HashIntoType * CountingHash::abundance_distribution(std::string filename,
+			    CallbackFn callback,
+			    void * callback_data) const
 {
   HashIntoType * dist = new HashIntoType[MAX_COUNT + 1];
   HashIntoType i;
@@ -481,6 +482,15 @@ const
     }
 
     read_num += 1;
+
+    // run callback, if specified
+    if (read_num % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("abundance_distribution", callback_data, read_num, 0);
+      } catch (...) {
+        throw;
+      }
+    }
   }
 
   for (i = 2; i <= MAX_COUNT; i++) {

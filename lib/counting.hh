@@ -153,7 +153,9 @@ namespace khmer {
 				     HashIntoType lower_bound = 0,
 				     HashIntoType upper_bound = 0);
 
-    HashIntoType * abundance_distribution(std::string filename) const;
+    HashIntoType * abundance_distribution(std::string filename,
+					  CallbackFn callback = NULL,
+					  void * callback_data = NULL) const;
 
     HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
 					 const unsigned int max_read_len,
