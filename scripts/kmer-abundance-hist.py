@@ -3,7 +3,7 @@ import sys, khmer
 
 K = 32
 N_HT=4
-HT_SIZE = int(4e9)
+HT_SIZE = int(4e6)
 
 ###
 
