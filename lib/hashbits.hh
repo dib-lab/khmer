@@ -203,6 +203,10 @@ namespace khmer {
 		      unsigned long long &n_consumed,
 		      CallbackFn callback = 0,
 		      void * callback_data = 0);
+
+    unsigned int count_kmers_within_radius(HashIntoType kmer_f,
+					   HashIntoType kmer_r,
+					   unsigned int radius);
   };
 };
 
