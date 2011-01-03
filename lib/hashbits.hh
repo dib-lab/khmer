@@ -206,7 +206,8 @@ namespace khmer {
 
     unsigned int count_kmers_within_radius(HashIntoType kmer_f,
 					   HashIntoType kmer_r,
-					   unsigned int radius);
+					   unsigned int radius,
+					   unsigned int max_count);
   };
 };
 

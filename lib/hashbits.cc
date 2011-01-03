@@ -754,7 +754,8 @@ void Hashbits::filter_if_present(const std::string infilename,
 
 unsigned int Hashbits::count_kmers_within_radius(HashIntoType kmer_f,
 						 HashIntoType kmer_r,
-						 unsigned int radius)
+						 unsigned int radius,
+						 unsigned int max_count)
 {
   HashIntoType f, r;
   NodeQueue node_q;
@@ -793,6 +794,10 @@ unsigned int Hashbits::count_kmers_within_radius(HashIntoType kmer_f,
     // keep track of seen kmers
     keeper.insert(kmer);
     total++;
+
+    if (max_count && total > max_count) {
+      break;
+    }
 
     assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     if (breadth > cur_breadth) { cur_breadth = breadth; }

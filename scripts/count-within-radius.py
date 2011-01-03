@@ -12,4 +12,4 @@ ht.consume_fasta(sys.argv[1])
 
 for record in screed.fasta.fasta_iter(open(sys.argv[1])):
     seq = record['sequence']
-    print ht.count_kmers_within_radius(seq[:K], THRESHOLD)
+    print ht.count_kmers_within_radius(seq[:K], THRESHOLD, 20000)
