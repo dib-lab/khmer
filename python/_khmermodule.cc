@@ -2363,6 +2363,25 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
   return PyInt_FromLong(partition_id);
 }
 
+static PyObject * hashbits_count_kmers_within_radius(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer = NULL;
+  unsigned long radius = 0;
+
+  if (!PyArg_ParseTuple(args, "sL", &kmer, &radius)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType kmer_f, kmer_r;
+  khmer::_hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
+  unsigned int n = hashbits->count_kmers_within_radius(kmer_f, kmer_r, radius);
+
+  return PyLong_FromUnsignedLong(n);
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
@@ -2408,6 +2427,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "set_partition_id", hashbits_set_partition_id, METH_VARARGS, "" },
   { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
   { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
+  { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
