@@ -2370,14 +2370,16 @@ static PyObject * hashbits_count_kmers_within_radius(PyObject * self, PyObject *
 
   char * kmer = NULL;
   unsigned long radius = 0;
+  unsigned long max_count = 0;
 
-  if (!PyArg_ParseTuple(args, "sL", &kmer, &radius)) {
+  if (!PyArg_ParseTuple(args, "sL|L", &kmer, &radius, &max_count)) {
     return NULL;
   }
 
   khmer::HashIntoType kmer_f, kmer_r;
   khmer::_hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
-  unsigned int n = hashbits->count_kmers_within_radius(kmer_f, kmer_r, radius);
+  unsigned int n = hashbits->count_kmers_within_radius(kmer_f, kmer_r, radius,
+						       max_count);
 
   return PyLong_FromUnsignedLong(n);
 }
