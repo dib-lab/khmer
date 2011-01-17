@@ -243,25 +243,6 @@ class Test_ConsumeString(object):
         assert dist[2] == 1
         assert sum(dist) == 2
 
-    def test_abundance_dist(self):
-        dist = self.kh.abundance_distribution()
-        assert dist[0] == 4**4
-        assert sum(dist[1:]) == 0
-        
-        n = self.kh.consume('AAAA')
-        n = self.kh.consume('AACT')
-        
-        dist = self.kh.abundance_distribution()
-        assert sum(dist[1:]) == 2, dist
-        assert dist[1] == 2
-
-        n = self.kh.consume('AAAA')
-        n = self.kh.consume('AACT')
-
-        dist = self.kh.abundance_distribution()
-        assert sum(dist[1:]) == 2
-        assert dist[2] == 2, dist
-
     def test_n_occupied_args(self):
         assert self.kh.n_occupied() == 0
         n = self.kh.consume('AAAA')
@@ -345,80 +326,15 @@ class Test_ConsumeString(object):
         count = self.kh.get_max_count('AAAAA', 1, 4**4)
         assert count == 0
 
-####
-
-DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
-
-class Test_HashtableIntersect(object):
+class Test_AbundanceDistribution(object):
     def setup(self):
-        self.hi = khmer.HashtableIntersect(10, *khmer.PRIMES_1m)
+        self.kh = khmer.new_hashtable(4, 4**4)
+        A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
+        self.kh.consume_fasta(A_filename)
 
-    def test_basic(self):
-        hi = self.hi
-        hi.consume(DNA)
+    def test_count_A(self):
+        A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
+        dist = self.kh.abundance_distribution(A_filename)
 
-        x = hi.get_min_count(DNA)
-        assert x == 1, x
-
-        x = hi.get_max_count(DNA)
-        assert x == 1, x
-
-        hi.consume('ATTCTGACTG')
-
-        x = hi.get_min_count(DNA)
-        assert x == 1, x
-
-        x = hi.get_max_count(DNA)
-        assert x == 2, x
-
-    def test_collision_1(self):
-        return                          # @CTB
-        kt = khmer.new_ktable(10)
-        
-        GG = 'G' * 10                   # forward_hash: 1048575
-        assert kt.forward_hash(GG) == 1048575
-
-        collision_1 = 'AACGGTCGGA'      # forward_hash: 48572
-        assert kt.forward_hash(collision_1) == 48572
-
-        collision_2 = 'AACTTGTTAC'      # forward_hash: 38738
-        assert kt.forward_hash(collision_2) == 38738
-
-        # note, hash(GG) % 1000003 == hash(collision_1)
-        # note, hash(GG) % 1009837 == hash(collision_2)
-
-        hi = self.hi
-        hi.consume(GG)
-        hi.consume(collision_1)
-
-        assert hi._kh1.get(GG) == 2
-        assert hi._kh2.get(GG) == 1
-
-        assert hi.get_min_count(GG) == 1
-        assert hi.get_max_count(GG) == 1
-
-    def test_collision_2(self):
-        return                          # @CTB
-        kt = khmer.new_ktable(10)
-        
-        GG = 'G' * 10                   # forward_hash: 1048575
-        assert kt.forward_hash(GG) == 1048575
-
-        collision_1 = 'AACGGTCGGA'      # forward_hash: 48572
-        assert kt.forward_hash(collision_1) == 48572
-
-        collision_2 = 'AACTTGTTAC'      # forward_hash: 38738
-        assert kt.forward_hash(collision_2) == 38738
-
-        # note, hash(GG) % 1000003 == hash(collision_1)
-        # note, hash(GG) % 1009837 == hash(collision_2)
-
-        hi = self.hi
-        hi.consume(GG)
-        hi.consume(collision_2)
-
-        assert hi._kh1.get(GG) == 1
-        assert hi._kh2.get(GG) == 2
-
-        assert hi.get_min_count(GG) == 1
-        assert hi.get_max_count(GG) == 1
+        assert sum(dist) == 1
+        assert dist[10] == 1

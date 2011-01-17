@@ -224,6 +224,69 @@ class Test_InexactGraphFu(object):
 
 ###
 
+class Test_Partitioning(object):
+    def test_disconnected_20_a(self):
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+
+        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        subset = ht.do_subset_partition(0, 0)
+        x = ht.subset_count_partitions(subset)
+        assert x == (99, 0)             # disconnected @ 21
+
+    def test_connected_20_a(self):
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+
+        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        subset = ht.do_subset_partition(0, 0)
+        x = ht.subset_count_partitions(subset)
+        assert x == (1, 0)             # connected @ 20
+
+    def test_disconnected_20_b(self):
+        filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
+
+        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        subset = ht.do_subset_partition(0, 0)
+        x = ht.subset_count_partitions(subset)
+        assert x == (99, 0)             # disconnected @ 21
+
+    def test_connected_20_b(self):
+        filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
+
+        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        subset = ht.do_subset_partition(0, 0)
+        x = ht.subset_count_partitions(subset)
+        assert x == (1, 0)             # connected @ 20
+
+    def test_disconnected_31_c(self):
+        filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
+
+        ht = khmer.new_hashbits(32, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        subset = ht.do_subset_partition(0, 0)
+        x = ht.subset_count_partitions(subset)
+        assert x == (999, 0)            # disconnected @ K = 32
+
+    def test_connected_31_c(self):
+        filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
+
+        ht = khmer.new_hashbits(31, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        subset = ht.do_subset_partition(0, 0)
+        x = ht.subset_count_partitions(subset)
+        assert x == (1, 0)             # connected @ K = 31
+
+###
+
 class Test_PythonAPI(object):
     def test_ordered_connect(self):
         ht = khmer.new_hashbits(20, 4**15+1)

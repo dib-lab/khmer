@@ -152,24 +152,7 @@ namespace khmer {
 
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
-      HashIntoType byte;
-      unsigned char bit;
-
-      bool is_new_kmer = false;
-      for (unsigned int i = 0; i < _n_tables; i++) {
-	HashIntoType bin = hash % _tablesizes[i];
-	byte = bin / 8;
-	bit = bin % 8;
-
-	if (!( _counts[i][byte] & (1<<bit))) {
-	  _occupied_bins += 1;
-	  is_new_kmer = true;
-	}
-	_counts[i][byte] |= (1 << bit);
-      }
-      if (is_new_kmer) {
-	_n_unique_kmers +=1;
-      }
+      count(hash);
     }
 
     virtual void count(HashIntoType khash) {
@@ -193,17 +176,7 @@ namespace khmer {
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
       HashIntoType hash = _hash(kmer, _ksize);
-
-      for (unsigned int i = 0; i < _n_tables; i++) {
-	HashIntoType bin = hash % _tablesizes[i];
-	HashIntoType byte = bin / 8;
-	unsigned char bit = bin % 8;
-      
-	if (!(_counts[i][byte] & (1 << bit))) {
-	  return 0;
-	}
-      }
-      return 1;
+      return get_count(hash);
     }
 
     // get the count for the given k-mer hash.
@@ -230,6 +203,11 @@ namespace khmer {
 		      unsigned long long &n_consumed,
 		      CallbackFn callback = 0,
 		      void * callback_data = 0);
+
+    unsigned int count_kmers_within_radius(HashIntoType kmer_f,
+					   HashIntoType kmer_r,
+					   unsigned int radius,
+					   unsigned int max_count);
   };
 };
 

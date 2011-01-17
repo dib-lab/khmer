@@ -46,10 +46,9 @@ def merge(filename1, filename2, ht):
     merge_filename = os.path.join(dir2, '%s.merge.%d' % (dir2, next_n))
     print 'merge: %s = %s + %s' % (merge_filename, filename1, filename2)
     subset1 = ht.load_subset_partitionmap(filename1)
-    subset2 = ht.load_subset_partitionmap(filename2)
-    ht.merge2_subset(subset1, subset2)
-
+    ht.merge2_subset_from_disk(subset1, filename2)
     ht.save_subset_partitionmap(subset1, merge_filename + '.pmap')
+    
     return merge_filename + '.pmap'
 
 def main(dir1, dir2, n_threads):
