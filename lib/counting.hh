@@ -28,7 +28,7 @@ namespace khmer {
 
   public:
     CountingHash(WordLength ksize, HashIntoType single_tablesize) :
-      khmer::Hashtable(ksize), _n_tables(1) {
+      khmer::Hashtable(ksize) {
       _tablesizes.push_back(single_tablesize);
       
       _allocate_counters();
@@ -153,7 +153,9 @@ namespace khmer {
 				     HashIntoType lower_bound = 0,
 				     HashIntoType upper_bound = 0);
 
-    HashIntoType * abundance_distribution(unsigned int table_i=0) const;
+    HashIntoType * abundance_distribution(std::string filename,
+					  CallbackFn callback = NULL,
+					  void * callback_data = NULL) const;
 
     HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
 					 const unsigned int max_read_len,

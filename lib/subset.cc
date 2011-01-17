@@ -2,7 +2,7 @@
 #include "subset.hh"
 #include "parsers.hh"
 
-#define IO_BUF_SIZE 50*1000*1000
+#define IO_BUF_SIZE 1000*1000*1000
 
 using namespace khmer;
 using namespace std;
@@ -590,7 +590,7 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
   PartitionPtrSet * s = reverse_pmap[*orig_pp];
   PartitionPtrSet * t = reverse_pmap[*new_pp];
   reverse_pmap.erase(*new_pp);
-    
+
   for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
     PartitionID * iter_pp;
     iter_pp = *pi;
@@ -599,6 +599,34 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
     s->insert(iter_pp);
   }
   delete t;
+}
+
+PartitionID * SubsetPartition::_add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp)
+{
+  PartitionPtrSet * s = reverse_pmap[*orig_pp];
+  PartitionPtrSet * t = reverse_pmap[*new_pp];
+
+  if (s->size() < t->size()) {
+    PartitionPtrSet * tmp = s;  s = t; t = tmp;
+    PartitionID * tmp2 = orig_pp; orig_pp = new_pp; new_pp = tmp2;
+  }
+
+  reverse_pmap.erase(*new_pp);
+
+  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
+    PartitionID * iter_pp;
+    iter_pp = *pi;
+
+    *iter_pp = *orig_pp;
+    s->insert(iter_pp);
+  }
+  delete t;
+
+  if (s->size() == 100 || s->size() % 10000 == 0) {
+    cout << "Big un: " << *orig_pp << "; size " << s->size() << "\n";
+  }
+
+  return orig_pp;
 }
 
 PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
@@ -798,6 +826,147 @@ void SubsetPartition::merge(SubsetPartition * other)
   del_partitions_to_tags(master_pttm);
 }
 
+
+void SubsetPartition::_merge_from_disk_consolidate(PartitionPtrMap& diskp_to_pp)
+{
+  for (PartitionPtrMap::iterator pp = diskp_to_pp.begin();
+       pp != diskp_to_pp.end(); pp++) {
+    PartitionPtrSet * s = reverse_pmap[*(pp->second)];
+    if (s->size() > 1) {
+      pp->second = *(s->begin());
+    }
+  }
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      PartitionPtrSet * s = reverse_pmap[*(pi->second)];
+      if (s->size() > 1) {
+	pi->second = *(s->begin());
+      }
+    }
+  }
+
+  return;
+
+  for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
+       ri != reverse_pmap.end(); ri++) {
+    PartitionPtrSet * s = ri->second;
+    if (s->size() > 1) {
+      PartitionPtrSet::iterator si = s->begin();
+      si++;
+
+      while(si != s->end()) { free(*si); si++; }
+      
+      si = s->begin();
+      si++;
+      s->erase(si, s->end());
+    }
+  }
+}
+
+void SubsetPartition::merge_from_disk(string other_filename)
+{
+  ifstream infile(other_filename.c_str(), ios::binary);
+  char * buf = NULL;
+  buf = new char[IO_BUF_SIZE];
+
+  unsigned int n_bytes = 0;
+  unsigned int loaded = 0;
+  unsigned int remainder;
+
+  assert(infile.is_open());
+
+  PartitionPtrMap diskp_to_pp;
+
+  HashIntoType * kmer_p = NULL;
+  PartitionID * diskp = NULL;
+
+  //
+  // Run through the entire partitionmap file, figuring out what partition IDs
+  // are present.
+  //
+
+  remainder = 0;
+  unsigned int iteration = 0;
+  while (!infile.eof()) {
+    unsigned int i;
+
+    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+    n_bytes = infile.gcount() + remainder;
+    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+    n_bytes -= remainder;
+
+    //    cout << "Read " << n_bytes + remainder << " (" << iteration << ")\n";
+    // cout << other_filename << "; mapping: " << diskp_to_pp.size()
+    //	 << "; partitions: " << reverse_pmap.size() << "\n";
+    iteration++;
+
+    for (i = 0; i < n_bytes;) {
+      kmer_p = (HashIntoType *) (buf + i);
+      i += sizeof(HashIntoType);
+      diskp = (PartitionID *) (buf + i);
+      i += sizeof(PartitionID);
+
+      assert(*diskp != 0);		// sanity check.
+
+      // @@ partitions.insert(*pp);
+
+      // OK.  Does our current partitionmap have this?
+      PartitionID * pp_0;
+      pp_0 = partition_map[*kmer_p];
+
+      if (pp_0 == NULL) {	// No!  OK, map to new 'un.
+	PartitionID * existing_pp_0 = diskp_to_pp[*diskp];
+
+	if (existing_pp_0) {	// already seen this *diskp
+	  // cout << "This diskp already seen -- " << *diskp << " to " << *existing_pp_0 << "\n";
+	  partition_map[*kmer_p] = existing_pp_0;
+	}
+	else {			// new *diskp! create a new partition.
+	  pp_0 = get_new_partition();
+
+	  PartitionPtrSet * pp_set = new PartitionPtrSet();
+	  pp_set->insert(pp_0);
+	  reverse_pmap[*pp_0] = pp_set;
+	  partition_map[*kmer_p] = pp_0;
+
+	  diskp_to_pp[*diskp] = pp_0;
+	  // cout << "New partition! " << *diskp << " mapped to " << *pp_0 << "\n";
+	}
+      }
+      else {			// yes, we've seen this tag before...
+	PartitionID * existing_pp_0 = diskp_to_pp[*diskp];
+
+	if (existing_pp_0) {	// mapping exists.  copacetic?
+	  if (*pp_0 == *existing_pp_0) {
+	    ;			// yep! nothing to do, yay!
+	  } else {
+	    // remapping must be done... we need to merge!
+	    // the two partitions to merge are *pp_0 and *existing_pp_0.
+	    // we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
+	    //	    cout << "Remapping/merging: " << *existing_pp_0 << "=>" << *pp_0 << "\n";
+	    pp_0 = _add_partition_ptr2(pp_0, existing_pp_0);
+	    diskp_to_pp[*diskp] = pp_0;
+	  }
+	}
+	else {
+	  // no, does not exist in our mapping yet.  but that's ok,
+	  // we can fix that.
+	  // cout << "First time/existing mapping: " << *diskp << "->" << *pp_0 << "\n";
+	  diskp_to_pp[*diskp] = pp_0;
+	}
+      }
+
+      loaded++;
+    }
+    assert(i == n_bytes);
+    memcpy(buf, buf + n_bytes, remainder);
+
+    // _merge_from_disk_consolidate(diskp_to_pp);
+  }
+}
+
 // load partition maps from & save to disk 
 
 void SubsetPartition::save_partitionmap(string pmap_filename)
@@ -848,110 +1017,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 					 
 void SubsetPartition::load_partitionmap(string infilename)
 {
-  ifstream infile(infilename.c_str(), ios::binary);
-  char * buf = NULL;
-  buf = new char[IO_BUF_SIZE];
-
-  unsigned int n_bytes = 0;
-  unsigned int loaded = 0;
-  unsigned int remainder;
-
-  assert(infile.is_open());
-
-  PartitionSet partitions;
-
-  HashIntoType * kmer_p = NULL;
-  PartitionID * pp = NULL;
-
-  //
-  // Run through the entire partitionmap file, figuring out what partition IDs
-  // are present.  Put the partition IDs into a set (PartitionSet).
-  //
-
-  remainder = 0;
-  while (!infile.eof()) {
-    unsigned int i;
-
-    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-    n_bytes = infile.gcount() + remainder;
-    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
-    n_bytes -= remainder;
-
-    for (i = 0; i < n_bytes;) {
-      // ignore kmer for this loop.
-      i += sizeof(HashIntoType);
-      pp = (PartitionID *) (buf + i);
-      i += sizeof(PartitionID);
-
-      partitions.insert(*pp);
-
-      loaded++;
-    }
-    assert(i == n_bytes);
-    memcpy(buf, buf + n_bytes, remainder);
-  }
-
-  // Now, go through and allocate space for all of the partition IDs,
-  // for the 2-level indirection structure that's used to keep track
-  // of tags -> partition IDs.
-
-  PartitionID max_p_id = 1;
-  PartitionPtrMap ppmap;
-  for (PartitionSet::const_iterator si = partitions.begin();
-      si != partitions.end(); si++) {
-    if (*si == 0) {		// ignore tags with unassigned partitions
-      continue;			// (should never happen; see save_, above.)
-    }
-
-    PartitionID * p = new PartitionID;
-    *p = *(si);
-    ppmap[*p] = p;
-
-    PartitionPtrSet * s = new PartitionPtrSet();
-    s->insert(p);
-    reverse_pmap[*p] = s;
-
-    if (max_p_id < *p) {
-      max_p_id = *p;
-    }
-  }
-  
-  // Be sure to set the next partition ID appropriately.
-  next_partition_id = max_p_id + 1;
-
-  // Restart.
-  infile.clear();
-  infile.seekg(0, ios::beg);
-
-  // Go through the entire file again, but this time assign partition IDs
-  // to tags.
-  remainder = 0;
-  while (!infile.eof()) {
-    unsigned int i;
-
-    infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-    n_bytes = infile.gcount() + remainder;
-    remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
-    n_bytes -= remainder;
-
-    for (i = 0; i < n_bytes;) {
-      kmer_p = (HashIntoType *) (buf + i);
-      i += sizeof(HashIntoType);
-      pp = (PartitionID *) (buf + i);
-      i += sizeof(PartitionID);
-
-      if (*pp == 0) {
-	partition_map[*kmer_p] = NULL;
-      } else {
-	partition_map[*kmer_p] = ppmap[*pp];
-      } 
-    }
-    assert(i == n_bytes);
-    memcpy(buf, buf + n_bytes, remainder);
-  }
-
-  infile.close();
-  delete buf; buf = NULL;
+  merge_from_disk(infilename);
 }
 
 
