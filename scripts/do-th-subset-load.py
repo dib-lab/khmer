@@ -19,6 +19,9 @@ for subset_file in subset_filenames:
     print '<-', subset_file
     ht.merge_subset_from_disk(subset_file)
 
+# save merged partitionmap
+ht.save_partitionmap(filename + '.pmap.merged')
+
 # partition!
 n_partitions = ht.output_partitions(filename, filename + '.part')
 print n_partitions
