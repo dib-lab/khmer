@@ -1609,6 +1609,21 @@ static PyObject * hashbits_connectivity_distribution(PyObject * self, PyObject *
   return x;
 }
 
+static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer_s = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &kmer_s, &callback_obj)) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(hashbits->kmer_degree(kmer_s));
+}
+
 void free_subset_partition_info(void * p)
 {
   khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
@@ -2384,6 +2399,27 @@ static PyObject * hashbits_count_kmers_within_radius(PyObject * self, PyObject *
   return PyLong_FromUnsignedLong(n);
 }
 
+static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer = NULL;
+  unsigned long max_count = 0;
+  unsigned long max_radius = 0;
+
+  if (!PyArg_ParseTuple(args, "sLL", &kmer, &max_count, &max_radius)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType kmer_f, kmer_r;
+  khmer::_hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
+  unsigned int n = hashbits->find_radius_for_volume(kmer_f, kmer_r, max_count,
+						    max_radius);
+
+  return PyLong_FromUnsignedLong(n);
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
@@ -2393,6 +2429,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "trim_graphs", hashbits_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hashbits_graphsize_distribution, METH_VARARGS, "" },
+  { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
   { "connectivity_distribution", hashbits_connectivity_distribution, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hashbits_filter_file_connected, METH_VARARGS, "" },
@@ -2430,6 +2467,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
   { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
   { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
+  { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
