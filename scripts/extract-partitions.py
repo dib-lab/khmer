@@ -2,46 +2,37 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=50000
-THRESHOLD=1
+MAX_SIZE=1
+THRESHOLD=5000
 
 def read_partition_file(fp):
     for n, line in enumerate(fp):
         if n % 2 == 0:
-            surrendered = False
             name, partition_id = line[1:].strip().rsplit('\t', 1)
-
-            if '*' in partition_id:
-                partition_id = int(partition_id[:-1])
-                surrendered = True
-            else:
-                partition_id = int(partition_id)
+            partition_id = int(partition_id)
         else:
             sequence = line.strip()
 
-            yield name, partition_id, surrendered, sequence
+            yield name, partition_id, sequence
 
 
 (filename, prefix, distfilename) = sys.argv[1:]
 
 distfp = open(distfilename, 'w')
-surrendered_exist = False
 
 count = {}
 
 ###
 
-for n, (name, pid, surr, seq) in enumerate(read_partition_file(open(filename))):
+for n, (name, pid, seq) in enumerate(read_partition_file(open(filename))):
     if n % 10000 == 0:
         print '...', n
 
     count[pid] = count.get(pid, 0) + 1
-    if surr:
-        surrendered_exist = True
 
 # develop histogram of partition sizes
 dist = {}
-for n, (name, pid, surr, seq) in enumerate(read_partition_file(open(filename))):
+for n, (name, pid, seq) in enumerate(read_partition_file(open(filename))):
     if n % 10000 == 0:
         print '...x2', n
 
@@ -103,28 +94,20 @@ for n in range(group_n):
     fp = open('%s.group%d.fa' % (prefix, n), 'w')
     group_fps[n] = fp
 
-if surrendered_exist:
-    surrendered_fp = open('%s.surrender.fa' % prefix, 'w')
-
 ## write 'em all out!
 fp = open(filename)
 for n, x in enumerate(read_partition_file(fp)):
     if n % 100000 == 0:
         print '...x3', n
 
-    name, partition_id, surrendered, seq = x
+    name, partition_id, seq = x
     if partition_id == 0:
         continue
     
-    if surrendered:
-        surrender_ch = '*'
-        outfp = surrendered_fp
-    else:
-        surrender_ch = ' '
-        try:
-            group_n = group_d[partition_id]
-        except KeyError:
-            continue
-        outfp = group_fps[group_n]
+    try:
+        group_n = group_d[partition_id]
+    except KeyError:
+        continue
+    outfp = group_fps[group_n]
 
-    outfp.write('>%s\t%s%s\n%s\n' % (name, partition_id, surrender_ch, seq))
+    outfp.write('>%s\t%s\n%s\n' % (name, partition_id, seq))
