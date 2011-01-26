@@ -136,6 +136,8 @@ namespace khmer {
 				   CallbackFn callback=0,
 				   void * callback_data=0);
 
+    unsigned int kmer_degree(const char * kmer_s) const;
+
     void tags_to_map(TagCountMap& tag_map);
     void discard_tags(TagCountMap& tag_map, unsigned int threshold);
 
@@ -208,6 +210,10 @@ namespace khmer {
 					   HashIntoType kmer_r,
 					   unsigned int radius,
 					   unsigned int max_count);
+    unsigned int find_radius_for_volume(HashIntoType kmer_f,
+					HashIntoType kmer_r,
+					unsigned int max_count,
+					unsigned int max_radius);
   };
 };
 

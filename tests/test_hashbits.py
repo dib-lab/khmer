@@ -192,3 +192,22 @@ def test_count_within_radius_big():
    ht.consume_fasta(inpfile)
    n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', 1e6)
    assert n == 39
+
+def test_count_kmer_degree():
+   inpfile = os.path.join(thisdir, 'test-data', 'all-A.fa')
+   ht = khmer.new_hashbits(4, 1e6, 2)
+   ht.consume_fasta(inpfile)
+
+   assert ht.kmer_degree('AAAA') == 2
+   assert ht.kmer_degree('AAAT') == 1
+   assert ht.kmer_degree('AATA') == 0
+   assert ht.kmer_degree('TAAA') == 1
+
+def test_find_radius_for_volume():
+   inpfile = os.path.join(thisdir, 'test-data', 'all-A.fa')
+   ht = khmer.new_hashbits(4, 1e6, 2)
+   ht.consume_fasta(inpfile)
+
+   assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
+   assert ht.find_radius_for_volume('AAAA', 1, 100) == 0
+   assert ht.find_radius_for_volume('AAAA', 2, 100) == 100

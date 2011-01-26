@@ -314,13 +314,59 @@ void Hashbits::load_tagset(std::string infilename)
   delete buf;
 }
 
+unsigned int Hashbits::kmer_degree(const char * kmer_s) const
+{
+  unsigned int neighbors = 0;
+  HashIntoType kmer_f, kmer_r;
+
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+  _hash(kmer_s, _ksize, kmer_f, kmer_r);
+
+  HashIntoType f, r;
+
+  // NEXT.
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+	  
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+  // PREVIOUS.
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+    
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  if (get_count(uniqify_rc(f, r))) { neighbors++; }
+
+  return neighbors;
+}
+
 
 void Hashbits::connectivity_distribution(const std::string infilename,
 					 HashIntoType dist[9],
 					 CallbackFn callback,
 					 void * callback_data)
 {
-  const unsigned int rc_left_shift = _ksize*2 - 2;
   unsigned int total_reads = 0;
   for (unsigned int i = 0; i < 9; i++) {
     dist[i] = 0;
@@ -330,8 +376,6 @@ void Hashbits::connectivity_distribution(const std::string infilename,
   Read read;
   string seq;
   bool is_valid;
-
-  HashIntoType kmer_f, kmer_r;
 
   while(!parser->is_complete()) {
     // increment read number
@@ -345,45 +389,7 @@ void Hashbits::connectivity_distribution(const std::string infilename,
       const char * kmer_s = seq.c_str();
 
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	unsigned int neighbors = 0;
-	_hash(kmer_s + i, _ksize, kmer_f, kmer_r);
-
-	HashIntoType f, r;
-
-	// NEXT.
-	f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-	r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-	  
-	f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-	r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-
-	f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-	r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-
-	f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-	r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-
-	// PREVIOUS.
-	r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-	f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-
-	r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-	f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-    
-	r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-	f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-
-	r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-	f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-	if (get_count(uniqify_rc(f, r))) { neighbors++; }
-
+	unsigned int neighbors = kmer_degree(kmer_s + i);
 	dist[neighbors]++;
       }
 
@@ -874,4 +880,125 @@ unsigned int Hashbits::count_kmers_within_radius(HashIntoType kmer_f,
   }
 
   return total;
+}
+
+unsigned int Hashbits::find_radius_for_volume(HashIntoType kmer_f,
+					      HashIntoType kmer_r,
+					      unsigned int max_count,
+					      unsigned int max_radius)
+{
+  HashIntoType f, r;
+  NodeQueue node_q;
+  std::queue<unsigned int> breadth_q;
+  unsigned int breadth = 0;
+
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+  unsigned int total = 0;
+
+  SeenSet keeper;		// keep track of traversed kmers
+
+  // start breadth-first search.
+
+  node_q.push(kmer_f);
+  node_q.push(kmer_r);
+  breadth_q.push(0);
+
+  while(!node_q.empty()) {
+    kmer_f = node_q.front();
+    node_q.pop();
+    kmer_r = node_q.front();
+    node_q.pop();
+    breadth = breadth_q.front();
+    breadth_q.pop();
+
+    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+    if (keeper.find(kmer) != keeper.end()) {
+      continue;
+    }
+
+    // keep track of seen kmers
+    keeper.insert(kmer);
+    total++;
+
+    if (total >= max_count || breadth >= max_radius) {
+      break;
+    }
+
+    //
+    // Enqueue next set of nodes.
+    //
+
+    // NEXT.
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    // PREVIOUS.
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+    
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    if (node_q.empty()) {
+      breadth = max_radius;
+      break;
+    }
+  }
+
+  return breadth;
 }
