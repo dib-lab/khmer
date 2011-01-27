@@ -2,61 +2,47 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=1
-THRESHOLD=5000
+MAX_SIZE=50000
+THRESHOLD=1
 
 def read_partition_file(fp):
-    for n, line in enumerate(fp):
-        if n % 2 == 0:
-            name, partition_id = line[1:].strip().rsplit('\t', 1)
-            partition_id = int(partition_id)
-        else:
-            sequence = line.strip()
+    for n, record in enumerate(fasta_iter(fp, parse_description=False)):
+        name = record['name']
+        name, partition_id = name.rsplit('\t', 1)
+        yield n, name, partition_id, record['sequence']
 
-            yield name, partition_id, sequence
-
+###
 
 (filename, prefix, distfilename) = sys.argv[1:]
-
 distfp = open(distfilename, 'w')
+
+###
 
 count = {}
 
 ###
 
-for n, (name, pid, seq) in enumerate(read_partition_file(open(filename))):
+for n, name, pid, seq in read_partition_file(open(filename)):
     if n % 10000 == 0:
         print '...', n
 
     count[pid] = count.get(pid, 0) + 1
 
+if 0 in count:                          # eliminate unpartitioned sequences
+   del count[0]
+   
 # develop histogram of partition sizes
 dist = {}
-for n, (name, pid, seq) in enumerate(read_partition_file(open(filename))):
-    if n % 10000 == 0:
-        print '...x2', n
-
-    if pid not in count:
-        continue
-    
-    c = count[pid]
-    if pid == 0:
-        c = 0
-
-    dist[c] = dist.get(c, 0) + 1
-
+for pid, size in count.items():
+    dist[size] = dist.get(size, 0) + 1
+        
 # output histogram
 total = 0
 for c, n in sorted(dist.items()):
-    if c:
-        n /= c
     total += n
     distfp.write('%d %d %d\n' % (c, n, total))
 
-# separate
-if 0 in count:
-   del count[0]
-
+# sort groups by size
 divvy = sorted(count.items(), key=lambda y:y[1])
 divvy = filter(lambda y:y[1] > THRESHOLD, divvy)
 
@@ -95,19 +81,21 @@ for n in range(group_n):
     group_fps[n] = fp
 
 ## write 'em all out!
+    
 fp = open(filename)
-for n, x in enumerate(read_partition_file(fp)):
+for n, name, partition_id, seq in read_partition_file(fp):
     if n % 100000 == 0:
-        print '...x3', n
+        print '...x2', n
 
-    name, partition_id, seq = x
     if partition_id == 0:
         continue
     
     try:
         group_n = group_d[partition_id]
     except KeyError:
+        assert count[partition_id] <= THRESHOLD
         continue
+    
     outfp = group_fps[group_n]
 
     outfp.write('>%s\t%s\n%s\n' % (name, partition_id, seq))
