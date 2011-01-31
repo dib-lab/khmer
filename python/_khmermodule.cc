@@ -2391,10 +2391,16 @@ static PyObject * hashbits_count_kmers_within_radius(PyObject * self, PyObject *
     return NULL;
   }
 
+  unsigned int n;
+
+  Py_BEGIN_ALLOW_THREADS
+
   khmer::HashIntoType kmer_f, kmer_r;
   khmer::_hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
-  unsigned int n = hashbits->count_kmers_within_radius(kmer_f, kmer_r, radius,
+  n = hashbits->count_kmers_within_radius(kmer_f, kmer_r, radius,
 						       max_count);
+
+  Py_END_ALLOW_THREADS
 
   return PyLong_FromUnsignedLong(n);
 }
@@ -2412,10 +2418,16 @@ static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * ar
     return NULL;
   }
 
+  unsigned int n;
+
+  Py_BEGIN_ALLOW_THREADS
+
   khmer::HashIntoType kmer_f, kmer_r;
   khmer::_hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
-  unsigned int n = hashbits->find_radius_for_volume(kmer_f, kmer_r, max_count,
+  n = hashbits->find_radius_for_volume(kmer_f, kmer_r, max_count,
 						    max_radius);
+
+  Py_END_ALLOW_THREADS
 
   return PyLong_FromUnsignedLong(n);
 }
