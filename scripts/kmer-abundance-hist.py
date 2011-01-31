@@ -3,7 +3,7 @@ import sys, khmer
 
 K = 32
 N_HT=4
-HT_SIZE = int(4e6)
+HT_SIZE = int(5e8)
 
 ###
 
@@ -20,3 +20,5 @@ fp = open(output, 'w')
 
 for n, i in enumerate(z[1:]):
     print >>fp, n + 1, i
+
+#ht.fasta_dump_kmers_by_abundance(filename, 255)
