@@ -762,6 +762,7 @@ unsigned int Hashbits::count_kmers_within_radius(HashIntoType kmer_f,
 						 HashIntoType kmer_r,
 						 unsigned int radius,
 						 unsigned int max_count)
+const
 {
   HashIntoType f, r;
   NodeQueue node_q;
@@ -886,6 +887,7 @@ unsigned int Hashbits::find_radius_for_volume(HashIntoType kmer_f,
 					      HashIntoType kmer_r,
 					      unsigned int max_count,
 					      unsigned int max_radius)
+const
 {
   HashIntoType f, r;
   NodeQueue node_q;

@@ -209,11 +209,11 @@ namespace khmer {
     unsigned int count_kmers_within_radius(HashIntoType kmer_f,
 					   HashIntoType kmer_r,
 					   unsigned int radius,
-					   unsigned int max_count);
+					   unsigned int max_count) const;
     unsigned int find_radius_for_volume(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					unsigned int max_count,
-					unsigned int max_radius);
+					unsigned int max_radius) const;
   };
 };
 
