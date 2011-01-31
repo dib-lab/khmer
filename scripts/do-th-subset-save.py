@@ -8,7 +8,7 @@ K=32
 HASHTABLE_SIZE=int(4e9)
 N_HT=4
 
-SUBSET_SIZE = int(1e6)
+SUBSET_SIZE = int(2e5)
 N_THREADS = 8
 
 ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
@@ -83,6 +83,7 @@ def main(filename):
         worker_q.put((ht, i, start, end))
 
     print 'enqueued %d subset tasks' % n_subsets
+    open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
 
     threads = []
     for n in range(N_THREADS):
