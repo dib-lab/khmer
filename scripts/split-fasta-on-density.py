@@ -4,11 +4,10 @@ import khmer
 K = 32
 HASHTABLE_SIZE=int(8e9)
 N_HT = 4
-RADIUS=10
-
 ###
 
-MAX_DENSITY=500
+RADIUS=10
+MAX_DENSITY=31
 
 infile = sys.argv[1]
 outprefix = sys.argv[2]
@@ -59,7 +58,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
             if density < MAX_DENSITY:
                 break
 
-        chop_end = pos
+        chop_end = pos + K
             
         densities.reverse()
         for (density, pos) in densities:
