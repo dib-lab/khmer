@@ -24,5 +24,7 @@ ht.save_partitionmap(filename + '.pmap.merged')
 
 # partition!
 n_partitions = ht.output_partitions(filename, filename + '.part')
-print n_partitions
-print ht.count_partitions()
+(n_partitions, n_singletons) = ht.count_partitions()
+print 'output partitions:', n_partitions
+print 'pmap partitions:', n_partitions
+print 'singletons:', n_singletons
