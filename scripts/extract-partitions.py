@@ -13,8 +13,16 @@ def read_partition_file(fp):
 
 ###
 
-(filename, prefix, distfilename) = sys.argv[1:]
+(filename, prefix) = sys.argv[1:]
+
+distfilename = prefix + '.dist'
 distfp = open(distfilename, 'w')
+
+print '---'
+print 'reading partitioned file:', filename
+print 'outputting to files named "%s.groupN.fa"' % prefix
+print 'partition size distribution will go to %s' % distfilename
+print '---'
 
 ###
 
@@ -23,7 +31,7 @@ count = {}
 ###
 
 for n, name, pid, seq in read_partition_file(open(filename)):
-    if n % 10000 == 0:
+    if n % 100000 == 0:
         print '...', n
 
     count[pid] = count.get(pid, 0) + 1
@@ -41,6 +49,7 @@ total = 0
 for c, n in sorted(dist.items()):
     total += n
     distfp.write('%d %d %d\n' % (c, n, total))
+distfp.close()
 
 # sort groups by size
 divvy = sorted(count.items(), key=lambda y:y[1])
@@ -59,7 +68,7 @@ for partition_id, n_reads in divvy:
     if total > MAX_SIZE:
         for partition_id in group:
             group_d[partition_id] = group_n
-            print 'group_d', partition_id, group_n
+            #print 'group_d', partition_id, group_n
 
         group_n += 1
         group = set()
@@ -68,7 +77,7 @@ for partition_id, n_reads in divvy:
 if group:
     for partition_id in group:
         group_d[partition_id] = group_n
-        print 'group_d', partition_id, group_n
+        #print 'group_d', partition_id, group_n
     group_n += 1
 
 
