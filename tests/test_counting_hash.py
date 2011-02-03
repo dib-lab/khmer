@@ -116,3 +116,37 @@ def test_3_tables():
     
     hi.consume(collision_3)
     assert hi.get(GG) == 2
+
+def test_simple_median():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume("AAAAAA")
+    (median, average, stddev) = hi.get_median_count("AAAAAA")
+    assert median == 1
+    assert average == 1.0
+    assert stddev == 0.0
+
+    hi.consume("AAAAAA")
+    (median, average, stddev) = hi.get_median_count("AAAAAA")
+    assert median == 2
+    assert average == 2.0
+    assert stddev == 0.0
+
+    hi.consume("AAAAAT")
+    (median, average, stddev) = hi.get_median_count("AAAAAAT")
+    assert median == 2
+    assert average == 1.5
+    assert int(stddev*100) == 70        # .707
+    
+    hi.consume("AAAAAT")
+    (median, average, stddev) = hi.get_median_count("AAAAAAT")
+    assert median == 2
+    assert average == 2.0
+    assert stddev == 0.0
+
+    hi.consume("AAAAAT")
+    (median, average, stddev) = hi.get_median_count("AAAAAAT")
+    print median, average, stddev
+    assert median == 3
+    assert average == 2.5
+    assert int(stddev*100) == 70        # .707
