@@ -153,6 +153,11 @@ namespace khmer {
 				     HashIntoType lower_bound = 0,
 				     HashIntoType upper_bound = 0);
 
+    void get_median_count(const std::string &s,
+			  BoundedCounterType &median,
+			  float &average,
+			  float &stddev);
+
     HashIntoType * abundance_distribution(std::string filename,
 					  CallbackFn callback = NULL,
 					  void * callback_data = NULL) const;

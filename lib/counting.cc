@@ -2,6 +2,8 @@
 #include "counting.hh"
 #include "parsers.hh"
 
+#include <math.h>
+
 using namespace std;
 using namespace khmer;
 
@@ -656,3 +658,60 @@ void CountingHash::load(std::string infilename)
   infile.close();
 #endif // 0
 }
+
+// technically, get medioid count... our "median" is always a member of the
+// population.
+
+void CountingHash::get_median_count(const std::string &s,
+				    BoundedCounterType &median,
+				    float &average,
+				    float &stddev)
+{
+  const unsigned int length = s.length();
+  const char * sp = s.c_str();
+  BoundedCounterType count;
+  std::vector<BoundedCounterType> counts;
+
+  HashIntoType h = 0, r = 0;
+ 
+  HashIntoType bin = _hash(sp, _ksize, h, r);
+  count = this->get_count(bin);
+  counts.push_back(count);
+
+  for (unsigned int i = _ksize; i < length; i++) {
+    // left-shift the previous hash over
+    h = h << 2;
+
+    // 'or' in the current nt
+    h |= twobit_repr(sp[i]);
+
+    // mask off the 2 bits we shifted over.
+    h &= bitmask;
+
+    // now handle reverse complement
+    r = r >> 2;
+    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
+
+    bin = uniqify_rc(h, r);
+    count = this->get_count(bin);
+    counts.push_back(count);
+  }
+
+  average = 0;
+  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
+       i != counts.end(); i++) {
+    average += *i;
+  }
+  average /= float(counts.size());
+
+  stddev = 0;
+  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
+       i != counts.end(); i++) {
+    stddev += (float(*i) - average) * (float(*i) - average);
+  }
+  stddev = sqrt(stddev);
+
+  sort(counts.begin(), counts.end());
+  median = counts[counts.size() / 2]; // rounds down
+}
+
