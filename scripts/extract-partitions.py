@@ -86,7 +86,7 @@ print '%d groups' % group_n
 ## open a bunch of output files for the different groups
 group_fps = {}
 for n in range(group_n):
-    fp = open('%s.group%d.fa' % (prefix, n), 'w')
+    fp = open('%s.group%04d.fa' % (prefix, n), 'w')
     group_fps[n] = fp
 
 ## write 'em all out!
