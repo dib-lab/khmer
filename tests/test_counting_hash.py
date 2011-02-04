@@ -122,24 +122,28 @@ def test_simple_median():
 
     hi.consume("AAAAAA")
     (median, average, stddev) = hi.get_median_count("AAAAAA")
+    print median, average, stddev
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
 
     hi.consume("AAAAAA")
     (median, average, stddev) = hi.get_median_count("AAAAAA")
+    print median, average, stddev
     assert median == 2
     assert average == 2.0
     assert stddev == 0.0
 
     hi.consume("AAAAAT")
     (median, average, stddev) = hi.get_median_count("AAAAAAT")
+    print median, average, stddev
     assert median == 2
     assert average == 1.5
-    assert int(stddev*100) == 70        # .707
+    assert int(stddev*100) == 50        # .5
     
     hi.consume("AAAAAT")
     (median, average, stddev) = hi.get_median_count("AAAAAAT")
+    print median, average, stddev
     assert median == 2
     assert average == 2.0
     assert stddev == 0.0
@@ -149,4 +153,4 @@ def test_simple_median():
     print median, average, stddev
     assert median == 3
     assert average == 2.5
-    assert int(stddev*100) == 70        # .707
+    assert int(stddev*100) == 50        # .5

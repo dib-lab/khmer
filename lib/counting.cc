@@ -710,6 +710,7 @@ void CountingHash::get_median_count(const std::string &s,
        i != counts.end(); i++) {
     stddev += (float(*i) - average) * (float(*i) - average);
   }
+  stddev /= float(counts.size());
   stddev = sqrt(stddev);
 
   sort(counts.begin(), counts.end());
