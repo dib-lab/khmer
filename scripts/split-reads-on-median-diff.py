@@ -29,9 +29,10 @@ for n, record in enumerate(fasta_iter(open(infile))):
         continue
         
     median, average, stddev = ht.get_median_count(seq)
+    max_count = ht.get_max_count(seq)
 
     fp = outfp
-    if median >= 128 or abs(median - average) > 60:
+    if max_count == 255 or median >= 128 or abs(median - average) > 60:
         fp = outfp2
 
     print >>fp, ">%s\n%s" % (record['name'], record['sequence'])
