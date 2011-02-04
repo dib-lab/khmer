@@ -46,9 +46,11 @@ for pid, size in count.items():
         
 # output histogram
 total = 0
+wtotal = 0
 for c, n in sorted(dist.items()):
     total += n
-    distfp.write('%d %d %d\n' % (c, n, total))
+    wtotal += c*n
+    distfp.write('%d %d %d %d\n' % (c, n, total, wtotal))
 distfp.close()
 
 # sort groups by size
