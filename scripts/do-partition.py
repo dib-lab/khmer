@@ -119,6 +119,7 @@ def main(filename):
     # load & merge all pmap files
     for i in range(0, n_subsets):
         pmap_file = basename + '.subset.%d.pmap' % (i,)
+        print 'loading', pmap_file
         ht.merge_subset_from_disk(pmap_file)
 
     # save merged partitionmap
