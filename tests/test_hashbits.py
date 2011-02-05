@@ -211,3 +211,21 @@ def test_find_radius_for_volume():
    assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
    assert ht.find_radius_for_volume('AAAA', 1, 100) == 0
    assert ht.find_radius_for_volume('AAAA', 2, 100) == 100
+
+def test_circumference():
+   ht = khmer.new_hashbits(4, 1e6, 2)
+
+   ht.count( 'ATGC')
+   ht.count('GATG')
+   ht.count( 'ATGG')
+
+   x = ht.count_kmers_on_radius('GATG', 1, 200)
+   assert x == 2
+
+   ht.count( 'ATGA')
+   x = ht.count_kmers_on_radius('GATG', 1, 200)
+   assert x == 3, x
+
+   ht.count('TGAT')
+   x = ht.count_kmers_on_radius('GATG', 1, 200)
+   assert x == 4, x
