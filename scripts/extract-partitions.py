@@ -13,7 +13,11 @@ def read_partition_file(fp):
 
 ###
 
-(filename, prefix) = sys.argv[1:]
+filename = sys.argv[1]
+
+prefix = filename
+if len(sys.argv) > 2:
+    prefix = sys.argv[2]
 
 distfilename = prefix + '.dist'
 distfp = open(distfilename, 'w')
