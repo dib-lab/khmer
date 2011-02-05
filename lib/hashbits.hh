@@ -214,6 +214,11 @@ namespace khmer {
 					HashIntoType kmer_r,
 					unsigned int max_count,
 					unsigned int max_radius) const;
+
+    unsigned int count_kmers_on_radius(HashIntoType kmer_f,
+				       HashIntoType kmer_r,
+				       unsigned int radius,
+				       unsigned int max_volume) const;
   };
 };
 

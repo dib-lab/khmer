@@ -2431,6 +2431,32 @@ static PyObject * hashbits_count_kmers_within_radius(PyObject * self, PyObject *
   return PyLong_FromUnsignedLong(n);
 }
 
+static PyObject * hashbits_count_kmers_on_radius(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer = NULL;
+  unsigned long radius = 0;
+  unsigned long max_volume = 0;
+
+  if (!PyArg_ParseTuple(args, "sL|L", &kmer, &radius, &max_volume)) {
+    return NULL;
+  }
+
+  unsigned int n;
+
+  Py_BEGIN_ALLOW_THREADS
+
+  khmer::HashIntoType kmer_f, kmer_r;
+  khmer::_hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
+  n = hashbits->count_kmers_on_radius(kmer_f, kmer_r, radius, max_volume);
+
+  Py_END_ALLOW_THREADS
+
+  return PyLong_FromUnsignedLong(n);
+}
+
 static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2505,6 +2531,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
   { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
   { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
+  { "count_kmers_on_radius", hashbits_count_kmers_on_radius, METH_VARARGS, "" },
   { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
