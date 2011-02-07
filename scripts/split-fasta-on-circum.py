@@ -45,7 +45,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
     end = len(seq) - K + 1 - incr/2
     is_high = False
 
-    for pos in range(start, end, incr):
+    for pos in range(end, start, -incr):
         circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
 
         if circum >= MAX_CIRCUM:
@@ -57,6 +57,13 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 #                seq = seq[:chop + K]    # may be salvageable
                 
             break
+
+    if pos != start:
+        pos = start
+        circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
+
+        if circum >= MAX_CIRCUM:
+            is_high = True
 
     # sort "high circumference" and "low" circumerence sequences separately.
     if is_high:
