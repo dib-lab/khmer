@@ -644,7 +644,7 @@ PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
   PartitionID * orig_pp = *(reverse_pmap[orig]->begin());
   PartitionID * join_pp = *(reverse_pmap[join]->begin());
 
-  _add_partition_ptr(orig_pp, join_pp);
+  _add_partition_ptr2(orig_pp, join_pp);
 
   return orig;
 }
