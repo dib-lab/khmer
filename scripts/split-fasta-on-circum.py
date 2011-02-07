@@ -4,6 +4,7 @@ import khmer
 K = 32
 HASHTABLE_SIZE=int(8e9)
 N_HT = 4
+
 ###
 
 RADIUS=2
@@ -40,6 +41,9 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         print '... saving', n
 
     seq = record['sequence']
+
+
+    # between [RADIUS:-RADIUS] kmers, calculate circumference every 2*RADIUS
     end = len(seq) - K + 1 - incr/2
 
     is_high = False
@@ -53,26 +57,37 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         if circum >= MAX_CIRCUM:
             is_high = True
 
+    # did we find a circumference >= our max?  If so, try to trim the reads.
     if is_high:
+        # trim from the back:
         for (circum, pos) in circums:
             if circum < MAX_CIRCUM:
                 break
 
         chop_end = pos
-            
+
+        # trim from the front:
         circums.reverse()
         for (circum, pos) in circums:
             if circum < MAX_CIRCUM:
                 break
         chop_start = pos
 
+        # make sure we're not missing anything in the middle that wasn't
+        # trimmed on either side:
         if max([ circ for (circ,_) in circums ]) < MAX_CIRCUM and \
                chop_end - chop_start >= 0:
+
+            # do the trimming & rewrite the name
             sequence = record['sequence'][chop_start:chop_end + K]
             record['name'] = record['name'] + '\tTRUNC:%d-%d' % (chop_start,
                                                                  chop_end + K)
+
+            # clear the 'is_high' flag if there are no more high-circum
+            # k-mers left.
             is_high = False
 
+    # sort "high circumference" and "low" circumerence sequences separately.
     if is_high:
         fp = highfp
     else:
