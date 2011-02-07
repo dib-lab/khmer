@@ -11,15 +11,20 @@ N_HT=4
 SUBSET_SIZE = int(2e5)
 N_THREADS = 8
 
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+ht = None
 
 ###
 
 save_ht = False
 load_ht = False
 save_merged_pmap = True
+remove_orig_pmap = True
 
 assert not (save_ht and load_ht)         # incompatible
+
+if not save_merged_pmap and remove_orig_pmap:
+    print '** warning, all the pmap files are going away! no permanent record!'
+    print ''
 
 ###
 
@@ -49,12 +54,17 @@ def main(filename):
     
     basename = os.path.basename(filename)
 
+    print 'input file to partition: %s' % filename
+    print '-- settings:'
     print 'K', K
     print 'HASHTABLE SIZE %g' % HASHTABLE_SIZE
+    print 'N HASHTABLES %d' % N_HT
     print 'SUBSET SIZE', SUBSET_SIZE
     print 'N THREADS', N_THREADS
     print '--'
 
+    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+    
     # populate the hash table and tag set
     if not load_ht:
         print 'reading sequences and loading tagset from %s...' % (filename,)
@@ -126,6 +136,12 @@ def main(filename):
     if save_merged_pmap:
         print 'saving merged pmap to %s.pmap.merged' % basename 
         ht.save_partitionmap(basename + '.pmap.merged')
+
+    if remove_orig_pmap:
+        print 'removing subset pmap files'
+        for i in range(0, n_subsets):
+            pmap_file = basename + '.subset.%d.pmap' % (i,)
+            os.unlink(pmap_file)
 
     # output partitions!
     n_partitions = ht.output_partitions(filename, basename + '.part')
