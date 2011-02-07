@@ -29,6 +29,8 @@ highfp = open(highfile, 'w')
 print 'eating', infile
 ht.consume_fasta(infile)
 
+incr = -2*RADIUS
+
 for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
                                                    parse_description=False)):
     if n % 10000 == 0:
@@ -40,9 +42,8 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
     end = len(seq) - K
     is_high = False
 
-    for pos in range(end, -1, -1):
+    for pos in range(end, -1, incr):
         circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
-        print seq[pos:pos+K], circum
 
         if circum >= MAX_CIRCUM:
             is_high = True
