@@ -77,6 +77,9 @@ def main():
    '''
    Outputs assembly statistics for provided FASTA files.
    '''
+   totalN = 0
+   totalSum = 0
+
    if len(sys.argv) < 3:
       print "Usage: python assemstats.py <min contig length> [ FASTA files ]"
       return
@@ -89,25 +92,26 @@ def main():
 
    print "N\tsum\tmax\tfilename"
 
-   for expr in sys.argv[2:len(sys.argv)]:
-      for filename in glob.glob(expr):
-         lens = getLens(filename)
-         trimmedLens = trimLens(lens, minLen)
+   for filename in sys.argv[2:]:
+      lens = getLens(filename)
+      trimmedLens = trimLens(lens, minLen)
 
-         if len(trimmedLens) == 0:
-            print filename + " - no sequences longer than threshold"
-            continue
-
-         statN = len(lens)
+      if trimmedLens:
          statTrimmedN = len(trimmedLens)
          statSum = sum(trimmedLens)
-         statMin = min(trimmedLens)
          statMax = max(trimmedLens)
-         statMed = trimmedLens[(len(trimmedLens)-1)/2]
-         statMean = int(statSum / float(statTrimmedN))
-         statN50, statN50Len = calcNXX(trimmedLens, 50)
-         statN90, statN90Len = calcNXX(trimmedLens, 90)
+      else:
+         statTrimmedN = 0
+         statSum = 0
+         statMax = 0
 
-         print "%d\t%d\t%d\t%s" % (statTrimmedN, statSum, statMax, filename)
+      totalN += statTrimmedN
+      totalSum += statSum
+
+      print "%d\t%d\t%d\t%s" % (statTrimmedN, statSum, statMax, filename)
+
+   if len(sys.argv) > 3:
+      print '--'
+      print 'TOTAL: %g in %d contigs' % (totalSum, totalN)
 
 main()
