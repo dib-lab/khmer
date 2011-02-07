@@ -29,9 +29,6 @@ highfp = open(highfile, 'w')
 print 'eating', infile
 ht.consume_fasta(infile)
 
-start = RADIUS
-incr = 2*RADIUS
-
 for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
                                                    parse_description=False)):
     if n % 10000 == 0:
@@ -39,31 +36,17 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 
     seq = record['sequence']
 
-    # between [RADIUS:-RADIUS] kmers, calculate circumference every 2*RADIUS.
-    # chop sequence from first high circumference, onwards.
-    
-    end = len(seq) - K + 1 - incr/2
+    # calculate circumference for every point.
+    end = len(seq) - K
     is_high = False
 
-    for pos in range(end, start, -incr):
+    for pos in range(end, -1, -1):
         circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
+        print seq[pos:pos+K], circum
 
         if circum >= MAX_CIRCUM:
             is_high = True
-#            if pos == start:    # entire sequence is crud => high file
-#                is_high = True
-#            else:
-#                chop = pos - incr
-#                seq = seq[:chop + K]    # may be salvageable
-                
             break
-
-    if pos != start:
-        pos = start
-        circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
-
-        if circum >= MAX_CIRCUM:
-            is_high = True
 
     # sort "high circumference" and "low" circumerence sequences separately.
     if is_high:
