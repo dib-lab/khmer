@@ -16,18 +16,15 @@ outprefix = sys.argv[2]
 
 lowfile = outprefix + '.low'
 highfile = outprefix + '.high'
-circfile = outprefix + '.circ'
 
 print 'saving low-density to:', lowfile
 print 'saving high-density to:', highfile
-print 'saving all densities to:', circfile
 
 print 'making hashtable'
 ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 
 lowfp = open(lowfile, 'w')
 highfp = open(highfile, 'w')
-circfp = open(circfile, 'w')
 
 print 'eating', infile
 ht.consume_fasta(infile)
@@ -42,51 +39,24 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 
     seq = record['sequence']
 
-
-    # between [RADIUS:-RADIUS] kmers, calculate circumference every 2*RADIUS
+    # between [RADIUS:-RADIUS] kmers, calculate circumference every 2*RADIUS.
+    # chop sequence from first high circumference, onwards.
+    
     end = len(seq) - K + 1 - incr/2
-
     is_high = False
-    circums = []
-    for pos in range(start, end):
+
+    for pos in range(start, end, incr):
         circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
 
-        circums.append((circum, pos))
-        print >>circfp, circum
-        
         if circum >= MAX_CIRCUM:
             is_high = True
-
-    # did we find a circumference >= our max?  If so, try to trim the reads.
-    if is_high:
-        # trim from the front:
-        for i in range(len(circums)):
-            circum, pos = circums[i]
-            if circum < MAX_CIRCUM:
-                break
-        chop_start = pos
-
-        # trim from the back:
-        for j in range(len(circums) - 1, 0, -1):
-            circum, pos = circums[j]
-            if circum < MAX_CIRCUM:
-                break
-        chop_end = pos
-
-        trimmed_circums = circums[i:j+1]
-
-        # make sure we're not missing anything in the middle that wasn't
-        # trimmed on either side:
-        if trimmed_circums and \
-               max([ circ for (circ,_) in trimmed_circums ]) < MAX_CIRCUM:
-            # do the trimming & note in the name
-            sequence = record['sequence'][chop_start:chop_end + K]
-            record['name'] = record['name'] + '\tTRUNC:%d-%d' % (chop_start,
-                                                                 chop_end + K)
-
-            # clear the 'is_high' flag, since there are no more high-circum
-            # k-mers left.
-            is_high = False
+#            if pos == start:    # entire sequence is crud => high file
+#                is_high = True
+#            else:
+#                chop = pos - incr
+#                seq = seq[:chop + K]    # may be salvageable
+                
+            break
 
     # sort "high circumference" and "low" circumerence sequences separately.
     if is_high:
@@ -94,9 +64,4 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
     else:
         fp = lowfp
         
-    print >>fp, '>%s\n%s' % (record['name'], record['sequence'])
-#    for circum, pos in circums:
-#        print >>fp, circum,
-#    print >>fp, ''
-#    if is_high:
-#        print >>fp, chop_start, chop_end
+    print >>fp, '>%s\n%s' % (record['name'], seq)
