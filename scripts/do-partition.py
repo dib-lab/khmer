@@ -19,7 +19,7 @@ save_ht = False
 load_ht = False
 save_merged_pmap = True
 
-assert not (save_ht or load_ht)         # incompatible
+assert not (save_ht and load_ht)         # incompatible
 
 ###
 
