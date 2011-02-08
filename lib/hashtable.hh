@@ -30,6 +30,8 @@ namespace khmer {
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
 
+  class ReadMaskTable;
+
   class Hashtable {		// Base class implementation of a Bloom ht.
   protected:
     WordLength _ksize;
