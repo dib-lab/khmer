@@ -2,6 +2,7 @@
 #include "subset.hh"
 #include "parsers.hh"
 
+#define MAX_CIRCUM 3
 #define IO_BUF_SIZE 1000*1000*1000
 
 using namespace khmer;
@@ -343,6 +344,10 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     if (breadth > cur_breadth) { cur_breadth = breadth; }
 
     if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
+
+    if (_ht->count_kmers_on_radius(kmer_f, kmer_r, 2, 200) > MAX_CIRCUM) {
+      continue;
+    }
 
     //
     // Enqueue next set of nodes.
