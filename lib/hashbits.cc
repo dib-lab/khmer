@@ -146,6 +146,10 @@ const
     return;
   }
 
+  if (count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
+    return;
+  }
+
   // otherwise, explore in all directions.
 
   // NEXT.

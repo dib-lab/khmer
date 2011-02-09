@@ -4,6 +4,10 @@
 #define TAG_DENSITY 40
 #define CONNECTED_THRESHOLD 0
 
+#define MAX_CIRCUM 3
+#define CIRCUM_RADIUS 2
+#define CIRCUM_MAX_VOL 200
+
 namespace khmer {
   // largest number we can count up to, exactly. (8 bytes)
   typedef unsigned long long int ExactCounterType;
