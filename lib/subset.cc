@@ -345,7 +345,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
 
-    if (_ht->count_kmers_on_radius(kmer_f, kmer_r, 2, 200) > MAX_CIRCUM) {
+    if (_ht->count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS,
+				   CIRCUM_MAX_VOL) > MAX_CIRCUM) {
       continue;
     }
 
