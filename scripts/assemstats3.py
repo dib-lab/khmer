@@ -90,6 +90,7 @@ def main():
       print "Minimum contig length must be an integer."
       return
 
+   print '** cutoff:', minLen
    print "N\tsum\tmax\tfilename"
 
    for filename in sys.argv[2:]:
@@ -112,6 +113,6 @@ def main():
 
    if len(sys.argv) > 3:
       print '--'
-      print 'TOTAL: %g in %d contigs' % (totalSum, totalN)
+      print 'TOTAL: %g in %d contigs (mean size %d)' % (totalSum, totalN, totalSum / float(totalN) + .5)
 
 main()
