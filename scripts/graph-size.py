@@ -3,9 +3,10 @@ import sys
 import screed
 import threading, Queue
 
-K = 14
-HASHTABLE_SIZE=int(1e9)
+K = 32
+HASHTABLE_SIZE=int(4e9)
 THRESHOLD=100
+N_HT=4
 
 GROUPSIZE=100
 WORKER_THREADS=4
@@ -50,7 +51,7 @@ def main():
     outfile = infile + '.graphsize'
 
     print 'creating ht'
-    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
+    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
     print 'eating fa', infile
     total_reads, n_consumed = ht.consume_fasta(infile)
     outfp = open(outfile, 'w')
