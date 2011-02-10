@@ -83,9 +83,9 @@ def main(filename):
         print '---'
     else:
         print 'loading ht %s.ht' % basename
-        ht.save(basename + '.ht')
+        ht.load(basename + '.ht')
         print 'loading tagset %s.tagset...' % basename
-        ht.save_tagset(basename + '.tagset')
+        ht.load_tagset(basename + '.tagset')
 
     # divide the tags up into subsets
     divvy = ht.divide_tags_into_subsets(SUBSET_SIZE)
