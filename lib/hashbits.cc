@@ -139,14 +139,16 @@ const
 
   // keep track of both seen kmers, and counts.
   keeper.insert(kmer);
+
+  // is this a high-circumerence k-mer?  if so, don't count it; get outta here!
+  if (count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
+    return;
+  }
+
   count += 1;
 
   // are we past the threshold? truncate search.
   if (threshold && count >= threshold) {
-    return;
-  }
-
-  if (count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
     return;
   }
 
