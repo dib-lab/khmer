@@ -10,4 +10,4 @@ if [ \! -f $BASE.se -o \! -f $BASE.pe \]; then
 fi
 
 velveth $BASE.ass.$K $K -fasta -short ${BASE}.se -shortPaired ${BASE}.pe && \
-velvetg $BASE.ass.$K -read_trkg yes -exp_cov auto -cov_cutoff 0
+velvetg $BASE.ass.$K -read_trkg yes -exp_cov 3 -cov_cutoff 0
