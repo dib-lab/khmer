@@ -118,7 +118,7 @@ def main():
     worker_count = 0
     
     infile = sys.argv[1]
-    outfile = os.path.basename(infile) + '.graphsize'
+    outfile = os.path.basename(infile) + '.graphcirc'
     if len(sys.argv) == 3:
         outfile = sys.argv[2]
 
