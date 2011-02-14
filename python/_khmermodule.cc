@@ -1545,15 +1545,27 @@ static PyObject * hashbits_calc_connected_graph_size(PyObject * self, PyObject *
 
   char * _kmer;
   unsigned int max_size = 0;
-  if (!PyArg_ParseTuple(args, "s|i", &_kmer, &max_size)) {
+  PyObject * break_on_circum_o = NULL;
+  if (!PyArg_ParseTuple(args, "s|iO", &_kmer, &max_size, &break_on_circum_o)) {
     return NULL;
+  }
+
+  bool break_on_circum = false;
+  if (break_on_circum_o && !PyBool_Check(break_on_circum_o)) {
+    PyErr_SetString(PyExc_TypeError, "third argument must be True/False");
+    return NULL;
+  }
+
+  if (break_on_circum_o == Py_True) {
+    break_on_circum = true;
   }
 
   unsigned long long size = 0;
 
   Py_BEGIN_ALLOW_THREADS
   khmer::SeenSet keeper;
-  hashbits->calc_connected_graph_size(_kmer, size, keeper, max_size);
+  hashbits->calc_connected_graph_size(_kmer, size, keeper, max_size,
+				      break_on_circum);
   Py_END_ALLOW_THREADS
 
   return PyInt_FromLong(size);

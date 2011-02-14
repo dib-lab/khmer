@@ -333,10 +333,12 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     // if this is a high-circumference k-mer, do nothing more with it;
     // definitely do not connect partitions across it!
+#if 0
     if (_ht->count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS,
 				   CIRCUM_MAX_VOL) > MAX_CIRCUM) {
       continue;
     }
+#endif // 0
 
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect

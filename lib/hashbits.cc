@@ -118,10 +118,11 @@ ReadMaskTable * Hashbits::filter_file_connected(const std::string &est,
 }
 
 void Hashbits::calc_connected_graph_size(const HashIntoType kmer_f,
-					  const HashIntoType kmer_r,
-					  unsigned long long& count,
-					  SeenSet& keeper,
-					  const unsigned long long threshold)
+					 const HashIntoType kmer_r,
+					 unsigned long long& count,
+					 SeenSet& keeper,
+					 const unsigned long long threshold,
+					 bool break_on_circum)
 const
 {
   HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
@@ -141,7 +142,9 @@ const
   keeper.insert(kmer);
 
   // is this a high-circumerence k-mer?  if so, don't count it; get outta here!
-  if (count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
+  if (break_on_circum && \
+      count_kmers_on_radius(kmer_f, kmer_r,
+			    CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
     return;
   }
 

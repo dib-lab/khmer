@@ -93,17 +93,19 @@ namespace khmer {
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
-				   const unsigned long long threshold=0) const{
+				   const unsigned long long threshold=0,
+				   bool break_on_circum=false) const{
       HashIntoType r, f;
       _hash(kmer, _ksize, f, r);
-      calc_connected_graph_size(f, r, count, keeper, threshold);
+      calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
     }
 
     void calc_connected_graph_size(const HashIntoType kmer_f,
 				   const HashIntoType kmer_r,
 				   unsigned long long& count,
 				   SeenSet& keeper,
-				   const unsigned long long threshold=0) const;
+				   const unsigned long long threshold=0,
+				   bool break_on_circum=false) const;
 
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
