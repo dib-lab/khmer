@@ -24,7 +24,7 @@ def process(inq, outq, ht):
         x = []
         for record in recordlist:
             kmer = record['sequence'][:K]
-            size = ht.calc_connected_graph_size(kmer, THRESHOLD, True)
+            size = ht.calc_connected_graph_size(kmer, THRESHOLD)
             if size >= THRESHOLD:
                 x.append(record)
 
