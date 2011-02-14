@@ -1,6 +1,7 @@
 import khmer
 import sys
 import screed
+import os.path
 import threading, Queue
 
 K = 32
@@ -23,7 +24,7 @@ def process(inq, outq, ht):
         x = []
         for record in recordlist:
             kmer = record['sequence'][:K]
-            size = ht.calc_connected_graph_size(kmer, THRESHOLD)
+            size = ht.calc_connected_graph_size(kmer, THRESHOLD, True)
             if size >= THRESHOLD:
                 x.append(record)
 
@@ -48,7 +49,9 @@ def main():
     worker_count = 0
     
     infile = sys.argv[1]
-    outfile = infile + '.graphsize'
+    outfile = os.path.basename(infile) + '.graphsize'
+    if len(sys.argv) == 3:
+        outfile = sys.argv[2]
 
     print 'creating ht'
     ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
