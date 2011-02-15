@@ -1,4 +1,4 @@
-assert 0, "don't use this script -- use graph-size.py instead"
+#assert 0, "don't use this script -- use graph-size.py instead"
 
 import khmer
 import sys
@@ -8,41 +8,40 @@ import subprocess
 import zlib
 import gzip
 
-K = 30
-HASHTABLE_SIZE=4**17+1
-THRESHOLD=100
+K = 32
+HASHTABLE_SIZE=int(4e9)
+THRESHOLD=500
+N_HT=4
 
 print 'ht size'
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
+ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 
 read_count = 0
 
-fd = open(sys.argv[1], 'w')
-
-for filename in sys.argv[2:]:
+for filename in sys.argv[1:]:
 
     print 'processing file: ' + filename + ' reads processed: ' + str(read_count)
 
-    for n, record in enumerate(screed.fastq.fastq_iter(gzip.open(filename))):
+    for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):
+        seq = record['sequence']
+        if len(seq) >= K:
+           ht.consume(seq)
 
-        read_count += 1
-        ht.consume(record['sequence'])
+        if n % 10000 == 0:
+           print '... loading', n
     
-        if read_count % 100000 == 0:
-            fd.write(str(read_count) + " " + str(ht.n_occupied()) + " " + str(ht.n_occupied() / float(HASHTABLE_SIZE)) +'\n')
-            fd.flush()
-
-for filename in sys.argv[2:]:
-    outfp = open(filename[:-3] + '.graphsize', 'w')
+for filename in sys.argv[1:]:
+    outfp = open(filename + '.graphsize', 'w')
     
     n_kept = 0
 
-    for n, record in enumerate(screed.fastq.fastq_iter(gzip.open(filename))):
+    for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):
         kmer = record['sequence'][:K]
         size = ht.calc_connected_graph_size(kmer, THRESHOLD)
         if size >= THRESHOLD:
-            print >>outfp, ">%s\n%s" % (record['name'], record['sequence'])
+            name = record['name'].rsplit('/', 2)[0] + '.%d' % n
+            print >>outfp, ">%s\n%s" % (name, record['sequence'])
             n_kept += 1
 
-        if n % 100000 == 0:
+        if n % 10000 == 0:
             print '...', n, n_kept, n - n_kept + 1
