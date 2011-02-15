@@ -141,7 +141,7 @@ const
   // keep track of both seen kmers, and counts.
   keeper.insert(kmer);
 
-  // is this a high-circumerence k-mer?  if so, don't count it; get outta here!
+  // is this a high-circumference k-mer? if so, don't count it; get outta here!
   if (break_on_circum && \
       count_kmers_on_radius(kmer_f, kmer_r,
 			    CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
@@ -164,37 +164,37 @@ const
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 }
 
 void Hashbits::trim_graphs(const std::string infilename,
