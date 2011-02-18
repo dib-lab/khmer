@@ -1094,6 +1094,43 @@ static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
+static PyObject * hash_get_kmer_abund_mean(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  unsigned long long total = 0;
+  unsigned long long count = 0;
+  float mean = 0.0;
+  counting->get_kmer_abund_mean(filename, total, count, mean);
+
+  return Py_BuildValue("LLf", total, count, mean);
+}
+
+static PyObject * hash_get_kmer_abund_abs_deviation(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * filename = NULL;
+  float mean = 0.0;
+
+  if (!PyArg_ParseTuple(args, "sf", &filename, &mean)) {
+    return NULL;
+  }
+
+  float abs_dev = 0.0;
+  counting->get_kmer_abund_abs_deviation(filename, mean, abs_dev);
+
+  return Py_BuildValue("f", abs_dev);
+}
+
 static PyObject * hash_get(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1306,6 +1343,8 @@ static PyMethodDef khmer_counting_methods[] = {
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
   { "load", hash_load, METH_VARARGS, "" },
   { "save", hash_save, METH_VARARGS, "" },
+  { "get_kmer_abund_abs_deviation", hash_get_kmer_abund_abs_deviation, METH_VARARGS, "" },
+  { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
