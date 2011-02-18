@@ -717,3 +717,101 @@ void CountingHash::get_median_count(const std::string &s,
   median = counts[counts.size() / 2]; // rounds down
 }
 
+
+void CountingHash::get_kmer_abund_mean(const std::string &filename,
+				       unsigned long long &total,
+				       unsigned long long &count,
+				       float &mean) const
+{
+  total = 0;
+  count = 0;
+  mean = 0.0;
+
+  Read read;
+  IParser* parser = IParser::get_parser(filename.c_str());
+  string name;
+  string seq;
+  unsigned int read_num = 0;
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	string kmer = seq.substr(i, i + _ksize);
+	BoundedCounterType n = get_count(kmer.c_str());
+
+	total += n;
+	count ++;
+      }
+
+      name.clear();
+      seq.clear();
+    }
+
+    read_num += 1;
+
+#if 0
+    // run callback, if specified
+    if (read_num % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("abundance_distribution", callback_data, read_num, 0);
+      } catch (...) {
+        throw;
+      }
+    }
+#endif // 0
+  }
+
+  mean = float(total) / float(count);
+}
+
+void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
+						float mean,
+						float &abs_deviation) const
+{
+  float total = 0.0;
+  unsigned long long count = 0;
+
+  Read read;
+  IParser* parser = IParser::get_parser(filename.c_str());
+  string name;
+  string seq;
+  unsigned int read_num = 0;
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	string kmer = seq.substr(i, i + _ksize);
+	BoundedCounterType n = get_count(kmer.c_str());
+
+	float diff = mean - (unsigned int)n;
+	if (diff < 0) { diff = -diff; }
+	total += diff;
+	count ++;
+      }
+
+      name.clear();
+      seq.clear();
+    }
+
+    read_num += 1;
+
+#if 0
+    // run callback, if specified
+    if (read_num % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("abundance_distribution", callback_data, read_num, 0);
+      } catch (...) {
+        throw;
+      }
+    }
+#endif // 0
+  }
+
+  abs_deviation = total / float(count);
+}

@@ -174,6 +174,14 @@ namespace khmer {
 				       BoundedCounterType limit_by_count,
 				       CallbackFn callback = NULL,
 				       void * callback_data = NULL);
+
+    void get_kmer_abund_mean(const std::string &inputfile,
+			     unsigned long long &total,
+			     unsigned long long &count,
+			     float &mean) const;
+
+    void get_kmer_abund_abs_deviation(const std::string &inputfile,
+				      float mean, float &abs_deviation) const;
   };
 };
 
