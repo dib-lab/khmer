@@ -3,9 +3,10 @@ import sys
 import screed
 import os.path
 import threading, Queue
+import gc
 
 K = 32
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE=int(1e9)
 THRESHOLD=500
 N_HT=4
 WORKER_THREADS=5
@@ -126,6 +127,8 @@ def write(outq, outfp):
 
             del groups[next_group]
             next_group += 1
+
+        gc.collect()
 
 def main():
     global done, worker_count
