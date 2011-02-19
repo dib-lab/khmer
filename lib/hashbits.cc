@@ -323,13 +323,12 @@ void Hashbits::load_tagset(std::string infilename)
   delete buf;
 }
 
-unsigned int Hashbits::kmer_degree(const char * kmer_s) const
+unsigned int Hashbits::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
+const
 {
   unsigned int neighbors = 0;
-  HashIntoType kmer_f, kmer_r;
 
   const unsigned int rc_left_shift = _ksize*2 - 2;
-  _hash(kmer_s, _ksize, kmer_f, kmer_r);
 
   HashIntoType f, r;
 
@@ -1142,4 +1141,30 @@ const
   }
 
   return count;
+}
+
+unsigned int Hashbits::trim_on_degree(std::string seq, unsigned int max_degree)
+const
+{
+  if (!check_read(seq)) {
+    return 0;
+
+  }
+  const char * first_kmer = seq.c_str();
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+  if (kmer_degree(kmer_f, kmer_r) > max_degree) {
+    return _ksize;
+  }
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    _next_hash(seq[i], kmer_f, kmer_r);
+
+    if (kmer_degree(kmer_f, kmer_r) > max_degree) {
+      return i;
+    }
+  }
+
+  return seq.length();
 }

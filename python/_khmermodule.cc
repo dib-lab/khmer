@@ -1701,6 +1701,29 @@ static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
   return PyInt_FromLong(hashbits->kmer_degree(kmer_s));
 }
 
+static PyObject * hashbits_trim_on_degree(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+  unsigned int max_degree = 0;
+
+  if (!PyArg_ParseTuple(args, "si", &seq, &max_degree)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    trim_at = hashbits->trim_on_degree(seq, max_degree);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  return Py_BuildValue("Oi", trim_seq, trim_at);
+}
+
 void free_subset_partition_info(void * p)
 {
   khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
@@ -2545,6 +2568,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "trim_graphs", hashbits_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hashbits_graphsize_distribution, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
+  { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
   { "connectivity_distribution", hashbits_connectivity_distribution, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hashbits_filter_file_connected, METH_VARARGS, "" },
