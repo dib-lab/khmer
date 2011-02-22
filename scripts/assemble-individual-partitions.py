@@ -12,7 +12,7 @@ def load_sequences(filename):
 
     for r in records:
         name = r['name']
-        partition = name.rsplit(' ', 1)[1]
+        partition = name.rsplit('\t', 1)[1]
         partition = int(partition)
 
         x = d.get(partition, [])
@@ -21,22 +21,27 @@ def load_sequences(filename):
 
     return len(records), d
 
-def assemble_sequences(records, k, length_cutoff=400):
+def assemble_sequences(records, k, length_cutoff=1000):
     dirname = tempfile.mkdtemp()
+    os.chdir(dirname)
 
     try:
         seqfile = os.path.join(dirname, 'seqs.fa')
         fp = open(seqfile, 'w')
         for r in records:
-            fp.write('>%s\n%s\n' % (r['name'], r['sequence']))
+            fp.write('>%s\n%s\n' % (r['name'].split()[0], r['sequence']))
         fp.close()
 
+        p = subprocess.Popen('python /root/khmer/scripts/strip-and-split-for-assembly.py seqs.fa seqs.fa', shell=True)
+        p.communicate()
+        assert p.returncode == 0
+
         assemble_dir = os.path.join(dirname, 'assemble')
-        p = subprocess.Popen('velveth %s %d -short %s' % (assemble_dir, k, seqfile), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen('velveth %s %d -shortPaired %s.pe -short %s.se' % (assemble_dir, k, seqfile, seqfile), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
         assert p.returncode == 0, (stdout, stderr)
 
-        p = subprocess.Popen('velvetg %s -read_trkg yes' % (assemble_dir,),
+        p = subprocess.Popen('velvetg %s -read_trkg yes -exp_cov auto -cov_cutoff 0' % (assemble_dir,),
                              shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
         assert p.returncode == 0, (stdout, stderr)
@@ -52,6 +57,7 @@ def assemble_sequences(records, k, length_cutoff=400):
         return total, x
     finally:
         shutil.rmtree(dirname)
+        #print 'XXX', dirname
 
 def best_assemble_sequences(r, try_k=(33, 35, 37, 39, 41, 43, 45, 47, 49, 51)):
 
@@ -80,4 +86,5 @@ for pid in partitions:
 
     for n,r in enumerate(records):
         fp.write('>part%d.%d\n%s\n' % (pid, n, r['sequence']))
+
 fp.close()
