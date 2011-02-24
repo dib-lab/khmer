@@ -111,7 +111,7 @@ def main():
 
       print "%d\t%d\t%d\t%s" % (statTrimmedN, statSum, statMax, filename)
 
-   if len(sys.argv) > 3:
+   if len(sys.argv) > 3 and totalN:
       print '--'
       print 'TOTAL: %g in %d contigs (mean size %d)' % (totalSum, totalN, totalSum / float(totalN) + .5)
 
