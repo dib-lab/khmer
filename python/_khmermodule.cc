@@ -1416,7 +1416,7 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
   }
 
   std::vector<khmer::HashIntoType> sizes;
-  for (unsigned int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+  for (int i = 0; i < PyObject_Length(sizes_list_o); i++) {
     PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
     sizes.push_back(PyLong_AsLongLong(size_o));
   }
@@ -2657,7 +2657,7 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
   }
 
   std::vector<khmer::HashIntoType> sizes;
-  for (unsigned int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+  for (int i = 0; i < PyObject_Length(sizes_list_o); i++) {
     PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
     sizes.push_back(PyLong_AsLongLong(size_o));
   }
