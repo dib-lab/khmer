@@ -4,8 +4,7 @@ CXXFLAGS=-g -fPIC -Wall -O2 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
-all: zlib parsers.o ktable.o hashtable.o intertable.o hashbits.o subset.o \
-	counting.o
+all: zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
 clean:
 	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz.so.1.2.3
