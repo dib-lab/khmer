@@ -1,0 +1,91 @@
+=====================
+Introduction to khmer
+=====================
+
+Introduction
+============
+
+khmer is a library and toolkit for doing k-mer-based dataset analysis
+and transformations.  Our focus in developing it has been on scaling
+assembly of metagenomes and mRNA.
+
+khmer can be used for a number of transformations, include inexact
+transformations (abundance filtering and error trimming) and exact
+transformations (graphsize filtering, to throw away disconnected
+reads; and partitioning, to split reads into disjoint sets).  Of
+these, only partitioning is not constant memory.  In all cases, the
+memory required for assembly with Velvet or another de Bruijn graph
+assembler will be less than the memory required to use our
+software. Our software will not increase the memory required for
+Velvet, either , although we may not be able to *decrease* the memory
+required for assembly for every data set.
+
+Most of khmer relies on an underlying probablistic data structure
+known as a Bloom filter (@@ wikipedia), which is essentially a set of
+hash tables, each of different size, with no collision detection.
+These hash tables are used to store the presence of specific k-mers
+and/or their count.  The lack of collision detection means that
+the Bloom filter may report a k-mer as being "present" when it is
+not, in fact, in the data set; however, it will never incorrectly
+report a k-mer as being absent when it *is* present.  This one-sided
+error makes the Bloom filter very useful for certain kinds of
+operations.
+
+khmer is also independent of K, and currently works for K <= 32.  We
+will be integrating code for up to K=64 soon.
+
+khmer is implemented in C++ with a Python wrapper, which is what
+all of the scripts use.
+
+Using khmer
+===========
+
+khmer comes "out of the box" with a number of scripts that make it
+immediately useful for a few different operations, including:
+
+ - eliminating reads that will not be used by a de Bruijn graph assembler;
+
+ - dividing reads into disjoint sets that do not connect;
+
+ - removing reads with low- or high-abundance k-mers;
+
+ - trimming reads of certain kinds of sequencing errors;
+
+ - counting k-mers and estimating data set coverage based on k-mer counts;
+
+ - running Velvet and calculating assembly statistics;
+
+ - optimizing assemblies on various parameters;
+
+ - converting FASTA to FASTQ;
+
+and a few other random functions.
+
+Practical considerations
+========================
+
+The most important thing to think about when using khmer is whether or
+not the transformation or filter you're applying is appropriate for
+the data you're trying to assemble.  The most powerful operations
+available in khmer, graphsize filtering and graph partitioning, only
+make sense for assembly datasets with many theoretically unconnected
+components.  This is typical of metagenomic and mRNAseq data sets.
+khmer will probably never be all that useful for single-genome
+assembly, although abundance filtering and error trimming may be
+helpful for those data sets.
+
+The second most important consideration is memory usage.  The
+effectiveness of all of the Bloom filter-based functions (which is
+everything interesting in khmer!)  depends critically on having enough
+memory to do a good job.  We've found that about 2 bytes per unique
+k-mer is a good amount.  So if you have really, really large sequence
+data set from an extremely high-diversity sample, you may need 100 GB
+or more.
+
+Copyright and license
+=====================
+
+Portions of khmer are Copyright California Institute of Technology,
+where the exact counting code was first developed; the remainder is
+Copyright Michigan State University.  The code is freely available for
+use and re-use under the BSD License.
