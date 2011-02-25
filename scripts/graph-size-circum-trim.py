@@ -3,9 +3,10 @@ import sys
 import screed
 import os.path
 import threading, Queue
+import gc
 
 K = 32
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE=int(1e9)
 THRESHOLD=500
 N_HT=4
 WORKER_THREADS=5
@@ -35,6 +36,43 @@ def is_pair(r1, r2):
 
     return (a==b)
 
+def trim_by_circumference(ht, name, seq):
+    # calculate circumference for every point.
+    end = len(seq) - K
+    is_high = False
+
+    pos = 0
+    for pos in range(0, end, incr):
+        circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
+
+        if circum >= MAX_CIRCUM:
+            is_high = True
+            break
+
+    # ok. sequence has high-radius k-mers; can we trim them off?
+    if is_high and pos > incr:
+        pos -= incr
+
+        # find last k-mer with a low radius:
+        i = 1
+        for i in range(1, incr):
+            circum = ht.count_kmers_on_radius(seq[pos+i:pos+i+K],
+                                              RADIUS, MAX_VOLUME)
+            if circum >= MAX_CIRCUM:
+                break
+
+        pos += i - 1
+
+        # now trim sequence:
+        seq = seq[:pos+K]
+        is_high = False
+        name += "\tTRUNC.%d" % pos
+
+    if is_high:
+        return None, None
+    else:
+        return name, seq
+
 def process(inq, outq, ht):
     global worker_count
     
@@ -58,7 +96,12 @@ def process(inq, outq, ht):
 
             last_record = record
 
-        y = [ (record['name'], record['sequence']) for record in x ]
+        y = []
+        for record in x:
+            name, seq = trim_by_circumference(ht, record['name'],
+                                                  record['sequence'])
+            if name:
+                y.append((name, seq))
 
         gg = SequenceGroup(g.order, y)
         outq.put(gg)
@@ -85,13 +128,15 @@ def write(outq, outfp):
             del groups[next_group]
             next_group += 1
 
+        gc.collect()
+
 def main():
     global done, worker_count
     done = False
     worker_count = 0
     
     infile = sys.argv[1]
-    outfile = os.path.basename(infile) + '.graphsize'
+    outfile = os.path.basename(infile) + '.graphcirc'
     if len(sys.argv) == 3:
         outfile = sys.argv[2]
 

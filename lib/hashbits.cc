@@ -118,10 +118,11 @@ ReadMaskTable * Hashbits::filter_file_connected(const std::string &est,
 }
 
 void Hashbits::calc_connected_graph_size(const HashIntoType kmer_f,
-					  const HashIntoType kmer_r,
-					  unsigned long long& count,
-					  SeenSet& keeper,
-					  const unsigned long long threshold)
+					 const HashIntoType kmer_r,
+					 unsigned long long& count,
+					 SeenSet& keeper,
+					 const unsigned long long threshold,
+					 bool break_on_circum)
 const
 {
   HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
@@ -139,6 +140,14 @@ const
 
   // keep track of both seen kmers, and counts.
   keeper.insert(kmer);
+
+  // is this a high-circumference k-mer? if so, don't count it; get outta here!
+  if (break_on_circum && \
+      count_kmers_on_radius(kmer_f, kmer_r,
+			    CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
+    return;
+  }
+
   count += 1;
 
   // are we past the threshold? truncate search.
@@ -155,37 +164,37 @@ const
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
   r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
   r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
   r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
   r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   // PREVIOUS.
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
   f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
   f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
   f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
-  calc_connected_graph_size(f, r, count, keeper, threshold);
+  calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 }
 
 void Hashbits::trim_graphs(const std::string infilename,
@@ -314,13 +323,12 @@ void Hashbits::load_tagset(std::string infilename)
   delete buf;
 }
 
-unsigned int Hashbits::kmer_degree(const char * kmer_s) const
+unsigned int Hashbits::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
+const
 {
   unsigned int neighbors = 0;
-  HashIntoType kmer_f, kmer_r;
 
   const unsigned int rc_left_shift = _ksize*2 - 2;
-  _hash(kmer_s, _ksize, kmer_f, kmer_r);
 
   HashIntoType f, r;
 
@@ -1133,4 +1141,30 @@ const
   }
 
   return count;
+}
+
+unsigned int Hashbits::trim_on_degree(std::string seq, unsigned int max_degree)
+const
+{
+  if (!check_read(seq)) {
+    return 0;
+
+  }
+  const char * first_kmer = seq.c_str();
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+  if (kmer_degree(kmer_f, kmer_r) > max_degree) {
+    return _ksize;
+  }
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    _next_hash(seq[i], kmer_f, kmer_r);
+
+    if (kmer_degree(kmer_f, kmer_r) > max_degree) {
+      return i;
+    }
+  }
+
+  return seq.length();
 }

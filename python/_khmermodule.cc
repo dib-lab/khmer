@@ -1094,6 +1094,43 @@ static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
+static PyObject * hash_get_kmer_abund_mean(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  unsigned long long total = 0;
+  unsigned long long count = 0;
+  float mean = 0.0;
+  counting->get_kmer_abund_mean(filename, total, count, mean);
+
+  return Py_BuildValue("LLf", total, count, mean);
+}
+
+static PyObject * hash_get_kmer_abund_abs_deviation(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * filename = NULL;
+  float mean = 0.0;
+
+  if (!PyArg_ParseTuple(args, "sf", &filename, &mean)) {
+    return NULL;
+  }
+
+  float abs_dev = 0.0;
+  counting->get_kmer_abund_abs_deviation(filename, mean, abs_dev);
+
+  return Py_BuildValue("f", abs_dev);
+}
+
 static PyObject * hash_get(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1306,6 +1343,8 @@ static PyMethodDef khmer_counting_methods[] = {
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
   { "load", hash_load, METH_VARARGS, "" },
   { "save", hash_save, METH_VARARGS, "" },
+  { "get_kmer_abund_abs_deviation", hash_get_kmer_abund_abs_deviation, METH_VARARGS, "" },
+  { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -1545,15 +1584,27 @@ static PyObject * hashbits_calc_connected_graph_size(PyObject * self, PyObject *
 
   char * _kmer;
   unsigned int max_size = 0;
-  if (!PyArg_ParseTuple(args, "s|i", &_kmer, &max_size)) {
+  PyObject * break_on_circum_o = NULL;
+  if (!PyArg_ParseTuple(args, "s|iO", &_kmer, &max_size, &break_on_circum_o)) {
     return NULL;
+  }
+
+  bool break_on_circum = false;
+  if (break_on_circum_o && !PyBool_Check(break_on_circum_o)) {
+    PyErr_SetString(PyExc_TypeError, "third argument must be True/False");
+    return NULL;
+  }
+
+  if (break_on_circum_o == Py_True) {
+    break_on_circum = true;
   }
 
   unsigned long long size = 0;
 
   Py_BEGIN_ALLOW_THREADS
   khmer::SeenSet keeper;
-  hashbits->calc_connected_graph_size(_kmer, size, keeper, max_size);
+  hashbits->calc_connected_graph_size(_kmer, size, keeper, max_size,
+				      break_on_circum);
   Py_END_ALLOW_THREADS
 
   return PyInt_FromLong(size);
@@ -1648,6 +1699,29 @@ static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
   }
 
   return PyInt_FromLong(hashbits->kmer_degree(kmer_s));
+}
+
+static PyObject * hashbits_trim_on_degree(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+  unsigned int max_degree = 0;
+
+  if (!PyArg_ParseTuple(args, "si", &seq, &max_degree)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    trim_at = hashbits->trim_on_degree(seq, max_degree);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  return Py_BuildValue("Oi", trim_seq, trim_at);
 }
 
 void free_subset_partition_info(void * p)
@@ -2494,6 +2568,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "trim_graphs", hashbits_trim_graphs, METH_VARARGS, "" },
   { "graphsize_distribution", hashbits_graphsize_distribution, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
+  { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
   { "connectivity_distribution", hashbits_connectivity_distribution, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "filter_file_connected", hashbits_filter_file_connected, METH_VARARGS, "" },

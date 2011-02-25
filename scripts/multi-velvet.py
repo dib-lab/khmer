@@ -19,6 +19,7 @@ print '** K is %d' % K
 print '** running with %d concurrent processes' % N_PROCESSES
 
 filenames = sys.argv[1:]
+filenames.reverse()
 
 running = []
 
