@@ -13,11 +13,27 @@ for record in screed.fasta.fasta_iter(open(sys.argv[1]), parse_description=False
 
     name = name.split()[0]
 
-    fp = single_fp
-    if name.endswith('2') and last_record and name[:-1] == last_name[:-1]:
-        fp = paired_fp
-        print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
-    
-    print >>fp, '>%s\n%s' % (name, sequence,)
+    if last_record:
+        if last_name.endswith('/1') and name.endswith('/2') and name[:-1] == last_name[:-1]:
+           fp = paired_fp
+           print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+           print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
+           name, record = None, None
+        else:
+           print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+
     last_name = name
     last_record = record
+
+if last_record:
+   if last_name.endswith('/1') and name.endswith('/2') and name[:-1] == last_name[:-1]:
+      fp = paired_fp
+      print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+      print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
+      name, record = None, None
+   else:
+      print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+      name, record = None, None
+
+if record:
+   print >>single_fp, '>%s\n%s' % (name, record['sequence'])

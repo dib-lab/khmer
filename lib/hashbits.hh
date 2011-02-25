@@ -93,17 +93,19 @@ namespace khmer {
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
-				   const unsigned long long threshold=0) const{
+				   const unsigned long long threshold=0,
+				   bool break_on_circum=false) const{
       HashIntoType r, f;
       _hash(kmer, _ksize, f, r);
-      calc_connected_graph_size(f, r, count, keeper, threshold);
+      calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
     }
 
     void calc_connected_graph_size(const HashIntoType kmer_f,
 				   const HashIntoType kmer_r,
 				   unsigned long long& count,
 				   SeenSet& keeper,
-				   const unsigned long long threshold=0) const;
+				   const unsigned long long threshold=0,
+				   bool break_on_circum=false) const;
 
     typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
 
@@ -136,7 +138,13 @@ namespace khmer {
 				   CallbackFn callback=0,
 				   void * callback_data=0);
 
-    unsigned int kmer_degree(const char * kmer_s) const;
+    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
+    unsigned int kmer_degree(const char * kmer_s) const {
+      HashIntoType kmer_f, kmer_r;
+      _hash(kmer_s, _ksize, kmer_f, kmer_r);
+
+      return kmer_degree(kmer_f, kmer_r);
+    }
 
     void tags_to_map(TagCountMap& tag_map);
     void discard_tags(TagCountMap& tag_map, unsigned int threshold);
@@ -219,6 +227,9 @@ namespace khmer {
 				       HashIntoType kmer_r,
 				       unsigned int radius,
 				       unsigned int max_volume) const;
+
+    unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
+      const;
   };
 };
 
