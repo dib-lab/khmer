@@ -78,18 +78,6 @@ namespace khmer {
     virtual void save_tagset(std::string);
     virtual void load_tagset(std::string);
 
-    void trim_graphs(const std::string infilename,
-		     const std::string outfilename,
-		     unsigned int min_size,
-		     CallbackFn callback = NULL,
-		     void * callback_data = NULL);
-
-    HashIntoType * graphsize_distribution(const unsigned int &max_size);
-
-    ReadMaskTable * filter_file_connected(const std::string &est,
-                                          const std::string &readsfile,
-                                          unsigned int total_reads);
-
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
 				   SeenSet& keeper,
@@ -133,11 +121,6 @@ namespace khmer {
 				   CallbackFn callback = 0,
 				   void * callback_data = 0);
 
-    void connectivity_distribution(const std::string infilename,
-				   HashIntoType dist[9],
-				   CallbackFn callback=0,
-				   void * callback_data=0);
-
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
     unsigned int kmer_degree(const char * kmer_s) const {
       HashIntoType kmer_f, kmer_r;
@@ -146,18 +129,16 @@ namespace khmer {
       return kmer_degree(kmer_f, kmer_r);
     }
 
-    void tags_to_map(TagCountMap& tag_map);
-    void discard_tags(TagCountMap& tag_map, unsigned int threshold);
-
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
 				  HashIntoType stop=0) const {
+      // @@ CTB need to be able to *save* this...
       return _occupied_bins/_n_tables;
     }
       
     virtual const HashIntoType n_kmers(HashIntoType start=0,
                   HashIntoType stop=0) const {
-      return _n_unique_kmers;
+      return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
     }
 
     virtual void count(const char * kmer) {
@@ -207,12 +188,6 @@ namespace khmer {
 			   const std::string outputfilename,
 			   CallbackFn callback=0,
 			   void * callback_data=0);
-
-    void thread_fasta(const std::string &filename,
-		      unsigned int &total_reads,
-		      unsigned long long &n_consumed,
-		      CallbackFn callback = 0,
-		      void * callback_data = 0);
 
     unsigned int count_kmers_within_radius(HashIntoType kmer_f,
 					   HashIntoType kmer_r,
