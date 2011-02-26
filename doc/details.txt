@@ -1,0 +1,5 @@
+Miscellaneous implementation details
+====================================
+
+Partition IDs are "stored" in FASTA files as an integer in the last
+tab-separated field.  Yeah, dumb, huh?
