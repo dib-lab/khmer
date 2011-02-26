@@ -11,7 +11,6 @@
 #include "hashbits.hh"
 #include "counting.hh"
 #include "storage.hh"
-#include "intertable.hh"
 
 //
 // Function necessary for Python loading:
@@ -1499,36 +1498,6 @@ static PyObject * hashbits_count(PyObject * self, PyObject * args)
   return PyInt_FromLong(1);
 }
 
-static PyObject * hashbits_filter_file_connected(PyObject * self, PyObject *args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * est;
-  char * readsfile;
-  unsigned int total_reads;
-
-  khmer::ReadMaskTable * readmask;
-
-  if (!PyArg_ParseTuple(args, "ssi", &est, &readsfile, &total_reads)) {
-    return NULL;
-  }
-
-  try {
-    readmask = hashbits->filter_file_connected(est, readsfile, total_reads);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-
-  readmask_obj->mask = readmask;
-
-  return (PyObject *) readmask_obj;
-}
-
-
 static PyObject * hashbits_consume(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -1608,82 +1577,6 @@ static PyObject * hashbits_calc_connected_graph_size(PyObject * self, PyObject *
   Py_END_ALLOW_THREADS
 
   return PyInt_FromLong(size);
-}
-
-static PyObject * hashbits_trim_graphs(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  unsigned int threshold = 0;
-  char * filename = NULL;
-  char * outfile = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "sis|O", &filename, &threshold, &outfile,
-			&callback_obj)) {
-    return NULL;
-  }
-  
-  try {
-    hashbits->trim_graphs(filename, outfile, threshold, _report_fn,
-			   callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-  
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * hashbits_graphsize_distribution(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  unsigned int threshold = 0;
-  if (!PyArg_ParseTuple(args, "i", &threshold)) {
-    return NULL;
-  }
-
-  khmer::HashIntoType * p = hashbits->graphsize_distribution(threshold);
-  
-  PyObject * x = PyList_New(threshold);
-  for (unsigned int i = 0; i < threshold; i++) {
-    if (i > 0) { p[i] /= i; }
-    PyList_SET_ITEM(x, i, PyInt_FromLong(p[i]));
-  }
-
-  delete p;
-
-  return x;
-}
-
-static PyObject * hashbits_connectivity_distribution(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * filename = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
-    return NULL;
-  }
-
-  khmer::HashIntoType dist[9];
-  try {
-    hashbits->connectivity_distribution(filename, dist, _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  PyObject * x = PyList_New(9);
-  for (unsigned int i = 0; i < 9; i++) {
-    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-  }
-
-  return x;
 }
 
 static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
@@ -1882,33 +1775,6 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * arg
   try {
     hashbits->consume_fasta_and_tag(filename, total_reads, n_consumed,
 				     _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  return Py_BuildValue("iL", total_reads, n_consumed);
-}
-
-static PyObject * hashbits_thread_fasta(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * filename;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
-    return NULL;
-  }
-
-  // call the C++ function, and trap signals => Python
-
-  unsigned long long n_consumed;
-  unsigned int total_reads;
-
-  try {
-    hashbits->thread_fasta(filename, total_reads, n_consumed,
-			   _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -2320,113 +2186,6 @@ static PyObject * hashbits__validate_subset_partitionmap(PyObject * self, PyObje
   return Py_None;
 }
 
-static PyObject * hashbits_divide_tags_into_subsets(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  unsigned int subset_size = 0;
-
-  if (!PyArg_ParseTuple(args, "i", &subset_size)) {
-    return NULL;
-  }
-
-  khmer::SeenSet divvy;
-  hashbits->divide_tags_into_subsets(subset_size, divvy);
-
-  PyObject * x = PyList_New(divvy.size());
-  unsigned int i = 0;
-  for (khmer::SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
-       si++, i++) {
-    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(*si));
-  }
-
-  return x;
-}
-
-void free_tag_map(void * p)
-{
-  khmer::TagCountMap * m = (khmer::TagCountMap *) p;
-  delete m;
-}
-
-static PyObject * hashbits_new_tagmap(PyObject * self, PyObject * args)
-{
-  // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  // khmer::Hashbits * hashbits = me->hashbits;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  khmer::TagCountMap * tag_map = new khmer::TagCountMap();
-
-  return PyCObject_FromVoidPtr(tag_map, free_tag_map);
-}
-
-static PyObject * hashbits_subset_maxify_partition_size(PyObject * self, PyObject * args)
-{
-  PyObject * subset_obj = NULL;
-  PyObject * tagmap_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "OO", &subset_obj, &tagmap_obj)) {
-    return NULL;
-  }
-
-  khmer::SubsetPartition * subset_p;
-  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
-
-  khmer::TagCountMap * tag_count;
-  tag_count = (khmer::TagCountMap *) PyCObject_AsVoidPtr(tagmap_obj);
-
-  subset_p->maxify_partition_size(*tag_count);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * hashbits_discard_tags(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  PyObject * tagmap_obj = NULL;
-  unsigned int threshold = 0;
-
-  if (!PyArg_ParseTuple(args, "Oi", &tagmap_obj, &threshold)) {
-    return NULL;
-  }
-
-  khmer::TagCountMap * tag_count;
-  tag_count = (khmer::TagCountMap *) PyCObject_AsVoidPtr(tagmap_obj);
-
-  hashbits->discard_tags(*tag_count, threshold);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * hashbits_subset_filter_against_tags(PyObject * self, PyObject * args)
-{
-  PyObject * subset_obj = NULL;
-  PyObject * tagmap_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "OO", &subset_obj, &tagmap_obj)) {
-    return NULL;
-  }
-
-  khmer::SubsetPartition * subset_p;
-  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
-
-  khmer::TagCountMap * tag_count;
-  tag_count = (khmer::TagCountMap *) PyCObject_AsVoidPtr(tagmap_obj);
-
-  subset_p->filter_against_tags(*tag_count);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 static PyObject * hashbits_set_partition_id(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2476,6 +2235,30 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
   partition_id = hashbits->partition->get_partition_id(kmer);
 
   return PyInt_FromLong(partition_id);
+}
+
+static PyObject * hashbits_divide_tags_into_subsets(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  unsigned int subset_size = 0;
+
+  if (!PyArg_ParseTuple(args, "i", &subset_size)) {
+    return NULL;
+  }
+
+  khmer::SeenSet divvy;
+  hashbits->divide_tags_into_subsets(subset_size, divvy);
+
+  PyObject * x = PyList_New(divvy.size());
+  unsigned int i = 0;
+  for (khmer::SeenSet::const_iterator si = divvy.begin(); si != divvy.end();
+       si++, i++) {
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(*si));
+  }
+
+  return x;
 }
 
 static PyObject * hashbits_count_kmers_within_radius(PyObject * self, PyObject * args)
@@ -2565,13 +2348,9 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
-  { "trim_graphs", hashbits_trim_graphs, METH_VARARGS, "" },
-  { "graphsize_distribution", hashbits_graphsize_distribution, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
   { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
-  { "connectivity_distribution", hashbits_connectivity_distribution, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
-  { "filter_file_connected", hashbits_filter_file_connected, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
@@ -2587,7 +2366,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_validate_partitionmap", hashbits__validate_partitionmap, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
-  { "thread_fasta", hashbits_thread_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
   { "merge_subset_from_disk", hashbits_merge_from_disk, METH_VARARGS, "" },
@@ -2598,10 +2376,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },
   { "merge2_subset_from_disk", hashbits_merge2_from_disk, METH_VARARGS },
   { "_validate_subset_partitionmap", hashbits__validate_subset_partitionmap, METH_VARARGS, "" },
-  { "new_tagmap", hashbits_new_tagmap, METH_VARARGS, "" },
-  { "subset_filter_against_tags", hashbits_subset_filter_against_tags, METH_VARARGS, "" },
-  { "discard_tags", hashbits_discard_tags, METH_VARARGS, "" },
-  { "subset_maxify_partition_size", hashbits_subset_maxify_partition_size, METH_VARARGS, "" },
   { "set_partition_id", hashbits_set_partition_id, METH_VARARGS, "" },
   { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
   { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
@@ -3213,28 +2987,6 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
   Py_INCREF(Py_None);
   return Py_None;
 }
-static PyObject * do_intersection_partition(PyObject * self, PyObject * args)
-{
-  int ksize;
-  khmer::HashIntoType tablesize;
-  char * infile = NULL;
-  char * outfile = NULL;
-  
-  if (!PyArg_ParseTuple(args, "iLss", &ksize, &tablesize, &infile,
-			&outfile)) {
-    return NULL;
-  }
-
-  khmer::IntersectTable * iitable;
-  iitable = new khmer::IntersectTable(ksize, tablesize);
-  iitable->do_partition(infile, outfile);
-
-  delete iitable;
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 
 //
 // Module machinery.
@@ -3252,7 +3004,6 @@ static PyMethodDef KhmerMethods[] = {
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
   { "reverse_hash", reverse_hash, METH_VARARGS, "", },
   { "set_reporting_callback", set_reporting_callback, METH_VARARGS, "" },
-  { "do_intersection_partition", do_intersection_partition, METH_VARARGS, "" },
   { NULL, NULL, 0, NULL }
 };
 

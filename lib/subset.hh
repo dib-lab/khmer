@@ -74,9 +74,6 @@ namespace khmer {
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
 					 void * callback_data=0);
-
-    void maxify_partition_size(TagCountMap& tag_map);
-    void filter_against_tags(TagCountMap& tag_map);
   };
 }
 

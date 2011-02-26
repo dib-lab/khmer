@@ -70,53 +70,6 @@ void Hashbits::load(std::string infilename)
 //////////////////////////////////////////////////////////////////////
 // graph stuff
 
-ReadMaskTable * Hashbits::filter_file_connected(const std::string &est,
-                                                 const std::string &readsfile,
-                                                 unsigned int total_reads)
-{
-   unsigned int read_num = 0;
-   unsigned int n_kept = 0;
-   unsigned long long int cluster_size;
-   ReadMaskTable * readmask = new ReadMaskTable(total_reads);
-   IParser* parser = IParser::get_parser(readsfile.c_str());
-
-
-   std::string first_kmer = est.substr(0, _ksize);
-   SeenSet keeper;
-   calc_connected_graph_size(first_kmer.c_str(),
-                             cluster_size,
-                             keeper);
-
-   while(!parser->is_complete())
-   {
-      std::string seq = parser->get_next_read().seq;
-
-      if (readmask->get(read_num))
-      {
-         bool keep = false;
-
-         HashIntoType h = 0, r = 0, kmer;
-         kmer = _hash(seq.substr(0, _ksize).c_str(), _ksize, h, r);
-         kmer = uniqify_rc(h, r);
-
-         SeenSet::iterator i = keeper.find(kmer);
-         if (i != keeper.end()) {
-            keep = true;
-         }
-
-         if (!keep) {
-            readmask->set(read_num, false);
-         } else {
-            n_kept++;
-         }
-      }
-
-      read_num++;
-   }
-
-   return readmask;
-}
-
 void Hashbits::calc_connected_graph_size(const HashIntoType kmer_f,
 					 const HashIntoType kmer_r,
 					 unsigned long long& count,
@@ -195,90 +148,6 @@ const
   r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
   f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-}
-
-void Hashbits::trim_graphs(const std::string infilename,
-			    const std::string outfilename,
-			    unsigned int min_size,
-			    CallbackFn callback,
-			    void * callback_data)
-{
-  IParser* parser = IParser::get_parser(infilename.c_str());
-  unsigned int total_reads = 0;
-  unsigned int reads_kept = 0;
-  Read read;
-  string seq;
-
-  string line;
-  ofstream outfile(outfilename.c_str());
-
-  //
-  // iterate through the FASTA file & consume the reads.
-  //
-
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    seq = read.seq;
-
-    bool is_valid = check_read(seq);
-
-    if (is_valid) {
-      std::string first_kmer = seq.substr(0, _ksize);
-      unsigned long long clustersize = 0;
-      SeenSet keeper;
-      calc_connected_graph_size(first_kmer.c_str(), clustersize, keeper,
-				min_size);
-
-      if (clustersize >= min_size) {
-	outfile << ">" << read.name << endl;
-	outfile << seq << endl;
-	reads_kept++;
-      }
-    }
-	       
-    total_reads++;
-
-    // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-      try {
-	callback("trim_graphs", callback_data, total_reads, reads_kept);
-      } catch (...) {
-	delete parser;
-	throw;
-      }
-    }
-  }
-
-  delete parser;
-}
-
-HashIntoType * Hashbits::graphsize_distribution(const unsigned int &max_size)
-{
-  HashIntoType * p = new HashIntoType[max_size];
-  const unsigned char seen = 1 << 7;
-  unsigned long long size;
-
-  for (unsigned int i = 0; i < max_size; i++) {
-    p[i] = 0;
-  }
-
-  for (HashIntoType i = 0; i < _tablesizes[0]; i++) {
-    BoundedCounterType count = get_count(i);
-    if (count && !(count & seen)) {
-      std::string kmer = _revhash(i, _ksize);
-      size = 0;
-
-      SeenSet keeper;
-      calc_connected_graph_size(kmer.c_str(), size, keeper, max_size);
-      if (size) {
-	if (size < max_size) {
-	  p[size] += 1;
-	}
-      }
-    }
-  }
-
-  return p;
 }
 
 void Hashbits::save_tagset(std::string outfilename)
@@ -370,52 +239,6 @@ const
 }
 
 
-void Hashbits::connectivity_distribution(const std::string infilename,
-					 HashIntoType dist[9],
-					 CallbackFn callback,
-					 void * callback_data)
-{
-  unsigned int total_reads = 0;
-  for (unsigned int i = 0; i < 9; i++) {
-    dist[i] = 0;
-  }
-
-  IParser* parser = IParser::get_parser(infilename);
-  Read read;
-  string seq;
-  bool is_valid;
-
-  while(!parser->is_complete()) {
-    // increment read number
-    read = parser->get_next_read();
-    total_reads++;
-
-    seq = read.seq;
-
-    is_valid = check_read(seq);
-    if (is_valid) {
-      const char * kmer_s = seq.c_str();
-
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	unsigned int neighbors = kmer_degree(kmer_s + i);
-	dist[neighbors]++;
-      }
-
-      // run callback, if specified
-      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-	try {
-	  callback("connectivity_dist", callback_data, total_reads, 0);
-	} catch (...) {
-	  delete parser;
-	  throw;
-	}
-      }
-    }
-  }
-
-  delete parser;
-}
-
 //
 // consume_fasta: consume a FASTA file of reads
 //
@@ -500,70 +323,6 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 }
 
 //
-// thread_fasta: thread tags using a FASTA file of reads
-//
-
-void Hashbits::thread_fasta(const std::string &filename,
-			    unsigned int &total_reads,
-			    unsigned long long &n_consumed,
-			    CallbackFn callback,
-			    void * callback_data)
-{
-  total_reads = 0;
-  n_consumed = 0;
-
-  IParser* parser = IParser::get_parser(filename.c_str());
-  Read read;
-
-  string seq = "";
-
-  //
-  // iterate through the FASTA file
-  //
-
-  while(!parser->is_complete())  {
-    HashIntoType kmer;
-    SeenSet tags_to_join;
-
-    read = parser->get_next_read();
-    seq = read.seq;
-
-    bool is_valid;
-
-    is_valid = check_read(seq);
-
-    if (is_valid) {
-      const char * first_kmer = seq.c_str();
-
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	kmer = _hash(first_kmer + i, _ksize);
-	if (all_tags.find(kmer) != all_tags.end()) {
-	  tags_to_join.insert(kmer);
-	}
-      }
-    }
-
-    kmer = *(tags_to_join.begin());
-    partition->assign_partition_id(kmer, tags_to_join);
-
-    // reset the sequence info, increment read number
-    total_reads++;
-
-    // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-      try {
-        callback("thread_fasta", callback_data, total_reads,
-		 n_consumed);
-      } catch (...) {
-	delete parser;
-        throw;
-      }
-    }
-  }
-  delete parser;
-}
-
-//
 // divide_tags_into_subsets - take all of the tags in 'all_tags', and
 //   divide them into subsets (based on starting tag) of <= given size.
 //
@@ -580,45 +339,6 @@ void Hashbits::divide_tags_into_subsets(unsigned int subset_size,
       i = 0;
     }
     i++;
-  }
-}
-
-//
-// tags_to_map - convert the 'all_tags' set into a TagCountMap, connecting
-//    each tag to a number (defaulting to zero).
-//
-
-void Hashbits::tags_to_map(TagCountMap& tag_map)
-{
-  for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
-       si++) {
-    tag_map[*si] = 0;
-  }
-  cout << "TM size: " << tag_map.size() << "\n";
-}
-
-//
-// discard_tags - remove tags from a TagCountMap if they have fewer than
-//   threshold count tags in their partition.  Used to eliminate tags belonging
-//   to small partitions.
-//
-
-void Hashbits::discard_tags(TagCountMap& tag_map, unsigned int threshold)
-{
-  SeenSet delete_me;
-
-  // Go through and find all tags that belong to small partitions.
-  for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
-       ti++) {
-    if (ti->second < threshold) {
-      delete_me.insert(ti->first);
-    }
-  }
-
-  // Remove 'em from the tag_map.
-  for (SeenSet::const_iterator si = delete_me.begin(); si != delete_me.end();
-       si++) {
-    tag_map.erase(*si);
   }
 }
 
