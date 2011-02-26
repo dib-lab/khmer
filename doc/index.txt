@@ -11,13 +11,17 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   introduction
    install
    ktable
    methods
    scripts
    blog-posts
    partitioning-big-data
+   details
    contributors
+
+   LICENSE
 
 Indices and tables
 ==================
