@@ -24,36 +24,6 @@ class Test_ExactGraphFu(object):
         x = ht.calc_connected_graph_size(kmer)
         assert x == 36, x
 
-    def test_trim(self):
-        ht = self.ht
-        
-        filename = os.path.join(thisdir, 'test-graph.fa')
-        outfile = os.path.join(thisdir, 'test-graph.fa.out') # @CTB use tempfile
-        ht.consume_fasta(filename)
-        ht.trim_graphs(filename, 40, outfile)
-
-        ht = khmer.new_hashbits(12, 4**12)
-        ht.consume_fasta(outfile)
-
-        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
-        assert x == 69, x
-        
-        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
-        assert x == 68, x
-        
-        x = ht.calc_connected_graph_size("ATACTGTAAATA")
-        assert x == 0, x
-
-    def test_graphsize_distrib(self):
-        ht = self.ht
-        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
-        x = ht.graphsize_distribution(200)
-
-        assert sum(x) == 3, x
-        assert x[69] == 1
-        assert x[68] == 1
-        assert x[36] == 1
-
     def test_graph_links_next_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -129,26 +99,6 @@ class Test_ExactGraphFu(object):
 class Test_InexactGraphFu(object):
     def setup(self):
         self.ht = khmer.new_hashbits(12, 4**8+1)
-
-    def test_trim(self):
-        ht = self.ht
-        filename = os.path.join(thisdir, 'test-graph.fa')
-        outfile = os.path.join(thisdir, 'test-graph.fa.out')
-        
-        ht.consume_fasta(filename)
-        ht.trim_graphs(filename, 40, outfile)
-
-        ht = khmer.new_hashbits(12, 4**12)
-        ht.consume_fasta(outfile)
-
-        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
-        assert x >= 69, x
-        
-        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
-        assert x >= 68, x               # @CTB why 69??
-        
-        x = ht.calc_connected_graph_size("ATACTGTAAATA")
-        assert x == 0, x
 
     def test_graph_links_next_a(self):
         ht = self.ht

@@ -42,20 +42,6 @@ def test_raise_in_consume_fasta():
     except:
         raise
 
-def test_raise_in_trim_graphs():
-    kh = khmer.new_hashbits(4, 4**4)
-
-    n, _ = kh.consume_fasta(reads_filename, 0, 0, None, False)
-    try:
-        print n
-        kh.trim_graphs(reads_filename, 5, "/dev/null", callback_raise)
-        assert 0
-    except GoodException:
-        pass
-    except:
-        raise
-    
-
 def test_raise_in_readmask_filter_fasta_file():
     readmask = khmer.new_readmask(N_READS)
 
