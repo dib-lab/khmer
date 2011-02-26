@@ -2,12 +2,21 @@
 Contributors and Acknowledgements
 =================================
 
+khmer is a product of the GED lab at Michigan State University,
+
+   http://ged.msu.edu/
+
+---
+
 C. Titus Brown <ctb@msu.edu> wrote the initial ktable and hashtable
-implementations.
+implementations, as well as hashbits and counting_hash.
 
 Jason Pell implemented many of the C++ k-mer filtering functions.
 
-Adina Howe and Arend Hintze contributed significantly to discussions
-of approaches and algorithms.
+Qingpeng contributed code to do unique k-mer counting.
+
+Adina Howe, Rosangela Canino-Koning, and Arend Hintze contributed
+significantly to discussions of approaches and algorithms; Adina wrote
+a number of scripts.
 
 CTB 8/10
