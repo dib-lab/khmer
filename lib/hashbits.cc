@@ -96,8 +96,7 @@ const
 
   // is this a high-circumference k-mer? if so, don't count it; get outta here!
   if (break_on_circum && \
-      count_kmers_on_radius(kmer_f, kmer_r,
-			    CIRCUM_RADIUS, CIRCUM_MAX_VOL) > MAX_CIRCUM) {
+      kmer_degree(kmer_f, kmer_r) > 4) {
     return;
   }
 
