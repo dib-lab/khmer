@@ -7,10 +7,11 @@ N_HT = 4
 
 ###
 
-MAX_DEGREE=4
+MAX_DEGREE=int(sys.argv[4])
 
-infile = sys.argv[1]
-outprefix = sys.argv[2]
+repfile = sys.argv[1]
+infile = sys.argv[2]
+outprefix = sys.argv[3]
 
 lowfile = outprefix + '.low'
 highfile = outprefix + '.high'
@@ -24,8 +25,8 @@ ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 lowfp = open(lowfile, 'w')
 highfp = open(highfile, 'w')
 
-print 'eating', infile
-ht.consume_fasta(infile)
+print 'eating', repfile
+ht.consume_fasta(repfile)
 
 for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
                                                    parse_description=False)):
@@ -39,7 +40,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
     # sort high degree & low degree sequences separately; ignore trimmed
     # component.
 
-    if trim_at >= K:
+    if trim_at > K:
         print >>lowfp, '>%s %d %d %d\n%s' % (name, trim_at, len(seq), len(trim_seq), trim_seq)
     else:
         print >>highfp, '>%s\n%s' % (name, seq)
