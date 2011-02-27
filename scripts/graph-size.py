@@ -12,14 +12,6 @@ WORKER_THREADS=5
 
 ###
 
-RADIUS=2
-MAX_CIRCUM=4                            # 4 seems to eliminate lump in 1m.fa
-MAX_VOLUME=200
-
-incr = 2*RADIUS
-
-###
-
 GROUPSIZE=100
 
 ###
@@ -94,6 +86,16 @@ def main():
     outfile = os.path.basename(infile) + '.graphsize'
     if len(sys.argv) == 3:
         outfile = sys.argv[2]
+
+    print 'input file to graphsize filter: %s' % infile
+    print 'filtering to output:', outfile
+    print '-- settings:'
+    print 'K', K
+    print 'HASHTABLE SIZE %g' % HASHTABLE_SIZE
+    print 'N HASHTABLES %d' % N_HT
+    print 'THRESHOLD', THRESHOLD
+    print 'N THREADS', WORKER_THREADS
+    print '--'
 
     print 'creating ht'
     ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
