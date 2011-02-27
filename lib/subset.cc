@@ -164,7 +164,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   string seq;
 
   std::string first_kmer;
-  HashIntoType kmer_f, kmer_r, kmer;
+  HashIntoType kmer_f, kmer_r, kmer = 0;
 
   const unsigned char ksize = _ht->ksize();
 

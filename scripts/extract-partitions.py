@@ -3,7 +3,9 @@ import sys
 from screed.fasta import fasta_iter
 
 MAX_SIZE=50000
-THRESHOLD=1
+THRESHOLD=5
+
+output_groups = True
 
 def read_partition_file(fp):
     for n, record in enumerate(fasta_iter(fp, parse_description=False)):
@@ -24,7 +26,12 @@ distfp = open(distfilename, 'w')
 
 print '---'
 print 'reading partitioned file:', filename
-print 'outputting to files named "%s.groupN.fa"' % prefix
+if output_groups:
+    print 'outputting to files named "%s.groupN.fa"' % prefix
+    print 'min reads to keep a partition:', THRESHOLD
+    print 'max size of a group file:', MAX_SIZE
+else:
+    print 'NOT outputtting groups! Beware!'
 print 'partition size distribution will go to %s' % distfilename
 print '---'
 
