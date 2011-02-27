@@ -1,6 +1,7 @@
 import sys, screed.fasta, os
 import khmer
 import threading, Queue
+import gc
 
 K = 31                                  # use K-1 for assembly K
 HASHTABLE_SIZE=int(4e9)
@@ -44,6 +45,8 @@ def process(inq, outq, ht):
         gg = SequenceGroup(g.order, y)
         outq.put(gg)
 
+        gc.collect()
+
     worker_count -= 1
 
 def write(outq, outfp):
@@ -65,6 +68,8 @@ def write(outq, outfp):
 
             del groups[next_group]
             next_group += 1
+
+            gc.collect()
 
 def main():
     global ht, done, worker_count
