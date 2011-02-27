@@ -121,7 +121,8 @@ def main(filename):
 
     print 'erasing old ht, creating new'
     del ht
-    
+    gc.collect()
+
     # create a new, empty ht object for merging; K matters, but not
     # hashtable size.
     ht = khmer.new_hashbits(32, 1, 1)
