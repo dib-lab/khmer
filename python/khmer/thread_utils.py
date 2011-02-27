@@ -37,8 +37,11 @@ class ThreadedSequenceProcessor(object):
         self.worker_count = 0
         self.done = False
         self.verbose = verbose
+        
         self.n_processed = 0
         self.n_written = 0
+        self.bp_processed = 0
+        self.bp_written = 0
 
     def start(self, inputiter, outfp):
         if self.verbose:
@@ -103,20 +106,31 @@ class ThreadedSequenceProcessor(object):
             except Queue.Empty:
                 continue
 
+            bp_processed = 0
+            bp_written = 0
+
             keep = []
             for record in g.seqlist:
                 name, sequence = self.process_fn(record)
+                bp_processed += len(record['sequence'])
                 if name:
+                    bp_written += len(sequence)
                     keep.append((name, sequence))
 
             self.outqueue.put(SequenceGroup(0, keep))
 
             self.n_processed += len(g.seqlist)
             self.n_written += len(keep)
+            self.bp_processed += bp_processed
+            self.bp_written += bp_written
+            
             if self.verbose and self.n_processed % 100000 == 0:
                 print >>sys.stderr, "processed %d / wrote %d / removed %d" % \
                       (self.n_processed, self.n_written,
                        self.n_processed - self.n_written)
+                print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
+                      (self.bp_processed, self.bp_written,
+                       self.bp_processed - self.bp_written)
 
         # end of thread; exit, decrement worker count.
         self.worker_count -= 1
