@@ -71,6 +71,9 @@ def write(outq, outfp):
 
             gc.collect()
 
+        if len(groups) > 20:
+            print 'WAITAMINIT: len(groups) is', len(groups)
+
 def main():
     global ht, done, worker_count
     done = False
