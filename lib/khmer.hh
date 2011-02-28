@@ -1,7 +1,7 @@
 #define VERSION "0.3"
 
 #define MAX_COUNT 255
-#define TAG_DENSITY 40
+#define TAG_DENSITY 40		// must be even
 #define CONNECTED_THRESHOLD 0
 
 #define MAX_CIRCUM 3
