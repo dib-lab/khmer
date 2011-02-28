@@ -309,6 +309,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      std::cout << "n tags: " << all_tags.size() << "\n";
       try {
         callback("consume_fasta_and_tag", callback_data, total_reads,
 		 n_consumed);
