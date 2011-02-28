@@ -51,6 +51,7 @@ namespace khmer {
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
       khmer::Hashtable(ksize), _tablesizes(tablesizes) {
       _tag_density = TAG_DENSITY;
+      assert(_tag_density % 2 == 0);
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
       _n_unique_kmers = 0;
