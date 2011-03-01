@@ -46,55 +46,58 @@ class ThreadedSequenceProcessor(object):
     def start(self, inputiter, outfp):
         if self.verbose:
             print >>sys.stderr, 'starting threads'
-            
-        for i in range(self.n_workers):
-            t = threading.Thread(target=self.do_process)
-            self.worker_count += 1
-            t.start()
 
-        if self.verbose:
-            print >>sys.stderr, 'starting writer'
-            
-        w = threading.Thread(target=self.do_write, args=(outfp,))
-        w.start()
+        try:
+            for i in range(self.n_workers):
+                t = threading.Thread(target=self.do_process)
+                self.worker_count += 1
+                t.start()
 
-        if self.verbose:
-            print >>sys.stderr, 'loading...'
+            if self.verbose:
+                print >>sys.stderr, 'starting writer'
 
-        batch = []
-        last_record = None
-        i = 0
-        for record in inputiter:
-            if i >= self.group_size:
-                # keep pairs together in batches, to retain the interleaving.
-                if is_pair(record, last_record):
-                    batch.append(record)
-                    g = SequenceGroup(0, batch)
-                    self.inqueue.put(g)
-                    
-                    batch = []
+            w = threading.Thread(target=self.do_write, args=(outfp,))
+            w.start()
+
+            if self.verbose:
+                print >>sys.stderr, 'loading...'
+
+            batch = []
+            last_record = None
+            i = 0
+            for record in inputiter:
+                if i >= self.group_size:
+                    # keep pairs together in batches, to retain the interleaving.
+                    if is_pair(record, last_record):
+                        batch.append(record)
+                        g = SequenceGroup(0, batch)
+                        self.inqueue.put(g)
+
+                        batch = []
+                    else:
+                        g = SequenceGroup(0, batch)
+                        self.inqueue.put(g)
+                        batch = [record]
+
+                    i = 0
                 else:
-                    g = SequenceGroup(0, batch)
-                    self.inqueue.put(g)
-                    batch = [record]
+                    batch.append(record)
 
-                i = 0
-            else:
-                batch.append(record)
-                
-            last_record = record
-            i += 1
+                last_record = record
+                i += 1
 
-        # submit last set of sequences
-        if batch:
-            g = SequenceGroup(0, batch)
-            self.inqueue.put(g)
+            # submit last set of sequences
+            if batch:
+                g = SequenceGroup(0, batch)
+                self.inqueue.put(g)
 
-        if self.verbose:
-            print >>sys.stderr, 'done loading in sequences'
-        self.done = True
+            if self.verbose:
+                print >>sys.stderr, 'done loading in sequences'
+            self.done = True
 
-        w.join()
+            w.join()
+        finally:
+            self.done = True
 
     def do_process(self):
         inq = self.inqueue
@@ -138,6 +141,9 @@ class ThreadedSequenceProcessor(object):
     def do_write(self, outfp):
         outq = self.outqueue
         while self.worker_count > 0 or not outq.empty():
+            if self.done:
+                break
+            
             try:
                 g = outq.get(True, 1)
             except Queue.Empty:
