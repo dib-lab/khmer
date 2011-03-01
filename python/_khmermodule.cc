@@ -1614,7 +1614,10 @@ static PyObject * hashbits_trim_on_degree(PyObject * self, PyObject * args)
   Py_END_ALLOW_THREADS;
 
   PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
-  return Py_BuildValue("Oi", trim_seq, trim_at);
+  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
+  Py_DECREF(trim_seq);
+
+  return ret;
 }
 
 void free_subset_partition_info(void * p)
