@@ -5,7 +5,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 K = 31                                  # use K-1 for part/assembly with K
 HASHTABLE_SIZE=int(4e9)
 N_HT = 4
-MAX_DEGREE=4
+MAX_DEGREE=3
 
 WORKER_THREADS=8
 GROUPSIZE=100
