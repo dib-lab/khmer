@@ -96,8 +96,9 @@ class ThreadedSequenceProcessor(object):
             self.done = True
 
             w.join()
-        finally:
+        except:
             self.done = True
+            raise
 
     def do_process(self):
         inq = self.inqueue
@@ -141,9 +142,6 @@ class ThreadedSequenceProcessor(object):
     def do_write(self, outfp):
         outq = self.outqueue
         while self.worker_count > 0 or not outq.empty():
-            if self.done:
-                break
-            
             try:
                 g = outq.get(True, 1)
             except Queue.Empty:
