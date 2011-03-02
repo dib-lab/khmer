@@ -38,7 +38,7 @@ def test_basic():
     tsp.start(input, outfp)
 
     x = load_records_d(outfp)
-    assert len(x) == 2
+    assert len(x) == 2, x
     assert x['a'] == 'AAA'
     assert x['b'] == 'TTT'
 
@@ -65,7 +65,7 @@ def test_basic_2thread():
     tsp.start(input, outfp)
 
     x = load_records_d(outfp)
-    assert len(x) == 2
+    assert len(x) == 2, x
     assert x['a'] == 'AAA'
     assert x['b'] == 'TTT'
 
@@ -112,7 +112,7 @@ def test_paired_2thread():
     tsp.start(input, outfp)
 
     x = load_records_d(outfp)
-    assert len(x) == 2
+    assert len(x) == 2, x
     assert x['a/1'] == 'AAA'
     assert x['a/2'] == 'TTT'
 
@@ -161,7 +161,7 @@ def test_paired_2thread_more_seq():
     tsp.start(input, outfp)
 
     x = load_records_d(outfp)
-    assert len(x) == 4
+    assert len(x) == 4, x
     assert x['a/1'] == 'AAA'
     assert x['a/2'] == 'TTT'
     assert x['b/1'] == 'AAA'
