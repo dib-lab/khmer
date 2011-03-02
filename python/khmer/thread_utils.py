@@ -62,34 +62,7 @@ class ThreadedSequenceProcessor(object):
             if self.verbose:
                 print >>sys.stderr, 'loading...'
 
-            batch = []
-            last_record = None
-            i = 0
-            for record in inputiter:
-                if i >= self.group_size:
-                    # keep pairs together in batches, to retain the interleaving.
-                    if is_pair(record, last_record):
-                        batch.append(record)
-                        g = SequenceGroup(0, batch)
-                        self.inqueue.put(g)
-
-                        batch = []
-                    else:
-                        g = SequenceGroup(0, batch)
-                        self.inqueue.put(g)
-                        batch = [record]
-
-                    i = 0
-                else:
-                    batch.append(record)
-
-                last_record = record
-                i += 1
-
-            # submit last set of sequences
-            if batch:
-                g = SequenceGroup(0, batch)
-                self.inqueue.put(g)
+            self.push_sequences(inputiter)
 
             if self.verbose:
                 print >>sys.stderr, 'done loading in sequences'
@@ -99,6 +72,36 @@ class ThreadedSequenceProcessor(object):
         except:
             self.done = True
             raise
+
+    def push_sequences(self, inputiter):
+        batch = []
+        last_record = None
+        i = 0
+        for record in inputiter:
+            if i >= self.group_size:
+                # keep pairs together in batches, to retain the interleaving.
+                if is_pair(record, last_record):
+                    batch.append(record)
+                    g = SequenceGroup(0, batch)
+                    self.inqueue.put(g)
+
+                    batch = []
+                else:
+                    g = SequenceGroup(0, batch)
+                    self.inqueue.put(g)
+                    batch = [record]
+
+                i = 0
+            else:
+                batch.append(record)
+
+            last_record = record
+            i += 1
+
+        # submit last set of sequences
+        if batch:
+            g = SequenceGroup(0, batch)
+            self.inqueue.put(g)
 
     def do_process(self):
         inq = self.inqueue
