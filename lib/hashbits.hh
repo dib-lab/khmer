@@ -206,6 +206,8 @@ namespace khmer {
 
     unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
       const;
+    unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
+      const;
   };
 };
 
