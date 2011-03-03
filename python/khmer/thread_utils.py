@@ -12,6 +12,14 @@ def verbose_fasta_iter(filename):
             print >>sys.stderr, '... filtering', n
         yield record
 
+def verbose_fastq_iter(filename):
+    from screed.fastq import fastq_iter
+    it = fastq_iter(open(filename))
+    for n, record in enumerate(it):
+        if n % 10000 == 0:
+            print >>sys.stderr, '... filtering', n
+        yield record
+
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order
