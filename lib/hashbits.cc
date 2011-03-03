@@ -908,7 +908,7 @@ const
     _next_hash(seq[i], kmer_f, kmer_r);
 
     if (count_kmers_on_radius(kmer_f, kmer_r, 2, 20) > max_degree) {
-      return _ksize;
+      return i - 1;
     }
   }
 
