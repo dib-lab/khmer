@@ -272,7 +272,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
       HashIntoType kmer_f = 0, kmer_r = 0;
       HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
 
-      unsigned char since = _tag_density;
+      unsigned char since = _tag_density / 2 + 1;
       for (unsigned int i = _ksize; i < seq.length(); i++) {
 
 	is_new_kmer = (bool) !get_count(kmer);
@@ -301,7 +301,9 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	n_consumed++;
       }
 
-      all_tags.insert(kmer);	// insert the last k-mer, too.
+      if (since >= _tag_density/2 - 1) {
+	all_tags.insert(kmer);	// insert the last k-mer, too.
+      }
     }
 	       
     // reset the sequence info, increment read number
