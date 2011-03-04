@@ -2379,7 +2379,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
   { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
-  { "trim_on_sodd", hashbits_trim_on_degree, METH_VARARGS, "" },
+  { "trim_on_sodd", hashbits_trim_on_sodd, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },

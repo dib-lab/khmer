@@ -49,7 +49,7 @@ def main():
 
         trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
 
-        if trim_at > K:
+        if trim_at >= K:
             return name, trim_seq
 
         return None, None
