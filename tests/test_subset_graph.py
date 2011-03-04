@@ -15,7 +15,7 @@ class Test_RandomData(object):
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
 
-        (a, b, _, _, c) = ht.divide_tags_into_subsets(1)
+        (a, b, c) = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
@@ -38,14 +38,12 @@ class Test_RandomData(object):
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
 
-        (a, b, _, _, c) = ht.divide_tags_into_subsets(1)
+        (a, b, c) = ht.divide_tags_into_subsets(1)
         
-        x = ht.do_subset_partition(a, b)
+        x = ht.do_subset_partition(b, c)
         ht.merge_subset(x)
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 2, n_partitions        # all singular
 
-        y = ht.do_subset_partition(b, c)
+        y = ht.do_subset_partition(a, b)
         ht.merge_subset(y)
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
@@ -65,8 +63,6 @@ class Test_RandomData(object):
         
         x = ht.do_subset_partition(divvy[0], divvy[4])
         ht.merge_subset(x)
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 2, n_partitions
 
         y = ht.do_subset_partition(divvy[4], 0)
         ht.merge_subset(y)
@@ -197,7 +193,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
-        (a, _, b, _, c) = divvy
+        (a, b, c) = divvy
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
@@ -254,7 +250,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
-        (a, _, b, _, c) = divvy
+        (a, b, c) = divvy
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 3, n_partitions        # all singular
