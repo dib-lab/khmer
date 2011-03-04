@@ -64,6 +64,9 @@ for c, n in sorted(dist.items()):
     distfp.write('%d %d %d %d\n' % (c, n, total, wtotal))
 distfp.close()
 
+if not output_groups:
+    sys.exit(0)
+
 # sort groups by size
 divvy = sorted(count.items(), key=lambda y:y[1])
 divvy = filter(lambda y:y[1] > THRESHOLD, divvy)
