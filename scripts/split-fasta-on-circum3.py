@@ -11,8 +11,9 @@ RADIUS=2
 MAX_CIRCUM=4                            # 4 seems to eliminate lump in 1m.fa
 MAX_VOLUME=200
 
-infile = sys.argv[1]
-outprefix = sys.argv[2]
+repfile = sys.argv[1]
+infile = sys.argv[2]
+outprefix = sys.argv[3]
 
 lowfile = outprefix + '.low'
 highfile = outprefix + '.high'
@@ -27,7 +28,7 @@ lowfp = open(lowfile, 'w')
 highfp = open(highfile, 'w')
 
 print 'eating', infile
-ht.consume_fasta(infile)
+ht.consume_fasta(repfile)
 
 incr = 2*RADIUS
 
@@ -52,7 +53,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
             break
 
     # ok. sequence has high-radius k-mers; can we trim them off?
-    if is_high and pos > incr:
+    if is_high and pos >= incr:
         pos -= incr
 
         # find last k-mer with a low radius:
