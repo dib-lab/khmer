@@ -914,14 +914,15 @@ const
 
       i -= INCR;
       unsigned int pos = 1;
-    
+
       for (; pos < INCR; pos++) {
 	_hash(first_kmer + i + pos, _ksize, kmer_f, kmer_r);
 	if (count_kmers_on_radius(kmer_f, kmer_r, RADIUS, 20) > max_degree) {
 	  break;
 	}
       }
-      
+
+      if (pos == INCR) pos--;
       return i + pos + _ksize - 1;
     }
   }
