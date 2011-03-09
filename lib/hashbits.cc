@@ -947,6 +947,7 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
   HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
 
+#if 0
   kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
   path.insert(kmer);
 
@@ -954,21 +955,18 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
     kmer = _next_hash(seq[i], kmer_f, kmer_r);
     path.insert(kmer);
   }
+#endif // 0
 
   kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-
-  path.erase(kmer);
   unsigned int count = count_kmers_within_radius(kmer_f, kmer_r,
 						 radius, max_volume, &path);
   if (count >= max_volume) {
     return 0;
   }
-
   path.insert(kmer);
 
   for (unsigned int i = _ksize; i < seq.length(); i++) {
     kmer = _next_hash(seq[i], kmer_f, kmer_r);
-    path.erase(kmer);
     count = count_kmers_within_radius(kmer_f, kmer_r, radius, max_volume,
 				      &path);
     if (count >= max_volume) {

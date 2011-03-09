@@ -3,11 +3,11 @@ import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE=int(8e8)
 N_HT = 4
 
-RADIUS=100
-MAX_VOLUME=2000
+RADIUS=2
+MAX_VOLUME=10
 
 WORKER_THREADS=8
 GROUPSIZE=100
