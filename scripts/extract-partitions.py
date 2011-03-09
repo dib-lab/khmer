@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import sys
+import os.path
 from screed.fasta import fasta_iter
 
 MAX_SIZE=50000
@@ -17,7 +18,7 @@ def read_partition_file(fp):
 
 filename = sys.argv[1]
 
-prefix = filename
+prefix = os.path.basename(filename)
 if len(sys.argv) > 2:
     prefix = sys.argv[2]
 
