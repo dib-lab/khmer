@@ -193,7 +193,8 @@ namespace khmer {
     unsigned int count_kmers_within_radius(HashIntoType kmer_f,
 					   HashIntoType kmer_r,
 					   unsigned int radius,
-					   unsigned int max_count) const;
+					   unsigned int max_count,
+					   const SeenSet * seen=0) const;
     unsigned int find_radius_for_volume(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					unsigned int max_count,
@@ -207,6 +208,8 @@ namespace khmer {
     unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
       const;
     unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
+      const;
+    unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
       const;
   };
 };

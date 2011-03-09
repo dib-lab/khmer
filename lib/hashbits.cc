@@ -491,7 +491,8 @@ void Hashbits::filter_if_present(const std::string infilename,
 unsigned int Hashbits::count_kmers_within_radius(HashIntoType kmer_f,
 						 HashIntoType kmer_r,
 						 unsigned int radius,
-						 unsigned int max_count)
+						 unsigned int max_count,
+						 const SeenSet * seen)
 const
 {
   HashIntoType f, r;
@@ -504,6 +505,7 @@ const
   unsigned int total = 0;
 
   SeenSet keeper;		// keep track of traversed kmers
+  if (seen) { keeper = *seen; }
 
   // start breadth-first search.
 
@@ -925,6 +927,54 @@ const
       if (pos == INCR) pos--;
       return i + pos + _ksize - 1;
     }
+  }
+
+  return seq.length();
+}
+
+unsigned int Hashbits::trim_on_density_explosion(std::string seq,
+						 unsigned int radius,
+						 unsigned int max_volume)
+  const
+{
+  if (!check_read(seq)) {
+    return 0;
+  }
+
+  const char * first_kmer = seq.c_str();
+  SeenSet path;
+
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  HashIntoType kmer;
+
+  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+  path.insert(kmer);
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+    path.insert(kmer);
+  }
+
+  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+  path.erase(kmer);
+  unsigned int count = count_kmers_within_radius(kmer_f, kmer_r,
+						 radius, max_volume, &path);
+  if (count >= max_volume) {
+    return 0;
+  }
+
+  path.insert(kmer);
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+    path.erase(kmer);
+    count = count_kmers_within_radius(kmer_f, kmer_r, radius, max_volume,
+				      &path);
+    if (count >= max_volume) {
+      return i - 1;
+    }
+    path.insert(kmer);
   }
 
   return seq.length();

@@ -2343,6 +2343,33 @@ static PyObject * hashbits_count_kmers_on_radius(PyObject * self, PyObject * arg
   return PyLong_FromUnsignedLong(n);
 }
 
+static PyObject * hashbits_trim_on_density_explosion(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+  unsigned long radius = 0;
+  unsigned long max_volume = 0;
+
+  if (!PyArg_ParseTuple(args, "sLL", &seq, &radius, &max_volume)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    trim_at = hashbits->trim_on_density_explosion(seq, radius, max_volume);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
+  Py_DECREF(trim_seq);
+
+  return ret;
+}
+
 static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2380,6 +2407,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
   { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
   { "trim_on_sodd", hashbits_trim_on_sodd, METH_VARARGS, "" },
+  { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
