@@ -160,3 +160,14 @@ class ThreadedSequenceProcessor(object):
 
             for name, seq in g.seqlist:
                 outfp.write('>%s\n%s\n' % (name, seq,))
+
+        if self.verbose:
+            print >>sys.stderr, "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
+                  (self.n_processed, self.n_written,
+                   self.n_processed - self.n_written)
+            print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
+                  (self.bp_processed, self.bp_written,
+                   self.bp_processed - self.bp_written)
+        
+
+                
