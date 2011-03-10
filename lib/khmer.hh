@@ -1,7 +1,7 @@
 #define VERSION "0.3"
 
 #define MAX_COUNT 255
-#define DEFAULT_TAG_DENSITY 200		// must be even
+#define DEFAULT_TAG_DENSITY 40		// must be even
 #define CONNECTED_THRESHOLD 0		// @CTB remove
 
 #define MAX_CIRCUM 3		// @CTB remove
