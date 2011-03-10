@@ -25,9 +25,6 @@ namespace khmer {
 			 const HashIntoType kmer_r,
 			 HashIntoType& tagged_kmer);
 
-    bool _do_continue(const HashIntoType kmer,
-		      const SeenSet& keeper);
-
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
       ;
@@ -59,7 +56,7 @@ namespace khmer {
     void _validate_pmap();
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
-		       SeenSet& tagged_kmers, bool do_initial_check);
+		       SeenSet& tagged_kmers);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
