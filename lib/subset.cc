@@ -4,7 +4,7 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
-// #define VALIDATE_PARTITIONS
+#define VALIDATE_PARTITIONS
 
 using namespace khmer;
 using namespace std;
@@ -168,7 +168,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   std::string first_kmer;
   HashIntoType kmer_f, kmer_r, kmer = 0;
 
-  const unsigned char ksize = _ht->ksize();
+  const unsigned int ksize = _ht->ksize();
 
   //
   // go through all the reads, and take those with assigned partitions
@@ -184,35 +184,28 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
       bool found_tag = false;
       for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-	_hash(kmer_s + i, ksize, kmer_f, kmer_r);
-	kmer = uniqify_rc(kmer_f, kmer_r);
+	kmer = _hash(kmer_s + i, ksize, kmer_f, kmer_r);
 
-	// some partitioning schemes tag the first kmer_f; others label
-	// *some* kmer in the read.  Output properly for both.
-
-	if (_ht->all_tags.find(kmer_f) != _ht->all_tags.end()) {
-	  kmer = kmer_f;
-	  found_tag = true;
-	  break;
-	}
-	if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+	// is this a known tag?
+	if (partition_map.find(kmer) != partition_map.end()) {
 	  found_tag = true;
 	  break;
 	}
       }
 
-      // @CTB this should be a WARNING, or OPTIONAL, not a FAILURE,
-      // because it is triggered if you do tagsize filtering.
-      // assert(found_tag);
+      // all sequences should have at least one tag in them.
+      assert(found_tag);
 
-      PartitionID * partition_p = partition_map[kmer];
-      PartitionID partition_id;
-      if (partition_p == NULL ){
-	partition_id = 0;
-	n_singletons++;
-      } else {
-	partition_id = *partition_p;
-	partitions.insert(partition_id);
+      PartitionID partition_id = 0;
+      if (found_tag) {
+	PartitionID * partition_p = partition_map[kmer];
+	if (partition_p == NULL ){
+	  partition_id = 0;
+	  n_singletons++;
+	} else {
+	  partition_id = *partition_p;
+	  partitions.insert(partition_id);
+	}
       }
 
       if (partition_id > 0 || output_unassigned) {
@@ -220,6 +213,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 	outfile << "\n" << seq << "\n";
       }
 #ifdef VALIDATE_PARTITIONS
+      std::cout << "checking: " << read.name << "\n";
       assert(is_single_partition(seq));
 #endif // VALIDATE_PARTITIONS
 	       
@@ -1099,14 +1093,18 @@ bool SubsetPartition::is_single_partition(std::string seq)
 
   if (partition_map.find(kmer) != partition_map.end()) {
     pp = partition_map[kmer];
-    if (pp) { partitions.insert(*pp); }
+    if (pp) {
+      partitions.insert(*pp);
+    }
   }
 
   for (unsigned int i = _ht->ksize(); i < seq.length(); i++) {
     kmer = _ht->_next_hash(seq[i], kmer_f, kmer_r);
     if (partition_map.find(kmer) != partition_map.end()) {
       pp = partition_map[kmer];
-      if (pp) { partitions.insert(*pp); }
+      if (pp) {
+	partitions.insert(*pp);
+      }
     }
   }
 
