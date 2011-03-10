@@ -325,6 +325,8 @@ def test_tiny_real_partitions():
     filename = os.path.join(thisdir, 'test-data/real-partition-tiny.fa')
     
     ht = khmer.new_hashbits(32, 8e7, 4)
+    ht.consume_fasta_and_tag(filename)
+    
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
@@ -353,6 +355,8 @@ def test_small_real_partitions():
     filename = os.path.join(thisdir, 'test-data/real-partition-small.fa')
     
     ht = khmer.new_hashbits(32, 8e7, 4)
+    ht.consume_fasta_and_tag(filename)
+
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
 
