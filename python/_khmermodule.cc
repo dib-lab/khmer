@@ -1868,8 +1868,7 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
 
   ppi = new _pre_partition_info(kmer_f);
   hashbits->partition->find_all_tags(kmer_f, kmer_r,
-				     ppi->tagged_kmers,
-				     false);
+				     ppi->tagged_kmers);
   hashbits->add_kmer_to_tags(kmer_f);
 
   Py_END_ALLOW_THREADS

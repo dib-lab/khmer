@@ -166,7 +166,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   string seq;
 
   std::string first_kmer;
-  HashIntoType kmer_f, kmer_r, kmer = 0;
+  HashIntoType kmer = 0;
 
   const unsigned int ksize = _ht->ksize();
 
@@ -184,7 +184,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
       bool found_tag = false;
       for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-	kmer = _hash(kmer_s + i, ksize, kmer_f, kmer_r);
+	kmer = _hash(kmer_s + i, ksize);
 
 	// is this a known tag?
 	if (partition_map.find(kmer) != partition_map.end()) {
@@ -241,15 +241,6 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
 ///
 
-bool SubsetPartition::_do_continue(const HashIntoType kmer,
-				   const SeenSet& keeper)
-{
-  // have we already seen me? don't count; exit.
-  SeenSet::iterator i = keeper.find(kmer);
-
-  return (i == keeper.end());
-}
-
 bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
 				      const HashIntoType kmer_r,
 				      HashIntoType& tagged_kmer)
@@ -275,18 +266,11 @@ bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
 
 void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    HashIntoType kmer_r,
-				    SeenSet& tagged_kmers,
-				    bool do_initial_check)
+				    SeenSet& tagged_kmers)
 {
   const HashIntoType bitmask = _ht->bitmask;
 
   HashIntoType tagged_kmer;
-  if (do_initial_check && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-    if (partition_map[kmer_f] != NULL) {
-      tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
-      return;
-    }
-  }
 
   HashIntoType f, r;
   bool first = true;
@@ -320,7 +304,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     breadth_q.pop();
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (!_do_continue(kmer, keeper)) {
+
+    if (keeper.find(kmer) != keeper.end()) {
       continue;
     }
 
@@ -466,7 +451,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
     // find all tagged kmers within range.
     tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers, false);
+    find_all_tags(kmer_f, kmer_r, tagged_kmers);
 
     HashIntoType cnt = tagged_kmers.size();
     if (cnt >= 65535) { cnt = 65534; }
