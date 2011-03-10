@@ -304,7 +304,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	n_consumed++;
       }
 
-      if (since >= _tag_density/2 - 1 || 1) {
+      if (since >= _tag_density/2 - 1) {
 	all_tags.insert(kmer);	// insert the last k-mer, too.
 	// std::cout << "inserting last: " << kmer << "\n";
       } else {
