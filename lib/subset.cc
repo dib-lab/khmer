@@ -4,6 +4,8 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
+// #define VALIDATE_PARTITIONS
+
 using namespace khmer;
 using namespace std;
 
@@ -213,12 +215,13 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 	partitions.insert(partition_id);
       }
 
-      // Is this a partition that has not been entirely explored? If so,
-      // mark it.
       if (partition_id > 0 || output_unassigned) {
 	outfile << ">" << read.name << "\t" << partition_id;
 	outfile << "\n" << seq << "\n";
       }
+#ifdef VALIDATE_PARTITIONS
+      assert(is_single_partition(seq));
+#endif // VALIDATE_PARTITIONS
 	       
       total_reads++;
 
@@ -1076,3 +1079,38 @@ void SubsetPartition::_clear_partitions()
   partition_map.clear();
   next_partition_id = 1;
 }
+
+
+bool SubsetPartition::is_single_partition(std::string seq)
+{
+  if (!_ht->check_read(seq)) {
+    return 0;
+  }
+
+  const char * first_kmer = seq.c_str();
+
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  HashIntoType kmer;
+
+  kmer = _hash(first_kmer, _ht->ksize(), kmer_f, kmer_r);
+
+  PartitionSet partitions;
+  PartitionID *pp;
+
+  if (partition_map.find(kmer) != partition_map.end()) {
+    pp = partition_map[kmer];
+    if (pp) { partitions.insert(*pp); }
+  }
+
+  for (unsigned int i = _ht->ksize(); i < seq.length(); i++) {
+    kmer = _ht->_next_hash(seq[i], kmer_f, kmer_r);
+    if (partition_map.find(kmer) != partition_map.end()) {
+      pp = partition_map[kmer];
+      if (pp) { partitions.insert(*pp); }
+    }
+  }
+
+  if (partitions.size() > 1) { return false; }
+
+  return true;
+} 
