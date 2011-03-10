@@ -1863,13 +1863,12 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
 
-  khmer::HashIntoType kmer_f, kmer_r;
-  khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
+    khmer::HashIntoType kmer, kmer_f, kmer_r;
+    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
 
-  ppi = new _pre_partition_info(kmer_f);
-  hashbits->partition->find_all_tags(kmer_f, kmer_r,
-				     ppi->tagged_kmers);
-  hashbits->add_kmer_to_tags(kmer_f);
+    ppi = new _pre_partition_info(kmer);
+    hashbits->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers);
+    hashbits->add_kmer_to_tags(kmer);
 
   Py_END_ALLOW_THREADS
 
