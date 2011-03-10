@@ -272,7 +272,8 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
       HashIntoType kmer_f = 0, kmer_r = 0;
       HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
 
-      unsigned char since = _tag_density / 2 + 1;
+      unsigned int since = _tag_density / 2 + 1;
+      // std::cout << "starting since at: " << since << "\n";
       for (unsigned int i = _ksize; i < seq.length(); i++) {
 
 	is_new_kmer = (bool) !get_count(kmer);
@@ -282,14 +283,16 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	}
 
 	if (!is_new_kmer && all_tags.find(kmer) != all_tags.end()) {
-	  since = 0;
+	  // std::cout << "RESETTING SINCE\n";
+	  since = 1;
 	} else {
 	  since++;
 	}
 
 	if (since >= _tag_density) {
+	  // std::cout << "SETTING SINCE\n";
 	  all_tags.insert(kmer);
-	  since = 0;
+	  since = 1;
 	}
 
 	kmer = _next_hash(seq[i], kmer_f, kmer_r);
@@ -301,9 +304,25 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	n_consumed++;
       }
 
-      if (since >= _tag_density/2 - 1) {
+      if (since >= _tag_density/2 - 1 || 1) {
 	all_tags.insert(kmer);	// insert the last k-mer, too.
+	// std::cout << "inserting last: " << kmer << "\n";
+      } else {
+	// std::cout << "since: " << since << " vs " << _tag_density/2 - 1 << "\n";
       }
+
+#if 0
+      std::cout << read.name << "; size " << seq.length() << " - ";
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	kmer = _hash(first_kmer + i, _ksize);
+	if (all_tags.find(kmer) != all_tags.end()) {
+	  std::cout << i << ", ";
+	}
+      }
+      std::cout << "\n";
+      std::cout << "LAST KMER is: " << kmer << "\n";
+#endif // 1
+      
     }
 	       
     // reset the sequence info, increment read number
@@ -910,7 +929,7 @@ const
     return _ksize - 1;
   }
 
-  for (unsigned int i = INCR; i < seq.length() - _ksize; i += INCR) {
+  for (unsigned int i = INCR; i < seq.length() - _ksize + 1; i += INCR) {
     _hash(first_kmer + i, _ksize, kmer_f, kmer_r);
     if (count_kmers_on_radius(kmer_f, kmer_r, RADIUS, 20) > max_degree) {
 
