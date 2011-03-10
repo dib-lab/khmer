@@ -50,7 +50,7 @@ namespace khmer {
 
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
       khmer::Hashtable(ksize), _tablesizes(tablesizes) {
-      _tag_density = TAG_DENSITY;
+      _tag_density = DEFAULT_TAG_DENSITY;
       assert(_tag_density % 2 == 0);
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
@@ -78,6 +78,16 @@ namespace khmer {
     virtual void load(std::string);
     virtual void save_tagset(std::string);
     virtual void load_tagset(std::string);
+
+    // for debugging/testing purposes only!
+    void _set_tag_density(unsigned int d) {
+      assert(d % 2 == 0);	// must be even
+      _tag_density = d;
+    }
+
+    unsigned int _get_tag_density() const {
+      return _tag_density;
+    }
 
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,

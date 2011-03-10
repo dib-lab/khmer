@@ -11,6 +11,14 @@ import os
 thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
+def test__get_set_tag_density():
+   ht = khmer.new_hashbits(32, 1, 1)
+
+   orig = ht._get_tag_density()
+   assert orig != 2
+   ht._set_tag_density(2)
+   assert ht._get_tag_density() == 2
+
 def test_n_occupied_1():
    filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
 

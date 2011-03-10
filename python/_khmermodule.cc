@@ -2148,6 +2148,36 @@ static PyObject * hashbits_load_subset_partitionmap(PyObject * self, PyObject * 
   return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
 }
 
+static PyObject * hashbits__set_tag_density(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  unsigned int d;
+  if (!PyArg_ParseTuple(args, "i", &d)) {
+    return NULL;
+  }
+
+  hashbits->_set_tag_density(d);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hashbits__get_tag_density(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  unsigned int d = hashbits->_get_tag_density();
+
+  return PyInt_FromLong(d);
+}
+
 static PyObject * hashbits_merge2_subset(PyObject * self, PyObject * args)
 {
   // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2446,6 +2476,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "load_partitionmap", hashbits_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hashbits_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hashbits__validate_partitionmap, METH_VARARGS, "" },
+  { "_get_tag_density", hashbits__get_tag_density, METH_VARARGS, "" },
+  { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
