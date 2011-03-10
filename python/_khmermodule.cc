@@ -2266,6 +2266,30 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
   return PyInt_FromLong(partition_id);
 }
 
+static PyObject * hashbits_is_single_partition(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &seq)) {
+    return NULL;
+  }
+
+  bool v = hashbits->partition->is_single_partition(seq);
+
+  PyObject * val;
+  if (v) {
+    val = Py_True;
+  } else {
+    val = Py_False;
+  }
+  Py_INCREF(val);
+
+  return val;
+}
+
 static PyObject * hashbits_divide_tags_into_subsets(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2437,6 +2461,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "set_partition_id", hashbits_set_partition_id, METH_VARARGS, "" },
   { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
   { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
+  { "is_single_partition", hashbits_is_single_partition, METH_VARARGS, "" },
   { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
   { "count_kmers_on_radius", hashbits_count_kmers_on_radius, METH_VARARGS, "" },
   { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },

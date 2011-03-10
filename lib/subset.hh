@@ -74,6 +74,8 @@ namespace khmer {
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
 					 void * callback_data=0);
+
+    bool is_single_partition(std::string sequence);
   };
 }
 
