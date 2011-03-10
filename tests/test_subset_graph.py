@@ -294,13 +294,18 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
 def test_output_partitions():
-    filename = os.path.join(thisdir, 'test-output-partitions.fa')
+    filename = os.path.join(thisdir, 'test-data/test-output-partitions.fa')
 
     ht = khmer.new_hashbits(10, 1, 1)
     ht.set_partition_id('TTAGGACTGC', 2)
     ht.set_partition_id('TGCGTTTCAA', 3)
     ht.set_partition_id('ATACTGTAAA', 4)
 
+    try:
+        os.unlink(filename + '.part')
+    except OSError:
+        pass
+    assert not os.path.exists(filename + '.part')
     ht.output_partitions(filename, filename + '.part')
 
     data = open(filename + '.part').read()
@@ -315,3 +320,59 @@ def test_output_partitions():
     assert parts[2] == '4'
 
 test_output_partitions.runme = True
+
+def test_tiny_real_partitions():
+    filename = os.path.join(thisdir, 'test-data/real-partition-tiny.fa')
+    
+    ht = khmer.new_hashbits(32, 8e7, 4)
+    subset = ht.do_subset_partition(0, 0)
+    ht.merge_subset(subset)
+
+    try:
+        os.unlink(filename + '.part')
+    except OSError:
+        pass
+    
+    assert not os.path.exists(filename + '.part')
+    ht.output_partitions(filename, filename + '.part')
+
+    data = open(filename + '.part').read()
+    assert len(data)
+    
+    records = [ r for r in screed.open(filename + '.part') ]
+    names = [ r.name for r in records ]
+    parts = [ n.rsplit('\t', 1)[1] for n in names ]
+
+    assert len(parts) == 2, len(parts)
+    assert len(set(parts)) == 1
+    assert set(parts) != set(['0'])
+
+test_tiny_real_partitions.runme = True
+
+def test_small_real_partitions():
+    filename = os.path.join(thisdir, 'test-data/real-partition-small.fa')
+    
+    ht = khmer.new_hashbits(32, 8e7, 4)
+    subset = ht.do_subset_partition(0, 0)
+    ht.merge_subset(subset)
+
+    try:
+        os.unlink(filename + '.part')
+    except OSError:
+        pass
+    
+    assert not os.path.exists(filename + '.part')
+    ht.output_partitions(filename, filename + '.part')
+
+    data = open(filename + '.part').read()
+    assert len(data)
+    
+    records = [ r for r in screed.open(filename + '.part') ]
+    names = [ r.name for r in records ]
+    parts = [ n.rsplit('\t', 1)[1] for n in names ]
+
+    assert len(parts) == 6, len(parts)
+    assert len(set(parts)) == 1
+    assert set(parts) != set(['0'])
+
+test_small_real_partitions.runme = True
