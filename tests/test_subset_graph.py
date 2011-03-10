@@ -13,15 +13,10 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
-
         (a, b, c) = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
         
         y = ht.do_subset_partition(b, 0)
         ht.merge_subset(y)
@@ -36,9 +31,6 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
-
         (a, b, c) = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(b, c)
@@ -57,9 +49,6 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 6, total_reads
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == total_reads, n_partitions # all singular
-
         divvy = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(divvy[0], divvy[4])
@@ -196,9 +185,6 @@ class Test_SaveLoadPmap(object):
         print divvy
         (a, b, c) = divvy
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
-        
         x = ht.do_subset_partition(a, b)
         ht.save_subset_partitionmap(x, 'x.pmap')
         del x
@@ -252,9 +238,6 @@ class Test_SaveLoadPmap(object):
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
         (a, b, c) = divvy
-        
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
         
         x = ht.do_subset_partition(a, b)
         ht.save_subset_partitionmap(x, 'x.pmap')
