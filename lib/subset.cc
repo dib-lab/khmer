@@ -4,7 +4,7 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
-#define VALIDATE_PARTITIONS
+// #define VALIDATE_PARTITIONS
 
 using namespace khmer;
 using namespace std;
@@ -502,14 +502,14 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
 void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
 {
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer;
   assert(kmer_s.length() >= _ht->ksize());
-  _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+  kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
-  set_partition_id(kmer_f, p);
+  set_partition_id(kmer, p);
 }
 
-void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
+void SubsetPartition::set_partition_id(HashIntoType kmer, PartitionID p)
 {
   PartitionPtrSet * s = reverse_pmap[p];
   PartitionID * pp = NULL;
@@ -521,7 +521,7 @@ void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
   } else {
     pp = *(s->begin());
   }
-  partition_map[kmer_f] = pp;
+  partition_map[kmer] = pp;
 
   if (next_partition_id <= p) {
     next_partition_id = p + 1;
