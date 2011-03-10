@@ -82,6 +82,7 @@ namespace khmer {
     // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d) {
       assert(d % 2 == 0);	// must be even
+      assert(all_tags.size() == 0); // no tags exist!
       _tag_density = d;
     }
 
