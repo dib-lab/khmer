@@ -3,6 +3,7 @@ thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
 import khmer
+import screed
 
 class Test_RandomData(object):
     def test_3_merge_013(self):
@@ -291,3 +292,26 @@ class Test_SaveLoadPmap(object):
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 1, n_partitions        # combined.
+
+def test_output_partitions():
+    filename = os.path.join(thisdir, 'test-output-partitions.fa')
+
+    ht = khmer.new_hashbits(10, 1, 1)
+    ht.set_partition_id('TTAGGACTGC', 2)
+    ht.set_partition_id('TGCGTTTCAA', 3)
+    ht.set_partition_id('ATACTGTAAA', 4)
+
+    ht.output_partitions(filename, filename + '.part')
+
+    data = open(filename + '.part').read()
+    assert len(data)
+
+    records = [ r for r in screed.open(filename + '.part') ]
+    names = [ r.name for r in records ]
+    parts = [ n.rsplit('\t', 1)[1] for n in names ]
+
+    assert parts[0] == '2'
+    assert parts[1] == '3'
+    assert parts[2] == '4'
+
+test_output_partitions.runme = True
