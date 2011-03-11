@@ -18,7 +18,7 @@ print 'merged pmap will be in', basename + '.pmap.merged'
 print '---'
 
 # create a fake-ish ht; K matters, but not hashtable size.
-ht = khmer.new_hashbits(32, 1, 1)
+ht = khmer.new_hashbits(K, 1, 1)
  
 # load & merge
 for subset_file in subset_filenames:
