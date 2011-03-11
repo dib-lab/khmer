@@ -399,7 +399,7 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
       PartitionID p = _parse_partition_id(read.name);
 
       // Then consume the sequence
-      n_consumed += consume_string(seq);
+      n_consumed += consume_string(seq); // @CTB why are we doing this?
 
       // Next, compute the tag & set the partition, if nonzero
       HashIntoType kmer = _hash(seq.c_str(), _ksize);
