@@ -393,7 +393,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
   unsigned int total_reads = 0;
 
   std::string kmer_s;
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer_f, kmer_r, kmer;
   SeenSet tagged_kmers;
   const unsigned char ksize = _ht->ksize();
 
@@ -414,7 +414,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     total_reads++;
 
     kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-    _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
     // find all tagged kmers within range.
     tagged_kmers.clear();
@@ -469,7 +469,7 @@ void SubsetPartition::set_partition_id(HashIntoType kmer, PartitionID p)
   }
 }
 
-PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
+PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
 						 SeenSet& tagged_kmers)
 
 {
@@ -478,10 +478,10 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1) {
-    pp = _reassign_partition_ids(tagged_kmers, kmer_f);
+    pp = _reassign_partition_ids(tagged_kmers, kmer);
     return_val = *pp;
   } else {
-    partition_map[kmer_f] = NULL;
+    partition_map[kmer] = NULL;
     return_val = 0;
   }
 
@@ -489,7 +489,7 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 }
 
 PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
-						     const HashIntoType kmer_f)
+						       const HashIntoType kmer)
 {
   SeenSet::iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = NULL;
@@ -526,7 +526,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
   }
 
   assert(this_partition_p != NULL);
-  partition_map[kmer_f] = this_partition_p;
+  partition_map[kmer] = this_partition_p;
 
   return this_partition_p;
 }
@@ -606,10 +606,10 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
   return get_partition_id(kmer);
 }
 
-PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
+PartitionID SubsetPartition::get_partition_id(HashIntoType kmer)
 {
-  if (partition_map.find(kmer_f) != partition_map.end()) {
-    PartitionID * pp = partition_map[kmer_f];
+  if (partition_map.find(kmer) != partition_map.end()) {
+    PartitionID * pp = partition_map[kmer];
     if (pp == NULL) {
       return 0;
     }
