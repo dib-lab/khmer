@@ -125,7 +125,7 @@ def main(filename):
 
     # create a new, empty ht object for merging; K matters, but not
     # hashtable size.
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.new_hashbits(K, 1, 1)
 
     # load & merge all pmap files
     for i in range(0, n_subsets):
