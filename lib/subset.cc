@@ -292,10 +292,6 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
-    if (CONNECTED_THRESHOLD && tagged_kmers.size() > CONNECTED_THRESHOLD) {
-      break;
-    }
-
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
@@ -458,9 +454,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     counters[cnt]++;
 
     // assign the partition ID
-    if (CONNECTED_THRESHOLD == 0 || cnt <= CONNECTED_THRESHOLD) {
-      assign_partition_id(kmer_f, tagged_kmers);
-    }
+    assign_partition_id(kmer_f, tagged_kmers);
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
