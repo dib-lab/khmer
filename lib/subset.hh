@@ -21,10 +21,6 @@ namespace khmer {
     PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
 					const HashIntoType kmer_f);
 
-    bool _is_tagged_kmer(const HashIntoType kmer_f,
-			 const HashIntoType kmer_r,
-			 HashIntoType& tagged_kmer);
-
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
       ;
