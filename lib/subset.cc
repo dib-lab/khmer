@@ -241,27 +241,6 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
 ///
 
-bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
-				      const HashIntoType kmer_r,
-				      HashIntoType& tagged_kmer)
-{
-  SeenSet * tags = &_ht->all_tags;
-  SeenSet::const_iterator fi = tags->find(kmer_f);
-  if (fi != tags->end()) {
-    tagged_kmer = kmer_f;
-    return true;
-  }
-
-  fi = tags->find(kmer_r);
-  if (fi != tags->end()) {
-    tagged_kmer = kmer_r;
-    return true;
-  }
-
-  return false;
-}
-		     
-
 // used by do_truncated_partition
 
 void SubsetPartition::find_all_tags(HashIntoType kmer_f,
@@ -269,8 +248,6 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    SeenSet& tagged_kmers)
 {
   const HashIntoType bitmask = _ht->bitmask;
-
-  HashIntoType tagged_kmer;
 
   HashIntoType f, r;
   bool first = true;
@@ -322,9 +299,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect
     // partitions.)
-    if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-      tagged_kmers.insert(tagged_kmer);
-      first = false;
+    if (!first && _ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+      tagged_kmers.insert(kmer);
       continue;
     }
 
