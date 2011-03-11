@@ -421,7 +421,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     find_all_tags(kmer_f, kmer_r, tagged_kmers);
 
     // assign the partition ID
-    assign_partition_id(kmer_f, tagged_kmers);
+    assign_partition_id(kmer, tagged_kmers);
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
