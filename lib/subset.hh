@@ -19,7 +19,7 @@ namespace khmer {
     void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
-					const HashIntoType kmer_f);
+					  const HashIntoType kmer);
 
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
@@ -28,10 +28,9 @@ namespace khmer {
 
     ~SubsetPartition() { _clear_partitions(); }
 
-    PartitionID assign_partition_id(HashIntoType kmer_f,
-				    SeenSet& tagged_kmers);
+    PartitionID assign_partition_id(HashIntoType kmer, SeenSet& tagged_kmers);
 
-    void set_partition_id(HashIntoType kmer_f, PartitionID p);
+    void set_partition_id(HashIntoType kmer, PartitionID p);
     void set_partition_id(std::string kmer_s, PartitionID p);
     PartitionID join_partitions(PartitionID orig, PartitionID join);
     PartitionID get_partition_id(std::string kmer_s);
