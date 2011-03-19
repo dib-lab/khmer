@@ -282,6 +282,10 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
       continue;
     }
 
+    if (_ht->stop_tags.find(kmer) != _ht->stop_tags.end()) {
+      continue;
+    }
+
     // keep track of seen kmers
     keeper.insert(kmer);
     //    cout << "INSERT: " << _revhash(kmer, _ht->ksize()) << "=" << (int) (_ht->get_count(kmer)) << " xx " << kmer % _ht->n_entries() << " =\n";

@@ -91,6 +91,12 @@ const
     return;
   }
 
+  // is this in stop_tags?
+  i = stop_tags.find(kmer);
+  if (i != stop_tags.end()) {
+    return;
+  }
+
   // keep track of both seen kmers, and counts.
   keeper.insert(kmer);
 
@@ -976,4 +982,54 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
   }
 
   return seq.length();
+}
+
+unsigned int Hashbits::trim_on_stoptags(std::string seq) const
+{
+  if (!check_read(seq)) {
+    return 0;
+  }
+
+  const char * first_kmer = seq.c_str();
+  SeenSet path;
+
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  HashIntoType kmer;
+
+  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+  if (stop_tags.find(kmer) != stop_tags.end()) {
+    return 0;
+  }
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+    if (stop_tags.find(kmer) != stop_tags.end()) {
+      return i - 1;
+    }
+  }
+  return seq.length();
+}
+
+void Hashbits::load_stop_tags(std::string filename)
+{
+  std::ifstream infile(filename.c_str());
+  assert(infile.is_open());
+
+  std::string line;
+  HashIntoType kmer;
+
+  getline(infile, line);
+  while (!infile.eof()) {
+    if (line[_ksize] != ' ') {
+      std::cerr << "incorrect format\n";
+      std::cerr << line << "\n";
+      assert(0);
+    }
+    kmer = _hash(line.c_str(), _ksize);
+    stop_tags.insert(kmer);
+
+    getline(infile, line);
+  }
+  std::cout << "stop tags: " << stop_tags.size() << "\n";
 }

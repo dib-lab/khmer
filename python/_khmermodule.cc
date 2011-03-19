@@ -1522,6 +1522,23 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_consumed);
 }
 
+static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashbits->load_stop_tags(filename);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_get(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -1636,6 +1653,31 @@ static PyObject * hashbits_trim_on_sodd(PyObject * self, PyObject * args)
   Py_BEGIN_ALLOW_THREADS
 
     trim_at = hashbits->trim_on_sodd(seq, max_sodd);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
+  Py_DECREF(trim_seq);
+
+  return ret;
+}
+
+static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &seq)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    trim_at = hashbits->trim_on_stoptags(seq);
 
   Py_END_ALLOW_THREADS;
 
@@ -2454,11 +2496,13 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
   { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
   { "trim_on_sodd", hashbits_trim_on_sodd, METH_VARARGS, "" },
+  { "trim_on_stoptags", hashbits_trim_on_stoptags, METH_VARARGS, "" },
   { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
