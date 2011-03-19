@@ -17,6 +17,7 @@ namespace khmer {
 
     Byte ** _counts;
     SeenSet all_tags;
+    SeenSet stop_tags;
 
     virtual void _allocate_counters() {
       _n_tables = _tablesizes.size();
@@ -220,8 +221,12 @@ namespace khmer {
       const;
     unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
       const;
+
     unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
       const;
+
+    void load_stop_tags(std::string filename);
+    unsigned int trim_on_stoptags(std::string sequence) const;
   };
 };
 
