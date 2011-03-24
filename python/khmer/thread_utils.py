@@ -3,18 +3,17 @@ Utilities for dealing with multithreaded processing of short reads.
 """
 import threading, Queue
 import sys
+import screed
 
 def verbose_fasta_iter(filename):
-    from screed.fasta import fasta_iter
-    it = fasta_iter(open(filename))
+    it = screed.open(filename)
     for n, record in enumerate(it):
         if n % 10000 == 0:
             print >>sys.stderr, '... filtering', n
         yield record
 
 def verbose_fastq_iter(filename):
-    from screed.fastq import fastq_iter
-    it = fastq_iter(open(filename))
+    it = screed.open(filename)
     for n, record in enumerate(it):
         if n % 10000 == 0:
             print >>sys.stderr, '... filtering', n
