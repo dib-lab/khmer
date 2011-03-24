@@ -4,7 +4,7 @@ import khmer
 K = 32
 HASHTABLE_SIZE=int(8e9)
 N_HT = 4
-RADIUS=100
+RADIUS=10
 
 ###
 

@@ -8,7 +8,7 @@ K=32
 HASHTABLE_SIZE=int(8e9)
 N_HT=4
 
-SUBSET_SIZE = int(2e5)
+SUBSET_SIZE = int(1e4)
 N_THREADS = 8
 
 ht = None
