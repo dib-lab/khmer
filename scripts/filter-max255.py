@@ -3,7 +3,7 @@ import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fastq_iter
 
 K = 32
-HT_SIZE=1e9
+HT_SIZE=4e9
 N_HT=4
 
 WORKER_THREADS=8
