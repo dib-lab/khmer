@@ -3,11 +3,11 @@ import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
-HASHTABLE_SIZE=int(8e8)
+HASHTABLE_SIZE=int(8e9)
 N_HT = 4
 
-RADIUS=2
-MAX_VOLUME=10
+RADIUS=5
+MAX_VOLUME=30
 
 WORKER_THREADS=8
 GROUPSIZE=100
@@ -53,8 +53,10 @@ def main():
         trim_seq, trim_at = ht.trim_on_density_explosion(seq, RADIUS,
                                                          MAX_VOLUME)
 
-        if trim_at >= K:
-            return name, trim_seq
+#        if trim_at >= K:
+#            return name, trim_seq
+
+        if trim_at == len(seq): return name, seq
 
         return None, None
 
