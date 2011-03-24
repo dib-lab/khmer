@@ -621,6 +621,106 @@ const
   return total;
 }
 
+unsigned int Hashbits::count_kmers_within_depth(HashIntoType kmer_f,
+						HashIntoType kmer_r,
+						unsigned int depth,
+						unsigned int max_count,
+						SeenSet * seen)
+const
+{
+  HashIntoType f, r;
+  unsigned int count = 1;
+
+  if (depth == 0) { return 0; }
+
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+
+  seen->insert(uniqify_rc(kmer_f, kmer_r));
+
+  // NEXT.
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth - 1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+  }
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+
+  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+
+  // PREVIOUS.
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+    
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+
+  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  if (get_count(uniqify_rc(f,r)) && 
+      seen->find(uniqify_rc(f,r)) == seen->end()) {
+    count += count_kmers_within_depth(f, r, depth -1, max_count - count,
+				      seen);
+    if (count >= max_count) { return count; }
+    ;
+  }
+
+  return count;
+}
+
 unsigned int Hashbits::find_radius_for_volume(HashIntoType kmer_f,
 					      HashIntoType kmer_r,
 					      unsigned int max_count,
@@ -946,12 +1046,14 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
   if (!check_read(seq)) {
     return 0;
   }
+  unsigned int count;
 
   const char * first_kmer = seq.c_str();
   SeenSet path;
 
   HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
+  SeenSet seen;
 
 #if 0
   kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
@@ -964,21 +1066,18 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
 #endif // 0
 
   kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-  unsigned int count = count_kmers_within_radius(kmer_f, kmer_r,
-						 radius, max_volume, &path);
+  count = count_kmers_within_depth(kmer_f, kmer_r, radius, max_volume, &seen);
   if (count >= max_volume) {
     return 0;
   }
-  path.insert(kmer);
-
+  
   for (unsigned int i = _ksize; i < seq.length(); i++) {
+    SeenSet seen;
     kmer = _next_hash(seq[i], kmer_f, kmer_r);
-    count = count_kmers_within_radius(kmer_f, kmer_r, radius, max_volume,
-				      &path);
+    count = count_kmers_within_depth(kmer_f, kmer_r, radius, max_volume,&seen);
     if (count >= max_volume) {
       return i - 1;
     }
-    path.insert(kmer);
   }
 
   return seq.length();

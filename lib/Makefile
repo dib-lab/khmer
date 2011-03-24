@@ -3,7 +3,6 @@ CXXFLAGS=-g -fPIC -Wall -O2 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
 # comment out whichever is appropriate.  can probably make this automatic ;)
 SO_EXT=.so
-#.so
 DYLIB_EXT=
 #.dylib
 Z_LIB_DIR=zlib-1.2.3
