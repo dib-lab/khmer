@@ -1057,3 +1057,25 @@ bool SubsetPartition::is_single_partition(std::string seq)
 
   return true;
 } 
+
+void SubsetPartition::join_partitions_by_path(std::string seq)
+{
+  SeenSet tagged_kmers;
+  HashIntoType kmer_f, kmer_r, kmer;
+  const unsigned int ksize = _ht->ksize();
+
+  kmer = _hash(seq.c_str(), ksize, kmer_f, kmer_r);
+  if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+    tagged_kmers.insert(kmer);
+  }
+
+  for (unsigned int i = ksize; i < seq.length(); i++) {
+    kmer = _ht->_next_hash(seq[i], kmer_f, kmer_r);
+    if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+      tagged_kmers.insert(kmer);
+    }
+  }
+
+  assert(tagged_kmers.size());
+  assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
+}

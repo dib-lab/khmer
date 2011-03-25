@@ -68,6 +68,8 @@ namespace khmer {
 					 void * callback_data=0);
 
     bool is_single_partition(std::string sequence);
+
+    void join_partitions_by_path(std::string sequence);
   };
 }
 
