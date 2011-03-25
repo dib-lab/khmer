@@ -1720,6 +1720,22 @@ static PyObject * hashbits_do_subset_partition(PyObject * self, PyObject * args)
   return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
 }
 
+static PyObject * hashbits_join_partitions_by_path(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * sequence = NULL;
+  if (!PyArg_ParseTuple(args, "s", &sequence)) {
+    return NULL;
+  }
+
+  hashbits->partition->join_partitions_by_path(sequence);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_merge_subset(PyObject * self, PyObject *args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2523,6 +2539,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "join_partitions_by_path", hashbits_join_partitions_by_path, METH_VARARGS, "" },
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
   { "merge_subset_from_disk", hashbits_merge_from_disk, METH_VARARGS, "" },
   { "count_partitions", hashbits_count_partitions, METH_VARARGS, "" },
