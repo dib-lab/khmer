@@ -1,8 +1,8 @@
 #! /bin/bash
-scriptpath=$1
-filename=$2
-K=$3
+filename=$1
+K=$2
 
+scriptpath=`dirname $0`
 BASE=`basename $filename`
 
 if [ \! -f $BASE.strip \]; then
