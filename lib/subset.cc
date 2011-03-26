@@ -1076,6 +1076,6 @@ void SubsetPartition::join_partitions_by_path(std::string seq)
     }
   }
 
-  assert(tagged_kmers.size());
+  // assert(tagged_kmers.size());
   assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
 }
