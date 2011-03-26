@@ -11,6 +11,10 @@ if len(sys.argv) == 4:
     outfile = sys.argv[3]
 
 ht = khmer.new_hashbits(K, 1, 1)
+
+# tag every 10th k-mer in the contigs
+ht._set_tag_density(10)
+
 ht.consume_fasta_and_tag(readsfile)
 
 for n, record in enumerate(screed.open(contigfile)):
