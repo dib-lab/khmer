@@ -2,7 +2,8 @@ import sys, khmer
 import os.path
 import screed
 
-K=32
+K=21
+output_unassigned = True        # output sequences in no partition (p0)
 
 readsfile = sys.argv[1]
 contigfile = sys.argv[2]
@@ -29,4 +30,4 @@ for n, record in enumerate(screed.open(readsfile)):
     ht.join_partitions_by_path(record.sequence)
 
 # output partitions
-print ht.output_partitions(readsfile, outfile)
+print ht.output_partitions(readsfile, outfile, output_unassigned)

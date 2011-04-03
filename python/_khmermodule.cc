@@ -1965,9 +1965,17 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
   char * filename = NULL;
   char * output = NULL;
   PyObject * callback_obj = NULL;
+  PyObject * output_unassigned_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "ss|OO", &filename, &output,
+			&output_unassigned_o,
+			&callback_obj)) {
     return NULL;
+  }
+
+  bool output_unassigned = false;
+  if (output_unassigned_o != NULL && PyObject_IsTrue(output_unassigned_o)) {
+    output_unassigned = true;
   }
 
   unsigned int n_partitions = 0;
@@ -1976,7 +1984,7 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
     khmer::SubsetPartition * subset_p = hashbits->partition;
     n_partitions = subset_p->output_partitioned_file(filename,
 						     output,
-						     false,
+						     output_unassigned,
 						     _report_fn,
 						     callback_obj);
   } catch (_khmer_signal &e) {
