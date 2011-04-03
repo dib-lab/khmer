@@ -907,18 +907,13 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  // make sure update_readmask_bool is the right type of object
-  if (update_readmask_bool && !PyBool_Check(update_readmask_bool)) {
-    PyErr_SetString(PyExc_TypeError, "fifth argument must be True/False");
-    return NULL;
-  }
-
   // set C++ parameters accordingly
   bool update_readmask = false;
   khmer::ReadMaskTable * readmask = NULL;
 
   if (readmask_obj && readmask_obj != Py_None) {
-    if (update_readmask_bool == Py_True) {
+    if (update_readmask_bool != NULL &&
+	PyObject_IsTrue(update_readmask_bool)) {
       update_readmask = true;
     }
 
@@ -1576,12 +1571,7 @@ static PyObject * hashbits_calc_connected_graph_size(PyObject * self, PyObject *
   }
 
   bool break_on_circum = false;
-  if (break_on_circum_o && !PyBool_Check(break_on_circum_o)) {
-    PyErr_SetString(PyExc_TypeError, "third argument must be True/False");
-    return NULL;
-  }
-
-  if (break_on_circum_o == Py_True) {
+  if (break_on_circum_o && PyObject_IsTrue(break_on_circum_o)) {
     break_on_circum = true;
   }
 
@@ -1792,18 +1782,14 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  // make sure update_readmask_bool is the right type of object
-  if (update_readmask_bool && !PyBool_Check(update_readmask_bool)) {
-    PyErr_SetString(PyExc_TypeError, "fifth argument must be True/False");
-    return NULL;
-  }
-
-  // set C++ parameters accordingly
   bool update_readmask = false;
   khmer::ReadMaskTable * readmask = NULL;
 
+  // set C++ parameters accordingly
+
   if (readmask_obj && readmask_obj != Py_None) {
-    if (update_readmask_bool == Py_True) {
+    if (update_readmask_bool != NULL &&
+	PyObject_IsTrue(update_readmask_bool)) {
       update_readmask = true;
     }
 

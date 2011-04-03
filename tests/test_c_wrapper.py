@@ -111,17 +111,6 @@ def test_bad_readmask_in_filter_fasta_file_max():
     except:
         raise
 
-def test_bad_readmask_in_consume_fasta():
-    kh = khmer.new_hashtable(4, 4**4)
-
-    try:
-        kh.consume_fasta(reads_filename, 0, 0, None, "hi", callback_raise)
-        assert 0
-    except TypeError:
-        pass
-    except:
-        raise
-
 def test_nonbool_in_consume_fasta():
     kh = khmer.new_hashtable(4, 4**4)
 
