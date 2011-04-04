@@ -24,7 +24,7 @@ print 'eating', infile
 ht.consume_fasta(infile)
 
 outfp = open(outfile, 'w')
-for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
+for n, record in enumerate(screed.open(infile)):
     if n % 10000 == 0:
         print '... saving', n
     seq = record['sequence']
