@@ -3,16 +3,17 @@ import sys
 import os.path
 from screed.fasta import fasta_iter
 
-MAX_SIZE=50000
-THRESHOLD=5
+MAX_SIZE=int(1e6)
+THRESHOLD=1
 
 output_groups = True
+output_unassigned = True
 
 def read_partition_file(fp):
     for n, record in enumerate(fasta_iter(fp, parse_description=False)):
         name = record['name']
         name, partition_id = name.rsplit('\t', 1)
-        yield n, name, partition_id, record['sequence']
+        yield n, name, int(partition_id), record['sequence']
 
 ###
 
@@ -32,7 +33,11 @@ if output_groups:
     print 'min reads to keep a partition:', THRESHOLD
     print 'max size of a group file:', MAX_SIZE
 else:
-    print 'NOT outputtting groups! Beware!'
+    print 'NOT outputting groups! Beware!'
+
+if output_unassigned:
+    print 'outputting unassigned reads to "%s.unassigned.fa"' % prefix
+
 print 'partition size distribution will go to %s' % distfilename
 print '---'
 
@@ -42,11 +47,20 @@ count = {}
 
 ###
 
+if output_unassigned:
+    unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
+
 for n, name, pid, seq in read_partition_file(open(filename)):
     if n % 100000 == 0:
         print '...', n
 
     count[pid] = count.get(pid, 0) + 1
+
+    if pid == 0 and output_unassigned:
+        print >>unassigned_fp, '>%s\n%s' % (name, seq)
+
+if output_unassigned:
+    unassigned_fp.close()
 
 if 0 in count:                          # eliminate unpartitioned sequences
    del count[0]
