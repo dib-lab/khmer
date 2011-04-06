@@ -1534,6 +1534,46 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * counting_o = NULL;
+  unsigned int distance, frequency;
+
+  if (!PyArg_ParseTuple(args, "OII", &counting_o, &distance, &frequency)) {
+    return NULL;
+  }
+
+  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+
+  hashbits->traverse_from_tags(distance, frequency, *counting);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hashbits_hitraverse_to_stoptags(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * counting_o = NULL;
+  unsigned int cutoff = 0;
+
+  if (!PyArg_ParseTuple(args, "OI", &counting_o, &cutoff)) {
+    return NULL;
+  }
+
+  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+
+  hashbits->hitraverse_to_stoptags(*counting, cutoff);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_get(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2550,6 +2590,9 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
   { "count_kmers_on_radius", hashbits_count_kmers_on_radius, METH_VARARGS, "" },
   { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },
+  { "hitraverse_to_stoptags", hashbits_hitraverse_to_stoptags, METH_VARARGS, "" },
+  { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
+
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

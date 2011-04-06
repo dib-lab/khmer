@@ -4,6 +4,7 @@
 #include <vector>
 #include "hashtable.hh"
 #include "subset.hh"
+#include "counting.hh"
 
 namespace khmer {
   class Hashbits : public khmer::Hashtable {
@@ -233,6 +234,15 @@ namespace khmer {
 
     void load_stop_tags(std::string filename);
     unsigned int trim_on_stoptags(std::string sequence) const;
+
+    void traverse_from_tags(unsigned int distance,
+			    unsigned int frequency,
+			    CountingHash &counting) const;
+    void _traverse_from_tag(HashIntoType start,
+			    unsigned int radius,
+			    CountingHash &counting) const;
+    void hitraverse_to_stoptags(CountingHash &counting,
+				unsigned int cutoff);
   };
 };
 

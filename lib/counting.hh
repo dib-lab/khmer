@@ -1,6 +1,8 @@
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
+#define BIGCOUNT
+
 #include <vector>
 #include "hashtable.hh"
 
@@ -25,8 +27,11 @@ namespace khmer {
 	memset(_counts[i], 0, _tablesizes[i] * sizeof(BoundedCounterType));
       }
     }
-
   public:
+#ifdef BIGCOUNT
+    TagCountMap _bigcounts;
+#endif // BIGCOUNT
+
     CountingHash(WordLength ksize, HashIntoType single_tablesize) :
       khmer::Hashtable(ksize) {
       _tablesizes.push_back(single_tablesize);
@@ -84,6 +89,14 @@ namespace khmer {
 
 	if (_counts[i][bin] < MAX_COUNT) {
 	  _counts[i][bin] += 1;
+	} else {
+#ifdef BIGCOUNT
+	  if (_bigcounts[khash] == 0) {
+	    _bigcounts[khash] = MAX_COUNT + 1;
+	  } else {
+	    _bigcounts[khash] += 1;
+	  }
+#endif
 	}
       }
     }
@@ -105,6 +118,16 @@ namespace khmer {
       }
       return min_count;
     }
+
+#ifdef BIGCOUNT
+    virtual const unsigned int get_bigcount(HashIntoType khash) {
+      TagCountMap::const_iterator it = _bigcounts.find(khash);
+      if (it != _bigcounts.end()) {
+	return it->second;
+      }
+      return 0;
+    }
+#endif // BIGCOUNT
 
     //
 
