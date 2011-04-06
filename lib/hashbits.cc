@@ -1132,3 +1132,161 @@ void Hashbits::load_stop_tags(std::string filename)
   }
   std::cout << "stop tags: " << stop_tags.size() << "\n";
 }
+
+void Hashbits::traverse_from_tags(unsigned int distance,
+				  unsigned int frequency,
+				  CountingHash &counting) const
+{
+  unsigned int i = 0;
+
+  std::cout << all_tags.size() << " tags...\n";
+  for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
+       si++, i++) {
+    if (i % frequency == 0) {
+      _traverse_from_tag(*si, distance, counting);
+    }
+    if (i % 1000 == 0) {
+      std::cout << "traverse-counting from " << *si << " " << i << "\n";
+    }
+  }
+}
+
+void Hashbits::_traverse_from_tag(HashIntoType start,
+				  unsigned int radius,
+				  CountingHash &counting)
+const
+{
+  std::string kmer_s = _revhash(start, _ksize);
+  HashIntoType kmer, kmer_f, kmer_r;
+  kmer = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
+
+  HashIntoType f, r;
+  NodeQueue node_q;
+  std::queue<unsigned int> breadth_q;
+  unsigned int cur_breadth = 0;
+  unsigned int breadth = 0;
+
+  const unsigned int rc_left_shift = _ksize*2 - 2;
+  unsigned int total = 0;
+
+  SeenSet keeper;		// keep track of traversed kmers
+
+  // start breadth-first search.
+
+  node_q.push(kmer_f);
+  node_q.push(kmer_r);
+  breadth_q.push(0);
+
+  while(!node_q.empty()) {
+    kmer_f = node_q.front();
+    node_q.pop();
+    kmer_r = node_q.front();
+    node_q.pop();
+    breadth = breadth_q.front();
+    breadth_q.pop();
+
+    if (breadth > radius) {
+      break;
+    }
+
+    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+    if (keeper.find(kmer) != keeper.end()) {
+      continue;
+    }
+
+    // keep track of seen kmers
+    keeper.insert(kmer);
+    total++;
+
+    counting.count(kmer);
+
+    assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+    if (breadth > cur_breadth) { cur_breadth = breadth; }
+
+    //
+    // Enqueue next set of nodes.
+    //
+
+    // NEXT.
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
+    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
+    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
+    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    // PREVIOUS.
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
+    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
+    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+    
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
+    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
+    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    if (get_count(uniqify_rc(f,r)) && 
+	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+  }
+}
+
+void Hashbits::hitraverse_to_stoptags(CountingHash &counting,
+				      unsigned int cutoff)
+{
+#ifndef BIGCOUNT
+  assert(0);
+#endif // BIGCOUNT
+  TagCountMap::const_iterator ti = counting._bigcounts.begin();
+
+  for (; ti != counting._bigcounts.end(); ti++) {
+    if(ti->second >= cutoff) {
+      stop_tags.insert(ti->first);
+    }
+  }
+  std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
+}
