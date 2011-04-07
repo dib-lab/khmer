@@ -120,38 +120,39 @@ const
   HashIntoType f, r;
   const unsigned int rc_left_shift = _ksize*2 - 2;
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  f = next_f(kmer_f, 'A');
+  r = next_r(kmer_r, 'A');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  f = next_f(kmer_f, 'C');
+  r = next_r(kmer_r, 'C');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  f = next_f(kmer_f, 'G');
+  r = next_r(kmer_r, 'G');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  f = next_f(kmer_f, 'T');
+  r = next_r(kmer_r, 'T');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
   // PREVIOUS.
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  
+  r = prev_r(kmer_r, 'A');
+  f = prev_f(kmer_f, 'A');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  r = prev_r(kmer_r, 'C');
+  f = prev_f(kmer_f, 'C');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  r = prev_r(kmer_r, 'G');
+  f = prev_f(kmer_f, 'G');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  r = prev_r(kmer_r, 'T');
+  f = prev_f(kmer_f, 'T');
   calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
 }
 
@@ -1208,8 +1209,11 @@ const
     //
 
     // NEXT.
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
+      
+    // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
+    // r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
