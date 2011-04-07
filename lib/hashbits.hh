@@ -6,6 +6,12 @@
 #include "subset.hh"
 #include "counting.hh"
 
+#define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | twobit_repr(ch))
+#define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
+
+#define prev_f(kmer_f, ch) ((kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift)
+#define prev_r(kmer_r, ch) (((kmer_r) << 2) & bitmask | twobit_comp(ch));
+
 namespace khmer {
   class Hashbits : public khmer::Hashtable {
     friend class SubsetPartition;
