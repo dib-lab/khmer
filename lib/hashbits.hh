@@ -244,7 +244,7 @@ namespace khmer {
     void traverse_from_tags(unsigned int distance,
 			    unsigned int frequency,
 			    CountingHash &counting) const;
-    void _traverse_from_tag(HashIntoType start,
+    unsigned int _traverse_from_tag(HashIntoType start,
 			    unsigned int radius,
 			    CountingHash &counting) const;
     void hitraverse_to_stoptags(CountingHash &counting,
