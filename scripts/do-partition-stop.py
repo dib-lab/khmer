@@ -5,10 +5,10 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=int(1e8)
+HASHTABLE_SIZE=int(4e9)
 N_HT=4
 
-COUNTING_SIZE=int(1e7)
+COUNTING_SIZE=int(1e9)
 
 
 SUBSET_SIZE = int(1e4)
@@ -93,16 +93,16 @@ def main(filename):
     ###
 
     counting = khmer.new_counting_hash(K, COUNTING_SIZE, N_HT)
-    ht.traverse_from_tags(counting, 100, 500)
+    ht.traverse_from_tags(counting, 100, 10000, 20)
     x = counting.abundance_distribution(filename)
 
+    fp = open(basename + '.tabund', 'w')
     for i, n in enumerate(x):
         if n:
-            print i, n
+            print >>fp, i, n
+    fp.close()
     
-    #sys.exit(0)
-
-    ht.hitraverse_to_stoptags(counting, 10)
+    ht.hitraverse_to_stoptags(filename, counting, 5)
 
     ###
 

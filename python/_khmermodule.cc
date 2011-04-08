@@ -1540,15 +1540,15 @@ static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   PyObject * counting_o = NULL;
-  unsigned int distance, frequency;
+  unsigned int distance, threshold, num_todo;
 
-  if (!PyArg_ParseTuple(args, "OII", &counting_o, &distance, &frequency)) {
+  if (!PyArg_ParseTuple(args, "OIII", &counting_o, &distance, &threshold, &num_todo)) {
     return NULL;
   }
 
   khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
 
-  hashbits->traverse_from_tags(distance, frequency, *counting);
+  hashbits->traverse_from_tags(distance, threshold, num_todo, *counting);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -1561,14 +1561,15 @@ static PyObject * hashbits_hitraverse_to_stoptags(PyObject * self, PyObject * ar
 
   PyObject * counting_o = NULL;
   unsigned int cutoff = 0;
+  char * filename = NULL;
 
-  if (!PyArg_ParseTuple(args, "OI", &counting_o, &cutoff)) {
+  if (!PyArg_ParseTuple(args, "sOI", &filename, &counting_o, &cutoff)) {
     return NULL;
   }
 
   khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
 
-  hashbits->hitraverse_to_stoptags(*counting, cutoff);
+  hashbits->hitraverse_to_stoptags(filename, *counting, cutoff);
   
   Py_INCREF(Py_None);
   return Py_None;
