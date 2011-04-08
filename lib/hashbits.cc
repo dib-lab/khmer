@@ -1139,22 +1139,31 @@ void Hashbits::traverse_from_tags(unsigned int distance,
 				  CountingHash &counting) const
 {
   unsigned int i = 0;
+  unsigned int n = 0;
+  unsigned int count;
+  unsigned int n_big = 0;
 
   std::cout << all_tags.size() << " tags...\n";
   for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
        si++, i++) {
     if (i % frequency == 0) {
-      _traverse_from_tag(*si, distance, counting);
+      n++;
+      count = _traverse_from_tag(*si, distance, counting);
+
+      if (count > 10000) {
+	n_big++;
+      }
     }
     if (i % 1000 == 0) {
-      std::cout << "traverse-counting from " << *si << " " << i << "\n";
+      std::cout << "traverse-counting from " << *si << " " << i << " " << n << " " << n_big << "\n";
     }
   }
+  std::cout << "traversed from " << n << " tags total.\n";
 }
 
-void Hashbits::_traverse_from_tag(HashIntoType start,
-				  unsigned int radius,
-				  CountingHash &counting)
+unsigned int Hashbits::_traverse_from_tag(HashIntoType start,
+					  unsigned int radius,
+					  CountingHash &counting)
 const
 {
   std::string kmer_s = _revhash(start, _ksize);
@@ -1277,14 +1286,18 @@ const
       breadth_q.push(breadth + 1);
     }
   }
+
+  return total;
 }
 
 void Hashbits::hitraverse_to_stoptags(CountingHash &counting,
 				      unsigned int cutoff)
 {
+#if 0
 #ifndef BIGCOUNT
   assert(0);
 #endif // BIGCOUNT
+  assert(count._bigcounts.size());
   TagCountMap::const_iterator ti = counting._bigcounts.begin();
 
   for (; ti != counting._bigcounts.end(); ti++) {
@@ -1292,5 +1305,34 @@ void Hashbits::hitraverse_to_stoptags(CountingHash &counting,
       stop_tags.insert(ti->first);
     }
   }
+#else
+  Read read;
+  IParser* parser = IParser::get_parser("data/1m-bigpart.fa");
+  string name;
+  string seq;
+  unsigned int read_num = 0;
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {
+      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
+	string kmer = seq.substr(i, i + _ksize);
+	HashIntoType kmer_n = _hash(kmer.c_str(), _ksize);
+	BoundedCounterType n = counting.get_count(kmer_n);
+
+	if (n >= cutoff) {
+	  stop_tags.insert(kmer_n);
+	}
+      }
+
+      name.clear();
+      seq.clear();
+    }
+
+    read_num += 1;
+  }
+#endif // 0
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
 }

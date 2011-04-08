@@ -5,10 +5,10 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=int(1e9)
+HASHTABLE_SIZE=int(1e8)
 N_HT=4
 
-COUNTING_SIZE=int(1e8)
+COUNTING_SIZE=int(1e7)
 
 
 SUBSET_SIZE = int(1e4)
@@ -93,7 +93,15 @@ def main(filename):
     ###
 
     counting = khmer.new_counting_hash(K, COUNTING_SIZE, N_HT)
-    ht.traverse_from_tags(counting, 20, 1)
+    ht.traverse_from_tags(counting, 100, 500)
+    x = counting.abundance_distribution(filename)
+
+    for i, n in enumerate(x):
+        if n:
+            print i, n
+    
+    #sys.exit(0)
+
     ht.hitraverse_to_stoptags(counting, 10)
 
     ###
