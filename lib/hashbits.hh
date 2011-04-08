@@ -242,12 +242,14 @@ namespace khmer {
     unsigned int trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
-			    unsigned int frequency,
+			    unsigned int threshold,
+			    unsigned int num_high_todo,
 			    CountingHash &counting) const;
     unsigned int _traverse_from_tag(HashIntoType start,
 			    unsigned int radius,
 			    CountingHash &counting) const;
-    void hitraverse_to_stoptags(CountingHash &counting,
+    void hitraverse_to_stoptags(std::string filename,
+				CountingHash &counting,
 				unsigned int cutoff);
   };
 };
