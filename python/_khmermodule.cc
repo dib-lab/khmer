@@ -1534,6 +1534,23 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * hashbits_save_stop_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashbits->save_stop_tags(filename);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2548,6 +2565,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
+  { "save_stop_tags", hashbits_save_stop_tags, METH_VARARGS, "" },
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },

@@ -1111,6 +1111,8 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
   return seq.length();
 }
 
+#if 0
+
 void Hashbits::load_stop_tags(std::string filename)
 {
   std::ifstream infile(filename.c_str());
@@ -1133,6 +1135,8 @@ void Hashbits::load_stop_tags(std::string filename)
   }
   std::cout << "stop tags: " << stop_tags.size() << "\n";
 }
+
+#endif // 0
 
 void Hashbits::traverse_from_tags(unsigned int distance,
 				  unsigned int threshold,
@@ -1158,9 +1162,8 @@ void Hashbits::traverse_from_tags(unsigned int distance,
       if (n_big >= num_high_todo) {
 	break;
       }
-      if (i % 1000 == 0) {
-	std::cout << "traverse-counting from " << *si << " " << i << " " << n << " " << n_big << "\n";
-      }
+      std::cout << "traverse-counting from " << *si << " " << i
+		<< " " << n << " " << n_big << "\n";
   }
   std::cout << "traversed from " << n << " tags total.\n";
 }
@@ -1327,4 +1330,44 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
   }
 
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
+}
+
+void Hashbits::save_stop_tags(std::string outfilename)
+{
+  ofstream outfile(outfilename.c_str(), ios::binary);
+  const unsigned int tagset_size = stop_tags.size();
+
+  HashIntoType * buf = new HashIntoType[tagset_size];
+
+  outfile.write((const char *) &tagset_size, sizeof(tagset_size));
+
+  unsigned int i = 0;
+  for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
+	 pi++, i++) {
+    buf[i] = *pi;
+  }
+
+  outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+  outfile.close();
+
+  delete buf;
+}
+
+void Hashbits::load_stop_tags(std::string infilename)
+{
+  ifstream infile(infilename.c_str(), ios::binary);
+  all_tags.clear();
+
+  unsigned int tagset_size = 0;
+  infile.read((char *) &tagset_size, sizeof(tagset_size));
+
+  HashIntoType * buf = new HashIntoType[tagset_size];
+
+  infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+
+  for (unsigned int i = 0; i < tagset_size; i++) {
+    stop_tags.insert(buf[i]);
+  }
+  
+  delete buf;
 }
