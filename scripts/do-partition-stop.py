@@ -103,6 +103,7 @@ def main(filename):
     fp.close()
     
     ht.hitraverse_to_stoptags(filename, counting, 5)
+    ht.save_stop_tags(basename + '.stoptags')
 
     ###
 

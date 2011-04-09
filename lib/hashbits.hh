@@ -238,7 +238,6 @@ namespace khmer {
     unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
       const;
 
-    void load_stop_tags(std::string filename);
     unsigned int trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
@@ -251,6 +250,9 @@ namespace khmer {
     void hitraverse_to_stoptags(std::string filename,
 				CountingHash &counting,
 				unsigned int cutoff);
+
+    virtual void save_stop_tags(std::string);
+    virtual void load_stop_tags(std::string);
   };
 };
 
