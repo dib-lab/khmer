@@ -1356,7 +1356,7 @@ void Hashbits::save_stop_tags(std::string outfilename)
 void Hashbits::load_stop_tags(std::string infilename)
 {
   ifstream infile(infilename.c_str(), ios::binary);
-  all_tags.clear();
+  stop_tags.clear();
 
   unsigned int tagset_size = 0;
   infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -1370,4 +1370,18 @@ void Hashbits::load_stop_tags(std::string infilename)
   }
   
   delete buf;
+}
+
+void Hashbits::print_stop_tags(std::string infilename)
+{
+  ofstream printfile(infilename.c_str());
+
+  unsigned int i = 0;
+  for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
+	 pi++, i++) {
+    std::string kmer = _revhash(*pi, _ksize);
+    printfile << kmer << "\n";
+  }
+  
+  printfile.close();
 }

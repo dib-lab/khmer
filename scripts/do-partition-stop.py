@@ -104,6 +104,10 @@ def main(filename):
     
     ht.hitraverse_to_stoptags(filename, counting, 5)
     ht.save_stop_tags(basename + '.stoptags')
+    ht.print_stop_tags(basename + '.stoptags.txt')
+
+    del counting
+    gc.collect()
 
     ###
 
