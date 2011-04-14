@@ -19,14 +19,7 @@ namespace khmer {
     void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
-					const HashIntoType kmer_f);
-
-    bool _is_tagged_kmer(const HashIntoType kmer_f,
-			 const HashIntoType kmer_r,
-			 HashIntoType& tagged_kmer);
-
-    bool _do_continue(const HashIntoType kmer,
-		      const SeenSet& keeper);
+					  const HashIntoType kmer);
 
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
@@ -35,10 +28,9 @@ namespace khmer {
 
     ~SubsetPartition() { _clear_partitions(); }
 
-    PartitionID assign_partition_id(HashIntoType kmer_f,
-				    SeenSet& tagged_kmers);
+    PartitionID assign_partition_id(HashIntoType kmer, SeenSet& tagged_kmers);
 
-    void set_partition_id(HashIntoType kmer_f, PartitionID p);
+    void set_partition_id(HashIntoType kmer, PartitionID p);
     void set_partition_id(std::string kmer_s, PartitionID p);
     PartitionID join_partitions(PartitionID orig, PartitionID join);
     PartitionID get_partition_id(std::string kmer_s);
@@ -59,7 +51,7 @@ namespace khmer {
     void _validate_pmap();
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
-		       SeenSet& tagged_kmers, bool do_initial_check);
+		       SeenSet& tagged_kmers);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
@@ -74,6 +66,8 @@ namespace khmer {
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
 					 void * callback_data=0);
+
+    bool is_single_partition(std::string sequence);
   };
 }
 

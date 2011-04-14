@@ -3,7 +3,7 @@ import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE=int(8e9)
 N_HT = 4
 MAX_SODD=3
 
@@ -20,7 +20,7 @@ def main():
         
     outfile = os.path.basename(infile) + '.low'
     if len(sys.argv) >= 4:
-        outprefix = sys.argv[3]
+        outfile = sys.argv[3]
 
     print 'file with representative artifacts: %s' % repfile
     print 'input file to degree filter: %s' % infile
@@ -44,9 +44,12 @@ def main():
     def process_fn(record, ht=ht):
         name = record['name']
         seq = record['sequence']
+        if 'N' in seq:
+            return None, None
+
         trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
 
-        if trim_at > K:
+        if trim_at >= K:
             return name, trim_seq
 
         return None, None

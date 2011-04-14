@@ -1863,14 +1863,12 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
 
-  khmer::HashIntoType kmer_f, kmer_r;
-  khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
+    khmer::HashIntoType kmer, kmer_f, kmer_r;
+    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
 
-  ppi = new _pre_partition_info(kmer_f);
-  hashbits->partition->find_all_tags(kmer_f, kmer_r,
-				     ppi->tagged_kmers,
-				     false);
-  hashbits->add_kmer_to_tags(kmer_f);
+    ppi = new _pre_partition_info(kmer);
+    hashbits->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers);
+    hashbits->add_kmer_to_tags(kmer);
 
   Py_END_ALLOW_THREADS
 
@@ -2148,6 +2146,36 @@ static PyObject * hashbits_load_subset_partitionmap(PyObject * self, PyObject * 
   return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
 }
 
+static PyObject * hashbits__set_tag_density(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  unsigned int d;
+  if (!PyArg_ParseTuple(args, "i", &d)) {
+    return NULL;
+  }
+
+  hashbits->_set_tag_density(d);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hashbits__get_tag_density(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  unsigned int d = hashbits->_get_tag_density();
+
+  return PyInt_FromLong(d);
+}
+
 static PyObject * hashbits_merge2_subset(PyObject * self, PyObject * args)
 {
   // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2266,6 +2294,30 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
   return PyInt_FromLong(partition_id);
 }
 
+static PyObject * hashbits_is_single_partition(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &seq)) {
+    return NULL;
+  }
+
+  bool v = hashbits->partition->is_single_partition(seq);
+
+  PyObject * val;
+  if (v) {
+    val = Py_True;
+  } else {
+    val = Py_False;
+  }
+  Py_INCREF(val);
+
+  return val;
+}
+
 static PyObject * hashbits_divide_tags_into_subsets(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2343,6 +2395,33 @@ static PyObject * hashbits_count_kmers_on_radius(PyObject * self, PyObject * arg
   return PyLong_FromUnsignedLong(n);
 }
 
+static PyObject * hashbits_trim_on_density_explosion(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+  unsigned long radius = 0;
+  unsigned long max_volume = 0;
+
+  if (!PyArg_ParseTuple(args, "sLL", &seq, &radius, &max_volume)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    trim_at = hashbits->trim_on_density_explosion(seq, radius, max_volume);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
+  Py_DECREF(trim_seq);
+
+  return ret;
+}
+
 static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2379,7 +2458,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
   { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
-  { "trim_on_sodd", hashbits_trim_on_degree, METH_VARARGS, "" },
+  { "trim_on_sodd", hashbits_trim_on_sodd, METH_VARARGS, "" },
+  { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
@@ -2394,6 +2474,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "load_partitionmap", hashbits_load_partitionmap, METH_VARARGS, "" },
   { "save_partitionmap", hashbits_save_partitionmap, METH_VARARGS, "" },
   { "_validate_partitionmap", hashbits__validate_partitionmap, METH_VARARGS, "" },
+  { "_get_tag_density", hashbits__get_tag_density, METH_VARARGS, "" },
+  { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
@@ -2409,6 +2491,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "set_partition_id", hashbits_set_partition_id, METH_VARARGS, "" },
   { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
   { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
+  { "is_single_partition", hashbits_is_single_partition, METH_VARARGS, "" },
   { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
   { "count_kmers_on_radius", hashbits_count_kmers_on_radius, METH_VARARGS, "" },
   { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },

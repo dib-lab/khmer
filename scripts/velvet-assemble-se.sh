@@ -10,4 +10,4 @@ if [ \! -f $BASE.strip \]; then
 fi
 
 velveth $BASE.ass.$K.single $K -fasta -short ${BASE}.strip && \
-velvetg $BASE.ass.$K.single -read_trkg yes -exp_cov 3 -cov_cutoff 0
+velvetg $BASE.ass.$K.single -read_trkg yes

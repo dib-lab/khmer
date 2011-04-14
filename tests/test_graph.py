@@ -183,7 +183,7 @@ class Test_Partitioning(object):
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
-        assert x == (99, 0)             # disconnected @ 21
+        assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_a(self):
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
@@ -203,7 +203,7 @@ class Test_Partitioning(object):
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
-        assert x == (99, 0)             # disconnected @ 21
+        assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_b(self):
         filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
@@ -223,7 +223,7 @@ class Test_Partitioning(object):
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
-        assert x == (999, 0)            # disconnected @ K = 32
+        assert x == (999, 0), x            # disconnected @ K = 32
 
     def test_connected_31_c(self):
         filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
