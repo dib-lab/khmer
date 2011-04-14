@@ -4,6 +4,8 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
+// #define VALIDATE_PARTITIONS
+
 using namespace khmer;
 using namespace std;
 
@@ -164,9 +166,9 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   string seq;
 
   std::string first_kmer;
-  HashIntoType kmer_f, kmer_r, kmer = 0;
+  HashIntoType kmer = 0;
 
-  const unsigned char ksize = _ht->ksize();
+  const unsigned int ksize = _ht->ksize();
 
   //
   // go through all the reads, and take those with assigned partitions
@@ -182,43 +184,39 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
       bool found_tag = false;
       for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-	_hash(kmer_s + i, ksize, kmer_f, kmer_r);
-	kmer = uniqify_rc(kmer_f, kmer_r);
+	kmer = _hash(kmer_s + i, ksize);
 
-	// some partitioning schemes tag the first kmer_f; others label
-	// *some* kmer in the read.  Output properly for both.
-
-	if (_ht->all_tags.find(kmer_f) != _ht->all_tags.end()) {
-	  kmer = kmer_f;
-	  found_tag = true;
-	  break;
-	}
-	if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+	// is this a known tag?
+	if (partition_map.find(kmer) != partition_map.end()) {
 	  found_tag = true;
 	  break;
 	}
       }
 
-      // @CTB this should be a WARNING, or OPTIONAL, not a FAILURE,
-      // because it is triggered if you do tagsize filtering.
-      // assert(found_tag);
+      // all sequences should have at least one tag in them.
+      // assert(found_tag);  @CTB currently breaks tests.  give fn flag to
+      // disable.
 
-      PartitionID * partition_p = partition_map[kmer];
-      PartitionID partition_id;
-      if (partition_p == NULL ){
-	partition_id = 0;
-	n_singletons++;
-      } else {
-	partition_id = *partition_p;
-	partitions.insert(partition_id);
+      PartitionID partition_id = 0;
+      if (found_tag) {
+	PartitionID * partition_p = partition_map[kmer];
+	if (partition_p == NULL ){
+	  partition_id = 0;
+	  n_singletons++;
+	} else {
+	  partition_id = *partition_p;
+	  partitions.insert(partition_id);
+	}
       }
 
-      // Is this a partition that has not been entirely explored? If so,
-      // mark it.
       if (partition_id > 0 || output_unassigned) {
 	outfile << ">" << read.name << "\t" << partition_id;
 	outfile << "\n" << seq << "\n";
       }
+#ifdef VALIDATE_PARTITIONS
+      std::cout << "checking: " << read.name << "\n";
+      assert(is_single_partition(seq));
+#endif // VALIDATE_PARTITIONS
 	       
       total_reads++;
 
@@ -243,52 +241,13 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
 ///
 
-bool SubsetPartition::_do_continue(const HashIntoType kmer,
-				   const SeenSet& keeper)
-{
-  // have we already seen me? don't count; exit.
-  SeenSet::iterator i = keeper.find(kmer);
-
-  return (i == keeper.end());
-}
-
-bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
-				      const HashIntoType kmer_r,
-				      HashIntoType& tagged_kmer)
-{
-  SeenSet * tags = &_ht->all_tags;
-  SeenSet::const_iterator fi = tags->find(kmer_f);
-  if (fi != tags->end()) {
-    tagged_kmer = kmer_f;
-    return true;
-  }
-
-  fi = tags->find(kmer_r);
-  if (fi != tags->end()) {
-    tagged_kmer = kmer_r;
-    return true;
-  }
-
-  return false;
-}
-		     
-
 // used by do_truncated_partition
 
 void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    HashIntoType kmer_r,
-				    SeenSet& tagged_kmers,
-				    bool do_initial_check)
+				    SeenSet& tagged_kmers)
 {
   const HashIntoType bitmask = _ht->bitmask;
-
-  HashIntoType tagged_kmer;
-  if (do_initial_check && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-    if (partition_map[kmer_f] != NULL) {
-      tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
-      return;
-    }
-  }
 
   HashIntoType f, r;
   bool first = true;
@@ -310,10 +269,6 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
-    if (CONNECTED_THRESHOLD && tagged_kmers.size() > CONNECTED_THRESHOLD) {
-      break;
-    }
-
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
@@ -322,7 +277,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     breadth_q.pop();
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (!_do_continue(kmer, keeper)) {
+
+    if (keeper.find(kmer) != keeper.end()) {
       continue;
     }
 
@@ -343,9 +299,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect
     // partitions.)
-    if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-      tagged_kmers.insert(tagged_kmer);
-      first = false;
+    if (!first && _ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+      tagged_kmers.insert(kmer);
       continue;
     }
 
@@ -438,7 +393,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
   unsigned int total_reads = 0;
 
   std::string kmer_s;
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer_f, kmer_r, kmer;
   SeenSet tagged_kmers;
   const unsigned char ksize = _ht->ksize();
 
@@ -455,29 +410,18 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     end = _ht->all_tags.end();
   }
 
-  HashIntoType counters[65535];
-  for (unsigned int i = 0; i < 65535; i++) {
-    counters[i] = 0;
-  }
-
   for (; si != end; si++) {
     total_reads++;
 
     kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-    _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
     // find all tagged kmers within range.
     tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers, false);
-
-    HashIntoType cnt = tagged_kmers.size();
-    if (cnt >= 65535) { cnt = 65534; }
-    counters[cnt]++;
+    find_all_tags(kmer_f, kmer_r, tagged_kmers);
 
     // assign the partition ID
-    if (CONNECTED_THRESHOLD == 0 || cnt <= CONNECTED_THRESHOLD) {
-      assign_partition_id(kmer_f, tagged_kmers);
-    }
+    assign_partition_id(kmer, tagged_kmers);
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -493,26 +437,20 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 #endif // 0
       }
   }
-
-  for (unsigned int i = 0; i < 65535; i++) {
-    if (counters[i]) {
-      // cout << "N:" << i << " " << counters[i] << "\n";
-    }
-  }
 }
 
 //
 
 void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
 {
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer;
   assert(kmer_s.length() >= _ht->ksize());
-  _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+  kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
-  set_partition_id(kmer_f, p);
+  set_partition_id(kmer, p);
 }
 
-void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
+void SubsetPartition::set_partition_id(HashIntoType kmer, PartitionID p)
 {
   PartitionPtrSet * s = reverse_pmap[p];
   PartitionID * pp = NULL;
@@ -524,14 +462,14 @@ void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
   } else {
     pp = *(s->begin());
   }
-  partition_map[kmer_f] = pp;
+  partition_map[kmer] = pp;
 
   if (next_partition_id <= p) {
     next_partition_id = p + 1;
   }
 }
 
-PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
+PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
 						 SeenSet& tagged_kmers)
 
 {
@@ -540,10 +478,10 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1) {
-    pp = _reassign_partition_ids(tagged_kmers, kmer_f);
+    pp = _reassign_partition_ids(tagged_kmers, kmer);
     return_val = *pp;
   } else {
-    partition_map[kmer_f] = NULL;
+    partition_map[kmer] = NULL;
     return_val = 0;
   }
 
@@ -551,7 +489,7 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 }
 
 PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
-						     const HashIntoType kmer_f)
+						       const HashIntoType kmer)
 {
   SeenSet::iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = NULL;
@@ -588,7 +526,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
   }
 
   assert(this_partition_p != NULL);
-  partition_map[kmer_f] = this_partition_p;
+  partition_map[kmer] = this_partition_p;
 
   return this_partition_p;
 }
@@ -668,10 +606,10 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
   return get_partition_id(kmer);
 }
 
-PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
+PartitionID SubsetPartition::get_partition_id(HashIntoType kmer)
 {
-  if (partition_map.find(kmer_f) != partition_map.end()) {
-    PartitionID * pp = partition_map[kmer_f];
+  if (partition_map.find(kmer) != partition_map.end()) {
+    PartitionID * pp = partition_map[kmer];
     if (pp == NULL) {
       return 0;
     }
@@ -1076,3 +1014,42 @@ void SubsetPartition::_clear_partitions()
   partition_map.clear();
   next_partition_id = 1;
 }
+
+
+bool SubsetPartition::is_single_partition(std::string seq)
+{
+  if (!_ht->check_read(seq)) {
+    return 0;
+  }
+
+  const char * first_kmer = seq.c_str();
+
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  HashIntoType kmer;
+
+  kmer = _hash(first_kmer, _ht->ksize(), kmer_f, kmer_r);
+
+  PartitionSet partitions;
+  PartitionID *pp;
+
+  if (partition_map.find(kmer) != partition_map.end()) {
+    pp = partition_map[kmer];
+    if (pp) {
+      partitions.insert(*pp);
+    }
+  }
+
+  for (unsigned int i = _ht->ksize(); i < seq.length(); i++) {
+    kmer = _ht->_next_hash(seq[i], kmer_f, kmer_r);
+    if (partition_map.find(kmer) != partition_map.end()) {
+      pp = partition_map[kmer];
+      if (pp) {
+	partitions.insert(*pp);
+      }
+    }
+  }
+
+  if (partitions.size() > 1) { return false; }
+
+  return true;
+} 

@@ -50,7 +50,7 @@ namespace khmer {
 
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
       khmer::Hashtable(ksize), _tablesizes(tablesizes) {
-      _tag_density = TAG_DENSITY;
+      _tag_density = DEFAULT_TAG_DENSITY;
       assert(_tag_density % 2 == 0);
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
@@ -78,6 +78,17 @@ namespace khmer {
     virtual void load(std::string);
     virtual void save_tagset(std::string);
     virtual void load_tagset(std::string);
+
+    // for debugging/testing purposes only!
+    void _set_tag_density(unsigned int d) {
+      assert(d % 2 == 0);	// must be even
+      assert(all_tags.size() == 0); // no tags exist!
+      _tag_density = d;
+    }
+
+    unsigned int _get_tag_density() const {
+      return _tag_density;
+    }
 
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
@@ -193,7 +204,14 @@ namespace khmer {
     unsigned int count_kmers_within_radius(HashIntoType kmer_f,
 					   HashIntoType kmer_r,
 					   unsigned int radius,
-					   unsigned int max_count) const;
+					   unsigned int max_count,
+					   const SeenSet * seen=0) const;
+    unsigned int count_kmers_within_depth(HashIntoType kmer_f,
+					  HashIntoType kmer_r,
+					  unsigned int depth,
+					  unsigned int max_count,
+					  SeenSet * seen) const;
+
     unsigned int find_radius_for_volume(HashIntoType kmer_f,
 					HashIntoType kmer_r,
 					unsigned int max_count,
@@ -207,6 +225,8 @@ namespace khmer {
     unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
       const;
     unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
+      const;
+    unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
       const;
   };
 };

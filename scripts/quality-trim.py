@@ -2,7 +2,6 @@
 
 import sys
 import screed
-from screed import fastq
 
 # python quality-trim.py <input fastq file> <output filtered fastq file>
 # MINLENGTH is the minimum lenth of read desired.  NCALLS is the percentage of a read with 'N' base calls for which if read has greater, it will be removed. 
@@ -12,11 +11,10 @@ MINLENGTH = 30
 filein = sys.argv[1]
 fileout = sys.argv[2]
 
-fp = open(filein)
 fw = open(fileout, 'w')
 
 count=0
-for n, record in enumerate(fastq.fastq_iter(fp)):
+for n, record in enumerate(screed.open(filein)):
     name = record['name']
     sequence = record['sequence']
     accuracy = record['accuracy']

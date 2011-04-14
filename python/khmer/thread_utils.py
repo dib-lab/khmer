@@ -3,10 +3,17 @@ Utilities for dealing with multithreaded processing of short reads.
 """
 import threading, Queue
 import sys
+import screed
 
 def verbose_fasta_iter(filename):
-    from screed.fasta import fasta_iter
-    it = fasta_iter(open(filename))
+    it = screed.open(filename)
+    for n, record in enumerate(it):
+        if n % 10000 == 0:
+            print >>sys.stderr, '... filtering', n
+        yield record
+
+def verbose_fastq_iter(filename):
+    it = screed.open(filename)
     for n, record in enumerate(it):
         if n % 10000 == 0:
             print >>sys.stderr, '... filtering', n
@@ -152,3 +159,14 @@ class ThreadedSequenceProcessor(object):
 
             for name, seq in g.seqlist:
                 outfp.write('>%s\n%s\n' % (name, seq,))
+
+        if self.verbose:
+            print >>sys.stderr, "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
+                  (self.n_processed, self.n_written,
+                   self.n_processed - self.n_written)
+            print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
+                  (self.bp_processed, self.bp_written,
+                   self.bp_processed - self.bp_written)
+        
+
+                

@@ -1,12 +1,11 @@
 #define VERSION "0.3"
 
 #define MAX_COUNT 255
-#define TAG_DENSITY 40		// must be even
-#define CONNECTED_THRESHOLD 0
+#define DEFAULT_TAG_DENSITY 40		// must be even
 
-#define MAX_CIRCUM 3
-#define CIRCUM_RADIUS 2
-#define CIRCUM_MAX_VOL 200
+#define MAX_CIRCUM 3		// @CTB remove
+#define CIRCUM_RADIUS 2		// @CTB remove
+#define CIRCUM_MAX_VOL 200	// @CTB remove
 
 namespace khmer {
   // largest number we can count up to, exactly. (8 bytes)
