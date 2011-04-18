@@ -154,3 +154,24 @@ def test_simple_median():
     assert median == 3
     assert average == 2.5
     assert int(stddev*100) == 50        # .5
+
+def test_save_load():
+    thisdir = os.path.dirname(__file__)
+    inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
+    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    
+    x = list(PRIMES_1m)
+    x.append(1000005)
+    
+    hi = khmer._new_counting_hash(12, x)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    ht = khmer._new_counting_hash(12, x)
+    ht.load(savepath)
+
+    x = hi.abundance_distribution(inpath)
+    y = ht.abundance_distribution(inpath)
+
+    assert sum(x) == 3966
+    assert x == y, (x,y)
