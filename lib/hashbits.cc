@@ -86,14 +86,12 @@ const
   }
 
   // have we already seen me? don't count; exit.
-  SeenSet::iterator i = keeper.find(kmer);
-  if (i != keeper.end()) {
+  if (set_contains(keeper, kmer)) {
     return;
   }
 
   // is this in stop_tags?
-  i = stop_tags.find(kmer);
-  if (i != stop_tags.end()) {
+  if (set_contains(stop_tags, kmer)) {
     return;
   }
 
@@ -293,7 +291,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  n_consumed++;
 	}
 
-	if (!is_new_kmer && all_tags.find(kmer) != all_tags.end()) {
+	if (!is_new_kmer && set_contains(all_tags, kmer)) {
 	  since = 1;
 	} else {
 	  since++;
@@ -381,14 +379,14 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
       unsigned int since = _tag_density / 2 + 1;
       for (unsigned int i = _ksize; i < seq.length(); i++) {
 
-	if (stop_tags.find(kmer) == stop_tags.end()) { // NOT a stop tag... ok.
+	if (!set_contains(stop_tags, kmer)) { // NOT a stop tag... ok.
 	  is_new_kmer = (bool) !get_count(kmer);
 	  if (is_new_kmer) {
 	    count(kmer);
 	    n_consumed++;
 	  }
 
-	  if (!is_new_kmer && all_tags.find(kmer) != all_tags.end()) {
+	  if (!is_new_kmer && set_contains(all_tags, kmer)) {
 	    read_tags.insert(kmer);
 	    since = 1;
 	  } else {
@@ -416,7 +414,7 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 	kmer = _next_hash(seq[i], kmer_f, kmer_r);
       }
 
-      if (stop_tags.find(kmer) == stop_tags.end()) { // NOT a stop tag... ok.
+      if (!set_contains(stop_tags, kmer)) { // NOT a stop tag... ok.
 	is_new_kmer = (bool) !get_count(kmer);
 	if (is_new_kmer) {
 	  count(kmer);
@@ -654,7 +652,7 @@ const
     }
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (keeper.find(kmer) != keeper.end()) {
+    if (set_contains(keeper, kmer)) {
       continue;
     }
 
@@ -676,32 +674,28 @@ const
     // NEXT.
     f = next_f(kmer_f, 'A');
     r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'C');
     r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'G');
     r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'T');
     r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -709,32 +703,28 @@ const
     // PREVIOUS.
     r = prev_r(kmer_r, 'A');
     f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'C');
     f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
     r = prev_r(kmer_r, 'G');
     f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'T');
     f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f, r))){
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -762,8 +752,7 @@ const
   // NEXT.
   f = next_f(kmer_f, 'A');
   r = next_r(kmer_r, 'A');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth - 1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -771,8 +760,7 @@ const
 
   f = next_f(kmer_f, 'C');
   r = next_r(kmer_r, 'C');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -781,8 +769,7 @@ const
 
   f = next_f(kmer_f, 'G');
   r = next_r(kmer_r, 'G');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -791,8 +778,7 @@ const
 
   f = next_f(kmer_f, 'T');
   r = next_r(kmer_r, 'T');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -802,8 +788,7 @@ const
   // PREVIOUS.
   r = prev_r(kmer_r, 'A');
   f = prev_f(kmer_f, 'A');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -812,8 +797,7 @@ const
 
   r = prev_r(kmer_r, 'C');
   f = prev_f(kmer_f, 'C');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -822,8 +806,7 @@ const
     
   r = prev_r(kmer_r, 'G');
   f = prev_f(kmer_f, 'G');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -832,8 +815,7 @@ const
 
   r = prev_r(kmer_r, 'T');
   f = prev_f(kmer_f, 'T');
-  if (get_count(uniqify_rc(f,r)) && 
-      seen->find(uniqify_rc(f,r)) == seen->end()) {
+  if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
 				      seen);
     if (count >= max_count) { return count; }
@@ -874,7 +856,7 @@ const
     breadth_q.pop();
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (keeper.find(kmer) != keeper.end()) {
+    if (set_contains(keeper, kmer)) {
       continue;
     }
 
@@ -893,32 +875,28 @@ const
     // NEXT.
     f = next_f(kmer_f, 'A');
     r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'C');
     r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'G');
     r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'T');
     r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -926,32 +904,28 @@ const
     // PREVIOUS.
     r = prev_r(kmer_r, 'A');
     f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'C');
     f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
     r = prev_r(kmer_r, 'G');
     f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'T');
     f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -1002,7 +976,7 @@ const
     }
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (keeper.find(kmer) != keeper.end()) {
+    if (set_contains(keeper, kmer)) {
       continue;
     }
 
@@ -1028,32 +1002,28 @@ const
     // NEXT.
     f = next_f(kmer_f, 'A');
     r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'C');
     r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'G');
     r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'T');
     r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -1061,32 +1031,28 @@ const
     // PREVIOUS.
     r = prev_r(kmer_r, 'A');
     f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'C');
     f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
     r = prev_r(kmer_r, 'G');
     f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'T');
     f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -1219,13 +1185,13 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
 
   kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
 
-  if (stop_tags.find(kmer) != stop_tags.end()) {
+  if (set_contains(stop_tags, kmer)) {
     return 0;
   }
 
   for (unsigned int i = _ksize; i < seq.length(); i++) {
     kmer = _next_hash(seq[i], kmer_f, kmer_r);
-    if (stop_tags.find(kmer) != stop_tags.end()) {
+    if (set_contains(stop_tags, kmer)) {
       return i - 1;
     }
   }
@@ -1301,7 +1267,7 @@ const
     }
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (keeper.find(kmer) != keeper.end()) {
+    if (set_contains(keeper, kmer)) {
       continue;
     }
 
@@ -1324,32 +1290,28 @@ const
       
     // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
     r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'C');
     r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'G');
     r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     f = next_f(kmer_f, 'T');
     r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -1357,32 +1319,28 @@ const
     // PREVIOUS.
     r = prev_r(kmer_r, 'A');
     f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'C');
     f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
     r = prev_r(kmer_r, 'G');
     f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     r = prev_r(kmer_r, 'T');
     f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
