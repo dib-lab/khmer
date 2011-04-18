@@ -245,7 +245,8 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
 void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    HashIntoType kmer_r,
-				    SeenSet& tagged_kmers)
+				    SeenSet& tagged_kmers,
+				    bool break_on_stop_tags)
 {
   const HashIntoType bitmask = _ht->bitmask;
 
@@ -282,9 +283,10 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
       continue;
     }
 
-    // if (_ht->stop_tags.find(kmer) != _ht->stop_tags.end()) {
-    //      continue;
-    //    }
+    if (break_on_stop_tags &&
+	_ht->stop_tags.find(kmer) != _ht->stop_tags.end()) {
+      continue;
+    }
 
     // keep track of seen kmers
     keeper.insert(kmer);
@@ -391,6 +393,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
 void SubsetPartition::do_partition(HashIntoType first_kmer,
 				   HashIntoType last_kmer,
+				   bool break_on_stop_tags,
 				   CallbackFn callback,
 				   void * callback_data)
 {
@@ -422,7 +425,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
     // find all tagged kmers within range.
     tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers);
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, break_on_stop_tags);
 
     // assign the partition ID
     assign_partition_id(kmer, tagged_kmers);

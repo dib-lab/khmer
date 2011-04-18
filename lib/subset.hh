@@ -51,10 +51,12 @@ namespace khmer {
     void _validate_pmap();
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
-		       SeenSet& tagged_kmers);
+		       SeenSet& tagged_kmers,
+		       bool break_on_stop_tags=false);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
+		      bool break_on_stop_tags=false,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
 
