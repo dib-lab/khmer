@@ -101,17 +101,24 @@ def main(filename):
         if n:
             print >>fp, i, n
     fp.close()
-    
+
+    print 'converting to stoptags'
     ht.hitraverse_to_stoptags(filename, counting, 5)
+
+    print 'saving stoptags binary'
     ht.save_stop_tags(basename + '.stoptags')
+
+    print 'saving stoptags text'
     ht.print_stop_tags(basename + '.stoptags.txt')
 
+    print 'eliminating counting hash'
     del counting
     gc.collect()
 
     ###
 
     # divide the tags up into subsets
+    print 'divvying up tags'
     divvy = ht.divide_tags_into_subsets(SUBSET_SIZE)
     n_subsets = len(divvy)
     divvy.append(0)
