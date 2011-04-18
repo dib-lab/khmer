@@ -247,17 +247,22 @@ namespace khmer {
     unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
       const;
 
-    void load_stop_tags(std::string filename, bool clear_tags=true);
     unsigned int trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
-			    unsigned int frequency,
+			    unsigned int threshold,
+			    unsigned int num_high_todo,
 			    CountingHash &counting) const;
     unsigned int _traverse_from_tag(HashIntoType start,
 			    unsigned int radius,
 			    CountingHash &counting) const;
-    void hitraverse_to_stoptags(CountingHash &counting,
+    void hitraverse_to_stoptags(std::string filename,
+				CountingHash &counting,
 				unsigned int cutoff);
+
+    virtual void print_stop_tags(std::string);
+    virtual void save_stop_tags(std::string);
+    void load_stop_tags(std::string filename, bool clear_tags=true);
   };
 };
 

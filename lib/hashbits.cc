@@ -1261,7 +1261,8 @@ void Hashbits::load_stop_tags(std::string filename, bool clear_tags)
 }
 
 void Hashbits::traverse_from_tags(unsigned int distance,
-				  unsigned int frequency,
+				  unsigned int threshold,
+				  unsigned int num_high_todo,
 				  CountingHash &counting) const
 {
   unsigned int i = 0;
@@ -1270,19 +1271,21 @@ void Hashbits::traverse_from_tags(unsigned int distance,
   unsigned int n_big = 0;
 
   std::cout << all_tags.size() << " tags...\n";
-  for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
-       si++, i++) {
-    if (i % frequency == 0) {
+  SeenSet::const_iterator si = all_tags.end();
+  si--;
+
+  for (; si != all_tags.begin(); si--, i++) {
       n++;
       count = _traverse_from_tag(*si, distance, counting);
 
-      if (count > 10000) {
+      if (count >= threshold) {
 	n_big++;
       }
-    }
-    if (i % 1000 == 0) {
-      std::cout << "traverse-counting from " << *si << " " << i << " " << n << " " << n_big << "\n";
-    }
+      if (n_big >= num_high_todo) {
+	break;
+      }
+      std::cout << "traverse-counting from " << *si << " " << i
+		<< " " << n << " " << n_big << "\n";
   }
   std::cout << "traversed from " << n << " tags total.\n";
 }
@@ -1416,24 +1419,12 @@ const
   return total;
 }
 
-void Hashbits::hitraverse_to_stoptags(CountingHash &counting,
+void Hashbits::hitraverse_to_stoptags(std::string filename,
+				      CountingHash &counting,
 				      unsigned int cutoff)
 {
-#if 0
-#ifndef BIGCOUNT
-  assert(0);
-#endif // BIGCOUNT
-  assert(count._bigcounts.size());
-  TagCountMap::const_iterator ti = counting._bigcounts.begin();
-
-  for (; ti != counting._bigcounts.end(); ti++) {
-    if(ti->second >= cutoff) {
-      stop_tags.insert(ti->first);
-    }
-  }
-#else
   Read read;
-  IParser* parser = IParser::get_parser("data/1m-bigpart.fa");
+  IParser* parser = IParser::get_parser(filename);
   string name;
   string seq;
   unsigned int read_num = 0;
@@ -1459,6 +1450,41 @@ void Hashbits::hitraverse_to_stoptags(CountingHash &counting,
 
     read_num += 1;
   }
-#endif // 0
+
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
+}
+
+void Hashbits::save_stop_tags(std::string outfilename)
+{
+  ofstream outfile(outfilename.c_str(), ios::binary);
+  const unsigned int tagset_size = stop_tags.size();
+
+  HashIntoType * buf = new HashIntoType[tagset_size];
+
+  outfile.write((const char *) &tagset_size, sizeof(tagset_size));
+
+  unsigned int i = 0;
+  for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
+	 pi++, i++) {
+    buf[i] = *pi;
+  }
+
+  outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
+  outfile.close();
+
+  delete buf;
+}
+
+void Hashbits::print_stop_tags(std::string infilename)
+{
+  ofstream printfile(infilename.c_str());
+
+  unsigned int i = 0;
+  for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
+	 pi++, i++) {
+    std::string kmer = _revhash(*pi, _ksize);
+    printfile << kmer << "\n";
+  }
+  
+  printfile.close();
 }
