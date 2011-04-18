@@ -237,3 +237,45 @@ def test_circumference():
    ht.count('TGAT')
    x = ht.count_kmers_on_radius('GATG', 1, 200)
    assert x == 4, x
+
+def test_save_load_tagset():
+   ht = khmer.new_hashbits(32, 1, 1)
+
+   outfile = os.path.join(thisdir, 'tagset')
+
+   ht.add_tag('A'*32)
+   ht.save_tagset(outfile)
+
+   ht.add_tag('G'*32)
+   
+   ht.load_tagset(outfile)              # implicitly => clear_tags=True
+   ht.save_tagset(outfile)
+
+   # if tags have been cleared, then the new tagfile will be larger (24 bytes);
+   # else smaller (16 bytes).
+
+   fp = open(outfile, 'rb')
+   data = fp.read()
+   fp.close()
+   assert len(data) == 16, len(data)
+   
+def test_save_load_tagset_noclear():
+   ht = khmer.new_hashbits(32, 1, 1)
+
+   outfile = os.path.join(thisdir, 'tagset')
+
+   ht.add_tag('A'*32)
+   ht.save_tagset(outfile)
+   
+   ht.add_tag('G'*32)
+   
+   ht.load_tagset(outfile, False)       # set clear_tags => False; zero tags
+   ht.save_tagset(outfile)
+
+   # if tags have been cleared, then the new tagfile will be large (24 bytes);
+   # else small (16 bytes).
+
+   fp = open(outfile, 'rb')
+   data = fp.read()
+   fp.close()
+   assert len(data) == 24, len(data)

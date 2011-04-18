@@ -1523,12 +1523,17 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * filename = NULL;
+  PyObject * clear_tags_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &clear_tags_o)) {
     return NULL;
   }
 
-  hashbits->load_stop_tags(filename);
+  bool clear_tags = true;
+  if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
+    clear_tags = false;
+  }
+  hashbits->load_stop_tags(filename, clear_tags);
   
   Py_INCREF(Py_None);
   return Py_None;
@@ -1983,6 +1988,40 @@ static PyObject * hashbits_assign_partition_id(PyObject * self, PyObject *args)
   return PyInt_FromLong(p);
 }
 
+static PyObject * hashbits_add_tag(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer_s = NULL;
+  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType kmer = khmer::_hash(kmer_s, hashbits->ksize());
+  hashbits->add_tag(kmer);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hashbits_add_stop_tag(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer_s = NULL;
+  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType kmer = khmer::_hash(kmer_s, hashbits->ksize());
+  hashbits->add_stop_tag(kmer);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2165,12 +2204,17 @@ static PyObject * hashbits_load_tagset(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * filename = NULL;
+  PyObject * clear_tags_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &clear_tags_o)) {
     return NULL;
   }
 
-  hashbits->load_tagset(filename);
+  bool clear_tags = true;
+  if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
+    clear_tags = false;
+  }
+  hashbits->load_tagset(filename, clear_tags);
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -2559,6 +2603,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
   { "filter_if_present", hashbits_filter_if_present, METH_VARARGS, "" },
+  { "add_tag", hashbits_add_tag, METH_VARARGS, "" },
+  { "add_stop_tag", hashbits_add_stop_tag, METH_VARARGS, "" },
   { "load", hashbits_load, METH_VARARGS, "" },
   { "save", hashbits_save, METH_VARARGS, "" },
   { "load_tagset", hashbits_load_tagset, METH_VARARGS, "" },

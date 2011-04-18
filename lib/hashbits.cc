@@ -178,10 +178,14 @@ void Hashbits::save_tagset(std::string outfilename)
   delete buf;
 }
 
-void Hashbits::load_tagset(std::string infilename)
+void Hashbits::load_tagset(std::string infilename, bool clear_tags)
 {
   ifstream infile(infilename.c_str(), ios::binary);
-  all_tags.clear();
+  assert(infile.is_open());
+
+  if (clear_tags) {
+    all_tags.clear();
+  }
 
   unsigned int tagset_size = 0;
   infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -1111,10 +1115,14 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
   return seq.length();
 }
 
-void Hashbits::load_stop_tags(std::string filename)
+void Hashbits::load_stop_tags(std::string filename, bool clear_tags)
 {
   std::ifstream infile(filename.c_str());
   assert(infile.is_open());
+
+  if (clear_tags) {
+    stop_tags.clear();
+  }
 
   std::string line;
   HashIntoType kmer;
@@ -1131,7 +1139,8 @@ void Hashbits::load_stop_tags(std::string filename)
 
     getline(infile, line);
   }
-  std::cout << "stop tags: " << stop_tags.size() << "\n";
+  std::cout << "stop tags from: " << filename << ": "
+	    << stop_tags.size() << "\n";
 }
 
 void Hashbits::traverse_from_tags(unsigned int distance,
