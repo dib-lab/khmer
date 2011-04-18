@@ -85,7 +85,7 @@ namespace khmer {
     virtual void save(std::string);
     virtual void load(std::string);
     virtual void save_tagset(std::string);
-    virtual void load_tagset(std::string);
+    virtual void load_tagset(std::string, bool clear_tags=true);
 
     // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d) {
@@ -97,6 +97,9 @@ namespace khmer {
     unsigned int _get_tag_density() const {
       return _tag_density;
     }
+
+    void add_tag(HashIntoType tag) { all_tags.insert(tag); }
+    void add_stop_tag(HashIntoType tag) { stop_tags.insert(tag); }
 
     void calc_connected_graph_size(const char * kmer,
 				   unsigned long long& count,
@@ -238,7 +241,7 @@ namespace khmer {
     unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
       const;
 
-    void load_stop_tags(std::string filename);
+    void load_stop_tags(std::string filename, bool clear_tags=true);
     unsigned int trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
