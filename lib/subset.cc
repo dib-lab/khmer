@@ -187,7 +187,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 	kmer = _hash(kmer_s + i, ksize);
 
 	// is this a known tag?
-	if (partition_map.find(kmer) != partition_map.end()) {
+	if (set_contains(partition_map, kmer)) {
 	  found_tag = true;
 	  break;
 	}
@@ -279,12 +279,11 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 
-    if (keeper.find(kmer) != keeper.end()) {
+    if (set_contains(keeper, kmer)) {
       continue;
     }
 
-    if (break_on_stop_tags &&
-	_ht->stop_tags.find(kmer) != _ht->stop_tags.end()) {
+    if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
       continue;
     }
 
@@ -305,7 +304,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect
     // partitions.)
-    if (!first && _ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+    if (!first && set_contains(_ht->all_tags, kmer)) {
       tagged_kmers.insert(kmer);
       continue;
     }
@@ -322,8 +321,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // NEXT
     f = next_f(kmer_f, 'A');
     r = next_r(kmer_r, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    if (_ht->get_count(uniqify_rc(f,r)) &&
+	!set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -331,7 +330,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     f = next_f(kmer_f, 'C');
     r = next_r(kmer_r, 'C');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -339,7 +338,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     f = next_f(kmer_f, 'G');
     r = next_r(kmer_r, 'G');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -347,7 +346,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     f = next_f(kmer_f, 'T');
     r = next_r(kmer_r, 'T');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -356,7 +355,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'A');
     f = prev_f(kmer_f, 'A');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -364,7 +363,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'C');
     f = prev_f(kmer_f, 'C');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -372,7 +371,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'G');
     f = prev_f(kmer_f, 'G');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -380,7 +379,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'T');
     f = prev_f(kmer_f, 'T');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
