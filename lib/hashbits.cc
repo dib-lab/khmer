@@ -1426,32 +1426,26 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
 }
 
-void Hashbits::load_stop_tags(std::string filename, bool clear_tags)
+void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
 {
-  std::ifstream infile(filename.c_str());
-  assert(infile.is_open());
+  ifstream infile(infilename.c_str(), ios::binary);
 
   if (clear_tags) {
     stop_tags.clear();
   }
 
-  std::string line;
-  HashIntoType kmer;
+  unsigned int tagset_size = 0;
+  infile.read((char *) &tagset_size, sizeof(tagset_size));
 
-  getline(infile, line);
-  while (!infile.eof()) {
-    if (line[_ksize] != ' ') {
-      std::cerr << "incorrect format\n";
-      std::cerr << line << "\n";
-      assert(0);
-    }
-    kmer = _hash(line.c_str(), _ksize);
-    stop_tags.insert(kmer);
+  HashIntoType * buf = new HashIntoType[tagset_size];
 
-    getline(infile, line);
+  infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+
+  for (unsigned int i = 0; i < tagset_size; i++) {
+    stop_tags.insert(buf[i]);
   }
-  std::cout << "stop tags from: " << filename << ": "
-	    << stop_tags.size() << "\n";
+
+  delete buf;
 }
 
 void Hashbits::save_stop_tags(std::string outfilename)
