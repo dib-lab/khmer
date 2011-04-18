@@ -212,37 +212,37 @@ const
   HashIntoType f, r;
 
   // NEXT.
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  f = next_f(kmer_f, 'A');
+  r = next_r(kmer_r, 'A');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 	  
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  f = next_f(kmer_f, 'C');
+  r = next_r(kmer_r, 'C');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  f = next_f(kmer_f, 'G');
+  r = next_r(kmer_r, 'G');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  f = next_f(kmer_f, 'T');
+  r = next_r(kmer_r, 'T');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 
   // PREVIOUS.
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  r = prev_r(kmer_r, 'A');
+  f = prev_f(kmer_f, 'A');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  r = prev_r(kmer_r, 'C');
+  f = prev_f(kmer_f, 'C');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
     
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  r = prev_r(kmer_r, 'G');
+  f = prev_f(kmer_f, 'G');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  r = prev_r(kmer_r, 'T');
+  f = prev_f(kmer_f, 'T');
   if (get_count(uniqify_rc(f, r))) { neighbors++; }
 
   return neighbors;
@@ -674,32 +674,32 @@ const
     //
 
     // NEXT.
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -707,32 +707,32 @@ const
     }
 
     // PREVIOUS.
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -760,8 +760,8 @@ const
   seen->insert(uniqify_rc(kmer_f, kmer_r));
 
   // NEXT.
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-  r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+  f = next_f(kmer_f, 'A');
+  r = next_r(kmer_r, 'A');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth - 1, max_count - count,
@@ -769,8 +769,8 @@ const
     if (count >= max_count) { return count; }
   }
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-  r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+  f = next_f(kmer_f, 'C');
+  r = next_r(kmer_r, 'C');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -779,8 +779,8 @@ const
     ;
   }
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-  r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+  f = next_f(kmer_f, 'G');
+  r = next_r(kmer_r, 'G');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -789,8 +789,8 @@ const
     ;
   }
 
-  f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-  r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+  f = next_f(kmer_f, 'T');
+  r = next_r(kmer_r, 'T');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -800,8 +800,8 @@ const
   }
 
   // PREVIOUS.
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-  f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+  r = prev_r(kmer_r, 'A');
+  f = prev_f(kmer_f, 'A');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -810,8 +810,8 @@ const
     ;
   }
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-  f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+  r = prev_r(kmer_r, 'C');
+  f = prev_f(kmer_f, 'C');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -820,8 +820,8 @@ const
     ;
   }
     
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-  f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+  r = prev_r(kmer_r, 'G');
+  f = prev_f(kmer_f, 'G');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -830,8 +830,8 @@ const
     ;
   }
 
-  r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-  f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+  r = prev_r(kmer_r, 'T');
+  f = prev_f(kmer_f, 'T');
   if (get_count(uniqify_rc(f,r)) && 
       seen->find(uniqify_rc(f,r)) == seen->end()) {
     count += count_kmers_within_depth(f, r, depth -1, max_count - count,
@@ -891,32 +891,32 @@ const
     //
 
     // NEXT.
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -924,32 +924,32 @@ const
     }
 
     // PREVIOUS.
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -1026,32 +1026,32 @@ const
     //
 
     // NEXT.
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -1059,32 +1059,32 @@ const
     }
 
     // PREVIOUS.
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -1323,31 +1323,31 @@ const
     r = next_r(kmer_r, 'A');
       
     // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-    // r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
+    r = next_r(kmer_r, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
@@ -1355,32 +1355,32 @@ const
     }
 
     // PREVIOUS.
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
     if (get_count(uniqify_rc(f,r)) && 
 	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
       node_q.push(f); node_q.push(r);
