@@ -138,6 +138,12 @@ namespace khmer {
 			       CallbackFn callback = 0,
 			       void * callback_data = 0);
 
+    void consume_fasta_and_tag_with_stoptags(const std::string &filename,
+					     unsigned int &total_reads,
+					     unsigned long long &n_consumed,
+					     CallbackFn callback = 0,
+					     void * callback_data = 0);
+
     void consume_partitioned_fasta(const std::string &filename,
 				   unsigned int &total_reads,
 				   unsigned long long &n_consumed,

@@ -250,7 +250,8 @@ const
 
 
 //
-// consume_fasta: consume a FASTA file of reads
+// consume_fasta_and_tag: consume a FASTA file of reads, tagging reads every
+//     so often.
 //
 
 void Hashbits::consume_fasta_and_tag(const std::string &filename,
@@ -315,6 +316,122 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
       if (since >= _tag_density/2 - 1) {
 	all_tags.insert(kmer);	// insert the last k-mer, too.
       }
+    }
+	       
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      std::cout << "n tags: " << all_tags.size() << "\n";
+      try {
+        callback("consume_fasta_and_tag", callback_data, total_reads,
+		 n_consumed);
+      } catch (...) {
+	delete parser;
+        throw;
+      }
+    }
+  }
+  delete parser;
+}
+
+//
+// consume_fasta_and_tag_with_stoptags: consume a FASTA file of reads,
+//     tagging reads every so often.  Do not insert matches to stoptags,
+//     and join the tags across those gaps.
+//
+
+void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
+						   unsigned int &total_reads,
+						   unsigned long long &n_consumed,
+						   CallbackFn callback,
+						   void * callback_data)
+{
+  total_reads = 0;
+  n_consumed = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string seq = "";
+
+  SeenSet read_tags;
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    read_tags.clear();
+
+    // n_consumed += this_n_consumed;
+
+    if (check_read(seq)) {	// process?
+      bool is_new_kmer;
+      const char * first_kmer = seq.c_str();
+      HashIntoType kmer_f = 0, kmer_r = 0;
+      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+      HashIntoType last_kmer;
+      bool is_first_kmer = true;
+
+      unsigned int since = _tag_density / 2 + 1;
+      for (unsigned int i = _ksize; i < seq.length(); i++) {
+
+	if (stop_tags.find(kmer) == stop_tags.end()) { // NOT a stop tag... ok.
+	  is_new_kmer = (bool) !get_count(kmer);
+	  if (is_new_kmer) {
+	    count(kmer);
+	    n_consumed++;
+	  }
+
+	  if (!is_new_kmer && all_tags.find(kmer) != all_tags.end()) {
+	    read_tags.insert(kmer);
+	    since = 1;
+	  } else {
+	    since++;
+	  }
+
+	  if (since >= _tag_density) {
+	    all_tags.insert(kmer);
+	    read_tags.insert(kmer);
+	    since = 1;
+	  }
+	} else {		// stop tag!  do not insert, but connect.
+	  // before first tag insertion; insert last kmer.
+	  if (i > _ksize and read_tags.size() == 0) {
+	    assert(!is_first_kmer);
+	    read_tags.insert(last_kmer);
+	    all_tags.insert(last_kmer);
+	  }
+	  
+	  since = _tag_density - 1; // insert next kmer, too.
+	}
+
+	last_kmer = kmer;
+	is_first_kmer = false;
+	kmer = _next_hash(seq[i], kmer_f, kmer_r);
+      }
+
+      if (stop_tags.find(kmer) == stop_tags.end()) { // NOT a stop tag... ok.
+	is_new_kmer = (bool) !get_count(kmer);
+	if (is_new_kmer) {
+	  count(kmer);
+	  n_consumed++;
+	}
+
+	if (since >= _tag_density/2 - 1) {
+	  all_tags.insert(kmer);	// insert the last k-mer, too.
+	  read_tags.insert(kmer);
+	}
+      }
+    }
+
+    if (read_tags.size() > 1) {
+      partition->assign_partition_id(*(read_tags.begin()), read_tags);
     }
 	       
     // reset the sequence info, increment read number

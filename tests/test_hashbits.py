@@ -279,3 +279,64 @@ def test_save_load_tagset_noclear():
    data = fp.read()
    fp.close()
    assert len(data) == 24, len(data)
+
+def test_stop_traverse():
+   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   
+   K = 20 # size of kmer
+   HT_SIZE= 100000 # size of hashtable
+   N_HT = 3 # number of hashtables
+
+   ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+
+   # without tagging/joining across consume, this breaks into two partition;
+   # with, it is one partition.
+   ht.add_stop_tag('TTGCATACGTTGAGCCAGC')
+   
+   ht.consume_fasta_and_tag(filename)   # DO NOT join reads across stoptags
+   subset = ht.do_subset_partition(0, 0)
+   ht.merge_subset(subset)
+
+   n, _ = ht.count_partitions()
+   assert n == 2, n
+
+def test_tag_across_stoptraverse():
+   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   
+   K = 20 # size of kmer
+   HT_SIZE= 100000 # size of hashtable
+   N_HT = 3 # number of hashtables
+
+   ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+
+   # without tagging/joining across consume, this breaks into two partition;
+   # with, it is one partition.
+   ht.add_stop_tag('CCGAATATATAACAGCGAC')
+   
+   ht.consume_fasta_and_tag_with_stoptags(filename) # DO join reads across
+
+   subset = ht.do_subset_partition(0, 0)
+   ht.merge_subset(subset)
+
+   n, _ = ht.count_partitions()
+   assert n == 1, n
+
+def test_notag_across_stoptraverse():
+   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   
+   K = 20 # size of kmer
+   HT_SIZE= 100000 # size of hashtable
+   N_HT = 3 # number of hashtables
+
+   ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+
+   # connecting k-mer at the beginning/end of a read: breaks up into two.
+   ht.add_stop_tag('TTGCATACGTTGAGCCAGC')
+   
+   ht.consume_fasta_and_tag_with_stoptags(filename)
+
+   subset = ht.do_subset_partition(0, 0)
+   ht.merge_subset(subset)
+
+   n, _ = ht.count_partitions()
+   assert n == 2, n
