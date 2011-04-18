@@ -1232,34 +1232,6 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
   return seq.length();
 }
 
-void Hashbits::load_stop_tags(std::string filename, bool clear_tags)
-{
-  std::ifstream infile(filename.c_str());
-  assert(infile.is_open());
-
-  if (clear_tags) {
-    stop_tags.clear();
-  }
-
-  std::string line;
-  HashIntoType kmer;
-
-  getline(infile, line);
-  while (!infile.eof()) {
-    if (line[_ksize] != ' ') {
-      std::cerr << "incorrect format\n";
-      std::cerr << line << "\n";
-      assert(0);
-    }
-    kmer = _hash(line.c_str(), _ksize);
-    stop_tags.insert(kmer);
-
-    getline(infile, line);
-  }
-  std::cout << "stop tags from: " << filename << ": "
-	    << stop_tags.size() << "\n";
-}
-
 void Hashbits::traverse_from_tags(unsigned int distance,
 				  unsigned int threshold,
 				  unsigned int num_high_todo,
@@ -1452,6 +1424,34 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
   }
 
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
+}
+
+void Hashbits::load_stop_tags(std::string filename, bool clear_tags)
+{
+  std::ifstream infile(filename.c_str());
+  assert(infile.is_open());
+
+  if (clear_tags) {
+    stop_tags.clear();
+  }
+
+  std::string line;
+  HashIntoType kmer;
+
+  getline(infile, line);
+  while (!infile.eof()) {
+    if (line[_ksize] != ' ') {
+      std::cerr << "incorrect format\n";
+      std::cerr << line << "\n";
+      assert(0);
+    }
+    kmer = _hash(line.c_str(), _ksize);
+    stop_tags.insert(kmer);
+
+    getline(infile, line);
+  }
+  std::cout << "stop tags from: " << filename << ": "
+	    << stop_tags.size() << "\n";
 }
 
 void Hashbits::save_stop_tags(std::string outfilename)
