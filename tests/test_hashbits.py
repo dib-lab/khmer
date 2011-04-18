@@ -294,7 +294,7 @@ def test_stop_traverse():
    ht.add_stop_tag('TTGCATACGTTGAGCCAGC')
    
    ht.consume_fasta_and_tag(filename)   # DO NOT join reads across stoptags
-   subset = ht.do_subset_partition(0, 0)
+   subset = ht.do_subset_partition(0, 0, True)
    ht.merge_subset(subset)
 
    n, _ = ht.count_partitions()
@@ -316,9 +316,15 @@ def test_tag_across_stoptraverse():
    ht.consume_fasta_and_tag_with_stoptags(filename) # DO join reads across
 
    subset = ht.do_subset_partition(0, 0)
+   n, _ = ht.count_partitions()
+   assert n == 99                       # reads only connected by traversal...
+
+   n, _ = ht.subset_count_partitions(subset)
+   assert n == 2                        # but need main to cross stoptags.
+   
    ht.merge_subset(subset)
 
-   n, _ = ht.count_partitions()
+   n, _ = ht.count_partitions()         # ta-da!
    assert n == 1, n
 
 def test_notag_across_stoptraverse():

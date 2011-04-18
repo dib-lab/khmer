@@ -1771,17 +1771,25 @@ static PyObject * hashbits_do_subset_partition(PyObject * self, PyObject * args)
 
   PyObject * callback_obj = NULL;
   khmer::HashIntoType start_kmer = 0, end_kmer = 0;
+  PyObject * break_on_stop_tags_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "K|KO", &start_kmer, &end_kmer,
+  if (!PyArg_ParseTuple(args, "|KKOO", &start_kmer, &end_kmer,
+			&break_on_stop_tags_o,
 			&callback_obj)) {
     return NULL;
+  }
+
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
   }
 
   khmer::SubsetPartition * subset_p = NULL;
   try {
     Py_BEGIN_ALLOW_THREADS
     subset_p = new khmer::SubsetPartition(hashbits);
-    subset_p->do_partition(start_kmer, end_kmer, _report_fn, callback_obj);
+    subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
+			   _report_fn, callback_obj);
     Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
     return NULL;
