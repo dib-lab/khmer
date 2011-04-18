@@ -616,28 +616,33 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 
 void CountingHash::save(std::string outfilename)
 {
-  assert(_counts);
-#if 0				// @CTB
+  assert(_counts[0]);
+
   unsigned int save_ksize = _ksize;
-  unsigned long long save_tablesize = _tablesize;
+  unsigned long long save_tablesize;
 
   ofstream outfile(outfilename.c_str(), ios::binary);
 
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
 
-  outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
-  outfile.write((const char *) _counts,
-		sizeof(BoundedCounterType) * _tablesize);
+  for (unsigned int i = 0; i < _n_tables; i++) {
+    save_tablesize = _tablesizes[i];
+
+    outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
+    outfile.write((const char *) _counts[i], save_tablesize);
+  }
   outfile.close();
-#endif // 0
 }
 
 void CountingHash::load(std::string infilename)
 {
-#if 0				// @CTB
   if (_counts) {
+    for (unsigned int i = 0; i < _n_tables; i++) {
+      delete _counts[i]; _counts[i] = NULL;
+    }
     delete _counts; _counts = NULL;
   }
+  _tablesizes.clear();
   
   unsigned int save_ksize = 0;
   unsigned long long save_tablesize = 0;
@@ -645,19 +650,26 @@ void CountingHash::load(std::string infilename)
   ifstream infile(infilename.c_str(), ios::binary);
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   _ksize = (WordLength) save_ksize;
+  _init_bitstuff();
 
-  infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+  _counts = new Byte*[_n_tables];
+  for (unsigned int i = 0; i < _n_tables; i++) {
+    HashIntoType tablesize;
 
-  _tablesize = (HashIntoType) save_tablesize;
-  _counts = new BoundedCounterType[_tablesize];
+    infile.read((char *) &save_tablesize, sizeof(save_tablesize));
 
-  unsigned long long loaded = 0;
-  while (loaded != _tablesize) {
-    infile.read((char *) _counts, _tablesize - loaded);
-    loaded += infile.gcount();	// do I need to do this loop?
+    tablesize = (HashIntoType) save_tablesize;
+    _tablesizes.push_back(tablesize);
+
+    _counts[i] = new Byte[tablesize];
+
+    unsigned long long loaded = 0;
+    while (loaded != tablesize) {
+      infile.read((char *) _counts[i], tablesize - loaded);
+      loaded += infile.gcount();	// do I need to do this loop?
+    }
   }
   infile.close();
-#endif // 0
 }
 
 // technically, get medioid count... our "median" is always a member of the
