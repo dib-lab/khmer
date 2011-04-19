@@ -1579,15 +1579,15 @@ static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   PyObject * counting_o = NULL;
-  unsigned int distance, threshold, num_todo;
+  unsigned int distance, threshold, frequency;
 
-  if (!PyArg_ParseTuple(args, "OIII", &counting_o, &distance, &threshold, &num_todo)) {
+  if (!PyArg_ParseTuple(args, "OIII", &counting_o, &distance, &threshold, &frequency)) {
     return NULL;
   }
 
   khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
 
-  hashbits->traverse_from_tags(distance, threshold, num_todo, *counting);
+  hashbits->traverse_from_tags(distance, threshold, frequency, *counting);
 
   Py_INCREF(Py_None);
   return Py_None;
