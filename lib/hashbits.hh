@@ -255,9 +255,11 @@ namespace khmer {
 			    unsigned int threshold,
 			    unsigned int num_high_todo,
 			    CountingHash &counting) const;
+
     unsigned int _traverse_from_tag(HashIntoType start,
-			    unsigned int radius,
-			    CountingHash &counting) const;
+				    unsigned int radius,
+				    SeenSet &keeper) const;
+
     void hitraverse_to_stoptags(std::string filename,
 				CountingHash &counting,
 				unsigned int cutoff);

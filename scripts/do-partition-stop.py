@@ -5,10 +5,10 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE=int(1e9)
 N_HT=4
 
-COUNTING_SIZE=int(1e9)
+COUNTING_SIZE=int(1e8)
 
 
 SUBSET_SIZE = int(1e4)
@@ -93,7 +93,7 @@ def main(filename):
     ###
 
     counting = khmer.new_counting_hash(K, COUNTING_SIZE, N_HT)
-    ht.traverse_from_tags(counting, 100, 10000, 20)
+    ht.traverse_from_tags(counting, 100, 10000, 100)
     x = counting.abundance_distribution(filename)
 
     fp = open(basename + '.tabund', 'w')
@@ -114,6 +114,8 @@ def main(filename):
     print 'eliminating counting hash'
     del counting
     gc.collect()
+
+    sys.exit(0)
 
     ###
 

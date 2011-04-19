@@ -2,6 +2,8 @@
 #include "hashbits.hh"
 #include "parsers.hh"
 
+#define MAX_KEEPER_SIZE int(1e6)
+
 using namespace std;
 using namespace khmer;
 
@@ -1200,37 +1202,42 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
 
 void Hashbits::traverse_from_tags(unsigned int distance,
 				  unsigned int threshold,
-				  unsigned int num_high_todo,
+				  unsigned int frequency,
 				  CountingHash &counting) const
 {
   unsigned int i = 0;
   unsigned int n = 0;
   unsigned int count;
   unsigned int n_big = 0;
+  SeenSet keeper;
 
   std::cout << all_tags.size() << " tags...\n";
-  SeenSet::const_iterator si = all_tags.end();
-  si--;
+  SeenSet::const_iterator si = all_tags.begin();
 
-  for (; si != all_tags.begin(); si--, i++) {
+  for (; si != all_tags.end(); si++, i++) {
+    if (i % frequency == 0) {
       n++;
-      count = _traverse_from_tag(*si, distance, counting);
+      count = _traverse_from_tag(*si, distance, keeper);
 
       if (count >= threshold) {
 	n_big++;
+	
+	SeenSet::const_iterator ti;
+	for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+	  counting.count(*ti);
+	}
       }
-      if (n_big >= num_high_todo) {
-	break;
-      }
-      std::cout << "traverse-counting from " << *si << " " << i
-		<< " " << n << " " << n_big << "\n";
+      keeper.clear();
+
+      std::cout << "traversed from " << n << " tags total; "
+		<< n_big << " big\n";
+    }
   }
-  std::cout << "traversed from " << n << " tags total.\n";
 }
 
 unsigned int Hashbits::_traverse_from_tag(HashIntoType start,
 					  unsigned int radius,
-					  CountingHash &counting)
+					  SeenSet &keeper)
 const
 {
   std::string kmer_s = _revhash(start, _ksize);
@@ -1245,8 +1252,6 @@ const
 
   const unsigned int rc_left_shift = _ksize*2 - 2;
   unsigned int total = 0;
-
-  SeenSet keeper;		// keep track of traversed kmers
 
   // start breadth-first search.
 
@@ -1266,6 +1271,10 @@ const
       break;
     }
 
+    if (total > MAX_KEEPER_SIZE) {
+      break;
+    }
+
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
     if (set_contains(keeper, kmer)) {
       continue;
@@ -1274,8 +1283,6 @@ const
     // keep track of seen kmers
     keeper.insert(kmer);
     total++;
-
-    counting.count(kmer);
 
     assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     if (breadth > cur_breadth) { cur_breadth = breadth; }
