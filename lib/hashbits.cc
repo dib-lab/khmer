@@ -1203,7 +1203,7 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
 void Hashbits::traverse_from_tags(unsigned int distance,
 				  unsigned int threshold,
 				  unsigned int frequency,
-				  CountingHash &counting) const
+				  CountingHash &counting)
 {
   unsigned int i = 0;
   unsigned int n = 0;
@@ -1215,22 +1215,28 @@ void Hashbits::traverse_from_tags(unsigned int distance,
   SeenSet::const_iterator si = all_tags.begin();
 
   for (; si != all_tags.end(); si++, i++) {
-    if (i % frequency == 0) {
-      n++;
-      count = _traverse_from_tag(*si, distance, keeper);
+    n++;
+    count = _traverse_from_tag(*si, distance, keeper);
 
-      if (count >= threshold) {
-	n_big++;
+    if (count >= threshold) {
+      n_big++;
 	
-	SeenSet::const_iterator ti;
-	for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+      SeenSet::const_iterator ti;
+      for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+	if (counting.get_count(*ti) > frequency) {
+	  stop_tags.insert(*ti);
+	} else {
 	  counting.count(*ti);
 	}
       }
-      keeper.clear();
-
       std::cout << "traversed from " << n << " tags total; "
-		<< n_big << " big\n";
+		<< n_big << " big; " << keeper.size() << "\n";
+    }
+    keeper.clear();
+
+    if (n % 100 == 0) {
+      std::cout << "traversed " << n << " " << n_big << " " <<
+	all_tags.size() << " " << stop_tags.size() << "\n";
     }
   }
 }
@@ -1277,6 +1283,10 @@ const
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
     if (set_contains(keeper, kmer)) {
+      continue;
+    }
+
+    if (set_contains(stop_tags, kmer)) {
       continue;
     }
 

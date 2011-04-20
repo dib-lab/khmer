@@ -254,7 +254,7 @@ namespace khmer {
     void traverse_from_tags(unsigned int distance,
 			    unsigned int threshold,
 			    unsigned int num_high_todo,
-			    CountingHash &counting) const;
+			    CountingHash &counting);
 
     unsigned int _traverse_from_tag(HashIntoType start,
 				    unsigned int radius,

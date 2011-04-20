@@ -93,7 +93,14 @@ def main(filename):
     ###
 
     counting = khmer.new_counting_hash(K, COUNTING_SIZE, N_HT)
-    ht.traverse_from_tags(counting, 100, 10000, 100)
+    ht.traverse_from_tags(counting, 40, 2000, 5)
+
+    print 'saving stoptags binary'
+    ht.save_stop_tags(basename + '.stoptags')
+
+    sys.exit(0)
+
+    #
     x = counting.abundance_distribution(filename)
 
     fp = open(basename + '.tabund', 'w')
