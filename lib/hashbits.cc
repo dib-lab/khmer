@@ -1216,7 +1216,7 @@ void Hashbits::traverse_from_tags(unsigned int distance,
 
   for (; si != all_tags.end(); si++, i++) {
     n++;
-    count = _traverse_from_tag(*si, distance, keeper);
+    count = traverse_from_kmer(*si, distance, keeper);
 
     if (count >= threshold) {
       n_big++;
@@ -1241,7 +1241,9 @@ void Hashbits::traverse_from_tags(unsigned int distance,
   }
 }
 
-unsigned int Hashbits::_traverse_from_tag(HashIntoType start,
+
+
+unsigned int Hashbits::traverse_from_kmer(HashIntoType start,
 					  unsigned int radius,
 					  SeenSet &keeper)
 const
@@ -1456,4 +1458,73 @@ void Hashbits::print_stop_tags(std::string infilename)
   }
   
   printfile.close();
+}
+
+unsigned int Hashbits::count_and_transfer_to_stoptags(SeenSet &keeper,
+						      unsigned int threshold,
+						      CountingHash &counting)
+{
+  unsigned int n_inserted = 0;
+
+  SeenSet::const_iterator ti;
+  for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+    if (counting.get_count(*ti) >= threshold) {
+      stop_tags.insert(*ti);
+      n_inserted++;
+    } else {
+      counting.count(*ti);
+    }
+  }
+
+  return n_inserted;
+}
+
+void Hashbits::traverse_from_reads(std::string filename,
+				   unsigned int radius,
+				   unsigned int big_threshold,
+				   unsigned int transfer_threshold,
+				   CountingHash &counting)
+{
+  unsigned long long total_reads = 0;
+  unsigned long long total_stop = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+  SeenSet keeper;
+
+  string seq = "";
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {	// process?
+      const char * last_kmer = seq.c_str() + seq.length() - _ksize;
+      HashIntoType kmer = _hash(last_kmer, _ksize);
+
+      unsigned int n = traverse_from_kmer(kmer, radius, keeper);
+
+      if (n >= big_threshold) {
+	std::cout << "lump: " << n << "; added: " << total_stop << "\n";
+	total_stop += count_and_transfer_to_stoptags(keeper,
+						     transfer_threshold,
+						     counting);
+      }
+
+      keeper.clear();
+    }
+	       
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0) {
+      std::cout << "n reads: " << total_reads << "; n tags: " << all_tags.size() << "\n";
+    }
+  }
+  delete parser;
 }

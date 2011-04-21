@@ -1911,6 +1911,31 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hashbits_traverse_from_reads(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  unsigned int radius, big_threshold, transfer_threshold;
+  PyObject * counting_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "siiiO", &filename,
+			&radius, &big_threshold, &transfer_threshold,
+			&counting_o)) {
+    return NULL;
+  }
+
+  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+
+  hashbits->traverse_from_reads(filename, radius, big_threshold,
+				transfer_threshold, *counting);
+      
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 void sig(unsigned int total_reads, unsigned int n_consumed)
 {
    std::cout << total_reads << " " << n_consumed << std::endl;
@@ -2691,6 +2716,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "traverse_from_reads", hashbits_traverse_from_reads, METH_VARARGS, "" },
   { "consume_fasta_and_tag_with_stoptags", hashbits_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "join_partitions_by_path", hashbits_join_partitions_by_path, METH_VARARGS, "" },

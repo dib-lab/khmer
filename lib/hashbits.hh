@@ -256,9 +256,19 @@ namespace khmer {
 			    unsigned int num_high_todo,
 			    CountingHash &counting);
 
-    unsigned int _traverse_from_tag(HashIntoType start,
+    unsigned int traverse_from_kmer(HashIntoType start,
 				    unsigned int radius,
 				    SeenSet &keeper) const;
+
+    unsigned int count_and_transfer_to_stoptags(SeenSet &keeper,
+						unsigned int threshold,
+						CountingHash &counting);
+
+    void traverse_from_reads(std::string filename,
+			     unsigned int radius,
+			     unsigned int big_threshold,
+			     unsigned int transfer_threshold,
+			     CountingHash &counting);
 
     void hitraverse_to_stoptags(std::string filename,
 				CountingHash &counting,
