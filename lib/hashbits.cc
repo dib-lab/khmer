@@ -1523,7 +1523,7 @@ void Hashbits::traverse_from_reads(std::string filename,
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0) {
-      std::cout << "n reads: " << total_reads << "; n tags: " << all_tags.size() << "\n";
+      std::cout << "n reads: " << total_reads << "; n tags: " << stop_tags.size() << "\n";
     }
   }
   delete parser;
