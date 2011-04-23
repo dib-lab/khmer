@@ -1149,6 +1149,22 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
   return PyInt_FromLong(count);
 }
 
+static PyObject * hash_max_hamming1_count(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * kmer;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer)) {
+    return NULL;
+  }
+
+  unsigned long count = counting->max_hamming1_count(kmer);
+
+  return PyInt_FromLong(count);
+}
+
 static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1329,6 +1345,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "filter_fasta_file_run", hash_filter_fasta_file_run, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
+  { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
   { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
@@ -1930,6 +1947,31 @@ static PyObject * hashbits_traverse_from_reads(PyObject * self, PyObject * args)
 
   hashbits->traverse_from_reads(filename, radius, big_threshold,
 				transfer_threshold, *counting);
+      
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hashbits_consume_fasta_and_traverse(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  unsigned int radius, big_threshold, transfer_threshold;
+  PyObject * counting_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "siiiO", &filename,
+			&radius, &big_threshold, &transfer_threshold,
+			&counting_o)) {
+    return NULL;
+  }
+
+  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+
+  hashbits->consume_fasta_and_traverse(filename, radius, big_threshold,
+				       transfer_threshold, *counting);
       
 
   Py_INCREF(Py_None);
@@ -2717,6 +2759,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "traverse_from_reads", hashbits_traverse_from_reads, METH_VARARGS, "" },
+  { "consume_fasta_and_traverse", hashbits_consume_fasta_and_traverse, METH_VARARGS, "" },
   { "consume_fasta_and_tag_with_stoptags", hashbits_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "join_partitions_by_path", hashbits_join_partitions_by_path, METH_VARARGS, "" },

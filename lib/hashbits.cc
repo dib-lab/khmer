@@ -1528,3 +1528,70 @@ void Hashbits::traverse_from_reads(std::string filename,
   }
   delete parser;
 }
+
+//
+// consume_fasta: consume a FASTA file of reads
+//
+
+void Hashbits::consume_fasta_and_traverse(const std::string &filename,
+					  unsigned int radius,
+					  unsigned int big_threshold,
+					  unsigned int transfer_threshold,
+					  CountingHash &counting)
+{
+  unsigned long long total_reads = 0;
+  unsigned long long total_stop = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string seq = "";
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (check_read(seq)) {	// process?
+      const char * first_kmer = seq.c_str();
+      HashIntoType kmer_f = 0, kmer_r = 0;
+      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+      HashIntoType last_kmer = kmer;
+      bool is_first_kmer = true;
+
+      for (unsigned int i = _ksize; i < seq.length(); i++) {
+	if (set_contains(stop_tags, kmer)) {
+	  break;
+	}
+
+	count(kmer);
+
+	last_kmer = kmer;
+	is_first_kmer = false;
+	kmer = _next_hash(seq[i], kmer_f, kmer_r);
+      }
+
+      if (!is_first_kmer) {	// traverse
+	SeenSet keeper;
+
+	unsigned int n = traverse_from_kmer(kmer, radius, keeper);
+	if (n >= big_threshold) {
+	  std::cout << "lmp: " << n << "; added: " << stop_tags.size() << "\n";
+	  count_and_transfer_to_stoptags(keeper, transfer_threshold, counting);
+	}
+      }
+    }
+
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0) {
+      std::cout << "n reads: " << total_reads << "\n";
+    }
+  }
+  delete parser;
+}

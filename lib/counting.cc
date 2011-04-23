@@ -827,3 +827,32 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
 
   abs_deviation = total / float(count);
 }
+
+unsigned int CountingHash::max_hamming1_count(const std::string kmer_s)
+{
+  std::string ksub;
+
+  unsigned int max_count = 0;
+  for (unsigned int i = 0; i < _ksize; i++) {
+    unsigned int the_count;
+
+    ksub = kmer_s;
+    ksub[i] = 'A';
+    the_count = get_count(ksub.c_str());
+    if (the_count > max_count) { max_count = the_count; }
+
+    ksub[i] = 'C';
+    the_count = get_count(ksub.c_str());
+    if (the_count > max_count) { max_count = the_count; }
+
+    ksub[i] = 'G';
+    the_count = get_count(ksub.c_str());
+    if (the_count > max_count) { max_count = the_count; }
+
+    ksub[i] = 'T';
+    the_count = get_count(ksub.c_str());
+    if (the_count > max_count) { max_count = the_count; }
+  }
+
+  return max_count;
+}
