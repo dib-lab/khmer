@@ -205,6 +205,8 @@ namespace khmer {
 
     void get_kmer_abund_abs_deviation(const std::string &inputfile,
 				      float mean, float &abs_deviation) const;
+
+    unsigned int max_hamming1_count(const std::string kmer);
   };
 };
 
