@@ -1081,3 +1081,25 @@ void SubsetPartition::join_partitions_by_path(std::string seq)
   // assert(tagged_kmers.size());
   assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
 }
+
+void SubsetPartition::partition_size_distribution(PartitionCountDistribution &d,
+						  unsigned int& n_unassigned)
+const
+{
+  PartitionCountMap cm;
+  n_unassigned = 0;
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      cm[*(pi->second)]++;
+    } else {
+      n_unassigned++;
+    }
+  }
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    d[cmi->second]++;
+  }
+}

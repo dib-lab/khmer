@@ -72,6 +72,9 @@ namespace khmer {
     bool is_single_partition(std::string sequence);
 
     void join_partitions_by_path(std::string sequence);
+
+    void partition_size_distribution(PartitionCountDistribution &d,
+				    unsigned int& n_unassigned) const;
   };
 }
 
