@@ -246,6 +246,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    HashIntoType kmer_r,
 				    SeenSet& tagged_kmers,
+				    const SeenSet& all_tags,
 				    bool break_on_stop_tags)
 {
   const HashIntoType bitmask = _ht->bitmask;
@@ -304,7 +305,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect
     // partitions.)
-    if (!first && set_contains(_ht->all_tags, kmer)) {
+    if (!first && set_contains(all_tags, kmer)) {
       tagged_kmers.insert(kmer);
       continue;
     }
@@ -424,7 +425,8 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 
     // find all tagged kmers within range.
     tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers, break_on_stop_tags);
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+		  break_on_stop_tags);
 
     // assign the partition ID
     assign_partition_id(kmer, tagged_kmers);
@@ -1103,3 +1105,166 @@ const
     d[cmi->second]++;
   }
 }
+
+unsigned int SubsetPartition::repartition_largest_partition(unsigned int distance,
+						    unsigned int threshold,
+						    unsigned int frequency,
+						    CountingHash &counting)
+{
+  PartitionCountMap cm;
+  unsigned int n_unassigned = 0;
+  PartitionID biggest_p = 0;
+  unsigned int next_largest = 0;
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      cm[*(pi->second)]++;
+    } else {
+      n_unassigned++;
+    }
+  }
+
+  PartitionCountDistribution d;
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    d[cmi->second]++;
+  }
+
+  PartitionCountDistribution::const_iterator di = d.end();
+  di--;
+
+  assert(d.size());
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    if (cmi->second == di->first) {
+      biggest_p = cmi->first;	// find PID of largest partition
+    }
+  }
+  assert(biggest_p != 0);
+
+  std::cout << "biggest partition: " << di->first << "\n";
+  di--;
+  std::cout << "biggest partition ID: " << biggest_p << "\n";
+
+  next_largest = di->first;
+  std::cout << "next biggest partition: " << di->first << "\n";
+
+  ///
+
+  SeenSet bigtags;
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second && *(pi->second) == biggest_p) {
+      bigtags.insert(pi->first);
+      pi->second = NULL;
+    }
+  }
+
+  PartitionPtrSet * ps = reverse_pmap[biggest_p];
+  for (PartitionPtrSet::iterator psi = ps->begin(); psi != ps->end(); psi++) {
+    delete *psi;
+  }
+  delete ps;
+  reverse_pmap.erase(biggest_p);
+
+  std::cout << "gathered/cleared " << bigtags.size() << " tags.\n";
+
+  /// 
+
+  unsigned int i = 0;
+  unsigned int n = 0;
+  unsigned int count;
+  unsigned int n_big = 0;
+  SeenSet keeper;
+
+  SeenSet::const_iterator si = bigtags.begin();
+
+  for (; si != bigtags.end(); si++, i++) {
+    n++;
+    count = _ht->traverse_from_kmer(*si, distance, keeper);
+
+    if (count >= threshold) {
+      n_big++;
+	
+      SeenSet::const_iterator ti;
+      for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+	if (counting.get_count(*ti) > frequency) {
+	  _ht->stop_tags.insert(*ti);
+	} else {
+	  counting.count(*ti);
+	}
+      }
+      std::cout << "traversed from " << n << " tags total; "
+		<< n_big << " big; " << keeper.size() << "\n";
+    }
+    keeper.clear();
+
+    if (n % 1000 == 0) {
+      std::cout << "traversed " << n << " " << n_big << " " <<
+	bigtags.size() << " " << _ht->stop_tags.size() << "\n";
+    }
+  }
+
+  // return next_largest;
+
+  std::cout << "repartitioning...\n";
+
+  SeenSet tagged_kmers;
+  std::string kmer_s;
+  HashIntoType kmer_f, kmer_r, kmer;
+  unsigned int ksize = _ht->ksize();
+
+  n = 0;
+  for (si = bigtags.begin(); si != bigtags.end(); si++, n++) {
+    if (n % 1000 == 0) {
+      std::cout << "repartitioning... on " << n << " of " << bigtags.size() << "\n";
+    }
+    kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
+    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+
+    tagged_kmers.clear();
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags, true);
+
+    // only join things already in bigtags.
+    for (SeenSet::iterator ssi = tagged_kmers.begin();
+	 ssi != tagged_kmers.end(); ssi++) {
+      if (!set_contains(bigtags, *ssi)) {
+	tagged_kmers.erase(ssi);
+      }
+    }
+    // std::cout << "joining: " << tagged_kmers.size() << "\n";
+    assign_partition_id(kmer, tagged_kmers);
+  }
+
+  // 
+
+  cm.clear();
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      cm[*(pi->second)]++;
+    } else {
+      n_unassigned++;
+    }
+  }
+
+  d.clear();
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    d[cmi->second]++;
+  }
+
+  di = d.end();
+  di--;
+
+  std::cout << "post-repart new biggest partition size: " << di->first << "\n";
+
+  return next_largest;
+}
+
+
+

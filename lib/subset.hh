@@ -52,6 +52,7 @@ namespace khmer {
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
 		       SeenSet& tagged_kmers,
+		       const SeenSet& all_tags,
 		       bool break_on_stop_tags=false);
 
     void do_partition(HashIntoType first_kmer,
@@ -75,6 +76,9 @@ namespace khmer {
 
     void partition_size_distribution(PartitionCountDistribution &d,
 				    unsigned int& n_unassigned) const;
+
+    unsigned int repartition_largest_partition(unsigned int, unsigned int,
+					       unsigned int, CountingHash&);
   };
 }
 

@@ -3,8 +3,8 @@
 
 #include <vector>
 #include "hashtable.hh"
-#include "subset.hh"
 #include "counting.hh"
+#include "subset.hh"
 
 #define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | twobit_repr(ch))
 #define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
@@ -25,8 +25,6 @@ namespace khmer {
     HashIntoType _n_unique_kmers;
 
     Byte ** _counts;
-    SeenSet all_tags;
-    SeenSet stop_tags;
 
     virtual void _allocate_counters() {
       _n_tables = _tablesizes.size();
@@ -53,6 +51,8 @@ namespace khmer {
 
   public:
     SubsetPartition * partition;
+    SeenSet all_tags;
+    SeenSet stop_tags;
 
     void _validate_pmap() {
       if (partition) { partition->_validate_pmap(); }
