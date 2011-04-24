@@ -2302,6 +2302,35 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
   return Py_BuildValue("ii", n_partitions, n_unassigned);
 }
 
+static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
+					       PyObject * args)
+{
+  PyObject * subset_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    return NULL;
+  }
+  
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  khmer::PartitionCountDistribution d;
+
+  unsigned int n_unassigned = 0;
+  subset_p->partition_size_distribution(d, n_unassigned);
+
+  PyObject * x = PyList_New(d.size());
+  khmer::PartitionCountDistribution::const_iterator di;
+
+  unsigned int i;
+  for (i = 0, di = d.begin(); di != d.end(); di++, i++) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("LL", di->first, di->second));
+  }
+  assert (i == d.size());
+
+  return Py_BuildValue("Oi", x, n_unassigned);
+}
+
 static PyObject * hashbits_load(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2767,6 +2796,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "merge_subset_from_disk", hashbits_merge_from_disk, METH_VARARGS, "" },
   { "count_partitions", hashbits_count_partitions, METH_VARARGS, "" },
   { "subset_count_partitions", hashbits_subset_count_partitions, METH_VARARGS, "" },
+  { "subset_partition_size_distribution", hashbits_subset_partition_size_distribution, METH_VARARGS, "" },
   { "save_subset_partitionmap", hashbits_save_subset_partitionmap, METH_VARARGS },
   { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },
   { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },

@@ -29,6 +29,7 @@ namespace khmer {
   typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 
   class Hashtable {		// Base class implementation of a Bloom ht.
   protected:
