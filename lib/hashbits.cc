@@ -1241,8 +1241,6 @@ void Hashbits::traverse_from_tags(unsigned int distance,
   }
 }
 
-
-
 unsigned int Hashbits::traverse_from_kmer(HashIntoType start,
 					  unsigned int radius,
 					  SeenSet &keeper)
@@ -1257,6 +1255,7 @@ const
   std::queue<unsigned int> breadth_q;
   unsigned int cur_breadth = 0;
   unsigned int breadth = 0;
+  bool is_first_kmer = true;
 
   const unsigned int rc_left_shift = _ksize*2 - 2;
   unsigned int total = 0;
@@ -1295,6 +1294,10 @@ const
     // keep track of seen kmers
     keeper.insert(kmer);
     total++;
+
+    if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
+      continue;
+    }
 
     assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     if (breadth > cur_breadth) { cur_breadth = breadth; }
@@ -1363,6 +1366,8 @@ const
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
+
+    is_first_kmer = false;
   }
 
   return total;

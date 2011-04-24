@@ -1610,6 +1610,29 @@ static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * counting_o = NULL;
+  PyObject * subset_o = NULL;
+  unsigned int distance, threshold, frequency;
+
+  if (!PyArg_ParseTuple(args, "OOIII", &subset_o, &counting_o, &distance, &threshold, &frequency)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
+
+  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+
+  unsigned int next_largest = subset_p->repartition_largest_partition(distance, threshold, frequency, *counting);
+
+  return PyInt_FromLong(next_largest);
+}
+
 static PyObject * hashbits_hitraverse_to_stoptags(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2094,7 +2117,8 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
     kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
 
     ppi = new _pre_partition_info(kmer);
-    hashbits->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers);
+    hashbits->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers,
+				       hashbits->all_tags);
     hashbits->add_kmer_to_tags(kmer);
 
   Py_END_ALLOW_THREADS
@@ -2811,6 +2835,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },
   { "hitraverse_to_stoptags", hashbits_hitraverse_to_stoptags, METH_VARARGS, "" },
   { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
+  { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
