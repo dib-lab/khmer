@@ -43,9 +43,9 @@ namespace khmer {
       }
     }
 
-    void _clear_partitions() {
+    void _clear_all_partitions() {
       if (partition != NULL) {
-	partition->_clear_partitions();
+	partition->_clear_all_partitions();
       }
     }
 
@@ -81,7 +81,7 @@ namespace khmer {
 	_n_tables = 0;
       }
 
-      _clear_partitions();
+      _clear_all_partitions();
     }
 
     virtual void save(std::string);

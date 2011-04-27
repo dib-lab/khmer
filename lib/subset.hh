@@ -14,7 +14,7 @@ namespace khmer {
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
-    void _clear_partitions();
+    void _clear_all_partitions();
 
     void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
     PartitionID * _add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp);
@@ -26,7 +26,7 @@ namespace khmer {
       ;
     };
 
-    ~SubsetPartition() { _clear_partitions(); }
+    ~SubsetPartition() { _clear_all_partitions(); }
 
     PartitionID assign_partition_id(HashIntoType kmer, SeenSet& tagged_kmers);
 
@@ -79,6 +79,13 @@ namespace khmer {
 
     unsigned int repartition_largest_partition(unsigned int, unsigned int,
 					       unsigned int, CountingHash&);
+
+    void repartition_a_partition(const SeenSet& partition_tags);
+    void _clear_partition(PartitionID, SeenSet& partition_tags);
+
+    void _merge_other(HashIntoType tag,
+		      PartitionID other_partition,
+		      PartitionPtrMap& diskp_to_pp);
   };
 }
 
