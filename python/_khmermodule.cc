@@ -1624,7 +1624,11 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
   }
 
   khmer::SubsetPartition * subset_p;
-  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
+  if (subset_o != Py_None) {
+    subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
+  } else {
+    subset_p = hashbits->partition;
+  }
 
   khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
 
