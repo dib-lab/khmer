@@ -954,7 +954,8 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
 	  counting.count(*ti);
 	}
       }
-      std::cout << "traversed from " << n << " tags total; "
+      std::cout << "traversed from " << n << " tags total, of " 
+	        << bigtags.size() << "; "
 		<< n_big << " big; size is " << keeper.size() << "\n";
     }
     keeper.clear();
