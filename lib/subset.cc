@@ -473,6 +473,9 @@ void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_
   delete t;
 }
 
+// in comparison to _add_partition_ptr, _add_partition_ptr2 may swap the
+// partitions being joined, while _add_partition_ptr never does.
+
 PartitionID * SubsetPartition::_add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp)
 {
   PartitionPtrSet * s = reverse_pmap[*orig_pp];
@@ -596,6 +599,10 @@ void SubsetPartition::_merge_other(HashIntoType tag,
 				   PartitionID other_partition,
 				   PartitionPtrMap& diskp_to_pp)
 {
+  if (set_contains(_ht->stop_tags, tag)) { // don't merge if it's a stop_tag
+    return;
+  }
+
   // OK.  Does our current partitionmap have this?
   PartitionID * pp_0;
   pp_0 = partition_map[tag];
