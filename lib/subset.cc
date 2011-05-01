@@ -191,27 +191,20 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 
+    // Have we already seen this k-mer?  If so, skip.
     if (set_contains(keeper, kmer)) {
       continue;
     }
 
+    // Do we want to traverse through this k-mer?  If not, skip.
     if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
+      // @CTB optimize by inserting into keeper set?
       continue;
     }
 
     // keep track of seen kmers
     keeper.insert(kmer);
-    //    cout << "INSERT: " << _revhash(kmer, _ht->ksize()) << "=" << (int) (_ht->get_count(kmer)) << " xx " << kmer % _ht->n_entries() << " =\n";
     total++;
-
-    // if this is a high-circumference k-mer, do nothing more with it;
-    // definitely do not connect partitions across it!
-#if 0
-    if (_ht->count_kmers_on_radius(kmer_f, kmer_r, CIRCUM_RADIUS,
-				   CIRCUM_MAX_VOL) > MAX_CIRCUM) {
-      continue;
-    }
-#endif // 0
 
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect
@@ -555,6 +548,8 @@ void SubsetPartition::merge(SubsetPartition * other)
   }
 }
 
+// Merge PartitionIDs from another SubsetPartition, based on overlapping
+// tags.  Utility function for merge() and merge_from_disk().
 
 void SubsetPartition::_merge_other(HashIntoType tag,
 				   PartitionID other_partition,
@@ -607,6 +602,8 @@ void SubsetPartition::_merge_other(HashIntoType tag,
     }
   }
 }
+
+// Merge an on-disk SubsetPartition into this one.
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
@@ -661,7 +658,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
   }
 }
 
-// load partition maps from & save to disk 
+// Save a partition map to disk.
 
 void SubsetPartition::save_partitionmap(string pmap_filename)
 {
@@ -708,10 +705,12 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 
   delete buf;
 }
+
+// Load a partition map from disk.
 					 
 void SubsetPartition::load_partitionmap(string infilename)
 {
-  // @CTB make sure this is an empty partition...
+  // @CTB make sure this is an empty partition...?
   merge_from_disk(infilename);
 }
 
@@ -745,6 +744,8 @@ void SubsetPartition::_validate_pmap()
     }
   }
 }
+
+// Get rid of all partitions & partition information.
 
 void SubsetPartition::_clear_all_partitions()
 {
