@@ -444,7 +444,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
       partition_map[*it] = this_partition_p;
     } else {
       if (*pp_id != *this_partition_p) { // join partitions
-	_add_partition_ptr(this_partition_p, pp_id);
+	_add_partition_ptr2(this_partition_p, pp_id);
       }
     }
   }
@@ -453,24 +453,6 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
   partition_map[kmer] = this_partition_p;
 
   return this_partition_p;
-}
-
-///
-
-void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
-{
-  PartitionPtrSet * s = reverse_pmap[*orig_pp];
-  PartitionPtrSet * t = reverse_pmap[*new_pp];
-  reverse_pmap.erase(*new_pp);
-
-  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
-    PartitionID * iter_pp;
-    iter_pp = *pi;
-
-    *iter_pp = *orig_pp;
-    s->insert(iter_pp);
-  }
-  delete t;
 }
 
 // in comparison to _add_partition_ptr, _add_partition_ptr2 may swap the
