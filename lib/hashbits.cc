@@ -43,6 +43,7 @@ void Hashbits::load(std::string infilename)
   unsigned long long save_tablesize = 0;
 
   ifstream infile(infilename.c_str(), ios::binary);
+  assert(infile.is_open());
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   _ksize = (WordLength) save_ksize;
   _init_bitstuff();
@@ -1411,6 +1412,7 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
 {
   ifstream infile(infilename.c_str(), ios::binary);
+  assert(infile.is_open());
 
   if (clear_tags) {
     stop_tags.clear();
