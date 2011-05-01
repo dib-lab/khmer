@@ -556,45 +556,6 @@ void SubsetPartition::merge(SubsetPartition * other)
 }
 
 
-// @CTB dead code?
-void SubsetPartition::_merge_from_disk_consolidate(PartitionPtrMap& diskp_to_pp)
-{
-  for (PartitionPtrMap::iterator pp = diskp_to_pp.begin();
-       pp != diskp_to_pp.end(); pp++) {
-    PartitionPtrSet * s = reverse_pmap[*(pp->second)];
-    if (s->size() > 1) {
-      pp->second = *(s->begin());
-    }
-  }
-
-  for (PartitionMap::iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    if (pi->second) {
-      PartitionPtrSet * s = reverse_pmap[*(pi->second)];
-      if (s->size() > 1) {
-	pi->second = *(s->begin());
-      }
-    }
-  }
-
-  return;			// @@CTB??
-
-  for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
-       ri != reverse_pmap.end(); ri++) {
-    PartitionPtrSet * s = ri->second;
-    if (s->size() > 1) {
-      PartitionPtrSet::iterator si = s->begin();
-      si++;
-
-      while(si != s->end()) { free(*si); si++; }
-      
-      si = s->begin();
-      si++;
-      s->erase(si, s->end());
-    }
-  }
-}
-
 void SubsetPartition::_merge_other(HashIntoType tag,
 				   PartitionID other_partition,
 				   PartitionPtrMap& diskp_to_pp)
