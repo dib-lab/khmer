@@ -855,6 +855,8 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
   PartitionID biggest_p = 0;
   unsigned int next_largest = 0;
 
+  std::cout << "calculating partition size distribution.\n";
+
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     if (pi->second) {
@@ -940,27 +942,6 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
   repartition_a_partition(bigtags);
 
   // 
-
-  cm.clear();
-  for (PartitionMap::const_iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    if (pi->second) {
-      cm[*(pi->second)]++;
-    } else {
-      n_unassigned++;
-    }
-  }
-
-  d.clear();
-  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
-       cmi++) {
-    d[cmi->second]++;
-  }
-
-  di = d.end();
-  di--;
-
-  std::cout << "post-repart new biggest partition size: " << di->first << "\n";
 
   return next_largest;
 }
