@@ -397,7 +397,7 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1) {
-    pp = _reassign_partition_ids(tagged_kmers, kmer);
+    pp = _join_partitions_by_tags(tagged_kmers, kmer);
     return_val = *pp;
   } else {
     PartitionMap::iterator pi = partition_map.find(kmer);
@@ -412,10 +412,15 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
   return return_val;
 }
 
-PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
-						       const HashIntoType kmer)
+// _join_partitions_by_tags combines the tags in 'tagged_kmers' into a single
+// partition, creating or reassigning partitions as necessary.  Low level
+// function!
+
+PartitionID * SubsetPartition::_join_partitions_by_tags(
+                   const SeenSet& tagged_kmers,
+		   const HashIntoType kmer)
 {
-  SeenSet::iterator it = tagged_kmers.begin();
+  SeenSet::const_iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = NULL;
 
   // find first assigned partition ID in tagged set
@@ -427,7 +432,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
     it++;
   }
 
-  // none? allocate!
+  // no partition ID? allocate new!
   if (this_partition_p == NULL) {
     this_partition_p = new PartitionID(next_partition_id);
     next_partition_id++;
@@ -437,14 +442,20 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
     reverse_pmap[*this_partition_p] = s;
   }
   
+  // reassign all partitions individually.
   it = tagged_kmers.begin();
   for (; it != tagged_kmers.end(); ++it) {
-    PartitionID * pp_id = partition_map[*it];
-    if (pp_id == NULL) {
+    PartitionMap::iterator pi = partition_map.find(*it);
+
+    if (pi == partition_map.end()) { // no entry? insert.
       partition_map[*it] = this_partition_p;
     } else {
-      if (*pp_id != *this_partition_p) { // join partitions
-	_add_partition_ptr2(this_partition_p, pp_id);
+      PartitionID * pp_id = pi->second;
+
+      if (pp_id == NULL) {	// entry is null? set;
+	pi->second = this_partition_p;
+      } else if (*pp_id != *this_partition_p) { // != entry? join partitions.
+	_merge_two_partitions(this_partition_p, pp_id);
       }
     }
   }
@@ -455,31 +466,38 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
   return this_partition_p;
 }
 
-// in comparison to _add_partition_ptr, _add_partition_ptr2 may swap the
-// partitions being joined, while _add_partition_ptr never does.
+// _merge_two_partitions merges the 'merge_pp' partition into the
+// 'the_pp' partition.  It does this by joining the reverse pointer
+// map structures for two partitions and resetting each partition
+// pointer individually.
 
-PartitionID * SubsetPartition::_add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp)
+PartitionID * SubsetPartition::_merge_two_partitions(PartitionID *the_pp,
+						     PartitionID *merge_pp)
 {
-  PartitionPtrSet * s = reverse_pmap[*orig_pp];
-  PartitionPtrSet * t = reverse_pmap[*new_pp];
+  PartitionPtrSet * s = reverse_pmap[*the_pp];
+  PartitionPtrSet * t = reverse_pmap[*merge_pp];
 
+  // Choose the smaller of two sets to loop over.
   if (s->size() < t->size()) {
     PartitionPtrSet * tmp = s;  s = t; t = tmp;
-    PartitionID * tmp2 = orig_pp; orig_pp = new_pp; new_pp = tmp2;
+    PartitionID * tmp2 = the_pp; the_pp = merge_pp; merge_pp = tmp2;
   }
 
-  reverse_pmap.erase(*new_pp);
+  // Get rid of the reverse pointer for the old partition.
+  reverse_pmap.erase(*merge_pp);
 
+  // Merge all of the elements in the to-be-replaced PartitionPtrSet
+  // into the merged partition.
   for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
     PartitionID * iter_pp;
     iter_pp = *pi;
 
-    *iter_pp = *orig_pp;
+    *iter_pp = *the_pp;	// reset the partition ID to the new one.
     s->insert(iter_pp);
   }
   delete t;
 
-  return orig_pp;
+  return the_pp;
 }
 
 PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
@@ -497,7 +515,7 @@ PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
   PartitionID * orig_pp = *(reverse_pmap[orig]->begin());
   PartitionID * join_pp = *(reverse_pmap[join]->begin());
 
-  _add_partition_ptr2(orig_pp, join_pp);
+  _merge_two_partitions(orig_pp, join_pp);
 
   return orig;
 }
@@ -617,7 +635,7 @@ void SubsetPartition::_merge_other(HashIntoType tag,
 	// the two partitions to merge are *pp_0 and *existing_pp_0.
 	// we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
 
-	pp_0 = _add_partition_ptr2(pp_0, existing_pp_0);
+	pp_0 = _merge_two_partitions(pp_0, existing_pp_0);
 	diskp_to_pp[other_partition] = pp_0;
       }
     }

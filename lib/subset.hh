@@ -16,10 +16,10 @@ namespace khmer {
 
     void _clear_all_partitions();
 
-    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
-    PartitionID * _add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp);
-    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
-					  const HashIntoType kmer);
+    PartitionID * _merge_two_partitions(PartitionID *orig_pp,
+					PartitionID *new_pp);
+    PartitionID * _join_partitions_by_tags(const SeenSet& tagged_kmers,
+					   const HashIntoType kmer);
 
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
