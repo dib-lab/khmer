@@ -858,6 +858,7 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
 
   std::cout << "calculating partition size distribution.\n";
 
+  // first, count the number of members in each partition.
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     if (pi->second) {
@@ -867,6 +868,7 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
     }
   }
 
+  // then, build the distribution.
   PartitionCountDistribution d;
 
   for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
@@ -874,6 +876,7 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
     d[cmi->second]++;
   }
 
+  // find biggest.
   PartitionCountDistribution::const_iterator di = d.end();
   di--;
 
@@ -900,7 +903,8 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
   _clear_partition(biggest_p, bigtags);
   std::cout << "gathered/cleared " << bigtags.size() << " tags.\n";
 
-  /// 
+  /// Now, go through and traverse from all the bigtags, tracking
+  // those that lead to well-connected sets.
 
   unsigned int i = 0;
   unsigned int n = 0;
