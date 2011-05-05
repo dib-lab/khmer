@@ -916,6 +916,13 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
 
   for (; si != bigtags.end(); si++, i++) {
     n++;
+
+#if 1
+    if (set_contains(_ht->repart_small_tags, *si)) {
+      continue;
+    }
+#endif //0
+
     count = _ht->traverse_from_kmer(*si, distance, keeper);
 
     if (count >= threshold) {
@@ -931,7 +938,12 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
       }
       std::cout << "traversed from " << n << " tags total, of " 
 	        << bigtags.size() << "; "
-		<< n_big << " big; size is " << keeper.size() << "\n";
+		<< n_big << " big; size is " << keeper.size()
+		<< "; " << _ht->repart_small_tags.size() << " small\n";
+    } else {
+#if 1
+      _ht->repart_small_tags.insert(*si);
+#endif //0
     }
     keeper.clear();
 
