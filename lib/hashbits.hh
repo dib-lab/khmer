@@ -53,6 +53,7 @@ namespace khmer {
     SubsetPartition * partition;
     SeenSet all_tags;
     SeenSet stop_tags;
+    SeenSet repart_small_tags;
 
     void _validate_pmap() {
       if (partition) { partition->_validate_pmap(); }
