@@ -1547,7 +1547,6 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
 					  CountingHash &counting)
 {
   unsigned long long total_reads = 0;
-  unsigned long long total_stop = 0;
 
   IParser* parser = IParser::get_parser(filename.c_str());
   Read read;
