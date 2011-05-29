@@ -20,7 +20,12 @@ load_ht = False
 save_merged_pmap = True
 remove_orig_pmap = False
 
+stop_after_n_subsets = None     # only do this many subsets (None == do all)
+load_stoptags_if_exist = True   # load stoptags, if a .stoptags file exists.
+
 assert not (save_ht and load_ht)         # incompatible
+if stop_after_n_subsets == 0:
+    assert save_ht
 
 if not save_merged_pmap and remove_orig_pmap:
     print '** warning, all the pmap files are going away! no permanent record!'
@@ -42,7 +47,9 @@ def worker(q, basename):
             continue
         
         print 'starting:', basename, n
-        subset = ht.do_subset_partition(start, stop)
+
+        # pay attention to stoptags when partitioning, note
+        subset = ht.do_subset_partition(start, stop, True)
 
         print 'saving:', basename, n
         ht.save_subset_partitionmap(subset, outfile)
@@ -87,6 +94,20 @@ def main(filename):
         print 'loading tagset %s.tagset...' % basename
         ht.load_tagset(basename + '.tagset')
 
+    # did we just want to load the ht/tagset?
+    if stop_after_n_subsets == 0:
+        sys.exit(0)
+
+    # do we want to load stop tags, and do they exist?
+    stoptags_file = basename + '.stoptags'
+    if load_stoptags_if_exist and os.path.exists(stoptags_file):
+        print 'loading stoptags from', stoptags_file
+        ht.load_stop_tags(stoptags_file)
+
+    #
+    # now, partition!
+    #
+
     # divide the tags up into subsets
     divvy = ht.divide_tags_into_subsets(SUBSET_SIZE)
     n_subsets = len(divvy)
@@ -96,6 +117,9 @@ def main(filename):
     worker_q = Queue.Queue()
 
     for i in range(0, n_subsets):
+        if stop_after_n_subsets is not None and i >= stop_after_n_subsets:
+            break
+
         start = divvy[i]
         end = divvy[i+1]
         worker_q.put((ht, i, start, end))
