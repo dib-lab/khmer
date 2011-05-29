@@ -7,6 +7,10 @@
 #define CIRCUM_RADIUS 2		// @CTB remove
 #define CIRCUM_MAX_VOL 200	// @CTB remove
 
+#define SAVED_FORMAT_VERSION 1
+#define SAVED_COUNTING_HT 1
+#define SAVED_HASHBITS 2
+
 namespace khmer {
   // largest number we can count up to, exactly. (8 bytes)
   typedef unsigned long long int ExactCounterType;
@@ -26,4 +30,5 @@ namespace khmer {
 
   typedef void (*CallbackFn)(const char * info, void * callback_data,
 			     unsigned int n_reads, unsigned long long other);
+
 };
