@@ -12,11 +12,19 @@ void Hashbits::save(std::string outfilename)
   assert(_counts[0]);
 
   unsigned int save_ksize = _ksize;
+  unsigned char save_n_tables = _n_tables;
   unsigned long long save_tablesize;
 
   ofstream outfile(outfilename.c_str(), ios::binary);
 
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_COUNTING_HT;
+  outfile.write((const char *) &ht_type, 1);
+
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+  outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
 
   for (unsigned int i = 0; i < _n_tables; i++) {
     save_tablesize = _tablesizes[i];
@@ -40,12 +48,23 @@ void Hashbits::load(std::string infilename)
   _tablesizes.clear();
   
   unsigned int save_ksize = 0;
+  unsigned char save_n_tables = 0;
   unsigned long long save_tablesize = 0;
+  unsigned char version, ht_type;
 
   ifstream infile(infilename.c_str(), ios::binary);
   assert(infile.is_open());
+
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_COUNTING_HT);
+
   infile.read((char *) &save_ksize, sizeof(save_ksize));
+  infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+
   _ksize = (WordLength) save_ksize;
+  _n_tables = (unsigned int) save_n_tables;
   _init_bitstuff();
 
   _counts = new Byte*[_n_tables];
