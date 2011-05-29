@@ -5,7 +5,7 @@ import gc
 import os.path
 
 K=32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE=int(8e8)
 N_HT=4
 
 SUBSET_SIZE = int(1e4)
@@ -15,10 +15,10 @@ ht = None
 
 ###
 
-save_ht = False
+save_ht = True
 load_ht = False
 save_merged_pmap = True
-remove_orig_pmap = True
+remove_orig_pmap = False
 
 assert not (save_ht and load_ht)         # incompatible
 
