@@ -875,3 +875,34 @@ unsigned int CountingHash::max_hamming1_count(const std::string kmer_s)
 
   return max_count;
 }
+
+unsigned int CountingHash::trim_on_abundance(std::string seq,
+					     BoundedCounterType min_abund)
+  const
+{
+  if (!check_read(seq)) {
+    return 0;
+  }
+
+  const char * first_kmer = seq.c_str();
+  SeenSet path;
+
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  HashIntoType kmer;
+
+  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+  if (get_count(kmer) < min_abund) {
+    return 0;
+  }
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+    if (get_count(kmer) < min_abund) {
+      return i;
+    }
+  }
+
+  return seq.length();
+}
+

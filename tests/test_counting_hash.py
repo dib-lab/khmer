@@ -175,3 +175,24 @@ def test_save_load():
 
     assert sum(x) == 3966
     assert x == y, (x,y)
+
+def test_trim_full():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA)
+
+    seq, pos = hi.trim_on_abundance(DNA, 2)
+    assert DNA == seq, seq
+    
+def test_trim_short():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[:50])
+
+    seq, pos = hi.trim_on_abundance(DNA, 2)
+    assert DNA[:50] == seq, (seq, pos)
+    assert hi.get(seq[-6:]) == 2
+    assert hi.get(DNA[:51][-6:]) == 1
+    
