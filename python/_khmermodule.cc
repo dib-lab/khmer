@@ -1165,6 +1165,34 @@ static PyObject * hash_max_hamming1_count(PyObject * self, PyObject * args)
   return PyInt_FromLong(count);
 }
 
+static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * seq = NULL;
+  unsigned int min_count_i = 0;
+
+  if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    khmer::BoundedCounterType min_count = min_count_i;
+
+    trim_at = counting->trim_on_abundance(seq, min_count);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
+  Py_DECREF(trim_seq);
+
+  return ret;
+}
+
 static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1349,6 +1377,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
   { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
+  { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },

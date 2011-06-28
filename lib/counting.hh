@@ -207,6 +207,9 @@ namespace khmer {
 				      float mean, float &abs_deviation) const;
 
     unsigned int max_hamming1_count(const std::string kmer);
+
+    unsigned int trim_on_abundance(std::string seq,
+				   BoundedCounterType min_abund) const;
   };
 };
 
