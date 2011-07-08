@@ -2,7 +2,6 @@
 
 import sys
 import screed
-import gzip
 
 # python quality-trim.py <input fastq file> <output filtered fastq file>
 # MINLENGTH is the minimum lenth of read desired.  NCALLS is the percentage of a read with 'N' base calls for which if read has greater, it will be removed. 
@@ -12,7 +11,7 @@ MINLENGTH = 30
 filein = sys.argv[1]
 fileout = sys.argv[2]
 
-fw = gzip.open(fileout, 'w')
+fw = open(fileout, 'w')
 
 count=0
 for n, record in enumerate(screed.open(filein)):

@@ -7,11 +7,9 @@ paired_fp = open(sys.argv[2] + '.pe', 'w')
 
 last_record = None
 last_name = None
-for record in screed.fasta.fasta_iter(open(sys.argv[1]), parse_description=False):
+for record in screed.open(sys.argv[1]):
     name = record['name']
     sequence = record['sequence']
-
-    name = name.split()[0]
 
     if last_record:
         if last_name.endswith('/1') and name.endswith('/2') and name[:-1] == last_name[:-1]:

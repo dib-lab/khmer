@@ -1,13 +1,13 @@
 #! /usr/bin/env python
 import sys
-from screed.fasta import fasta_iter
+import screed
 
 filename = sys.argv[1]
 prefix = sys.argv[2]
 size = int(float(sys.argv[3]))          # e.g. 1e9
 
 division = -1
-for n, record in enumerate(fasta_iter(open(filename), parse_description=False)):
+for n, record in enumerate(screed.open(filename)):
     if n % 100000 == 0:
         print '...', n
         
