@@ -2,7 +2,7 @@ import sys, screed, os
 import khmer
 
 K = 32
-HT_SIZE=2e9
+HT_SIZE=2e7
 N_HT=4
 
 ###
@@ -19,9 +19,11 @@ def main():
        ht.consume_fasta(filename)
 
        if n > 0 and n % 10 == 0:
-          ht.save(base + '.ht')
-          open(base + '.ht.info', 'w').write('through %s' % filename)
+           print 'mid-save', base + '.ht'
+           ht.save(base + '.ht')
+           open(base + '.ht.info', 'w').write('through %s' % filename)
 
+    print 'saving', base + '.ht'
     ht.save(base + '.ht')
 
 if __name__ == '__main__':
