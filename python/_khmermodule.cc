@@ -1831,6 +1831,33 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
   return ret;
 }
 
+static PyObject * hashbits_identify_stoptags_by_position(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * seq = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &seq)) {
+    return NULL;
+  }
+
+  std::vector<unsigned int> posns;
+  Py_BEGIN_ALLOW_THREADS
+
+    hashbits->identify_stop_tags_by_position(seq, posns);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * x = PyList_New(posns.size());
+  
+  for (unsigned int i = 0; i < posns.size(); i++) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("i", posns[i]));
+  }
+
+  return x;
+}
+
 void free_subset_partition_info(void * p)
 {
   khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
@@ -2823,6 +2850,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
   { "trim_on_sodd", hashbits_trim_on_sodd, METH_VARARGS, "" },
   { "trim_on_stoptags", hashbits_trim_on_stoptags, METH_VARARGS, "" },
+  { "identify_stoptags_by_position", hashbits_identify_stoptags_by_position, METH_VARARGS, "" },
   { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },

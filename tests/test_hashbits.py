@@ -346,3 +346,19 @@ def test_notag_across_stoptraverse():
 
    n, _ = ht.count_partitions()
    assert n == 2, n
+
+def test_find_stoptags():
+   ht = khmer.new_hashbits(5, 1, 1)
+   ht.add_stop_tag("AAAAA")
+
+   assert ht.identify_stoptags_by_position("AAAAA") == [0]
+   assert ht.identify_stoptags_by_position("AAAAAA") == [0,1]
+   assert ht.identify_stoptags_by_position("TTTTT") == [0]
+   assert ht.identify_stoptags_by_position("TTTTTT") == [0,1]
+
+def test_find_stoptags2():
+   ht = khmer.new_hashbits(4, 1, 1)
+   ht.add_stop_tag("ATGC")
+
+   x = ht.identify_stoptags_by_position("ATGCATGCGCAT")
+   assert x == [0, 2, 4, 8], x

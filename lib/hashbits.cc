@@ -1620,3 +1620,34 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
   }
   delete parser;
 }
+
+void Hashbits::identify_stop_tags_by_position(std::string seq,
+					      std::vector<unsigned int> &posns)
+const
+{
+  if (!check_read(seq)) {
+    return;
+  }
+
+  const char * first_kmer = seq.c_str();
+  SeenSet path;
+
+  HashIntoType kmer_f = 0, kmer_r = 0;
+  HashIntoType kmer;
+
+  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+  if (set_contains(stop_tags, kmer)) {
+    posns.push_back(0);
+  }
+
+  for (unsigned int i = _ksize; i < seq.length(); i++) {
+    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+    if (set_contains(stop_tags, kmer)) {
+      posns.push_back(i - _ksize + 1);
+    }
+  }
+
+  return;
+}
+

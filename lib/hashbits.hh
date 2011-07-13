@@ -284,6 +284,10 @@ namespace khmer {
     virtual void print_stop_tags(std::string);
     virtual void save_stop_tags(std::string);
     void load_stop_tags(std::string filename, bool clear_tags=true);
+
+    void identify_stop_tags_by_position(std::string sequence,
+					std::vector<unsigned int> &posns)
+      const;
   };
 };
 
