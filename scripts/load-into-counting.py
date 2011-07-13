@@ -1,3 +1,13 @@
+# /usr/bin/env python
+"""
+Build a counting Bloom filter from the given sequences, save in <htname>.
+
+% python scripts/load-into-counting.py <htname> <data1> [ <data2> <...> ]
+
+Parameters to adjust: K, HT_SIZE.  HT_SIZE should be set to about 1/4 of the
+available system memory.
+"""
+
 import sys, screed, os
 import khmer
 
@@ -19,12 +29,12 @@ def main():
        ht.consume_fasta(filename)
 
        if n > 0 and n % 10 == 0:
-           print 'mid-save', base + '.ht'
-           ht.save(base + '.ht')
-           open(base + '.ht.info', 'w').write('through %s' % filename)
+           print 'mid-save', base
+           ht.save(base)
+           open(base + '.info', 'w').write('through %s' % filename)
 
-    print 'saving', base + '.ht'
-    ht.save(base + '.ht')
+    print 'saving', base
+    ht.save(base)
 
 if __name__ == '__main__':
     main()
