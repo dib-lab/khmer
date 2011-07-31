@@ -1231,7 +1231,9 @@ void Hashbits::traverse_from_tags(unsigned int distance,
   unsigned int n_big = 0;
   SeenSet keeper;
 
+#if VERBOSE_REPARTITION
   std::cout << all_tags.size() << " tags...\n";
+#endif // 0
   SeenSet::const_iterator si = all_tags.begin();
 
   for (; si != all_tags.end(); si++, i++) {
@@ -1249,14 +1251,18 @@ void Hashbits::traverse_from_tags(unsigned int distance,
 	  counting.count(*ti);
 	}
       }
+#if VERBOSE_REPARTITION
       std::cout << "traversed from " << n << " tags total; "
 		<< n_big << " big; " << keeper.size() << "\n";
+#endif // 0
     }
     keeper.clear();
 
     if (n % 100 == 0) {
+#if VERBOSE_REPARTITION
       std::cout << "traversed " << n << " " << n_big << " " <<
 	all_tags.size() << " " << stop_tags.size() << "\n";
+#endif // 0
     }
   }
 }
@@ -1425,7 +1431,9 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
     read_num += 1;
   }
 
+#if VERBOSE_REPARTITION
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
+#endif // 0
 }
 
 void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
@@ -1535,7 +1543,9 @@ void Hashbits::traverse_from_reads(std::string filename,
       unsigned int n = traverse_from_kmer(kmer, radius, keeper);
 
       if (n >= big_threshold) {
+#if VERBOSE_REPARTITION
 	std::cout << "lump: " << n << "; added: " << total_stop << "\n";
+#endif
 	total_stop += count_and_transfer_to_stoptags(keeper,
 						     transfer_threshold,
 						     counting);
@@ -1604,7 +1614,9 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
 
 	unsigned int n = traverse_from_kmer(kmer, radius, keeper);
 	if (n >= big_threshold) {
+#if VERBOSE_REPARTITION
 	  std::cout << "lmp: " << n << "; added: " << stop_tags.size() << "\n";
+#endif // VERBOSE_REPARTITION
 	  count_and_transfer_to_stoptags(keeper, transfer_threshold, counting);
 	}
       }
