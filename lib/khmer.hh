@@ -23,9 +23,7 @@ namespace khmer {
   // largest size 'k' value for k-mer calculations.  (1 byte/255)
   typedef unsigned char WordLength;
 
-  // largest number we can count up to, approximately. (8 bytes/127).
-  // see MAX_COUNT, above.
-  typedef unsigned char BoundedCounterType;
+  typedef unsigned short int BoundedCounterType;
 
   // A single-byte type.
   typedef unsigned char Byte;

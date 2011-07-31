@@ -1,12 +1,12 @@
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
-#define BIGCOUNT
-
 #include <vector>
 #include "hashtable.hh"
 
 namespace khmer {
+  typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
+
   class CountingHashIntersect;
 
   class CountingHash : public khmer::Hashtable {
@@ -16,21 +16,19 @@ namespace khmer {
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
 
-    BoundedCounterType ** _counts;
+    Byte ** _counts;
 
     virtual void _allocate_counters() {
       _n_tables = _tablesizes.size();
 
-      _counts = new BoundedCounterType*[_n_tables];
+      _counts = new Byte*[_n_tables];
       for (unsigned int i = 0; i < _n_tables; i++) {
-	_counts[i] = new BoundedCounterType[_tablesizes[i]];
-	memset(_counts[i], 0, _tablesizes[i] * sizeof(BoundedCounterType));
+	_counts[i] = new Byte[_tablesizes[i]];
+	memset(_counts[i], 0, _tablesizes[i]);
       }
     }
   public:
-#ifdef BIGCOUNT
-    TagCountMap _bigcounts;
-#endif // BIGCOUNT
+    KmerCountMap _bigcounts;
 
     CountingHash(WordLength ksize, HashIntoType single_tablesize) :
       khmer::Hashtable(ksize) {
@@ -90,13 +88,11 @@ namespace khmer {
 	if (_counts[i][bin] < MAX_COUNT) {
 	  _counts[i][bin] += 1;
 	} else {
-#ifdef BIGCOUNT
 	  if (_bigcounts[khash] == 0) {
 	    _bigcounts[khash] = MAX_COUNT + 1;
 	  } else {
 	    _bigcounts[khash] += 1;
 	  }
-#endif
 	}
       }
     }
@@ -116,18 +112,16 @@ namespace khmer {
 	  min_count = the_count;
 	}
       }
+#if 0
+      if (min_count == MAX_COUNT) {
+	TagCountMap::const_iterator it = _bigcounts.find(khash);
+	if (it != _bigcounts.end()) {
+	  min_count = it->second;
+	}
+      }
+#endif // 0
       return min_count;
     }
-
-#ifdef BIGCOUNT
-    virtual const unsigned int get_bigcount(HashIntoType khash) {
-      TagCountMap::const_iterator it = _bigcounts.find(khash);
-      if (it != _bigcounts.end()) {
-	return it->second;
-      }
-      return 0;
-    }
-#endif // BIGCOUNT
 
     //
 
