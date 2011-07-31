@@ -591,6 +591,37 @@ static PyTypeObject khmer_MinMaxType = {
 static void khmer_counting_dealloc(PyObject *);
 static void khmer_hashbits_dealloc(PyObject *);
 
+static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  PyObject * x;
+  if (!PyArg_ParseTuple(args, "O", &x)) {
+    return NULL;
+  }
+
+  bool setme = PyObject_IsTrue(x);
+  counting->set_use_bigcount(setme);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hash_get_use_bigcount(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  bool val = counting->get_use_bigcount();
+
+  return PyBool_FromLong((int)val);
+}
+
 static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1360,6 +1391,8 @@ static PyObject * hash_save(PyObject * self, PyObject * args)
 }
 
 static PyMethodDef khmer_counting_methods[] = {
+  { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
+  { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },

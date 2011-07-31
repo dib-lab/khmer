@@ -13,6 +13,7 @@ namespace khmer {
     friend class CountingHashIntersect;
 
   protected:
+    bool _use_bigcount;		// keep track of counts > MAX_COUNT?
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
 
@@ -31,7 +32,7 @@ namespace khmer {
     KmerCountMap _bigcounts;
 
     CountingHash(WordLength ksize, HashIntoType single_tablesize) :
-      khmer::Hashtable(ksize) {
+      khmer::Hashtable(ksize), _use_bigcount(false) {
       _tablesizes.push_back(single_tablesize);
       
       _allocate_counters();
@@ -56,6 +57,9 @@ namespace khmer {
 	_n_tables = 0;
       }
     }
+
+    void set_use_bigcount(bool b) { _use_bigcount = b; }
+    bool get_use_bigcount() { return _use_bigcount; }
 
     virtual void save(std::string);
     virtual void load(std::string);
@@ -112,9 +116,9 @@ namespace khmer {
 	  min_count = the_count;
 	}
       }
-#if 0
-      if (min_count == MAX_COUNT) {
-	TagCountMap::const_iterator it = _bigcounts.find(khash);
+#if 1
+      if (min_count == MAX_COUNT && _use_bigcount) {
+	KmerCountMap::const_iterator it = _bigcounts.find(khash);
 	if (it != _bigcounts.end()) {
 	  min_count = it->second;
 	}
