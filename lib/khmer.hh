@@ -11,6 +11,8 @@
 #define SAVED_COUNTING_HT 1
 #define SAVED_HASHBITS 2
 
+#define VERBOSE_REPARTITION 0
+
 namespace khmer {
   // largest number we can count up to, exactly. (8 bytes)
   typedef unsigned long long int ExactCounterType;

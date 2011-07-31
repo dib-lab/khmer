@@ -856,7 +856,9 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
   PartitionID biggest_p = 0;
   unsigned int next_largest = 0;
 
+#if VERBOSE_REPARTITION
   std::cout << "calculating partition size distribution.\n";
+#endif // 0
 
   // first, count the number of members in each partition.
   for (PartitionMap::const_iterator pi = partition_map.begin();
@@ -890,18 +892,28 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
   }
   assert(biggest_p != 0);
 
+#if VERBOSE_REPARTITION
   std::cout << "biggest partition: " << di->first << "\n";
+#endif // 0
   di--;
+
+#if VERBOSE_REPARTITION
   std::cout << "biggest partition ID: " << biggest_p << "\n";
+#endif // 0
 
   next_largest = di->first;
+
+#if VERBOSE_REPARTITION
   std::cout << "next biggest partition: " << di->first << "\n";
+#endif // 0
 
   ///
 
   SeenSet bigtags;
   _clear_partition(biggest_p, bigtags);
+#if VERBOSE_REPARTITION
   std::cout << "gathered/cleared " << bigtags.size() << " tags.\n";
+#endif // 0
 
   /// Now, go through and traverse from all the bigtags, tracking
   // those that lead to well-connected sets.
@@ -936,10 +948,12 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
 	  counting.count(*ti);
 	}
       }
+#if VERBOSE_REPARTITION
       std::cout << "traversed from " << n << " tags total, of " 
 	        << bigtags.size() << "; "
 		<< n_big << " big; size is " << keeper.size()
 		<< "; " << _ht->repart_small_tags.size() << " small\n";
+#endif // 0
     } else {
 #if 1
       _ht->repart_small_tags.insert(*si);
@@ -948,14 +962,18 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
     keeper.clear();
 
     if (n % 1000 == 0) {
+#if VERBOSE_REPARTITION
       std::cout << "found big 'un!  traversed " << n << " tags, " << n_big << " big; " <<
 	bigtags.size() << " total tags; " << _ht->stop_tags.size() 
 		<< " stop tags\n";
+#endif // 0
     }
   }
 
   // return next_largest;
+#if VERBOSE_REPARTITION
   std::cout << "repartitioning...\n";
+#endif // 0
   repartition_a_partition(bigtags);
 
   // 
@@ -975,7 +993,9 @@ void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
   unsigned n = 0;
   for (si = partition_tags.begin(); si != partition_tags.end(); si++, n++) {
     if (n % 1000 == 0) {
+#if VERBOSE_REPARTITION
       std::cout << "repartitioning... on " << n << " of " << partition_tags.size() << "\n";
+#endif // 0
     }
 
     kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
