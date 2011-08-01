@@ -1238,8 +1238,8 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
   khmer::HashIntoType * dist;
   dist = counting->abundance_distribution(filename, _report_fn, callback_obj);
   
-  PyObject * x = PyList_New(256);
-  for (int i = 0; i < 256; i++) {
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
     PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
   }
 

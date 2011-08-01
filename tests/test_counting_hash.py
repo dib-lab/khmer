@@ -297,3 +297,17 @@ def test_nobigcount_save():
         kh.get('AAAA')
 
     assert kh.get('AAAA') == MAX_COUNT
+
+def test_bigcount_abund_dist():
+    kh = khmer.new_counting_hash(18, 1e7, 4)
+    kh.set_use_bigcount(True)
+
+    thisdir = os.path.dirname(__file__)
+    seqpath = os.path.join(thisdir, 'test-abund-read-2.fa')
+
+    kh.consume_fasta(seqpath)
+
+    dist = kh.abundance_distribution(seqpath)
+    print kh.get('GGTTGACGGGGCTCAGGG')
+
+    assert dist[1001] == 1
