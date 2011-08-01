@@ -86,17 +86,22 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
+      unsigned int n_full = 0;
       for (unsigned int i = 0; i < _n_tables; i++) {
 	const HashIntoType bin = khash % _tablesizes[i];
 
 	if (_counts[i][bin] < MAX_COUNT) {
 	  _counts[i][bin] += 1;
 	} else {
-	  if (_bigcounts[khash] == 0) {
-	    _bigcounts[khash] = MAX_COUNT + 1;
-	  } else {
-	    _bigcounts[khash] += 1;
-	  }
+	  n_full++;
+	}
+      }
+
+      if (n_full == _n_tables && _use_bigcount) {
+	if (_bigcounts[khash] == 0) {
+	  _bigcounts[khash] = MAX_COUNT + 1;
+	} else {
+	  _bigcounts[khash] += 1;
 	}
       }
     }
@@ -116,14 +121,12 @@ namespace khmer {
 	  min_count = the_count;
 	}
       }
-#if 1
       if (min_count == MAX_COUNT && _use_bigcount) {
 	KmerCountMap::const_iterator it = _bigcounts.find(khash);
 	if (it != _bigcounts.end()) {
 	  min_count = it->second;
 	}
       }
-#endif // 0
       return min_count;
     }
 

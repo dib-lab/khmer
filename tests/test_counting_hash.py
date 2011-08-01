@@ -3,6 +3,7 @@ thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
 import khmer
+MAX_COUNT=255
 
 ####
 
@@ -196,3 +197,38 @@ def test_trim_short():
     assert hi.get(seq[-6:]) == 2
     assert hi.get(DNA[:51][-6:]) == 1
     
+
+def test_maxcount():
+    # hashtable should saturate at some point so as not to overflow counter
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    
+    last_count = None
+    for i in range(0, 10000):
+        kh.count('AAAA')
+        c = kh.get('AAAA')
+        
+        print last_count, c
+        if c == last_count:
+            break
+        last_count = c
+
+    assert c != 10000, "should not be able to count to 10000: %d" % c
+    assert c == MAX_COUNT, c       # this will depend on HashcountType...
+
+def test_maxcount_with_bigcount():
+    # hashtable should not saturate, if use_bigcount is set.
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    kh.set_use_bigcount(True)
+    
+    last_count = None
+    for i in range(0, 10000):
+        kh.count('AAAA')
+        c = kh.get('AAAA')
+        
+        print last_count, c
+        if c == last_count:
+            break
+        last_count = c
+
+    assert c == 10000, "should be able to count to 10000: %d" % c
+    assert c != MAX_COUNT, c
