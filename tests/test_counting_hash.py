@@ -4,6 +4,7 @@ thisdir = os.path.abspath(thisdir)
 
 import khmer
 MAX_COUNT=255
+MAX_BIGCOUNT=65535
 
 ####
 
@@ -311,3 +312,13 @@ def test_bigcount_abund_dist():
     print kh.get('GGTTGACGGGGCTCAGGG')
 
     assert dist[1001] == 1
+
+def test_bigcount_overflow():
+    kh = khmer.new_counting_hash(18, 1e7, 4)
+    kh.set_use_bigcount(True)
+
+    for i in range(0, 70000):
+        kh.count('GGTTGACGGGGCTCAGGG')
+
+    assert kh.get('GGTTGACGGGGCTCAGGG') == MAX_BIGCOUNT
+    
