@@ -455,10 +455,10 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
 			    CallbackFn callback,
 			    void * callback_data) const
 {
-  HashIntoType * dist = new HashIntoType[MAX_COUNT + 1];
+  HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
   HashIntoType i;
   
-  for (i = 0; i <= MAX_COUNT; i++) {
+  for (i = 0; i <= MAX_BIGCOUNT; i++) {
     dist[i] = 0;
   }
 
@@ -467,6 +467,9 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
   string name;
   string seq;
   unsigned int read_num = 0;
+
+  // if not, could lead to overflow.
+  assert(sizeof(BoundedCounterType) == 2);
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -496,7 +499,9 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     }
   }
 
-  for (i = 2; i <= MAX_COUNT; i++) {
+  // correct for the fact that we're counting things as many times as we
+  // saw them in the data set, e.g. a 1000-x k-mer will show up 1000 times.
+  for (i = 2; i <= MAX_BIGCOUNT; i++) {
     dist[i] /= i;
   }
 
