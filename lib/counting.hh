@@ -39,7 +39,7 @@ namespace khmer {
     }
 
     CountingHash(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      khmer::Hashtable(ksize), _tablesizes(tablesizes) {
+      khmer::Hashtable(ksize), _use_bigcount(false), _tablesizes(tablesizes) {
 
       _allocate_counters();
     }

@@ -7,7 +7,7 @@
 #define CIRCUM_RADIUS 2		// @CTB remove
 #define CIRCUM_MAX_VOL 200	// @CTB remove
 
-#define SAVED_FORMAT_VERSION 1
+#define SAVED_FORMAT_VERSION 2
 #define SAVED_COUNTING_HT 1
 #define SAVED_HASHBITS 2
 

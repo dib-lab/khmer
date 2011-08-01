@@ -201,18 +201,18 @@ def test_trim_short():
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
     kh = khmer.new_counting_hash(4, 4**4, 4)
+    kh.set_use_bigcount(False)
     
     last_count = None
-    for i in range(0, 10000):
+    for i in range(0, 1000):
         kh.count('AAAA')
         c = kh.get('AAAA')
         
-        print last_count, c
         if c == last_count:
             break
         last_count = c
 
-    assert c != 10000, "should not be able to count to 10000: %d" % c
+    assert c != 1000, "should not be able to count to 1000: %d" % c
     assert c == MAX_COUNT, c       # this will depend on HashcountType...
 
 def test_maxcount_with_bigcount():
@@ -221,14 +221,79 @@ def test_maxcount_with_bigcount():
     kh.set_use_bigcount(True)
     
     last_count = None
-    for i in range(0, 10000):
+    for i in range(0, 1000):
         kh.count('AAAA')
         c = kh.get('AAAA')
         
-        print last_count, c
         if c == last_count:
             break
         last_count = c
 
-    assert c == 10000, "should be able to count to 10000: %d" % c
+    assert c == 1000, "should be able to count to 1000: %d" % c
     assert c != MAX_COUNT, c
+
+def test_maxcount_with_bigcount_save():
+    # hashtable should not saturate, if use_bigcount is set.
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    kh.set_use_bigcount(True)
+    
+    last_count = None
+    for i in range(0, 1000):
+        kh.count('AAAA')
+        c = kh.get('AAAA')
+
+    thisdir = os.path.dirname(__file__)
+    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    kh.save(savepath)
+
+    kh = khmer.new_counting_hash(1, 1, 1)
+    kh.load(savepath)
+    
+    c = kh.get('AAAA')
+    assert c == 1000, "should be able to count to 1000: %d" % c
+    assert c != MAX_COUNT, c
+
+def test_bigcount_save():
+    # hashtable should not saturate, if use_bigcount is set.
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    kh.set_use_bigcount(True)
+    
+    thisdir = os.path.dirname(__file__)
+    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    kh.save(savepath)
+
+    kh = khmer.new_counting_hash(1, 1, 1)
+    kh.load(savepath)
+
+    ### set_use_bigcount should still be True after load (i.e. should be saved)
+
+    last_count = None
+    assert kh.get('AAAA') == 0
+    
+    for i in range(0, 1000):
+        kh.count('AAAA')
+        kh.get('AAAA')
+
+    assert kh.get('AAAA') == 1000
+
+def test_nobigcount_save():
+    kh = khmer.new_counting_hash(4, 4**4, 4)
+    # kh.set_use_bigcount(False) <-- this is the default
+    
+    thisdir = os.path.dirname(__file__)
+    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    kh.save(savepath)
+
+    kh = khmer.new_counting_hash(1, 1, 1)
+    kh.load(savepath)
+
+    ### set_use_bigcount should still be True after load (i.e. should be saved)
+
+    last_count = None
+    assert kh.get('AAAA') == 0
+    
+    for i in range(0, 1000):
+        kh.count('AAAA')
+        kh.get('AAAA')
+
+    assert kh.get('AAAA') == MAX_COUNT
