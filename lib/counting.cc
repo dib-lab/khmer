@@ -630,6 +630,12 @@ void CountingHash::save(std::string outfilename)
   unsigned char ht_type = SAVED_COUNTING_HT;
   outfile.write((const char *) &ht_type, 1);
 
+  unsigned char use_bigcount = 0;
+  if (_use_bigcount) {
+    use_bigcount = 1;
+  }
+  outfile.write((const char *) &use_bigcount, 1);
+
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
   outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
 
@@ -639,6 +645,19 @@ void CountingHash::save(std::string outfilename)
     outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
     outfile.write((const char *) _counts[i], save_tablesize);
   }
+
+  HashIntoType n_counts = _bigcounts.size();
+  outfile.write((const char *) &n_counts, sizeof(n_counts));
+
+  if (n_counts) {
+    KmerCountMap::const_iterator it = _bigcounts.begin();
+    
+    for (; it != _bigcounts.end(); it++) {
+      outfile.write((const char *) &it->first, sizeof(it->first));
+      outfile.write((const char *) &it->second, sizeof(it->second));
+    }
+  }
+
   outfile.close();
 }
 
@@ -655,7 +674,7 @@ void CountingHash::load(std::string infilename)
   unsigned int save_ksize = 0;
   unsigned char save_n_tables = 0;
   unsigned long long save_tablesize = 0;
-  unsigned char version, ht_type;
+  unsigned char version, ht_type, use_bigcount;
 
   ifstream infile(infilename.c_str(), ios::binary);
 
@@ -664,12 +683,15 @@ void CountingHash::load(std::string infilename)
   assert(version == SAVED_FORMAT_VERSION);
   assert(ht_type == SAVED_COUNTING_HT);
 
+  infile.read((char *) &use_bigcount, 1);
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   infile.read((char *) &save_n_tables, sizeof(save_n_tables));
 
   _ksize = (WordLength) save_ksize;
   _n_tables = (unsigned int) save_n_tables;
   _init_bitstuff();
+
+  _use_bigcount = use_bigcount;
 
   _counts = new Byte*[_n_tables];
   for (unsigned int i = 0; i < _n_tables; i++) {
@@ -688,6 +710,23 @@ void CountingHash::load(std::string infilename)
       loaded += infile.gcount();	// do I need to do this loop?
     }
   }
+
+  HashIntoType n_counts = 0;
+  infile.read((char *) &n_counts, sizeof(n_counts));
+
+  if (n_counts) {
+    _bigcounts.clear();
+
+    HashIntoType kmer;
+    BoundedCounterType count;
+
+    for (HashIntoType n = 0; n < n_counts; n++) {
+      infile.read((char *) &kmer, sizeof(kmer));
+      infile.read((char *) &count, sizeof(count));
+      _bigcounts[kmer] = count;
+    }
+  }
+
   infile.close();
 }
 
