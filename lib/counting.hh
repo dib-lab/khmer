@@ -101,7 +101,9 @@ namespace khmer {
 	if (_bigcounts[khash] == 0) {
 	  _bigcounts[khash] = MAX_COUNT + 1;
 	} else {
-	  _bigcounts[khash] += 1;
+	  if (_bigcounts[khash] < MAX_BIGCOUNT) {
+	    _bigcounts[khash] += 1;
+	  }
 	}
       }
     }
