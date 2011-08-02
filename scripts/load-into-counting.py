@@ -23,6 +23,7 @@ def main():
     
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    ht.set_use_bigcount(True)
 
     for n, filename in enumerate(filenames):
        print 'consuming input', filename
