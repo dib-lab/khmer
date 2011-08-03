@@ -478,13 +478,22 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     seq = read.seq;
 
     if (check_read(seq)) {
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	string kmer = seq.substr(i, i + _ksize);
-	if (!tracking->get_count(kmer.c_str())) {
-	  tracking->count(kmer.c_str());
+      HashIntoType kmer, kmer_f = 0, kmer_r = 0;
+      kmer = _hash(seq.c_str(), _ksize, kmer_f, kmer_r);
 
-	  BoundedCounterType n = get_count(kmer.c_str());
-	  assert(n >=0 && n <= 65535);
+      if (!tracking->get_count(kmer)) {
+	tracking->count(kmer);
+
+	BoundedCounterType n = get_count(kmer);
+	dist[n]++;
+      }
+
+      for (unsigned int i = _ksize; i < seq.length(); i++) {
+	kmer = _next_hash(seq[i], kmer_f, kmer_r);
+	if (!tracking->get_count(kmer)) {
+	  tracking->count(kmer);
+
+	  BoundedCounterType n = get_count(kmer);
 	  dist[n]++;
 	}
       }
