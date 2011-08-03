@@ -1230,13 +1230,22 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * filename = NULL;
+  PyObject * tracking_obj = NULL;
   PyObject * callback_obj = NULL;
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sO|O", &filename, &tracking_obj,
+			&callback_obj)) {
     return NULL;
   }
 
+  assert(is_hashbits_obj(tracking_obj));
+
+  khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
+  khmer::Hashbits * hashbits = tracking_o->hashbits;
+
+
   khmer::HashIntoType * dist;
-  dist = counting->abundance_distribution(filename, _report_fn, callback_obj);
+  dist = counting->abundance_distribution(filename, hashbits,
+					  _report_fn, callback_obj);
   
   PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {

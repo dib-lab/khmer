@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "hashtable.hh"
-#include "counting.hh"
 #include "subset.hh"
 
 #define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | (twobit_repr(ch)))
@@ -15,6 +14,8 @@
 #define set_contains(s, e) ((s).find(e) != (s).end())
 
 namespace khmer {
+  class CountingHash;
+
   class Hashbits : public khmer::Hashtable {
     friend class SubsetPartition;
   protected:
@@ -290,5 +291,7 @@ namespace khmer {
       const;
   };
 };
+
+#include "counting.hh"
 
 #endif // HASHBITS_HH

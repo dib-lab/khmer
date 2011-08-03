@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "hashtable.hh"
+#include "hashbits.hh"
 
 namespace khmer {
   typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -185,6 +186,7 @@ namespace khmer {
 			  float &stddev);
 
     HashIntoType * abundance_distribution(std::string filename,
+					  Hashbits * tracking,
 					  CallbackFn callback = NULL,
 					  void * callback_data = NULL) const;
 

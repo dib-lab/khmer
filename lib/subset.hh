@@ -4,6 +4,7 @@
 #include "hashtable.hh"
 
 namespace khmer {
+  class CountingHash;
   class Hashbits;
 
   class SubsetPartition {

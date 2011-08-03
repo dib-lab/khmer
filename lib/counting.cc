@@ -1,5 +1,6 @@
 #include "hashtable.hh"
 #include "counting.hh"
+#include "hashbits.hh"
 #include "parsers.hh"
 
 #include <math.h>
@@ -452,6 +453,7 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
 }
 
 HashIntoType * CountingHash::abundance_distribution(std::string filename,
+						    Hashbits * tracking,
 			    CallbackFn callback,
 			    void * callback_data) const
 {
@@ -478,9 +480,13 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     if (check_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	string kmer = seq.substr(i, i + _ksize);
-	BoundedCounterType n = get_count(kmer.c_str());
+	if (!tracking->get_count(kmer.c_str())) {
+	  tracking->count(kmer.c_str());
 
-	dist[n]++;
+	  BoundedCounterType n = get_count(kmer.c_str());
+	  assert(n >=0 && n <= 65535);
+	  dist[n]++;
+	}
       }
 
       name.clear();
@@ -497,12 +503,6 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
         throw;
       }
     }
-  }
-
-  // correct for the fact that we're counting things as many times as we
-  // saw them in the data set, e.g. a 1000-x k-mer will show up 1000 times.
-  for (i = 2; i <= MAX_BIGCOUNT; i++) {
-    dist[i] /= i;
   }
 
   return dist;
