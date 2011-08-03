@@ -36,6 +36,7 @@ def main():
 
     print 'saving', base
     ht.save(base)
+    open(base + '.info', 'w').write('through end: %s' % filename)
 
 if __name__ == '__main__':
     main()

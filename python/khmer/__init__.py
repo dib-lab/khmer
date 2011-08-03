@@ -25,6 +25,18 @@ def new_counting_hash(k, starting_size, n_tables=2):
     
     return _new_counting_hash(k, primes)
 
+def load_hashbits(filename):
+    ht = _new_hashbits(1, [1])
+    ht.load(filename)
+
+    return ht
+
+def load_counting_hash(filename):
+    ht = _new_counting_hash(1, [1])
+    ht.load(filename)
+    
+    return ht
+
 def _default_reporting_callback(info, n_reads, other):
     print '...', info, n_reads, other
 
