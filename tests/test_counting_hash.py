@@ -162,20 +162,23 @@ def test_save_load():
     inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
     savepath = os.path.join(thisdir, 'tempcountingsave.ht')
     
-    x = list(PRIMES_1m)
-    x.append(1000005)
-    
-    hi = khmer._new_counting_hash(12, x)
+    sizes = list(PRIMES_1m)
+    sizes.append(1000005)
+
+    hi = khmer._new_counting_hash(12, sizes)
     hi.consume_fasta(inpath)
     hi.save(savepath)
 
-    ht = khmer._new_counting_hash(12, x)
+    ht = khmer._new_counting_hash(12, sizes)
     ht.load(savepath)
 
-    x = hi.abundance_distribution(inpath)
-    y = ht.abundance_distribution(inpath)
+    tracking = khmer._new_hashbits(12, sizes)
+    x = hi.abundance_distribution(inpath, tracking)
 
-    assert sum(x) == 3966
+    tracking = khmer._new_hashbits(12, sizes)
+    y = ht.abundance_distribution(inpath, tracking)
+
+    assert sum(x) == 3966, sum(x)
     assert x == y, (x,y)
 
 def test_trim_full():
@@ -301,6 +304,7 @@ def test_nobigcount_save():
 
 def test_bigcount_abund_dist():
     kh = khmer.new_counting_hash(18, 1e7, 4)
+    tracking = khmer.new_hashbits(18, 1e7, 4)
     kh.set_use_bigcount(True)
 
     thisdir = os.path.dirname(__file__)
@@ -308,10 +312,29 @@ def test_bigcount_abund_dist():
 
     kh.consume_fasta(seqpath)
 
-    dist = kh.abundance_distribution(seqpath)
+    dist = kh.abundance_distribution(seqpath, tracking)
     print kh.get('GGTTGACGGGGCTCAGGG')
 
-    assert dist[1001] == 1
+    pdist = [ (i, dist[i]) for i in range(len(dist)) if dist[i] ]
+    assert dist[1001] == 1, pdist
+
+def test_bigcount_abund_dist_2():
+    kh = khmer.new_counting_hash(18, 1e7, 4)
+    tracking = khmer.new_hashbits(18, 1e7, 4)
+    kh.set_use_bigcount(True)
+
+    thisdir = os.path.dirname(__file__)
+    seqpath = os.path.join(thisdir, 'test-abund-read.fa')
+
+    kh.consume_fasta(seqpath)
+    for i in range(1000):
+        kh.count('GGTTGACGGGGCTCAGGG')
+
+    dist = kh.abundance_distribution(seqpath, tracking)
+    print kh.get('GGTTGACGGGGCTCAGGG')
+
+    pdist = [ (i, dist[i]) for i in range(len(dist)) if dist[i] ]
+    assert dist[1001] == 1, pdist
 
 def test_bigcount_overflow():
     kh = khmer.new_counting_hash(18, 1e7, 4)

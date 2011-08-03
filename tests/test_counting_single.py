@@ -383,7 +383,8 @@ class Test_AbundanceDistribution(object):
 
     def test_count_A(self):
         A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
-        dist = self.kh.abundance_distribution(A_filename)
+        tracking = khmer.new_hashbits(4, 4**4, 1)
+        dist = self.kh.abundance_distribution(A_filename, tracking)
 
         assert sum(dist) == 1
         assert dist[10] == 1
