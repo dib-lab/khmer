@@ -345,3 +345,10 @@ def test_bigcount_overflow():
 
     assert kh.get('GGTTGACGGGGCTCAGGG') == MAX_BIGCOUNT
     
+def test_get_ksize():
+    kh = khmer.new_counting_hash(22, 1, 1)
+    assert kh.ksize() == 22
+
+def test_get_hashsizes():
+   kh = khmer.new_counting_hash(22, 100, 4)
+   assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
