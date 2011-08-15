@@ -7,7 +7,7 @@ MAX_SIZE=int(1e6)
 THRESHOLD=1
 
 output_groups = True
-output_unassigned = True
+output_unassigned = False
 
 def read_partition_file(fp):
     for n, record in enumerate(fasta_iter(fp, parse_description=False)):

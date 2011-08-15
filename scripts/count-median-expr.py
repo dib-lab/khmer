@@ -20,7 +20,7 @@ def main():
           seq = seq.replace('N', 'G')
 
        a, b, c = ht.get_median_count(seq)
-       print record.name, a, b, c
+       print record.name, a, b, c, len(seq)
 
 if __name__ == '__main__':
     main()
