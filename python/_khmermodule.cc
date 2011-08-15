@@ -1399,7 +1399,43 @@ static PyObject * hash_save(PyObject * self, PyObject * args)
   return Py_None;
 }
 
+static PyObject * hash_get_ksize(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  unsigned int k = counting->ksize();
+
+  return PyInt_FromLong(k);
+}
+
+static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  std::vector<khmer::HashIntoType> ts = counting->get_tablesizes();
+
+  PyObject * x = PyList_New(ts.size());
+  for (int i = 0; i < ts.size(); i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(ts[i]));
+  }
+
+  return x;
+}
+
 static PyMethodDef khmer_counting_methods[] = {
+  { "ksize", hash_get_ksize, METH_VARARGS, "" },
+  { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
   { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
   { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
   { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
@@ -2878,7 +2914,43 @@ static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * ar
   return PyLong_FromUnsignedLong(n);
 }
 
+static PyObject * hashbits_get_ksize(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  unsigned int k = hashbits->ksize();
+
+  return PyInt_FromLong(k);
+}
+
+
+static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  std::vector<khmer::HashIntoType> ts = hashbits->get_tablesizes();
+
+  PyObject * x = PyList_New(ts.size());
+  for (int i = 0; i < ts.size(); i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(ts[i]));
+  }
+
+  return x;
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
+  { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
+  { "hashsizes", hashbits_get_hashsizes, METH_VARARGS, "" },
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },

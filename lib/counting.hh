@@ -59,6 +59,10 @@ namespace khmer {
       }
     }
 
+    std::vector<HashIntoType> get_tablesizes() const {
+      return _tablesizes;
+    }
+
     void set_use_bigcount(bool b) { _use_bigcount = b; }
     bool get_use_bigcount() { return _use_bigcount; }
 

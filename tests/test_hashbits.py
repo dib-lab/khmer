@@ -362,3 +362,12 @@ def test_find_stoptags2():
 
    x = ht.identify_stoptags_by_position("ATGCATGCGCAT")
    assert x == [0, 2, 4, 8], x
+
+    
+def test_get_ksize():
+   kh = khmer.new_hashbits(22, 1, 1)
+   assert kh.ksize() == 22
+
+def test_get_hashsizes():
+   kh = khmer.new_hashbits(22, 100, 4)
+   assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()

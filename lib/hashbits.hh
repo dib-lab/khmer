@@ -86,6 +86,10 @@ namespace khmer {
       _clear_all_partitions();
     }
 
+    std::vector<HashIntoType> get_tablesizes() const {
+      return _tablesizes;
+    }
+
     virtual void save(std::string);
     virtual void load(std::string);
     virtual void save_tagset(std::string);
