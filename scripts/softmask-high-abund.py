@@ -22,7 +22,7 @@ total = 0
 total_masked = 0
 
 for n, record in enumerate(screed.open(filename)):
-    if n % 100000 == 0:
+    if n % 1000 == 0:
         print '...', n
 
     x = []
@@ -46,6 +46,9 @@ for n, record in enumerate(screed.open(filename)):
             x.extend(['n'] * K)
             pos += K
             total_masked += K
+
+    leftover = len(seq) - len(x)
+    x.extend(seq[-leftover:])
 
     outfp.write(">%s\n%s\n" % (record.name, "".join(x)))
 
