@@ -752,34 +752,24 @@ void CountingHash::get_median_count(const std::string &s,
 				    float &average,
 				    float &stddev)
 {
-  const unsigned int length = s.length();
-  const char * sp = s.c_str();
   BoundedCounterType count;
   std::vector<BoundedCounterType> counts;
+  KMerIterator kmers(s.c_str(), _ksize);
 
-  HashIntoType h = 0, r = 0;
- 
-  HashIntoType bin = _hash(sp, _ksize, h, r);
-  count = this->get_count(bin);
-  counts.push_back(count);
-
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
-
-    bin = uniqify_rc(h, r);
-    count = this->get_count(bin);
+  while(!kmers.done()) {
+    HashIntoType kmer = kmers.next();
+    count = this->get_count(kmer);
     counts.push_back(count);
+  }
+
+  assert(counts.size());
+
+  if (!counts.size()) {
+    median = 0;
+    average = 0;
+    stddev = 0;
+
+    return;
   }
 
   average = 0;
