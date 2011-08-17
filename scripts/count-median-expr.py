@@ -19,8 +19,11 @@ def main():
        if 'N' in seq:
           seq = seq.replace('N', 'G')
 
-       a, b, c = ht.get_median_count(seq)
-       print record.name, a, b, c, len(seq)
+       if K <= len(seq):
+          a, b, c = ht.get_median_count(seq)
+          print record.name, a, b, c, len(seq)
+       else:
+          print>>sys.stderr, 'skipping very short sequence', record.name, 'of length', len(seq)
 
 if __name__ == '__main__':
     main()
