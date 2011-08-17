@@ -258,9 +258,9 @@ static PyObject * ktable_set(PyObject * self, PyObject * args)
   khmer::KTable * ktable = me->ktable;
 
   PyObject * arg;
-  unsigned long count;
+  khmer::ExactCounterType count;
 
-  if (!PyArg_ParseTuple(args, "OI", &arg, &count)) {
+  if (!PyArg_ParseTuple(args, "OK", &arg, &count)) {
     return NULL;
   }
 
