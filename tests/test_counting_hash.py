@@ -161,7 +161,7 @@ def test_simple_median():
 def test_save_load():
     thisdir = os.path.dirname(__file__)
     inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
-    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    savepath = os.path.join(thisdir, 'tempcountingsave0.ht')
     
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
@@ -185,8 +185,8 @@ def test_save_load():
 def test_load_gz():
     thisdir = os.path.dirname(__file__)
     inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
-    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
-    loadpath = os.path.join(thisdir, 'tempcountingsave.ht.gz')
+    savepath = os.path.join(thisdir, 'tempcountingsave1.ht')
+    loadpath = os.path.join(thisdir, 'tempcountingsave1.ht.gz')
     
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
@@ -206,6 +206,30 @@ def test_load_gz():
     # load compressed hashtable.
     ht = khmer._new_counting_hash(12, sizes)
     ht.load(loadpath)
+
+    tracking = khmer._new_hashbits(12, sizes)
+    x = hi.abundance_distribution(inpath, tracking)
+
+    tracking = khmer._new_hashbits(12, sizes)
+    y = ht.abundance_distribution(inpath, tracking)
+
+    assert sum(x) == 3966, sum(x)
+    assert x == y, (x,y)
+
+def test_save_load_gz():
+    thisdir = os.path.dirname(__file__)
+    inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
+    savepath = os.path.join(thisdir, 'tempcountingsave2.ht.gz')
+    
+    sizes = list(PRIMES_1m)
+    sizes.append(1000005)
+
+    hi = khmer._new_counting_hash(12, sizes)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    ht = khmer._new_counting_hash(12, sizes)
+    ht.load(savepath)
 
     tracking = khmer._new_hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
