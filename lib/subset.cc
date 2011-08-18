@@ -770,25 +770,15 @@ bool SubsetPartition::is_single_partition(std::string seq)
     return 0;
   }
 
-  const char * first_kmer = seq.c_str();
-
-  HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
-
-  kmer = _hash(first_kmer, _ht->ksize(), kmer_f, kmer_r);
 
   PartitionSet partitions;
   PartitionID *pp;
 
-  if (partition_map.find(kmer) != partition_map.end()) {
-    pp = partition_map[kmer];
-    if (pp) {
-      partitions.insert(*pp);
-    }
-  }
+  KMerIterator kmers(seq.c_str(), _ht->ksize());
+  while (!kmers.done()) {
+    kmer = kmers.next();
 
-  for (unsigned int i = _ht->ksize(); i < seq.length(); i++) {
-    kmer = _ht->_next_hash(seq[i], kmer_f, kmer_r);
     if (partition_map.find(kmer) != partition_map.end()) {
       pp = partition_map[kmer];
       if (pp) {
@@ -805,16 +795,12 @@ bool SubsetPartition::is_single_partition(std::string seq)
 void SubsetPartition::join_partitions_by_path(std::string seq)
 {
   SeenSet tagged_kmers;
-  HashIntoType kmer_f, kmer_r, kmer;
-  const unsigned int ksize = _ht->ksize();
+  HashIntoType kmer;
 
-  kmer = _hash(seq.c_str(), ksize, kmer_f, kmer_r);
-  if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
-    tagged_kmers.insert(kmer);
-  }
+  KMerIterator kmers(seq.c_str(), _ht->ksize());
 
-  for (unsigned int i = ksize; i < seq.length(); i++) {
-    kmer = _ht->_next_hash(seq[i], kmer_f, kmer_r);
+  while(!kmers.done()) {
+    kmer = kmers.next();
     if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
       tagged_kmers.insert(kmer);
     }
