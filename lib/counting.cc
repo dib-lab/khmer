@@ -1063,5 +1063,48 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
 
 CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht)
 {
+  assert(ht._counts[0]);
+
+  unsigned int save_ksize = ht._ksize;
+  unsigned char save_n_tables = ht._n_tables;
+  unsigned long long save_tablesize;
+
+  gzFile outfile = gzopen(outfilename.c_str(), "wb");
+
+  unsigned char version = SAVED_FORMAT_VERSION;
+  gzwrite(outfile, (const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_COUNTING_HT;
+  gzwrite(outfile, (const char *) &ht_type, 1);
+
+  unsigned char use_bigcount = 0;
+  if (ht._use_bigcount) {
+    use_bigcount = 1;
+  }
+  gzwrite(outfile, (const char *) &use_bigcount, 1);
+
+  gzwrite(outfile, (const char *) &save_ksize, sizeof(save_ksize));
+  gzwrite(outfile, (const char *) &save_n_tables, sizeof(save_n_tables));
+
+  for (unsigned int i = 0; i < save_n_tables; i++) {
+    save_tablesize = ht._tablesizes[i];
+
+    gzwrite(outfile, (const char *) &save_tablesize, sizeof(save_tablesize));
+    gzwrite(outfile, (const char *) ht._counts[i], save_tablesize);
+  }
+
+  HashIntoType n_counts = ht._bigcounts.size();
+  gzwrite(outfile, (const char *) &n_counts, sizeof(n_counts));
+
+  if (n_counts) {
+    KmerCountMap::const_iterator it = ht._bigcounts.begin();
+    
+    for (; it != ht._bigcounts.end(); it++) {
+      gzwrite(outfile, (const char *) &it->first, sizeof(it->first));
+      gzwrite(outfile, (const char *) &it->second, sizeof(it->second));
+    }
+  }
+
+  gzclose(outfile);
 }
 
