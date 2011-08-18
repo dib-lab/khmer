@@ -300,12 +300,14 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
     if (check_read(seq)) {	// process?
       bool is_new_kmer;
-      const char * first_kmer = seq.c_str();
-      HashIntoType kmer_f = 0, kmer_r = 0;
-      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+
+      KMerIterator kmers(seq.c_str(), _ksize);
+      HashIntoType kmer;
 
       unsigned int since = _tag_density / 2 + 1;
-      for (unsigned int i = _ksize; i < seq.length(); i++) {
+
+      while(!kmers.done()) {
+	kmer = kmers.next();
 
 	is_new_kmer = (bool) !get_count(kmer);
 	if (is_new_kmer) {
@@ -323,14 +325,6 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  all_tags.insert(kmer);
 	  since = 1;
 	}
-
-	kmer = _next_hash(seq[i], kmer_f, kmer_r);
-      }
-
-      is_new_kmer = (bool) !get_count(kmer);
-      if (is_new_kmer) {
-	count(kmer);
-	n_consumed++;
       }
 
       if (since >= _tag_density/2 - 1) {
@@ -392,14 +386,14 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
     if (check_read(seq)) {	// process?
       bool is_new_kmer;
-      const char * first_kmer = seq.c_str();
-      HashIntoType kmer_f = 0, kmer_r = 0;
-      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-      HashIntoType last_kmer;
+      KMerIterator kmers(seq.c_str(), _ksize);
+
+      HashIntoType kmer, last_kmer;
       bool is_first_kmer = true;
 
       unsigned int since = _tag_density / 2 + 1;
-      for (unsigned int i = _ksize; i < seq.length(); i++) {
+      while (!kmers.done()) {
+	kmer = kmers.next();
 
 	if (!set_contains(stop_tags, kmer)) { // NOT a stop tag... ok.
 	  is_new_kmer = (bool) !get_count(kmer);
@@ -422,8 +416,7 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 	  }
 	} else {		// stop tag!  do not insert, but connect.
 	  // before first tag insertion; insert last kmer.
-	  if (i > _ksize and read_tags.size() == 0) {
-	    assert(!is_first_kmer);
+	  if (!is_first_kmer && read_tags.size() == 0) {
 	    read_tags.insert(last_kmer);
 	    all_tags.insert(last_kmer);
 	  }
@@ -433,7 +426,6 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
 	last_kmer = kmer;
 	is_first_kmer = false;
-	kmer = _next_hash(seq[i], kmer_f, kmer_r);
       }
 
       if (!set_contains(stop_tags, kmer)) { // NOT a stop tag... ok.
@@ -597,12 +589,11 @@ void Hashbits::filter_if_present(const std::string infilename,
     seq = read.seq;
 
     if (check_read(seq)) {
-      const char * kmer_s = seq.c_str();
+      KMerIterator kmers(seq.c_str(), _ksize);
       bool keep = true;
-      
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	kmer = _hash(kmer_s + i, _ksize);
 
+      while (!kmers.done()) {
+	kmer = kmers.next();
 	if (get_count(kmer)) {
 	  keep = false;
 	  break;
@@ -1090,20 +1081,18 @@ const
     return 0;
 
   }
-  const char * first_kmer = seq.c_str();
+
   HashIntoType kmer_f = 0, kmer_r = 0;
-  _hash(first_kmer, _ksize, kmer_f, kmer_r);
+  KMerIterator kmers(seq.c_str(), _ksize);
 
-  if (kmer_degree(kmer_f, kmer_r) > max_degree) {
-    return _ksize;
-  }
-
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    _next_hash(seq[i], kmer_f, kmer_r);
-
+  unsigned int i = _ksize;
+  while(!kmers.done()) {
+    kmers.next(kmer_f, kmer_r);
+  
     if (kmer_degree(kmer_f, kmer_r) > max_degree) {
       return i;
     }
+    i++;
   }
 
   return seq.length();
@@ -1157,39 +1146,26 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
     return 0;
   }
   unsigned int count;
-
-  const char * first_kmer = seq.c_str();
   SeenSet path;
 
   HashIntoType kmer_f = 0, kmer_r = 0;
-  HashIntoType kmer;
   SeenSet seen;
 
-#if 0
-  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-  path.insert(kmer);
+  KMerIterator kmers(seq.c_str(), _ksize);
 
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    kmer = _next_hash(seq[i], kmer_f, kmer_r);
-    path.insert(kmer);
-  }
-#endif // 0
-
-  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-  count = count_kmers_within_depth(kmer_f, kmer_r, radius, max_volume, &seen);
-  if (count >= max_volume) {
-    return 0;
-  }
-  
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    SeenSet seen;
-    kmer = _next_hash(seq[i], kmer_f, kmer_r);
-    count = count_kmers_within_depth(kmer_f, kmer_r, radius, max_volume,&seen);
+  unsigned int i = _ksize - 2;
+  while(!kmers.done()) {
+    kmers.next(kmer_f, kmer_r);
+    count = count_kmers_within_depth(kmer_f, kmer_r, radius,
+				     max_volume, &seen);
     if (count >= max_volume) {
-      return i - 1;
+      return i;
     }
+    
+    i++;
   }
 
+  
   return seq.length();
 }
 
@@ -1199,24 +1175,20 @@ unsigned int Hashbits::trim_on_stoptags(std::string seq) const
     return 0;
   }
 
-  const char * first_kmer = seq.c_str();
   SeenSet path;
-
-  HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
 
-  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-
-  if (set_contains(stop_tags, kmer)) {
-    return 0;
-  }
-
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+  KMerIterator kmers(seq.c_str(), _ksize);
+  
+  unsigned int i = _ksize - 2;
+  while (!kmers.done()) {
+    kmer = kmers.next();
     if (set_contains(stop_tags, kmer)) {
-      return i - 1;
+      return i;
     }
+    i++;
   }
+
   return seq.length();
 }
 
@@ -1591,22 +1563,18 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
     seq = read.seq;
 
     if (check_read(seq)) {	// process?
-      const char * first_kmer = seq.c_str();
-      HashIntoType kmer_f = 0, kmer_r = 0;
-      HashIntoType kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
-      HashIntoType last_kmer = kmer;
-      bool is_first_kmer = true;
+      KMerIterator kmers(seq.c_str(), _ksize);
 
-      for (unsigned int i = _ksize; i < seq.length(); i++) {
+      HashIntoType kmer;
+      bool is_first_kmer = true;
+      while (!kmers.done()) {
+	kmer = kmers.next();
+
 	if (set_contains(stop_tags, kmer)) {
 	  break;
 	}
-
 	count(kmer);
-
-	last_kmer = kmer;
 	is_first_kmer = false;
-	kmer = _next_hash(seq[i], kmer_f, kmer_r);
       }
 
       if (!is_first_kmer) {	// traverse
@@ -1641,23 +1609,19 @@ const
     return;
   }
 
-  const char * first_kmer = seq.c_str();
   SeenSet path;
-
-  HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
 
-  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+  KMerIterator kmers(seq.c_str(), _ksize);
+  
+  unsigned int i = 0;
+  while(!kmers.done()) {
+    kmer = kmers.next();
 
-  if (set_contains(stop_tags, kmer)) {
-    posns.push_back(0);
-  }
-
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    kmer = _next_hash(seq[i], kmer_f, kmer_r);
     if (set_contains(stop_tags, kmer)) {
-      posns.push_back(i - _ksize + 1);
+      posns.push_back(i);
     }
+    i++;
   }
 
   return;
