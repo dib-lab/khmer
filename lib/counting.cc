@@ -3,6 +3,7 @@
 #include "hashbits.hh"
 #include "parsers.hh"
 
+#include "zlib-1.2.3/zlib.h"
 #include <math.h>
 #include <algorithm>
 
@@ -947,6 +948,70 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
 
 CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename, CountingHash &ht)
 {
+  if (ht._counts) {
+    for (unsigned int i = 0; i < ht._n_tables; i++) {
+      delete ht._counts[i]; ht._counts[i] = NULL;
+    }
+    delete ht._counts; ht._counts = NULL;
+  }
+  ht._tablesizes.clear();
+  
+  unsigned int save_ksize = 0;
+  unsigned char save_n_tables = 0;
+  unsigned long long save_tablesize = 0;
+  unsigned char version, ht_type, use_bigcount;
+
+  gzFile infile = gzopen(infilename.c_str(), "rb");
+
+  gzread(infile, (char *) &version, 1);
+  gzread(infile, (char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_COUNTING_HT);
+
+  gzread(infile, (char *) &use_bigcount, 1);
+  gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
+  gzread(infile, (char *) &save_n_tables, sizeof(save_n_tables));
+
+  ht._ksize = (WordLength) save_ksize;
+  ht._n_tables = (unsigned int) save_n_tables;
+  ht._init_bitstuff();
+
+  ht._use_bigcount = use_bigcount;
+
+  ht._counts = new Byte*[ht._n_tables];
+  for (unsigned int i = 0; i < ht._n_tables; i++) {
+    HashIntoType tablesize;
+
+    gzread(infile, (char *) &save_tablesize, sizeof(save_tablesize));
+
+    tablesize = (HashIntoType) save_tablesize;
+    ht._tablesizes.push_back(tablesize);
+
+    ht._counts[i] = new Byte[tablesize];
+
+    unsigned long long loaded = 0;
+    while (loaded != tablesize) {
+      loaded += gzread(infile, (char *) ht._counts[i], tablesize - loaded);
+    }
+  }
+
+  HashIntoType n_counts = 0;
+  gzread(infile, (char *) &n_counts, sizeof(n_counts));
+
+  if (n_counts) {
+    ht._bigcounts.clear();
+
+    HashIntoType kmer;
+    BoundedCounterType count;
+
+    for (HashIntoType n = 0; n < n_counts; n++) {
+      gzread(infile, (char *) &kmer, sizeof(kmer));
+      gzread(infile, (char *) &count, sizeof(count));
+      ht._bigcounts[kmer] = count;
+    }
+  }
+
+  gzclose(infile);
 }
 
 CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht)

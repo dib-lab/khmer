@@ -1,4 +1,5 @@
 import os
+import gzip
 thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
@@ -171,6 +172,40 @@ def test_save_load():
 
     ht = khmer._new_counting_hash(12, sizes)
     ht.load(savepath)
+
+    tracking = khmer._new_hashbits(12, sizes)
+    x = hi.abundance_distribution(inpath, tracking)
+
+    tracking = khmer._new_hashbits(12, sizes)
+    y = ht.abundance_distribution(inpath, tracking)
+
+    assert sum(x) == 3966, sum(x)
+    assert x == y, (x,y)
+
+def test_load_gz():
+    thisdir = os.path.dirname(__file__)
+    inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
+    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    loadpath = os.path.join(thisdir, 'tempcountingsave.ht.gz')
+    
+    sizes = list(PRIMES_1m)
+    sizes.append(1000005)
+
+    # save uncompressed hashtable.
+    hi = khmer._new_counting_hash(12, sizes)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    # compress.
+    in_file = open(savepath, 'rb')
+    out_file = gzip.open(loadpath, 'wb')
+    out_file.writelines(in_file)
+    out_file.close()
+    in_file.close()
+
+    # load compressed hashtable.
+    ht = khmer._new_counting_hash(12, sizes)
+    ht.load(loadpath)
 
     tracking = khmer._new_hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
