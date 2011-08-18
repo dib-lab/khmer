@@ -959,3 +959,42 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
   return seq.length();
 }
 
+
+void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
+{
+   std::string filename(infilename);
+   int found = filename.find_last_of(".");
+   std::string type = filename.substr(found+1);
+
+   if (type == "gz") { CountingHashGzFileReader(filename, ht); }
+   else { CountingHashFileReader(filename, ht); }
+}
+
+
+void CountingHashFile::save(const std::string &outfilename, const CountingHash &ht)
+{
+   std::string filename(outfilename);
+   int found = filename.find_last_of(".");
+   std::string type = filename.substr(found+1);
+
+   if (type == "gz") { CountingHashGzFileWriter(filename, ht); }
+   else { CountingHashFileWriter(filename, ht); }
+}
+
+
+CountingHashFileReader::CountingHashFileReader(const std::string &infilename, CountingHash &ht)
+{
+}
+
+CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename, CountingHash &ht)
+{
+}
+
+CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht)
+{
+}
+
+CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht)
+{
+}
+

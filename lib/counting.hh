@@ -9,9 +9,19 @@ namespace khmer {
   typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 
   class CountingHashIntersect;
+  class CountingHashFile;
+  class CountingHashFileReader;
+  class CountingHashFileWriter;
+  class CountingHashGzFileReader;
+  class CountingHashGzFileWriter;
 
   class CountingHash : public khmer::Hashtable {
     friend class CountingHashIntersect;
+    friend class CountingHashFile;
+    friend class CountingHashFileReader;
+    friend class CountingHashFileWriter;
+    friend class CountingHashGzFileReader;
+    friend class CountingHashGzFileWriter;
 
   protected:
     bool _use_bigcount;		// keep track of counts > MAX_COUNT?
@@ -219,6 +229,34 @@ namespace khmer {
 
     unsigned int trim_on_abundance(std::string seq,
 				   BoundedCounterType min_abund) const;
+  };
+
+
+  class CountingHashFile {
+  public:
+    static void load(const std::string &infilename, CountingHash &ht);
+    static void save(const std::string &outfilename, const CountingHash &ht);
+  };
+
+  class CountingHashFileReader : public CountingHashFile {
+  public:
+    CountingHashFileReader(const std::string &infilename, CountingHash &ht);
+  };
+
+  class CountingHashGzFileReader : public CountingHashFile {
+  public:
+    CountingHashGzFileReader(const std::string &infilename, CountingHash &ht);
+  };
+
+
+  class CountingHashFileWriter : public CountingHashFile {
+  public:
+    CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht);
+  };
+
+  class CountingHashGzFileWriter : public CountingHashFile {
+  public:
+    CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht);
   };
 };
 
