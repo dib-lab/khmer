@@ -359,44 +359,21 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s,
 					    HashIntoType lower_bound,
 					    HashIntoType upper_bound)
 {
-  const unsigned int length = s.length();
-  const char * sp = s.c_str();
+  KMerIterator kmers(s.c_str(), _ksize);
+  HashIntoType kmer;
+
   BoundedCounterType min_count = MAX_COUNT, count;
 
-  HashIntoType h = 0, r = 0;
   bool bounded = true;
-
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
 
-  HashIntoType bin;
-  
-  bin = _hash(sp, _ksize, h, r);
-  bin = uniqify_rc(h, r);	// @@CTB test this.
+  while(!kmers.done()) {
+    kmer = kmers.next();
 
-  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-    min_count = this->get_count(bin);
-  }
-
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
-
-    bin = uniqify_rc(h, r);
-
-    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      count = this->get_count(bin);
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count = this->get_count(kmer);
     
       if (count < min_count) {
 	min_count = count;
@@ -410,39 +387,21 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
 					    HashIntoType lower_bound,
 					    HashIntoType upper_bound)
 {
-  const unsigned int length = s.length();
-  const char * sp = s.c_str();
+  KMerIterator kmers(s.c_str(), _ksize);
+
   BoundedCounterType max_count = 0, count;
 
-  HashIntoType h = 0, r = 0;
   bool bounded = true;
-
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
 
-  HashIntoType bin = _hash(sp, _ksize, h, r);
-  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-    max_count = this->get_count(bin);
-  }
+  HashIntoType kmer;
+  while(!kmers.done()) {
+    kmer = kmers.next();
 
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
-
-    bin = uniqify_rc(h, r);
-    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      count = this->get_count(bin);
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count = this->get_count(kmer);
 
       if (count > max_count) {
 	max_count = count;
@@ -478,18 +437,12 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     seq = read.seq;
 
     if (check_read(seq)) {
-      HashIntoType kmer, kmer_f = 0, kmer_r = 0;
-      kmer = _hash(seq.c_str(), _ksize, kmer_f, kmer_r);
+      HashIntoType kmer;
+      KMerIterator kmers(seq.c_str(), _ksize);
 
-      if (!tracking->get_count(kmer)) {
-	tracking->count(kmer);
+      while(!kmers.done()) {
+	kmer = kmers.next();
 
-	BoundedCounterType n = get_count(kmer);
-	dist[n]++;
-      }
-
-      for (unsigned int i = _ksize; i < seq.length(); i++) {
-	kmer = _next_hash(seq[i], kmer_f, kmer_r);
 	if (!tracking->get_count(kmer)) {
 	  tracking->count(kmer);
 
@@ -927,23 +880,27 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
     return 0;
   }
 
-  const char * first_kmer = seq.c_str();
+  KMerIterator kmers(seq.c_str(), _ksize);
+
   SeenSet path;
 
-  HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
 
-  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+  if (kmers.done()) { return 0; }
+  kmer = kmers.next();
 
-  if (get_count(kmer) < min_abund) {
+  if (kmers.done() || get_count(kmer) < min_abund) {
     return 0;
   }
 
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+  unsigned int i = _ksize;
+  while (!kmers.done()) {
+    kmer = kmers.next();
+
     if (get_count(kmer) < min_abund) {
       return i;
     }
+    i++;
   }
 
   return seq.length();
