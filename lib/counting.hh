@@ -140,7 +140,7 @@ namespace khmer {
     //
 
     MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
-				       unsigned int total_reads,
+				       unsigned long long total_reads,
 				       ReadMaskTable * readmask = NULL,
 				       CallbackFn callback = NULL,
 				       void * callback_data = NULL);
@@ -166,7 +166,7 @@ namespace khmer {
                                               void * callback_data = NULL);
 
     ReadMaskTable * filter_fasta_file_run(const std::string &inputfile,
-					  unsigned int total_reads,
+					  unsigned long long total_reads,
 					  BoundedCounterType threshold,
 					  unsigned int runlength,
 					  ReadMaskTable * old_readmask = NULL,
