@@ -1565,7 +1565,7 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
     if (check_read(seq)) {	// process?
       KMerIterator kmers(seq.c_str(), _ksize);
 
-      HashIntoType kmer;
+      HashIntoType kmer = 0;
       bool is_first_kmer = true;
       while (!kmers.done()) {
 	kmer = kmers.next();
