@@ -10,7 +10,7 @@ using namespace std;
 using namespace khmer;
 
 MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
-					      unsigned int total_reads,
+					      unsigned long long total_reads,
 					      ReadMaskTable * readmask,
 					      CallbackFn callback,
 					      void * callback_data)
@@ -18,7 +18,7 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
    IParser* parser = IParser::get_parser(inputfile.c_str());
    Read read;
    string seq = "";
-   unsigned int read_num = 0;
+   unsigned long long read_num = 0;
 
    MinMaxTable * mmt = new MinMaxTable(total_reads);
 
@@ -68,8 +68,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_any(MinMaxTable &minmax,
 						 void * callback_data)
 
 {
-   unsigned int read_num;
-   const unsigned int tablesize = minmax.get_tablesize();
+   unsigned long long read_num;
+   const unsigned long long tablesize = minmax.get_tablesize();
    ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
    if (old_readmask) {
@@ -115,8 +115,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_limit_n(const std::string &reads
    IParser* parser = IParser::get_parser(readsfile.c_str());
    string seq;
    Read read;
-   unsigned int read_num = 0;
-   const unsigned int tablesize = minmax.get_tablesize();
+   unsigned long long read_num = 0;
+   const unsigned long long tablesize = minmax.get_tablesize();
 
    ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
@@ -171,8 +171,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_all(MinMaxTable &minmax,
 						 CallbackFn callback,
 						 void * callback_data)
 {
-   unsigned int read_num;
-   const unsigned int tablesize = minmax.get_tablesize();
+   unsigned long long read_num;
+   const unsigned long long tablesize = minmax.get_tablesize();
 
    ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
@@ -209,7 +209,7 @@ ReadMaskTable * CountingHash::filter_fasta_file_all(MinMaxTable &minmax,
 //
 
 ReadMaskTable * CountingHash::filter_fasta_file_run(const std::string &inputfile,
-						 unsigned int total_reads,
+						 unsigned long long total_reads,
 						 BoundedCounterType threshold,
 						 unsigned int runlength,
 						 ReadMaskTable * old_readmask,
@@ -220,8 +220,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_run(const std::string &inputfile
    IParser* parser = IParser::get_parser(inputfile.c_str());
    string seq;
    Read read;
-   unsigned int read_num = 0;
-   unsigned int n_kept = 0;
+   unsigned long long read_num = 0;
+   unsigned long long n_kept = 0;
    ReadMaskTable * readmask = new ReadMaskTable(total_reads);
 
    if (old_readmask) {
@@ -305,7 +305,7 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
 }
 
 
-unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
+unsigned long long khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       const std::string &outputfile,
 					       ReadMaskTable * readmask,
 					       CallbackFn callback,
@@ -317,8 +317,8 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
    Read read;
    string name;
    string seq;
-   unsigned int n_kept = 0;
-   unsigned int read_num = 0;
+   unsigned long long n_kept = 0;
+   unsigned long long read_num = 0;
 
 
    while(!parser->is_complete()) {
@@ -427,7 +427,7 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
   IParser* parser = IParser::get_parser(filename.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   // if not, could lead to overflow.
   assert(sizeof(BoundedCounterType) == 2);
@@ -487,7 +487,7 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
    IParser* parser = IParser::get_parser(inputfile.c_str());
    string name;
    string seq;
-   unsigned int read_num = 0;
+   unsigned long long read_num = 0;
 
    while(!parser->is_complete()) {
       read = parser->get_next_read();
@@ -540,7 +540,7 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
   IParser* parser = IParser::get_parser(inputfile.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -758,7 +758,7 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
   IParser* parser = IParser::get_parser(filename.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -805,7 +805,7 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
   IParser* parser = IParser::get_parser(filename.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();

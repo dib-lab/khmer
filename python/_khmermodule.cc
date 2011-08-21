@@ -49,7 +49,7 @@ static PyObject *_callback_obj = NULL;
 
 // callback function to pass into C++ functions
 
-void _report_fn(const char * info, void * data, unsigned int n_reads,
+void _report_fn(const char * info, void * data, unsigned long long n_reads,
 		unsigned long long other)
 {
   // handle signals etc. (like CTRL-C)
@@ -66,7 +66,7 @@ void _report_fn(const char * info, void * data, unsigned int n_reads,
   if (data) {
     PyObject * obj = (PyObject *) data;
     if (obj != Py_None) {
-      PyObject * args = Py_BuildValue("siL", info, n_reads, other);
+      PyObject * args = Py_BuildValue("sLL", info, n_reads, other);
 
       PyObject * r = PyObject_Call(obj, args, NULL);
       Py_XDECREF(r);
