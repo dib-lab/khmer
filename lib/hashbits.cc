@@ -1387,7 +1387,7 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 
     if (check_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	string kmer = seq.substr(i, i + _ksize);
+	string kmer = seq.substr(i, i + _ksize); // @CTB this wrong!
 	HashIntoType kmer_n = _hash(kmer.c_str(), _ksize);
 	BoundedCounterType n = counting.get_count(kmer_n);
 
@@ -1627,3 +1627,82 @@ const
   return;
 }
 
+void Hashbits::extract_unique_paths(std::string seq,
+				    unsigned int min_length,
+				    float min_unique_f,
+				    std::vector<std::string> &results)
+{
+  if (seq.size() < min_length) {
+    return;
+  }
+
+  float max_seen = 1.0 - min_unique_f;
+
+  min_length = min_length - _ksize + 1; // adjust for k-mer size.
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+  HashIntoType kmer;
+
+  std::deque<bool> seen_queue;
+  unsigned int n_already_seen = 0;
+  unsigned int n_kmers = 0;
+
+  while (!kmers.done()) {
+    kmer = kmers.next();
+
+    if (get_count(kmer)) {
+      seen_queue.push_back(true);
+      n_already_seen++;
+    } else {
+      seen_queue.push_back(false);
+    }
+    n_kmers++;
+  }
+
+  if ( ((float)n_already_seen / (float)n_kmers) <= max_seen ) {
+    results.push_back(seq);
+    return;
+  }
+
+  unsigned int i = 0;
+  while (i < n_kmers - min_length) {
+    unsigned int seen_counter = 0;
+    unsigned int j;
+
+    // yes, inefficient n^2 algorithm.  sue me.
+    for (j = 0; j < min_length; j++) {
+      if (seen_queue[i + j]) {
+	seen_counter++;
+      }
+    }
+
+    if ( ((float)seen_counter / (float) j) <= max_seen) {
+      while ((i + j) < n_kmers) {
+	if (seen_queue[i + j]) {
+	  seen_counter++;
+	}
+	j++;
+
+	if (((float)seen_counter / (float) j) > max_seen) {
+	  break;
+	}
+      }
+
+      if (i + j == n_kmers) {	// potentially decrement twice at end
+	if (((float)seen_counter / (float) j) > max_seen) {
+	  j--;
+	}
+	j--;
+      }
+      else {
+	j -= 2;
+      }
+
+      results.push_back(seq.substr(i, j + _ksize));
+
+      i = i + j + 1;
+    } else {
+      i++;
+    }
+  }
+}

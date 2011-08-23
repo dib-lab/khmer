@@ -2948,7 +2948,31 @@ static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
   return x;
 }
 
+static PyObject * hashbits_extract_unique_paths(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * sequence = NULL;
+  unsigned int min_length = 0;
+  float min_unique_f = 0;
+  if (!PyArg_ParseTuple(args, "sif", &sequence, &min_length, &min_unique_f)) {
+    return NULL;
+  }
+
+  std::vector<std::string> results;
+  hashbits->extract_unique_paths(sequence, min_length, min_unique_f, results);
+
+  PyObject * x = PyList_New(results.size());
+  for (unsigned int i = 0; i < results.size(); i++) {
+    PyList_SET_ITEM(x, i, PyString_FromString(results[i].c_str()));
+  }
+
+  return x;
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
+  { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hashbits_get_hashsizes, METH_VARARGS, "" },
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
