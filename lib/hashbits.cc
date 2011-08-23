@@ -1659,11 +1659,6 @@ void Hashbits::extract_unique_paths(std::string seq,
     n_kmers++;
   }
 
-  if ( ((float)n_already_seen / (float)n_kmers) <= max_seen ) {
-    results.push_back(seq);
-    return;
-  }
-
   unsigned int i = 0;
   while (i < n_kmers - min_length) {
     unsigned int seen_counter = 0;
@@ -1676,31 +1671,37 @@ void Hashbits::extract_unique_paths(std::string seq,
       }
     }
 
+    assert(j == min_length);
     if ( ((float)seen_counter / (float) j) <= max_seen) {
-      while ((i + j) < n_kmers) {
-	if (seen_queue[i + j]) {
+      unsigned int start = i;
+
+      while ((start + min_length) < n_kmers) {
+	if (seen_queue[start]) {
+	  seen_counter--;
+	}
+	if (seen_queue[start + min_length]) {
 	  seen_counter++;
 	}
-	j++;
+	start++;
 
-	if (((float)seen_counter / (float) j) > max_seen) {
+	if (((float)seen_counter / (float) min_length) > max_seen) {
 	  break;
 	}
       }
 
-      if (i + j == n_kmers) {	// potentially decrement twice at end
-	if (((float)seen_counter / (float) j) > max_seen) {
-	  j--;
+      if (start + min_length == n_kmers) {	// potentially decrement twice at end
+	if (((float)seen_counter / (float) min_length) > max_seen) {
+	  start--;
 	}
-	j--;
+	start--;
       }
       else {
-	j -= 2;
+	start -= 2;
       }
 
-      results.push_back(seq.substr(i, j + _ksize));
+      results.push_back(seq.substr(i, start + min_length + _ksize - i));
 
-      i = i + j + 1;
+      i = start + min_length + 1;
     } else {
       i++;
     }
