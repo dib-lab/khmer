@@ -30,6 +30,7 @@ namespace khmer {
   typedef unsigned char Byte;
 
   typedef void (*CallbackFn)(const char * info, void * callback_data,
-			     unsigned int n_reads, unsigned long long other);
+			     unsigned long long n_reads,
+			     unsigned long long other);
 
 };

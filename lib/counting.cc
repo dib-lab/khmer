@@ -11,7 +11,7 @@ using namespace std;
 using namespace khmer;
 
 MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
-					      unsigned int total_reads,
+					      unsigned long long total_reads,
 					      ReadMaskTable * readmask,
 					      CallbackFn callback,
 					      void * callback_data)
@@ -19,7 +19,7 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
    IParser* parser = IParser::get_parser(inputfile.c_str());
    Read read;
    string seq = "";
-   unsigned int read_num = 0;
+   unsigned long long read_num = 0;
 
    MinMaxTable * mmt = new MinMaxTable(total_reads);
 
@@ -69,8 +69,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_any(MinMaxTable &minmax,
 						 void * callback_data)
 
 {
-   unsigned int read_num;
-   const unsigned int tablesize = minmax.get_tablesize();
+   unsigned long long read_num;
+   const unsigned long long tablesize = minmax.get_tablesize();
    ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
    if (old_readmask) {
@@ -116,8 +116,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_limit_n(const std::string &reads
    IParser* parser = IParser::get_parser(readsfile.c_str());
    string seq;
    Read read;
-   unsigned int read_num = 0;
-   const unsigned int tablesize = minmax.get_tablesize();
+   unsigned long long read_num = 0;
+   const unsigned long long tablesize = minmax.get_tablesize();
 
    ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
@@ -172,8 +172,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_all(MinMaxTable &minmax,
 						 CallbackFn callback,
 						 void * callback_data)
 {
-   unsigned int read_num;
-   const unsigned int tablesize = minmax.get_tablesize();
+   unsigned long long read_num;
+   const unsigned long long tablesize = minmax.get_tablesize();
 
    ReadMaskTable * readmask = new ReadMaskTable(tablesize);
 
@@ -210,7 +210,7 @@ ReadMaskTable * CountingHash::filter_fasta_file_all(MinMaxTable &minmax,
 //
 
 ReadMaskTable * CountingHash::filter_fasta_file_run(const std::string &inputfile,
-						 unsigned int total_reads,
+						 unsigned long long total_reads,
 						 BoundedCounterType threshold,
 						 unsigned int runlength,
 						 ReadMaskTable * old_readmask,
@@ -221,8 +221,8 @@ ReadMaskTable * CountingHash::filter_fasta_file_run(const std::string &inputfile
    IParser* parser = IParser::get_parser(inputfile.c_str());
    string seq;
    Read read;
-   unsigned int read_num = 0;
-   unsigned int n_kept = 0;
+   unsigned long long read_num = 0;
+   unsigned long long n_kept = 0;
    ReadMaskTable * readmask = new ReadMaskTable(total_reads);
 
    if (old_readmask) {
@@ -306,7 +306,7 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
 }
 
 
-unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
+unsigned long long khmer::output_filtered_fasta_file(const std::string &inputfile,
 					       const std::string &outputfile,
 					       ReadMaskTable * readmask,
 					       CallbackFn callback,
@@ -318,8 +318,8 @@ unsigned int khmer::output_filtered_fasta_file(const std::string &inputfile,
    Read read;
    string name;
    string seq;
-   unsigned int n_kept = 0;
-   unsigned int read_num = 0;
+   unsigned long long n_kept = 0;
+   unsigned long long read_num = 0;
 
 
    while(!parser->is_complete()) {
@@ -360,44 +360,21 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s,
 					    HashIntoType lower_bound,
 					    HashIntoType upper_bound)
 {
-  const unsigned int length = s.length();
-  const char * sp = s.c_str();
+  KMerIterator kmers(s.c_str(), _ksize);
+  HashIntoType kmer;
+
   BoundedCounterType min_count = MAX_COUNT, count;
 
-  HashIntoType h = 0, r = 0;
   bool bounded = true;
-
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
 
-  HashIntoType bin;
-  
-  bin = _hash(sp, _ksize, h, r);
-  bin = uniqify_rc(h, r);	// @@CTB test this.
+  while(!kmers.done()) {
+    kmer = kmers.next();
 
-  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-    min_count = this->get_count(bin);
-  }
-
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2 - 2));
-
-    bin = uniqify_rc(h, r);
-
-    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      count = this->get_count(bin);
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count = this->get_count(kmer);
     
       if (count < min_count) {
 	min_count = count;
@@ -411,39 +388,21 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
 					    HashIntoType lower_bound,
 					    HashIntoType upper_bound)
 {
-  const unsigned int length = s.length();
-  const char * sp = s.c_str();
+  KMerIterator kmers(s.c_str(), _ksize);
+
   BoundedCounterType max_count = 0, count;
 
-  HashIntoType h = 0, r = 0;
   bool bounded = true;
-
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
 
-  HashIntoType bin = _hash(sp, _ksize, h, r);
-  if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-    max_count = this->get_count(bin);
-  }
+  HashIntoType kmer;
+  while(!kmers.done()) {
+    kmer = kmers.next();
 
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
-
-    bin = uniqify_rc(h, r);
-    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      count = this->get_count(bin);
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count = this->get_count(kmer);
 
       if (count > max_count) {
 	max_count = count;
@@ -469,7 +428,7 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
   IParser* parser = IParser::get_parser(filename.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   // if not, could lead to overflow.
   assert(sizeof(BoundedCounterType) == 2);
@@ -479,18 +438,12 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     seq = read.seq;
 
     if (check_read(seq)) {
-      HashIntoType kmer, kmer_f = 0, kmer_r = 0;
-      kmer = _hash(seq.c_str(), _ksize, kmer_f, kmer_r);
+      HashIntoType kmer;
+      KMerIterator kmers(seq.c_str(), _ksize);
 
-      if (!tracking->get_count(kmer)) {
-	tracking->count(kmer);
+      while(!kmers.done()) {
+	kmer = kmers.next();
 
-	BoundedCounterType n = get_count(kmer);
-	dist[n]++;
-      }
-
-      for (unsigned int i = _ksize; i < seq.length(); i++) {
-	kmer = _next_hash(seq[i], kmer_f, kmer_r);
 	if (!tracking->get_count(kmer)) {
 	  tracking->count(kmer);
 
@@ -535,7 +488,7 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
    IParser* parser = IParser::get_parser(inputfile.c_str());
    string name;
    string seq;
-   unsigned int read_num = 0;
+   unsigned long long read_num = 0;
 
    while(!parser->is_complete()) {
       read = parser->get_next_read();
@@ -588,7 +541,7 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
   IParser* parser = IParser::get_parser(inputfile.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -647,34 +600,24 @@ void CountingHash::get_median_count(const std::string &s,
 				    float &average,
 				    float &stddev)
 {
-  const unsigned int length = s.length();
-  const char * sp = s.c_str();
   BoundedCounterType count;
   std::vector<BoundedCounterType> counts;
+  KMerIterator kmers(s.c_str(), _ksize);
 
-  HashIntoType h = 0, r = 0;
- 
-  HashIntoType bin = _hash(sp, _ksize, h, r);
-  count = this->get_count(bin);
-  counts.push_back(count);
-
-  for (unsigned int i = _ksize; i < length; i++) {
-    // left-shift the previous hash over
-    h = h << 2;
-
-    // 'or' in the current nt
-    h |= twobit_repr(sp[i]);
-
-    // mask off the 2 bits we shifted over.
-    h &= bitmask;
-
-    // now handle reverse complement
-    r = r >> 2;
-    r |= (twobit_comp(sp[i]) << (_ksize*2-2));
-
-    bin = uniqify_rc(h, r);
-    count = this->get_count(bin);
+  while(!kmers.done()) {
+    HashIntoType kmer = kmers.next();
+    count = this->get_count(kmer);
     counts.push_back(count);
+  }
+
+  assert(counts.size());
+
+  if (!counts.size()) {
+    median = 0;
+    average = 0;
+    stddev = 0;
+
+    return;
   }
 
   average = 0;
@@ -710,7 +653,7 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
   IParser* parser = IParser::get_parser(filename.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -757,7 +700,7 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
   IParser* parser = IParser::get_parser(filename.c_str());
   string name;
   string seq;
-  unsigned int read_num = 0;
+  unsigned long long read_num = 0;
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
@@ -832,23 +775,27 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
     return 0;
   }
 
-  const char * first_kmer = seq.c_str();
+  KMerIterator kmers(seq.c_str(), _ksize);
+
   SeenSet path;
 
-  HashIntoType kmer_f = 0, kmer_r = 0;
   HashIntoType kmer;
 
-  kmer = _hash(first_kmer, _ksize, kmer_f, kmer_r);
+  if (kmers.done()) { return 0; }
+  kmer = kmers.next();
 
-  if (get_count(kmer) < min_abund) {
+  if (kmers.done() || get_count(kmer) < min_abund) {
     return 0;
   }
 
-  for (unsigned int i = _ksize; i < seq.length(); i++) {
-    kmer = _next_hash(seq[i], kmer_f, kmer_r);
+  unsigned int i = _ksize;
+  while (!kmers.done()) {
+    kmer = kmers.next();
+
     if (get_count(kmer) < min_abund) {
       return i;
     }
+    i++;
   }
 
   return seq.length();
