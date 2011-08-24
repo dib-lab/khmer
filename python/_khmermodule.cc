@@ -49,7 +49,7 @@ static PyObject *_callback_obj = NULL;
 
 // callback function to pass into C++ functions
 
-void _report_fn(const char * info, void * data, unsigned int n_reads,
+void _report_fn(const char * info, void * data, unsigned long long n_reads,
 		unsigned long long other)
 {
   // handle signals etc. (like CTRL-C)
@@ -66,7 +66,7 @@ void _report_fn(const char * info, void * data, unsigned int n_reads,
   if (data) {
     PyObject * obj = (PyObject *) data;
     if (obj != Py_None) {
-      PyObject * args = Py_BuildValue("siL", info, n_reads, other);
+      PyObject * args = Py_BuildValue("sLL", info, n_reads, other);
 
       PyObject * r = PyObject_Call(obj, args, NULL);
       Py_XDECREF(r);
@@ -1426,7 +1426,7 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
   std::vector<khmer::HashIntoType> ts = counting->get_tablesizes();
 
   PyObject * x = PyList_New(ts.size());
-  for (int i = 0; i < ts.size(); i++) {
+  for (unsigned int i = 0; i < ts.size(); i++) {
     PyList_SET_ITEM(x, i, PyInt_FromLong(ts[i]));
   }
 
@@ -2941,14 +2941,38 @@ static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
   std::vector<khmer::HashIntoType> ts = hashbits->get_tablesizes();
 
   PyObject * x = PyList_New(ts.size());
-  for (int i = 0; i < ts.size(); i++) {
+  for (unsigned int i = 0; i < ts.size(); i++) {
     PyList_SET_ITEM(x, i, PyInt_FromLong(ts[i]));
   }
 
   return x;
 }
 
+static PyObject * hashbits_extract_unique_paths(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * sequence = NULL;
+  unsigned int min_length = 0;
+  float min_unique_f = 0;
+  if (!PyArg_ParseTuple(args, "sif", &sequence, &min_length, &min_unique_f)) {
+    return NULL;
+  }
+
+  std::vector<std::string> results;
+  hashbits->extract_unique_paths(sequence, min_length, min_unique_f, results);
+
+  PyObject * x = PyList_New(results.size());
+  for (unsigned int i = 0; i < results.size(); i++) {
+    PyList_SET_ITEM(x, i, PyString_FromString(results[i].c_str()));
+  }
+
+  return x;
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
+  { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hashbits_get_hashsizes, METH_VARARGS, "" },
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },

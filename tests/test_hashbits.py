@@ -371,3 +371,51 @@ def test_get_ksize():
 def test_get_hashsizes():
    kh = khmer.new_hashbits(22, 100, 4)
    assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
+
+def test_extract_unique_paths_0():
+   kh = khmer.new_hashbits(10, 1e5, 4)
+   
+   x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+   assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGATG']
+
+   kh.consume('ATGGAGAGACACAGATAGACAGGAGTGGCGATG')
+   x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+   assert not x
+
+def test_extract_unique_paths_1():
+   kh = khmer.new_hashbits(10, 1e5, 4)
+   
+   kh.consume('AGTGGCGATG')
+   x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+   print x
+   assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGAT'] # all but the last k-mer
+
+def test_extract_unique_paths_2():
+   kh = khmer.new_hashbits(10, 1e5, 4)
+   
+   kh.consume('ATGGAGAGAC')
+   x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+   print x
+   assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGATG'] # all but the 1st k-mer
+
+def test_extract_unique_paths_3():
+   kh = khmer.new_hashbits(10, 1e5, 4)
+   
+   kh.consume('ATGGAGAGAC')
+   kh.consume('AGTGGCGATG')
+   x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+   print x
+   assert x == ['TGGAGAGACACAGATAGACAGGAGTGGCGAT'] # all but the 1st/last k-mer
+
+def test_extract_unique_paths_4():
+   kh = khmer.new_hashbits(10, 1e5, 4)
+   
+   kh.consume('ATGGAGAGAC')
+   kh.consume('AGTGGCGATG')
+
+   kh.consume('ATAGACAGGA')
+   
+   x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
+   print x
+   assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
+

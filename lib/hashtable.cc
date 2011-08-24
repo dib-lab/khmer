@@ -149,34 +149,24 @@ unsigned int Hashtable::consume_string(const std::string &s,
 				       HashIntoType upper_bound)
 {
   const char * sp = s.c_str();
-  const unsigned int length = s.length();
   unsigned int n_consumed = 0;
 
-  HashIntoType h = 0, r = 0;
   bool bounded = true;
+
+  KMerIterator kmers(sp, _ksize);
+  HashIntoType kmer;
 
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
-  
-  HashIntoType bin = _hash(sp, _ksize, h, r);
 
-  try {
-    if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-      count(bin);
+  while(!kmers.done()) {
+    kmer = kmers.next();
+  
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count(kmer);
       n_consumed++;
     }
-
-    for (unsigned int i = _ksize; i < length; i++) {
-      bin = _next_hash(sp[i], h, r);
-
-      if (!bounded || (bin >= lower_bound && bin < upper_bound)) {
-	count(bin);
-	n_consumed++;
-      }
-    }
-  } catch (...) {
-    throw;
   }
 
   return n_consumed;
