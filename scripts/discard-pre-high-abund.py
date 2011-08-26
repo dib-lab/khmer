@@ -9,7 +9,7 @@ import sys, screed, os
 import khmer
 import random
 
-DESIRED_COVERAGE=20
+DEFAULT_DESIRED_COVERAGE=20
 
 import argparse
 
@@ -59,41 +59,59 @@ def parse_args(parser):
 
 def main():
     parser = build_common_args()
-    parser.add_argument('input_filename')
-    parser.add_argument('output_filename')
+    parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
+                        default=DEFAULT_DESIRED_COVERAGE)
+    parser.add_argument('-s', '--savehash', dest='savehash', default='')
+    parser.add_argument('-l', '--loadhash', dest='loadhash',
+                        default='')
 
     args = parse_args(parser)
 
     K=args.ksize
     HT_SIZE=args.min_hashsize
     N_HT=args.n_hashes
+    DESIRED_COVERAGE=DEFAULT_DESIRED_COVERAGE
 
-    input_name = args.input_filename
-    output_name = args.output_filename
+    input_name_list = args.input_filenames
 
-    print 'making hashtable'
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    if args.loadhash:
+        print 'loading hashtable from', args.loadhash
+        ht = khmer.load_counting_hash(args.loadhash)
+    else:
+        print 'making hashtable'
+        ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
-    outfp = open(output_name, 'w')
-
+    total = 0
     discarded = 0
-    for n, record in enumerate(screed.open(input_name)):
-        if n > 0 and n % 10000 == 0:
-            print '...', n, discarded, int(discarded / float(n) * 100.)
+    for input_filename in input_name_list:
+        output_name = os.path.basename(input_filename) + '.keep'
+        outfp = open(output_name, 'w')
 
-        if len(record.sequence) < K:
-            continue
+        for n, record in enumerate(screed.open(input_filename)):
+            if n > 0 and n % 10000 == 0:
+                print '... kept', total - discarded, 'of', total, ', or', int(100. - discarded / float(total) * 100.), '%'
+                print '... in file', input_filename
 
-        med, _, _ = ht.get_median_count(record.sequence)
+            total += 1
 
-        if med < DESIRED_COVERAGE:
-            ht.consume(record.sequence)
-            outfp.write('>%s\n%s\n' % (record.name, record.sequence))
-        else:
-            discarded += 1
+            if len(record.sequence) < K:
+                continue
 
-    print 'consumed', n, 'discarded', discarded, 'percent', int(discarded / float(n) * 100.)
+            med, _, _ = ht.get_median_count(record.sequence)
 
+            if med < DESIRED_COVERAGE:
+                ht.consume(record.sequence)
+                outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+            else:
+                discarded += 1
+
+        print 'DONE with', input_filename, '; kept', total - discarded, 'of', total, 'or', int(100. - discarded / float(total) * 100.), '%'
+
+        if args.savehash:
+            print 'Saving hashfile through', input_filename
+            print '...saving to', args.savehash
+            ht.save(os.path.basename(args.savehash))
 
 if __name__ == '__main__':
     main()
