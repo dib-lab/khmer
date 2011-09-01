@@ -108,10 +108,10 @@ def main():
 
         print 'DONE with', input_filename, '; kept', total - discarded, 'of', total, 'or', int(100. - discarded / float(total) * 100.), '%'
 
-        if args.savehash:
-            print 'Saving hashfile through', input_filename
-            print '...saving to', args.savehash
-            ht.save(os.path.basename(args.savehash))
+    if args.savehash:
+        print 'Saving hashfile through', input_filename
+        print '...saving to', args.savehash
+        ht.save(os.path.basename(args.savehash))
 
 if __name__ == '__main__':
     main()
