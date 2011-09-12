@@ -149,6 +149,106 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   return partitions.size() + n_singletons;
 }
 
+unsigned int SubsetPartition::find_unpart(const std::string infilename,
+					  CallbackFn callback,
+					  void * callback_data)
+{
+  IParser* parser = IParser::get_parser(infilename);
+
+  unsigned int total_reads = 0;
+  unsigned int reads_kept = 0;
+  unsigned int n_singletons = 0;
+
+  Read read;
+  string seq;
+
+  std::string first_kmer;
+  HashIntoType kmer = 0;
+
+  const unsigned int ksize = _ht->ksize();
+
+  //
+  // go through all the reads, and take those with assigned partitions
+  // and output them.
+  //
+
+  while(!parser->is_complete()) {
+    read = parser->get_next_read();
+    seq = read.seq;
+
+    if (_ht->check_read(seq)) {
+      const char * kmer_s = seq.c_str();
+
+      bool found_tag = false;
+      for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
+	kmer = _hash(kmer_s + i, ksize);
+
+	// is this a known tag?
+	if (set_contains(partition_map, kmer)) {
+	  found_tag = true;
+	  break;
+	}
+      }
+
+      // all sequences should have at least one tag in them.
+      // assert(found_tag);  @CTB currently breaks tests.  give fn flag to
+      // disable.
+
+      PartitionID partition_id = 0;
+      if (found_tag) {
+	PartitionID * partition_p = partition_map[kmer];
+	if (partition_p == NULL ){
+	  partition_id = 0;
+	} else {
+	  partition_id = *partition_p; // May be 0 for unassigned parts, too.
+	}
+      }
+
+      if (partition_id == 0) {
+	// try!
+	HashIntoType kmer_f, kmer_r;
+	_hash(kmer_s + 0, ksize, kmer_f, kmer_r);
+	SeenSet tagged_kmers;
+	find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags);
+
+	if (tagged_kmers.size()) {
+	  PartitionID * partition_p = 0;
+	  for (SeenSet::iterator si = tagged_kmers.begin();
+	       si != tagged_kmers.end();
+	       si++) {
+	    if (partition_p != NULL) {
+	      partition_id = *partition_p;
+	      if (partition_id != 0) {
+		break;
+	      }
+	    }
+	  }
+	  if (partition_id == 0) {
+	    n_singletons++;
+	  }
+	}
+      }
+	       
+      total_reads++;
+
+      // run callback, if specified
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("find_unpart", callback_data,
+		   total_reads, reads_kept);
+	} catch (...) {
+	  delete parser; parser = NULL;
+	  throw;
+	}
+      }
+    }
+  }
+
+  delete parser; parser = NULL;
+
+  return n_singletons;
+}
+
 ///
 
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
