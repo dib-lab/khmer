@@ -1,4 +1,7 @@
 #! /usr/bin/env python
+"""
+Lowercase high-copy-number k-mers.
+"""
 import sys, khmer, screed, gzip
 
 THRESHOLD = 5
@@ -33,22 +36,26 @@ for n, record in enumerate(screed.open(filename)):
     pos = 0
     while pos < len(seq) - K + 1:
         kmer = seq[pos:pos + K]
-        if 'N' in kmer:
+        if 'N' in kmer.upper():
             x.extend(kmer)
             pos += K
+            continue
 
         count = ht.get(kmer)
         
         if count < THRESHOLD:
-            x.append(seq[pos])
+            x.append(seq[pos].upper())
             pos += 1
         else:
-            x.extend(['n'] * K)
-            pos += K
+            x.extend(seq[pos:pos+K].lower())
             total_masked += K
+            pos += K
 
     leftover = len(seq) - len(x)
-    x.extend(seq[-leftover:])
+    if leftover:
+        x.extend(seq[-leftover:])
+
+    assert len(x) == len(seq), (record.name, len(x), len(seq))
 
     outfp.write(">%s\n%s\n" % (record.name, "".join(x)))
 
