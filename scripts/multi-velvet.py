@@ -11,7 +11,7 @@ localdir = os.path.abspath(localdir)
 # velveth %(filename)s.ass $K -short -paired %(filename)s
 
 #COMMAND="velvetg %(filename)s.ass -read_trkg yes -exp_cov 3 -cov_cutoff 0 -min_contig_lgth 1000"
-COMMAND="%%(localdir)s/velvet-assemble.sh %%(localdir)s %%(filename)s %d" % K
+COMMAND="%%(localdir)s/velvet-assemble.sh %%(filename)s %d" % K
 
 
 N_PROCESSES = 8
