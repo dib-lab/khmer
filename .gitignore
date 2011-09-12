@@ -30,3 +30,5 @@ tests/test-data/random-20-a.fa.parttest
 tests/test-data/fakelump.fa.stopfoo
 tests/tagset
 tst
+tests/tempcountingsave1.ht.gz
+tests/tempcountingsave2.ht.gz
