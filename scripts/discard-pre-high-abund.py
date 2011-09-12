@@ -71,7 +71,7 @@ def main():
     K=args.ksize
     HT_SIZE=args.min_hashsize
     N_HT=args.n_hashes
-    DESIRED_COVERAGE=DEFAULT_DESIRED_COVERAGE
+    DESIRED_COVERAGE=args.cutoff
 
     input_name_list = args.input_filenames
 
