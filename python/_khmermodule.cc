@@ -2359,6 +2359,33 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
   return PyInt_FromLong(n_partitions);
 }
 
+static PyObject * hashbits_find_unpart(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  unsigned int n_singletons = 0;
+
+  try {
+    khmer::SubsetPartition * subset_p = hashbits->partition;
+    n_singletons = subset_p->find_unpart(filename, _report_fn,callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(n_singletons);
+
+  // Py_INCREF(Py_None);
+  // return Py_None;
+}
+
 static PyObject * hashbits_filter_if_present(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2994,6 +3021,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
+  { "find_unpart", hashbits_find_unpart, METH_VARARGS, "" },
   { "filter_if_present", hashbits_filter_if_present, METH_VARARGS, "" },
   { "add_tag", hashbits_add_tag, METH_VARARGS, "" },
   { "add_stop_tag", hashbits_add_stop_tag, METH_VARARGS, "" },
