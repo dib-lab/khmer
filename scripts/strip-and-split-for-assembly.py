@@ -8,7 +8,7 @@ paired_fp = open(sys.argv[2] + '.pe', 'w')
 last_record = None
 last_name = None
 for record in screed.open(sys.argv[1]):
-    name = record['name']
+    name = record['name'].split()[0]
     sequence = record['sequence']
 
     if last_record:
