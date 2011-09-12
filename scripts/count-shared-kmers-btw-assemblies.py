@@ -5,7 +5,7 @@ import os
 from screed.fasta import fasta_iter
 
 K=32
-HASHTABLE_SIZE = 1e6
+HASHTABLE_SIZE = 5e7
 N_HT = 4
 
 LENGTH_THRESHOLD = int(sys.argv[3])
@@ -18,6 +18,9 @@ def slidingWindow(sequence, K_size):
     total_windows = (len(sequence) - K_size) + 1
 
     for i in range(0, total_windows, 1):
+        kmer = sequence[i:i + K_size]
+        if 'N' in kmer:
+            continue
         yield sequence[i:i+K_size]
 
 def count(contigs1, contigs2):
@@ -30,8 +33,6 @@ def count(contigs1, contigs2):
             kmer1 = slidingWindow(n, K)
             for x in kmer1:
                 count += 1
-                if x.find('N') >= 0:
-                    continue
                 if ht.get(x):
                     continue
                 ht.consume(x)
@@ -41,8 +42,6 @@ def count(contigs1, contigs2):
             kmer2 = slidingWindow(n, K)
             for x in kmer2:
                 count2 += 1
-                if x.find('N') >= 0:
-                    continue
                 if ht.get(x) > 0:
                     count3 += 1
 
