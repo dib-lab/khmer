@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 import os.path
-from screed.fasta import fasta_iter
+import screed
 
 MAX_SIZE=int(1e6)
 THRESHOLD=1
@@ -9,11 +9,11 @@ THRESHOLD=1
 output_groups = True
 output_unassigned = False
 
-def read_partition_file(fp):
-    for n, record in enumerate(fasta_iter(fp, parse_description=False)):
-        name = record['name']
+def read_partition_file(filename):
+    for n, record in enumerate(screed.open(filename)):
+        name = record.name
         name, partition_id = name.rsplit('\t', 1)
-        yield n, name, int(partition_id), record['sequence']
+        yield n, name, int(partition_id), record.sequence
 
 ###
 
@@ -50,7 +50,7 @@ count = {}
 if output_unassigned:
     unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
 
-for n, name, pid, seq in read_partition_file(open(filename)):
+for n, name, pid, seq in read_partition_file(filename):
     if n % 100000 == 0:
         print '...', n
 
@@ -122,8 +122,7 @@ for n in range(group_n):
 
 ## write 'em all out!
     
-fp = open(filename)
-for n, name, partition_id, seq in read_partition_file(fp):
+for n, name, partition_id, seq in read_partition_file(filename):
     if n % 100000 == 0:
         print '...x2', n
 
