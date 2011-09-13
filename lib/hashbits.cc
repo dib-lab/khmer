@@ -299,37 +299,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     // n_consumed += this_n_consumed;
 
     if (check_read(seq)) {	// process?
-      bool is_new_kmer;
-
-      KMerIterator kmers(seq.c_str(), _ksize);
-      HashIntoType kmer;
-
-      unsigned int since = _tag_density / 2 + 1;
-
-      while(!kmers.done()) {
-	kmer = kmers.next();
-
-	is_new_kmer = (bool) !get_count(kmer);
-	if (is_new_kmer) {
-	  count(kmer);
-	  n_consumed++;
-	}
-
-	if (!is_new_kmer && set_contains(all_tags, kmer)) {
-	  since = 1;
-	} else {
-	  since++;
-	}
-
-	if (since >= _tag_density) {
-	  all_tags.insert(kmer);
-	  since = 1;
-	}
-      }
-
-      if (since >= _tag_density/2 - 1) {
-	all_tags.insert(kmer);	// insert the last k-mer, too.
-      }
+      consume_sequence_and_tag(seq, n_consumed);
     }
 	       
     // reset the sequence info, increment read number
@@ -348,6 +318,45 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     }
   }
   delete parser;
+}
+
+void Hashbits::consume_sequence_and_tag(const std::string& seq,
+					unsigned long long& n_consumed,
+					SeenSet  * new_tags)
+{
+  bool is_new_kmer;
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+  HashIntoType kmer;
+
+  unsigned int since = _tag_density / 2 + 1;
+
+  while(!kmers.done()) {
+    kmer = kmers.next();
+
+    is_new_kmer = (bool) !get_count(kmer);
+    if (is_new_kmer) {
+      count(kmer);
+      n_consumed++;
+    }
+
+    if (!is_new_kmer && set_contains(all_tags, kmer)) {
+      since = 1;
+    } else {
+      since++;
+    }
+
+    if (since >= _tag_density) {
+      all_tags.insert(kmer);
+      if (new_tags) { new_tags->insert(kmer); }
+      since = 1;
+    }
+  }
+
+  if (since >= _tag_density/2 - 1) {
+    all_tags.insert(kmer);	// insert the last k-mer, too.
+    if (new_tags) { new_tags->insert(kmer); }
+  }
 }
 
 //
