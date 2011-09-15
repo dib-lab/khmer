@@ -2,8 +2,13 @@
 import screed
 import sys
 
-single_fp = open(sys.argv[2] + '.se', 'w')
-paired_fp = open(sys.argv[2] + '.pe', 'w')
+infile = sys.argv[1]
+outfile = infile
+if len(sys.argv) > 2:
+    outfile = sys.argv[2]
+
+single_fp = open(outfile + '.se', 'w')
+paired_fp = open(outfile + '.pe', 'w')
 
 last_record = None
 last_name = None
@@ -35,3 +40,11 @@ if last_record:
 
 if record:
    print >>single_fp, '>%s\n%s' % (name, record['sequence'])
+
+single_fp.close()
+paired_fp.close()
+
+### check, at the end, to see if it worked!
+paired_fp = open(outfile + '.pe')
+if not paired_fp.read(1):
+    raise Exception("no paired reads!? check file formats...")
