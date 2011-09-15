@@ -19,7 +19,7 @@ ht.merge_subset_from_disk(pmap_filename)
 n_singletons = ht.find_unpart(filename)
 print 'found:', n_singletons
 
-
+n_partitions = ht.output_partitions(filename, basename + '.unpart')
 
 ###
 
