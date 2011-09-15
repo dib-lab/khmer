@@ -158,12 +158,14 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
   unsigned int n_singletons = 0;
+  unsigned long long n_consumed = 0;
 
   Read read;
   string seq;
 
   std::string first_kmer;
   HashIntoType kmer = 0;
+  SeenSet new_tags;
 
   const unsigned int ksize = _ht->ksize();
 
@@ -205,28 +207,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
       }
 
       if (partition_id == 0) {
-	// try!
-	HashIntoType kmer_f, kmer_r;
-	_hash(kmer_s + 0, ksize, kmer_f, kmer_r);
-	SeenSet tagged_kmers;
-	find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags);
-
-	if (tagged_kmers.size()) {
-	  PartitionID * partition_p = 0;
-	  for (SeenSet::iterator si = tagged_kmers.begin();
-	       si != tagged_kmers.end();
-	       si++) {
-	    if (partition_p != NULL) {
-	      partition_id = *partition_p;
-	      if (partition_id != 0) {
-		break;
-	      }
-	    }
-	  }
-	  if (partition_id == 0) {
-	    n_singletons++;
-	  }
-	}
+	_ht->consume_sequence_and_tag(seq, n_consumed, &new_tags);
       }
 	       
       total_reads++;
@@ -241,6 +222,33 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 	  throw;
 	}
       }
+    }
+  }
+
+  std::cout << "new tags size: " << new_tags.size() << "\n";
+
+  unsigned int n = 0;
+  std::string kmer_s;
+  HashIntoType kmer_f, kmer_r;
+  SeenSet tagged_kmers;
+  for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end(); si++) {
+    n += 1;
+
+    kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
+    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+
+    // find all tagged kmers within range.
+    tagged_kmers.clear();
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+		  true);
+
+    // assign the partition ID
+    std::cout << next_partition_id << "\n";
+    assign_partition_id(kmer, tagged_kmers);
+
+    // print out
+    if (n % 1000 == 0) {
+      cout << "unpart-part " << n << " " << next_partition_id << "\n";
     }
   }
 
