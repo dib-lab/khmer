@@ -158,14 +158,13 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
   unsigned int n_singletons = 0;
-  unsigned long long n_consumed = 0;
 
   Read read;
   string seq;
 
   std::string first_kmer;
   HashIntoType kmer = 0;
-  SeenSet new_tags;
+  SeenSet tags_todo;
 
   const unsigned int ksize = _ht->ksize();
 
@@ -179,37 +178,36 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
     seq = read.seq;
 
     if (_ht->check_read(seq)) {
-      const char * kmer_s = seq.c_str();
+      unsigned long long n_consumed = 0;
+      SeenSet new_tags;
+      _ht->consume_sequence_and_tag(seq, n_consumed, &new_tags);
 
-      bool found_tag = false;
-      for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-	kmer = _hash(kmer_s + i, ksize);
+      PartitionSet pset;
+      bool found_zero = false;
 
-	// is this a known tag?
-	if (set_contains(partition_map, kmer)) {
-	  found_tag = true;
-	  break;
+      for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
+	   si++) {
+	PartitionMap::iterator pi = partition_map.find(*si);
+	PartitionID partition_id = 0;
+	if (pi != partition_map.end() && pi->second != NULL) {
+	  partition_id = *(pi->second);
 	}
-      }
-
-      // all sequences should have at least one tag in them.
-      // assert(found_tag);  @CTB currently breaks tests.  give fn flag to
-      // disable.
-
-      PartitionID partition_id = 0;
-      if (found_tag) {
-	PartitionID * partition_p = partition_map[kmer];
-	if (partition_p == NULL ){
-	  partition_id = 0;
+	if (partition_id == 0) {
+	  found_zero = true;
 	} else {
-	  partition_id = *partition_p; // May be 0 for unassigned parts, too.
+	  pset.insert(partition_id);
 	}
       }
 
-      if (partition_id == 0) {
-	_ht->consume_sequence_and_tag(seq, n_consumed, &new_tags);
+      if (pset.size() > 1 || found_zero || n_consumed) {
+	for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
+	     si++) {
+	  tags_todo.insert(*si);
+	}
+	std::cout << "got one! " << read.name << "\n";
+	std::cout << pset.size() << " " << found_zero << " " << n_consumed << "\n";
       }
-	       
+
       total_reads++;
 
       // run callback, if specified
@@ -225,13 +223,13 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
     }
   }
 
-  std::cout << "new tags size: " << new_tags.size() << "\n";
+  std::cout << "new tags size: " << tags_todo.size() << "\n";
 
   unsigned int n = 0;
   std::string kmer_s;
   HashIntoType kmer_f, kmer_r;
   SeenSet tagged_kmers;
-  for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end(); si++) {
+  for (SeenSet::iterator si = tags_todo.begin(); si != tags_todo.end(); si++) {
     n += 1;
 
     kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
@@ -241,6 +239,8 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
     tagged_kmers.clear();
     find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
 		  true);
+
+    std::cout << "found " << tagged_kmers.size() << "\n";
 
     // assign the partition ID
     std::cout << next_partition_id << "\n";
