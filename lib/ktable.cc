@@ -19,6 +19,7 @@ HashIntoType khmer::_hash(const char * kmer, const WordLength k,
 {
   // sizeof(HashIntoType) * 8 bits / 2 bits/base  
   assert(k <= sizeof(HashIntoType)*4);
+  assert(strlen(kmer) >= k);
 
   HashIntoType h = 0, r = 0;
 
