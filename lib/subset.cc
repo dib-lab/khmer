@@ -211,9 +211,13 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 	// 1 is "perfect", 2 is imperfect but rilly fast.
 
 #if PERFECT_UNPART
-	for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
-	     si++) {
-	  tags_todo.insert(*si);
+	if (n_consumed || 1) {
+	  for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
+	       si++) {
+	    tags_todo.insert(*si);
+	  }
+	} else {
+	  assign_partition_id(*(new_tags.begin()), new_tags);
 	}
 #else
 	assign_partition_id(*(new_tags.begin()), new_tags);
