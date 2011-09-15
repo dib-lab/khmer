@@ -149,6 +149,8 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   return partitions.size() + n_singletons;
 }
 
+#define PERFECT_UNPART 1
+
 unsigned int SubsetPartition::find_unpart(const std::string infilename,
 					  CallbackFn callback,
 					  void * callback_data)
@@ -200,10 +202,23 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
       }
 
       if (pset.size() > 1 || found_zero || n_consumed) {
+
+	// ok, we found something unaccounted for by the current partitioning.
+	// we can either
+	//    (1) redo the partitioning of this area from scratch;
+	//    (2) just join tags that belong together (incl 0-tags);
+	//    (3) ...?
+	// 1 is "perfect", 2 is imperfect but rilly fast.
+
+#if PERFECT_UNPART
 	for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
 	     si++) {
 	  tags_todo.insert(*si);
 	}
+#else
+	assign_partition_id(*(new_tags.begin()), new_tags);
+#endif // 0
+
 	std::cout << "got one! " << read.name << "\n";
 	std::cout << pset.size() << " " << found_zero << " " << n_consumed << "\n";
       }
@@ -223,6 +238,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
     }
   }
 
+#if PERFECT_UNPART
   std::cout << "new tags size: " << tags_todo.size() << "\n";
 
   unsigned int n = 0;
@@ -251,6 +267,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
       cout << "unpart-part " << n << " " << next_partition_id << "\n";
     }
   }
+#endif // PERFECT_UNPART
 
   delete parser; parser = NULL;
 
