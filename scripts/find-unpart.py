@@ -2,8 +2,6 @@ import khmer, sys, os
 import gc
 import glob
 
-K = 32
-
 filename=sys.argv[1]
 basename = os.path.basename(filename)
 pmap_filename = sys.argv[2]
@@ -13,8 +11,7 @@ if not os.path.exists(filename):
     sys.exit(0)
 
 # create a fake-ish ht; K matters, but not hashtable size.
-ht = khmer.new_hashbits(K, 1, 1)
-ht.load(basename + '.ht')
+ht = khmer.load_hashbits(basename + '.ht')
 ht.load_tagset(basename + '.tagset')
 ht.merge_subset_from_disk(pmap_filename)
 
