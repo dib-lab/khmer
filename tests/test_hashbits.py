@@ -291,7 +291,7 @@ def test_stop_traverse():
 
    # without tagging/joining across consume, this breaks into two partition;
    # with, it is one partition.
-   ht.add_stop_tag('TTGCATACGTTGAGCCAGC')
+   ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
    
    ht.consume_fasta_and_tag(filename)   # DO NOT join reads across stoptags
    subset = ht.do_subset_partition(0, 0, True)
@@ -311,7 +311,7 @@ def test_tag_across_stoptraverse():
 
    # without tagging/joining across consume, this breaks into two partition;
    # with, it is one partition.
-   ht.add_stop_tag('CCGAATATATAACAGCGAC')
+   ht.add_stop_tag('CCGAATATATAACAGCGACG')
    
    ht.consume_fasta_and_tag_with_stoptags(filename) # DO join reads across
 
@@ -337,7 +337,7 @@ def test_notag_across_stoptraverse():
    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
 
    # connecting k-mer at the beginning/end of a read: breaks up into two.
-   ht.add_stop_tag('TTGCATACGTTGAGCCAGC')
+   ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
    
    ht.consume_fasta_and_tag_with_stoptags(filename)
 
