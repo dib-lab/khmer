@@ -211,7 +211,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 	// 1 is "perfect", 2 is imperfect but rilly fast.
 
 #if PERFECT_UNPART
-	if (n_consumed || 1) {
+	if (n_consumed || found_zero) {
 	  for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
 	       si++) {
 	    tags_todo.insert(*si);
