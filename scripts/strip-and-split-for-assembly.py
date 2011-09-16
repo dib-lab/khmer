@@ -2,6 +2,16 @@
 import screed
 import sys
 
+def is_pair(name1, name2):
+    if name1.endswith('/1') and name2.endswith('/2'):
+        s1 = name1.split('/')[0]
+        s2 = name2.split('/')[0]
+        if s1 == s2:
+            assert(s1)
+            return True
+        
+    return False
+
 infile = sys.argv[1]
 outfile = infile
 if len(sys.argv) > 2:
@@ -17,8 +27,7 @@ for record in screed.open(sys.argv[1]):
     sequence = record['sequence']
 
     if last_record:
-        if last_name.endswith('/1') and name.endswith('/2') and name[:-1] == last_name[:-1]:
-           fp = paired_fp
+        if is_pair(last_name, name):
            print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
            print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
            name, record = None, None
@@ -29,14 +38,13 @@ for record in screed.open(sys.argv[1]):
     last_record = record
 
 if last_record:
-   if last_name.endswith('/1') and name.endswith('/2') and name[:-1] == last_name[:-1]:
-      fp = paired_fp
-      print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
-      print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
-      name, record = None, None
-   else:
-      print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
-      name, record = None, None
+    if is_pair(last_name, name):
+        print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+        print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
+        name, record = None, None
+    else:
+        print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+        name, record = None, None
 
 if record:
    print >>single_fp, '>%s\n%s' % (name, record['sequence'])
