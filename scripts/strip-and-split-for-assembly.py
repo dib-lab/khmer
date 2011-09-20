@@ -22,7 +22,11 @@ paired_fp = open(outfile + '.pe', 'w')
 
 last_record = None
 last_name = None
-for record in screed.open(sys.argv[1]):
+
+print 'splitting pe/se sequences from %s to %s.{pe,se}' % (infile, outfile)
+for n, record in enumerate(screed.open(sys.argv[1])):
+    if n % 100000 == 0 and n > 0:
+       print '...', n
     name = record['name'].split()[0]
     sequence = record['sequence']
 
