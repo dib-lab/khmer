@@ -98,10 +98,12 @@ def main():
             if len(record.sequence) < K:
                 continue
 
-            med, _, _ = ht.get_median_count(record.sequence)
+            seq = record.sequence.replace('N', 'A')
+
+            med, _, _ = ht.get_median_count(seq)
 
             if med < DESIRED_COVERAGE:
-                ht.consume(record.sequence)
+                ht.consume(seq)
                 outfp.write('>%s\n%s\n' % (record.name, record.sequence))
             else:
                 discarded += 1
