@@ -8,7 +8,7 @@
 
 namespace khmer {
   class ReadMaskTable;
-  unsigned int output_filtered_fasta_file(const std::string &inputfile,
+  unsigned long long output_filtered_fasta_file(const std::string &inputfile,
 					  const std::string &outputfile,
 					  ReadMaskTable * readmask,
 					  CallbackFn callback = NULL,
@@ -16,20 +16,20 @@ namespace khmer {
 
   class ReadMaskTable {
   protected:
-    const unsigned int _tablesize;
+    const unsigned long long _tablesize;
     unsigned char * _mask;
 
     void _allocate(bool initialize=true) {
       _mask = new unsigned char[_tablesize];
       if (initialize) {
-	for (unsigned int i = 0; i < _tablesize; i++) {
+	for (unsigned long long i = 0; i < _tablesize; i++) {
 	  _mask[i] = 1;
 	}
       }
     }
 
   public:
-    ReadMaskTable(unsigned int tablesize) :
+    ReadMaskTable(unsigned long long tablesize) :
       _tablesize(tablesize), _mask(NULL) {
       _allocate();
     }
@@ -38,25 +38,25 @@ namespace khmer {
       if (_mask) { delete _mask; _mask = NULL; }
     }
 
-    const unsigned int get_tablesize() const {
+    const unsigned long long get_tablesize() const {
       return _tablesize;
     }
 
-    const unsigned int n_kept() const {
-      unsigned int n = 0;
-      for (unsigned int i = 0; i < _tablesize; i++) {
+    const unsigned long long n_kept() const {
+      unsigned long long n = 0;
+      for (unsigned long long i = 0; i < _tablesize; i++) {
 	if (_mask[i]) { n++; }
       }
       return n;
     }
 
-    const bool get(unsigned int index) const {
+    const bool get(unsigned long long index) const {
       if (index >= _tablesize) { return false; } // @CTB throw?
 
       return _mask[index];
     }
 
-    void set(unsigned int index, bool keep) {
+    void set(unsigned long long index, bool keep) {
       if (index >= _tablesize) { return; } // @CTB throw?
 
       _mask[index] = keep ? 1 : 0;
@@ -65,13 +65,13 @@ namespace khmer {
     void merge(ReadMaskTable &other) {
       if (this ->_tablesize != other._tablesize) { return; } // @CTB throw?
 
-      for (unsigned int i = 0; i < _tablesize; i++) {
+      for (unsigned long long i = 0; i < _tablesize; i++) {
 	_mask[i] = _mask[i] && other._mask[i] ? 1 : 0;
       }
     }
 
     void invert() {
-      for (unsigned int i = 0; i < _tablesize; i++) {
+      for (unsigned long long i = 0; i < _tablesize; i++) {
 	_mask[i] = !_mask[i];
       }
     }
@@ -96,7 +96,7 @@ namespace khmer {
       infile.close();
     }
 
-    unsigned int filter_fasta_file(const std::string &inputfile,
+    unsigned long long filter_fasta_file(const std::string &inputfile,
 				   const std::string &outputfile,
 				   CallbackFn callback = NULL,
 				   void * callback_data = NULL) {
@@ -114,7 +114,7 @@ namespace khmer {
 
   class MinMaxTable {
   protected:
-    const unsigned int _tablesize;
+    const unsigned long long _tablesize;
     MinMaxValue * _table;
 
     void _allocate(bool initialize=true) {
@@ -125,7 +125,7 @@ namespace khmer {
     }
 
   public:
-    MinMaxTable(unsigned int tablesize) :
+    MinMaxTable(unsigned long long tablesize) :
       _tablesize(tablesize), _table(NULL) {
       _allocate();
     }
@@ -134,21 +134,21 @@ namespace khmer {
       if (_table) { delete _table; _table = NULL; }
     }
 
-    const unsigned int get_tablesize() const {
+    const unsigned long long get_tablesize() const {
       return _tablesize;
     }
 
-    const BoundedCounterType get_min(unsigned int index) const {
+    const BoundedCounterType get_min(unsigned long long index) const {
       assert(index < _tablesize);
       return _table[index].min_val;
     }
 
-    const BoundedCounterType get_max(unsigned int index) const {
+    const BoundedCounterType get_max(unsigned long long index) const {
       assert(index < _tablesize);
       return _table[index].max_val;
     }
 
-    BoundedCounterType add_max(unsigned int index, unsigned int val) {
+    BoundedCounterType add_max(unsigned long long index, unsigned int val) {
       assert(index < _tablesize);
 
       if (val > MAX_COUNT) { val = MAX_COUNT; }
@@ -162,7 +162,7 @@ namespace khmer {
       return mmv->max_val;
     }
 
-    BoundedCounterType add_min(unsigned int index, unsigned int val) {
+    BoundedCounterType add_min(unsigned long long index, unsigned int val) {
       assert(index < _tablesize);
 
       if (val > MAX_COUNT) { val = MAX_COUNT; }
@@ -180,7 +180,7 @@ namespace khmer {
       return mmv->min_val;
     }
 
-    void clear(unsigned int index) {
+    void clear(unsigned long long index) {
       assert(index < _tablesize);
 
       MinMaxValue * mmv = &_table[index];
@@ -189,7 +189,7 @@ namespace khmer {
 
     void merge(MinMaxTable &other) {
       assert(this->_tablesize == other._tablesize);
-      for (unsigned int i = 0; i < _tablesize; i++) {
+      for (unsigned long long i = 0; i < _tablesize; i++) {
 	this->add_min(i, other.get_min(i));
 	this->add_max(i, other.get_max(i));
       }

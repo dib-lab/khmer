@@ -1,71 +1,88 @@
 #! /usr/bin/env python
 import sys
-from screed.fasta import fasta_iter
+import os.path
+import screed
 
-MAX_SIZE=50000
+MAX_SIZE=int(1e6)
 THRESHOLD=1
 
-def read_partition_file(fp):
-    for n, line in enumerate(fp):
-        if n % 2 == 0:
-            surrendered = False
-            name, partition_id = line[1:].strip().rsplit('\t', 1)
+output_groups = True
+output_unassigned = False
 
-            if '*' in partition_id:
-                partition_id = int(partition_id[:-1])
-                surrendered = True
-            else:
-                partition_id = int(partition_id)
-        else:
-            sequence = line.strip()
+def read_partition_file(filename):
+    for n, record in enumerate(screed.open(filename)):
+        name = record.name
+        name, partition_id = name.rsplit('\t', 1)
+        yield n, name, int(partition_id), record.sequence
 
-            yield name, partition_id, surrendered, sequence
+###
 
+filename = sys.argv[1]
 
-(filename, prefix, distfilename) = sys.argv[1:]
+prefix = os.path.basename(filename)
+if len(sys.argv) > 2:
+    prefix = sys.argv[2]
 
+distfilename = prefix + '.dist'
 distfp = open(distfilename, 'w')
-surrendered_exist = False
+
+print '---'
+print 'reading partitioned file:', filename
+if output_groups:
+    print 'outputting to files named "%s.groupN.fa"' % prefix
+    print 'min reads to keep a partition:', THRESHOLD
+    print 'max size of a group file:', MAX_SIZE
+else:
+    print 'NOT outputting groups! Beware!'
+
+if output_unassigned:
+    print 'outputting unassigned reads to "%s.unassigned.fa"' % prefix
+
+print 'partition size distribution will go to %s' % distfilename
+print '---'
+
+###
 
 count = {}
 
 ###
 
-for n, (name, pid, surr, seq) in enumerate(read_partition_file(open(filename))):
-    if n % 10000 == 0:
+if output_unassigned:
+    unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
+
+for n, name, pid, seq in read_partition_file(filename):
+    if n % 100000 == 0:
         print '...', n
 
     count[pid] = count.get(pid, 0) + 1
-    if surr:
-        surrendered_exist = True
 
+    if pid == 0 and output_unassigned:
+        print >>unassigned_fp, '>%s\n%s' % (name, seq)
+
+if output_unassigned:
+    unassigned_fp.close()
+
+if 0 in count:                          # eliminate unpartitioned sequences
+   del count[0]
+   
 # develop histogram of partition sizes
 dist = {}
-for n, (name, pid, surr, seq) in enumerate(read_partition_file(open(filename))):
-    if n % 10000 == 0:
-        print '...x2', n
-
-    if pid not in count:
-        continue
-    
-    c = count[pid]
-    if pid == 0:
-        c = 0
-
-    dist[c] = dist.get(c, 0) + 1
-
+for pid, size in count.items():
+    dist[size] = dist.get(size, 0) + 1
+        
 # output histogram
 total = 0
+wtotal = 0
 for c, n in sorted(dist.items()):
-    if c:
-        n /= c
     total += n
-    distfp.write('%d %d %d\n' % (c, n, total))
+    wtotal += c*n
+    distfp.write('%d %d %d %d\n' % (c, n, total, wtotal))
+distfp.close()
 
-# separate
-if 0 in count:
-   del count[0]
+if not output_groups:
+    sys.exit(0)
 
+# sort groups by size
 divvy = sorted(count.items(), key=lambda y:y[1])
 divvy = filter(lambda y:y[1] > THRESHOLD, divvy)
 
@@ -82,7 +99,7 @@ for partition_id, n_reads in divvy:
     if total > MAX_SIZE:
         for partition_id in group:
             group_d[partition_id] = group_n
-            print 'group_d', partition_id, group_n
+            #print 'group_d', partition_id, group_n
 
         group_n += 1
         group = set()
@@ -91,7 +108,7 @@ for partition_id, n_reads in divvy:
 if group:
     for partition_id in group:
         group_d[partition_id] = group_n
-        print 'group_d', partition_id, group_n
+        #print 'group_d', partition_id, group_n
     group_n += 1
 
 
@@ -100,31 +117,24 @@ print '%d groups' % group_n
 ## open a bunch of output files for the different groups
 group_fps = {}
 for n in range(group_n):
-    fp = open('%s.group%d.fa' % (prefix, n), 'w')
+    fp = open('%s.group%04d.fa' % (prefix, n), 'w')
     group_fps[n] = fp
 
-if surrendered_exist:
-    surrendered_fp = open('%s.surrender.fa' % prefix, 'w')
-
 ## write 'em all out!
-fp = open(filename)
-for n, x in enumerate(read_partition_file(fp)):
+    
+for n, name, partition_id, seq in read_partition_file(filename):
     if n % 100000 == 0:
-        print '...x3', n
+        print '...x2', n
 
-    name, partition_id, surrendered, seq = x
     if partition_id == 0:
         continue
     
-    if surrendered:
-        surrender_ch = '*'
-        outfp = surrendered_fp
-    else:
-        surrender_ch = ' '
-        try:
-            group_n = group_d[partition_id]
-        except KeyError:
-            continue
-        outfp = group_fps[group_n]
+    try:
+        group_n = group_d[partition_id]
+    except KeyError:
+        assert count[partition_id] <= THRESHOLD
+        continue
+    
+    outfp = group_fps[group_n]
 
-    outfp.write('>%s\t%s%s\n%s\n' % (name, partition_id, surrender_ch, seq))
+    outfp.write('>%s\t%s\n%s\n' % (name, partition_id, seq))

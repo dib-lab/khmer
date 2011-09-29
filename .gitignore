@@ -22,3 +22,13 @@ lib/zlib-1.2.3/libz.so.1
 lib/zlib-1.2.3/libz.so.1.2.3
 lib/zlib-1.2.3/minigzip
 lib/zlib-1.2.3/Makefile
+lib/zlib-1.2.3/libz.1.2.3.dylib
+lib/zlib-1.2.3/libz.1.dylib
+lib/zlib-1.2.3/libz.dylib
+tests/test-data/random-20-a.fa.part0test
+tests/test-data/random-20-a.fa.parttest
+tests/test-data/fakelump.fa.stopfoo
+tests/tagset
+tst
+tests/tempcountingsave1.ht.gz
+tests/tempcountingsave2.ht.gz

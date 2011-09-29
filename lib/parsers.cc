@@ -266,7 +266,7 @@ FastqParser::FastqParser(const std::string &inputfile) :
       getline(infile, quality_scores);
 
       assert(current_read.name[0] == '@');
-      assert(line_three[0] == '+');
+      assert(line_three[0] == '+' || line_three[0] == '#');
       assert(quality_scores.length() == current_read.seq.length());
    
       current_read.name = current_read.name.substr(1);
@@ -341,7 +341,7 @@ Read FastqParser::get_next_read()
       getline(infile, quality_scores);
    
       assert(current_read.name[0] == '@');
-      assert(line_three[0] == '+');
+      assert(line_three[0] == '+' || line_three[0] == '#');
       assert(quality_scores.length() == current_read.seq.length());
 
       current_read.name = current_read.name.substr(1);

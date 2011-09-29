@@ -4,43 +4,10 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
+// #define VALIDATE_PARTITIONS
+
 using namespace khmer;
 using namespace std;
-
-static void make_partitions_to_tags(PartitionMap& pmap,
-				    PartitionsToTagsMap& pttmap)
-{
-  SeenSet * sp;
-  HashIntoType tag;
-  PartitionID p;
-
-  for (PartitionMap::const_iterator pi = pmap.begin(); pi != pmap.end();
-       pi++) {
-    if (pi->second) {
-      tag = pi->first;
-      p = *(pi->second);
-
-      sp = pttmap[p];
-      if (sp == NULL) {
-	sp = new SeenSet();
-	pttmap[p] = sp;
-      }
-      sp->insert(tag);
-    }
-  }
-}
-
-static void del_partitions_to_tags(PartitionsToTagsMap& pttmap)
-{
-  for (PartitionsToTagsMap::iterator pt = pttmap.begin();
-       pt != pttmap.end(); pt++) {
-    SeenSet * sp = pt->second;
-    if (sp != NULL) {
-      delete sp;
-      pt->second = NULL;
-    }
-  }
-}
 
 #if 0
 
@@ -63,61 +30,6 @@ static void print_tag_set(SeenSet& p)
 }
 
 #endif //0
-
-static void get_new_tags_from_partitions(SeenSet& old_tags,
-					 SeenSet& new_tags,
-					 PartitionSet& new_partitions,
-					 PartitionsToTagsMap& pttm)
-{
-  for (PartitionSet::const_iterator psi = new_partitions.begin();
-       psi != new_partitions.end(); psi++) {
-    PartitionID p = *psi;
-    SeenSet * s = pttm[p];
-
-    for (SeenSet::const_iterator si = s->begin(); si != s->end(); si++) {
-      SeenSet::const_iterator test = old_tags.find(*si);
-      if (test == old_tags.end()) {
-	new_tags.insert(*si);
-      }
-    }
-  }
-}
-
-static void get_new_partitions_from_tags(PartitionSet& old_parts,
-					 PartitionSet& new_parts,
-					 SeenSet& new_tags,
-					 PartitionMap& pmap)
-{
-  for (SeenSet::const_iterator si = new_tags.begin(); si != new_tags.end();
-       si++) {
-    PartitionID * pp = pmap[*si];
-    if (pp != NULL) {
-      PartitionID p = *pp;
-
-      PartitionSet::const_iterator test = old_parts.find(p);
-      if (test == old_parts.end()) {
-	new_parts.insert(p);
-      }
-    }
-  }
-}
-
-static void transfer_tags(SeenSet& from, SeenSet& to)
-{
-  for (SeenSet::const_iterator si = from.begin(); si != from.end(); si++) {
-    to.insert(*si);
-  }
-  from.clear();
-}
-
-static void transfer_partitions(PartitionSet& from, PartitionSet& to)
-{
-  for (PartitionSet::const_iterator pi = from.begin(); pi != from.end();
-       pi++) {
-    to.insert(*pi);
-  }
-  from.clear();
-}
 
 void SubsetPartition::count_partitions(unsigned int& n_partitions,
 				       unsigned int& n_unassigned)
@@ -164,9 +76,9 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   string seq;
 
   std::string first_kmer;
-  HashIntoType kmer_f, kmer_r, kmer;
+  HashIntoType kmer = 0;
 
-  const unsigned char ksize = _ht->ksize();
+  const unsigned int ksize = _ht->ksize();
 
   //
   // go through all the reads, and take those with assigned partitions
@@ -182,43 +94,39 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
       bool found_tag = false;
       for (unsigned int i = 0; i < seq.length() - ksize + 1; i++) {
-	_hash(kmer_s + i, ksize, kmer_f, kmer_r);
-	kmer = uniqify_rc(kmer_f, kmer_r);
+	kmer = _hash(kmer_s + i, ksize);
 
-	// some partitioning schemes tag the first kmer_f; others label
-	// *some* kmer in the read.  Output properly for both.
-
-	if (_ht->all_tags.find(kmer_f) != _ht->all_tags.end()) {
-	  kmer = kmer_f;
-	  found_tag = true;
-	  break;
-	}
-	if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+	// is this a known tag?
+	if (set_contains(partition_map, kmer)) {
 	  found_tag = true;
 	  break;
 	}
       }
 
-      // @CTB this should be a WARNING, or OPTIONAL, not a FAILURE,
-      // because it is triggered if you do tagsize filtering.
-      // assert(found_tag);
+      // all sequences should have at least one tag in them.
+      // assert(found_tag);  @CTB currently breaks tests.  give fn flag to
+      // disable.
 
-      PartitionID * partition_p = partition_map[kmer];
-      PartitionID partition_id;
-      if (partition_p == NULL ){
-	partition_id = 0;
-	n_singletons++;
-      } else {
-	partition_id = *partition_p;
-	partitions.insert(partition_id);
+      PartitionID partition_id = 0;
+      if (found_tag) {
+	PartitionID * partition_p = partition_map[kmer];
+	if (partition_p == NULL ){
+	  partition_id = 0;
+	  n_singletons++;
+	} else {
+	  partition_id = *partition_p;
+	  partitions.insert(partition_id);
+	}
       }
 
-      // Is this a partition that has not been entirely explored? If so,
-      // mark it.
       if (partition_id > 0 || output_unassigned) {
 	outfile << ">" << read.name << "\t" << partition_id;
 	outfile << "\n" << seq << "\n";
       }
+#ifdef VALIDATE_PARTITIONS
+      std::cout << "checking: " << read.name << "\n";
+      assert(is_single_partition(seq));
+#endif // VALIDATE_PARTITIONS
 	       
       total_reads++;
 
@@ -243,52 +151,16 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
 ///
 
-bool SubsetPartition::_do_continue(const HashIntoType kmer,
-				   const SeenSet& keeper)
-{
-  // have we already seen me? don't count; exit.
-  SeenSet::iterator i = keeper.find(kmer);
-
-  return (i == keeper.end());
-}
-
-bool SubsetPartition::_is_tagged_kmer(const HashIntoType kmer_f,
-				      const HashIntoType kmer_r,
-				      HashIntoType& tagged_kmer)
-{
-  SeenSet * tags = &_ht->all_tags;
-  SeenSet::const_iterator fi = tags->find(kmer_f);
-  if (fi != tags->end()) {
-    tagged_kmer = kmer_f;
-    return true;
-  }
-
-  fi = tags->find(kmer_r);
-  if (fi != tags->end()) {
-    tagged_kmer = kmer_r;
-    return true;
-  }
-
-  return false;
-}
-		     
-
-// used by do_truncated_partition
+// find_all_tags: the core of the partitioning code.  finds all tagged k-mers
+//    connected to kmer_f/kmer_r in the graph.
 
 void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    HashIntoType kmer_r,
 				    SeenSet& tagged_kmers,
-				    bool do_initial_check)
+				    const SeenSet& all_tags,
+				    bool break_on_stop_tags)
 {
   const HashIntoType bitmask = _ht->bitmask;
-
-  HashIntoType tagged_kmer;
-  if (do_initial_check && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-    if (partition_map[kmer_f] != NULL) {
-      tagged_kmers.insert(tagged_kmer); // this might connect kmer_r and kmer_f
-      return;
-    }
-  }
 
   HashIntoType f, r;
   bool first = true;
@@ -310,10 +182,6 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
-    if (CONNECTED_THRESHOLD && tagged_kmers.size() > CONNECTED_THRESHOLD) {
-      break;
-    }
-
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
@@ -322,20 +190,27 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     breadth_q.pop();
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-    if (!_do_continue(kmer, keeper)) {
+
+    // Have we already seen this k-mer?  If so, skip.
+    if (set_contains(keeper, kmer)) {
+      continue;
+    }
+
+    // Do we want to traverse through this k-mer?  If not, skip.
+    if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
+      // @CTB optimize by inserting into keeper set?
       continue;
     }
 
     // keep track of seen kmers
     keeper.insert(kmer);
-    //    cout << "INSERT: " << _revhash(kmer, _ht->ksize()) << "=" << (int) (_ht->get_count(kmer)) << " xx " << kmer % _ht->n_entries() << " =\n";
     total++;
 
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
-    // Search no further in this direction.
-    if (!first && _is_tagged_kmer(kmer_f, kmer_r, tagged_kmer)) {
-      tagged_kmers.insert(tagged_kmer);
-      first = false;
+    // Search no further in this direction.  (This is where we connect
+    // partitions.)
+    if (!first && set_contains(all_tags, kmer)) {
+      tagged_kmers.insert(kmer);
       continue;
     }
 
@@ -348,68 +223,68 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     // Enqueue next set of nodes.
     //
 
-    // NEXT.
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
-    r = kmer_r >> 2 | (twobit_comp('A') << rc_left_shift);
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+    // NEXT
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
+    if (_ht->get_count(uniqify_rc(f,r)) &&
+	!set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('C');
-    r = kmer_r >> 2 | (twobit_comp('C') << rc_left_shift);
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('G');
-    r = kmer_r >> 2 | (twobit_comp('G') << rc_left_shift);
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    f = ((kmer_f << 2) & bitmask) | twobit_repr('T');
-    r = kmer_r >> 2 | (twobit_comp('T') << rc_left_shift);
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
     // PREVIOUS.
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('A');
-    f = kmer_f >> 2 | (twobit_repr('A') << rc_left_shift);
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('C');
-    f = kmer_f >> 2 | (twobit_repr('C') << rc_left_shift);
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
     
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('G');
-    f = kmer_f >> 2 | (twobit_repr('G') << rc_left_shift);
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
 
-    r = ((kmer_r << 2) & bitmask) | twobit_comp('T');
-    f = kmer_f >> 2 | (twobit_repr('T') << rc_left_shift);
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-	keeper.find(uniqify_rc(f,r)) == keeper.end()) {
+        !set_contains(keeper, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -422,13 +297,14 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
 void SubsetPartition::do_partition(HashIntoType first_kmer,
 				   HashIntoType last_kmer,
+				   bool break_on_stop_tags,
 				   CallbackFn callback,
 				   void * callback_data)
 {
   unsigned int total_reads = 0;
 
   std::string kmer_s;
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer_f, kmer_r, kmer;
   SeenSet tagged_kmers;
   const unsigned char ksize = _ht->ksize();
 
@@ -445,29 +321,19 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     end = _ht->all_tags.end();
   }
 
-  HashIntoType counters[65535];
-  for (unsigned int i = 0; i < 65535; i++) {
-    counters[i] = 0;
-  }
-
   for (; si != end; si++) {
     total_reads++;
 
     kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-    _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
     // find all tagged kmers within range.
     tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers, false);
-
-    HashIntoType cnt = tagged_kmers.size();
-    if (cnt >= 65535) { cnt = 65534; }
-    counters[cnt]++;
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+		  break_on_stop_tags);
 
     // assign the partition ID
-    if (CONNECTED_THRESHOLD == 0 || cnt <= CONNECTED_THRESHOLD) {
-      assign_partition_id(kmer_f, tagged_kmers);
-    }
+    assign_partition_id(kmer, tagged_kmers);
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -483,26 +349,20 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
 #endif // 0
       }
   }
-
-  for (unsigned int i = 0; i < 65535; i++) {
-    if (counters[i]) {
-      // cout << "N:" << i << " " << counters[i] << "\n";
-    }
-  }
 }
 
 //
 
 void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
 {
-  HashIntoType kmer_f, kmer_r;
+  HashIntoType kmer;
   assert(kmer_s.length() >= _ht->ksize());
-  _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+  kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
-  set_partition_id(kmer_f, p);
+  set_partition_id(kmer, p);
 }
 
-void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
+void SubsetPartition::set_partition_id(HashIntoType kmer, PartitionID p)
 {
   PartitionPtrSet * s = reverse_pmap[p];
   PartitionID * pp = NULL;
@@ -514,14 +374,14 @@ void SubsetPartition::set_partition_id(HashIntoType kmer_f, PartitionID p)
   } else {
     pp = *(s->begin());
   }
-  partition_map[kmer_f] = pp;
+  partition_map[kmer] = pp;
 
   if (next_partition_id <= p) {
     next_partition_id = p + 1;
   }
 }
 
-PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
+PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
 						 SeenSet& tagged_kmers)
 
 {
@@ -530,20 +390,30 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer_f,
 
   // did we find a tagged kmer?
   if (tagged_kmers.size() >= 1) {
-    pp = _reassign_partition_ids(tagged_kmers, kmer_f);
+    pp = _join_partitions_by_tags(tagged_kmers, kmer);
     return_val = *pp;
   } else {
-    partition_map[kmer_f] = NULL;
+    PartitionMap::iterator pi = partition_map.find(kmer);
+    if (pi != partition_map.end()) {
+      assert(pi->second == NULL); // if it's not... reverse_pmap removal TBD.
+    }
+
+    partition_map.erase(kmer);
     return_val = 0;
   }
 
   return return_val;
 }
 
-PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
-						     const HashIntoType kmer_f)
+// _join_partitions_by_tags combines the tags in 'tagged_kmers' into a single
+// partition, creating or reassigning partitions as necessary.  Low level
+// function!
+
+PartitionID * SubsetPartition::_join_partitions_by_tags(
+                   const SeenSet& tagged_kmers,
+		   const HashIntoType kmer)
 {
-  SeenSet::iterator it = tagged_kmers.begin();
+  SeenSet::const_iterator it = tagged_kmers.begin();
   unsigned int * this_partition_p = NULL;
 
   // find first assigned partition ID in tagged set
@@ -555,7 +425,7 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
     it++;
   }
 
-  // none? allocate!
+  // no partition ID? allocate new!
   if (this_partition_p == NULL) {
     this_partition_p = new PartitionID(next_partition_id);
     next_partition_id++;
@@ -565,68 +435,62 @@ PartitionID * SubsetPartition::_reassign_partition_ids(SeenSet& tagged_kmers,
     reverse_pmap[*this_partition_p] = s;
   }
   
+  // reassign all partitions individually.
   it = tagged_kmers.begin();
   for (; it != tagged_kmers.end(); ++it) {
-    PartitionID * pp_id = partition_map[*it];
-    if (pp_id == NULL) {
+    PartitionMap::iterator pi = partition_map.find(*it);
+
+    if (pi == partition_map.end()) { // no entry? insert.
       partition_map[*it] = this_partition_p;
     } else {
-      if (*pp_id != *this_partition_p) { // join partitions
-	_add_partition_ptr(this_partition_p, pp_id);
+      PartitionID * pp_id = pi->second;
+
+      if (pp_id == NULL) {	// entry is null? set;
+	pi->second = this_partition_p;
+      } else if (*pp_id != *this_partition_p) { // != entry? join partitions.
+	_merge_two_partitions(this_partition_p, pp_id);
       }
     }
   }
 
   assert(this_partition_p != NULL);
-  partition_map[kmer_f] = this_partition_p;
+  partition_map[kmer] = this_partition_p;
 
   return this_partition_p;
 }
 
-///
+// _merge_two_partitions merges the 'merge_pp' partition into the
+// 'the_pp' partition.  It does this by joining the reverse pointer
+// map structures for two partitions and resetting each partition
+// pointer individually.
 
-void SubsetPartition::_add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp)
+PartitionID * SubsetPartition::_merge_two_partitions(PartitionID *the_pp,
+						     PartitionID *merge_pp)
 {
-  PartitionPtrSet * s = reverse_pmap[*orig_pp];
-  PartitionPtrSet * t = reverse_pmap[*new_pp];
-  reverse_pmap.erase(*new_pp);
+  PartitionPtrSet * s = reverse_pmap[*the_pp];
+  PartitionPtrSet * t = reverse_pmap[*merge_pp];
 
-  for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
-    PartitionID * iter_pp;
-    iter_pp = *pi;
-
-    *iter_pp = *orig_pp;
-    s->insert(iter_pp);
-  }
-  delete t;
-}
-
-PartitionID * SubsetPartition::_add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp)
-{
-  PartitionPtrSet * s = reverse_pmap[*orig_pp];
-  PartitionPtrSet * t = reverse_pmap[*new_pp];
-
+  // Choose the smaller of two sets to loop over.
   if (s->size() < t->size()) {
     PartitionPtrSet * tmp = s;  s = t; t = tmp;
-    PartitionID * tmp2 = orig_pp; orig_pp = new_pp; new_pp = tmp2;
+    PartitionID * tmp2 = the_pp; the_pp = merge_pp; merge_pp = tmp2;
   }
 
-  reverse_pmap.erase(*new_pp);
+  // Get rid of the reverse pointer for the old partition.
+  reverse_pmap.erase(*merge_pp);
 
+  // Merge all of the elements in the to-be-replaced PartitionPtrSet
+  // into the merged partition.
   for (PartitionPtrSet::iterator pi = t->begin(); pi != t->end(); pi++) {
     PartitionID * iter_pp;
     iter_pp = *pi;
 
-    *iter_pp = *orig_pp;
+    *iter_pp = *the_pp;	// reset the partition ID to the new one.
     s->insert(iter_pp);
   }
   delete t;
 
-  if (s->size() == 100 || s->size() % 10000 == 0) {
-    cout << "Big un: " << *orig_pp << "; size " << s->size() << "\n";
-  }
-
-  return orig_pp;
+  return the_pp;
 }
 
 PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
@@ -644,7 +508,7 @@ PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
   PartitionID * orig_pp = *(reverse_pmap[orig]->begin());
   PartitionID * join_pp = *(reverse_pmap[join]->begin());
 
-  _add_partition_ptr(orig_pp, join_pp);
+  _merge_two_partitions(orig_pp, join_pp);
 
   return orig;
 }
@@ -658,10 +522,10 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
   return get_partition_id(kmer);
 }
 
-PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
+PartitionID SubsetPartition::get_partition_id(HashIntoType kmer)
 {
-  if (partition_map.find(kmer_f) != partition_map.end()) {
-    PartitionID * pp = partition_map[kmer_f];
+  if (partition_map.find(kmer) != partition_map.end()) {
+    PartitionID * pp = partition_map[kmer];
     if (pp == NULL) {
       return 0;
     }
@@ -672,198 +536,74 @@ PartitionID SubsetPartition::get_partition_id(HashIntoType kmer_f)
 
 void SubsetPartition::merge(SubsetPartition * other)
 {
-  assert (this != other);
+  if (this == other) { return; }
 
-  PartitionsToTagsMap subset_pttm, master_pttm;
-  PartitionID * pp;
-  PartitionID p;
+  PartitionPtrMap other_to_this;
 
-  //
-  // Convert the partition maps into something where we can do reverse
-  // lookups of what tags belong to a given partition.
-  //
-
-  make_partitions_to_tags(other->partition_map, subset_pttm);
-  make_partitions_to_tags(this->partition_map, master_pttm);
-
-  // Run through all of the unique partitions in 'other' and find the
-  // transitive overlaps with sets in 'this'.
-
-  for (PartitionsToTagsMap::iterator ptti = subset_pttm.begin();
-       ptti != subset_pttm.end(); ptti++) {
-    p = ptti->first;
-    SeenSet * these_tags = ptti->second;
-
-    if (these_tags == NULL) {	// We NULL the values as we deal with parts.
-      continue;
-    }
-
-    // OK, this partition has not yet been transferred.  DEAL.
-
-    //
-    // Here, we want to get all of the partitions connected to this
-    // one in the master map and the subset map -- and do
-    // transitively.  Loop until no more additional tags/partitions are found.
-    //
-
-    SeenSet old_tags;
-    SeenSet new_tags;
-
-    PartitionSet old_subset_partitions, new_subset_partitions;
-    PartitionSet old_master_partitions, new_master_partitions;
-
-    old_subset_partitions.insert(p);
-    transfer_tags(*these_tags, new_tags);
-
-    while(new_tags.size()) {
-      // first, get partitions (and then tags) for partitions in the *master*
-      // that overlap with any of the tags in this subset partition.
-      get_new_partitions_from_tags(old_master_partitions,
-				   new_master_partitions,
-				   new_tags,
-				   this->partition_map);
-      transfer_tags(new_tags, old_tags);
-      get_new_tags_from_partitions(old_tags, new_tags,
-				   new_master_partitions, master_pttm);
-      transfer_partitions(new_master_partitions, old_master_partitions);
-
-      // ok, now get partitions (and then tags) for partitions in *subset*
-      // that overlap with any of the tags from the master.
-
-      get_new_partitions_from_tags(old_subset_partitions,
-				   new_subset_partitions,
-				   new_tags,
-				   other->partition_map);
-      transfer_tags(new_tags, old_tags);
-      get_new_tags_from_partitions(old_tags, new_tags,
-				   new_subset_partitions, subset_pttm);
-      transfer_partitions(new_subset_partitions, old_subset_partitions);
-
-      // aaaaaand.... iterate until no more tags show up!
-    }
-
-    // Deal with merging incompletely traversed sets...
-
-    // All right!  We've now got all the tags that we want to be part of
-    // the master map partition; create or merge.
-
-    PartitionPtrSet * pp_set = NULL;
-
-    // No overlapping master partitions?  Create new.
-    if (old_master_partitions.size() == 0) {
-      pp = this->get_new_partition();
-	
-      pp_set = new PartitionPtrSet();
-      pp_set->insert(pp);
-      this->reverse_pmap[*pp] = pp_set;
-    } else {
-      PartitionSet::iterator psi = old_master_partitions.begin();
-      pp_set = this->reverse_pmap[*psi];
-
-      assert(pp_set != NULL);
-      pp = *(pp_set->begin());
-    }
-
-    // Remove all of the SeenSets in the subset_pttm map for these
-    // now-connected partitions.  (Also see NULL check at beginning of loop.)
-    for (PartitionSet::iterator psi2 = old_subset_partitions.begin();
-	 psi2 != old_subset_partitions.end(); psi2++) {
-      SeenSet * sp = subset_pttm[*psi2];
-      if (sp != NULL) {
-	subset_pttm[*psi2] = NULL;
-	delete sp;
-      }
-    }
-
-    // Remap all of the tags in the master map. This has the side
-    // benefit of condensing pretty much everything into a single
-    // pointer...
-
-    PartitionPtrSet remove_me;
-    for (SeenSet::iterator si = old_tags.begin(); si != old_tags.end(); si++) {
-      PartitionID * old_pp = this->partition_map[*si];
-
-      if (old_pp == NULL) {	// no previously assigned partition? assign!
-	this->partition_map[*si] = pp;
-      } else if (old_pp != pp) { // Overwrite, but keep track of those to free.
-	remove_me.insert(old_pp);
-	this->partition_map[*si] = pp;
-
-	// Note: even though there may be multiple PartitionID*s for
-	// this partition that need reassigning, we don't need to
-	// handle that in this loop; we're doing this systematically (and
-	// the 'remove_me' set will clear out with duplicates).
-      }
-    }
-
-    // Condense & reset the reverse_pmap for *this* entry, too.  These
-    // PartitionID*s will have been added to 'remove_me' in the previous loop
-    // already.
-    if (this->reverse_pmap[*pp]->size() > 1) {
-      pp_set = new PartitionPtrSet();
-      pp_set->insert(pp);
-      this->reverse_pmap[*pp] = pp_set;
-    }
-
-    // Finally: remove contents of remove_me & associated (obsolete)
-    // reverse_pmap entries.
-    for (PartitionPtrSet::iterator si = remove_me.begin();
-	 si != remove_me.end(); si++) {
-      PartitionID p = *(*si);
-
-      pp_set = this->reverse_pmap[p];
-      if (pp_set) {
-	delete pp_set;
-	this->reverse_pmap.erase(p);
-      }
-      delete *si;
-    }
-  }
-
-  // OK, clean up the reverse maps.
-
-  del_partitions_to_tags(subset_pttm);
-  del_partitions_to_tags(master_pttm);
-}
-
-
-void SubsetPartition::_merge_from_disk_consolidate(PartitionPtrMap& diskp_to_pp)
-{
-  for (PartitionPtrMap::iterator pp = diskp_to_pp.begin();
-       pp != diskp_to_pp.end(); pp++) {
-    PartitionPtrSet * s = reverse_pmap[*(pp->second)];
-    if (s->size() > 1) {
-      pp->second = *(s->begin());
-    }
-  }
-
-  for (PartitionMap::iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
+  PartitionMap::const_iterator pi = other->partition_map.begin();
+  for (; pi != other->partition_map.end(); pi++) {
     if (pi->second) {
-      PartitionPtrSet * s = reverse_pmap[*(pi->second)];
-      if (s->size() > 1) {
-	pi->second = *(s->begin());
-      }
-    }
-  }
-
-  return;
-
-  for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
-       ri != reverse_pmap.end(); ri++) {
-    PartitionPtrSet * s = ri->second;
-    if (s->size() > 1) {
-      PartitionPtrSet::iterator si = s->begin();
-      si++;
-
-      while(si != s->end()) { free(*si); si++; }
-      
-      si = s->begin();
-      si++;
-      s->erase(si, s->end());
+      _merge_other(pi->first, *(pi->second), other_to_this);
     }
   }
 }
+
+// Merge PartitionIDs from another SubsetPartition, based on overlapping
+// tags.  Utility function for merge() and merge_from_disk().
+
+void SubsetPartition::_merge_other(HashIntoType tag,
+				   PartitionID other_partition,
+				   PartitionPtrMap& diskp_to_pp)
+{
+  if (set_contains(_ht->stop_tags, tag)) { // don't merge if it's a stop_tag
+    return;
+  }
+
+  // OK.  Does our current partitionmap have this?
+  PartitionID * pp_0;
+  pp_0 = partition_map[tag];
+
+  if (pp_0 == NULL) {	// No!  OK, map to new 'un.
+    PartitionID * existing_pp_0 = diskp_to_pp[other_partition];
+
+    if (existing_pp_0) {	// already seen this other_partition
+      partition_map[tag] = existing_pp_0;
+    }
+    else {			// new other_partition! create a new partition.
+      pp_0 = get_new_partition();
+
+      PartitionPtrSet * pp_set = new PartitionPtrSet();
+      pp_set->insert(pp_0);
+      reverse_pmap[*pp_0] = pp_set;
+      partition_map[tag] = pp_0;
+
+      diskp_to_pp[other_partition] = pp_0;
+    }
+  }
+  else {			// yes, we've seen this tag before...
+    PartitionID * existing_pp_0 = diskp_to_pp[other_partition];
+
+    if (existing_pp_0) {	// mapping exists.  copacetic?
+      if (*pp_0 == *existing_pp_0) {
+	;			// yep! nothing to do, yay!
+      } else {
+	// remapping must be done... we need to merge!
+	// the two partitions to merge are *pp_0 and *existing_pp_0.
+	// we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
+
+	pp_0 = _merge_two_partitions(pp_0, existing_pp_0);
+	diskp_to_pp[other_partition] = pp_0;
+      }
+    }
+    else {
+      // no, does not exist in our mapping yet.  but that's ok,
+      // we can fix that.
+      diskp_to_pp[other_partition] = pp_0;
+    }
+  }
+}
+
+// Merge an on-disk SubsetPartition into this one.
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
@@ -897,9 +637,6 @@ void SubsetPartition::merge_from_disk(string other_filename)
     remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
     n_bytes -= remainder;
 
-    //    cout << "Read " << n_bytes + remainder << " (" << iteration << ")\n";
-    // cout << other_filename << "; mapping: " << diskp_to_pp.size()
-    //	 << "; partitions: " << reverse_pmap.size() << "\n";
     iteration++;
 
     for (i = 0; i < n_bytes;) {
@@ -910,53 +647,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
       assert(*diskp != 0);		// sanity check.
 
-      // @@ partitions.insert(*pp);
-
-      // OK.  Does our current partitionmap have this?
-      PartitionID * pp_0;
-      pp_0 = partition_map[*kmer_p];
-
-      if (pp_0 == NULL) {	// No!  OK, map to new 'un.
-	PartitionID * existing_pp_0 = diskp_to_pp[*diskp];
-
-	if (existing_pp_0) {	// already seen this *diskp
-	  // cout << "This diskp already seen -- " << *diskp << " to " << *existing_pp_0 << "\n";
-	  partition_map[*kmer_p] = existing_pp_0;
-	}
-	else {			// new *diskp! create a new partition.
-	  pp_0 = get_new_partition();
-
-	  PartitionPtrSet * pp_set = new PartitionPtrSet();
-	  pp_set->insert(pp_0);
-	  reverse_pmap[*pp_0] = pp_set;
-	  partition_map[*kmer_p] = pp_0;
-
-	  diskp_to_pp[*diskp] = pp_0;
-	  // cout << "New partition! " << *diskp << " mapped to " << *pp_0 << "\n";
-	}
-      }
-      else {			// yes, we've seen this tag before...
-	PartitionID * existing_pp_0 = diskp_to_pp[*diskp];
-
-	if (existing_pp_0) {	// mapping exists.  copacetic?
-	  if (*pp_0 == *existing_pp_0) {
-	    ;			// yep! nothing to do, yay!
-	  } else {
-	    // remapping must be done... we need to merge!
-	    // the two partitions to merge are *pp_0 and *existing_pp_0.
-	    // we also need to reset existing_pp_0 in diskp_to_pp to pp_0.
-	    //	    cout << "Remapping/merging: " << *existing_pp_0 << "=>" << *pp_0 << "\n";
-	    pp_0 = _add_partition_ptr2(pp_0, existing_pp_0);
-	    diskp_to_pp[*diskp] = pp_0;
-	  }
-	}
-	else {
-	  // no, does not exist in our mapping yet.  but that's ok,
-	  // we can fix that.
-	  // cout << "First time/existing mapping: " << *diskp << "->" << *pp_0 << "\n";
-	  diskp_to_pp[*diskp] = pp_0;
-	}
-      }
+      _merge_other(*kmer_p, *diskp, diskp_to_pp);
 
       loaded++;
     }
@@ -967,7 +658,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
   }
 }
 
-// load partition maps from & save to disk 
+// Save a partition map to disk.
 
 void SubsetPartition::save_partitionmap(string pmap_filename)
 {
@@ -1014,9 +705,12 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
 
   delete buf;
 }
+
+// Load a partition map from disk.
 					 
 void SubsetPartition::load_partitionmap(string infilename)
 {
+  // @CTB make sure this is an empty partition...?
   merge_from_disk(infilename);
 }
 
@@ -1051,7 +745,9 @@ void SubsetPartition::_validate_pmap()
   }
 }
 
-void SubsetPartition::_clear_partitions()
+// Get rid of all partitions & partition information.
+
+void SubsetPartition::_clear_all_partitions()
 {
   for (ReversePartitionMap::iterator ri = reverse_pmap.begin();
        ri != reverse_pmap.end(); ri++) {
@@ -1067,62 +763,272 @@ void SubsetPartition::_clear_partitions()
   next_partition_id = 1;
 }
 
-//
-// maxify_partition_size -- build a PartitionCountMap (tracking the number
-//   of tags included in each partition, by tag) and then check to see if
-//   this particular subset has a larger partition size for that tag then
-//   indicated in the TagCountMap.  Used to find the maximum included
-//   partition size for a tag across multiple subsets.
-//
 
-void SubsetPartition::maxify_partition_size(TagCountMap& tag_map)
+bool SubsetPartition::is_single_partition(std::string seq)
 {
-  PartitionCountMap partition_count;
-
-  // Run through and count the number of tags in each partition.
-  for (PartitionMap::const_iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    PartitionID * pp = pi->second;
-    if (pp) {
-      partition_count[*pp]++;
-    }
+  if (!_ht->check_read(seq)) {
+    return 0;
   }
 
-  // Now, for each tag, see if the partition it belongs to for this
-  // subset is bigger than for any other subset; if so, set the TagCountMap
-  // to the new partition size.
-  for (PartitionMap::const_iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    PartitionID * pp = pi->second;
-    if (pp) {    
-      if (tag_map[pi->first] < partition_count[*pp]) {
-	tag_map[pi->first] = partition_count[*pp];
+  HashIntoType kmer;
+
+  PartitionSet partitions;
+  PartitionID *pp;
+
+  KMerIterator kmers(seq.c_str(), _ht->ksize());
+  while (!kmers.done()) {
+    kmer = kmers.next();
+
+    if (partition_map.find(kmer) != partition_map.end()) {
+      pp = partition_map[kmer];
+      if (pp) {
+	partitions.insert(*pp);
       }
     }
   }
-}
 
-//
-// filter_against_tags - throw out elements of the partition map not present
-//   in the TagCountMap.  Used to throw out tags belonging to small partitions.
-//
+  if (partitions.size() > 1) { return false; }
 
-void SubsetPartition::filter_against_tags(TagCountMap& tag_map)
+  return true;
+} 
+
+void SubsetPartition::join_partitions_by_path(std::string seq)
 {
-  PartitionMap new_pmap;
+  SeenSet tagged_kmers;
+  HashIntoType kmer;
 
-  // Run through the TagCountMap and transfer only those tags in it
-  // into the new partition map.
-  for (TagCountMap::const_iterator ti = tag_map.begin(); ti != tag_map.end();
-       ti++) {
-    if (partition_map.find(ti->first) != partition_map.end()) {
-      new_pmap[ti->first] = partition_map[ti->first];
+  KMerIterator kmers(seq.c_str(), _ht->ksize());
+
+  while(!kmers.done()) {
+    kmer = kmers.next();
+    if (_ht->all_tags.find(kmer) != _ht->all_tags.end()) {
+      tagged_kmers.insert(kmer);
     }
   }
 
-  cout << "OLD partition map size: " << partition_map.size() << "\n";
-  cout << "NEW partition map size: " << new_pmap.size() << "\n";
+  // assert(tagged_kmers.size());
+  assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
+}
 
-  partition_map.swap(new_pmap);
-  new_pmap.clear();
+void SubsetPartition::partition_size_distribution(PartitionCountDistribution &d,
+						  unsigned int& n_unassigned)
+const
+{
+  PartitionCountMap cm;
+  n_unassigned = 0;
+
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      cm[*(pi->second)]++;
+    } else {
+      n_unassigned++;
+    }
+  }
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    d[cmi->second]++;
+  }
+}
+
+unsigned int SubsetPartition::repartition_largest_partition(unsigned int distance,
+						    unsigned int threshold,
+						    unsigned int frequency,
+						    CountingHash &counting)
+{
+  PartitionCountMap cm;
+  unsigned int n_unassigned = 0;
+  PartitionID biggest_p = 0;
+  unsigned int next_largest = 0;
+
+#if VERBOSE_REPARTITION
+  std::cout << "calculating partition size distribution.\n";
+#endif // 0
+
+  // first, count the number of members in each partition.
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      cm[*(pi->second)]++;
+    } else {
+      n_unassigned++;
+    }
+  }
+
+  // then, build the distribution.
+  PartitionCountDistribution d;
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    d[cmi->second]++;
+  }
+
+  // find biggest.
+  PartitionCountDistribution::const_iterator di = d.end();
+  di--;
+
+  assert(d.size());
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    if (cmi->second == di->first) {
+      biggest_p = cmi->first;	// find PID of largest partition
+    }
+  }
+  assert(biggest_p != 0);
+
+#if VERBOSE_REPARTITION
+  std::cout << "biggest partition: " << di->first << "\n";
+#endif // 0
+  di--;
+
+#if VERBOSE_REPARTITION
+  std::cout << "biggest partition ID: " << biggest_p << "\n";
+#endif // 0
+
+  next_largest = di->first;
+
+#if VERBOSE_REPARTITION
+  std::cout << "next biggest partition: " << di->first << "\n";
+#endif // 0
+
+  ///
+
+  SeenSet bigtags;
+  _clear_partition(biggest_p, bigtags);
+#if VERBOSE_REPARTITION
+  std::cout << "gathered/cleared " << bigtags.size() << " tags.\n";
+#endif // 0
+
+  /// Now, go through and traverse from all the bigtags, tracking
+  // those that lead to well-connected sets.
+
+  unsigned int i = 0;
+  unsigned int n = 0;
+  unsigned int count;
+  unsigned int n_big = 0;
+  SeenSet keeper;
+
+  SeenSet::const_iterator si = bigtags.begin();
+
+  for (; si != bigtags.end(); si++, i++) {
+    n++;
+
+#if 1
+    if (set_contains(_ht->repart_small_tags, *si)) {
+      continue;
+    }
+#endif //0
+
+    count = _ht->traverse_from_kmer(*si, distance, keeper);
+
+    if (count >= threshold) {
+      n_big++;
+	
+      SeenSet::const_iterator ti;
+      for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+	if (counting.get_count(*ti) > frequency) {
+	  _ht->stop_tags.insert(*ti);
+	} else {
+	  counting.count(*ti);
+	}
+      }
+#if VERBOSE_REPARTITION
+      std::cout << "traversed from " << n << " tags total, of " 
+	        << bigtags.size() << "; "
+		<< n_big << " big; size is " << keeper.size()
+		<< "; " << _ht->repart_small_tags.size() << " small\n";
+#endif // 0
+    } else {
+#if 1
+      _ht->repart_small_tags.insert(*si);
+#endif //0
+    }
+    keeper.clear();
+
+    if (n % 1000 == 0) {
+#if VERBOSE_REPARTITION
+      std::cout << "found big 'un!  traversed " << n << " tags, " << n_big << " big; " <<
+	bigtags.size() << " total tags; " << _ht->stop_tags.size() 
+		<< " stop tags\n";
+#endif // 0
+    }
+  }
+
+  // return next_largest;
+#if VERBOSE_REPARTITION
+  std::cout << "repartitioning...\n";
+#endif // 0
+  repartition_a_partition(bigtags);
+
+  // 
+
+  return next_largest;
+}
+
+void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
+{
+  SeenSet tagged_kmers;
+  std::string kmer_s;
+  HashIntoType kmer_f, kmer_r, kmer;
+  unsigned int ksize = _ht->ksize();
+
+  SeenSet::const_iterator si;
+
+  unsigned n = 0;
+  for (si = partition_tags.begin(); si != partition_tags.end(); si++, n++) {
+    if (n % 1000 == 0) {
+#if VERBOSE_REPARTITION
+      std::cout << "repartitioning... on " << n << " of " << partition_tags.size() << "\n";
+#endif // 0
+    }
+
+    kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
+    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+
+    tagged_kmers.clear();
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags, true);
+
+    // only join things already in bigtags.
+    for (SeenSet::iterator ssi = tagged_kmers.begin();
+	 ssi != tagged_kmers.end(); ssi++) {
+      if (!set_contains(partition_tags, *ssi)) {
+	tagged_kmers.erase(ssi);
+      }
+    }
+    // std::cout << "joining: " << tagged_kmers.size() << "\n";
+    assign_partition_id(kmer, tagged_kmers);
+  }
+}
+
+// _clear_partition: given a partition ID, identifies all tags that belong
+//    to that partition & (a) clears their PID, and (b) adds them to
+//    the SeenSet partition_tags.  partition_tags is cleared first.
+
+void SubsetPartition::_clear_partition(PartitionID the_partition,
+				       SeenSet& partition_tags)
+{
+  partition_tags.clear();
+
+  for (PartitionMap::iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second && *(pi->second) == the_partition) {
+      partition_tags.insert(pi->first);
+    }
+  }
+
+  for (SeenSet::const_iterator si = partition_tags.begin();
+       si != partition_tags.end(); si++) {
+    partition_map.erase(*si);
+  }
+
+  // clear out the reverse partition mapping, too.
+  PartitionPtrSet * ps = reverse_pmap[the_partition];
+  for (PartitionPtrSet::iterator psi = ps->begin(); psi != ps->end(); psi++) {
+    delete *psi;
+  }
+  delete ps;
+
+  reverse_pmap.erase(the_partition);
 }

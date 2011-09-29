@@ -1,88 +1,58 @@
 import khmer
 import sys
 import screed
-import threading, Queue
+import os.path
+from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
-K = 14
-HASHTABLE_SIZE=int(1e9)
-THRESHOLD=100
+K = 32
+HASHTABLE_SIZE=int(4e9)
+THRESHOLD=500
+N_HT=4
+WORKER_THREADS=5
+
+###
 
 GROUPSIZE=100
-WORKER_THREADS=4
 
-def process(inq, outq, ht):
-    global worker_count
-    
-    while not done or not inq.empty():
-        try:
-            recordlist = inq.get(True, 1)
-        except Queue.Empty:
-            continue
-
-        x = []
-        for record in recordlist:
-            kmer = record['sequence'][:K]
-            size = ht.calc_connected_graph_size(kmer, THRESHOLD)
-            if size >= THRESHOLD:
-                x.append(record)
-
-        outq.put(x)
-
-    worker_count -= 1
-
-def write(outq, outfp):
-    global worker_count
-    while worker_count > 0 or not outq.empty():
-        try:
-            recordlist = outq.get(True, 1)
-        except Queue.Empty:
-            continue
-
-        for record in recordlist:
-            outfp.write('>%s\n%s\n' % (record['name'], record['sequence']))
+###
 
 def main():
-    global done, worker_count
-    done = False
-    worker_count = 0
-    
     infile = sys.argv[1]
-    outfile = infile + '.graphsize'
+    outfile = os.path.basename(infile) + '.graphsize'
+    if len(sys.argv) == 3:
+        outfile = sys.argv[2]
+
+    print 'input file to graphsize filter: %s' % infile
+    print 'filtering to output:', outfile
+    print '-- settings:'
+    print 'K', K
+    print 'HASHTABLE SIZE %g' % HASHTABLE_SIZE
+    print 'N HASHTABLES %d' % N_HT
+    print 'THRESHOLD', THRESHOLD
+    print 'N THREADS', WORKER_THREADS
+    print '--'
 
     print 'creating ht'
-    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
+    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
     print 'eating fa', infile
     total_reads, n_consumed = ht.consume_fasta(infile)
     outfp = open(outfile, 'w')
 
-    inqueue = Queue.Queue(50)
-    outqueue = Queue.Queue(50)
+    ###
+    
+    def process_fn(record, ht=ht):
+        kmer = record['sequence'][:K]
+        size = ht.calc_connected_graph_size(kmer, THRESHOLD)
+        if size >= THRESHOLD:
+            return record['name'], record['sequence']
 
-    ## worker and writer threads
-    for i in range(WORKER_THREADS):
-        t = threading.Thread(target=process, args=(inqueue, outqueue, ht))
-        worker_count += 1
-        t.start()
+        return None, None
 
-    threading.Thread(target=write, args=(outqueue, outfp)).start()
+    tsp = ThreadedSequenceProcessor(process_fn, WORKER_THREADS, GROUPSIZE)
 
-    ### main thread
-    x = []
-    i = 0
-    for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
-        if n % 10000 == 0:
-            print '...', n
+    ###
 
-        x.append(record)
-        i += 1
-
-        if i > GROUPSIZE:
-            inqueue.put(x)
-            x = []
-            i = 0
-    inqueue.put(x)
-
-    done = True
+    tsp.start(verbose_fasta_iter(infile), outfp)
 
 if __name__ == '__main__':
     main()

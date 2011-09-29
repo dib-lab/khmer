@@ -3,6 +3,7 @@ thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
 import khmer
+import screed
 
 class Test_RandomData(object):
     def test_3_merge_013(self):
@@ -12,15 +13,10 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
-
-        (a, b, _, _, c) = ht.divide_tags_into_subsets(1)
+        (a, b, c) = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(a, a)
         ht.merge_subset(x)
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
         
         y = ht.do_subset_partition(b, 0)
         ht.merge_subset(y)
@@ -35,17 +31,12 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 3, total_reads
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
-
-        (a, b, _, _, c) = ht.divide_tags_into_subsets(1)
+        (a, b, c) = ht.divide_tags_into_subsets(1)
         
-        x = ht.do_subset_partition(a, b)
+        x = ht.do_subset_partition(b, c)
         ht.merge_subset(x)
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 2, n_partitions        # all singular
 
-        y = ht.do_subset_partition(b, c)
+        y = ht.do_subset_partition(a, b)
         ht.merge_subset(y)
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
@@ -58,15 +49,10 @@ class Test_RandomData(object):
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
         assert total_reads == 6, total_reads
         
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == total_reads, n_partitions # all singular
-
         divvy = ht.divide_tags_into_subsets(1)
         
         x = ht.do_subset_partition(divvy[0], divvy[4])
         ht.merge_subset(x)
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 2, n_partitions
 
         y = ht.do_subset_partition(divvy[4], 0)
         ht.merge_subset(y)
@@ -197,10 +183,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
-        (a, _, b, _, c) = divvy
-        
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
+        (a, b, c) = divvy
         
         x = ht.do_subset_partition(a, b)
         ht.save_subset_partitionmap(x, 'x.pmap')
@@ -254,10 +237,7 @@ class Test_SaveLoadPmap(object):
 
         divvy = ht.divide_tags_into_subsets(1)
         print divvy
-        (a, _, b, _, c) = divvy
-        
-        n_partitions = ht.output_partitions(filename, filename + '.out')
-        assert n_partitions == 3, n_partitions        # all singular
+        (a, b, c) = divvy
         
         x = ht.do_subset_partition(a, b)
         ht.save_subset_partitionmap(x, 'x.pmap')
@@ -295,3 +275,91 @@ class Test_SaveLoadPmap(object):
         
         n_partitions = ht.output_partitions(filename, filename + '.out')
         assert n_partitions == 1, n_partitions        # combined.
+
+def test_output_partitions():
+    filename = os.path.join(thisdir, 'test-data/test-output-partitions.fa')
+
+    ht = khmer.new_hashbits(10, 1, 1)
+    ht.set_partition_id('TTAGGACTGC', 2)
+    ht.set_partition_id('TGCGTTTCAA', 3)
+    ht.set_partition_id('ATACTGTAAA', 4)
+
+    try:
+        os.unlink(filename + '.part')
+    except OSError:
+        pass
+    assert not os.path.exists(filename + '.part')
+    ht.output_partitions(filename, filename + '.part')
+
+    data = open(filename + '.part').read()
+    assert len(data)
+
+    records = [ r for r in screed.open(filename + '.part') ]
+    names = [ r.name for r in records ]
+    parts = [ n.rsplit('\t', 1)[1] for n in names ]
+
+    assert parts[0] == '2'
+    assert parts[1] == '3'
+    assert parts[2] == '4'
+
+test_output_partitions.runme = True
+
+def test_tiny_real_partitions():
+    filename = os.path.join(thisdir, 'test-data/real-partition-tiny.fa')
+    
+    ht = khmer.new_hashbits(32, 8e7, 4)
+    ht.consume_fasta_and_tag(filename)
+    
+    subset = ht.do_subset_partition(0, 0)
+    ht.merge_subset(subset)
+
+    try:
+        os.unlink(filename + '.part')
+    except OSError:
+        pass
+    
+    assert not os.path.exists(filename + '.part')
+    ht.output_partitions(filename, filename + '.part')
+
+    data = open(filename + '.part').read()
+    assert len(data)
+    
+    records = [ r for r in screed.open(filename + '.part') ]
+    names = [ r.name for r in records ]
+    parts = [ n.rsplit('\t', 1)[1] for n in names ]
+
+    assert len(parts) == 2, len(parts)
+    assert len(set(parts)) == 1
+    assert set(parts) != set(['0'])
+
+test_tiny_real_partitions.runme = True
+
+def test_small_real_partitions():
+    filename = os.path.join(thisdir, 'test-data/real-partition-small.fa')
+    
+    ht = khmer.new_hashbits(32, 8e7, 4)
+    ht.consume_fasta_and_tag(filename)
+
+    subset = ht.do_subset_partition(0, 0)
+    ht.merge_subset(subset)
+
+    try:
+        os.unlink(filename + '.part')
+    except OSError:
+        pass
+    
+    assert not os.path.exists(filename + '.part')
+    ht.output_partitions(filename, filename + '.part')
+
+    data = open(filename + '.part').read()
+    assert len(data)
+    
+    records = [ r for r in screed.open(filename + '.part') ]
+    names = [ r.name for r in records ]
+    parts = [ n.rsplit('\t', 1)[1] for n in names ]
+
+    assert len(parts) == 6, len(parts)
+    assert len(set(parts)) == 1
+    assert set(parts) != set(['0'])
+
+test_small_real_partitions.runme = True

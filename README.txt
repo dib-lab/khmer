@@ -1,6 +1,11 @@
-Welcome to khmer, k-mer counting & filtering FTW!
+Welcome to khmer, k-mer counting, filtering and graph traversal FTW!
 
-NOTE:
+As of August 2011, there's a khmer mailing list at librelist.com that
+you can use to get help with khmer.  To sign up, just shoot
+'khmer@librelist.com' an e-mail and it will subscribe you; then send
+your question/comment there.
+
+IMPORTANT NOTE:
 
 khmer is *pre-publication* and *research* software, so please keep in
 mind that (a) the code may have undiscovered bugs in it, (b) you
@@ -19,4 +24,4 @@ khmer is under the BSD license; see doc/LICENSE.txt.  Distribution,
 modification and redistribution, incorporation into other software,
 and pretty much everything else is allowed.
 
-CTB 11/2010.
+CTB 8/2011.

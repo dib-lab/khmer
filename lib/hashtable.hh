@@ -29,6 +29,85 @@ namespace khmer {
   typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+
+  //
+  // Sequence iterator class, test.  Not really a C++ iterator yet.
+  //
+
+  class KMerIterator {
+  protected:
+    const char * _seq;
+    const unsigned char _ksize;
+    
+    HashIntoType _kmer_f, _kmer_r;
+    HashIntoType bitmask;
+    unsigned int _nbits_sub_1;
+    unsigned int index, length;
+    bool initialized;
+  public:
+    KMerIterator(const char * seq, unsigned char k) : _seq(seq), _ksize(k) {
+      bitmask = 0;
+      for (unsigned int i = 0; i < _ksize; i++) {
+	bitmask = (bitmask << 2) | 3;
+      }
+      _nbits_sub_1 = (_ksize*2 - 2);
+
+      index = _ksize - 1;
+      length = strlen(seq);
+      initialized = false;
+    }
+
+    HashIntoType first(HashIntoType& f, HashIntoType& r) {
+      HashIntoType x;
+      x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
+
+      f = _kmer_f;
+      r = _kmer_r;
+
+      index = _ksize;
+
+      return x;
+    }
+
+    HashIntoType next(HashIntoType& f, HashIntoType& r) {
+      if (done()) {
+	throw std::exception();
+      }
+
+      if (!initialized) {
+	initialized = true;
+	return first(f, r);
+      }
+
+      unsigned char ch = _seq[index];
+      index++;
+      assert(index <= length);
+
+      // left-shift the previous hash over
+      _kmer_f = _kmer_f << 2;
+
+      // 'or' in the current nt
+      _kmer_f |= twobit_repr(ch);
+
+      // mask off the 2 bits we shifted over.
+      _kmer_f &= bitmask;
+
+      // now handle reverse complement
+      _kmer_r = _kmer_r >> 2;
+      _kmer_r |= (twobit_comp(ch) << _nbits_sub_1);
+
+      f = _kmer_f;
+      r = _kmer_r;
+
+      return uniqify_rc(_kmer_f, _kmer_r);
+    }
+
+    HashIntoType first() { return first(_kmer_f, _kmer_r); }
+    HashIntoType next() { return next(_kmer_f, _kmer_r); }
+
+    bool done() { return index >= length; }
+  };
 
   class ReadMaskTable;
 

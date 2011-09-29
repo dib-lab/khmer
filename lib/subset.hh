@@ -4,6 +4,7 @@
 #include "hashtable.hh"
 
 namespace khmer {
+  class CountingHash;
   class Hashbits;
 
   class SubsetPartition {
@@ -14,31 +15,23 @@ namespace khmer {
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
-    void _clear_partitions();
+    void _clear_all_partitions();
 
-    void _add_partition_ptr(PartitionID *orig_pp, PartitionID *new_pp);
-    PartitionID * _add_partition_ptr2(PartitionID *orig_pp, PartitionID *new_pp);
-    PartitionID * _reassign_partition_ids(SeenSet& tagged_kmers,
-					const HashIntoType kmer_f);
-
-    bool _is_tagged_kmer(const HashIntoType kmer_f,
-			 const HashIntoType kmer_r,
-			 HashIntoType& tagged_kmer);
-
-    bool _do_continue(const HashIntoType kmer,
-		      const SeenSet& keeper);
+    PartitionID * _merge_two_partitions(PartitionID *orig_pp,
+					PartitionID *new_pp);
+    PartitionID * _join_partitions_by_tags(const SeenSet& tagged_kmers,
+					   const HashIntoType kmer);
 
   public:
     SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
       ;
     };
 
-    ~SubsetPartition() { _clear_partitions(); }
+    ~SubsetPartition() { _clear_all_partitions(); }
 
-    PartitionID assign_partition_id(HashIntoType kmer_f,
-				    SeenSet& tagged_kmers);
+    PartitionID assign_partition_id(HashIntoType kmer, SeenSet& tagged_kmers);
 
-    void set_partition_id(HashIntoType kmer_f, PartitionID p);
+    void set_partition_id(HashIntoType kmer, PartitionID p);
     void set_partition_id(std::string kmer_s, PartitionID p);
     PartitionID join_partitions(PartitionID orig, PartitionID join);
     PartitionID get_partition_id(std::string kmer_s);
@@ -59,10 +52,13 @@ namespace khmer {
     void _validate_pmap();
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
-		       SeenSet& tagged_kmers, bool do_initial_check);
+		       SeenSet& tagged_kmers,
+		       const SeenSet& all_tags,
+		       bool break_on_stop_tags=false);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
+		      bool break_on_stop_tags=false,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
 
@@ -75,8 +71,22 @@ namespace khmer {
 					 CallbackFn callback=0,
 					 void * callback_data=0);
 
-    void maxify_partition_size(TagCountMap& tag_map);
-    void filter_against_tags(TagCountMap& tag_map);
+    bool is_single_partition(std::string sequence);
+
+    void join_partitions_by_path(std::string sequence);
+
+    void partition_size_distribution(PartitionCountDistribution &d,
+				    unsigned int& n_unassigned) const;
+
+    unsigned int repartition_largest_partition(unsigned int, unsigned int,
+					       unsigned int, CountingHash&);
+
+    void repartition_a_partition(const SeenSet& partition_tags);
+    void _clear_partition(PartitionID, SeenSet& partition_tags);
+
+    void _merge_other(HashIntoType tag,
+		      PartitionID other_partition,
+		      PartitionPtrMap& diskp_to_pp);
   };
 }
 

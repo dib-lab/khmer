@@ -1,8 +1,8 @@
 import sys
 
-first = True
 n = 0
-countSum = []
+countSum = [0]*255
+countN = [0]*255
 
 fd = open(sys.argv[1])
 for n, line in enumerate(fd):
@@ -11,17 +11,15 @@ for n, line in enumerate(fd):
 
    tok = line.split()
 
-   if first:
-      countSum = [0]*len(tok)
-      first = False
-
    for i in range(len(tok)):
       countSum[i] += int(tok[i])
+      countN[i] += 1
 
 y = [0.0]*len(countSum)
 
 for i in range(len(countSum)):
-   y[i] = float(countSum[i]) / n
+   if countN[i]:
+      y[i] = float(countSum[i]) / float(countN[i])
 
 for n, i in enumerate(y):
    print n, i
