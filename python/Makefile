@@ -1,9 +1,5 @@
 all:
-	python setup.py build_ext -i
-
-test:	all
-	nosetests
+	python setup.py build_ext --inplace
 
 clean:
-	python setup.py clean
-	/bin/rm -f khmer/*.so
+	rm -rf build
