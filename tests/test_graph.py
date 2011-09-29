@@ -24,36 +24,6 @@ class Test_ExactGraphFu(object):
         x = ht.calc_connected_graph_size(kmer)
         assert x == 36, x
 
-    def test_trim(self):
-        ht = self.ht
-        
-        filename = os.path.join(thisdir, 'test-graph.fa')
-        outfile = os.path.join(thisdir, 'test-graph.fa.out') # @CTB use tempfile
-        ht.consume_fasta(filename)
-        ht.trim_graphs(filename, 40, outfile)
-
-        ht = khmer.new_hashbits(12, 4**12)
-        ht.consume_fasta(outfile)
-
-        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
-        assert x == 69, x
-        
-        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
-        assert x == 68, x
-        
-        x = ht.calc_connected_graph_size("ATACTGTAAATA")
-        assert x == 0, x
-
-    def test_graphsize_distrib(self):
-        ht = self.ht
-        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
-        x = ht.graphsize_distribution(200)
-
-        assert sum(x) == 3, x
-        assert x[69] == 1
-        assert x[68] == 1
-        assert x[36] == 1
-
     def test_graph_links_next_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -130,26 +100,6 @@ class Test_InexactGraphFu(object):
     def setup(self):
         self.ht = khmer.new_hashbits(12, 4**8+1)
 
-    def test_trim(self):
-        ht = self.ht
-        filename = os.path.join(thisdir, 'test-graph.fa')
-        outfile = os.path.join(thisdir, 'test-graph.fa.out')
-        
-        ht.consume_fasta(filename)
-        ht.trim_graphs(filename, 40, outfile)
-
-        ht = khmer.new_hashbits(12, 4**12)
-        ht.consume_fasta(outfile)
-
-        x = ht.calc_connected_graph_size("TTAGGACTGCAC")
-        assert x >= 69, x
-        
-        x = ht.calc_connected_graph_size("TGCGTTTCAATC")
-        assert x >= 68, x               # @CTB why 69??
-        
-        x = ht.calc_connected_graph_size("ATACTGTAAATA")
-        assert x == 0, x
-
     def test_graph_links_next_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -225,6 +175,40 @@ class Test_InexactGraphFu(object):
 ###
 
 class Test_Partitioning(object):
+    def test_output_unassigned(self):
+        import screed
+
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+
+        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        output_file = filename + '.part0test'
+        ht.output_partitions(filename, output_file, True)
+
+        len1 = len(list(screed.open(filename)))
+        len2 = len(list(screed.open(output_file)))
+
+        assert len1 > 0
+        assert len1 == len2, (len1, len2)
+
+    def test_not_output_unassigned(self):
+        import screed
+
+        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+
+        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+
+        output_file = filename + '.parttest'
+        ht.output_partitions(filename, output_file, False)
+
+        len1 = len(list(screed.open(filename)))
+        len2 = len(list(screed.open(output_file)))
+
+        assert len1 > 0
+        assert len2 == 0, len2
+
     def test_disconnected_20_a(self):
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
 
@@ -233,7 +217,7 @@ class Test_Partitioning(object):
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
-        assert x == (99, 0)             # disconnected @ 21
+        assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_a(self):
         filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
@@ -253,7 +237,7 @@ class Test_Partitioning(object):
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
-        assert x == (99, 0)             # disconnected @ 21
+        assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_b(self):
         filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
@@ -273,7 +257,7 @@ class Test_Partitioning(object):
 
         subset = ht.do_subset_partition(0, 0)
         x = ht.subset_count_partitions(subset)
-        assert x == (999, 0)            # disconnected @ K = 32
+        assert x == (999, 0), x            # disconnected @ K = 32
 
     def test_connected_31_c(self):
         filename = os.path.join(thisdir, 'test-data/random-31-c.fa')

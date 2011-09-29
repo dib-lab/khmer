@@ -109,6 +109,24 @@ def test_maxcount():
     assert c != 10000, "should not be able to count to 10000"
     assert c == MAX_COUNT       # this will depend on HashcountType...
 
+def test_maxcount_with_bigcount():
+    # hashtable should not saturate, if use_bigcount is set.
+    kh = khmer.new_hashtable(4, 4**4)
+    kh.set_use_bigcount(True)
+    
+    last_count = None
+    for i in range(0, 10000):
+        kh.count('AAAA')
+        c = kh.get('AAAA')
+        
+        print last_count, c
+        if c == last_count:
+            break
+        last_count = c
+
+    assert c == 10000, "should be able to count to 10000"
+    assert c != MAX_COUNT
+
 def test_consume_uniqify_first():
     kh = khmer.new_hashtable(4, 4**4)
     
@@ -128,6 +146,17 @@ def test_maxcount_consume():
 
     c = kh.get('AAAA')
     assert c == MAX_COUNT, c    # this will depend on HashcountType...
+
+def test_maxcount_consume_with_bigcount():
+    # use the bigcount hack to avoid saturating the hashtable.
+    kh = khmer.new_hashtable(4, 4**4)
+    kh.set_use_bigcount(True)
+
+    s = "A"*10000
+    kh.consume(s)
+
+    c = kh.get('AAAA')
+    assert c == 10000 - 3, c
 
 def test_get_mincount():
     kh = khmer.new_hashtable(4, 4**4)
@@ -243,6 +272,26 @@ class Test_ConsumeString(object):
         assert dist[2] == 1
         assert sum(dist) == 2
 
+    def test_abundance_by_pos_bigcount(self):
+        kh = self.kh
+        kh.set_use_bigcount(True)       # count past MAX_COUNT
+
+        for i in range(0, 300):
+            kh.count('ATCG')
+
+        for i in range(0, 10):
+            kh.count('ATGG')
+
+        short_filename = os.path.join(thisdir, 'test-short.fa')
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
+        assert dist[4] == 1
+        assert sum(dist) == 1
+        
+        dist = kh.fasta_count_kmers_by_position(short_filename, 6, 300)
+        assert dist[0] == 1, dist[0]
+        assert dist[2] == 1
+        assert sum(dist) == 2
+
     def test_n_occupied_args(self):
         assert self.kh.n_occupied() == 0
         n = self.kh.consume('AAAA')
@@ -334,7 +383,8 @@ class Test_AbundanceDistribution(object):
 
     def test_count_A(self):
         A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
-        dist = self.kh.abundance_distribution(A_filename)
+        tracking = khmer.new_hashbits(4, 4**4, 1)
+        dist = self.kh.abundance_distribution(A_filename, tracking)
 
         assert sum(dist) == 1
         assert dist[10] == 1

@@ -10,7 +10,6 @@ from _khmer import new_minmax
 from _khmer import consume_genome
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback
-from _khmer import do_intersection_partition
 
 from filter_utils import filter_fasta_file_any, filter_fasta_file_all, filter_fasta_file_limit_n
 
@@ -25,6 +24,18 @@ def new_counting_hash(k, starting_size, n_tables=2):
     primes = get_n_primes_above_x(n_tables, starting_size)
     
     return _new_counting_hash(k, primes)
+
+def load_hashbits(filename):
+    ht = _new_hashbits(1, [1])
+    ht.load(filename)
+
+    return ht
+
+def load_counting_hash(filename):
+    ht = _new_counting_hash(1, [1])
+    ht.load(filename)
+    
+    return ht
 
 def _default_reporting_callback(info, n_reads, other):
     print '...', info, n_reads, other
