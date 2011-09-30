@@ -7,6 +7,14 @@ namespace khmer {
   class CountingHash;
   class Hashbits;
 
+  class pre_partition_info {
+  public:
+    HashIntoType kmer;
+    SeenSet tagged_kmers;
+
+    pre_partition_info(HashIntoType _kmer) : kmer(_kmer) {};
+  };
+
   class SubsetPartition {
     friend class Hashbits;
   protected:
