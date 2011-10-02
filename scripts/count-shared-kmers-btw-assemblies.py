@@ -45,7 +45,10 @@ def count(contigs1, contigs2):
                 if ht.get(x) > 0:
                     count3 += 1
 
-    print count, count2, count3 
+    # 'count' is the total number of kmers in the first file
+    # 'count2' is the total number of kmers in the second file
+    # 'count3' is the total number of kmers shared between the two files.
+    print count, count2, count3, "%.1f%%" % (count3 / float(count) * 100.)
 
 def main(contig1, contig2):
     ht = count(iterseq(screed.open(contig1)), 
