@@ -3,6 +3,7 @@
 *.so
 *~
 python/build
+python/_khmermodule.cpp
 lib/test
 doc/_build
 python/test-graph.fa.out
