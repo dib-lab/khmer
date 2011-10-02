@@ -1223,6 +1223,33 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
 
   return ret;
 }
+static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * seq = NULL;
+  unsigned int max_count_i = 0;
+
+  if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
+    return NULL;
+  }
+
+  unsigned int trim_at;
+  Py_BEGIN_ALLOW_THREADS
+
+    khmer::BoundedCounterType max_count = max_count_i;
+
+    trim_at = counting->trim_below_abundance(seq, max_count);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
+  Py_DECREF(trim_seq);
+
+  return ret;
+}
 
 static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 {
@@ -1456,6 +1483,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
   { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
   { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
+  { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
@@ -1653,6 +1681,23 @@ static PyObject * hashbits_print_stop_tags(PyObject * self, PyObject * args)
   }
 
   hashbits->print_stop_tags(filename);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject * hashbits_print_tagset(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &filename)) {
+    return NULL;
+  }
+
+  hashbits->print_tagset(filename);
   
   Py_INCREF(Py_None);
   return Py_None;
@@ -2982,6 +3027,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
   { "save_stop_tags", hashbits_save_stop_tags, METH_VARARGS, "" },
   { "print_stop_tags", hashbits_print_stop_tags, METH_VARARGS, "" },
+  { "print_tagset", hashbits_print_tagset, METH_VARARGS, "" },
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },

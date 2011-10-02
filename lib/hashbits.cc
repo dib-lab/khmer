@@ -218,7 +218,7 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
   for (unsigned int i = 0; i < tagset_size; i++) {
     all_tags.insert(buf[i]);
   }
-  
+
   delete buf;
 }
 
@@ -1458,6 +1458,20 @@ void Hashbits::print_stop_tags(std::string infilename)
 
   unsigned int i = 0;
   for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
+	 pi++, i++) {
+    std::string kmer = _revhash(*pi, _ksize);
+    printfile << kmer << "\n";
+  }
+  
+  printfile.close();
+}
+
+void Hashbits::print_tagset(std::string infilename)
+{
+  ofstream printfile(infilename.c_str());
+
+  unsigned int i = 0;
+  for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
 	 pi++, i++) {
     std::string kmer = _revhash(*pi, _ksize);
     printfile << kmer << "\n";
