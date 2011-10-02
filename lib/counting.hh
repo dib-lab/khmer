@@ -229,6 +229,8 @@ namespace khmer {
 
     unsigned int trim_on_abundance(std::string seq,
 				   BoundedCounterType min_abund) const;
+    unsigned int trim_below_abundance(std::string seq,
+				      BoundedCounterType max_abund) const;
   };
 
 

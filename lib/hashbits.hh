@@ -286,6 +286,7 @@ namespace khmer {
 				CountingHash &counting,
 				unsigned int cutoff);
 
+    virtual void print_tagset(std::string);
     virtual void print_stop_tags(std::string);
     virtual void save_stop_tags(std::string);
     void load_stop_tags(std::string filename, bool clear_tags=true);

@@ -802,6 +802,41 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 }
 
 
+unsigned int CountingHash::trim_below_abundance(std::string seq,
+						BoundedCounterType max_abund)
+  const
+{
+  if (!check_read(seq)) {
+    return 0;
+  }
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+
+  SeenSet path;
+
+  HashIntoType kmer;
+
+  if (kmers.done()) { return 0; }
+  kmer = kmers.next();
+
+  if (kmers.done() || get_count(kmer) > max_abund) {
+    return 0;
+  }
+
+  unsigned int i = _ksize;
+  while (!kmers.done()) {
+    kmer = kmers.next();
+
+    if (get_count(kmer) > max_abund) {
+      return i;
+    }
+    i++;
+  }
+
+  return seq.length();
+}
+
+
 void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
 {
    std::string filename(infilename);

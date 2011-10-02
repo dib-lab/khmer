@@ -2,9 +2,10 @@ import sys, screed.fasta, os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
-K = 32
 WORKER_THREADS=8
 GROUPSIZE=100
+
+CUTOFF=2000
 
 ###
 
@@ -18,12 +19,12 @@ def main():
     print '--'
 
     print 'making hashtable'
-    ht = khmer.new_counting_hash(K, 1, 1)
-    ht.load(counting_ht)
+    ht = khmer.load_counting_hash(counting_ht)
+    K=ht.ksize()
 
     for infile in infiles:
        print 'filtering', infile
-       outfile = os.path.basename(infile) + '.abundfilt'
+       outfile = os.path.basename(infile) + '.below'
 
        outfp = open(outfile, 'w')
 
@@ -33,7 +34,7 @@ def main():
           if 'N' in seq:
               return None, None
 
-          trim_seq, trim_at = ht.trim_on_abundance(seq, 2)
+          trim_seq, trim_at = ht.trim_below_abundance(seq, CUTOFF)
 
           if trim_at >= K:
               return name, trim_seq
