@@ -1661,6 +1661,8 @@ void Hashbits::extract_unique_paths(std::string seq,
   unsigned int n_already_seen = 0;
   unsigned int n_kmers = 0;
 
+  // first, put together an array for presence/absence of the k-mer
+  // at each given position.
   while (!kmers.done()) {
     kmer = kmers.next();
 
@@ -1673,22 +1675,31 @@ void Hashbits::extract_unique_paths(std::string seq,
     n_kmers++;
   }
 
+  // next, run through this array with 'i'.
+
   unsigned int i = 0;
   while (i < n_kmers - min_length) {
-    unsigned int seen_counter = 0;
-    unsigned int j;
+    unsigned int seen_counter, j;
+
+    // For each starting 'i', count the number of 'seen' k-mers in the
+    // given window.
 
     // yes, inefficient n^2 algorithm.  sue me.
-    for (j = 0; j < min_length; j++) {
+    for (seen_counter = 0, j = 0; j < min_length; j++) {
       if (seen_queue[i + j]) {
 	seen_counter++;
       }
     }
 
+    // If the fraction seen is small enough to be interesting, suggesting
+    // that this, in fact, a "new" window -- extend until it isn't, and
+    // then extract.
+
     assert(j == min_length);
     if ( ((float)seen_counter / (float) j) <= max_seen) {
       unsigned int start = i;
 
+      // extend the window until the end of the sequence...
       while ((start + min_length) < n_kmers) {
 	if (seen_queue[start]) {
 	  seen_counter--;
@@ -1698,11 +1709,13 @@ void Hashbits::extract_unique_paths(std::string seq,
 	}
 	start++;
 
+	// ...or until we've seen too many of the k-mers.
 	if (((float)seen_counter / (float) min_length) > max_seen) {
 	  break;
 	}
       }
 
+      // adjust for ending point.
       if (start + min_length == n_kmers) {	// potentially decrement twice at end
 	if (((float)seen_counter / (float) min_length) > max_seen) {
 	  start--;
@@ -1713,6 +1726,8 @@ void Hashbits::extract_unique_paths(std::string seq,
 	start -= 2;
       }
 
+      // ...and now extract the relevant portion of the sequence, and adjust
+      // starting pos'n.
       results.push_back(seq.substr(i, start + min_length + _ksize - i));
 
       i = start + min_length + 1;
