@@ -1,8 +1,9 @@
-import os
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
-
 import khmer
+
+import khmer_tst_utils as utils
+
+def teardown():
+    utils.cleanup()
 
 class Test_ExactGraphFu(object):
     def setup(self):
@@ -10,7 +11,7 @@ class Test_ExactGraphFu(object):
 
     def test_counts(self):
         ht = self.ht
-        ht.consume_fasta(os.path.join(thisdir, 'test-graph.fa'))
+        ht.consume_fasta(utils.get_test_data('test-graph.fa'))
 
         kmer = "TTAGGACTGCAC"
         x = ht.calc_connected_graph_size(kmer)
@@ -178,12 +179,12 @@ class Test_Partitioning(object):
     def test_output_unassigned(self):
         import screed
 
-        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.new_hashbits(21, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
 
-        output_file = filename + '.part0test'
+        output_file = utils.get_temp_filename('part0test')
         ht.output_partitions(filename, output_file, True)
 
         len1 = len(list(screed.open(filename)))
@@ -195,12 +196,12 @@ class Test_Partitioning(object):
     def test_not_output_unassigned(self):
         import screed
 
-        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.new_hashbits(21, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
 
-        output_file = filename + '.parttest'
+        output_file = utils.get_temp_filename('parttest')
         ht.output_partitions(filename, output_file, False)
 
         len1 = len(list(screed.open(filename)))
@@ -210,7 +211,7 @@ class Test_Partitioning(object):
         assert len2 == 0, len2
 
     def test_disconnected_20_a(self):
-        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.new_hashbits(21, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
@@ -220,7 +221,7 @@ class Test_Partitioning(object):
         assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_a(self):
-        filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+        filename = utils.get_test_data('random-20-a.fa')
 
         ht = khmer.new_hashbits(20, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
@@ -230,7 +231,7 @@ class Test_Partitioning(object):
         assert x == (1, 0)             # connected @ 20
 
     def test_disconnected_20_b(self):
-        filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
+        filename = utils.get_test_data('random-20-b.fa')
 
         ht = khmer.new_hashbits(21, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
@@ -240,7 +241,7 @@ class Test_Partitioning(object):
         assert x == (99, 0), x             # disconnected @ 21
 
     def test_connected_20_b(self):
-        filename = os.path.join(thisdir, 'test-data/random-20-b.fa')
+        filename = utils.get_test_data('random-20-b.fa')
 
         ht = khmer.new_hashbits(20, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
@@ -250,7 +251,7 @@ class Test_Partitioning(object):
         assert x == (1, 0)             # connected @ 20
 
     def test_disconnected_31_c(self):
-        filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
+        filename = utils.get_test_data('random-31-c.fa')
 
         ht = khmer.new_hashbits(32, 1e6, 4)
         ht.consume_fasta_and_tag(filename)
@@ -260,7 +261,7 @@ class Test_Partitioning(object):
         assert x == (999, 0), x            # disconnected @ K = 32
 
     def test_connected_31_c(self):
-        filename = os.path.join(thisdir, 'test-data/random-31-c.fa')
+        filename = utils.get_test_data('random-31-c.fa')
 
         ht = khmer.new_hashbits(31, 1e6, 4)
         ht.consume_fasta_and_tag(filename)

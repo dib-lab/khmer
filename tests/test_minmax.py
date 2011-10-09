@@ -1,10 +1,11 @@
-import os
-import tempfile
-import shutil
-
 import khmer
 
+import khmer_tst_utils as utils
+
 MINMAXTABLE_SIZE=50
+
+def teardown():
+    utils.cleanup()
 
 class Test_Basic(object):
     def __init__(self):
@@ -122,20 +123,24 @@ class Test_Basic(object):
 class Test_Filestuff(object):
     def __init__(self):
         self.mmt = khmer.new_minmax(MINMAXTABLE_SIZE)
-        self.tempdir = tempfile.mkdtemp()
-        self.filename = os.path.join(self.tempdir, 'tst')
 
     def test_saveload(self):
+        filename = utils.get_temp_filename('save')
+
         mmt = self.mmt
 
         for i in range(0, MINMAXTABLE_SIZE):
             mmt.add_min(i, i)
             mmt.add_max(i, MINMAXTABLE_SIZE-i)
 
-        mmt.save(self.filename)
+        print mmt
+        print 'saving to:', filename
+        mmt.save(filename)
 
         mmt2 = khmer.new_minmax(0)
-        mmt2.load(self.filename)
+        print 'mm2'
+        print 'loading from:', filename
+        mmt2.load(filename)
 
         for i in range(0, MINMAXTABLE_SIZE):
             assert mmt.get_min(i) == mmt2.get_min(i)
@@ -145,13 +150,15 @@ class Test_Filestuff(object):
             assert mmt.get_max(i) == MINMAXTABLE_SIZE - i
 
     def test_save_no_load(self):
+        filename = utils.get_temp_filename('save')
+
         mmt = self.mmt
 
         for i in range(0, MINMAXTABLE_SIZE):
             mmt.add_min(i, i)
             mmt.add_max(i, MINMAXTABLE_SIZE-i)
 
-        mmt.save(self.filename)
+        mmt.save(filename)
 
         mmt2 = khmer.new_minmax(MINMAXTABLE_SIZE)
         # no load!
@@ -176,6 +183,3 @@ class Test_Filestuff(object):
             raise
         except Exception:
             pass
-                
-    def teardown(self):
-        shutil.rmtree(self.tempdir)

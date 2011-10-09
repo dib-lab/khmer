@@ -1,42 +1,24 @@
-import os
-import tempfile
-import shutil
-
 import khmer
-try:
-   import screed
-   from screed.fasta import fasta_iter
-except ImportError:
-   pass
+import screed
+from screed.fasta import fasta_iter
 
-import nose
+import khmer_tst_utils as utils
 
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
+def teardown():
+   utils.cleanup()
 
 def load_fa_seq_names(filename):
-    try:
-       fasta_iter
-    except NameError:
-       raise nose.SkipTest
-
     fp = open(filename)
     records = list(fasta_iter(fp))
     names = [ r['name'] for r in records ]
     return names
 
 class Test_Filter(object):
-    def setup(self):
-        self.tempdir = tempfile.mkdtemp()
-
-    def teardown(self):
-        shutil.rmtree(self.tempdir)
-
     def test_abund(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test-abund-read.fa')
-        outname = os.path.join(self.tempdir, 'test_abund.out')
+        filename = utils.get_test_data('test-abund-read.fa')
+        outname = utils.get_temp_filename('test_abund.out')
 
         ht.consume_fasta(filename)
         ht.output_fasta_kmer_pos_freq(filename, outname)
@@ -56,26 +38,28 @@ class Test_Filter(object):
     def test_filter_limit_n(self):
         ht = khmer.new_hashtable(4, 4**4)
 
-        filename = os.path.join(thisdir, 'test-data/simple_3.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_3.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         (total_reads, n_consumed) = ht.consume_fasta(filename)
         assert total_reads == 2, total_reads
 
-        (total_reads, n_seq_kept) = khmer.filter_fasta_file_limit_n(ht, filename,
-                                                                    total_reads,
-                                                                    outname, 2,
-                                                                    7)
+        (total_reads, n_seq_kept) = \
+            khmer.filter_fasta_file_limit_n(ht, filename,
+                                            total_reads,
+                                            outname, 2,
+                                            7)
 
 
         assert total_reads == 2
         assert n_seq_kept == 1 
 
  
-        (total_reads, n_seq_kept) = khmer.filter_fasta_file_limit_n(ht, filename,
-                                                                    total_reads,
-                                                                    outname, 2,
-                                                                    4)
+        (total_reads, n_seq_kept) = \
+            khmer.filter_fasta_file_limit_n(ht, filename,
+                                            total_reads,
+                                            outname, 2,
+                                            4)
 
         assert total_reads == 2
         assert n_seq_kept == 2
@@ -84,8 +68,8 @@ class Test_Filter(object):
     def test_filter(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test-data/simple_1.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_1.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         (total_reads, n_consumed) = ht.consume_fasta(filename)
         assert total_reads == 3, total_reads
@@ -102,8 +86,8 @@ class Test_Filter(object):
     def test_filter_n(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_2.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         (total_reads, n_consumed) = ht.consume_fasta(filename)
         assert total_reads == 4, total_reads
@@ -120,8 +104,8 @@ class Test_Filter(object):
     def test_consume_build_readmask(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_2.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         # sequence #4 (index 3) is bad; the new readmask should have that.
         x = ht.consume_fasta_build_readmask(filename)
@@ -137,8 +121,8 @@ class Test_Filter(object):
     def test_consume_update_readmask(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_2.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         readmask = khmer.new_readmask(4)
 
@@ -155,8 +139,8 @@ class Test_Filter(object):
     def test_consume_no_update_readmask(self):
         ht = khmer.new_hashtable(10, 4**10)
 
-        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_2.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         readmask = khmer.new_readmask(4)
 
@@ -171,8 +155,8 @@ class Test_Filter(object):
         assert readmask.get(3)          # NOT updated
 
     def test_readmask_1(self):
-        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_2.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         readmask = khmer.new_readmask(4)
         readmask.set(1, False)
@@ -185,8 +169,8 @@ class Test_Filter(object):
         assert names == ['1'], names
 
     def test_readmask_2(self):
-        filename = os.path.join(thisdir, 'test-data/simple_2.fa')
-        outname = os.path.join(self.tempdir, 'test_filter.out')
+        filename = utils.get_test_data('simple_2.fa')
+        outname = utils.get_temp_filename('test_filter.out')
 
         readmask = khmer.new_readmask(4)
         readmask.set(0, False)
@@ -206,7 +190,7 @@ def test_filter_sodd():
    MAX_SODD=3
    
    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
-   filename = os.path.join(thisdir, '../data/high-sodd.fa')
+   filename = utils.get_test_data('../../data/high-sodd.fa')
 
    ht.consume_fasta(filename)
 
