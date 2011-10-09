@@ -1,15 +1,12 @@
 import khmer
 
-try:
-   import screed
-   from screed.fasta import fasta_iter
-except ImportError:
-   import nose
-   raise nose.SkipTest
+import screed
+from screed.fasta import fasta_iter
 
-import os
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
+import khmer_tst_utils as utils
+
+def teardown():
+   utils.cleanup()
 
 def test__get_set_tag_density():
    ht = khmer.new_hashbits(32, 1, 1)
@@ -20,7 +17,7 @@ def test__get_set_tag_density():
    assert ht._get_tag_density() == 2
 
 def test_n_occupied_1():
-   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   filename = utils.get_test_data('random-20-a.fa')
 
    K = 20 # size of kmer
    HT_SIZE= 100000 # size of hashtable
@@ -37,7 +34,7 @@ def test_n_occupied_1():
 
 def test_bloom_python_1():
    ### test python code to count unique kmers using bloom filter 
-   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   filename = utils.get_test_data('random-20-a.fa')
     
    K = 20 # size of kmer
    HT_SIZE= 100000 # size of hashtable
@@ -62,7 +59,7 @@ def test_bloom_python_1():
 def test_bloom_c_1():
    ### test c++ code to count unique kmers using bloom filter
    
-   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   filename = utils.get_test_data('random-20-a.fa')
 
    K = 20 # size of kmer
    HT_SIZE= 100000 # size of hashtable
@@ -126,9 +123,9 @@ def test_bloom_c_2(): # simple one
 def test_filter_if_present():
    ht = khmer.new_hashbits(32, 1e6, 2)
 
-   maskfile = os.path.join(thisdir, 'test-data', 'filter-test-A.fa')
-   inputfile = os.path.join(thisdir, 'test-data', 'filter-test-B.fa')
-   outfile = os.path.join(thisdir, 'test-data', 'filter-test-C.fa')
+   maskfile = utils.get_test_data('filter-test-A.fa')
+   inputfile = utils.get_test_data('filter-test-B.fa')
+   outfile = utils.get_temp_filename('filter')
 
    ht.consume_fasta(maskfile)
    ht.filter_if_present(inputfile, outfile)
@@ -138,7 +135,7 @@ def test_filter_if_present():
    assert records[0]['name'] == '3'
 
 def test_combine_pe():
-   inpfile = os.path.join(thisdir, 'test-data', 'combine_parts_1.fa')
+   inpfile = utils.get_test_data('combine_parts_1.fa')
    ht = khmer.new_hashbits(32, 1, 1)
 
    ht.consume_partitioned_fasta(inpfile)
@@ -162,7 +159,7 @@ def test_combine_pe():
    assert ht.count_partitions() == (1, 0)
 
 def test_load_partitioned():
-   inpfile = os.path.join(thisdir, 'test-data', 'combine_parts_1.fa')
+   inpfile = utils.get_test_data('combine_parts_1.fa')
    ht = khmer.new_hashbits(32, 1, 1)
 
    ht.consume_partitioned_fasta(inpfile)
@@ -178,7 +175,7 @@ def test_load_partitioned():
    assert ht.get(s3)
 
 def test_count_within_radius_simple():
-   inpfile = os.path.join(thisdir, 'test-data', 'all-A.fa')
+   inpfile = utils.get_test_data('all-A.fa')
    ht = khmer.new_hashbits(4, 1e6, 2)
 
    print ht.consume_fasta(inpfile)
@@ -189,7 +186,7 @@ def test_count_within_radius_simple():
    assert n == 1
    
 def test_count_within_radius_big():
-   inpfile = os.path.join(thisdir, 'test-data', 'random-20-a.fa')
+   inpfile = utils.get_test_data('random-20-a.fa')
    ht = khmer.new_hashbits(20, 1e6, 4)
 
    ht.consume_fasta(inpfile)
@@ -202,7 +199,7 @@ def test_count_within_radius_big():
    assert n == 39
 
 def test_count_kmer_degree():
-   inpfile = os.path.join(thisdir, 'test-data', 'all-A.fa')
+   inpfile = utils.get_test_data('all-A.fa')
    ht = khmer.new_hashbits(4, 1e6, 2)
    ht.consume_fasta(inpfile)
 
@@ -212,7 +209,7 @@ def test_count_kmer_degree():
    assert ht.kmer_degree('TAAA') == 1
 
 def test_find_radius_for_volume():
-   inpfile = os.path.join(thisdir, 'test-data', 'all-A.fa')
+   inpfile = utils.get_test_data('all-A.fa')
    ht = khmer.new_hashbits(4, 1e6, 2)
    ht.consume_fasta(inpfile)
 
@@ -241,7 +238,7 @@ def test_circumference():
 def test_save_load_tagset():
    ht = khmer.new_hashbits(32, 1, 1)
 
-   outfile = os.path.join(thisdir, 'tagset')
+   outfile = utils.get_temp_filename('tagset')
 
    ht.add_tag('A'*32)
    ht.save_tagset(outfile)
@@ -262,7 +259,7 @@ def test_save_load_tagset():
 def test_save_load_tagset_noclear():
    ht = khmer.new_hashbits(32, 1, 1)
 
-   outfile = os.path.join(thisdir, 'tagset')
+   outfile = utils.get_temp_filename('tagset')
 
    ht.add_tag('A'*32)
    ht.save_tagset(outfile)
@@ -281,7 +278,7 @@ def test_save_load_tagset_noclear():
    assert len(data) == 24, len(data)
 
 def test_stop_traverse():
-   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   filename = utils.get_test_data('random-20-a.fa')
    
    K = 20 # size of kmer
    HT_SIZE= 100000 # size of hashtable
@@ -301,7 +298,7 @@ def test_stop_traverse():
    assert n == 2, n
 
 def test_tag_across_stoptraverse():
-   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   filename = utils.get_test_data('random-20-a.fa')
    
    K = 20 # size of kmer
    HT_SIZE= 100000 # size of hashtable
@@ -328,7 +325,7 @@ def test_tag_across_stoptraverse():
    assert n == 1, n
 
 def test_notag_across_stoptraverse():
-   filename = os.path.join(thisdir, 'test-data/random-20-a.fa')
+   filename = utils.get_test_data('random-20-a.fa')
    
    K = 20 # size of kmer
    HT_SIZE= 100000 # size of hashtable

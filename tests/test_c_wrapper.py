@@ -1,11 +1,14 @@
 import os
 import khmer
 
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
+import khmer_tst_utils as utils
 
-reads_filename = os.path.join(thisdir, 'test-reads.fa')
+reads_filename = utils.get_test_data('test-reads.fa')
+
 N_READS = 25000
+
+def teardown():
+    utils.cleanup()
 
 class GoodException(Exception):
     pass
@@ -45,8 +48,10 @@ def test_raise_in_consume_fasta():
 def test_raise_in_readmask_filter_fasta_file():
     readmask = khmer.new_readmask(N_READS)
 
+    tstfile = utils.get_temp_filename('tst')
+
     try:
-        readmask.filter_fasta_file(reads_filename, "tst", callback_raise)
+        readmask.filter_fasta_file(reads_filename, tstfile, callback_raise)
         assert 0
     except GoodException:
         pass

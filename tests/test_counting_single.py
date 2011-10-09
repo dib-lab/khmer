@@ -1,8 +1,5 @@
-import os
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
-
 import khmer
+import khmer_tst_utils as utils
 
 MAX_COUNT=255
 
@@ -230,7 +227,7 @@ def test_64bitshift_2():
        assert kh.get(substr) > 0
 
 def test_very_short_read():
-    short_filename = os.path.join(thisdir, 'test-short.fa')
+    short_filename = utils.get_test_data('test-short.fa')
     kh = khmer.new_hashtable(9, 4**4+1)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
     assert n_reads == 1
@@ -262,7 +259,7 @@ class Test_ConsumeString(object):
         for i in range(0, 10):
             kh.count('ATGG')
 
-        short_filename = os.path.join(thisdir, 'test-short.fa')
+        short_filename = utils.get_test_data('test-short.fa')
         dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
         assert dist[4] == 1
         assert sum(dist) == 1
@@ -282,7 +279,7 @@ class Test_ConsumeString(object):
         for i in range(0, 10):
             kh.count('ATGG')
 
-        short_filename = os.path.join(thisdir, 'test-short.fa')
+        short_filename = utils.get_test_data('test-short.fa')
         dist = kh.fasta_count_kmers_by_position(short_filename, 6, 10)
         assert dist[4] == 1
         assert sum(dist) == 1
@@ -378,11 +375,12 @@ class Test_ConsumeString(object):
 class Test_AbundanceDistribution(object):
     def setup(self):
         self.kh = khmer.new_hashtable(4, 4**4)
-        A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
+        A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_fasta(A_filename)
 
     def test_count_A(self):
-        A_filename = os.path.join(thisdir, 'test-data/all-A.fa')
+        A_filename = utils.get_test_data('all-A.fa')
+
         tracking = khmer.new_hashbits(4, 4**4, 1)
         dist = self.kh.abundance_distribution(A_filename, tracking)
 
