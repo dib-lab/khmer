@@ -1,0 +1,37 @@
+======================
+A guide to using khmer
+======================
+
+khmer can be used for several different assembly-related functions at this
+point.  What you need or use will depend on what kind of data you have.
+
+Note that khmer was built around Illumina sequences: short reads under ~150bp
+in length.  Longer sequences will screw up various assumptions; check with
+the authors to see how, or read the source code :).
+
+Metagenomes
+===========
+
+You'll probably be interested in:
+
+ - low-abundance k-mer trimming; see filter-abund.py in :doc:`scripts`.
+ - partitioning
+ - digital normalization; see normalize-by-median.py in :doc:`scripts`.
+
+mRNAseq
+=======
+
+ - low-abundance k-mer trimming; see filter-abund.py in :doc:`scripts`.
+ - digital normalization; see normalize-by-median.py in :doc:`scripts`.
+
+Genomes
+=======
+
+khmer's graph-filtering functionality can be used to remove repeats from
+raw reads, which for at least some data sets scales the assembly process
+rather dramatically.
+
+ChIP-seq
+========
+
+We've never used khmer for ChIP-seq analysis, sorry!
