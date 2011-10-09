@@ -8,7 +8,7 @@ N_HT=4
 UNIQUE_LEN=100
 UNIQUE_F=0.9
 
-OUTPUT_WINDOW=50
+OUTPUT_WINDOW=100
 OUTPUT_OVERLAP=10
 
 kh = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
@@ -38,6 +38,11 @@ for filename in sys.argv[1:]:
 
         for i, path in enumerate(paths):
             n_out += 1
+
+            if len(path) < OUTPUT_WINDOW:
+                total_out += 1
+                print '>%d\n%s' % (total_out, path)
+                continue
 
             for start in range(0, len(path) - OUTPUT_WINDOW + 1,
                                OUTPUT_OVERLAP):
