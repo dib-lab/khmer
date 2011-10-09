@@ -1,3 +1,15 @@
+fix tests cleanup
+pyrex/cython stuff
+script testing
+docs!
+
+---
+
+the N dilemma
+
+---
+
+
 put in logging.
 
 fix tests and test cases to properly isolate/remove temp files.
