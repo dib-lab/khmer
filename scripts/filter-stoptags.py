@@ -58,5 +58,7 @@ def main():
        tsp = ThreadedSequenceProcessor(process_fn)
        tsp.start(verbose_loader(infile), outfp)
 
+       print 'output in', outfile
+
 if __name__ == '__main__':
     main()
