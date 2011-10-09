@@ -248,13 +248,13 @@ def test_save_load_tagset():
    ht.load_tagset(outfile)              # implicitly => clear_tags=True
    ht.save_tagset(outfile)
 
-   # if tags have been cleared, then the new tagfile will be larger (24 bytes);
-   # else smaller (16 bytes).
+   # if tags have been cleared, then the new tagfile will be larger (30 bytes);
+   # else smaller (22 bytes).
 
    fp = open(outfile, 'rb')
    data = fp.read()
    fp.close()
-   assert len(data) == 16, len(data)
+   assert len(data) == 22, len(data)
    
 def test_save_load_tagset_noclear():
    ht = khmer.new_hashbits(32, 1, 1)
@@ -269,13 +269,13 @@ def test_save_load_tagset_noclear():
    ht.load_tagset(outfile, False)       # set clear_tags => False; zero tags
    ht.save_tagset(outfile)
 
-   # if tags have been cleared, then the new tagfile will be large (24 bytes);
-   # else small (16 bytes).
+   # if tags have been cleared, then the new tagfile will be large (30 bytes);
+   # else small (22 bytes).
 
    fp = open(outfile, 'rb')
    data = fp.read()
    fp.close()
-   assert len(data) == 24, len(data)
+   assert len(data) == 30, len(data)
 
 def test_stop_traverse():
    filename = utils.get_test_data('random-20-a.fa')

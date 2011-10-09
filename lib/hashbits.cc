@@ -20,7 +20,7 @@ void Hashbits::save(std::string outfilename)
   unsigned char version = SAVED_FORMAT_VERSION;
   outfile.write((const char *) &version, 1);
 
-  unsigned char ht_type = SAVED_COUNTING_HT;
+  unsigned char ht_type = SAVED_HASHBITS;
   outfile.write((const char *) &ht_type, 1);
 
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
@@ -58,7 +58,7 @@ void Hashbits::load(std::string infilename)
   infile.read((char *) &version, 1);
   infile.read((char *) &ht_type, 1);
   assert(version == SAVED_FORMAT_VERSION);
-  assert(ht_type == SAVED_COUNTING_HT);
+  assert(ht_type == SAVED_HASHBITS);
 
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   infile.read((char *) &save_n_tables, sizeof(save_n_tables));
@@ -180,9 +180,17 @@ void Hashbits::save_tagset(std::string outfilename)
 {
   ofstream outfile(outfilename.c_str(), ios::binary);
   const unsigned int tagset_size = all_tags.size();
+  unsigned int save_ksize = _ksize;
 
   HashIntoType * buf = new HashIntoType[tagset_size];
 
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_TAGS;
+  outfile.write((const char *) &ht_type, 1);
+
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
   outfile.write((const char *) &tagset_size, sizeof(tagset_size));
   outfile.write((const char *) &_tag_density, sizeof(_tag_density));
 
@@ -207,7 +215,19 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
     all_tags.clear();
   }
 
+  unsigned char version, ht_type;
+  unsigned int save_ksize = 0;
+
   unsigned int tagset_size = 0;
+
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_TAGS);
+  
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  assert(save_ksize == _ksize);
+
   infile.read((char *) &tagset_size, sizeof(tagset_size));
   infile.read((char *) &_tag_density, sizeof(_tag_density));
 
@@ -1417,7 +1437,18 @@ void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
     stop_tags.clear();
   }
 
+  unsigned char version, ht_type;
+  unsigned int save_ksize = 0;
+
   unsigned int tagset_size = 0;
+
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_STOPTAGS);
+  
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  assert(save_ksize == _ksize);
   infile.read((char *) &tagset_size, sizeof(tagset_size));
 
   HashIntoType * buf = new HashIntoType[tagset_size];
@@ -1438,6 +1469,14 @@ void Hashbits::save_stop_tags(std::string outfilename)
 
   HashIntoType * buf = new HashIntoType[tagset_size];
 
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_STOPTAGS;
+  outfile.write((const char *) &ht_type, 1);
+
+  unsigned int save_ksize = _ksize;
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
   outfile.write((const char *) &tagset_size, sizeof(tagset_size));
 
   unsigned int i = 0;
