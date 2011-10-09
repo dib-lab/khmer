@@ -5,14 +5,10 @@ import threading, Queue
 import sys
 import screed
 
-def verbose_fasta_iter(filename):
-    it = screed.open(filename)
-    for n, record in enumerate(it):
-        if n % 10000 == 0:
-            print >>sys.stderr, '... filtering', n
-        yield record
+DEFAULT_WORKER_THREADS=8
+DEFAULT_GROUPSIZE=100
 
-def verbose_fastq_iter(filename):
+def verbose_loader(filename):
     it = screed.open(filename)
     for n, record in enumerate(it):
         if n % 10000 == 0:
@@ -33,7 +29,8 @@ def is_pair(r1, r2):
 class ThreadedSequenceProcessor(object):
     QUEUESIZE = 50
     
-    def __init__(self, process_fn, n_workers, group_size, verbose=True):
+    def __init__(self, process_fn, n_workers=DEFAULT_WORKER_THREADS,
+                 group_size=DEFAULT_GROUPSIZE, verbose=True):
         self.process_fn = process_fn
         self.n_workers = n_workers
         self.group_size = group_size
