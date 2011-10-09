@@ -150,3 +150,64 @@ def test_filter_stoptags():
     seqs = set([ r.sequence for r in screed.open(outfile) ])
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
+
+def test_normalize_by_median():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+
+def test_normalize_by_median_2():
+    CUTOFF='2'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 2, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
+
+def test_normalize_by_min():
+    CUTOFF='5'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('normalize-by-min.py')
+    args = ['-C', CUTOFF, '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 5, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs

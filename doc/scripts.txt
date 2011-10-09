@@ -47,3 +47,29 @@ filter-stoptags.py: trim sequences at stoptags.
    <fileN>.stopfilt.
 
    (Stoptags are produced by various (re)partitioning scripts.)
+
+Digital normalization
+=====================
+
+normalize-by-min.py: do digital normalization (remove redundant sequences)
+
+   Usage::
+
+	normalize-by-median.py [ options ] <file1> <file2> ...
+
+   Discard sequences based on whether or not their **minimum** k-mer
+   abundance lies above a specified cutoff.  Kept sequences will be
+   placed in <fileN>.keep.
+
+   Note: this is, in theory, a loss-less operation.  Only sequences that
+   contribute no novel k-mers will be discarded.
+
+normalize-by-median.py: do digital normalization (remove redundant sequences)
+
+   Usage::
+
+	normalize-by-median.py [ options ] <file1> <file2> ...
+
+   Discard sequences based on whether or not their **median** k-mer
+   abundance lies above a specified cutoff.  Kept sequences will be
+   placed in <fileN>.keep.
