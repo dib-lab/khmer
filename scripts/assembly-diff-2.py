@@ -2,7 +2,7 @@
 import sys, khmer, screed, os
 
 K=20
-HASHTABLE_SIZE=int(2.5e8)
+HASHTABLE_SIZE=int(4e9)
 N_HT=4
 
 UNIQUE_LEN=100
@@ -23,7 +23,7 @@ path_n = 0
 for n, record in enumerate(screed.open(filename2)):
     if n % 10000 == 0:
         print '...', filename2, n
-    seq = record.sequence
+    seq = record.sequence.upper().replace('N', 'G')
     paths = kh.extract_unique_paths(seq, UNIQUE_LEN, UNIQUE_F)
     kh.consume(seq)
 
