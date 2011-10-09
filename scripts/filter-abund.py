@@ -54,11 +54,12 @@ def main():
     for infile in infiles:
        print 'filtering', infile
        outfile = os.path.basename(infile) + '.abundfilt'
-
        outfp = open(outfile, 'w')
 
        tsp = ThreadedSequenceProcessor(process_fn)
        tsp.start(verbose_loader(infile), outfp)
+
+       print 'output in', outfile
 
 if __name__ == '__main__':
     main()
