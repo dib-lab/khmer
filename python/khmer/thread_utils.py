@@ -15,6 +15,8 @@ def verbose_loader(filename):
             print >>sys.stderr, '... filtering', n
         yield record
 
+verbose_fasta_iter = verbose_loader
+
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order

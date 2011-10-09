@@ -3,6 +3,7 @@ from cStringIO import StringIO
 import traceback
 
 import khmer_tst_utils as utils
+import khmer
 import screed
 
 def scriptpath(scriptfile):
@@ -106,7 +107,7 @@ def test_filter_abund_2():
     counting_ht = _make_counting(infile, K=17)
 
     script = scriptpath('filter-abund.py')
-    args = ['-C', '1', counting_ht, infile]
+    args = ['-C', '1', counting_ht, infile, infile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
 
@@ -116,3 +117,36 @@ def test_filter_abund_2():
     seqs = set([ r.sequence for r in screed.open(outfile) ])
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+def test_filter_stoptags():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    stopfile = utils.get_temp_filename('stoptags', in_dir)
+
+    # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    # now, create a file with some stop tags in it --
+    K = 18
+    kh = khmer.new_hashbits(K, 1, 1)
+    kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
+    kh.save_stop_tags(stopfile)
+    del kh
+    
+    # finally, run filter-stoptags.
+    script = scriptpath('filter-stoptags.py')
+    args = ['-k', str(K), stopfile, infile, infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    print out
+    print err
+    assert status == 0
+
+    # verify that the basic output file exists
+    outfile = infile + '.stopfilt'
+    assert os.path.exists(outfile), outfile
+
+    # it should contain only one unique sequence, because we've trimmed
+    # off everything after the beginning of the only long sequence in there.
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs

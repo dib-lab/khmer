@@ -5,7 +5,7 @@ Ready-made khmer scripts
 k-mer counting
 ==============
 
-load-into-counting.py:
+load-into-counting.py: build a counting hash.
 
    Usage::
 
@@ -18,7 +18,7 @@ load-into-counting.py:
 
 	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
-filter-abund.py:
+filter-abund.py: trim sequences at a min k-mer abundance.
 
    Usage::
 	
@@ -32,3 +32,18 @@ filter-abund.py:
 
 	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
 	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
+
+Partitioning
+============
+
+filter-stoptags.py: trim sequences at stoptags.
+
+   Usage::
+
+	filter-stoptags.py [ -k <ksize> ] <input.stoptags> <file1> <file2> ...
+
+   Load stoptags in from the given .stoptags file and use them to trim
+   or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
+   <fileN>.stopfilt.
+
+   (Stoptags are produced by various (re)partitioning scripts.)

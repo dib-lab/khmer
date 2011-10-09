@@ -21,12 +21,13 @@ def test_fakelump_together():
 # try loading stop tags from previously saved
 def test_fakelump_stop():
     fakelump_fa = utils.get_test_data('fakelump.fa')
-    fakelump_fa_stop = utils.get_test_data('fakelump.fa.stoptags')
+    fakelump_stoptags_txt = utils.get_test_data('fakelump.fa.stoptags.txt')
 
     ht = khmer.new_hashbits(32, 1e7, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
-    ht.load_stop_tags(fakelump_fa_stop)
+    for line in open(fakelump_stoptags_txt):
+        ht.add_stop_tag(line.strip())
 
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
