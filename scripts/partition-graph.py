@@ -21,21 +21,6 @@ import khmer
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
-ht = None
-
-###
-
-save_ht = True
-load_ht = False
-save_merged_pmap = True
-remove_orig_pmap = False
-
-assert not (save_ht and load_ht)         # incompatible
-
-if not save_merged_pmap and remove_orig_pmap:
-    print '** warning, all the pmap files are going away! no permanent record!'
-    print ''
-
 ###
 
 def worker(q, basename):
