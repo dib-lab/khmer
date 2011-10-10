@@ -242,7 +242,9 @@ def test_load_graph():
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
-def _make_graph(infilename, SIZE=1e7, N=2, K=20, do_partition=False):
+def _make_graph(infilename, SIZE=1e7, N=2, K=20,
+                do_partition=False,
+                output_partitions=False):
     script = scriptpath('load-graph.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
@@ -264,10 +266,23 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20, do_partition=False):
         script = scriptpath('partition-graph.py')
         args = [outfile]
         (status, out, err) = runscript(script, args)
+        print out
+        print err
         assert status == 0
 
         final_pmap_file = outfile + '.pmap.merged'
         assert os.path.exists(final_pmap_file)
+
+        if output_partitions:
+            script = scriptpath('output-partitions.py')
+            args = ["-k", str(K), outfile, infilename]
+
+            in_dir = os.path.dirname(outfile)
+            (status, out, err) = runscript(script, args, in_dir)
+            assert status == 0
+
+            baseinfile = os.path.basename(infilename)
+            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
 
     return outfile
 
@@ -362,7 +377,8 @@ def test_output_partitions():
 def test_output_partitions_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
-    graphbase = _make_graph(seqfile, do_partition=True, K=21)
+    graphbase = _make_graph(seqfile, do_partition=True,
+                            K=21)
     in_dir = os.path.dirname(graphbase)
 
     # get the final pmap file
@@ -380,3 +396,33 @@ def test_output_partitions_2():
     parts = set(parts)
     print parts
     assert len(parts) == 99, len(parts)
+
+def test_extract_partitions():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _make_graph(seqfile, do_partition=True, output_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+    
+    (status, out, err) = runscript(script, args, in_dir)
+    print out
+    print err
+    assert status == 0
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
