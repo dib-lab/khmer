@@ -13,6 +13,7 @@
 #define SAVED_HASHBITS 2
 #define SAVED_TAGS 3
 #define SAVED_STOPTAGS 4
+#define SAVED_SUBSET 5
 
 #define VERBOSE_REPARTITION 0
 

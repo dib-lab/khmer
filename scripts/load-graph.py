@@ -1,4 +1,4 @@
-# /usr/bin/env python
+#! /usr/bin/env python
 """
 Build a graph from the given sequences, save in <htname>.
 

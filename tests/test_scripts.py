@@ -242,7 +242,7 @@ def test_load_graph():
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
-def _make_graph(infilename, SIZE=1e7, N=2, K=20):
+def _make_graph(infilename, SIZE=1e7, N=2, K=20, do_partition=False):
     script = scriptpath('load-graph.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
@@ -259,6 +259,15 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20):
 
     tagset_file = outfile + '.tagset'
     assert os.path.exists(tagset_file), tagset_file
+
+    if do_partition:
+        script = scriptpath('partition-graph.py')
+        args = [outfile]
+        (status, out, err) = runscript(script, args)
+        assert status == 0
+
+        final_pmap_file = outfile + '.pmap.merged'
+        assert os.path.exists(final_pmap_file)
 
     return outfile
 
@@ -328,3 +337,46 @@ def test_partition_graph_3():
 
     x = ht.count_partitions()
     assert x == (2, 0)          # should be 2 partitions
+
+def test_output_partitions():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _make_graph(seqfile, do_partition=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final pmap file
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    script = scriptpath('output-partitions.py')
+    args = ["-k", "20", graphbase, seqfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
+def test_output_partitions_2():
+    # test with K=21 (no joining of sequences)
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _make_graph(seqfile, do_partition=True, K=21)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final pmap file
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    script = scriptpath('output-partitions.py')
+    args = ["-k", "21", graphbase, seqfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    parts = set(parts)
+    print parts
+    assert len(parts) == 99, len(parts)

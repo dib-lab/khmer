@@ -36,11 +36,47 @@ filter-abund.py: trim sequences at a min k-mer abundance.
 Partitioning
 ============
 
+load-graph.py: load sequences into the compressible graph format.
+
+   Usage::
+
+        load-graph.py [ options ] <graphbase> <file1> [ <file2> ... ]
+
+   Load in a set of sequences, marking waypoints as you go, and save
+   into a ht/tagset pair of files.  See 'extract-partitions' for a
+   complete workflow.
+
+partition-graph.py: partition a graph based on waypoint connectivity.
+
+   Usage::
+
+	partition-graph.py [ options ] <graphbase>
+
+   Partition the given graph (ht + tagset) into disconnected subgraphs,
+   and save the resulting partitionmap(s).
+
+output-partitions.py: annotate sequences with partition IDs.
+
+   Usage::
+
+	output-partitions.py [ -k <ksize> ] <pmap.merged> <file1> [ <file2> ... ]
+
+   Load in a partitionmap (generally produced by partition-graph.py)
+   and annotate the sequences in the given files with their partition
+   IDs.  Use 'extract-partitions.py' to actually extract sequences
+   into separate group files.
+
+   Example::
+
+	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/partition-graph.py example
+	scripts/output-partitions.py -k 20 example tests/test-data/random-20-a.fa
+
 filter-stoptags.py: trim sequences at stoptags.
 
    Usage::
 
-	filter-stoptags.py [ -k <ksize> ] <input.stoptags> <file1> <file2> ...
+	filter-stoptags.py [ -k <ksize> ] <input.stoptags> <file1> [ <file2> ... ]
 
    Load stoptags in from the given .stoptags file and use them to trim
    or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
