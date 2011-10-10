@@ -66,11 +66,25 @@ output-partitions.py: annotate sequences with partition IDs.
    IDs.  Use 'extract-partitions.py' to actually extract sequences
    into separate group files.
 
-   Example::
+   Example (results will be in ``random-20-a.fa.part``)::
 
 	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
 	scripts/partition-graph.py example
 	scripts/output-partitions.py -k 20 example tests/test-data/random-20-a.fa
+
+extract-partitions.py: separate sequences annotated with partitions into group files
+
+   Usage::
+
+	extract-partitions.py [ options ] <prefix> <file1.part> [ <file2.part> ... ]
+
+   Example (results will be in ``example.group0000.fa``)::
+
+	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/partition-graph.py example
+	scripts/output-partitions.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/extract-partitions.py example random-20-a.fa.part
+
 
 filter-stoptags.py: trim sequences at stoptags.
 
