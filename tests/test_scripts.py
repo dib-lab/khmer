@@ -211,3 +211,53 @@ def test_normalize_by_min():
     seqs = [ r.sequence for r in screed.open(outfile) ]
     assert len(seqs) == 5, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+
+####
+
+def test_load_graph():
+    script = scriptpath('load-graph.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    ht_file = outfile + '.ht'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+def _make_counting(infilename, SIZE=1e7, N=2, K=20):
+    script = scriptpath('load-graph.py')
+    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    ht_file = outfile + '.ht'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    return (ht_file, tagset_file)
