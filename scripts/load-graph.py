@@ -58,7 +58,9 @@ def main():
        print 'consuming input', filename
        ht.consume_fasta_and_tag(filename)
 
+    print 'saving hashtable in', base + '.ht'
     ht.save(base + '.ht')
+    print 'saving tagset in', base + '.tagset'
     ht.save_tagset(base + '.tagset')
 
 if __name__ == '__main__':

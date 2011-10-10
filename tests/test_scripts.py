@@ -242,12 +242,12 @@ def test_load_graph():
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
-def _make_counting(infilename, SIZE=1e7, N=2, K=20):
+def _make_graph(infilename, SIZE=1e7, N=2, K=20):
     script = scriptpath('load-graph.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
     outfile = utils.get_temp_filename('out')
-    infile = utils.get_test_data('random-20-a.fa')
+    infile = utils.get_test_data(infilename)
 
     args.extend([outfile, infile])
 
@@ -260,4 +260,71 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20):
     tagset_file = outfile + '.tagset'
     assert os.path.exists(tagset_file), tagset_file
 
-    return (ht_file, tagset_file)
+    return outfile
+
+def test_partition_graph_1():
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+    in_dir = os.path.dirname(graphbase)
+
+    script = scriptpath('partition-graph.py')
+    args = [graphbase]
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0)          # should be exactly one partition.
+
+def test_partition_graph_2():
+    # test with K=21
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), K=21)
+    in_dir = os.path.dirname(graphbase)
+
+    script = scriptpath('partition-graph.py')
+    args = [graphbase]
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (99, 0)          # should be 99 partitions at K=21
+
+def test_partition_graph_3():
+    # test with stoptags
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
+    in_dir = os.path.dirname(graphbase)
+
+    # add in some stop tags
+    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
+    stoptags_file = graphbase + '.stoptags'
+    ht.save_stop_tags(stoptags_file)
+    del ht
+
+    # run script with stoptags option
+    script = scriptpath('partition-graph.py')
+    args = ['--stoptags', stoptags_file, graphbase]
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (2, 0)          # should be 2 partitions
