@@ -608,6 +608,19 @@ void SubsetPartition::_merge_other(HashIntoType tag,
 void SubsetPartition::merge_from_disk(string other_filename)
 {
   ifstream infile(other_filename.c_str(), ios::binary);
+  assert(infile.is_open());
+
+  unsigned int save_ksize = 0;
+  unsigned char version, ht_type;
+
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_SUBSET);
+
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  assert(save_ksize == _ht->ksize());
+
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
 
@@ -663,6 +676,18 @@ void SubsetPartition::merge_from_disk(string other_filename)
 void SubsetPartition::save_partitionmap(string pmap_filename)
 {
   ofstream outfile(pmap_filename.c_str(), ios::binary);
+
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_SUBSET;
+  outfile.write((const char *) &ht_type, 1);
+
+  unsigned int save_ksize = _ht->ksize();
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+
+  ///
+
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
   unsigned int n_bytes = 0;

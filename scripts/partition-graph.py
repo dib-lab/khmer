@@ -1,18 +1,22 @@
-# /usr/bin/env python
+#! /usr/bin/env python
 """
 Partition a graph.
 
 % python scripts/partition-graph.py <base>
 
+Final merged pmap file will be in <base>.pmap.merged.
+
 Use '-h' for parameter help.
 """
 
-import khmer, sys
+import sys
 import threading
 import Queue
 import gc
 import os.path
 import argparse
+
+import khmer
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
