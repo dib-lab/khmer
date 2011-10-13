@@ -5,6 +5,10 @@ Installing and running khmer
 You'll need git, Python and `virtualenv
 <http://pypi.python.org/pypi/virtualenv>`__.
 
+Note: python-dev need be installed with::
+
+  apt-get install python-dev
+
 Then, check out screed and khmer::
 
   git clone git://github.com/ctb/screed.git
