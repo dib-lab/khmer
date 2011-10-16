@@ -111,7 +111,7 @@ def main():
     print 'enqueued %d subset tasks' % n_subsets
     open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
 
-    n_threads = args.n_threads
+    n_threads = int(args.n_threads)
     if n_subsets < n_threads:
         n_threads = n_subsets
 
