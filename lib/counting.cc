@@ -875,6 +875,7 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
   unsigned char version, ht_type, use_bigcount;
 
   ifstream infile(infilename.c_str(), ios::binary);
+  assert(infile.is_open());
 
   infile.read((char *) &version, 1);
   infile.read((char *) &ht_type, 1);
