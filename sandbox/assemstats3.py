@@ -15,7 +15,7 @@ Once completed, you should be able to run this script as is.
 Author: Jason Pell (pelljaso@cse.msu.edu)
 '''
 
-import screed.fasta
+import screed
 import sys
 import glob
 
@@ -40,13 +40,10 @@ def getLens(filename):
    Parses FASTA file using screed to create a sorted list of contig lengths.
    '''
    lens = []
-   fd = open(filename, 'r')
 
-   fa_instance = screed.fasta.fasta_iter(fd)
+   fa_instance = screed.open(filename)
    for record in fa_instance:
       lens.append(len(record['sequence']))
-
-   fd.close()
 
    return sorted(lens)
 
