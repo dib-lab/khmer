@@ -53,24 +53,35 @@ partition-graph.py: partition a graph based on waypoint connectivity.
 	partition-graph.py [ options ] <graphbase>
 
    Partition the given graph (ht + tagset) into disconnected subgraphs,
-   and save the resulting partitionmap(s).
+   and save the resulting partitionmap(s) as *.pmap files.
 
-output-partitions.py: annotate sequences with partition IDs.
+merge-partitions.py: merge pmap files into a single merged pmap file.
 
    Usage::
 
-	output-partitions.py [ -k <ksize> ] <pmap.merged> <file1> [ <file2> ... ]
+        merge-partitions.py [ options ] <graphbase>
 
-   Load in a partitionmap (generally produced by partition-graph.py)
-   and annotate the sequences in the given files with their partition
-   IDs.  Use 'extract-partitions.py' to actually extract sequences
-   into separate group files.
+   Take the <graphbase>.subset.N.pmap files and merge them all into a
+   single <graphbase>.pmap.merged file for annotate-partitions to use.
+
+annotate-partitions.py: annotate sequences with partition IDs.
+
+   Usage::
+
+	annotate-partitions.py [ -k <ksize> ] <pmap.merged> <file1> [ <file2> ... ]
+
+   Load in a partitionmap (generally produced by
+   partition-graph.py/merge-partitins.py) and annotate the sequences
+   in the given files with their partition IDs.  Use
+   'extract-partitions.py' to actually extract sequences into separate
+   group files.
 
    Example (results will be in ``random-20-a.fa.part``)::
 
 	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
 	scripts/partition-graph.py example
-	scripts/output-partitions.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/merge-partitions.py -k 20 example
+	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
 
 extract-partitions.py: separate sequences annotated with partitions into group files
 
@@ -82,7 +93,8 @@ extract-partitions.py: separate sequences annotated with partitions into group f
 
 	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
 	scripts/partition-graph.py example
-	scripts/output-partitions.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/merge-partitions.py -k 20 example
+	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
 	scripts/extract-partitions.py example random-20-a.fa.part
 
 

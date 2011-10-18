@@ -4,7 +4,7 @@ Partition a graph.
 
 % python scripts/partition-graph.py <base>
 
-Final merged pmap file will be in <base>.pmap.merged.
+This will output many <base>.subset.N.pmap files.
 
 Use '-h' for parameter help.
 """
@@ -52,11 +52,6 @@ def main():
     parser.add_argument('basename')
     parser.add_argument('--stoptags', '-S', dest='stoptags', default='',
                         help="Use stoptags in this file during partitioning")
-    parser.add_argument('--no-merge', '-M', dest='merge_subsets', default=True,
-                        action='store_false', help='Do not merge subsets.')
-    parser.add_argument('--keep-subsets', dest='remove_subsets',
-                        default=True, action='store_false',
-                        help='Keep individual subsets')
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (usually 1e5-1e6 is good)')
@@ -71,8 +66,6 @@ def main():
     print '--'
     print 'SUBSET SIZE', args.subset_size
     print 'N THREADS', args.n_threads
-    print 'merge subsets?', args.merge_subsets
-    print 'remove subsets after merging?', args.remove_subsets
     if args.stoptags:
         print 'stoptag file:', args.stoptags
     print '--'
@@ -133,36 +126,6 @@ def main():
 
     print '---'
     print 'done making subsets! see %s.subset.*.pmap' % (basename,)
-
-    ###
-
-    # load & merge all pmap files
-    if args.merge_subsets:
-        print 'erasing old ht, creating new for merge'
-        del ht
-        gc.collect()
-
-        # create a new, empty ht object for merging; K matters, but not
-        # hashtable size.
-        ht = khmer.new_hashbits(K, 1, 1)
-
-        for i in range(0, n_subsets):
-            pmap_file = basename + '.subset.%d.pmap' % (i,)
-            print 'merging', pmap_file
-            ht.merge_subset_from_disk(pmap_file)
-
-        # save merged partitionmap
-        print 'saving merged pmap to %s.pmap.merged' % basename 
-        ht.save_partitionmap(basename + '.pmap.merged')
-
-        if args.remove_subsets:
-            print 'removing subset pmap files'
-            for i in range(0, n_subsets):
-                pmap_file = basename + '.subset.%d.pmap' % (i,)
-                os.unlink(pmap_file)
-
-        print '---'
-        print 'see final partitioning in', basename + '.pmap.merged'
 
 if __name__ == '__main__':
     main()
