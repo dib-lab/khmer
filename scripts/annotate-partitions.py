@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 """
-Output sequences with partition numbers.
+Annotate sequences with partition numbers.
 
-% python scripts/output-partitions.py <pmap_file> <file1> [ <file2> ... ]
+% python scripts/annotate-partitions.py <pmap_file> <file1> [ <file2> ... ]
 
-Partition-annotated sequences will be in <file1>.part.
+Partition-annotated sequences will be in <fileN>.part.
 
 Use '-h' for parameter help.
 """
@@ -17,10 +17,10 @@ import khmer
 DEFAULT_K=32
 
 def main():
-    parser = argparse.ArgumentParser(description="Output partitioned seqs.")
+    parser = argparse.ArgumentParser(description="Annotate seqs with partitions.")
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
-                        help="k-mer size")
+                        help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('graphbase')
     parser.add_argument('input_filenames', nargs='+')
 
