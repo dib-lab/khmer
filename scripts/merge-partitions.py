@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 """
-Merge 
+Merge multiple pmap files into a single one.
 
 % python scripts/merge-partitions.py <base>
 
