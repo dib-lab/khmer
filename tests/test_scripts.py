@@ -244,7 +244,7 @@ def test_load_graph():
 
 def _make_graph(infilename, SIZE=1e7, N=2, K=20,
                 do_partition=False,
-                output_partitions=False):
+                annotate_partitions=False):
     script = scriptpath('load-graph.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
@@ -270,11 +270,18 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
         print err
         assert status == 0
 
+        script = scriptpath('merge-partitions.py')
+        args = [outfile, '-k', str(K)]
+        (status, out, err) = runscript(script, args)
+        print out
+        print err
+        assert status == 0
+
         final_pmap_file = outfile + '.pmap.merged'
         assert os.path.exists(final_pmap_file)
 
-        if output_partitions:
-            script = scriptpath('output-partitions.py')
+        if annotate_partitions:
+            script = scriptpath('annotate-partitions.py')
             args = ["-k", str(K), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
@@ -296,6 +303,13 @@ def test_partition_graph_1():
     (status, out, err) = runscript(script, args)
     assert status == 0
 
+    script = scriptpath('merge-partitions.py')
+    args = [graphbase, '-k', str(20)]
+    (status, out, err) = runscript(script, args)
+    print out
+    print err
+    assert status == 0
+
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
@@ -314,6 +328,13 @@ def test_partition_graph_2():
     args = [graphbase]
 
     (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    script = scriptpath('merge-partitions.py')
+    args = [graphbase, '-k', str(21)]
+    (status, out, err) = runscript(script, args)
+    print out
+    print err
     assert status == 0
 
     final_pmap_file = graphbase + '.pmap.merged'
@@ -344,6 +365,13 @@ def test_partition_graph_3():
     (status, out, err) = runscript(script, args)
     assert status == 0
 
+    script = scriptpath('merge-partitions.py')
+    args = [graphbase, '-k', str(20)]
+    (status, out, err) = runscript(script, args)
+    print out
+    print err
+    assert status == 0
+
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
@@ -353,7 +381,7 @@ def test_partition_graph_3():
     x = ht.count_partitions()
     assert x == (2, 0)          # should be 2 partitions
 
-def test_output_partitions():
+def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
     in_dir = os.path.dirname(graphbase)
@@ -362,7 +390,7 @@ def test_output_partitions():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    script = scriptpath('output-partitions.py')
+    script = scriptpath('annotate-partitions.py')
     args = ["-k", "20", graphbase, seqfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
@@ -374,7 +402,7 @@ def test_output_partitions():
     assert '2' in parts
     assert len(parts) == 1
 
-def test_output_partitions_2():
+def test_annotate_partitions_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True,
@@ -385,7 +413,7 @@ def test_output_partitions_2():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    script = scriptpath('output-partitions.py')
+    script = scriptpath('annotate-partitions.py')
     args = ["-k", "21", graphbase, seqfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
@@ -399,7 +427,7 @@ def test_output_partitions_2():
 
 def test_extract_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')
-    graphbase = _make_graph(seqfile, do_partition=True, output_partitions=True)
+    graphbase = _make_graph(seqfile, do_partition=True, annotate_partitions=True)
     in_dir = os.path.dirname(graphbase)
 
     # get the final part file
