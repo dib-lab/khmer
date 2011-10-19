@@ -2,94 +2,105 @@
 Partitioning large data sets (50m+ reads)
 =========================================
 
-We've successfully used khmer to partition extremely large data sets.
-These are challenging because of the data size, the memory
-constraints, and the time involved.  You'll probably need 60-80gb of
-RAM to follow this process; we usually just rent EC2 machines at
-http://aws.amazon.com/.
+"Partitioning" is what khmer calls the process of separating reads
+that do not connect to each other into different logical bins.  The
+goal of partitioning is to apply divide & conquer to the process of
+metagenomic assembly.
 
-Here's a rough guide.
+Basic partitioning
+------------------
 
-Step 1a: Load the reads into a hashtable and tagset
-==================================================
+The basic workflow for partitioning is in the figure below:
 
-Load all of the k-mers in all of the reads in memory.
+.. image:: partitioning-workflow.png
+   :width: 40%
 
-This builds the basic data structure (a fixed-size hash table), which
-we can traverse as a probabilistic de Bruijn graph; and a set of
-k-mers that are tagged at a minimum density within that graph (the
-tag set).  In terms of memory consumption, the hashtable is fixed size
-and the tag set is linear with the number of reads (one tagged k-mer
-per read).
+Briefly, you load everything into khmer's probabilistic graph
+representation; exhaustively explore the graph to find all
+disconnected sequences; merge the results of the (parallelized) graph
+exploration; annotate sequences with their partition; and then extract
+the different partitions into files grouped by partition size.  These
+groups can then be assembled individually.
 
-Implemented in do-th-subset-save.py (first part).
+Artifact removal
+----------------
 
-Make the hashtable as big as possible.  Use large K.
+As part of our partitioning research, we discovered that large
+Illumina data sets tend to contain a single large, connected
+component.  This connected component seems to stem from sequencing
+artifacts that causes knots in the assembly graph.  We have developed
+tools to forcibly remove the knot at the heart of the graph.
 
-Note: hashtable occupancy should be less than 50%, rule of thumb.
+Here's the workflow:
 
-Optional: save the hashtable and tagset.  See ht.save(filename) and
-ht.save_tagset(filename).
+.. image:: artifact-removal.png
+  :width: 40%
 
-Example: ::
+Running on an example data set
+------------------------------
 
-  %% python ./scripts/do-th-subset-save.py data/25k.fa
+Here is a set of commands for running both basic partitioning and
+artifact removal on a small soil metagenomics data set that we've
+made available for this purpose.
 
-Step 1b: Do subset partitioning
-==============================
+The data set is about 1.1G and you can download it from here:
 
-Break the set of all tags into smaller subsets (1-5m in size is a good
-low-memory choice) and do a tabu search from each tag to all possible
-connected tags (stopping at the first connected tag in each
-path). Then label all connected tags with a partition ID. These
-subsets can be evaluated in parallel, then saved to disk when finished.
+https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
 
-Implemented in do-th-subset-save.py (second part).
+::
 
-The smaller the subset size, the less memory used and the more threads
-can be used to partition subsets in parallel.  We would suggest
-using a subset size of 1m with 8 threads, which is small enough to be
-evaluated and saved quickly, without using much memory.
+  cd /path/to/data
+  
+  # the next command will create a '50m.ht' and a '50m.tagset',
+  # representing the de Bruijn graph
+  python scripts/load-graph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz 
+  
+  # this will then partition that graph. should take a while.
+  # update threads to something higher if you have more cores.
+  # this creates a bunch of files, 50m.subset.*.pmap
+  python scripts/partition-graph.py --threads 4 -s 1e5 50m
+  
+  # now, merge the pmap files into one big pmap file, 50m.pmap.merged
+  python scripts/merge-partitions 50m
+  
+  # next, annotate the original sequences with their partition numbers.
+  # this will create iowa-corn-50m.fa.gz.part
+  python scripts/annotate-partitions.py 50m iowa-corn-50m.fa.gz
+  
+  # now, extract the partitions in groups into 'iowa-corn-50m.groupNNNN.fa'
+  python scripts/extract-partitions iowa-corn-50m iowa-corn-50m.fa.gz.part
+  
+  # at this point, you can assemble the group files individually.  Note,
+  # however, that the last one them is quite big?  this is because it's
+  # the lump! yay!
+  
+  # if you want to break up the lump, go through the partitioning bit
+  # on the group file, but this time with a twist:
+  mv iowa-corn-50m.group0005.fa corn-50m.lump.fa
+  
+  # create graph,
+  python scripts/load-graph.py -x 8e9 lump corn-50m.lump.fa
 
-After subset partitioning, neither the hashtable nor the original tagset
-is needed.
+  # create an initial set of stoptags to help in knot-traversal; otherwise,
+  # partitioning and knot-traversal (which is systematic) is really expensive.
+  python scripts/make-initial-stoptags.py lump
 
-Step 2: Merge subsets
-=====================
+  # now partition the graph, using the stoptags file
+  python scripts/partition-graph.py --stoptags lump.stoptags lump
 
-Do a pairwise merge of as many subsets as possible.  This is memory-
-and CPU- and disk-intensive.  Keep the number of parallel threads as
-high as possible without running out of memory.
+  # use the partitioned subsets to find the k-mers that nucleate the lump
+  python scripts/find-knots.py -x 2e8 -N 4 lump
 
-Implemented in do-subset-merge.py.
+  # remove those k-mers from the fasta files
+  python scripts/filter-stoptags.py *.stoptags corn-50m.lump.fa
 
-Repeat step #2 until you're sick of doing merges.  If you run out of
-memory, you may not be able to move on to step 3, but that hasn't
-happened to us -- if you can partition (step 1), you can probably
-do step 2.
+  # now, reload the filtered data set in and partition again.
+  python scripts/load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
+  python scripts/partition-graph.py -T 4 lumpfilt
+  python scripts/merge-partitions.py lumpfilt
+  python scripts/annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt
+  python scripts/extract-partitions.py corn-50m-lump corn-50m.lump.fa.stopfilt.part
 
-Step 3: Output the reads with their partitions
-==============================================
-
-Next, load/merge all the merged subsets (either as in step 2), and run
-through the entire original read file. Output any read that has been
-assigned a partition.
-
-Implemented in do-th-subset-load.py.
-
-Step 4: Group the sequences into separate groups, based on partition size
-=========================================================================
-
-Finally, we want to produce some files feed to the assembler.  While
-we *could* assemble each partition individually, in practice there
-will 10s of thousands to millions of partitions in a single large data
-set.  So instead we want to group them.
-
-The strategy we use is to go through the partitions, counting the
-number of reads in each; then order the partitions by size, smallest
-to largest; then output all the reads into a series of group files,
-each of a particular minimum size (containing a set of reads).
-(There's no particular logic as to why to do it this way; you could
-just as easily randomly assign partitions to groups.)
-
-Implemented in extract-partitions.py.
+  # and voila, after all that, you should now have your de-knotted lump in
+  # corn-50m-lump.group*.fa.  The *.group????.fa files can now be
+  # assembled individually by your favorite assembler.
