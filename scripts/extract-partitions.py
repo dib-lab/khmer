@@ -34,10 +34,10 @@ def main():
     parser.add_argument('prefix')
     parser.add_argument('part_filenames', nargs='+')
     parser.add_argument('--max-size', '-X', dest='max_size',
-                        default=DEFAULT_MAX_SIZE,
+                        default=DEFAULT_MAX_SIZE, type=int,
                         help='Max group size (n sequences)')
     parser.add_argument('--min-partition-size', '-m', dest='min_part_size',
-                        default=DEFAULT_THRESHOLD,
+                        default=DEFAULT_THRESHOLD, type=int,
                         help='Minimum partition size worth keeping')
     parser.add_argument('--no-output-groups', '-n', dest='output_groups',
                         default=True, action='store_false',
@@ -143,6 +143,9 @@ def main():
 
 
     print '%d groups' % group_n
+    if group_n == 0:
+        print 'nothing to output; exiting!'
+        return
 
     ## open a bunch of output files for the different groups
     group_fps = {}
