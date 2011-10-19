@@ -14,7 +14,6 @@ import os
 import khmer
 
 # counting hash parameters.
-DEFAULT_SUBSET_SIZE=int(1e5)
 DEFAULT_COUNTING_HT_SIZE=3e6                # number of bytes
 DEFAULT_COUNTING_HT_N=4                     # number of counting hash tables
 
@@ -44,9 +43,6 @@ def main():
     parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
                         default=DEFAULT_COUNTING_HT_SIZE,
                         help='lower bound on counting hashsize to use')
-    parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
-                        dest='subset_size', type=float,
-                        help='Set subset size (default 1e5 is prob ok)')
     parser.add_argument('graphbase')
 
     args = parser.parse_args()
