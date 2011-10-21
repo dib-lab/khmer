@@ -21,5 +21,5 @@ def cleanup():
     global cleanup_list
 
     for path in cleanup_list:
-        shutil.rmtree(path)
+        shutil.rmtree(path, ignore_errors=True)
     cleanup_list = []
