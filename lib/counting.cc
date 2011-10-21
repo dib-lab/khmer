@@ -1091,3 +1091,93 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
   gzclose(outfile);
 }
 
+void CountingHash::collect_high_abundance_kmers(const std::string &filename,
+						unsigned int lower_count,
+						unsigned int upper_count,
+						SeenSet& found_kmers)
+{
+  unsigned long long total_reads = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string currName = "";
+  string currSeq = "";
+
+  //
+  // iterate through the FASTA file & consume the reads, until we hit
+  // upper_count.
+  //
+
+  bool done = false;
+  while(!parser->is_complete() && !done)  {
+    read = parser->get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
+
+    // do we want to process it?
+    if (check_read(currSeq)) {
+      const char * sp = currSeq.c_str();
+
+      KMerIterator kmers(sp, _ksize);
+      HashIntoType kmer;
+
+      while(!kmers.done()) {
+	kmer = kmers.next();
+
+	count(kmer);
+	if (get_count(kmer) >= upper_count) {
+	  done = true;
+	}
+      }
+    }
+	       
+    // increment read number
+    total_reads++;
+
+    if (total_reads % 100000 == 0) {
+      std::cout << "..." << total_reads << "\n";
+    }
+  }
+
+  delete parser; parser = NULL;
+
+  unsigned long long stop_at_read = total_reads;
+
+  //
+  // go back through the file again, and store all k-mers >= lower_count
+  //
+
+  parser = IParser::get_parser(filename.c_str());
+
+  total_reads = 0;
+  while(!parser->is_complete() && total_reads != stop_at_read)  {
+    read = parser->get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
+
+    // do we want to process it?
+    if (check_read(currSeq)) {
+      const char * sp = currSeq.c_str();
+
+      KMerIterator kmers(sp, _ksize);
+      HashIntoType kmer;
+
+      while(!kmers.done()) {
+	kmer = kmers.next();
+
+	if (get_count(kmer) >= lower_count) {
+	  found_kmers.insert(kmer);
+	}
+      }
+    }
+	       
+    // increment read number
+    total_reads++;
+
+    if (total_reads % 100000 == 0) {
+      std::cout << "... x 2 " << total_reads << "\n";
+    }
+  }
+  delete parser; parser = NULL;
+}

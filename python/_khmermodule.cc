@@ -1460,6 +1460,9 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
   return x;
 }
 
+static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
+						    PyObject * args);
+
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
@@ -1491,6 +1494,8 @@ static PyMethodDef khmer_counting_methods[] = {
   { "save", hash_save, METH_VARARGS, "" },
   { "get_kmer_abund_abs_deviation", hash_get_kmer_abund_abs_deviation, METH_VARARGS, "" },
   { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
+  { "collect_high_abundance_kmers", hash_collect_high_abundance_kmers,
+    METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -2367,6 +2372,53 @@ static PyObject * hashbits_add_stop_tag(PyObject * self, PyObject *args)
   return Py_None;
 }
 
+static PyObject * hashbits_get_stop_tags(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  khmer::WordLength k = hashbits->ksize();
+  khmer::SeenSet::const_iterator si;
+
+  PyObject * x = PyList_New(hashbits->stop_tags.size());
+  unsigned long long i = 0;
+  for (si = hashbits->stop_tags.begin(); si != hashbits->stop_tags.end(); si++)
+    {
+      std::string s = khmer::_revhash(*si, k);
+      PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
+      i++;
+    }
+
+  return x;
+}
+
+static PyObject * hashbits_get_tagset(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  khmer::WordLength k = hashbits->ksize();
+  khmer::SeenSet::const_iterator si;
+
+  PyObject * x = PyList_New(hashbits->all_tags.size());
+  unsigned long long i = 0;
+  for (si = hashbits->all_tags.begin(); si != hashbits->all_tags.end(); si++) {
+    std::string s = khmer::_revhash(*si, k);
+    PyList_SET_ITEM(x, i, Py_BuildValue("s", s.c_str()));
+    i++;
+  }
+
+  return x;
+}
+
 static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3043,6 +3095,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "filter_if_present", hashbits_filter_if_present, METH_VARARGS, "" },
   { "add_tag", hashbits_add_tag, METH_VARARGS, "" },
   { "add_stop_tag", hashbits_add_stop_tag, METH_VARARGS, "" },
+  { "get_stop_tags", hashbits_get_stop_tags, METH_VARARGS, "" },
+  { "get_tagset", hashbits_get_tagset, METH_VARARGS, "" },
   { "load", hashbits_load, METH_VARARGS, "" },
   { "save", hashbits_save, METH_VARARGS, "" },
   { "load_tagset", hashbits_load_tagset, METH_VARARGS, "" },
@@ -3140,6 +3194,36 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
     PyObject_New(khmer_KHashbitsObject, &khmer_KHashbitsType);
 
   khashbits_obj->hashbits = new khmer::Hashbits(k, sizes);
+
+  return (PyObject *) khashbits_obj;
+}
+
+static PyObject * hash_collect_high_abundance_kmers(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * filename = NULL;
+  unsigned int lower_count, upper_count;
+
+  if (!PyArg_ParseTuple(args, "sII", &filename, &lower_count, &upper_count)) {
+    return NULL;
+  }
+
+  khmer::SeenSet found_kmers;
+  counting->collect_high_abundance_kmers(filename, lower_count, upper_count,
+					 found_kmers);
+
+  // create a new hashbits object...
+  std::vector<khmer::HashIntoType> sizes;
+  sizes.push_back(1);
+
+  khmer_KHashbitsObject * khashbits_obj = (khmer_KHashbitsObject *) \
+    PyObject_New(khmer_KHashbitsObject, &khmer_KHashbitsType);
+
+  // ...and set the collected kmers as the stoptags.
+  khashbits_obj->hashbits = new khmer::Hashbits(counting->ksize(), sizes);
+  khashbits_obj->hashbits->stop_tags.swap(found_kmers);
 
   return (PyObject *) khashbits_obj;
 }
