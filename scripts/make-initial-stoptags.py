@@ -43,11 +43,18 @@ def main():
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (default 1e4 is prob ok)')
+    parser.add_argument('--stoptags', '-S', dest='stoptags', default='',
+                        help="Use stoptags in this file during partitioning")
+
     parser.add_argument('graphbase')
 
     args = parser.parse_args()
 
     graphbase = args.graphbase
+    # do we want to load stop tags, and do they exist?
+    if args.stoptags:
+        print 'loading stoptags from', args.stoptags
+        ht.load_stop_tags(args.stoptags)
     
     print 'loading ht %s.ht' % graphbase
     ht = khmer.load_hashbits(graphbase + '.ht')
