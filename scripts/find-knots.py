@@ -55,7 +55,7 @@ def main():
     print 'loading tagset %s.tagset...' % graphbase
     ht.load_tagset(graphbase + '.tagset')
 
-    initial_stoptags = False
+    initial_stoptags = False    # @CTB regularize with make-initial
     if os.path.exists(graphbase + '.stoptags'):
         print 'loading stoptags %s.stoptags' % graphbase
         ht.load_stop_tags(graphbase + '.stoptags')

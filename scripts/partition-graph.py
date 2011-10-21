@@ -77,11 +77,10 @@ def main():
     # retrieve K
     K = ht.ksize()
 
-    # do we want to load stop tags, and do they exist? @CTB
-    stoptags_file = basename + '.stoptags'
+    # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print 'loading stoptags from', args.stoptags
-        ht.load_stop_tags(stoptags_file)
+        ht.load_stop_tags(args.stoptags)
 
     #
     # now, partition!
