@@ -170,8 +170,14 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
   const unsigned int ksize = _ht->ksize();
 
   //
-  // go through all the reads, and take those with assigned partitions
-  // and output them.
+  // go through all the new reads, and consume & tag them.  keep track
+  // of all waypoints in the read in 'found_tags', and then check to
+  // see if we've found either tags with no partition, or tags from
+  // different partitions, or, heck, anything new.  if we did, then
+  // we have "new stuff" from the perspective of the graph.
+  //
+  // so, we can either traverse the graph, or just merge the partitions.
+  // the former is exact, the latter is inexact but way faster :)
   //
 
   while(!parser->is_complete()) {
@@ -180,13 +186,13 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 
     if (_ht->check_read(seq)) {
       unsigned long long n_consumed = 0;
-      SeenSet new_tags;
-      _ht->consume_sequence_and_tag(seq, n_consumed, &new_tags);
+      SeenSet found_tags;
+      _ht->consume_sequence_and_tag(seq, n_consumed, &found_tags);
 
       PartitionSet pset;
       bool found_zero = false;
 
-      for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
+      for (SeenSet::iterator si = found_tags.begin(); si != found_tags.end();
 	   si++) {
 	PartitionMap::iterator pi = partition_map.find(*si);
 	PartitionID partition_id = 0;
@@ -215,15 +221,15 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 	  // go with behavior #1
 
 	  if (n_consumed || found_zero) {
-	    for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
+	    for (SeenSet::iterator si = found_tags.begin(); si != found_tags.end();
 		 si++) {
 	      tags_todo.insert(*si);
 	    }
 	  } else {
-	    assign_partition_id(*(new_tags.begin()), new_tags);
+	    assign_partition_id(*(found_tags.begin()), found_tags);
 	  }
 	} else {
-	  assign_partition_id(*(new_tags.begin()), new_tags);
+	  assign_partition_id(*(found_tags.begin()), found_tags);
 	}
 
 	//	std::cout << "got one! " << read.name << "\n";
