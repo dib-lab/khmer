@@ -2462,17 +2462,20 @@ static PyObject * hashbits_find_unpart(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * filename = NULL;
+  PyObject * traverse_o = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sO|O", &filename, &traverse_o, &callback_obj)) {
     return NULL;
   }
 
+  bool traverse = PyObject_IsTrue(traverse_o);
   unsigned int n_singletons = 0;
 
   try {
     khmer::SubsetPartition * subset_p = hashbits->partition;
-    n_singletons = subset_p->find_unpart(filename, _report_fn,callback_obj);
+    n_singletons = subset_p->find_unpart(filename, traverse,
+					 _report_fn,callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
