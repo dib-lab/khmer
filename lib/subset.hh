@@ -72,6 +72,7 @@ namespace khmer {
 					 void * callback_data=0);
 
     unsigned int find_unpart(const std::string infilename,
+			     bool traverse,
 			     CallbackFn callback=0,
 			     void * callback_data=0);
 

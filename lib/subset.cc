@@ -149,9 +149,8 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
   return partitions.size() + n_singletons;
 }
 
-#define PERFECT_UNPART 1
-
 unsigned int SubsetPartition::find_unpart(const std::string infilename,
+					  bool traverse,
 					  CallbackFn callback,
 					  void * callback_data)
 {
@@ -206,25 +205,29 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 	// ok, we found something unaccounted for by the current partitioning.
 	// we can either
 	//    (1) redo the partitioning of this area from scratch;
-	//    (2) just join tags that belong together (incl 0-tags);
-	//    (3) ...?
+	//    (2) just join tags that are on the same sequence (incl 0-tags);
 	// 1 is "perfect", 2 is imperfect but rilly fast.
 
-#if PERFECT_UNPART
-	if (n_consumed || found_zero) {
-	  for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
-	       si++) {
-	    tags_todo.insert(*si);
+	// note, in the case of #2, we can dispense with the hashtable,
+	// and just use the tagset/partition map.
+
+	if (traverse) {
+	  // go with behavior #1
+
+	  if (n_consumed || found_zero) {
+	    for (SeenSet::iterator si = new_tags.begin(); si != new_tags.end();
+		 si++) {
+	      tags_todo.insert(*si);
+	    }
+	  } else {
+	    assign_partition_id(*(new_tags.begin()), new_tags);
 	  }
 	} else {
 	  assign_partition_id(*(new_tags.begin()), new_tags);
 	}
-#else
-	assign_partition_id(*(new_tags.begin()), new_tags);
-#endif // 0
 
-	std::cout << "got one! " << read.name << "\n";
-	std::cout << pset.size() << " " << found_zero << " " << n_consumed << "\n";
+	//	std::cout << "got one! " << read.name << "\n";
+	// std::cout << pset.size() << " " << found_zero << " " << n_consumed << "\n";
       }
 
       total_reads++;
@@ -242,36 +245,36 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
     }
   }
 
-#if PERFECT_UNPART
-  std::cout << "new tags size: " << tags_todo.size() << "\n";
+  if (traverse) {
+    // std::cout << "new tags size: " << tags_todo.size() << "\n";
 
-  unsigned int n = 0;
-  std::string kmer_s;
-  HashIntoType kmer_f, kmer_r;
-  SeenSet tagged_kmers;
-  for (SeenSet::iterator si = tags_todo.begin(); si != tags_todo.end(); si++) {
-    n += 1;
+    unsigned int n = 0;
+    std::string kmer_s;
+    HashIntoType kmer_f, kmer_r;
+    SeenSet tagged_kmers;
+    for (SeenSet::iterator si = tags_todo.begin(); si != tags_todo.end(); si++) {
+      n += 1;
 
-    kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
-    kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+      kmer_s = _revhash(*si, ksize); // @CTB hackity hack hack!
+      kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
-    // find all tagged kmers within range.
-    tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
-		  true);
+      // find all tagged kmers within range.
+      tagged_kmers.clear();
+      find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+		    true);
 
-    std::cout << "found " << tagged_kmers.size() << "\n";
+      // std::cout << "found " << tagged_kmers.size() << "\n";
 
-    // assign the partition ID
-    std::cout << next_partition_id << "\n";
-    assign_partition_id(kmer, tagged_kmers);
+      // assign the partition ID
+      // std::cout << next_partition_id << "\n";
+      assign_partition_id(kmer, tagged_kmers);
 
-    // print out
-    if (n % 1000 == 0) {
-      cout << "unpart-part " << n << " " << next_partition_id << "\n";
+      // print out
+      if (n % 1000 == 0) {
+	cout << "unpart-part " << n << " " << next_partition_id << "\n";
+      }
     }
   }
-#endif // PERFECT_UNPART
 
   delete parser; parser = NULL;
 

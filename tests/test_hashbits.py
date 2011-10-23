@@ -416,3 +416,66 @@ def test_extract_unique_paths_4():
    print x
    assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
+
+def test_find_unpart():
+   filename = utils.get_test_data('random-20-a.odd.fa')
+   filename2 = utils.get_test_data('random-20-a.even.fa')
+   
+   K = 20 # size of kmer
+   HT_SIZE= 100000 # size of hashtable
+   N_HT = 3 # number of hashtables
+
+   ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+   ht.consume_fasta_and_tag(filename)
+
+   subset = ht.do_subset_partition(0, 0)
+   ht.merge_subset(subset)
+
+   n, _ = ht.count_partitions()
+   assert n == 49
+
+   ht.find_unpart(filename2, True)
+   n, _ = ht.count_partitions()
+   assert n == 1, n                     # all sequences connect
+   
+def test_find_unpart_notraverse():
+   filename = utils.get_test_data('random-20-a.odd.fa')
+   filename2 = utils.get_test_data('random-20-a.even.fa')
+   
+   K = 20 # size of kmer
+   HT_SIZE= 100000 # size of hashtable
+   N_HT = 3 # number of hashtables
+
+   ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+   ht.consume_fasta_and_tag(filename)
+
+   subset = ht.do_subset_partition(0, 0)
+   ht.merge_subset(subset)
+
+   n, _ = ht.count_partitions()
+   assert n == 49
+
+   ht.find_unpart(filename2, False)     # <-- don't traverse
+   n, _ = ht.count_partitions()
+   assert n == 99, n                    # all sequences disconnected
+
+def test_find_unpart_fail():
+   filename = utils.get_test_data('random-20-a.odd.fa')
+   filename2 = utils.get_test_data('random-20-a.odd.fa') #  <- switch to odd
+   
+   K = 20 # size of kmer
+   HT_SIZE= 100000 # size of hashtable
+   N_HT = 3 # number of hashtables
+
+   ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+   ht.consume_fasta_and_tag(filename)
+
+   subset = ht.do_subset_partition(0, 0)
+   ht.merge_subset(subset)
+
+   n, _ = ht.count_partitions()
+   assert n == 49
+
+   ht.find_unpart(filename2, True)
+   n, _ = ht.count_partitions()
+   assert n == 49, n                    # only 49 sequences worth of tags
