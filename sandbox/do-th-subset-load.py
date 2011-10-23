@@ -26,7 +26,8 @@ for subset_file in subset_filenames:
     ht.merge_subset_from_disk(subset_file)
 
 # save merged partitionmap
-ht.save_partitionmap(basename + '.pmap.merged')
+if len(subset_filenames) > 1:
+    ht.save_partitionmap(basename + '.pmap.merged')
 
 # partition!
 n_partitions = ht.output_partitions(filename, basename + '.part')

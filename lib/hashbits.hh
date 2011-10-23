@@ -146,6 +146,11 @@ namespace khmer {
 			       CallbackFn callback = 0,
 			       void * callback_data = 0);
 
+    void consume_sequence_and_tag(const std::string& seq,
+				  unsigned long long& n_consumed,
+				  SeenSet * new_tags = 0);
+
+
     void consume_fasta_and_tag_with_stoptags(const std::string &filename,
 					     unsigned int &total_reads,
 					     unsigned long long &n_consumed,
