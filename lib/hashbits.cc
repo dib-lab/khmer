@@ -342,7 +342,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
 void Hashbits::consume_sequence_and_tag(const std::string& seq,
 					unsigned long long& n_consumed,
-					SeenSet * new_tags)
+					SeenSet * found_tags)
 {
   bool is_new_kmer;
 
@@ -362,21 +362,21 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
 
     if (!is_new_kmer && set_contains(all_tags, kmer)) {
       since = 1;
-      if (new_tags) { new_tags->insert(kmer); }
+      if (found_tags) { found_tags->insert(kmer); }
     } else {
       since++;
     }
 
     if (since >= _tag_density) {
       all_tags.insert(kmer);
-      if (new_tags) { new_tags->insert(kmer); }
+      if (found_tags) { found_tags->insert(kmer); }
       since = 1;
     }
   }
 
   if (since >= _tag_density/2 - 1) {
     all_tags.insert(kmer);	// insert the last k-mer, too.
-    if (new_tags) { new_tags->insert(kmer); }
+    if (found_tags) { found_tags->insert(kmer); }
   }
 }
 
