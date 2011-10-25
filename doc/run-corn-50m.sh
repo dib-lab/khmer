@@ -20,14 +20,14 @@ ${SCRIPTPATH}/load-graph.py -k 32 -N 4 -x 12e9 50m iowa-corn-50m.fa.gz
 ${SCRIPTPATH}/partition-graph.py --threads 4 -s 1e5 50m
 
 # now, merge the pmap files into one big pmap file, 50m.pmap.merged
-${SCRIPTPATH}/merge-partitions 50m
+${SCRIPTPATH}/merge-partitions.py 50m
 
 # next, annotate the original sequences with their partition numbers.
 # this will create iowa-corn-50m.fa.gz.part
 ${SCRIPTPATH}/annotate-partitions.py 50m iowa-corn-50m.fa.gz
 
 # now, extract the partitions in groups into 'iowa-corn-50m.groupNNNN.fa'
-${SCRIPTPATH}/extract-partitions iowa-corn-50m iowa-corn-50m.fa.gz.part
+${SCRIPTPATH}/extract-partitions.py iowa-corn-50m iowa-corn-50m.fa.gz.part
 
 # at this point, you can assemble the group files individually.  Note,
 # however, that the last one them is quite big?  this is because it's
@@ -35,7 +35,7 @@ ${SCRIPTPATH}/extract-partitions iowa-corn-50m iowa-corn-50m.fa.gz.part
 
 # if you want to break up the lump, go through the partitioning bit
 # on the group file, but this time with a twist:
-mv iowa-corn-50m.group0005.fa corn-50m.lump.fa
+mv iowa-corn-50m.group0007.fa corn-50m.lump.fa
 
 # create graph,
 ${SCRIPTPATH}/load-graph.py -x 8e9 lump corn-50m.lump.fa
@@ -58,7 +58,7 @@ ${SCRIPTPATH}/load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
 ${SCRIPTPATH}/partition-graph.py -T 4 lumpfilt
 ${SCRIPTPATH}/merge-partitions.py lumpfilt
 ${SCRIPTPATH}/annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt
-${SCRIPTPATH}/extract-partitions.py corn-50m-lump corn-50m.lump.fa.stopfilt.pa
+${SCRIPTPATH}/extract-partitions.py corn-50m-lump corn-50m.lump.fa.stopfilt.part
 
 # and voila, after all that, you should now have your de-knotted lump in
 # corn-50m-lump.group*.fa.  The *.group????.fa files can now be
