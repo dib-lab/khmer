@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """
 Trim sequences at k-mers in the given stoptags file.  Output sequences
 will be placed in 'infile.stopfilt'.
