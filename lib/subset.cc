@@ -4,6 +4,9 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
+// #define STOP_BIG_TRAVERSALS
+#define BIG_TRAVERSALS_ARE 200
+
 // #define VALIDATE_PARTITIONS
 
 using namespace khmer;
@@ -320,6 +323,12 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
+#ifdef STOP_BIG_TRAVERSALS
+    if (keeper.size() > BIG_TRAVERSALS_ARE) {
+      tagged_kmers.clear();
+      break;
+    }
+#endif // 0
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
@@ -532,9 +541,12 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
     return_val = *pp;
   } else {
     PartitionMap::iterator pi = partition_map.find(kmer);
+
+#ifndef STOP_BIG_TRAVERSALS
     if (pi != partition_map.end()) {
-      assert(pi->second == NULL); // if it's not... reverse_pmap removal TBD.
+      // assert(pi->second == NULL); // if it's not... reverse_pmap removal TBD.
     }
+#endif // STOP_BIG_TRAVERSALS
 
     partition_map.erase(kmer);
     return_val = 0;
