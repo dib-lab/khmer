@@ -4,7 +4,6 @@
 
 #define IO_BUF_SIZE 1000*1000*1000
 
-// #define STOP_BIG_TRAVERSALS
 #define BIG_TRAVERSALS_ARE 200
 
 // #define VALIDATE_PARTITIONS
@@ -154,6 +153,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
 unsigned int SubsetPartition::find_unpart(const std::string infilename,
 					  bool traverse,
+					  bool stop_big_traversals,
 					  CallbackFn callback,
 					  void * callback_data)
 {
@@ -270,7 +270,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
       // find all tagged kmers within range.
       tagged_kmers.clear();
       find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
-		    true);
+		    true, stop_big_traversals);
 
       // std::cout << "found " << tagged_kmers.size() << "\n";
 
@@ -299,7 +299,8 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 				    HashIntoType kmer_r,
 				    SeenSet& tagged_kmers,
 				    const SeenSet& all_tags,
-				    bool break_on_stop_tags)
+				    bool break_on_stop_tags,
+				    bool stop_big_traversals)
 {
   const HashIntoType bitmask = _ht->bitmask;
 
@@ -323,12 +324,11 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   breadth_q.push(0);
 
   while(!node_q.empty()) {
-#ifdef STOP_BIG_TRAVERSALS
-    if (keeper.size() > BIG_TRAVERSALS_ARE) {
+    if (stop_big_traversals && keeper.size() > BIG_TRAVERSALS_ARE) {
       tagged_kmers.clear();
       break;
     }
-#endif // 0
+
     kmer_f = node_q.front();
     node_q.pop();
     kmer_r = node_q.front();
@@ -445,6 +445,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 void SubsetPartition::do_partition(HashIntoType first_kmer,
 				   HashIntoType last_kmer,
 				   bool break_on_stop_tags,
+				   bool stop_big_traversals,
 				   CallbackFn callback,
 				   void * callback_data)
 {
@@ -477,7 +478,7 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     // find all tagged kmers within range.
     tagged_kmers.clear();
     find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
-		  break_on_stop_tags);
+		  break_on_stop_tags, stop_big_traversals);
 
     // assign the partition ID
     assign_partition_id(kmer, tagged_kmers);
@@ -541,12 +542,6 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
     return_val = *pp;
   } else {
     PartitionMap::iterator pi = partition_map.find(kmer);
-
-#ifndef STOP_BIG_TRAVERSALS
-    if (pi != partition_map.end()) {
-      // assert(pi->second == NULL); // if it's not... reverse_pmap removal TBD.
-    }
-#endif // STOP_BIG_TRAVERSALS
 
     partition_map.erase(kmer);
     return_val = 0;
@@ -1163,7 +1158,7 @@ void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
     kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
 
     tagged_kmers.clear();
-    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags, true);
+    find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags, true, false);
 
     // only join things already in bigtags.
     for (SeenSet::iterator ssi = tagged_kmers.begin();
