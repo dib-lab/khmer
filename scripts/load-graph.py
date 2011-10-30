@@ -63,5 +63,14 @@ def main():
     print 'saving tagset in', base + '.tagset'
     ht.save_tagset(base + '.tagset')
 
+    fp_rate = khmer.calc_expected_collisions(ht)
+    print 'fp rate estimated to be %1.3f' % fp_rate
+    if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** ERROR: the graph structure is too small for"
+        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >>sys.stderr, "**"
+        sys.exit(-1)
+
 if __name__ == '__main__':
     main()
