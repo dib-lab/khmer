@@ -66,6 +66,21 @@ def test_load_into_counting():
     assert status == 0
     assert os.path.exists(outfile)
 
+def test_load_into_counting_fail():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e2', '-N', '2', '-k', '20'] # use small HT
+    
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = runscript(script, args)
+    print out
+    print err
+    assert status == -1
+    assert "ERROR:" in err
+
 def _make_counting(infilename, SIZE=1e7, N=2, K=20):
     script = scriptpath('load-into-counting.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
@@ -241,6 +256,19 @@ def test_load_graph():
     subset = ht.do_subset_partition(0, 0)
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
+
+def test_load_graph_fail():
+    script = scriptpath('load-graph.py')
+    args = ['-x', '1e3', '-N', '2', '-k', '20'] # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = runscript(script, args)
+    assert status == -1
+    assert "ERROR:" in err
 
 def _make_graph(infilename, SIZE=1e7, N=2, K=20,
                 do_partition=False,

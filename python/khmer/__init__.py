@@ -45,6 +45,20 @@ def reset_reporting_callback():
 
 reset_reporting_callback()
 
+def calc_expected_collisions(ht):
+    """
+    A quick & dirty expected collision rate calculation
+    """
+    sizes = ht.hashsizes()
+    n_ht = float(len(sizes))
+    occupancy = float(ht.n_occupied())
+    avg_size = sum(sizes) / n_ht
+
+    fp_one = occupancy / avg_size
+    fp_all = fp_one ** n_ht
+
+    return fp_all
+
 ###
 
 class KmerCount(object):
