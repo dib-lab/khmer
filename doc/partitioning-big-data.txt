@@ -104,3 +104,36 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   # and voila, after all that, you should now have your de-knotted lump in
   # corn-50m-lump.group*.fa.  The *.group????.fa files can now be
   # assembled individually by your favorite assembler.
+
+Post-partitioning assembly
+--------------------------
+
+The 'extract-partitions' script takes reads belonging to each
+partition and aggregates them into 'group' files; each group file
+contains at least one entire partition (and generally a lot more).
+Note, you can control the number of reads in each file (equiv, the
+size of these files) with some of the arguments that
+'extract-partitions' takes.
+
+Now that you have these files... what do you do with them?  The short
+answer is: assemble them!  Each of these group files contains reads
+that do not connect to reads in other files, so the files can be
+assembled individually (which is the whole point of partitioning).
+
+If you're using Velvet, checkout the ``sandbox/velvet-assemble.sh`` script,
+which you can run like this::
+
+   bash /path/to/khmer/sandbox/velvet-assemble.sh <groupfile> <k>
+
+This script does three things:
+
+ - first, it breaks the reads up into paired reads and single reads,
+   and puts them in separate files (.pe and .se);
+
+ - second, it strips off the partition information from the reads,
+   which confuses Velvet;
+
+ - and third, it runs velveth and velvetg to actually assemble.
+
+You can implement your own approach, of course, but this is an example of
+what we do ourselves.
