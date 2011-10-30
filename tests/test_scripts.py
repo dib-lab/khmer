@@ -272,7 +272,8 @@ def test_load_graph_fail():
 
 def _make_graph(infilename, SIZE=1e7, N=2, K=20,
                 do_partition=False,
-                annotate_partitions=False):
+                annotate_partitions=False,
+                stop_big_traverse=False):
     script = scriptpath('load-graph.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
 
@@ -293,6 +294,8 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
     if do_partition:
         script = scriptpath('partition-graph.py')
         args = [outfile]
+        if stop_big_traverse:
+            args.insert(0, '--no-big-traverse')
         (status, out, err) = runscript(script, args)
         print out
         print err
@@ -347,7 +350,7 @@ def test_partition_graph_1():
     x = ht.count_partitions()
     assert x == (1, 0)          # should be exactly one partition.
 
-def test_partition_graph_2():
+def test_partition_graph_nojoin_k21():
     # test with K=21
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), K=21)
     in_dir = os.path.dirname(graphbase)
@@ -374,7 +377,7 @@ def test_partition_graph_2():
     x = ht.count_partitions()
     assert x == (99, 0)          # should be 99 partitions at K=21
 
-def test_partition_graph_3():
+def test_partition_graph_nojoin_stoptags():
     # test with stoptags
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
     in_dir = os.path.dirname(graphbase)
@@ -408,6 +411,35 @@ def test_partition_graph_3():
 
     x = ht.count_partitions()
     assert x == (2, 0)          # should be 2 partitions
+
+def test_partition_graph_big_traverse():
+    graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
+                            do_partition=True, stop_big_traverse=True)
+    in_dir = os.path.dirname(graphbase)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (1, 0)          # should be exactly one partition.
+
+def test_partition_graph_no_big_traverse():
+    # do NOT exhaustively traverse
+    graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
+                            do_partition=True, stop_big_traverse=False)
+    in_dir = os.path.dirname(graphbase)
+
+    final_pmap_file = graphbase + '.pmap.merged'
+    assert os.path.exists(final_pmap_file)
+
+    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_partitionmap(final_pmap_file)
+
+    x = ht.count_partitions()
+    assert x == (4, 0), x       # should be four partitions, broken at knot.
 
 def test_annotate_partitions():
     seqfile = utils.get_test_data('random-20-a.fa')

@@ -434,7 +434,7 @@ def test_find_unpart():
    n, _ = ht.count_partitions()
    assert n == 49
 
-   ht.find_unpart(filename2, True)
+   ht.find_unpart(filename2, True, False)
    n, _ = ht.count_partitions()
    assert n == 1, n                     # all sequences connect
    
@@ -455,7 +455,7 @@ def test_find_unpart_notraverse():
    n, _ = ht.count_partitions()
    assert n == 49
 
-   ht.find_unpart(filename2, False)     # <-- don't traverse
+   ht.find_unpart(filename2, False, False)     # <-- don't traverse
    n, _ = ht.count_partitions()
    assert n == 99, n                    # all sequences disconnected
 
@@ -476,6 +476,6 @@ def test_find_unpart_fail():
    n, _ = ht.count_partitions()
    assert n == 49
 
-   ht.find_unpart(filename2, True)
+   ht.find_unpart(filename2, True, False)
    n, _ = ht.count_partitions()
    assert n == 49, n                    # only 49 sequences worth of tags

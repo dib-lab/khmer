@@ -23,7 +23,7 @@ DEFAULT_N_THREADS = 4
 
 ###
 
-def worker(q, basename):
+def worker(q, basename, stop_big_traversals):
     while 1:
         try:
             (ht, n, start, stop) = q.get(False)
@@ -38,8 +38,9 @@ def worker(q, basename):
         
         print 'starting:', basename, n
 
-        # pay attention to stoptags when partitioning, note
-        subset = ht.do_subset_partition(start, stop, True)
+        # pay attention to stoptags when partitioning; take command line
+        # direction on whether or not to exhaustively traverse.
+        subset = ht.do_subset_partition(start, stop, True, stop_big_traversals)
 
         print 'saving:', basename, n
         ht.save_subset_partitionmap(subset, outfile)
@@ -55,6 +56,10 @@ def main():
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (usually 1e5-1e6 is good)')
+
+    parser.add_argument('--no-big-traverse', dest='no_big_traverse',
+                        action='store_false', default=True,
+                        help='Truncate graph joins at big traversals')
 
     parser.add_argument('--threads', '-T', dest='n_threads',
                         default=DEFAULT_N_THREADS,
@@ -81,6 +86,9 @@ def main():
     if args.stoptags:
         print 'loading stoptags from', args.stoptags
         ht.load_stop_tags(args.stoptags)
+
+    # do we want to exhaustively traverse the graph?
+    stop_big_traversals = args.no_big_traverse
 
     #
     # now, partition!
@@ -113,7 +121,8 @@ def main():
 
     threads = []
     for n in range(n_threads):
-        t = threading.Thread(target=worker, args=(worker_q, basename))
+        t = threading.Thread(target=worker, args=(worker_q, basename,
+                                                  stop_big_traversals))
         threads.append(t)
         t.start()
 

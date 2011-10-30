@@ -2000,9 +2000,11 @@ static PyObject * hashbits_do_subset_partition(PyObject * self, PyObject * args)
   PyObject * callback_obj = NULL;
   khmer::HashIntoType start_kmer = 0, end_kmer = 0;
   PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "|KKOO", &start_kmer, &end_kmer,
+  if (!PyArg_ParseTuple(args, "|KKOOO", &start_kmer, &end_kmer,
 			&break_on_stop_tags_o,
+			&stop_big_traversals_o,
 			&callback_obj)) {
     return NULL;
   }
@@ -2011,12 +2013,17 @@ static PyObject * hashbits_do_subset_partition(PyObject * self, PyObject * args)
   if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
     break_on_stop_tags = true;
   }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
 
   khmer::SubsetPartition * subset_p = NULL;
   try {
     Py_BEGIN_ALLOW_THREADS
     subset_p = new khmer::SubsetPartition(hashbits);
     subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
+			   stop_big_traversals,
 			   _report_fn, callback_obj);
     Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
@@ -2463,18 +2470,22 @@ static PyObject * hashbits_find_unpart(PyObject * self, PyObject * args)
 
   char * filename = NULL;
   PyObject * traverse_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "sO|O", &filename, &traverse_o, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sOO|O", &filename, &traverse_o,
+			&stop_big_traversals_o, &callback_obj)) {
     return NULL;
   }
 
   bool traverse = PyObject_IsTrue(traverse_o);
+  bool stop_big_traversals = PyObject_IsTrue(stop_big_traversals_o);
   unsigned int n_singletons = 0;
 
   try {
     khmer::SubsetPartition * subset_p = hashbits->partition;
     n_singletons = subset_p->find_unpart(filename, traverse,
+					 stop_big_traversals,
 					 _report_fn,callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
