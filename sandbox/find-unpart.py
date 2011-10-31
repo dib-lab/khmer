@@ -3,6 +3,7 @@ import gc
 import glob
 
 TRAVERSE_ON_UNPART=True
+STOP_BIG_TRAVERSALS=True
 
 already_part = sys.argv[1]
 new_to_part = sys.argv[2]
@@ -19,7 +20,7 @@ ht.load_tagset(already_part + '.tagset')
 ht.merge_subset_from_disk(pmap_filename)
 
 # find singletons
-n_singletons = ht.find_unpart(new_to_part, TRAVERSE_ON_UNPART)
+n_singletons = ht.find_unpart(new_to_part, TRAVERSE_ON_UNPART, STOP_BIG_TRAVERSALS)
 print 'found:', n_singletons
 
 print 'saving', basename + '.unpart'
