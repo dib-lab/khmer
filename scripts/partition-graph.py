@@ -58,7 +58,7 @@ def main():
                         help='Set subset size (usually 1e5-1e6 is good)')
 
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',
-                        action='store_false', default=True,
+                        action='store_true', default=False,
                         help='Truncate graph joins at big traversals')
 
     parser.add_argument('--threads', '-T', dest='n_threads',
@@ -89,6 +89,10 @@ def main():
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
+    if stop_big_traversals:
+        print '** This script brakes for lumps: stop_big_traversals is true.'
+    else:
+        print '** Traverse all the things: stop_big_traversals is false.'
 
     #
     # now, partition!

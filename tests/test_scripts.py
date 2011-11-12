@@ -414,7 +414,7 @@ def test_partition_graph_nojoin_stoptags():
 
 def test_partition_graph_big_traverse():
     graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
-                            do_partition=True, stop_big_traverse=True)
+                            do_partition=True, stop_big_traverse=False)
     in_dir = os.path.dirname(graphbase)
 
     final_pmap_file = graphbase + '.pmap.merged'
@@ -429,7 +429,7 @@ def test_partition_graph_big_traverse():
 def test_partition_graph_no_big_traverse():
     # do NOT exhaustively traverse
     graphbase = _make_graph(utils.get_test_data('biglump-random-20-a.fa'),
-                            do_partition=True, stop_big_traverse=False)
+                            do_partition=True, stop_big_traverse=True)
     in_dir = os.path.dirname(graphbase)
 
     final_pmap_file = graphbase + '.pmap.merged'
