@@ -86,5 +86,17 @@ def main():
         print '...saving to', args.savehash
         ht.save(args.savehash)
 
+    # Change 0.2 only if you really grok it.  HINT: You don't.
+    fp_rate = khmer.calc_expected_collisions(ht)
+    print 'fp rate estimated to be %1.3f' % fp_rate
+
+    if fp_rate > 0.20:
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** ERROR: the counting hash is too small for"
+        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** Do not use these results!!"
+        sys.exit(-1)
+
 if __name__ == '__main__':
     main()
