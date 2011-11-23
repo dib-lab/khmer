@@ -514,3 +514,23 @@ def test_extract_partitions():
     assert len(parts) == 99, len(parts)
     parts = set(parts)
     assert len(parts) == 1, len(parts)
+
+def test_abundance_dist():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17)
+
+    script = scriptpath('abundance-dist.py')
+    args = ['-z', htfile, infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line

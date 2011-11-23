@@ -18,6 +18,24 @@ load-into-counting.py: build a counting hash.
 
 	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
+abundance-dist.py: calculate the abundance distribution.
+
+   Usage::
+	
+	scripts/abundance-dist.py [ options ] <input.kh> <datafile> <histout>
+
+   Use a counting hash table to count the k-mer abundance distribution in
+   <datafile>; output distribution to <histout>.
+
+   Example::
+
+	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+	scripts/abundance-dist.py -z out.kh data/100k-filtered.fa out.hist
+
+   The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
+   are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
+   of total distinct k-mers.
+
 filter-abund.py: trim sequences at a min k-mer abundance.
 
    Usage::
