@@ -2,7 +2,7 @@
 """
 Produce the k-mer abundance distribution for the given file.
 
-% python scripts/kmer-abundance-hist.py [ -z ] <htname> <data> <histout>
+% python scripts/abundance-dist.py [ -z -s ] <htname> <data> <histout>
 
 Use '-h' for parameter help.
 """
