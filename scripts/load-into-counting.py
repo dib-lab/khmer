@@ -1,4 +1,4 @@
-# /usr/bin/env python
+#! /usr/bin/env python
 """
 Build a counting Bloom filter from the given sequences, save in <htname>.
 
