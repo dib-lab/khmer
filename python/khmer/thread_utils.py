@@ -144,6 +144,9 @@ class ThreadedSequenceProcessor(object):
                 print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
                       (self.bp_processed, self.bp_written,
                        self.bp_processed - self.bp_written)
+                discarded = self.bp_processed - self.bp_written
+                f = float(discarded) / float(self.bp_processed) * 100
+                print >>sys.stderr, "discarded %.1f%%" % f
 
         # end of thread; exit, decrement worker count.
         self.worker_count -= 1
@@ -166,6 +169,9 @@ class ThreadedSequenceProcessor(object):
             print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
                   (self.bp_processed, self.bp_written,
                    self.bp_processed - self.bp_written)
+            discarded = self.bp_processed - self.bp_written
+            f = float(discarded) / float(self.bp_processed) * 100
+            print >>sys.stderr, "discarded %.1f%%" % f
         
 
                 
