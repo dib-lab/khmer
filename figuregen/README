@@ -10,7 +10,7 @@ EBS. The snapshot ID is snap-5b1b473. If you would like to obtain
 the data through a different method, email jason.pell@gmail.com.
 
 IMPORTANT: Once you have the data, you need to create a directory 
-called 'data' in this folder that contains the following 3 files:
+called 'data' in this directory that contains the following 3 files:
 
 	reads.fa
 	ecoli.fa
