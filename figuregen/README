@@ -3,6 +3,19 @@ results in the paper "Scaling metagenome sequence assembly with
 probabilistic de Bruijn graphs." If you have any questions, email 
 jason.pell@gmail.com.
 
+Obtaining the Data
+==================
+Currently, the easiest way to obtain the data is through Amazon's 
+EBS. The snapshot ID is snap-5b1b473. If you would like to obtain 
+the data through a different method, email jason.pell@gmail.com.
+
+IMPORTANT: Once you have the data, you need to create a directory 
+called 'data' in this folder that contains the following 3 files:
+
+	reads.fa
+	ecoli.fa
+	msb2.fq
+
 Package Requirements
 ====================
 To generate all of the results, you will need the following packages:
