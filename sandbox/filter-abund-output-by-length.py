@@ -75,7 +75,6 @@ def main():
     for infile in infiles:
        print 'filtering', infile
        outfile = os.path.basename(infile) + '.abundfilt'
-       outfp = open(outfile, 'w')
 
        tsp = ThreadedSequenceProcessor(process_fn)
        tsp.start(verbose_loader(infile), OutputByLength(outfile))
