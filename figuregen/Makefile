@@ -5,8 +5,9 @@
 #    screed (github.com/ctb/screed)
 #    R
 #    graphviz
+#    octave
 
-all: bitsperkmer graphvisual clustsize numparts seqerror diam
+all: bitsperkmer graphvisual clustsize numparts seqerror diam perc
 
 bitsperkmer:
 	python bitsperk.py > results/bitsperk.txt 
@@ -38,6 +39,10 @@ numparts:
 	./output.sh
 	mv Rplots.pdf results/part.pdf
 
+perc:
+	perc/do.sh > percout.txt
+	mv perc/S1/S1.pdf results/perc.pdf
+
 clean:
 	rm -f *.dot
 	rm -rf 0.0*
@@ -46,3 +51,8 @@ clean:
 	rm -f *.txt
 	rm -f genome.fa
 	rm -f results/*
+	rm -f perc/S1/*.txt
+	rm -f perc/scripts/*.txt
+	rm -f perc/S1/ppt
+	rm -f perc/scripts/ppt
+	rm -f perc/src/ppt

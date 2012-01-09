@@ -1,0 +1,26 @@
+L4=loadPPTData('_K4.txt');
+L5=loadPPTData('_K5.txt');
+L6=loadPPTData('_K6.txt');
+L7=loadPPTData('_K7.txt');
+%L8=loadPPTData('_K8.txt');
+%L9=loadPPTData('_K9.txt');
+%L10=loadPPTData('_K10.txt');
+%L11=loadPPTData('_K11.txt');
+%L12=loadPPTData('_K12.txt');
+plot(L4(:,1),L4(:,2)),hold on;
+plot(L5(:,1),L5(:,2)),hold on;
+plot(L6(:,1),L6(:,2)),hold on;
+plot(L7(:,1),L7(:,2)),hold on;
+%plot(L8(:,1),L8(:,2),'magenta'),hold on;
+%plot(L9(:,1),L9(:,2),'Color',[0.5430,0,0]),hold on;
+%plot(L10(:,1),L10(:,2),'yellow'),hold on;
+%plot(L11(:,1),L11(:,2),'cyan'),hold on;
+%plot(L12(:,1),L12(:,2),'Color',[1,0.4,0.6]),hold on;
+set(get(gca,'XLabel'),'String','p');
+set(get(gca,'YLabel'),'String','\theta');
+%legend('K4','K5','K6','K7','K8','K9','K10','K11','K12');
+legend('K4','K5','K6','K7');
+%saveas(gcf,'resultPlot.pdf','pdf');
+%exit();
+print -dpdf S1.pdf
+exit();
