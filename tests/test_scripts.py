@@ -227,6 +227,27 @@ def test_normalize_by_min():
     assert len(seqs) == 5, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
+def test_count_median():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = infile + '.counts'
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = scriptpath('count-median.py')
+    args = [counting_ht, infile, outfile]
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    assert os.path.exists(outfile), outfile
+
+    data = [ x.strip() for x in open(outfile) ]
+    data = set(data)
+    assert len(data) == 2, data
+    assert 'seq 1001 1001.0 0.0 18' in data
+    assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
+
 ####
 
 def test_load_graph():
