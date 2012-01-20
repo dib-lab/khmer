@@ -99,6 +99,7 @@ def main():
 
         print 'saving stoptags binary'
         ht.save_stop_tags(graphbase + '.stoptags')
+        os.rename(subset_file, subset_file + '.processed')
         print '(%d of %d)\n' % (n, len(pmap_files))
 
     print 'done!'
