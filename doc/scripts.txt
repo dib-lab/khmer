@@ -5,7 +5,7 @@ Ready-made khmer scripts
 k-mer counting
 ==============
 
-load-into-counting.py: build a counting hash.
+**load-into-counting.py**: build a counting hash.
 
    Usage::
 
@@ -18,7 +18,7 @@ load-into-counting.py: build a counting hash.
 
 	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
-abundance-dist.py: calculate the abundance distribution.
+**abundance-dist.py**: calculate the abundance distribution.
 
    Usage::
 	
@@ -36,7 +36,7 @@ abundance-dist.py: calculate the abundance distribution.
    are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
    of total distinct k-mers.
 
-filter-abund.py: trim sequences at a min k-mer abundance.
+**filter-abund.py**: trim sequences at a min k-mer abundance.
 
    Usage::
 	
@@ -51,10 +51,21 @@ filter-abund.py: trim sequences at a min k-mer abundance.
 	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
 	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
 
+**count-median.py**: count median, average, and stddev of k-mer abundance in sequences.
+
+   Usage::
+
+        count-median.py <input.kh> <input sequence file> <output file>
+
+   Load a counting hash table from <input.kh> and use it to calculate the
+   median, average, and stddev k-mer count for each sequence in the
+   <input sequence file>.  Output counts are placed in <output file>,
+   in the format "name median average stddev sequence_length".
+
 Partitioning
 ============
 
-load-graph.py: load sequences into the compressible graph format.
+**load-graph.py**: load sequences into the compressible graph format.
 
    Usage::
 
@@ -64,7 +75,7 @@ load-graph.py: load sequences into the compressible graph format.
    into a ht/tagset pair of files.  See 'extract-partitions' for a
    complete workflow.
 
-partition-graph.py: partition a graph based on waypoint connectivity.
+**partition-graph.py**: partition a graph based on waypoint connectivity.
 
    Usage::
 
@@ -75,7 +86,7 @@ partition-graph.py: partition a graph based on waypoint connectivity.
 
    See 'Artifact removal' to understand the stoptags argument.
 
-merge-partitions.py: merge pmap files into a single merged pmap file.
+**merge-partitions.py**: merge pmap files into a single merged pmap file.
 
    Usage::
 
@@ -84,7 +95,7 @@ merge-partitions.py: merge pmap files into a single merged pmap file.
    Take the <graphbase>.subset.N.pmap files and merge them all into a
    single <graphbase>.pmap.merged file for annotate-partitions to use.
 
-annotate-partitions.py: annotate sequences with partition IDs.
+**annotate-partitions.py**: annotate sequences with partition IDs.
 
    Usage::
 
@@ -103,7 +114,7 @@ annotate-partitions.py: annotate sequences with partition IDs.
 	scripts/merge-partitions.py -k 20 example
 	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
 
-extract-partitions.py: separate sequences annotated with partitions into group files
+**extract-partitions.py**: separate sequences annotated with partitions into group files
 
    Usage::
 
@@ -124,7 +135,7 @@ Artifact removal
 The following scripts are specialized scripts for finding and removing
 highly-connected k-mers (HCKs).  See :doc:`partitioning-big-data`.
 
-make-initial-stoptags.py: find an initial set of HCKs
+**make-initial-stoptags.py**: find an initial set of HCKs
 
    Usage::
 
@@ -142,7 +153,7 @@ make-initial-stoptags.py: find an initial set of HCKs
    specifies the number of waypoints from which to traverse; for
    highly connected data sets, the default (1000) is probably ok.
 
-find-knots.py: find all HCKs
+**find-knots.py**: find all HCKs
 
    Usage::
 
@@ -165,7 +176,7 @@ find-knots.py: find all HCKs
 
    TODO: eliminate or rename the already-processed pmap files?
 
-filter-stoptags.py: trim sequences at stoptags.
+**filter-stoptags.py**: trim sequences at stoptags.
 
    Usage::
 
@@ -178,7 +189,7 @@ filter-stoptags.py: trim sequences at stoptags.
 Digital normalization
 =====================
 
-normalize-by-min.py: do digital normalization (remove entirely
+**normalize-by-min.py**: do digital normalization (remove entirely
 redundant sequences)
 
    Usage::
@@ -196,7 +207,7 @@ redundant sequences)
 
 	scripts/normalize-by-min.py -k 17 tests/test-data/test-abund-read-2.fa
 
-normalize-by-median.py: do digital normalization (remove mostly
+**normalize-by-median.py**: do digital normalization (remove mostly
 redundant sequences)
 
    Usage::
