@@ -1,0 +1,15 @@
+Development miscellany
+======================
+
+Python command-line scripts should use '-' instead of '_' in the name.
+(Only filenames containing code for import imported should use _.)
+
+Please follow the command-line conventions used under scripts/.  This
+includes most especially standardization of '-x' to be hash table size,
+'-N' to be number of hash tables, and '-k' to always refer to the
+k-mer size.
+
+All code in scripts/ must have automated tests; see tests/test_scripts.py.
+Otherwise it belongs in sandbox/.
+
+@@CTB: to squash output, or not to squash, by default?

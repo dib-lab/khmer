@@ -19,6 +19,7 @@ Contents:
    blog-posts
    partitioning-big-data
    details
+   development
    contributors
 
    LICENSE
