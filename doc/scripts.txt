@@ -174,8 +174,6 @@ highly-connected k-mers (HCKs).  See :doc:`partitioning-big-data`.
    restart the process, and if you eliminate the already-processed
    pmap files, you can continue where you left off.
 
-   TODO: eliminate or rename the already-processed pmap files?
-
 **filter-stoptags.py**: trim sequences at stoptags.
 
    Usage::
