@@ -1,0 +1,7 @@
+/u/qingpeng/Github/newkhmer/tests/test-data/test-overlap1.fa:
+# of unique kmers:440346
+# of occupied bin:440299
+/u/qingpeng/Github/newkhmer/tests/test-data/test-overlap2.fa:
+# of unique kmers:581866
+# of occupied bin:581783
+# of overlap unique kmers:184849
