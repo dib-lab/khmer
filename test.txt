@@ -4,3 +4,5 @@ Here's another line to test commeting on different lines.
 
 Now I'm testing GitHub/Lighthouse integration and need an updated file.
 
+Ooops, helps if I use the right ticket number in my commit message.
+
