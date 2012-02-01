@@ -1,5 +1,5 @@
 NO_UNIQUE_RC=0
-CXXFLAGS=-g -fPIC -Wall -O2 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+CXXFLAGS=-g -fPIC -Wall -O3 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
 # comment out whichever is appropriate.  can probably make this automatic ;)
 SO_EXT=.so
@@ -7,10 +7,10 @@ SO_EXT=.so
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
-all: zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+all: zlib threadedParsers.o parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
 clean:
-	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
+	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT) smpFiltering
 
 #test: test.cc ktable.o hashtable.o
 
@@ -18,6 +18,9 @@ zlib: $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
 
 $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT):
 	cd $(Z_LIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
+
+smpFiltering: threadedParsers.o parsers.o counting.o hashtable.o ktable.o zlib
+	$(CXX) $(CXXFLAGS) -o smpFiltering smpFiltering.cc threadedParsers.o parsers.o counting.o hashtable.o ktable.o $(Z_LIB_FILES) -fopenmp
 
 parsetest: parsers.o 
 	$(CXX) -o parsers parsers.o $(Z_LIB_FILES)
@@ -30,6 +33,8 @@ graphtest: graphtest.o ktable.o hashtable.o
 
 consume_prof: consume_prof.o hashtable.o ktable.o
 	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
+
+threadedParsers.o: threadedParsers.cc threadedParsers.hh
 
 parsers.o: parsers.cc parsers.hh
 
