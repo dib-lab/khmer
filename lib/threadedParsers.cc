@@ -1,5 +1,8 @@
 #include "threadedParsers.hh"
 
+using namespace khmer;
+using namespace khmer:: threaded_parsers;
+
 /* This function returns the proper parser factory for a given
  * file type
  */

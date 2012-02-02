@@ -1,5 +1,8 @@
 #include "parsers.hh"
 
+using namespace khmer;
+using namespace khmer:: parsers;
+
 IParser* IParser::get_parser(const std::string &inputfile)
 {
    std::string filename(inputfile);
