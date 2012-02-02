@@ -1,5 +1,6 @@
 NO_UNIQUE_RC=0
 CXXFLAGS=-g -fPIC -Wall -O3 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+CXXFLAGS+=-DKHMER_THREADED -fopenmp
 
 # comment out whichever is appropriate.  can probably make this automatic ;)
 SO_EXT=.so

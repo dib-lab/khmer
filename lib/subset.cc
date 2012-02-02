@@ -9,6 +9,7 @@
 // #define VALIDATE_PARTITIONS
 
 using namespace khmer;
+using namespace khmer:: parsers;
 using namespace std;
 
 #if 0

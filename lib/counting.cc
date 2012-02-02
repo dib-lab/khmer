@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace khmer;
+using namespace khmer:: parsers;
 
 MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
 					      unsigned long long total_reads,

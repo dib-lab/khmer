@@ -5,6 +5,7 @@
 #define CALLBACK_PERIOD 10000
 
 using namespace khmer;
+using namespace khmer:: parsers;
 using namespace std;
 
 //

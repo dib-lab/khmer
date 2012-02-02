@@ -1,6 +1,7 @@
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "parsers.hh"
+#include "threadedParsers.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -300,10 +301,20 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 				      CallbackFn callback,
 				      void * callback_data)
 {
+#ifndef KHMER_THREADED
+  using namespace khmer:: parsers;
+#else
+  using namespace khmer:: threaded_parsers;
+#endif
+
   total_reads = 0;
   n_consumed = 0;
 
-  IParser* parser = IParser::get_parser(filename.c_str());
+#ifndef KHMER_THREADED
+  IParser *		    parser  = IParser::get_parser(filename.c_str());
+#else
+  ThreadedIParserFactory *  pf	    = ThreadedIParserFactory:: get_parser( filename.c_str( ), 104857600 );
+#endif
   Read read;
 
   string seq = "";
@@ -311,33 +322,62 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
   //
   // iterate through the FASTA file & consume the reads.
   //
+  
+#ifdef KHMER_THREADED
+#pragma omp parallel
+  while ( !pf->is_complete( ) )
+  {
+    ThreadedIParser *	    parser    = pf->get_next_parser( );
+#endif
 
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    seq = read.seq;
+    while(!parser->is_complete())  {
+      read = parser->get_next_read();
+      seq = read.seq;
 
-    // n_consumed += this_n_consumed;
+      // n_consumed += this_n_consumed;
 
-    if (check_read(seq)) {	// process?
-      consume_sequence_and_tag(seq, n_consumed);
-    }
-	       
-    // reset the sequence info, increment read number
-    total_reads++;
+      // TODO: Think about C++ exceptions from within a critical block.
+#ifdef KHMER_THREADED
+#     pragma omp critical
+      {
+#endif
 
-    // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-      std::cout << "n tags: " << all_tags.size() << "\n";
-      try {
-        callback("consume_fasta_and_tag", callback_data, total_reads,
-		 n_consumed);
-      } catch (...) {
-	delete parser;
-        throw;
-      }
-    }
-  }
-  delete parser;
+	if (check_read(seq)) {	// process?
+	  consume_sequence_and_tag(seq, n_consumed);
+	}
+		   
+	// reset the sequence info, increment read number
+	total_reads++;
+
+	// run callback, if specified
+	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	  std::cout << "n tags: " << all_tags.size() << "\n";
+	  try {
+	    callback("consume_fasta_and_tag", callback_data, total_reads,
+		     n_consumed);
+	  } catch (...) {
+	    delete parser;
+#ifdef KHMER_THREADED
+	    delete pf;
+	    // TODO? Tell all threads to rejoin master.
+#endif
+	    throw;
+	  }
+	}
+
+#ifdef KHMER_THREADED
+      } // end critical block
+#endif
+    } // while reads left for parser
+
+    delete parser;
+
+#ifdef KHMER_THREADED
+  } // while parser fatory is still doling out parsers
+  
+  delete pf;
+#endif
+
 }
 
 void Hashbits::consume_sequence_and_tag(const std::string& seq,
@@ -392,6 +432,8 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 						   CallbackFn callback,
 						   void * callback_data)
 {
+  using namespace khmer:: parsers;
+
   total_reads = 0;
   n_consumed = 0;
 
@@ -544,6 +586,8 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 					  CallbackFn callback,
 					  void * callback_data)
 {
+  using namespace khmer:: parsers;
+
   total_reads = 0;
   n_consumed = 0;
 
@@ -602,6 +646,8 @@ void Hashbits::filter_if_present(const std::string infilename,
 				 CallbackFn callback,
 				 void * callback_data)
 {
+  using namespace khmer:: parsers;
+
   IParser* parser = IParser::get_parser(infilename);
   ofstream outfile(outputfile.c_str());
 
@@ -1405,6 +1451,8 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 				      CountingHash &counting,
 				      unsigned int cutoff)
 {
+  using namespace khmer:: parsers;
+
   Read read;
   IParser* parser = IParser::get_parser(filename);
   string name;
@@ -1554,6 +1602,8 @@ void Hashbits::traverse_from_reads(std::string filename,
 				   unsigned int transfer_threshold,
 				   CountingHash &counting)
 {
+  using namespace khmer:: parsers;
+
   unsigned long long total_reads = 0;
   unsigned long long total_stop = 0;
 
@@ -1610,6 +1660,8 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
 					  unsigned int transfer_threshold,
 					  CountingHash &counting)
 {
+  using namespace khmer:: parsers;
+
   unsigned long long total_reads = 0;
 
   IParser* parser = IParser::get_parser(filename.c_str());
@@ -1785,3 +1837,5 @@ void Hashbits::extract_unique_paths(std::string seq,
     }
   }
 }
+
+// vim: set sts=2 sw=2:
