@@ -10,7 +10,7 @@ doc: FORCE
 lib_files:
 	cd lib && make
 
-python_files:
+python_files: lib_files
 	cd python && python setup.py build_ext -i
 
 test: all
