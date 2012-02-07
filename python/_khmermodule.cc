@@ -1625,6 +1625,88 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     return PyInt_FromLong(n);
 }
 
+static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
+{
+    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+    khmer::Hashbits * hashbits = me->hashbits;
+    
+    khmer::HashIntoType start = 0, stop = 0;
+    
+    if (!PyArg_ParseTuple(args, "os", &ht2, &file_name)) {
+        return NULL;
+    }
+    
+    khmer::HashIntoType n = hashbits->n_kmers(start, stop);
+    
+    return PyInt_FromLong(n);
+}
+
+
+static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  PyObject * readmask_obj = NULL;
+  PyObject * update_readmask_bool = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
+  khmer::Hashbits ht2;
+
+
+  if (!PyArg_ParseTuple(args, "so|iiOOO", &filename, &ht2,&lower_bound, &upper_bound,
+			&readmask_obj, &update_readmask_bool,
+			&callback_obj)) {
+    return NULL;
+  }
+
+  bool update_readmask = false;
+  khmer::ReadMaskTable * readmask = NULL;
+
+  // set C++ parameters accordingly
+
+#### pass ht2_p parameters!!!!!!
+
+  if (readmask_obj && readmask_obj != Py_None) {
+    if (update_readmask_bool != NULL &&
+	PyObject_IsTrue(update_readmask_bool)) {
+      update_readmask = true;
+    }
+
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fourth argument must be None or a readmask object");
+      return NULL;
+    }
+    
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashbits->consume_fasta_overlap(filename,&ht2, total_reads, n_consumed,
+			     lower_bound, upper_bound, &readmask,
+			     update_readmask, _report_fn, callback_obj,);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  // error checking -- this should still be null!
+  if (!update_readmask && !readmask_obj) {
+    assert(readmask == NULL);
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
+
+
+
 static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2158,9 +2240,9 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   unsigned int total_reads;
 
   try {
-    hashbits->consume_fasta_overlap(filename, total_reads, n_consumed,
+    hashbits->consume_fasta(filename, total_reads, n_consumed,
 			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn, callback_obj,ht2_p);
+			     update_readmask, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -3143,6 +3225,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
+  { "count_overlap", hashbits_count_overlap,METH_VARARGS,"Count overlap kmers in two datasets" },
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
   { "save_stop_tags", hashbits_save_stop_tags, METH_VARARGS, "" },
