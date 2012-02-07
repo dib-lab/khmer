@@ -2135,6 +2135,8 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
   // set C++ parameters accordingly
 
+#### pass ht2_p parameters!!!!!!
+
   if (readmask_obj && readmask_obj != Py_None) {
     if (update_readmask_bool != NULL &&
 	PyObject_IsTrue(update_readmask_bool)) {
@@ -2156,9 +2158,9 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   unsigned int total_reads;
 
   try {
-    hashbits->consume_fasta(filename, total_reads, n_consumed,
+    hashbits->consume_fasta_overlap(filename, total_reads, n_consumed,
 			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn, callback_obj);
+			     update_readmask, _report_fn, callback_obj,ht2_p);
   } catch (_khmer_signal &e) {
     return NULL;
   }
