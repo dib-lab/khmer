@@ -53,7 +53,7 @@ def main():
 
     fp = open(os.path.basename(args.input_contigs) + '.unfound', 'w')
 
-    for contig in screed.open(args.input_contigs):
+    for contig in screed.open(base):
         seq = contig.sequence
         
         n_not_found = 0
