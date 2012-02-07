@@ -411,6 +411,7 @@ Read FastqGzParser::get_next_read()
 }
 
 
+/*
 int main()
 {
    IParser* parser = IParser::get_parser("test.fasta.gz");
@@ -432,3 +433,4 @@ int main()
 
    return 0;
 }
+*/
