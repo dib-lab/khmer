@@ -2,6 +2,7 @@
 #include "hashbits.hh"
 #include "parsers.hh"
 #include "threadedParsers.hh"
+#include <omp.h>
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -312,10 +313,11 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
 #ifndef KHMER_THREADED
   IParser *		    parser  = IParser::get_parser(filename.c_str());
+  Read read;
 #else
   ThreadedIParserFactory *  pf	    = ThreadedIParserFactory:: get_parser( filename.c_str( ), 104857600 );
+  ThreadedIParser *	    parser  = NULL;
 #endif
-  Read read;
 
   string seq = "";
 
@@ -324,10 +326,12 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
   //
   
 #ifdef KHMER_THREADED
-#pragma omp parallel
+#pragma omp parallel shared( pf, total_reads, n_consumed, callback, callback_data ) private( parser, seq )
   while ( !pf->is_complete( ) )
   {
-    ThreadedIParser *	    parser    = pf->get_next_parser( );
+    // ThreadedIParser *	    parser    = pf->get_next_parser( );
+    Read read;
+    parser    = pf->get_next_parser( );
 #endif
 
     while(!parser->is_complete())  {
@@ -336,20 +340,17 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
       // n_consumed += this_n_consumed;
 
-      // TODO: Think about C++ exceptions from within a critical block.
-#ifdef KHMER_THREADED
-#     pragma omp critical
-      {
-#endif
-
+#pragma omp critical ( consume_and_tag_seq )
 	if (check_read(seq)) {	// process?
 	  consume_sequence_and_tag(seq, n_consumed);
 	}
-		   
+
 	// reset the sequence info, increment read number
+#pragma omp critical ( incr_tot_reads )
 	total_reads++;
 
 	// run callback, if specified
+#pragma omp critical ( call_callback )
 	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	  std::cout << "n tags: " << all_tags.size() << "\n";
 	  try {
@@ -358,17 +359,16 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  } catch (...) {
 	    delete parser;
 #ifdef KHMER_THREADED
-	    delete pf;
-	    // TODO? Tell all threads to rejoin master.
+	    // delete pf;
 #endif
 	    throw;
 	  }
 	}
 
-#ifdef KHMER_THREADED
-      } // end critical block
-#endif
     } // while reads left for parser
+
+#pragma omp critical ( debug4 )
+    std::cout << "DEBUG: " << omp_get_thread_num( ) << " before parser deletion\n";
 
     delete parser;
 
