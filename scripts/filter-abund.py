@@ -1,4 +1,4 @@
-# /usr/bin/env python
+#! /usr/bin/env python
 """
 Trim sequences at k-mers of the given abundance, based on the given counting
 hash table.  Output sequences will be placed in 'infile.abundfilt'.
