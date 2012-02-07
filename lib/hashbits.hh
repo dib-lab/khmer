@@ -24,7 +24,7 @@ namespace khmer {
     unsigned int _tag_density;
     HashIntoType _occupied_bins;
     HashIntoType _n_unique_kmers;
-
+	HashIntoType _n_overlap_kmers;
     Byte ** _counts;
 
     virtual void _allocate_counters() {
@@ -43,7 +43,7 @@ namespace khmer {
 	memset(_counts[i], 0, tablebytes);
       }
     }
-
+            
     void _clear_all_partitions() {
       if (partition != NULL) {
 	partition->_clear_all_partitions();
@@ -67,6 +67,7 @@ namespace khmer {
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
       _n_unique_kmers = 0;
+	  _n_overlap_kmers = 0;
 
       _allocate_counters();
     }
@@ -211,6 +212,55 @@ namespace khmer {
 	_n_unique_kmers +=1;
       }
     }
+
+
+    virtual void count_overlap(HashIntoType khash, Hashbits *ht2_p) {
+      bool is_new_kmer = false;
+
+      for (unsigned int i = 0; i < _n_tables; i++) {
+	HashIntoType bin = khash % _tablesizes[i];
+	HashIntoType byte = bin / 8;
+	unsigned char bit = bin % 8;
+	if (!( _counts[i][byte] & (1<<bit))) {
+	  _occupied_bins += 1;
+	  is_new_kmer = true;
+	}
+	_counts[i][byte] |= (1 << bit);
+      }
+      if (is_new_kmer) {
+	_n_unique_kmers +=1;
+	if (check_overlap(khash,ht2_p)){
+		_n_overlap_kmers +=1;
+      }
+    }
+
+
+
+	virtual void check_overlap(HashIntoType khash, Hashbits *ht2_p) {
+	 // Byte ** _counts2;
+	 // _counts2 = ht2->_counts;
+	  bool is_new_kmer = false;
+
+	  for (unsigned int i = 0; i < ht2_p->_n_tables; i++) {
+		HashIntoType bin = khash % ht2_p->_tablesizes[i];
+		HashIntoType byte = bin / 8;
+		unsigned char bit = bin % 8;
+		if (!( ht2_p->_counts[i][byte] & (1<<bit))) {
+		  is_new_kmer = true;
+	}
+	ht2_p->_counts[i][byte] |= (1 << bit);
+      }
+      if (! is_new_kmer) {
+		return true;
+      }
+	  else {
+		return false;
+	  }
+
+	  }
+
+
+
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
