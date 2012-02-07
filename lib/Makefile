@@ -32,6 +32,9 @@ bittest: bittest.o ktable.o
 graphtest: graphtest.o ktable.o hashtable.o
 	$(CXX) -o graphtest graphtest.o ktable.o hashtable.o
 
+load_graph: load_graph.o hashbits.o hashtable.o threadedParsers.o parsers.o zlib
+	$(CXX) $(CXXFLAGS) -pg -o load_graph load_graph.cc hashbits.o hashtable.o subset.o ktable.o threadedParsers.o parsers.o $(Z_LIB_FILES) -fopenmp
+
 consume_prof: consume_prof.o hashtable.o ktable.o
 	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
 
