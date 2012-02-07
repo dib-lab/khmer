@@ -220,7 +220,7 @@ def test_normalize_by_min():
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
 
-    outfile = infile + '.keep'
+    outfile = infile + '.minkeep'
     assert os.path.exists(outfile), outfile
 
     seqs = [ r.sequence for r in screed.open(outfile) ]
