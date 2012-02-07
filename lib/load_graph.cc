@@ -10,10 +10,17 @@
 #include <error.h>
 #include <getopt.h>
 
-// #include <string>
+#define HASH_TYPE_TO_TEST   1 // Counting Hash
+// #define HASH_TYPE_TO_TEST   2 // Bit Hash
 
-#include "hashbits.hh"
-
+#if HASH_TYPE_TO_TEST == 1
+#  include "counting.hh"
+#elif HASH_TYPE_TO_TEST == 2
+#  include "hashbits.hh"
+#else
+#  error "No HASH_TYPE_TO_TEST macro defined."
+#endif
+#include "primes.hh"
 
 using namespace std;
 using namespace khmer;
@@ -27,14 +34,14 @@ int main( int argc, char * argv[ ] )
     unsigned long	kmer_length	    = 32;
     float		ht_size_FP	    = 1.0E6;
     unsigned long	ht_count	    = 4;
-    unsigned long	input_chunk_size    = 104857600;
+    // unsigned long	input_chunk_size    = 104857600;
 
     int			rc		    = 0;
     int			opt		    = -1;
     char *		conv_residue	    = NULL;
     string		ofile_name;
     string		ifile_name;
-    FILE *		ofile		    = NULL;
+    // FILE *		ofile		    = NULL;
 
     while (-1 != (opt = getopt( argc, argv, SHORT_OPTS )))
     {
@@ -69,13 +76,21 @@ int main( int argc, char * argv[ ] )
     else error( EINVAL, 0, "Input file name required" );
 
     HashIntoType	    ht_size		= (HashIntoType)ht_size_FP;
-    unsigned int	    reads_total		= 0;
-    unsigned long long int  n_consumed		= 0;
+    Primes primetab( ht_size );
     vector<HashIntoType> ht_sizes;
     for ( unsigned int i = 0; i < ht_count; ++i )
-	ht_sizes.push_back( ht_size );
+	ht_sizes.push_back( primetab.get_next_prime( ) );
+
+    unsigned int	    reads_total		= 0;
+    unsigned long long int  n_consumed		= 0;
+
+#if HASH_TYPE_TO_TEST == 1
+    CountingHash ht( kmer_length, ht_sizes );
+    ht.consume_fasta( ifile_name, reads_total, n_consumed );
+#elif HASH_TYPE_TO_TEST == 2
     Hashbits ht( kmer_length, ht_sizes );
-    ht.consume_fasta_and_tag( ifile_name, reads_total, n_consumed, NULL, NULL );
+    ht.consume_fasta_and_tag( ifile_name, reads_total, n_consumed );
+#endif
     
     //ofile = fopen( ofile_name.c_str( ), "w" );
     //if (!ofile) error( EINVAL, 0, "Failed to open output file" );

@@ -7,6 +7,8 @@
 #include <fstream>
 #include <assert.h>
 
+#define THREADED_PARSER_CHUNK_SIZE	104857600
+
 namespace khmer
 {
 

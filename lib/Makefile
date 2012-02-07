@@ -7,20 +7,21 @@ SO_EXT=.so
 #DYLIB_EXT=.dylib
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
+DRV_PROGS=smpFiltering load_graph #consume_prof
 
 all: zlib threadedParsers.o parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
 clean:
-	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT) smpFiltering
+	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT) $(DRV_PROGS)
 
-#test: test.cc ktable.o hashtable.o
+test: test.cc ktable.o hashtable.o
 
 zlib: $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
 
 $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT):
 	cd $(Z_LIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
 
-smpFiltering: threadedParsers.o parsers.o counting.o hashtable.o ktable.o zlib
+smpFiltering: threadedParsers.o parsers.o counting.o hashtable.o ktable.o zlib primes.hh
 	$(CXX) $(CXXFLAGS) -o smpFiltering smpFiltering.cc threadedParsers.o parsers.o counting.o hashtable.o ktable.o $(Z_LIB_FILES) -fopenmp
 
 parsetest: parsers.o 
@@ -32,11 +33,12 @@ bittest: bittest.o ktable.o
 graphtest: graphtest.o ktable.o hashtable.o
 	$(CXX) -o graphtest graphtest.o ktable.o hashtable.o
 
-load_graph: load_graph.o hashbits.o hashtable.o threadedParsers.o parsers.o zlib
-	$(CXX) $(CXXFLAGS) -pg -o load_graph load_graph.cc hashbits.o hashtable.o subset.o ktable.o threadedParsers.o parsers.o $(Z_LIB_FILES) -fopenmp
+load_graph: counting.o hashbits.o hashtable.o threadedParsers.o parsers.o zlib
+	$(CXX) $(CXXFLAGS) -pg -o load_graph load_graph.cc counting.o hashbits.o hashtable.o subset.o ktable.o threadedParsers.o parsers.o $(Z_LIB_FILES) -fopenmp
 
-consume_prof: consume_prof.o hashtable.o ktable.o
-	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
+# NOTE: Doesn't build into anything useful and is thus disabled for the time being.
+#consume_prof: consume_prof.o hashtable.o ktable.o threadedParsers.o parsers.o
+#	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o threadedParsers.o parsers.o -fopenmp
 
 threadedParsers.o: threadedParsers.cc threadedParsers.hh
 

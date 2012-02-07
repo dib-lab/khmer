@@ -1,11 +1,11 @@
 #include "khmer.hh"
 #include "hashtable.hh"
 #include "parsers.hh"
+#include "threadedParsers.hh"
 
 #define CALLBACK_PERIOD 10000
 
 using namespace khmer;
-using namespace khmer:: parsers;
 using namespace std;
 
 //
@@ -57,11 +57,22 @@ void Hashtable::consume_fasta(const std::string &filename,
 			      CallbackFn callback,
 			      void * callback_data)
 {
+#ifndef KHMER_THREADED
+  using namespace khmer:: parsers;
+#else
+  using namespace khmer:: threaded_parsers;
+#endif
+
   total_reads = 0;
   n_consumed = 0;
 
+#ifndef KHMER_THREADED
   IParser* parser = IParser::get_parser(filename.c_str());
   Read read;
+#else
+  ThreadedIParserFactory *  pf	    = ThreadedIParserFactory:: get_parser( filename.c_str( ), THREADED_PARSER_CHUNK_SIZE );
+  ThreadedIParser *	    parser  = NULL;
+#endif
 
   string currName = "";
   string currSeq = "";
@@ -80,49 +91,65 @@ void Hashtable::consume_fasta(const std::string &filename,
   //
   // iterate through the FASTA file & consume the reads.
   //
+#ifdef KHMER_THREADED
+// TODO: Figure out if readmasks can be efficiently data-parallelized. If not, then again stuck with critical section bottleneck.
+#pragma omp parallel shared( pf, total_reads, n_consumed, callback, callback_data, readmask, masklist ) private( parser, currName, currSeq )
+  while (!pf->is_complete( ))
+  {
+    Read read;
+    parser    = pf->get_next_parser( );
+#endif
 
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    currSeq = read.seq;
-    currName = read.name; 
+    while(!parser->is_complete())  {
+      read = parser->get_next_read();
+      currSeq = read.seq;
+      currName = read.name; 
 
-    // do we want to process it?
-    if (!readmask || readmask->get(total_reads)) {
+      // do we want to process it?
+#pragma omp critical (check_masked_read)
+      if (!readmask || readmask->get(total_reads)) {
 
-      // yep! process.
-      unsigned int this_n_consumed;
-      bool is_valid;
+	// yep! process.
+	unsigned int this_n_consumed;
+	bool is_valid;
 
-      this_n_consumed = check_and_process_read(currSeq,
-					       is_valid,
-					       lower_bound,
-					       upper_bound);
+	this_n_consumed = check_and_process_read(currSeq,
+						 is_valid,
+						 lower_bound,
+						 upper_bound);
 
-      // was this an invalid sequence -> mark as bad?
-      if (!is_valid && update_readmask) {
-        if (readmask) {
-	  readmask->set(total_reads, false);
-	} else {
-	  masklist.push_back(total_reads);
+	// was this an invalid sequence -> mark as bad?
+	if (!is_valid && update_readmask) {
+	  if (readmask) {
+	    readmask->set(total_reads, false);
+	  } else {
+	    masklist.push_back(total_reads);
+	  }
+	} else {		// nope -- count it!
+	  n_consumed += this_n_consumed;
 	}
-      } else {		// nope -- count it!
-        n_consumed += this_n_consumed;
-      }
-    }
-	       
-    // reset the sequence info, increment read number
-    total_reads++;
+      } // check masked read
+		 
+      // reset the sequence info, increment read number
+#pragma omp critical (incr_tot_reads)
+      total_reads++;
 
-    // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-      try {
-        callback("consume_fasta", callback_data, total_reads, n_consumed);
-      } catch (...) {
-        throw;
+      // run callback, if specified
+#pragma omp critical (call_callback)
+      if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	try {
+	  callback("consume_fasta", callback_data, total_reads, n_consumed);
+	} catch (...) {
+	  throw;
+	}
       }
-    }
-  }
+    } // while reads left for parser
 
+#ifdef KHMER_THREADED
+  } // while parser factory is still doling out parsers
+
+  delete pf;
+#endif
 
   //
   // We've either updated the readmask in place, OR we need to create a
@@ -173,3 +200,4 @@ unsigned int Hashtable::consume_string(const std::string &s,
   return n_consumed;
 }
 
+// vim: set sts=2 sw=2:
