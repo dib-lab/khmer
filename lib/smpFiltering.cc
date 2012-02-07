@@ -19,6 +19,7 @@ for read in file:
 
 using namespace std;
 using namespace khmer;
+using namespace khmer:: threaded_parsers;
 
 #define MAX_MEDIAN_COUNT 10 /* Only count if the median is < this */
 #define TABLE_SIZE 2000000000

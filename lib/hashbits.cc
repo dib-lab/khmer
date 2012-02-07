@@ -315,7 +315,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
   IParser *		    parser  = IParser::get_parser(filename.c_str());
   Read read;
 #else
-  ThreadedIParserFactory *  pf	    = ThreadedIParserFactory:: get_parser( filename.c_str( ), 104857600 );
+  ThreadedIParserFactory *  pf	    = ThreadedIParserFactory:: get_parser( filename.c_str( ), THREADED_PARSER_CHUNK_SIZE );
   ThreadedIParser *	    parser  = NULL;
 #endif
 
@@ -340,17 +340,17 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
       // n_consumed += this_n_consumed;
 
-#pragma omp critical ( consume_and_tag_seq )
+#pragma omp critical (consume_and_tag_seq)
 	if (check_read(seq)) {	// process?
 	  consume_sequence_and_tag(seq, n_consumed);
 	}
 
 	// reset the sequence info, increment read number
-#pragma omp critical ( incr_tot_reads )
+#pragma omp critical (incr_tot_reads)
 	total_reads++;
 
 	// run callback, if specified
-#pragma omp critical ( call_callback )
+#pragma omp critical (call_callback)
 	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	  std::cout << "n tags: " << all_tags.size() << "\n";
 	  try {
@@ -366,9 +366,6 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	}
 
     } // while reads left for parser
-
-#pragma omp critical ( debug4 )
-    std::cout << "DEBUG: " << omp_get_thread_num( ) << " before parser deletion\n";
 
     delete parser;
 
