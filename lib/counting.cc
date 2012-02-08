@@ -663,13 +663,15 @@ void CountingHash::get_kadian_count(const std::string &s,
   }
 
   sort(counts.begin(), counts.end());
-  kadian = counts[kpos-1];
+  kadian = counts[kpos - 1];
 
-  std::cout << "k " << (int)kpos << ": ";
+#if 0
+  std::cout << "k " << kpos << ": ";
   for (unsigned int i = 0; i < counts.size(); i++) {
-    std::cout << i << "-" << counts[i] << "; ";
+    std::cout << i << "-" << counts[i] << " ";
   }
   std::cout << "\n";
+#endif // 0
 }
 
 
