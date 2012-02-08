@@ -52,9 +52,9 @@ def calc_expected_collisions(ht):
     sizes = ht.hashsizes()
     n_ht = float(len(sizes))
     occupancy = float(ht.n_occupied())
-    avg_size = sum(sizes) / n_ht
+    min_size = min(sizes)
 
-    fp_one = occupancy / avg_size
+    fp_one = occupancy / min_size
     fp_all = fp_one ** n_ht
 
     return fp_all
