@@ -1,2 +1,5 @@
 load_graph
 smpFiltering
+bittest
+ktable_test
+*.swp

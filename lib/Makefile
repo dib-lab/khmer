@@ -1,44 +1,86 @@
+# Use multiple threads?
+# Set this variable to true if you wish the codes to use multiple threads when they can.
+WANT_THREADING=true
+
+# Profile?
+# Set this variable to true if you wish to profile the codes.
+WANT_PROFILING=true
+
+# Which profiling tool to use?
+# Assuming you have TAU installed and setup properly, you can instrument codes with it to get detailed multi-threaded profiling.
+# Otherwise, gprof is able to give you some information without threading info.
+# Choose one of: gprof, TAU
+PROFILER_OF_CHOICE=TAU
+
 NO_UNIQUE_RC=0
+
 CXXFLAGS=-g -fPIC -Wall -O3 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
+LIBS=
+
+ifeq ($(WANT_THREADING), true)
 CXXFLAGS+=-DKHMER_THREADED -fopenmp
+LIBS+=-fopenmp
+endif
+
+ifeq ($(WANT_PROFILING), true)
+ifeq ($(PROFILER_OF_CHOICE), TAU)
+CXX=tau_cxx.sh
+endif
+ifeq ($(PROFILER_OF_CHOICE), gprof)
+CXXFLAGS+=-pg
+endif
+endif
 
 # comment out whichever is appropriate.  can probably make this automatic ;)
 SO_EXT=.so
 #DYLIB_EXT=.dylib
-Z_LIB_DIR=zlib-1.2.3
-Z_LIB_FILES=$(Z_LIB_DIR)/*.o
-DRV_PROGS=smpFiltering load_graph #consume_prof
+ZLIB_DIR=zlib-1.2.3
+ZLIB_OBJS=$(ZLIB_DIR)/*.o
+DRV_PROGS=smpFiltering load_graph bittest ktable_test #graphtest #consume_prof
 
-all: zlib threadedParsers.o parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+PARSER_OBJS=parsers.o
+MT_PARSER_OBJS=threadedParsers.o
+PARSERS_OBJS=$(PARSER_OBJS) $(MT_PARSER_OBJS)
+
+all: zlib $(PARSERS_OBJS) ktable.o hashtable.o hashbits.o subset.o counting.o test
 
 clean:
-	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT) $(DRV_PROGS)
+	(cd $(ZLIB_DIR) && make clean)
+	rm -f *.o $(DRV_PROGS)
 
-test: test.cc ktable.o hashtable.o
+test: $(DRV_PROGS)
 
-zlib: $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
+zlib: $(ZLIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
 
-$(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT):
-	cd $(Z_LIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
+$(ZLIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT):
+	cd $(ZLIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
 
-smpFiltering: threadedParsers.o parsers.o counting.o hashtable.o ktable.o zlib primes.hh
-	$(CXX) $(CXXFLAGS) -o smpFiltering smpFiltering.cc threadedParsers.o parsers.o counting.o hashtable.o ktable.o $(Z_LIB_FILES) -fopenmp
+DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o $(PARSERS_OBJS)
+DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o $(PARSERS_OBJS)
 
-parsetest: parsers.o 
-	$(CXX) -o parsers parsers.o $(Z_LIB_FILES)
+smpFiltering: $(DRV_SMP_FILTERING_OBJS) zlib primes.hh
+	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(LIBS)
+
+load_graph: $(DRV_LOAD_GRAPH_OBJS) zlib primes.hh
+	$(CXX) -o $@ $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(LIBS)
+
+# TODO: Move 'main' to a driver program.
+#parsetest: parsers.o 
+#	$(CXX) -o $@ parsers.o $(ZLIB_OBJS)
 
 bittest: bittest.o ktable.o
-	$(CXX) -o bittest bittest.o ktable.o
+	$(CXX) -o $@ bittest.o ktable.o
 
-graphtest: graphtest.o ktable.o hashtable.o
-	$(CXX) -o graphtest graphtest.o ktable.o hashtable.o
+ktable_test: ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) zlib
+	$(CXX) -o $@ ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(LIBS)
 
-load_graph: counting.o hashbits.o hashtable.o threadedParsers.o parsers.o zlib
-	$(CXX) $(CXXFLAGS) -pg -o load_graph load_graph.cc counting.o hashbits.o hashtable.o subset.o ktable.o threadedParsers.o parsers.o $(Z_LIB_FILES) -fopenmp
+# NOTE: Disabled due to broken constructor call.
+#graphtest: graphtest.o ktable.o hashtable.o
+#	$(CXX) -o $@ graphtest.o ktable.o hashtable.o
 
-# NOTE: Doesn't build into anything useful and is thus disabled for the time being.
-#consume_prof: consume_prof.o hashtable.o ktable.o threadedParsers.o parsers.o
-#	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o threadedParsers.o parsers.o -fopenmp
+# NOTE: Disabled due to broken constructor call.
+#consume_prof: consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS)
+#	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
 
 threadedParsers.o: threadedParsers.cc threadedParsers.hh
 
@@ -47,8 +89,6 @@ parsers.o: parsers.cc parsers.hh
 ktable.o: ktable.cc ktable.hh
 
 hashtable.o: hashtable.cc hashtable.hh ktable.hh khmer.hh
-
-intertable.o: intertable.cc intertable.hh ktable.hh khmer.hh
 
 hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh ktable.hh khmer.hh counting.hh
 
