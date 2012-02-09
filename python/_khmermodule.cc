@@ -1625,48 +1625,31 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     return PyInt_FromLong(n);
 }
 
+
 static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
-{
-    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    khmer::Hashbits * hashbits = me->hashbits;
-    
-    khmer::HashIntoType start = 0, stop = 0;
-    
-    if (!PyArg_ParseTuple(args, "os", &ht2, &file_name)) {
-        return NULL;
-    }
-    
-    khmer::HashIntoType n = hashbits->n_kmers(start, stop);
-    
-    return PyInt_FromLong(n);
-}
-
-
-static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
-
+  khmer_KHashbitsObject * ht2_argu;
   char * filename;
   PyObject * readmask_obj = NULL;
   PyObject * update_readmask_bool = NULL;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
-  khmer::Hashbits ht2;
+  khmer::Hashbits * ht2;
 
-
-  if (!PyArg_ParseTuple(args, "so|iiOOO", &filename, &ht2,&lower_bound, &upper_bound,
+  if (!PyArg_ParseTuple(args, "sO|iiOOO", &filename, &ht2_argu,&lower_bound, &upper_bound,
 			&readmask_obj, &update_readmask_bool,
 			&callback_obj)) {
     return NULL;
   }
 
+  ht2 = ht2_argu->hashbits;
+
   bool update_readmask = false;
   khmer::ReadMaskTable * readmask = NULL;
 
   // set C++ parameters accordingly
-
-#### pass ht2_p parameters!!!!!!
 
   if (readmask_obj && readmask_obj != Py_None) {
     if (update_readmask_bool != NULL &&
@@ -1689,9 +1672,9 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   unsigned int total_reads;
 
   try {
-    hashbits->consume_fasta_overlap(filename,&ht2, total_reads, n_consumed,
+    hashbits->consume_fasta_overlap(filename,*ht2, total_reads, n_consumed,
 			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn, callback_obj,);
+			     update_readmask, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1700,12 +1683,13 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   if (!update_readmask && !readmask_obj) {
     assert(readmask == NULL);
   }
+    khmer::HashIntoType start = 0, stop = 0;
 
-  return Py_BuildValue("iL", total_reads, n_consumed);
+    khmer::HashIntoType n = hashbits->n_kmers(start, stop);
+    khmer::HashIntoType n_overlap = hashbits->n_overlap_kmers(start,stop);
+
+  return Py_BuildValue("LL", n, n_overlap);
 }
-
-
-
 
 static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
 {
@@ -2216,8 +2200,6 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   khmer::ReadMaskTable * readmask = NULL;
 
   // set C++ parameters accordingly
-
-#### pass ht2_p parameters!!!!!!
 
   if (readmask_obj && readmask_obj != Py_None) {
     if (update_readmask_bool != NULL &&

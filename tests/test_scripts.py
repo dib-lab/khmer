@@ -610,3 +610,21 @@ def test_count_overlap_without_curve():
     assert '# of occupied bin: 581783' in data
     assert 'false positive rate: 7.160103e-15' in data
     assert '# of overlap unique k-mers: 184849' in data
+
+def test_count_overlap_cpp():
+    seqfile1 = utils.get_test_data('test-overlap1.ht')
+    seqfile2 = utils.get_test_data('test-overlap2.fa')
+    in_dir = os.path.dirname(seqfile1)
+    script = scriptpath('count-overlap_cpp.py')
+    outfile = seqfile1+'.out'
+    args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000',\
+            seqfile1,seqfile2,outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+    assert os.path.exists(outfile), outfile
+    #report file
+    data = [ x.strip() for x in open(outfile) ]
+    data = set(data)
+    assert 'unique k-mers in dataset2:581866' in data
+    assert 'overlap k-mers:184849' in data
+

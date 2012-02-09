@@ -170,6 +170,33 @@ namespace khmer {
 				   CallbackFn callback = 0,
 				   void * callback_data = 0);
 
+    // for overlap k-mer counting
+    void consume_fasta_overlap(const std::string &filename,
+                                      khmer::Hashbits &ht2,
+			      unsigned int &total_reads,
+			      unsigned long long &n_consumed,
+			      HashIntoType lower_bound,
+			      HashIntoType upper_bound,
+			      ReadMaskTable ** orig_readmask,
+			      bool update_readmask,
+			      CallbackFn callback,
+			      void * callback_data);
+
+
+
+    // just for overlap k-mer counting!
+    unsigned int check_and_process_read_overlap(const std::string &read,
+					    bool &is_valid,HashIntoType lower_bound,
+                                            HashIntoType upper_bound,
+                                            khmer::Hashbits &ht2);
+    // for overlap k-mer counting!
+    unsigned int consume_string_overlap(const std::string &s,
+				       HashIntoType lower_bound,
+				       HashIntoType upper_bound,khmer::Hashbits &ht2);
+
+
+
+
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
     unsigned int kmer_degree(const char * kmer_s) const {
       HashIntoType kmer_f, kmer_r;
@@ -188,6 +215,11 @@ namespace khmer {
     virtual const HashIntoType n_kmers(HashIntoType start=0,
                   HashIntoType stop=0) const {
       return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
+    }
+
+    virtual const HashIntoType n_overlap_kmers(HashIntoType start=0,
+                  HashIntoType stop=0) const {
+      return _n_overlap_kmers;	// @@ CTB need to be able to *save* this...
     }
 
     virtual void count(const char * kmer) {
@@ -214,7 +246,36 @@ namespace khmer {
     }
 
 
-    virtual void count_overlap(HashIntoType khash, Hashbits *ht2_p) {
+
+	virtual bool check_overlap(HashIntoType khash, Hashbits &ht2) {
+	 // Byte ** _counts2;
+	 // _counts2 = ht2._counts;
+	  bool is_new_kmer = false;
+
+	  for (unsigned int i = 0; i < ht2._n_tables; i++) {
+		HashIntoType bin = khash % ht2._tablesizes[i];
+		HashIntoType byte = bin / 8;
+		unsigned char bit = bin % 8;
+		if (!( ht2._counts[i][byte] & (1<<bit))) {
+		  is_new_kmer = true;
+	}
+	ht2._counts[i][byte] |= (1 << bit);
+      }
+      if (! is_new_kmer) {
+		return true;
+      }
+	  else {
+		return false;
+	  }
+
+	  }
+
+    virtual void count_overlap(const char * kmer, Hashbits &ht2) {
+      HashIntoType hash = _hash(kmer, _ksize);
+      count_overlap(hash,ht2);
+    }
+
+    virtual void count_overlap(HashIntoType khash, Hashbits &ht2) {
       bool is_new_kmer = false;
 
       for (unsigned int i = 0; i < _n_tables; i++) {
@@ -229,38 +290,11 @@ namespace khmer {
       }
       if (is_new_kmer) {
 	_n_unique_kmers +=1;
-	if (check_overlap(khash,ht2_p)){
+	if (check_overlap(khash,ht2)){
 		_n_overlap_kmers +=1;
       }
     }
-
-
-
-	virtual void check_overlap(HashIntoType khash, Hashbits *ht2_p) {
-	 // Byte ** _counts2;
-	 // _counts2 = ht2->_counts;
-	  bool is_new_kmer = false;
-
-	  for (unsigned int i = 0; i < ht2_p->_n_tables; i++) {
-		HashIntoType bin = khash % ht2_p->_tablesizes[i];
-		HashIntoType byte = bin / 8;
-		unsigned char bit = bin % 8;
-		if (!( ht2_p->_counts[i][byte] & (1<<bit))) {
-		  is_new_kmer = true;
 	}
-	ht2_p->_counts[i][byte] |= (1 << bit);
-      }
-      if (! is_new_kmer) {
-		return true;
-      }
-	  else {
-		return false;
-	  }
-
-	  }
-
-
-
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
