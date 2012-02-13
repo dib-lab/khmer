@@ -5,6 +5,14 @@
 
 #define CALLBACK_PERIOD 10000
 
+// Note: This simple inlined code should be quicker than a call to a 
+//	 'toupper' function in the C library.
+//	 This should boil down to one integer compare, one branch, and 
+//	 maybe one integer subtraction.
+//	 This will be potentially called on trillions of bytes, 
+//	 so efficiency probably matters some.
+#define quick_toupper( c )  (0x61 <= (c) ? (c) - 0x20 : (c))
+
 using namespace khmer;
 using namespace std;
 
@@ -12,12 +20,12 @@ using namespace std;
 // check_and_process_read: checks for non-ACGT characters before consuming
 //
 
-unsigned int Hashtable::check_and_process_read(const std::string &read,
+unsigned int Hashtable::check_and_process_read(std::string &read,
 					    bool &is_valid,
                                             HashIntoType lower_bound,
                                             HashIntoType upper_bound)
 {
-   is_valid = check_read(read);
+   is_valid = check_and_normalize_read(read);
 
    if (!is_valid) { return 0; }
 
@@ -25,16 +33,23 @@ unsigned int Hashtable::check_and_process_read(const std::string &read,
 }
 
 //
-// check_read: checks for non-ACGT characters
+// check_and_normalize_read: checks for non-ACGT characters
+//			     converts lowercase characters to uppercase one
+// Note: Usually it is desirable to keep checks and mutations separate.
+//	 However, in the interests of efficiency (we are potentially working 
+//	 with TB of data), a check and mutation have been placed inside the 
+//	 same loop. Potentially trillions fewer fetches from memory would 
+//	 seem to be a worthwhile goal.
 //
 
-bool Hashtable::check_read(const std::string &read) const
+bool Hashtable::check_and_normalize_read(std::string &read) const
 {
   if (read.length() < _ksize) {
     return false;
   }
 
   for (unsigned int i = 0; i < read.length(); i++)  {
+    read[ i ] = quick_toupper( read[ i ] ); // normalize to uppercase letters
     if (!is_valid_dna(read[i])) {
       return false;
     }
