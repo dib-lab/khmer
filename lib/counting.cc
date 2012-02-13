@@ -30,7 +30,7 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
 
      bool valid_read = true;
      if (!readmask || readmask->get(read_num)) {
-       valid_read = check_read(seq);
+       valid_read = check_and_normalize_read(seq);
 
        if (valid_read) {
          BoundedCounterType minval = get_min_count(seq);
@@ -438,7 +438,7 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       HashIntoType kmer;
       KMerIterator kmers(seq.c_str(), _ksize);
 
@@ -498,7 +498,7 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
       bool valid_read = true;
 	 
       if (!readmask || readmask->get(read_num)) {
-	valid_read = check_read(seq);
+	valid_read = check_and_normalize_read(seq);
 
 	if (valid_read) {
 	  for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -550,7 +550,7 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
     seq = read.seq;
 
     if (!readmask || readmask->get(read_num)) {
-      valid_read = check_read(seq);
+      valid_read = check_and_normalize_read(seq);
 
       if (valid_read) {
         for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -685,7 +685,7 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	string kmer = seq.substr(i, i + _ksize);
 	BoundedCounterType n = get_count(kmer.c_str());
@@ -732,7 +732,7 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	string kmer = seq.substr(i, i + _ksize);
 	BoundedCounterType n = get_count(kmer.c_str());
@@ -797,7 +797,7 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 					     BoundedCounterType min_abund)
   const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
 
@@ -832,7 +832,7 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
 						BoundedCounterType max_abund)
   const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
 
@@ -1142,7 +1142,7 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
     currName = read.name; 
 
     // do we want to process it?
-    if (check_read(currSeq)) {
+    if (check_and_normalize_read(currSeq)) {
       const char * sp = currSeq.c_str();
 
       KMerIterator kmers(sp, _ksize);
@@ -1183,7 +1183,7 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
     currName = read.name; 
 
     // do we want to process it?
-    if (check_read(currSeq)) {
+    if (check_and_normalize_read(currSeq)) {
       const char * sp = currSeq.c_str();
 
       KMerIterator kmers(sp, _ksize);

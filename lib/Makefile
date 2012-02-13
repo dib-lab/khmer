@@ -1,10 +1,10 @@
 # Use multiple threads?
 # Set this variable to true if you wish the codes to use multiple threads when they can.
-WANT_THREADING=true
+WANT_THREADING=false
 
 # Profile?
 # Set this variable to true if you wish to profile the codes.
-WANT_PROFILING=true
+WANT_PROFILING=false
 
 # Which profiling tool to use?
 # Assuming you have TAU installed and setup properly, you can instrument codes with it to get detailed multi-threaded profiling.
@@ -12,10 +12,19 @@ WANT_PROFILING=true
 # Choose one of: gprof, TAU
 PROFILER_OF_CHOICE=TAU
 
+# Perform extra sanity checking?
+# Set this variable to true if you wish the codes to perform extra sanity checking (to the possible detriment of performance).
+WANT_EXTRA_SANITY_CHECKING=false
+
+
 NO_UNIQUE_RC=0
 
 CXXFLAGS=-g -fPIC -Wall -O3 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 LIBS=
+
+ifeq ($(WANT_EXTRA_SANITY_CHECKING), true)
+CXXFLAGS+=-DKHMER_EXTRA_SANITY_CHECKS
+endif
 
 ifeq ($(WANT_THREADING), true)
 CXXFLAGS+=-DKHMER_THREADED -fopenmp

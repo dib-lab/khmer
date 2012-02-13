@@ -341,7 +341,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
       // n_consumed += this_n_consumed;
 
 #pragma omp critical (consume_and_tag_seq)
-	if (check_read(seq)) {	// process?
+	if (check_and_normalize_read(seq)) {	// process?
 	  consume_sequence_and_tag(seq, n_consumed);
 	}
 
@@ -453,7 +453,7 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
     // n_consumed += this_n_consumed;
 
-    if (check_read(seq)) {	// process?
+    if (check_and_normalize_read(seq)) {	// process?
       bool is_new_kmer;
       KMerIterator kmers(seq.c_str(), _ksize);
 
@@ -605,7 +605,7 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
       PartitionID p = _parse_partition_id(read.name);
 
@@ -661,7 +661,7 @@ void Hashbits::filter_if_present(const std::string infilename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       KMerIterator kmers(seq.c_str(), _ksize);
       bool keep = true;
 
@@ -1150,7 +1150,7 @@ const
 unsigned int Hashbits::trim_on_degree(std::string seq, unsigned int max_degree)
 const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
 
   }
@@ -1174,7 +1174,7 @@ const
 unsigned int Hashbits::trim_on_sodd(std::string seq, unsigned int max_degree)
 const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
 
@@ -1215,7 +1215,7 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
 						 unsigned int max_volume)
   const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
   unsigned int count;
@@ -1244,7 +1244,7 @@ unsigned int Hashbits::trim_on_density_explosion(std::string seq,
 
 unsigned int Hashbits::trim_on_stoptags(std::string seq) const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
 
@@ -1460,7 +1460,7 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	string kmer = seq.substr(i, i + _ksize); // @CTB this wrong!
 	HashIntoType kmer_n = _hash(kmer.c_str(), _ksize);
@@ -1618,7 +1618,7 @@ void Hashbits::traverse_from_reads(std::string filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {	// process?
+    if (check_and_normalize_read(seq)) {	// process?
       const char * last_kmer = seq.c_str() + seq.length() - _ksize;
       HashIntoType kmer = _hash(last_kmer, _ksize);
 
@@ -1674,7 +1674,7 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (check_read(seq)) {	// process?
+    if (check_and_normalize_read(seq)) {	// process?
       KMerIterator kmers(seq.c_str(), _ksize);
 
       HashIntoType kmer = 0;
@@ -1717,7 +1717,7 @@ void Hashbits::identify_stop_tags_by_position(std::string seq,
 					      std::vector<unsigned int> &posns)
 const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return;
   }
 

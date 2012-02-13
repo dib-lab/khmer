@@ -92,7 +92,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (_ht->check_read(seq)) {
+    if (_ht->check_and_normalize_read(seq)) {
       const char * kmer_s = seq.c_str();
 
       bool found_tag = false;
@@ -188,7 +188,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
     read = parser->get_next_read();
     seq = read.seq;
 
-    if (_ht->check_read(seq)) {
+    if (_ht->check_and_normalize_read(seq)) {
       unsigned long long n_consumed = 0;
       SeenSet found_tags;
       _ht->consume_sequence_and_tag(seq, n_consumed, &found_tags);
@@ -937,7 +937,7 @@ void SubsetPartition::_clear_all_partitions()
 
 bool SubsetPartition::is_single_partition(std::string seq)
 {
-  if (!_ht->check_read(seq)) {
+  if (!_ht->check_and_normalize_read(seq)) {
     return 0;
   }
 
