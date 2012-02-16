@@ -102,17 +102,31 @@ namespace khmer {
 
     virtual void count(HashIntoType khash) {
       unsigned int n_full = 0;
+//#pragma omp critical (update_counts)
       for (unsigned int i = 0; i < _n_tables; i++) {
 	const HashIntoType bin = khash % _tablesizes[i];
-
+#ifdef KHMER_THREADED
+	// NOTE: Technically, multiple threads can cause the bin to spill 
+	//	 over MAX_COUNT a little, if they all read it as less than 
+	//	 MAX_COUNT before any of them increment it.
+	//	 However, do we actually care if there is a little 
+	//	 bit of slop here? It can always be trimmed off later, if 
+	//	 that would help with stats.
+	if ( MAX_COUNT > _counts[ i ][ bin ] )
+	  __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+	else
+	  n_full++;
+#else
 	if (_counts[i][bin] < MAX_COUNT) {
 	  _counts[i][bin] += 1;
 	} else {
 	  n_full++;
 	}
-      }
+#endif
+      } // for each table
 
       if (n_full == _n_tables && _use_bigcount) {
+#pragma omp critical (update_bigcounts)
 	if (_bigcounts[khash] == 0) {
 	  _bigcounts[khash] = MAX_COUNT + 1;
 	} else {
@@ -271,3 +285,5 @@ namespace khmer {
 };
 
 #endif // COUNTING_HH
+
+// vim: set sts=2 sw=2:

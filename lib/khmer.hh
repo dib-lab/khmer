@@ -1,6 +1,7 @@
 #define VERSION "0.3"
 
-#define MAX_COUNT 255
+//#define MAX_COUNT 255
+#define MAX_COUNT 200
 #define MAX_BIGCOUNT 65535
 #define DEFAULT_TAG_DENSITY 40		// must be even
 

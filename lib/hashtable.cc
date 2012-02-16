@@ -107,7 +107,6 @@ void Hashtable::consume_fasta(const std::string &filename,
   // iterate through the FASTA file & consume the reads.
   //
 #ifdef KHMER_THREADED
-// TODO: Figure out if readmasks can be efficiently data-parallelized. If not, then again stuck with critical section bottleneck.
 #pragma omp parallel shared( pf, total_reads, n_consumed, callback, callback_data, readmask, masklist ) private( parser, currName, currSeq )
   while (!pf->is_complete( ))
   {
@@ -121,13 +120,13 @@ void Hashtable::consume_fasta(const std::string &filename,
       currName = read.name; 
 
       // do we want to process it?
-#pragma omp critical (check_masked_read)
       if (!readmask || readmask->get(total_reads)) {
 
 	// yep! process.
 	unsigned int this_n_consumed;
 	bool is_valid;
 
+//#pragma omp critical (process_read)
 	this_n_consumed = check_and_process_read(currSeq,
 						 is_valid,
 						 lower_bound,
@@ -136,21 +135,29 @@ void Hashtable::consume_fasta(const std::string &filename,
 	// was this an invalid sequence -> mark as bad?
 	if (!is_valid && update_readmask) {
 	  if (readmask) {
+#pragma omp critical (set_read_mask)
 	    readmask->set(total_reads, false);
 	  } else {
+#pragma omp critical (append_to_masklist)
 	    masklist.push_back(total_reads);
 	  }
 	} else {		// nope -- count it!
+#ifdef KHMER_THREADED
+	  __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#else
 	  n_consumed += this_n_consumed;
+#endif
 	}
       } // check masked read
 		 
       // reset the sequence info, increment read number
-#pragma omp critical (incr_tot_reads)
+#ifdef KHMER_THREADED
+      __sync_add_and_fetch( &total_reads, 1 );
+#else
       total_reads++;
+#endif
 
       // run callback, if specified
-#pragma omp critical (call_callback)
       if (total_reads % CALLBACK_PERIOD == 0 && callback) {
 	try {
 	  callback("consume_fasta", callback_data, total_reads, n_consumed);
@@ -207,6 +214,7 @@ unsigned int Hashtable::consume_string(const std::string &s,
     kmer = kmers.next();
   
     if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+// #pragma omp critical (count_kmer)
       count(kmer);
       n_consumed++;
     }
