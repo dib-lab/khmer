@@ -59,7 +59,12 @@ namespace khmer {
     void set(unsigned long long index, bool keep) {
       if (index >= _tablesize) { return; } // @CTB throw?
 
-      _mask[index] = keep ? 1 : 0;
+#ifdef KHMER_THREADED
+      __sync_add_and_fetch( _mask + index, (unsigned char)keep );
+#else
+      //_mask[index] = keep ? 1 : 0;
+      _mask[index] = (unsigned char)keep;
+#endif
     }
 
     void merge(ReadMaskTable &other) {
@@ -219,3 +224,5 @@ namespace khmer {
 }
 
 #endif // STORAGE_HH
+
+// vim: set sts=2 sw=2:
