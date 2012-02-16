@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 """
-Eliminate reads with minimum k-mer abundance higher than
-DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
+Eliminate reads with kadian k-mer abundance higher than
+DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keepkad'.
 
-% python scripts/normalize-by-min.py [ -C <cutoff> ] <data1> <data2> ...
+% python scripts/normalize-by-median.py [ -C <cutoff> ] <data1> <data2> ...
 
 Use '-h' for parameter help.
 """
@@ -12,12 +12,12 @@ import sys, screed, os
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
-DEFAULT_MINIMUM_COVERAGE=5
+DEFAULT_DESIRED_COVERAGE=5
 
 def main():
     parser = build_construct_args()
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
-                        default=DEFAULT_MINIMUM_COVERAGE)
+                        default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
     parser.add_argument('-l', '--loadhash', dest='loadhash',
                         default='')
@@ -54,7 +54,7 @@ def main():
     total = 0
     discarded = 0
     for input_filename in filenames:
-        output_name = os.path.basename(input_filename) + '.minkeep'
+        output_name = os.path.basename(input_filename) + '.keepkad'
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
@@ -69,9 +69,9 @@ def main():
                 continue
 
             seq = record.sequence.replace('N', 'A')
-            mincount = ht.get_min_count(seq)
+            kad = ht.get_kadian_count(seq)
 
-            if mincount < DESIRED_COVERAGE:
+            if kad < DESIRED_COVERAGE:
                 ht.consume(seq)
                 outfp.write('>%s\n%s\n' % (record.name, record.sequence))
             else:
