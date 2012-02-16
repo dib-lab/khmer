@@ -1125,8 +1125,9 @@ static PyObject * hash_get_kadian_count(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * long_str;
+  unsigned int nk = 1;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s|I", &long_str, &nk)) {
     return NULL;
   }
 
@@ -1138,7 +1139,7 @@ static PyObject * hash_get_kadian_count(PyObject * self, PyObject * args)
 
   khmer::BoundedCounterType kad = 0;
 
-  counting->get_kadian_count(long_str, kad);
+  counting->get_kadian_count(long_str, kad, nk);
 
   return Py_BuildValue("i", kad);
 }
