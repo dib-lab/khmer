@@ -13,6 +13,8 @@
 #define HASH_TYPE_TO_TEST   1 // Counting Hash
 // #define HASH_TYPE_TO_TEST   2 // Bit Hash
 
+#define OUTPUT_HASHTABLE
+
 #if HASH_TYPE_TO_TEST == 1
 #  include "counting.hh"
 #elif HASH_TYPE_TO_TEST == 2
@@ -91,9 +93,14 @@ int main( int argc, char * argv[ ] )
     Hashbits ht( kmer_length, ht_sizes );
     ht.consume_fasta_and_tag( ifile_name, reads_total, n_consumed );
 #endif
-    
-    //ofile = fopen( ofile_name.c_str( ), "w" );
-    //if (!ofile) error( EINVAL, 0, "Failed to open output file" );
+
+#ifdef OUTPUT_HASHTABLE
+#if	HASH_TYPE_TO_TEST == 1
+    ht.save( ofile_name );
+#elif	HASH_TYPE_TO_TEST == 2
+    // TODO: Implement. 
+#endif
+#endif
 
     return rc;
 }
