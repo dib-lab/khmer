@@ -566,6 +566,7 @@ def test_count_overlap_with_curve():
     args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000',\
             '--curve', curvefile,seqfile1,seqfile2,outfile]
     (status, out, err) = runscript(script, args, in_dir)
+    print out, err
     assert status == 0
     assert os.path.exists(outfile), outfile
     assert os.path.exists(curvefile),curvefile

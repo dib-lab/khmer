@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 """
-Count the overlap k-mers, which are the k-mers apperaring in two sequence datase
-ts.
+Count the overlap k-mers, which are the k-mers apperaring in two datasets.
 
 usage: count-overlap.py [-h] [-q] [--ksize KSIZE] [--n_hashes N_HASHES]
                         [--hashsize HASHSIZE] [--curve CURVE_REPORT_FILENAME]
@@ -50,7 +49,7 @@ def main():
     parser.add_argument('second_filename')
     parser.add_argument('report_filename')
     parser.add_argument('--curve','-c',type=str,dest='curve_report_filename',
-                        default = 'N',
+                        default = None,
                         help = 'report to generate the curve of the increase of'
                         +'overlap k-mers, optional, no such report to generate'
                         +'if no such argument is provided')
@@ -76,33 +75,43 @@ hashsize / 8)' % (args.n_hashes * args.hashsize / 8.)
     file_curve = args.curve_report_filename
     count_overlap(K,HT_SIZE,N_HT,filename,filename2,file_result,file_curve)
 
-def count_overlap(K,HT_SIZE,N_HT,filename,filename2,file_result,file_curve):
-    if file_curve !='N':
+def count_overlap(K, HT_SIZE, N_HT, filename, filename2, file_result,
+                  file_curve):
+    if file_curve:
         count = 0
         for n, record in enumerate(screed.open(filename2)):
-            count = count+1
-        max_count = count/100
-        file3 = open(file_curve,'w')
-# consume first dataset
+            count = count + 1
+        max_count = count / 100
+        file3 = open(file_curve, 'w')
+
+    # consume first dataset
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
     n_unique = 0
+
     for n, record in enumerate(screed.open(filename)):
         sequence = record['sequence']
         seq_len = len(sequence)
-        for n in range(0,seq_len+1-K):
+        for n in range(0, seq_len+1-K):
             kmer = sequence[n:n+K]
             if (not ht.get(kmer)):
-                n_unique+=1
+                n_unique += 1
             ht.count(kmer)
+
     print filename,'has been consumed.'
-    fpr = (1- math.exp(-n_unique/HT_SIZE))**N_HT
-    printout1 = "%s:\n# of unique k-mers: %d\n# of occupied bin: %d\n\
-false positive rate: %e\n" %(filename,n_unique,ht.n_occupied(),fpr)
-# consume second dataset
+    fpr = (1 - math.exp(-n_unique/HT_SIZE))**N_HT
+    printout1 = """\
+%s:
+# of unique k-mers: %d
+# of occupied bin: %d
+false positive rate: %e
+""" % (filename, n_unique, ht.n_occupied(), fpr)
+
+    # consume second dataset
     ht2 = khmer.new_hashbits(K, HT_SIZE, N_HT)
     n_unique = 0
     n_overlap = 0
     seq_count = 0
+
     for n, record in enumerate(screed.open(filename2)):
         sequence = record['sequence']
         seq_len = len(sequence)
@@ -113,19 +122,26 @@ false positive rate: %e\n" %(filename,n_unique,ht.n_occupied(),fpr)
                 if (ht.get(kmer)):
                     n_overlap+=1
             ht2.count(kmer)
-        if file_curve !='N':
+        if file_curve:
             seq_count = seq_count + 1
             if seq_count == max_count:
-                string = str(n_unique)+' '+str(n_overlap)+'\n'
-                file3 = open(file_curve,'a')
+                string = str(n_unique) + ' ' + str(n_overlap) + '\n'
+                file3 = open(file_curve, 'a')
                 file3.write(string)
                 file3.close()
                 seq_count = 0
-    print filename2,'has been consumed.'
-    fpr = (1- math.exp(-n_unique/HT_SIZE))**N_HT
-    printout2 = "%s:\n# of unique k-mers: %d\n# of occupied bin: %d\nfalse \
-positive rate: %e\n===============\n# of overlap unique k-mers: %d\n" \
-%(filename2,n_unique,ht2.n_occupied(),fpr,n_overlap)
+
+    print filename2, 'has been consumed.'
+    fpr = (1 - math.exp(-n_unique/HT_SIZE))**N_HT
+    printout2 = """\
+%s:
+# of unique k-mers: %d
+# of occupied bin: %d
+false positive rate: %e
+===============
+# of overlap unique k-mers: %d""" % \
+    (filename2, n_unique, ht2.n_occupied(), fpr, n_overlap)
+
     file_result_object = open(file_result,'w')
     file_result_object.write(printout1)
     file_result_object.write(printout2)
