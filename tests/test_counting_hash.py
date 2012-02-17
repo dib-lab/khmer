@@ -161,6 +161,90 @@ def test_simple_median():
     assert average == 2.5
     assert int(stddev*100) == 50        # .5
 
+def test_simple_kadian():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG") == 1
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #           ---------------^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #           ---------------^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGtGCTAcG")
+    #           --------------^^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 1, x
+
+def test_simple_kadian_2():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG") == 1
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACaGCTATCTCTAGAGCTATG")
+    #           --^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACaGCTATCTCTAGAcCTATG")
+    #           --^          --^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 1, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCgCTAGAGCTATG")
+    #                  --^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2, x
+
+def test_2_kadian():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 1
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #           ---------------^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTAtG")
+    #           ---------------^---^
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 2
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTACtcCTAtG")
+    #           --------------^^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTgTCTCTACtcCTAtG")
+    #           ------^-------^^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
+    assert x == 1, x
+
 def test_save_load():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')

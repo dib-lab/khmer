@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 """
-Eliminate reads with median k-mer abundance higher than
-DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
+Eliminate reads with kadian k-mer abundance higher than
+DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keepkad'.
 
 % python scripts/normalize-by-median.py [ -C <cutoff> ] <data1> <data2> ...
 
@@ -11,7 +11,6 @@ Use '-h' for parameter help.
 import sys, screed, os
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
-import argparse
 
 DEFAULT_DESIRED_COVERAGE=5
 
@@ -22,8 +21,6 @@ def main():
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
     parser.add_argument('-l', '--loadhash', dest='loadhash',
                         default='')
-    parser.add_argument('-R', '--report-to-file', dest='report_file',
-                        type=argparse.FileType('w'))
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
@@ -44,7 +41,6 @@ def main():
     HT_SIZE=args.min_hashsize
     N_HT=args.n_hashes
     DESIRED_COVERAGE=args.cutoff
-    report_fp = args.report_file
 
     filenames = args.input_filenames
 
@@ -58,7 +54,7 @@ def main():
     total = 0
     discarded = 0
     for input_filename in filenames:
-        output_name = os.path.basename(input_filename) + '.keep'
+        output_name = os.path.basename(input_filename) + '.keepkad'
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
@@ -67,20 +63,15 @@ def main():
                     int(100. - discarded / float(total) * 100.), '%'
                 print '... in file', input_filename
 
-                if report_fp:
-                    print>>report_fp, total, total - discarded, \
-                        100. - (discarded / float(total))
-                    report_fp.flush()
-
             total += 1
 
             if len(record.sequence) < K:
                 continue
 
             seq = record.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
+            kad = ht.get_kadian_count(seq)
 
-            if med < DESIRED_COVERAGE:
+            if kad < DESIRED_COVERAGE:
                 ht.consume(seq)
                 outfp.write('>%s\n%s\n' % (record.name, record.sequence))
             else:
