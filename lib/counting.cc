@@ -640,7 +640,8 @@ void CountingHash::get_median_count(const std::string &s,
 }
 
 void CountingHash::get_kadian_count(const std::string &s,
-				    BoundedCounterType &kadian)
+				    BoundedCounterType &kadian,
+				    unsigned int nk)
 {
   BoundedCounterType count;
   std::vector<BoundedCounterType> counts;
@@ -653,15 +654,24 @@ void CountingHash::get_kadian_count(const std::string &s,
   }
 
   assert(counts.size());
-
-  if (counts.size() < _ksize + 1) {
+  unsigned int kpos = nk*_ksize;
+  
+  if (counts.size() < kpos) {
     kadian = 0;
 
     return;
   }
 
   sort(counts.begin(), counts.end());
-  kadian = counts[_ksize];
+  kadian = counts[kpos - 1];
+
+#if 0
+  std::cout << "k " << kpos << ": ";
+  for (unsigned int i = 0; i < counts.size(); i++) {
+    std::cout << i << "-" << counts[i] << " ";
+  }
+  std::cout << "\n";
+#endif // 0
 }
 
 

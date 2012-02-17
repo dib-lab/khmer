@@ -35,6 +35,7 @@ def main():
     ht = khmer.load_counting_hash(htfile)
     K = ht.ksize()
 
+    print 'writing to', output_filename
     output = open(output_filename, 'w')
     
     for record in screed.open(input_filename):
