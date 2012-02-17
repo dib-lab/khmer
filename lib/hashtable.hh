@@ -16,9 +16,6 @@
 #include "storage.hh"
 
 
-
-
-
 #define CALLBACK_PERIOD 10000
 
 namespace khmer {
@@ -171,9 +168,6 @@ namespace khmer {
 				HashIntoType lower_bound = 0,
 				HashIntoType upper_bound = 0);
     
-
-
-
     // checks each read for non-ACGT characters
     bool check_read(const std::string &read) const;
 
@@ -183,8 +177,6 @@ namespace khmer {
 					HashIntoType lower_bound = 0,
 					HashIntoType upper_bound = 0);
     
-
-
     // count every k-mer in the FASTA file.
     void consume_fasta(const std::string &filename,
 		       unsigned int &total_reads,
@@ -195,9 +187,6 @@ namespace khmer {
 		       bool update_readmask = true,
 		       CallbackFn callback = NULL,
 		       void * callback_data = NULL);
-    
-
-
   };
 
 			  
