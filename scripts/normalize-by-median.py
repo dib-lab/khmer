@@ -69,7 +69,7 @@ def main():
 
                 if report_fp:
                     print>>report_fp, total, total - discarded, \
-                        100. - (discarded / float(total))
+                        1. - (discarded / float(total))
                     report_fp.flush()
 
             total += 1
