@@ -10,8 +10,8 @@
 #include <error.h>
 #include <getopt.h>
 
-#define HASH_TYPE_TO_TEST   1 // Counting Hash
-// #define HASH_TYPE_TO_TEST   2 // Bit Hash
+//#define HASH_TYPE_TO_TEST   1 // Counting Hash
+#define HASH_TYPE_TO_TEST   2 // Bit Hash
 
 #define OUTPUT_HASHTABLE
 
@@ -96,9 +96,10 @@ int main( int argc, char * argv[ ] )
 
 #ifdef OUTPUT_HASHTABLE
 #if	HASH_TYPE_TO_TEST == 1
-    ht.save( ofile_name );
+    ht.save( ofile_name + ".ht_count" );
 #elif	HASH_TYPE_TO_TEST == 2
-    // TODO: Implement. 
+    ht.save( ofile_name + ".ht_bits" );
+    ht.save_tagset( ofile_name + ".tagset" );
 #endif
 #endif
 
