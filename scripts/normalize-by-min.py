@@ -54,7 +54,7 @@ def main():
     total = 0
     discarded = 0
     for input_filename in filenames:
-        output_name = os.path.basename(input_filename) + '.keep'
+        output_name = os.path.basename(input_filename) + '.minkeep'
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
