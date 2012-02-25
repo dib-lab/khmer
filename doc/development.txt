@@ -12,4 +12,8 @@ k-mer size.
 All code in scripts/ must have automated tests; see tests/test_scripts.py.
 Otherwise it belongs in sandbox/.
 
+When files are overwritten, they should only be opened to be overwritten
+after the input files have been shown to exist.  That prevents stupid
+command like mistakes from trashing important files.
+
 @@CTB: to squash output, or not to squash, by default?

@@ -2,7 +2,6 @@
 #include "hashtable.hh"
 #include "parsers.hh"
 
-
 #define CALLBACK_PERIOD 10000
 
 using namespace khmer;

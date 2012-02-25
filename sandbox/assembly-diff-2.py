@@ -29,4 +29,4 @@ for n, record in enumerate(screed.open(filename2)):
 
     for path in paths:
         path_n += 1
-        print >>uniq2, '>%s\n%s' % (path_n, path)
+        print >>uniq2, '>%s from:%s\n%s' % (path_n, record.name, path)
