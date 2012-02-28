@@ -51,7 +51,7 @@ PARSER_OBJS=parsers.o
 MT_PARSER_OBJS=threadedParsers.o
 PARSERS_OBJS=$(PARSER_OBJS) $(MT_PARSER_OBJS)
 
-all: zlib $(PARSERS_OBJS) ktable.o hashtable.o hashbits.o subset.o counting.o test
+all: zlib $(PARSERS_OBJS) khmer_config.o ktable.o hashtable.o hashbits.o subset.o counting.o test
 
 clean:
 	(cd $(ZLIB_DIR) && make clean)
@@ -90,6 +90,8 @@ ktable_test: ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) zlib
 # NOTE: Disabled due to broken constructor call.
 #consume_prof: consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS)
 #	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
+
+khmer_config.o: khmer_config.cc khmer_config.hh
 
 threadedParsers.o: threadedParsers.cc threadedParsers.hh
 
