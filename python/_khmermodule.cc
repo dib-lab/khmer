@@ -6,6 +6,7 @@
 
 #include "Python.h"
 #include "khmer.hh"
+#include "khmer_config.hh"
 #include "ktable.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
@@ -83,6 +84,198 @@ void _report_fn(const char * info, void * data, unsigned long long n_reads,
   Py_END_ALLOW_THREADS;
 }
 
+
+/***********************************************************************/
+
+//
+// Config object -- configuration of khmer internals
+//
+
+/*
+// For bookkeeping purposes.
+static khmer:: Config *	    the_active_config	  = NULL;
+*/
+
+typedef struct
+{
+  PyObject_HEAD
+  khmer:: Config *    config;
+} khmer_ConfigObject;
+
+static void khmer_config_dealloc( PyObject * );
+static PyObject * khmer_config_getattr( PyObject * obj, char * name );
+
+static PyTypeObject khmer_ConfigType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "Config", sizeof(khmer_ConfigObject),
+    0,
+    khmer_config_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_config_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "config object",            /* tp_doc */
+};
+
+/*
+static
+PyObject *
+new_config( PyObject * self, PyObject * args )
+{
+  // TODO: Take a dictionary to initialize config values.
+  //	   Need khmer:: Config constructor which supports this first.
+
+  khmer_ConfigObject * obj = 
+    (khmer_ConfigObject *)PyObject_New(khmer_ConfigObject, &khmer_ConfigType);
+
+  obj->config = new khmer:: Config( );
+
+  return (PyObject *)obj;
+}
+*/
+
+static
+PyObject *
+get_config( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	obj = 
+    (khmer_ConfigObject *)PyObject_New(khmer_ConfigObject, &khmer_ConfigType);
+
+  khmer:: Config *	config_new      = &(khmer:: get_active_config( ));
+  obj->config	    = config_new;
+//  the_active_config = config_new;
+
+  return (PyObject *)obj;
+}
+
+/*
+static
+PyObject *
+set_config( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  obj	  = NULL;
+
+  if (!PyArg_ParseTuple( args, "O!", &khmer_ConfigType, &obj ))
+    return NULL;
+
+  khmer:: Config *	  config = obj->config;
+  // TODO? Add sanity check to ensure that 'config' is valid.
+  khmer:: set_active_config( *config );
+  the_active_config = config;
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+*/
+
+static
+void
+khmer_config_dealloc( PyObject* self )
+{
+  khmer_ConfigObject * obj = (khmer_ConfigObject *) self;
+//  if (the_active_config != obj->config)
+//  {
+//    delete obj->config;
+//    obj->config = NULL;
+//  }
+  
+  PyObject_Del((PyObject *) obj);
+}
+
+static
+PyObject *
+config_is_threaded( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  if (config->is_threaded( )) Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+static
+PyObject *
+config_get_number_of_threads( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  return PyLong_FromUnsignedLong( (unsigned long)config->get_number_of_threads( ) );
+}
+
+#ifdef KHMER_THREADED
+static
+PyObject *
+config_set_number_of_threads( PyObject * self, PyObject * args )
+{
+  unsigned int	  number_of_threads;
+
+  if (!PyArg_ParseTuple( args, "I", &number_of_threads ))
+    return NULL;
+
+  if (!number_of_threads)
+  {
+    PyErr_SetString(
+      PyExc_ValueError,
+      "number of threads must be greater than zero"
+    );
+    return NULL;
+  }
+
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  config->set_number_of_threads( number_of_threads );
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#endif
+
+static
+PyObject *
+config_get_hash_count_threshold( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  return PyInt_FromSize_t( (size_t)config->get_hash_count_threshold( ) );
+}
+
+static
+PyObject *
+config_get_hash_bigcount_threshold( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  return PyInt_FromSize_t( (size_t)config->get_hash_bigcount_threshold( ) );
+}
+
+static PyMethodDef khmer_config_methods[] = {
+  { "is_threaded", config_is_threaded, METH_VARARGS, "Compiled with threading support?" },
+  { "get_number_of_threads", config_get_number_of_threads, METH_VARARGS, "Get the number of threads to use." },
+#ifdef KHMER_THREADED
+  { "set_number_of_threads", config_set_number_of_threads, METH_VARARGS, "Set the number of threads to use." },
+#endif
+  { "get_hash_count_threshold", config_get_hash_count_threshold, METH_VARARGS, "Get the maximum count held by a Bloom filter hash bin." },
+  { "get_hash_bigcount_threshold", config_get_hash_bigcount_threshold, METH_VARARGS, "Get the maximum count held by an overflow hash bin." },
+  {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static
+PyObject *
+khmer_config_getattr( PyObject * obj, char * name )
+{
+  return Py_FindMethod(khmer_config_methods, obj, name);
+}
 
 
 /***********************************************************************/
@@ -3845,6 +4038,9 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 //
 
 static PyMethodDef KhmerMethods[] = {
+  /* { "new_config", new_config, METH_VARARGS, "Create a default internals config" }, */
+  { "get_config", get_config, METH_VARARGS, "Get active khmer configuration object" },
+  /* { "set_config", set_active_config, METH_VARARGS, "Set active khmer configuration object" }, */
   { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty single-table counting hash" },
   { "_new_counting_hash", _new_counting_hash, METH_VARARGS, "Create an empty counting hash" },
@@ -3872,3 +4068,5 @@ DL_EXPORT(void) init_khmer(void)
 
   PyModule_AddObject(m, "error", KhmerError);
 }
+
+// vim: set sts=2 sw=2:
