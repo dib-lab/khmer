@@ -64,8 +64,8 @@ zlib: $(ZLIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
 $(ZLIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT):
 	cd $(ZLIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
 
-DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o $(PARSERS_OBJS)
-DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o $(PARSERS_OBJS)
+DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o khmer_config.o $(PARSERS_OBJS)
+DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o khmer_config.o $(PARSERS_OBJS)
 
 smpFiltering: $(DRV_SMP_FILTERING_OBJS) zlib primes.hh
 	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(LIBS)

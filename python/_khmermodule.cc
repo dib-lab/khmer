@@ -210,7 +210,7 @@ config_get_number_of_threads( PyObject * self, PyObject * args )
 {
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
   khmer::Config *	  config    = me->config;
-  return PyLong_FromUnsignedLong( (unsigned long)config->get_number_of_threads( ) );
+  return PyInt_FromSize_t( (size_t)config->get_number_of_threads( ) );
 }
 
 #ifdef KHMER_THREADED
@@ -223,7 +223,7 @@ config_set_number_of_threads( PyObject * self, PyObject * args )
   if (!PyArg_ParseTuple( args, "I", &number_of_threads ))
     return NULL;
 
-  if (!number_of_threads)
+  if (0 >= number_of_threads)
   {
     PyErr_SetString(
       PyExc_ValueError,
