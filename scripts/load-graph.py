@@ -19,9 +19,9 @@ from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
 def main():
     parser = build_construct_args()
-    parser.add_argument('--build-tagset', '-t', default=True,
-                        action='store_false',
-                        help='Construct tagset while loading sequences')
+    parser.add_argument('--no-build-tagset', '-n', default=False,
+                        action='store_true', dest='no_build_tagset',
+                        help='Do NOT construct tagset while loading sequences')
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
 
@@ -48,6 +48,10 @@ def main():
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
+    if args.no_build_tagset:
+        print 'We WILL NOT build the tagset.'
+    else:
+        print 'We WILL build the tagset (for partitioning/traversal).'
 
     ###
     
@@ -56,12 +60,20 @@ def main():
 
     for n, filename in enumerate(filenames):
        print 'consuming input', filename
-       ht.consume_fasta_and_tag(filename)
+       if args.no_build_tagset:
+           ht.consume_fasta(filename)
+       else:
+           ht.consume_fasta_and_tag(filename)
 
     print 'saving hashtable in', base + '.ht'
     ht.save(base + '.ht')
-    print 'saving tagset in', base + '.tagset'
-    ht.save_tagset(base + '.tagset')
+
+    if not args.no_build_tagset:
+        print 'saving tagset in', base + '.tagset'
+        ht.save_tagset(base + '.tagset')
+
+    info_fp = open(base + '.info', 'w')
+    info_fp.write('%d unique k-mers' % ht.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(ht)
     print 'fp rate estimated to be %1.3f' % fp_rate
