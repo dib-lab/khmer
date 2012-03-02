@@ -1,6 +1,6 @@
 # Use multiple threads?
 # Set this variable to true if you wish the codes to use multiple threads when they can.
-WANT_THREADING=true
+WANT_THREADING=false
 
 # Profile?
 # Set this variable to true if you wish to profile the codes.

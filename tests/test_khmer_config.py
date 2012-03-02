@@ -41,7 +41,7 @@ def test_EXISTENCE_OTHERS( ):
     config = get_active_config( )
     for attr_name in \
 	[
-	    "get_number_of_threads", "get_hash_count_threshold", "get_hash_bigcount_threshold",
+	    "has_extra_sanity_checks", "get_number_of_threads", "get_hash_count_threshold", "get_hash_bigcount_threshold",
 	]:
 	yield check_attribute_exists, config, attr_name
     if config.is_threaded( ):

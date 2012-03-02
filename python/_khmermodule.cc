@@ -206,6 +206,16 @@ config_is_threaded( PyObject * self, PyObject * args )
 
 static
 PyObject *
+config_has_extra_sanity_checks( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  if (config->has_extra_sanity_checks( )) Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+static
+PyObject *
 config_get_number_of_threads( PyObject * self, PyObject * args )
 {
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
@@ -261,6 +271,7 @@ config_get_hash_bigcount_threshold( PyObject * self, PyObject * args )
 
 static PyMethodDef khmer_config_methods[] = {
   { "is_threaded", config_is_threaded, METH_VARARGS, "Compiled with threading support?" },
+  { "has_extra_sanity_checks", config_has_extra_sanity_checks, METH_VARARGS, "Compiled with extra sanity checking?" },
   { "get_number_of_threads", config_get_number_of_threads, METH_VARARGS, "Get the number of threads to use." },
 #ifdef KHMER_THREADED
   { "set_number_of_threads", config_set_number_of_threads, METH_VARARGS, "Set the number of threads to use." },

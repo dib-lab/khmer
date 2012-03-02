@@ -32,6 +32,7 @@ namespace khmer
     Config( void );
     
     const bool is_threaded( void );
+    const bool has_extra_sanity_checks( void );
     
     const unsigned int get_number_of_threads( void );
 #ifdef KHMER_THREADED
