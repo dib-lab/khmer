@@ -49,18 +49,22 @@ def main():
 
     print 'preparing hist...'
     z = ht.abundance_distribution(datafile, tracking)
-    total = sum(z[1:])
+    total = sum(z)
         
     fp = open(histout, 'w')
+
     sofar = 0
-    for n, i in enumerate(z[1:]):
+    for n, i in enumerate(z):
         if i == 0 and not args.output_zero:
             continue
 
         sofar += i
         frac = sofar / float(total)
 
-        print >>fp, n + 1, i, sofar, round(frac, 3)
+        print >>fp, n, i, sofar, round(frac, 3)
+
+        if sofar == total:
+            break
 
 if __name__ == '__main__':
     main()
