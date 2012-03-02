@@ -191,13 +191,14 @@ def test_KmerCount():
     assert i == 2
 
     ### test capital letters vs lowercase
+    config = khmer.get_config( )
+    if config.has_extra_sanity_checks( ):
+	km = khmer.KmerCount(4, report_zero=True)
+	km.consume('AAAAAC'.lower())
+	expected = (('AAAA', 2), ('AAAC', 1))
 
-    km = khmer.KmerCount(4, report_zero=True)
-    km.consume('AAAAAC'.lower())
-    expected = (('AAAA', 2), ('AAAC', 1))
-
-    assert km['AAAA'] == 2
-    assert km['AAAC'] == 1
+	assert km['AAAA'] == 2
+	assert km['AAAC'] == 1
 
     ### hooray, done!
 

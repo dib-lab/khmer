@@ -194,21 +194,24 @@ def test_simple_kadian_2():
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACaGCTATCTCTAGAGCTATG")
+    #hi.consume("ACaGCTATCTCTAGAGCTATG")
+    hi.consume("ACAGCTATCTCTAGAGCTATG")
     #           --^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
     assert x == 2, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACaGCTATCTCTAGAcCTATG")
+    #hi.consume("ACaGCTATCTCTAGAcCTATG")
+    hi.consume("ACAGCTATCTCTAGACCTATG")
     #           --^          --^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
     assert x == 1, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCgCTAGAGCTATG")
+    #hi.consume("ACTGCTATCgCTAGAGCTATG")
+    hi.consume("ACTGCTATCGCTAGAGCTATG")
     #                  --^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
     assert x == 2, x
@@ -220,27 +223,31 @@ def test_2_kadian():
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #hi.consume("ACTGCTATCTCTAGAcCTATG")
+    hi.consume("ACTGCTATCTCTAGACCTATG")
     #           ---------------^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 2, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGAcCTAtG")
+    #hi.consume("ACTGCTATCTCTAGAcCTAtG")
+    hi.consume("ACTGCTATCTCTAGACCTATG")
     #           ---------------^---^
     assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 2
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTACtcCTAtG")
+    #hi.consume("ACTGCTATCTCTACtcCTAtG")
+    hi.consume("ACTGCTATCTCTACTCCTATG")
     #           --------------^^---^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 2, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTgTCTCTACtcCTAtG")
+    #hi.consume("ACTGCTgTCTCTACtcCTAtG")
+    hi.consume("ACTGCTGTCTCTACTCCTATG")
     #           ------^-------^^---^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 1, x
