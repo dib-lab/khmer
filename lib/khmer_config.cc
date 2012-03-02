@@ -55,6 +55,11 @@ namespace khmer
     sprintf( buf, "%u", 1 );
     _config_data[ "number_of_threads" ]	      = string( buf );
 #endif
+#ifdef KHMER_EXTRA_SANITY_CHECKS
+    _config_data[ "has_extra_sanity_checks" ] = string( "true" );
+#else
+    _config_data[ "has_extra_sanity_checks" ] = string( "false" );
+#endif
     
   }
 
@@ -64,6 +69,13 @@ namespace khmer
   Config::
   is_threaded( void ) 
   { return !_config_data[ "is_threaded" ].compare( "true" ); }
+
+
+  const
+  bool
+  Config::
+  has_extra_sanity_checks( void )
+  { return !_config_data[ "has_extra_sanity_checks" ].compare( "true" ); }
 
 
   const
