@@ -563,8 +563,8 @@ def test_count_overlap():
     in_dir = os.path.dirname(seqfile1)
     script = scriptpath('count-overlap.py')
 #    --ksize 32 --n_hashes 4 --hashsize 2000000000 --curve curve.out ../tests/test-data/test-graph3.fa ../tests/test-data/test-graph4.fa test.out
-    curvefile = seqfile1+'.curve'
-    outfile = seqfile1+'.out'
+    curvefile = utils.get_temp_filename( os.path.basename( seqfile1 )+'.curve' )
+    outfile = utils.get_temp_filename( os.path.basename( seqfile1 )+'.out' )
     args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000','--curve', curvefile,seqfile1,seqfile2,outfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
