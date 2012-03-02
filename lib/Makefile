@@ -1,44 +1,6 @@
-# Use multiple threads?
-# Set this variable to true if you wish the codes to use multiple threads when they can.
-WANT_THREADING=false
-
-# Profile?
-# Set this variable to true if you wish to profile the codes.
-WANT_PROFILING=false
-
-# Which profiling tool to use?
-# Assuming you have TAU installed and setup properly, you can instrument codes with it to get detailed multi-threaded profiling.
-# Otherwise, gprof is able to give you some information without threading info.
-# Choose one of: gprof, TAU
-PROFILER_OF_CHOICE=TAU
-
-# Perform extra sanity checking?
-# Set this variable to true if you wish the codes to perform extra sanity checking (to the possible detriment of performance).
-WANT_EXTRA_SANITY_CHECKING=false
-
-
 NO_UNIQUE_RC=0
 
-CXXFLAGS=-g -fPIC -Wall -O3 -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
-LIBS=
-
-ifeq ($(WANT_EXTRA_SANITY_CHECKING), true)
-CXXFLAGS+=-DKHMER_EXTRA_SANITY_CHECKS
-endif
-
-ifeq ($(WANT_THREADING), true)
-CXXFLAGS+=-DKHMER_THREADED -fopenmp
-LIBS+=-fopenmp
-endif
-
-ifeq ($(WANT_PROFILING), true)
-ifeq ($(PROFILER_OF_CHOICE), TAU)
-CXX=tau_cxx.sh
-endif
-ifeq ($(PROFILER_OF_CHOICE), gprof)
-CXXFLAGS+=-pg
-endif
-endif
+CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
 # comment out whichever is appropriate.  can probably make this automatic ;)
 SO_EXT=.so
@@ -62,7 +24,7 @@ test: $(DRV_PROGS)
 zlib: $(ZLIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
 
 $(ZLIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT):
-	cd $(ZLIB_DIR); ./configure --shared; make; rm minigzip.o; rm example.o
+	cd $(ZLIB_DIR) && ./configure --shared && make libz.so.1.2.3
 
 DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o khmer_config.o $(PARSERS_OBJS)
 DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o khmer_config.o $(PARSERS_OBJS)
