@@ -1,6 +1,6 @@
 # Use multiple threads?
 # Set this variable to true if you wish the codes to use multiple threads when they can.
-WANT_THREADING=false
+WANT_THREADING=true
 
 # Profile?
 # Set this variable to true if you wish to profile the codes.
@@ -67,7 +67,7 @@ all: lib_files python_files
 
 clean:
 	cd lib && make clean
-	cd python && rm -fr build khmer/*.so
+	cd python && make clean
 
 doc: FORCE
 	cd doc && make html
