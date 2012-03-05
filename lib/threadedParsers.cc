@@ -161,6 +161,7 @@ ThreadedFastaParser::ThreadedFastaParser(const std::string &inputfile,
     long int startPos, long int end) : 
                          infile(inputfile.c_str())
 {
+
     assert(infile.is_open());
 
     /* Lay the start pointer down in the right location */
@@ -194,7 +195,7 @@ Read ThreadedFastaParser::get_next_read()
       if (!infile.eof())
           infile.unget();
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       } 
 
@@ -239,7 +240,7 @@ Read ThreadedFastqParser::get_next_read()
 
       read.name = read.name.substr(1);
 
-      if ((int)read.seq.find('N') == -1)  {
+      if ((int)read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -247,3 +248,4 @@ Read ThreadedFastqParser::get_next_read()
    return read;
 }
 
+// vim: set sts=2 sw=2:
