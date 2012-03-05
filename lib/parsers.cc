@@ -57,7 +57,7 @@ FastaParser::FastaParser(const std::string &inputfile) :
          }
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
 
@@ -116,7 +116,7 @@ FastaGzParser::FastaGzParser(const std::string &inputfile)
          }
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
 
@@ -171,7 +171,7 @@ Read FastaParser::get_next_read()
          next_name = line.substr(1);
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }  else if (infile.eof())  {
          one_read_left = false;
@@ -231,7 +231,7 @@ Read FastaGzParser::get_next_read()
          next_name = line.substr(1);
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }  else if (gzeof(infile))  {
          one_read_left = false;
@@ -271,7 +271,7 @@ FastqParser::FastqParser(const std::string &inputfile) :
    
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -314,7 +314,7 @@ FastqGzParser::FastqGzParser(const std::string &inputfile)
 
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -345,7 +345,7 @@ Read FastqParser::get_next_read()
 
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -398,7 +398,7 @@ Read FastqGzParser::get_next_read()
 
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
 
