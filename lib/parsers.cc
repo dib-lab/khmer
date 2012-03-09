@@ -171,17 +171,18 @@ Read FastaParser::get_next_read()
          next_name = line.substr(1);
       }
 
+      if ((int)seq.find_first_of("Nn") == -1)  {
+         valid_read = 1;
+      }  else if (infile.eof()) {
+	 one_read_left = true;
+         break;
+      }
+
       current_read.seq = seq;
       seq = "";
 
       if (infile.eof()) {
          one_read_left = true;
-      }
-
-      if ((int)seq.find_first_of("Nn") == -1)  {
-         valid_read = 1;
-      }  else if (infile.eof()) {
-         break;
       }
 
    } // while read is not validated
@@ -434,3 +435,5 @@ int main()
    return 0;
 }
 */
+
+// vim: set sts=3 sw=3:
