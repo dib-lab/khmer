@@ -83,10 +83,18 @@ def explore(ht, start_kmer, K):
          
    return hash_ids, edges 
 
-def gen_graph(filename, edges):
+def gen_graph(filename, edges, hash_ids, chr, K):
    fd = open(filename, "w")
 
    fd.write("graph x {\nsize=\"16, 16\";\n")
+   fd.write("node [ color = red, fontcolor = black, style = filled ];\n")
+
+   for i in range(len(chr) - K):
+      kmer = chr[i:i + K]
+      kmer_hash = khmer.forward_hash(kmer, K)
+      hash_id = hash_ids[kmer_hash]
+
+      fd.write("N" + str(hash_id) + " [color = black, fontcolor = white];\n")
 
    for edge in edges:
       fd.write("N" + str(edge[0]) + " -- " + "N" + str(edge[1]) + ";\n")
@@ -108,6 +116,6 @@ def main():
       ht.consume(seq)
       hash_ids, edges = explore(ht, seq[0:K], K)
 
-      gen_graph(str(p) + ".dot", edges)
+      gen_graph(str(p) + ".dot", edges, hash_ids, seq, K)
 
 main()
