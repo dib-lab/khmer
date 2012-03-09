@@ -14,6 +14,6 @@ test:	all
 	nosetests
 
 clean:
-	python setup.py clean
-	/bin/rm setup.py
+	-python setup.py clean
+	/bin/rm -f setup.py
 	/bin/rm -f khmer/*.so
