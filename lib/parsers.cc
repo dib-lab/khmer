@@ -171,13 +171,6 @@ Read FastaParser::get_next_read()
          next_name = line.substr(1);
       }
 
-      if ((int)seq.find_first_of("Nn") == -1)  {
-         valid_read = 1;
-      }  else if (infile.eof())  {
-         one_read_left = false;
-         break;
-      }
-
       current_read.seq = seq;
       seq = "";
 
@@ -185,7 +178,13 @@ Read FastaParser::get_next_read()
          one_read_left = true;
       }
 
-   }
+      if ((int)seq.find_first_of("Nn") == -1)  {
+         valid_read = 1;
+      }  else if (infile.eof()) {
+         break;
+      }
+
+   } // while read is not validated
 
    return next_read;
 }
@@ -234,6 +233,7 @@ Read FastaGzParser::get_next_read()
       if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }  else if (gzeof(infile))  {
+	 // NOTE: Is this logic correct?
          one_read_left = false;
          break;
       }
@@ -245,7 +245,7 @@ Read FastaGzParser::get_next_read()
          one_read_left = true;
       }
 
-   }
+   } // while read is not validated
 
    return next_read;
 }
