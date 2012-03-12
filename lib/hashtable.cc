@@ -107,7 +107,7 @@ void Hashtable::consume_fasta(const std::string &filename,
   // iterate through the FASTA file & consume the reads.
   //
 #ifdef KHMER_THREADED
-#pragma omp parallel shared( pf, total_reads, n_consumed, callback, callback_data, readmask, masklist ) private( parser, currName, currSeq )
+#pragma omp parallel default( shared ) firstprivate( parser, currName, currSeq )
   while (!pf->is_complete( ))
   {
     Read read;
