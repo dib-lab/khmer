@@ -181,7 +181,8 @@ Read ThreadedFastaParser::get_next_read()
    while (!valid_read)  {
       getline(infile, line);
 
-      assert(line[0] == '>');
+      if (!infile.eof( ))
+	assert(line[0] == '>');
       read.name = line.substr(1);
 
       /* Get all the lines that are sequence data */
@@ -196,8 +197,8 @@ Read ThreadedFastaParser::get_next_read()
           infile.unget();
 
       if ((int)seq.find_first_of("Nn") == -1)  {
-         valid_read = 1;
-      } 
+          valid_read = 1;
+      }
 
       read.seq = seq;
       seq = "";
