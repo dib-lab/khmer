@@ -228,9 +228,9 @@ static
 PyObject *
 config_set_number_of_threads( PyObject * self, PyObject * args )
 {
-  unsigned int	  number_of_threads;
+  int	  number_of_threads;
 
-  if (!PyArg_ParseTuple( args, "I", &number_of_threads ))
+  if (!PyArg_ParseTuple( args, "i", &number_of_threads ))
     return NULL;
 
   if (0 >= number_of_threads)
