@@ -2,6 +2,7 @@
 #define COUNTING_HH
 
 #include <vector>
+#include "khmer_config.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
 
@@ -24,7 +25,7 @@ namespace khmer {
     friend class CountingHashGzFileWriter;
 
   protected:
-    bool _use_bigcount;		// keep track of counts > MAX_COUNT?
+    bool _use_bigcount;		// keep track of counts > Bloom filter hash count threshold?
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
 
@@ -101,23 +102,26 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
-      unsigned int n_full = 0;
+      unsigned int  n_full	  = 0;
+      Config	    config	  = get_active_config( );
+      unsigned int  max_count	  = config.get_hash_count_threshold( );
+      unsigned int  max_bigcount  = config.get_hash_bigcount_threshold( );
 //#pragma omp critical (update_counts)
       for (unsigned int i = 0; i < _n_tables; i++) {
 	const HashIntoType bin = khash % _tablesizes[i];
 #ifdef KHMER_THREADED
 	// NOTE: Technically, multiple threads can cause the bin to spill 
-	//	 over MAX_COUNT a little, if they all read it as less than 
-	//	 MAX_COUNT before any of them increment it.
+	//	 over max_count a little, if they all read it as less than 
+	//	 max_count before any of them increment it.
 	//	 However, do we actually care if there is a little 
 	//	 bit of slop here? It can always be trimmed off later, if 
 	//	 that would help with stats.
-	if ( MAX_COUNT > _counts[ i ][ bin ] )
+	if ( max_count > _counts[ i ][ bin ] )
 	  __sync_add_and_fetch( *(_counts + i) + bin, 1 );
 	else
 	  n_full++;
 #else
-	if (_counts[i][bin] < MAX_COUNT) {
+	if (_counts[i][bin] < max_count) {
 	  _counts[i][bin] += 1;
 	} else {
 	  n_full++;
@@ -128,9 +132,9 @@ namespace khmer {
       if (n_full == _n_tables && _use_bigcount) {
 #pragma omp critical (update_bigcounts)
 	if (_bigcounts[khash] == 0) {
-	  _bigcounts[khash] = MAX_COUNT + 1;
+	  _bigcounts[khash] = max_count + 1;
 	} else {
-	  if (_bigcounts[khash] < MAX_BIGCOUNT) {
+	  if (_bigcounts[khash] < max_bigcount) {
 	    _bigcounts[khash] += 1;
 	  }
 	}
@@ -145,14 +149,16 @@ namespace khmer {
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-      BoundedCounterType min_count = MAX_COUNT;
+      Config		  config	= get_active_config( );
+      unsigned int	  max_count	= config.get_hash_count_threshold( );
+      BoundedCounterType  min_count	= max_count;
       for (unsigned int i = 0; i < _n_tables; i++) {
 	BoundedCounterType the_count = _counts[i][khash % _tablesizes[i]];
 	if (the_count < min_count) {
 	  min_count = the_count;
 	}
       }
-      if (min_count == MAX_COUNT && _use_bigcount) {
+      if (min_count == max_count && _use_bigcount) {
 	KmerCountMap::const_iterator it = _bigcounts.find(khash);
 	if (it != _bigcounts.end()) {
 	  min_count = it->second;
