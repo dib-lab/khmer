@@ -311,6 +311,8 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
   total_reads = 0;
   n_consumed = 0;
 
+  unsigned int total_reads_TL = 0;
+
 #ifndef KHMER_THREADED
   IParser *		    parser  = IParser::get_parser(filename.c_str());
   Read read;
@@ -326,10 +328,11 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
   //
   
 #ifdef KHMER_THREADED
-#pragma omp parallel shared( pf, total_reads, n_consumed, callback, callback_data ) private( parser, seq )
+#pragma omp parallel default( shared ) private( parser, seq, total_reads_TL )
+//  shared( pf, total_reads, n_consumed, callback, callback_data ) 
+//  firstprivate( parser, seq, total_reads_TL )
   while ( !pf->is_complete( ) )
   {
-    // ThreadedIParser *	    parser    = pf->get_next_parser( );
     Read read;
     parser    = pf->get_next_parser( );
 #endif
@@ -340,21 +343,23 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
       // n_consumed += this_n_consumed;
 
-#pragma omp critical (consume_and_tag_seq)
 	if (check_and_normalize_read(seq)) {	// process?
+//#pragma omp critical (consume_and_tag_seq)
 	  consume_sequence_and_tag(seq, n_consumed);
 	}
 
 	// reset the sequence info, increment read number
-#pragma omp critical (incr_tot_reads)
-	total_reads++;
+#ifdef KHMER_THREADED
+	total_reads_TL = __sync_add_and_fetch( &total_reads, 1 );
+#else
+	total_reads_TL = ++total_reads;
+#endif
 
 	// run callback, if specified
-#pragma omp critical (call_callback)
-	if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+	if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
 	  std::cout << "n tags: " << all_tags.size() << "\n";
 	  try {
-	    callback("consume_fasta_and_tag", callback_data, total_reads,
+	    callback("consume_fasta_and_tag", callback_data, total_reads_TL,
 		     n_consumed);
 	  } catch (...) {
 	    delete parser;
@@ -370,7 +375,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     delete parser;
 
 #ifdef KHMER_THREADED
-  } // while parser fatory is still doling out parsers
+  } // while parser factory is still doling out chunk parsers
   
   delete pf;
 #endif
@@ -391,26 +396,48 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
   while(!kmers.done()) {
     kmer = kmers.next();
 
+    // Set the bits for the kmer in the various hashtables,
+    // and report on whether or not they had already been set.
+    // This is probably better than first testing and then setting the bits, 
+    // as a failed test essentially results in doing the same amount of work 
+    // twice. This way is also easier to add thread safety at an atomic level.
+#if (1)
+    if ((is_new_kmer = test_and_set_bits( kmer )))
+#ifdef KHMER_THREADED
+      __sync_add_and_fetch( &n_consumed, 1 );
+#else
+      n_consumed++;
+#endif
+#else
     is_new_kmer = (bool) !get_count(kmer);
     if (is_new_kmer) {
       count(kmer);
       n_consumed++;
     }
+#endif
 
-    if (!is_new_kmer && set_contains(all_tags, kmer)) {
-      since = 1;
-      if (found_tags) { found_tags->insert(kmer); }
-    } else {
-      since++;
-    }
+#ifdef KHMER_THREADED
+# pragma omp critical (add_found_tags)
+#endif
+    {
+      if (!is_new_kmer && set_contains(all_tags, kmer)) {
+	since = 1;
+	if (found_tags) { found_tags->insert(kmer); }
+      } else {
+	since++;
+      }
 
-    if (since >= _tag_density) {
-      all_tags.insert(kmer);
-      if (found_tags) { found_tags->insert(kmer); }
-      since = 1;
-    }
-  }
+      if (since >= _tag_density) {
+	all_tags.insert(kmer);
+	if (found_tags) { found_tags->insert(kmer); }
+	since = 1;
+      }
+    } // critical section
+  } // iteration over kmers
 
+#ifdef KHMER_THREADED
+# pragma omp critical (update_all_tags)
+#endif
   if (since >= _tag_density/2 - 1) {
     all_tags.insert(kmer);	// insert the last k-mer, too.
     if (found_tags) { found_tags->insert(kmer); }
