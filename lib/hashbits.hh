@@ -245,11 +245,7 @@ namespace khmer {
       }
     }
 
-
-
 	virtual bool check_overlap(HashIntoType khash, Hashbits &ht2) {
-	 // Byte ** _counts2;
-	 // _counts2 = ht2._counts;
 	  bool is_new_kmer = false;
 
 	  for (unsigned int i = 0; i < ht2._n_tables; i++) {
@@ -257,17 +253,10 @@ namespace khmer {
 		HashIntoType byte = bin / 8;
 		unsigned char bit = bin % 8;
 		if (!( ht2._counts[i][byte] & (1<<bit))) {
-		  is_new_kmer = true;
+		  return false;
 	}
-	ht2._counts[i][byte] |= (1 << bit);
       }
-      if (! is_new_kmer) {
-		return true;
-      }
-	  else {
-		return false;
-	  }
-
+	  return true;
 	  }
 
     virtual void count_overlap(const char * kmer, Hashbits &ht2) {
