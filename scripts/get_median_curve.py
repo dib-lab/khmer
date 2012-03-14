@@ -80,36 +80,52 @@ def count_median(K,HT_SIZE,N_HT,filename,fileout):
 
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
     ht.set_use_bigcount(True)
-    seq_array = []
+#    seq_array = []
     seq_count = 0
     median_array = [1,2,3,4,5]
     med={}
-    fileout_obj = open(fileout,'w')
+    
     for median in median_array:
         med[median] = 0
     #print med
-
+    count = 0
     for n, record in enumerate(screed.open(filename)):
         sequence = record['sequence']
         ht.consume(sequence)
-        seq_array.append(sequence)
+#        seq_array.append(sequence)
         seq_count = seq_count + 1
         if seq_count == max_count:
-            for seq in seq_array:
-                a, b, c = ht.get_median_count(seq)
+            count = count+1
+            number_of_sequence_consumed = max_count*count
+            counted_sequence = 0
+            #print number_of_sequence_consumed
+            for n2,record2 in enumerate(screed.open(filename)):
+                counted_sequence = counted_sequence+1
+                sequence2 = record2['sequence']
+                #print sequence2
+#for seq in seq_array:
+                a, b, c = ht.get_median_count(sequence2)
                 #print a,b,c
                 for median in median_array:
                     if a == median:
                         #print "hit!"
                         med[a] = med[a]+1
+                if counted_sequence == number_of_sequence_consumed:
+                    break
+                
             #print med
-            print_line = ''
+            fileout_obj = open(fileout,'a')
+            print_line = str(number_of_sequence_consumed)
             for median in median_array:
-                print_line = print_line+ str(med[median])+'\t'
+                print_line = print_line+ '\t'+str(med[median])+'\t'
             print_line = print_line+'\n'
             fileout_obj.write(print_line)
+            fileout_obj.close()
             seq_count = 0
-    fileout_obj.close()
+            med={}
+            for median in median_array:
+                med[median] = 0
+
 if __name__ == '__main__':
     main()
 

@@ -95,6 +95,20 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20):
 
     return outfile
 
+def _make_graph(infilename, SIZE=1e7, N=2, K=20):
+    script = scriptpath('load-graph.py')
+    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+    
+    outfile = utils.get_temp_filename('out.kh')
+
+    args.extend([outfile, infilename])
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+    assert os.path.exists(outfile)
+
+    return outfile
+
 def test_filter_abund_1():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -613,19 +627,24 @@ def test_count_overlap_without_curve():
     assert '# of overlap unique k-mers: 184849' in data
 
 def test_count_overlap_cpp():
-    seqfile1 = utils.get_test_data('test-overlap1.ht')
-    seqfile2 = utils.get_test_data('test-overlap2.fa')
+    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
+    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
+    outfile = utils.get_temp_filename('overlap.out', in_dir)
+    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
+    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
+    htfile = _make_graph(seqfile1, K=20)
+    ht_dir = os.path.dirname(htfile)
     script = scriptpath('count-overlap_cpp.py')
-    outfile = seqfile1+'.out'
-    args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000',\
-            seqfile1,seqfile2,outfile]
+    args = ['--ksize', '20', '--n_hashes', '2', '--hashsize','10000000',\
+            htfile+'.ht',seqfile2,outfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile
-    #report file
     data = [ x.strip() for x in open(outfile) ]
     data = set(data)
-    assert 'unique k-mers in dataset2:581866' in data
-    assert 'overlap k-mers:184849' in data
+    assert 'unique k-mers in dataset2:759047' in data
+    assert 'overlap k-mers:245621' in data
 
+
+test_count_overlap_cpp()
