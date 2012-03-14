@@ -1,11 +1,15 @@
-from distutils.core import setup, Extension
+from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
 
 # the c++ extension module (needs to be linked in with ktable.o ...)
-extension_mod = Extension("khmer._khmermodule",
-                          ["_khmermodule.cc"],
+extension_mod = Extension("khmer._khmer",
+                          sources=["_khmermodule.pyx"],
                           extra_compile_args=['-g'],
+                          language="c++",
                           include_dirs=['../lib',],
                           library_dirs=['../lib',],
+                          libraries=["stdc++"],
                           extra_objects=['../lib/ktable.o',
                                          '../lib/hashtable.o',
                                          '../lib/parsers.o',
@@ -32,6 +36,7 @@ extension_mod = Extension("khmer._khmermodule",
                                    '../lib/hashtable.o',
                                    '../lib/ktable.o',
                                    '../lib/parsers.o',
+                                   '../lib/intertable.o',
                                    '../lib/hashbits.o',
                                    '../lib/counting.o',
                                    '../lib/subset.o',
@@ -59,4 +64,6 @@ setup(name = "khmer", version = "0.2",
       url = 'http://ged.msu.edu/',
       license='New BSD License',
       packages = [py_mod,],
-      ext_modules = [extension_mod,])
+      ext_modules = [extension_mod,],
+      cmdclass = {'build_ext': build_ext},
+)
