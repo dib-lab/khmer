@@ -109,6 +109,8 @@ namespace khmer {
     bool done() { return index >= length; }
   };
 
+  class ReadMaskTable;
+
   class Hashtable {		// Base class implementation of a Bloom ht.
   protected:
     WordLength _ksize;
