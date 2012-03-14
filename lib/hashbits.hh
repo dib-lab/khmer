@@ -189,6 +189,76 @@ namespace khmer {
       return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
     }
 
+    // Get and set the hashbits for the given kmer.
+    inline
+    virtual
+    const
+    BoundedCounterType
+    test_and_set_bits(const char * kmer)
+    {
+      HashIntoType hash = _hash(kmer, _ksize);
+      return test_and_set_bits(hash);
+    }
+
+    // Get and set the hashbits for the given kmer hash.
+    // Generally, it is better to keep tests and mutations separate, 
+    // but, in the interests of efficiency and thread safety, 
+    // tests and mutations are being blended here against conventional 
+    // software engineering wisdom.
+    inline
+    virtual
+    const
+    bool
+    test_and_set_bits( HashIntoType khash ) 
+    {
+      bool is_new_kmer = false;
+
+      for (unsigned int i = 0; i < _n_tables; i++)
+      {
+        HashIntoType bin = khash % _tablesizes[i];
+	HashIntoType byte = bin / 8;
+	unsigned char bit = (unsigned char)(1 << (bin % 8));
+
+#ifdef KHMER_THREADED
+	unsigned char bits_orig = __sync_fetch_and_or( *(_counts + i) + byte, bit );
+	if (!(bits_orig & bit))
+	{
+	  __sync_add_and_fetch( &_occupied_bins, 1 );
+	  is_new_kmer = true;
+	}
+#else
+#if (0)
+	unsigned char bits_orig = _counts[ i ][ byte ];
+	_counts[ i ][ byte ] |= bit;
+	if (!(bits_orig & bit))
+	{
+	  _occupied_bins++;
+	  is_new_kmer = true;
+	}
+#else
+	if (!(_counts[ i ][ byte ] & bit))
+	{
+	  _counts[ i ][ byte ] |= bit;
+	  _occupied_bins++;
+	  is_new_kmer = true;
+	}
+#endif
+#endif
+      } // iteration over hashtables
+
+      if (is_new_kmer)
+      {
+#ifdef KHMER_THREADED
+	__sync_add_and_fetch( &_n_unique_kmers, 1 );
+#else
+	_n_unique_kmers++;
+#endif
+	return true; // kmer not seen before
+      }
+
+      return false; // kmer already seen
+    } // test_and_set_bits
+
     virtual void count(const char * kmer) {
       HashIntoType hash = _hash(kmer, _ksize);
       count(hash);
@@ -310,3 +380,5 @@ namespace khmer {
 #include "counting.hh"
 
 #endif // HASHBITS_HH
+
+// vim: set sts=2 sw=2:
