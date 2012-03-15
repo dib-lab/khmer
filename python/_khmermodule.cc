@@ -1671,9 +1671,10 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
 
   unsigned long long n_consumed;
   unsigned int total_reads;
+  khmer::HashIntoType curve[2][100];
 
   try {
-    hashbits->consume_fasta_overlap(filename,*ht2, total_reads, n_consumed,
+    hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed,
 			     lower_bound, upper_bound, &readmask,
 			     update_readmask, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
@@ -1689,7 +1690,15 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
     khmer::HashIntoType n = hashbits->n_kmers(start, stop);
     khmer::HashIntoType n_overlap = hashbits->n_overlap_kmers(start,stop);
 
-  return Py_BuildValue("LL", n, n_overlap);
+  PyObject * x = PyList_New(200);
+
+  for (unsigned int i = 0; i < 100; i++) {
+    PyList_SetItem(x, i, Py_BuildValue("i", curve[0][i]));
+  }
+  for (unsigned int i = 0; i < 100; i++) {
+    PyList_SetItem(x, i+100, Py_BuildValue("i", curve[1][i]));
+  }
+  return Py_BuildValue("LLO", n, n_overlap,x);
 }
 
 static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)

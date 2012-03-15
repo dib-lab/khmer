@@ -631,6 +631,8 @@ def test_count_overlap_cpp():
     in_dir = os.path.dirname(seqfile1)
     seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
     outfile = utils.get_temp_filename('overlap.out', in_dir)
+    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
+    figurefile = utils.get_temp_filename('overlap.out.curve.png', in_dir)
     shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, K=20)
@@ -643,8 +645,14 @@ def test_count_overlap_cpp():
     assert os.path.exists(outfile), outfile
     data = [ x.strip() for x in open(outfile) ]
     data = set(data)
-    assert 'unique k-mers in dataset2:759047' in data
-    assert 'overlap k-mers:245621' in data
-
+    assert '# of unique k-mers in dataset2: 759047' in data
+    assert '# of overlap unique k-mers: 245621' in data
+    assert os.path.exists(curvefile), curvefile
+    data = [ x.strip() for x in open(curvefile) ]
+    data = set(data)
+    assert '178633 1155' in data
+    assert '496285 2970' in data
+    assert '752053 238627' in data
+    assert os.path.exists(figurefile), curvefile
 
 test_count_overlap_cpp()
