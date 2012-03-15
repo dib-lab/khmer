@@ -118,7 +118,7 @@ namespace khmer
 #ifdef KHMER_THREADED
     unsigned int    number_of_threads	    = get_number_of_threads( );
     if (1 == number_of_threads) return (Byte)MAX_COUNT;
-    return (Byte)(MAX_COUNT - 2*get_number_of_threads( ) + 1);
+    return (Byte)(MAX_COUNT - get_number_of_threads( ) + 1);
 #else
     return (Byte)MAX_COUNT;
 #endif
@@ -133,7 +133,7 @@ namespace khmer
 #ifdef KHMER_THREADED
     unsigned int    number_of_threads	    = get_number_of_threads( );
     if (1 == number_of_threads) return (BoundedCounterType)MAX_BIGCOUNT;
-    return (BoundedCounterType)(MAX_BIGCOUNT - 2*get_number_of_threads( ) + 1);
+    return (BoundedCounterType)(MAX_BIGCOUNT - get_number_of_threads( ) + 1);
 #else
     return (BoundedCounterType)MAX_BIGCOUNT;
 #endif
