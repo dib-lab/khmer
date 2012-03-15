@@ -171,7 +171,7 @@ namespace khmer {
 				   void * callback_data = 0);
 
     // for overlap k-mer counting
-    void consume_fasta_overlap(const std::string &filename,
+    void consume_fasta_overlap(const std::string &filename,HashIntoType curve[2][100],
                                       khmer::Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
@@ -246,7 +246,6 @@ namespace khmer {
     }
 
 	virtual bool check_overlap(HashIntoType khash, Hashbits &ht2) {
-	  bool is_new_kmer = false;
 
 	  for (unsigned int i = 0; i < ht2._n_tables; i++) {
 		HashIntoType bin = khash % ht2._tablesizes[i];

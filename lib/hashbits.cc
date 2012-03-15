@@ -1,7 +1,7 @@
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "parsers.hh"
-
+#include <iostream>
 #define MAX_KEEPER_SIZE int(1e6)
 
 using namespace std;
@@ -1810,7 +1810,7 @@ unsigned int Hashbits::check_and_process_read_overlap(const std::string &read,
 //
 
 void Hashbits::consume_fasta_overlap(const std::string &filename,
-                                      Hashbits &ht2,
+                                        HashIntoType curve[2][100],Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
 			      HashIntoType lower_bound,
@@ -1822,11 +1822,23 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 {
   total_reads = 0;
   n_consumed = 0;
+  Read read;
+
+//get total number of reads in dataset
 
   IParser* parser = IParser::get_parser(filename.c_str());
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    total_reads++;
+  }
+//block size for curve
+  int block_size = total_reads/100;
+  
+  total_reads = 0;
+  khmer::HashIntoType start = 0, stop = 0;
+  parser = IParser::get_parser(filename.c_str());
 
 
-  Read read;
 
   string currName = "";
   string currSeq = "";
@@ -1876,8 +1888,13 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     }
 	       
     // reset the sequence info, increment read number
+
     total_reads++;
 
+    if (total_reads%block_size == 0) {
+        curve[0][total_reads/block_size-1] = n_overlap_kmers(start,stop);
+        curve[1][total_reads/block_size-1] = n_kmers(start,stop);
+    }
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
       try {
@@ -1886,6 +1903,9 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
         throw;
       }
     }
+//   count<<curve[0][0]<<" ";
+//   count<< curve[0][1]<<" ";
+
   }
 
 
