@@ -91,7 +91,7 @@ def check_hash_count_threshold( config, i, max_count, count_func_name ):
     number_of_threads = 2**i
     config.set_number_of_threads( number_of_threads )
     if 0 == i:	assert max_count == getattr( config, count_func_name )( )
-    else:	assert (max_count - 2*number_of_threads + 1) == getattr( config, count_func_name )( )
+    else:	assert (max_count - number_of_threads + 1) == getattr( config, count_func_name )( )
 
 def test_EFFECTS_set_number_of_threads( ):
     """
