@@ -20,6 +20,10 @@ WANT_EXTRA_SANITY_CHECKING=false
 # Set this variable to true if you wish the codes to be built with debugging symbols (increases code size and does not always produce accurate stepping in a debugger when optimization is turned on).
 WANT_DEBUGGING=true
 
+# Use Cython?
+# Set this variable to true if you wish to build the Python wrapper with Cython rather than the directly using the Python C API.
+USE_CYTHON=true
+
 CXXFLAGS=
 CXX_WARNING_FLAGS=-Wall
 CXX_OPTIMIZATION_FLAGS=-O3
@@ -63,6 +67,12 @@ CXXFLAGS+= -pg
 endif
 endif
 
+ifeq ($(USE_CYTHON), true)
+CYTHON_ENABLED_BOOL=True
+else
+CYTHON_ENABLED_BOOL=False
+endif
+
 all: lib_files python_files
 
 clean:
@@ -82,10 +92,11 @@ python_files: lib_files
 		DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
 		CXX_DEBUG_FLAGS="$(CXX_DEBUG_FLAGS)" \
 		CXX_THREADING_FLAGS="$(CXX_THREADING_FLAGS)" \
-		THREADING_LIBS="$(THREADING_LIBS)" 
+		THREADING_LIBS="$(THREADING_LIBS)" \
+		CYTHON_ENABLED_BOOL="$(CYTHON_ENABLED_BOOL)"
 #	python setup.py build_ext -i
 
 test: all
-	nosetests
+	nosetests -v -x
 
 FORCE:
