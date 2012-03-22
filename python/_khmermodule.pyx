@@ -48,6 +48,52 @@ cdef extern from "string" namespace "std":
       char* c_str()
       unsigned int length()
 
+
+cdef extern from "../lib/khmer_config.hh"	namespace "khmer":
+    
+  cdef cppclass Config:
+      Config( )
+
+      bool is_threaded( )
+      bool has_extra_sanity_checks( )
+
+      unsigned int get_number_of_threads( )
+      void set_number_of_threads( unsigned int )
+
+      Byte get_hash_count_threshold( )
+      BoundedCounterType get_hash_bigcount_threshold( )
+
+  cdef Config get_active_config( )
+
+cdef class get_config:
+
+   cdef Config *     thisref
+
+   def __cinit__( self ):
+      # NOTE! The following code is wrong.
+      #       Changes to the active config in the C++ API will not be 
+      # reflected in the Python wrapper.
+      #       This is due to Cython's pathetic ability to handle C++ 
+      # references.
+      self.thisref = new Config( )
+
+   def is_threaded( self ): return self.thisref.is_threaded( )
+   def has_extra_sanity_checks( self ):
+      return self.thisref.has_extra_sanity_checks( )
+
+   def get_number_of_threads( self ): 
+      return self.thisref.get_number_of_threads( )
+   def set_number_of_threads( self, unsigned int number_of_threads ):
+      if 0 >= number_of_threads:
+         raise ValueError( "Number of threads must be > 0." )
+      self.thisref.set_number_of_threads( number_of_threads )
+
+   def get_hash_count_threshold( self ): 
+      return self.thisref.get_hash_count_threshold( )
+   def get_hash_bigcount_threshold( self ): 
+      return self.thisref.get_hash_bigcount_threshold( )
+    
+
 cdef extern from "../lib/ktable.hh" namespace "khmer":
    HashIntoType _hash(char*, WordLength)
    HashIntoType _hash(char*, WordLength, HashIntoType&, HashIntoType&)
@@ -1001,3 +1047,4 @@ cdef class _new_subsetpartition:
                                                   output_unassigned,
                                                   _report_fn, <void*>_callback_obj)
 
+# vim: set sts=3 sw=3 et:
