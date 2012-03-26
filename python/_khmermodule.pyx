@@ -230,6 +230,7 @@ cdef extern from "../lib/counting.hh" namespace "khmer":
       void get_kmer_abund_abs_deviation(char*, float mean, float &abs_deviation)
       unsigned int max_hamming1_count(char*)
       unsigned int trim_on_abundance(char*, BoundedCounterType)
+      # TODO: Take care of corresponding test when this is modified.
       # void collect_high_abundance_kmers(char*, unsigned int, unsigned int, ) @CTB
 
 

@@ -499,8 +499,8 @@ def test_get_hashsizes():
     kh = khmer.new_counting_hash(22, 100, 4)
     assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
 
-def test_collect_high_abundance_kmers():
-    seqpath = utils.get_test_data('test-abund-read-2.fa')
-
-    kh = khmer.new_counting_hash(18, 1e6, 4)
-    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
+#def test_collect_high_abundance_kmers():
+#    seqpath = utils.get_test_data('test-abund-read-2.fa')
+#
+#    kh = khmer.new_counting_hash(18, 1e6, 4)
+#    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
