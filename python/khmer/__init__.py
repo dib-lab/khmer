@@ -3,8 +3,8 @@ __version__ = "0.2"
 import _khmer
 from _khmer import get_config
 from _khmer import new_ktable
-#from _khmer import new_hashtable
-from _khmer import _new_counting_hash as new_hashtable
+from _khmer import new_hashtable
+#from _khmer import _new_counting_hash as new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
 from _khmer import new_readmask
