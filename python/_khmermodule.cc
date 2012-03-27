@@ -68,7 +68,6 @@ void _report_fn(const char * info, void * data, unsigned long long n_reads,
     PyObject * obj = (PyObject *) data;
     if (obj != Py_None) {
       PyObject * args = Py_BuildValue("sLL", info, n_reads, other);
-
       PyObject * r = PyObject_Call(obj, args, NULL);
       Py_XDECREF(r);
       Py_DECREF(args);
@@ -1202,9 +1201,9 @@ static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * 
 
   // this will allocate 'readmask' and fill it in.
   try {
-    counting->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, &readmask, true,
-			     _report_fn, callback_obj);
+      counting->consume_fasta(filename, total_reads, n_consumed,
+			      lower_bound, upper_bound, &readmask, true,
+			      _report_fn, callback_obj);
   } catch  (_khmer_signal &e) {
     return NULL;
   }
@@ -1542,7 +1541,7 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
 
   unsigned long long * counts;
   counts = counting->fasta_count_kmers_by_position(inputfile, max_read_len,
-						    readmask, limit_by,
+						    limit_by, readmask,
 						    _report_fn, callback_obj);
 					 
   PyObject * x = PyList_New(max_read_len);
@@ -1801,6 +1800,13 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
     PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
     sizes.push_back(PyLong_AsLongLong(size_o));
   }
+  /*
+  if (PyErr_Occurred( ))
+  {
+    std:: cerr << "DEBUG: Error while creating list of hashtable sizes." << std:: endl;
+    PyErr_Print( );
+  }
+  */
 
   khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
     PyObject_New(khmer_KCountingHashObject, &khmer_KCountingHashType);
