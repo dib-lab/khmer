@@ -78,6 +78,7 @@ all: lib_files python_files
 clean:
 	cd lib && make clean
 	cd python && make clean
+	cd tests && rm -rf khmertest_*
 
 doc: FORCE
 	cd doc && make html
