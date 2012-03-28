@@ -5,7 +5,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 WORKER_THREADS=8
 GROUPSIZE=100
 
-CUTOFF=2000
+CUTOFF=50
 
 ###
 
