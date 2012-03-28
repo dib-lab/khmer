@@ -1836,6 +1836,81 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     return PyInt_FromLong(n);
 }
 
+
+static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+  khmer_KHashbitsObject * ht2_argu;
+  char * filename;
+  PyObject * readmask_obj = NULL;
+  PyObject * update_readmask_bool = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
+  khmer::Hashbits * ht2;
+
+  if (!PyArg_ParseTuple(args, "sO|iiOOO", &filename, &ht2_argu,&lower_bound, &upper_bound,
+			&readmask_obj, &update_readmask_bool,
+			&callback_obj)) {
+    return NULL;
+  }
+
+  ht2 = ht2_argu->hashbits;
+
+  bool update_readmask = false;
+  khmer::ReadMaskTable * readmask = NULL;
+
+  // set C++ parameters accordingly
+
+  if (readmask_obj && readmask_obj != Py_None) {
+    if (update_readmask_bool != NULL &&
+	PyObject_IsTrue(update_readmask_bool)) {
+      update_readmask = true;
+    }
+
+    if (!is_readmask_obj(readmask_obj)) {
+      PyErr_SetString(PyExc_TypeError,
+		      "fourth argument must be None or a readmask object");
+      return NULL;
+    }
+    
+    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+  khmer::HashIntoType curve[2][100];
+
+  try {
+    hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed,
+			     lower_bound, upper_bound, &readmask,
+			     update_readmask, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  // error checking -- this should still be null!
+  if (!update_readmask && !readmask_obj) {
+    assert(readmask == NULL);
+  }
+    khmer::HashIntoType start = 0, stop = 0;
+
+    khmer::HashIntoType n = hashbits->n_kmers(start, stop);
+    khmer::HashIntoType n_overlap = hashbits->n_overlap_kmers(start,stop);
+
+  PyObject * x = PyList_New(200);
+
+  for (unsigned int i = 0; i < 100; i++) {
+    PyList_SetItem(x, i, Py_BuildValue("i", curve[0][i]));
+  }
+  for (unsigned int i = 0; i < 100; i++) {
+    PyList_SetItem(x, i+100, Py_BuildValue("i", curve[1][i]));
+  }
+  return Py_BuildValue("LLO", n, n_overlap,x);
+}
+
 static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3352,6 +3427,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
   { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
+  { "count_overlap", hashbits_count_overlap,METH_VARARGS,"Count overlap kmers in two datasets" },
   { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
   { "save_stop_tags", hashbits_save_stop_tags, METH_VARARGS, "" },
