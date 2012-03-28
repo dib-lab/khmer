@@ -1,9 +1,9 @@
+#include <iostream>
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "parsers.hh"
 #include "threadedParsers.hh"
 #include <omp.h>
-
 #define MAX_KEEPER_SIZE int(1e6)
 
 using namespace std;
@@ -1860,6 +1860,179 @@ void Hashbits::extract_unique_paths(std::string seq,
       i++;
     }
   }
+}
+
+// for counting overlap k-mers specifically!!
+
+//
+// check_and_process_read: checks for non-ACGT characters before consuming
+//
+
+unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
+					    bool &is_valid,HashIntoType lower_bound,
+                                            HashIntoType upper_bound,
+                                            Hashbits &ht2)
+{
+   is_valid = check_and_normalize_read(read);
+
+   if (!is_valid) { return 0; }
+
+   return consume_string_overlap(read, lower_bound, upper_bound, ht2);
+}
+
+//
+// consume_fasta: consume a FASTA file of reads
+//
+
+void Hashbits::consume_fasta_overlap(const std::string &filename,
+                                        HashIntoType curve[2][100],Hashbits &ht2,
+			      unsigned int &total_reads,
+			      unsigned long long &n_consumed,
+			      HashIntoType lower_bound,
+			      HashIntoType upper_bound,
+			      ReadMaskTable ** orig_readmask,
+			      bool update_readmask,
+			      CallbackFn callback,
+			      void * callback_data)
+{
+  using namespace khmer:: parsers;
+
+  total_reads = 0;
+  n_consumed = 0;
+  Read read;
+
+//get total number of reads in dataset
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    total_reads++;
+  }
+//block size for curve
+  int block_size = total_reads/100;
+  
+  total_reads = 0;
+  khmer::HashIntoType start = 0, stop = 0;
+  parser = IParser::get_parser(filename.c_str());
+
+
+
+  string currName = "";
+  string currSeq = "";
+
+  //
+  // readmask stuff: were we given one? do we want to update it?
+  // 
+
+  ReadMaskTable * readmask = NULL;
+  std::list<unsigned int> masklist;
+
+  if (orig_readmask && *orig_readmask) {
+    readmask = *orig_readmask;
+  }
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
+
+    // do we want to process it?
+    if (!readmask || readmask->get(total_reads)) {
+
+      // yep! process.
+      unsigned int this_n_consumed;
+      bool is_valid;
+
+      this_n_consumed = check_and_process_read_overlap(currSeq,
+					       is_valid,
+					       lower_bound,
+					       upper_bound,ht2);
+
+      // was this an invalid sequence -> mark as bad?
+      if (!is_valid && update_readmask) {
+        if (readmask) {
+	  readmask->set(total_reads, false);
+	} else {
+	  masklist.push_back(total_reads);
+	}
+      } else {		// nope -- count it!
+        n_consumed += this_n_consumed;
+      }
+    }
+	       
+    // reset the sequence info, increment read number
+
+    total_reads++;
+
+    if (total_reads%block_size == 0) {
+        curve[0][total_reads/block_size-1] = n_overlap_kmers(start,stop);
+        curve[1][total_reads/block_size-1] = n_kmers(start,stop);
+    }
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("consume_fasta", callback_data, total_reads, n_consumed);
+      } catch (...) {
+        throw;
+      }
+    }
+//   count<<curve[0][0]<<" ";
+//   count<< curve[0][1]<<" ";
+
+  }
+
+
+  //
+  // We've either updated the readmask in place, OR we need to create a
+  // new one.
+  //
+
+  if (orig_readmask && update_readmask && readmask == NULL) {
+    // allocate, fill in from masklist
+    readmask = new ReadMaskTable(total_reads);
+
+    list<unsigned int>::const_iterator it;
+    for(it = masklist.begin(); it != masklist.end(); ++it) {
+      readmask->set(*it, false);
+    }
+    *orig_readmask = readmask;
+  }
+}
+
+//
+// consume_string: run through every k-mer in the given string, & hash it.
+//
+
+unsigned int Hashbits::consume_string_overlap(const std::string &s,
+				       HashIntoType lower_bound,
+				       HashIntoType upper_bound,Hashbits &ht2)
+{
+  const char * sp = s.c_str();
+  unsigned int n_consumed = 0;
+
+  bool bounded = true;
+
+  KMerIterator kmers(sp, _ksize);
+  HashIntoType kmer;
+
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
+
+  while(!kmers.done()) {
+    kmer = kmers.next();
+  
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count_overlap(kmer,ht2);
+      n_consumed++;
+    }
+  }
+
+  return n_consumed;
 }
 
 // vim: set sts=2 sw=2:
