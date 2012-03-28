@@ -7,7 +7,7 @@
 #    graphviz
 #    octave
 
-all: bitsperkmer graphvisual clustsize numparts seqerror diam perc
+all: membound bitsperkmer graphvisual clustsize numparts seqerror diam perc
 
 bitsperkmer:
 	python bitsperk.py > results/bitsperk.txt 
@@ -42,6 +42,10 @@ numparts:
 perc:
 	perc/do.sh > percout.txt
 	mv perc/S1/S1.pdf results/perc.pdf
+
+membound:
+	python membound.py
+	mv memusg.pdf results/memusg.pdf
 
 clean:
 	rm -f *.dot
