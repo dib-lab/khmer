@@ -1,7 +1,9 @@
 import _khmer
 from _khmer import new_ktable
-from _khmer import new_hashtable
-#from _khmer import _new_counting_hash as new_hashtable
+try: # CPython API
+    from _khmer import new_hashtable
+except ImportError: # Cython
+    from _khmer import _new_counting_hash as new_hashtable
 #from _khmer import consume_genome
 #from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 
