@@ -73,9 +73,8 @@ Generates the Diameter vs. FPR graph.
 Other Results
 =============
 Some results are more difficult to automate since they require monitoring 
-memory usage. We used the memory report that MSU's High Performance Computing 
-cluster generates. We have provided the scripts and data to run the 
-same analyses, but we do not provide a method to monitor the memory usage.
+memory usage. We have provided the scripts and data to run the 
+same analyses, and the memusg script is in the assemble directory.
 
 To replicate our MSB2 assembly results, you can run the following scripts:
 	assemble/001/partition.sh

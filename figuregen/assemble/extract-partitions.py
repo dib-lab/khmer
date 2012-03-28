@@ -17,7 +17,7 @@ import os.path
 import screed
 import argparse
 
-DEFAULT_MAX_SIZE=int(1e6)
+DEFAULT_MAX_SIZE=int(1e5)
 DEFAULT_THRESHOLD=5
 
 def read_partition_file(filename):
