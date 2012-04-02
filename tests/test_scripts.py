@@ -570,63 +570,8 @@ def test_abundance_dist():
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
 
-def test_count_overlap_with_curve():
-    seqfile1 = utils.get_test_data('test-overlap1.fa')
-    seqfile2 = utils.get_test_data('test-overlap2.fa')
-    in_dir = os.path.dirname(seqfile1)
-    script = scriptpath('count-overlap.py')
-    curvefile = seqfile1+'.curve'
-    outfile = seqfile1+'.out'
-    args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000',\
-            '--curve', curvefile,seqfile1,seqfile2,outfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    print out, err
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    assert os.path.exists(curvefile),curvefile
-    #report file
-    data = [ x.strip() for x in open(outfile) ]
-    data = set(data)
-    assert len(data) == 10, data
-    assert '# of unique k-mers: 440346' in data
-    assert '# of occupied bin: 440299' in data
-    assert '# of unique k-mers: 581866' in data
-    assert '# of occupied bin: 581783' in data
-    assert 'false positive rate: 7.160103e-15' in data
-    assert '# of overlap unique k-mers: 184849' in data
-    #curve file
-    data = [ x.strip() for x in open(curvefile) ]
-    data = set(data)
-    assert len(data) == 100, data
-    assert '6021 0' in data
-    assert '29649 40' in data
-    assert '471277 74260' in data
-    assert '529993 132976' in data
-    assert '581866 184849' in data
 
-def test_count_overlap_without_curve():
-    seqfile1 = utils.get_test_data('test-overlap1.fa')
-    seqfile2 = utils.get_test_data('test-overlap2.fa')
-    in_dir = os.path.dirname(seqfile1)
-    script = scriptpath('count-overlap.py')
-    outfile = seqfile1+'.out'
-    args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000',\
-            seqfile1,seqfile2,outfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    #report file
-    data = [ x.strip() for x in open(outfile) ]
-    data = set(data)
-    assert len(data) == 10, data
-    assert '# of unique k-mers: 440346' in data
-    assert '# of occupied bin: 440299' in data
-    assert '# of unique k-mers: 581866' in data
-    assert '# of occupied bin: 581783' in data
-    assert 'false positive rate: 7.160103e-15' in data
-    assert '# of overlap unique k-mers: 184849' in data
-
-def test_count_overlap_cpp():
+def test_count_overlap():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)
     seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
@@ -637,7 +582,7 @@ def test_count_overlap_cpp():
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, K=20)
     ht_dir = os.path.dirname(htfile)
-    script = scriptpath('count-overlap_cpp.py')
+    script = scriptpath('count-overlap.py')
     args = ['--ksize', '20', '--n_hashes', '2', '--hashsize','10000000',\
             htfile+'.ht',seqfile2,outfile]
     (status, out, err) = runscript(script, args, in_dir)
@@ -655,4 +600,3 @@ def test_count_overlap_cpp():
     assert '752053 238627' in data
     assert os.path.exists(figurefile), curvefile
 
-test_count_overlap_cpp()
