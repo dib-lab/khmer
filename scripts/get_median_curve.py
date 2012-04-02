@@ -1,21 +1,12 @@
 #! /usr/bin/env python
 """
-Count the overlap k-mers, which are the k-mers apperaring in two sequence datase
-ts.
+get the number of reads with specific median k-mer abundance as reads are consumed
 
-usage: count-overlap.py [-h] [-q] [--ksize KSIZE] [--n_hashes N_HASHES]
-                        [--hashsize HASHSIZE] [--curve CURVE_REPORT_FILENAME]
-                        first_filename second_filename report_filename
+usage: get_median_curve.py [-h] [-q] [--ksize KSIZE] [--n_hashes N_HASHES]
+                        [--hashsize HASHSIZE]   file_to_count report_file
 
 Use '-h' for parameter help.
 
-Note: "curve_report_filename" is optional. If it is provided, the script will
-generate a report of the increase of overlap k-mers as the number of sequences
-in the second dataset increases. The report can be used to generate a curve to
-show that trend easily.
-
-The report file contains the numbers of unique k-mers in the two datasets
-seperately and the number of overlap k-mers appearing in both datasets..
 """
 import khmer
 import sys
@@ -31,7 +22,7 @@ DEFAULT_HASHSIZE=1e6
 
 def main():
     parser = argparse.ArgumentParser(description=
-                                     'Use bloom filter to count overlap k-mers')
+                                     'get the number of reads with specific median k-mer abundance as reads are consumed')
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
     env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_HASHSIZE)
