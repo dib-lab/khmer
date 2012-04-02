@@ -62,7 +62,7 @@ def main():
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
-            if n > 0 and n % 10000 == 0:
+            if n > 0 and n % 100000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
                     int(100. - discarded / float(total) * 100.), '%'
                 print '... in file', input_filename
