@@ -250,6 +250,68 @@ config_set_number_of_threads( PyObject * self, PyObject * args )
 }
 #endif
 
+
+static
+PyObject *
+config_get_reads_parser_threading( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  if (config->get_reads_parser_threading( )) Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+
+#ifdef KHMER_THREADED
+static
+PyObject *
+config_set_reads_parser_threading( PyObject * self, PyObject * args )
+{
+  unsigned char	reads_parser_threading;
+
+  if (!PyArg_ParseTuple( args, "B", &reads_parser_threading ))
+    return NULL;
+
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  config->set_reads_parser_threading( reads_parser_threading ? 1 : 0 );
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#endif
+
+
+static
+PyObject *
+config_get_reads_file_chunk_size( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  return PyLong_FromUnsignedLongLong( config->get_reads_file_chunk_size( ) );
+}
+
+
+static
+PyObject *
+config_set_reads_file_chunk_size( PyObject * self, PyObject * args )
+{
+  unsigned long long reads_file_chunk_size;
+
+  if (!PyArg_ParseTuple( args, "K", &reads_file_chunk_size ))
+    return NULL;
+
+  // TODO: ensure value > 0.
+
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  config->set_reads_file_chunk_size( reads_file_chunk_size );
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+
 static
 PyObject *
 config_get_hash_count_threshold( PyObject * self, PyObject * args )
@@ -275,6 +337,12 @@ static PyMethodDef khmer_config_methods[] = {
 #ifdef KHMER_THREADED
   { "set_number_of_threads", config_set_number_of_threads, METH_VARARGS, "Set the number of threads to use." },
 #endif
+  { "get_reads_parser_threading", config_get_reads_parser_threading, METH_VARARGS, "Does the reads parser use multiple threads?" },
+#ifdef KHMER_THREADED
+  { "set_reads_parser_threading", config_set_reads_parser_threading, METH_VARARGS, "Choose whether the reads parser uses mutliple threads." },
+#endif
+  { "get_reads_file_chunk_size", config_get_reads_file_chunk_size, METH_VARARGS, "Get the chunk size used by the threaded reads file parser." },
+  { "set_reads_file_chunk_size", config_set_reads_file_chunk_size, METH_VARARGS, "Set the chunk size used by the threaded reads file parser." },
   { "get_hash_count_threshold", config_get_hash_count_threshold, METH_VARARGS, "Get the maximum count held by a Bloom filter hash bin." },
   { "get_hash_bigcount_threshold", config_get_hash_bigcount_threshold, METH_VARARGS, "Get the maximum count held by an overflow hash bin." },
   {NULL, NULL, 0, NULL}           /* sentinel */

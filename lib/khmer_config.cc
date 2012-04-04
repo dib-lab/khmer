@@ -50,17 +50,20 @@ namespace khmer
     _config_data[ "is_threaded" ]	      = string( "true" );
     sprintf( buf, "%u", detected_number_of_threads( ) );
     _config_data[ "number_of_threads" ]	      = string( buf );
+    _config_data[ "reads_parser_threading" ]  = string( "true" );
 #else
     _config_data[ "is_threaded" ]	      = string( "false" );
     sprintf( buf, "%u", 1 );
     _config_data[ "number_of_threads" ]	      = string( buf );
+    _config_data[ "reads_parser_threading" ]  = string( "false" );
 #endif
 #ifdef KHMER_EXTRA_SANITY_CHECKS
     _config_data[ "has_extra_sanity_checks" ] = string( "true" );
 #else
     _config_data[ "has_extra_sanity_checks" ] = string( "false" );
 #endif
-    
+    sprintf( buf, "%ull", 104857600 );
+    _config_data[ "reads_file_chunk_size" ]   = string( buf );
   }
 
 
@@ -108,6 +111,52 @@ namespace khmer
     _config_data[ "number_of_threads" ] = buf;
   }
 #endif
+  
+
+  const
+  bool
+  Config::
+  get_reads_parser_threading( void )
+  { return !_config_data[ "reads_parser_threading" ].compare( "true" ); }
+
+
+#ifdef KHMER_THREADED
+  void
+  Config::
+  set_reads_parser_threading( const bool threading )
+  {
+    _config_data[ "reads_parser_threading" ] = 
+      threading ? string( "true" ) : string( "false" );
+  }
+#endif
+
+
+  const
+  unsigned long long
+  Config::
+  get_reads_file_chunk_size( void )
+  {
+    unsigned long long  reads_file_chunk_size;
+
+    sscanf(
+      (const char *)_config_data[ "reads_file_chunk_size" ].c_str( ), 
+      "%llu", &reads_file_chunk_size
+    );
+    return reads_file_chunk_size;
+  }
+
+
+  void
+  Config::
+  set_reads_file_chunk_size( unsigned long long reads_file_chunk_size )
+  {
+    // TODO: Throw exception if chunk size is 0.
+
+    char	  buf[ 1024 ];
+
+    sprintf( buf, "%llu", reads_file_chunk_size );
+    _config_data[ "reads_file_chunk_size" ] = buf;
+  }
 
 
   const

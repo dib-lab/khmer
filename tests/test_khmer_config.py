@@ -32,7 +32,7 @@ def check_attribute_exists( config, attr_name ):
     """
 	Helper function for testing attribute existence.
     """
-    assert True == hasattr( config, attr_name )
+    assert True == hasattr( config, attr_name ), attr_name
 
 def test_EXISTENCE_OTHERS( ):
     """
@@ -41,13 +41,16 @@ def test_EXISTENCE_OTHERS( ):
     config = get_active_config( )
     for attr_name in \
 	[
-	    "has_extra_sanity_checks", "get_number_of_threads", "get_hash_count_threshold", "get_hash_bigcount_threshold",
+	    "has_extra_sanity_checks", "get_number_of_threads", 
+	    "get_reads_parser_threading",
+	    "get_reads_file_chunk_size", "set_reads_file_chunk_size",
+	    "get_hash_count_threshold", "get_hash_bigcount_threshold",
 	]:
 	yield check_attribute_exists, config, attr_name
     if config.is_threaded( ):
 	for attr_name in \
 	    [
-		"set_number_of_threads",
+		"set_number_of_threads", "set_reads_parser_threading",
 	    ]:
 	    yield check_attribute_exists, config, attr_name
 
@@ -82,6 +85,26 @@ def test_USE_set_number_of_threads( ):
     if config.is_threaded( ):
 	config.set_number_of_threads( 8 )
 	assert 8 == config.get_number_of_threads( )
+
+
+def test_USE_set_reads_parser_threading( ):
+    """
+	Verify that the reads parser threading can be toggled.
+    """
+    config = get_active_config( )
+    if config.is_threaded( ):
+	config.set_reads_parser_threading( True )
+	assert True == config.get_reads_parser_threading( )
+
+
+def test_USE_set_reads_file_chunk_size( ):
+    """
+	Verify that the reads file chunk size is what is reported.
+    """
+    config = get_active_config( )
+    if config.is_threaded( ):
+	config.set_reads_file_chunk_size( 123456789L )
+	assert 123456789L == config.get_reads_file_chunk_size( )
 
 
 def check_hash_count_threshold( config, i, max_count, count_func_name ):
