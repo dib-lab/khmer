@@ -60,6 +60,11 @@ cdef extern from "../lib/khmer_config.hh"	namespace "khmer":
       unsigned int get_number_of_threads( )
       void set_number_of_threads( unsigned int )
 
+      bool get_reads_parser_threading( )
+      void set_reads_parser_threading( bool )
+      unsigned long long get_reads_file_chunk_size( )
+      void set_reads_file_chunk_size( unsigned long long )
+
       Byte get_hash_count_threshold( )
       BoundedCounterType get_hash_bigcount_threshold( )
 
@@ -87,6 +92,17 @@ cdef class get_config:
       if 0 >= number_of_threads:
          raise ValueError( "Number of threads must be > 0." )
       self.thisref.set_number_of_threads( number_of_threads )
+
+   def get_reads_parser_threading( self ):
+      return self.thisref.get_reads_parser_threading( )
+   def set_reads_parser_threading( self, bool reads_parser_threading ):
+      self.thisref.set_reads_parser_threading( reads_parser_threading )
+   def get_reads_file_chunk_size( self ):
+      return self.thisref.get_reads_file_chunk_size( )
+   def set_reads_file_chunk_size( self, unsigned long long reads_file_chunk_size ):
+      if 0 >= reads_file_chunk_size:
+         raise ValueError( "Reads file chunk size must be > 0." )
+      self.thisref.set_reads_file_chunk_size( reads_file_chunk_size )
 
    def get_hash_count_threshold( self ): 
       return self.thisref.get_hash_count_threshold( )
