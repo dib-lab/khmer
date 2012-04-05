@@ -3,8 +3,6 @@
 #include "parsers.hh"
 #include "threadedParsers.hh"
 
-#define CALLBACK_PERIOD 10000
-
 // Note: This simple inlined code should be quicker than a call to a 
 //	 'toupper' function in the C library.
 //	 This should boil down to one integer compare, one branch, and 
