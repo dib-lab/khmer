@@ -3,7 +3,7 @@
 #include "hashbits.hh"
 #include "parsers.hh"
 
-#include "zlib-1.2.3/zlib.h"
+#include "zlib/zlib.h"
 #include <math.h>
 #include <algorithm>
 

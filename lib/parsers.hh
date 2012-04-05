@@ -6,7 +6,7 @@
 #include <string.h>
 #include <fstream>
 #include <assert.h>
-#include "zlib-1.2.3/zlib.h"
+#include "zlib/zlib.h"
 
 namespace khmer
 {

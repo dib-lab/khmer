@@ -2,7 +2,7 @@ NO_UNIQUE_RC=0
 
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
-ZLIB_DIR=zlib-1.2.3
+ZLIB_DIR=zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
 	zutil.o inflate.o infback.o inftrees.o inffast.o
