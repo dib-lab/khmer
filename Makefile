@@ -22,7 +22,7 @@ WANT_DEBUGGING=true
 
 # Use Cython?
 # Set this variable to true if you wish to build the Python wrapper with Cython rather than the directly using the Python C API.
-USE_CYTHON=false
+USE_CYTHON=true
 
 CXXFLAGS=
 CXX_WARNING_FLAGS=-Wall
