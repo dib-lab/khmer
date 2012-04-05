@@ -82,7 +82,10 @@ def main():
 
             if med < DESIRED_COVERAGE:
                 ht.consume(seq)
-                outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+                if hasattr(record,'accuracy'):
+                    outfp.write('@%s\n%s\n+\n%s\n' % (record.name, record.sequence, record.accuracy))
+                else:
+                    outfp.write('>%s\n%s\n' % (record.name, record.sequence))
             else:
                 discarded += 1
 
