@@ -11,7 +11,7 @@ DEFAULT_GROUPSIZE=100
 def verbose_loader(filename):
     it = screed.open(filename)
     for n, record in enumerate(it):
-        if n % 10000 == 0:
+        if n % 100000 == 0:
             print >>sys.stderr, '... filtering', n
         yield record
 
@@ -137,7 +137,7 @@ class ThreadedSequenceProcessor(object):
             self.bp_processed += bp_processed
             self.bp_written += bp_written
             
-            if self.verbose and self.n_processed % 100000 == 0:
+            if self.verbose and self.n_processed % 500000 == 0:
                 print >>sys.stderr, "processed %d / wrote %d / removed %d" % \
                       (self.n_processed, self.n_written,
                        self.n_processed - self.n_written)

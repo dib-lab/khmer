@@ -1,6 +1,8 @@
 @@ merge refactor => master
 @@ review site for paper?
 
+auto-memory setting.
+
 find-knot speedup:
    - too many redundant rounds of partitioning?
 
@@ -13,6 +15,8 @@ graphsize filtering with stop-big-traversal
 why does stop-big-traversal still connect???
 
 cython integrate!
+
+pull reads into partitions?
 
 ----
 

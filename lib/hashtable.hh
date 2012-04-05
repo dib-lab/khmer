@@ -15,8 +15,7 @@
 #include "khmer.hh"
 #include "storage.hh"
 
-
-#define CALLBACK_PERIOD 10000
+#define CALLBACK_PERIOD 100000
 
 namespace khmer {
   typedef unsigned int PartitionID;
