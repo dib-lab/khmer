@@ -10,15 +10,29 @@ Use '-h' for parameter help.
 
 import sys, screed, os
 import khmer
+from itertools import izip
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 import argparse
 
 DEFAULT_DESIRED_COVERAGE=5
 
+# Iterate a collection in arbitrary batches
+# from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
+def batchwise(t, size):
+    it = iter(t)
+    return izip(*[it]*size)
+
+# Returns true if the pair of records are properly pairs
+def validpair(r0, r1):
+    return r0.name[-1] == "1" and \
+           r1.name[-1] == "2" and \
+           r0.name[0:-1] == r1.name[0:-1]
+
 def main():
     parser = build_construct_args()
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
                         default=DEFAULT_DESIRED_COVERAGE)
+    parser.add_argument('-p', '--paired', action='store_true')
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
     parser.add_argument('-l', '--loadhash', dest='loadhash',
                         default='')
@@ -36,6 +50,7 @@ def main():
         print>>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
+        print>>sys.stderr, ' - paired = %d' % args.paired
         print>>sys.stderr, ''
         print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
         print>>sys.stderr, '-'*8
@@ -45,8 +60,12 @@ def main():
     N_HT=args.n_hashes
     DESIRED_COVERAGE=args.cutoff
     report_fp = args.report_file
-
     filenames = args.input_filenames
+
+    # In paired mode we read two records at a time
+    batch_size = 1
+    if args.paired:
+        batch_size = 2
 
     if args.loadhash:
         print 'loading hashtable from', args.loadhash
@@ -57,12 +76,13 @@ def main():
 
     total = 0
     discarded = 0
+
     for input_filename in filenames:
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-        for n, record in enumerate(screed.open(input_filename)):
-            if n > 0 and n % 10000 == 0:
+        for n, batch in enumerate(batchwise(screed.open(input_filename), batch_size)):
+            if n > 0 and n % 100000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
                     int(100. - discarded / float(total) * 100.), '%'
                 print '... in file', input_filename
@@ -72,22 +92,38 @@ def main():
                         1. - (discarded / float(total))
                     report_fp.flush()
 
-            total += 1
+            total += len(batch)
 
-            if len(record.sequence) < K:
-                continue
+            # If in paired mode, check that the reads are properly interleaved
+            if args.paired:
+                if not validpair(batch[0], batch[1]):
+                    print >>sys.stderr, 'Error: Improperly interleaved pairs %s %s' % (batch[0].name, batch[1].name)
+                    sys.exit(-1)
 
-            seq = record.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
+            # Check if any record in the batch passed the filter
+            passed = False
+            for record in batch:
+                if len(record.sequence) < K:
+                    continue
 
-            if med < DESIRED_COVERAGE:
-                ht.consume(seq)
-                if hasattr(record,'accuracy'):
-                    outfp.write('@%s\n%s\n+\n%s\n' % (record.name, record.sequence, record.accuracy))
-                else:
-                    outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+                seq = record.sequence.replace('N', 'A')
+                med, _, _ = ht.get_median_count(seq)
+
+                if med < DESIRED_COVERAGE:
+                    ht.consume(seq)
+                    passed = True
+            
+            # Emit records if any passed
+            if passed:
+                for record in batch:
+                    if hasattr(record,'accuracy'):
+                        outfp.write('@%s\n%s\n+\n%s\n' % (record.name, 
+                                                          record.sequence, 
+                                                          record.accuracy))
+                    else:
+                        outfp.write('>%s\n%s\n' % (record.name, record.sequence))
             else:
-                discarded += 1
+                discarded += len(batch)
 
         print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
             total, 'or', int(100. - discarded / float(total) * 100.), '%'
