@@ -14,11 +14,9 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=smpFiltering load_graph bittest ktable_test #graphtest #consume_prof
+DRV_PROGS=smpFiltering load_graph bittest ktable_test test-StreamReader #graphtest #consume_prof
 
-PARSER_OBJS=parsers.o
-MT_PARSER_OBJS=threadedParsers.o
-PARSERS_OBJS=$(PARSER_OBJS) $(MT_PARSER_OBJS)
+PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(PARSERS_OBJS) khmer_config.o ktable.o hashtable.o hashbits.o subset.o counting.o test
 
@@ -31,12 +29,16 @@ test: $(DRV_PROGS)
 
 DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o khmer_config.o $(PARSERS_OBJS)
 DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o khmer_config.o $(PARSERS_OBJS)
+DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o
 
-smpFiltering: $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) primes.hh
-	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(LIBS)
+smpFiltering: $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) primes.hh
+	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
-load_graph: $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) primes.hh
-	$(CXX) -o $@ $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(LIBS)
+load_graph: $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) primes.hh
+	$(CXX) -o $@ $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+
+test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # TODO: Move 'main' to a driver program.
 #parsetest: parsers.o 
@@ -45,8 +47,8 @@ load_graph: $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) primes.hh
 bittest: bittest.o ktable.o
 	$(CXX) -o $@ bittest.o ktable.o
 
-ktable_test: ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS)
-	$(CXX) -o $@ ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(LIBS)
+ktable_test: ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	$(CXX) -o $@ ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # NOTE: Disabled due to broken constructor call.
 #graphtest: graphtest.o ktable.o hashtable.o
@@ -63,6 +65,8 @@ $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
 
 khmer_config.o: khmer_config.cc khmer_config.hh
+
+read_parsers.o: read_parsers.cc read_parsers.hh
 
 threadedParsers.o: threadedParsers.cc threadedParsers.hh
 
