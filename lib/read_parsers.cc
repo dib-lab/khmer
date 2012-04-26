@@ -253,21 +253,15 @@ CacheManager(
     
     _stream_reader_PTR	= stream_reader_PTR;
 
-    // TODO: Verify that the number of threads > 0.
+    // TODO: Throw exception if number_of_threads == 0.
     _number_of_threads	= number_of_threads;
-    // Renormalize cache size by way of integer division.
-    _segment_size	= cache_size / number_of_threads;
-    _cache_size		= _segment_size * number_of_threads;
-
-    // Allocate cache and segment information.
-    _cache		= new uint8_t[ _cache_size ];
-    _psegment_infos	= new SegmentInfo *[ number_of_threads ];
-    _ssegment_infos	= new SegmentInfo *[ number_of_threads ];
-
     _thread_counter	= 0;
     _tid_map_spin_lock	= 0;
 
-    _fill_cursor	= 0;
+    _segment_size	= cache_size / number_of_threads;
+    _segments		= new CacheSegment *[ number_of_threads ];
+    for (uint32_t i = 0; i < number_of_threads; ++i) _segments[ i ] = NULL;
+    _segment_to_fill	= 0;
 
 }
 
@@ -275,75 +269,80 @@ CacheManager(
 CacheManager::
 ~CacheManager( )
 {
-    
-    for (uint64_t i = 0; i < _number_of_threads ; ++i)
+
+    for (uint32_t i = 0; i < _number_of_threads; ++i)
     {
-	delete _psegment_infos[ i ];
-	delete _ssegment_infos[ i ];
+	delete _segments[ i ];
+	_segments[ i ]	= NULL;
     }
-    delete [ ] _psegment_infos;
-    _psegment_infos	= NULL;
-    delete [ ] _ssegment_infos;
-    _ssegment_infos	= NULL;
-    delete [ ] _cache;
-    _cache		= NULL;
+    delete [ ] _segments;
+    _segments		= NULL;
 
 }
 
 
-CacheManager:: SegmentInfo::
-SegmentInfo( uint64_t const start, uint64_t const end )
+CacheManager:: CacheSegment::
+CacheSegment( uint32_t const P_thread_id, uint64_t const P_size )
 {
-    cursor	    = end;
-    segment_start   = start;
-    segment_end	    = end;
-    _available	    = false;
+    thread_id		= P_thread_id;
+    size		= P_size;
+    memory		= new uint8_t[ P_size ];
+    cursor		= 0;
+    cursor_in_sa_buffer	= false;
+    _sa_buffer_avail	= false;
+    sa_buffer_size	= 0;
+    avail		= true;
 }
 
 
-CacheManager:: SegmentInfo::
-~SegmentInfo( )
+CacheManager:: CacheSegment::
+~CacheSegment( )
 {
-    // TODO: Implement.
+    avail		= false;
+    _sa_buffer_avail	= false;
+    sa_buffer_size	= 0;
+    size		= 0;
+    delete [ ] memory;
+    memory		= NULL;
 }
 
 
-inline
 bool const
-CacheManager:: SegmentInfo::
-get_availability( ) const
+CacheManager::
+has_more_data( )
 {
-    return _available;
+    CacheSegment &	segment		= _get_segment( );
+
+    // Return true immediately, if segment can provide more data.
+    if (segment.avail) return true;
+
+    // Block indefinitely, if some other segment can provide more data.
+    // (This is a synchronization barrier.)
+sync_barrier:
+    while (_segment_ref_count);
+
+    // Return false, if no segment can provide more data.
+    if (!_get_segment_ref_count_ATOMIC( )) return false;
+    // If we somehow got here and there are still active segments,
+    // then go back to waiting.
+    else goto sync_barrier;
 }
 
 
 inline
-bool const
-CacheManager:: SegmentInfo::
-get_availability_ATOMIC( )
-{
-    return __sync_and_and_fetch( &_available, 1 );
-}
-
-
-inline
-void
-CacheManager:: SegmentInfo::
-set_availability_ATOMIC( bool const available )
-{
-    __sync_bool_compare_and_swap( &_available, !available, available );
-}
-
-
 uint8_t const
 CacheManager::
 get_byte( )
 {
-    SegmentInfo &	segment_info	    = _get_psegment( );   
+    CacheSegment &	segment		= _get_segment( );
 
-    _perform_segment_maintenance( segment_info );
+    if (!segment.avail)
+	// TODO: Throw exception.
+	;
 
-    return _cache[ segment_info.cursor++ ];
+    _perform_segment_maintenance( segment );
+
+    return segment.memory[ segment.cursor++ ];
 }
 
 
@@ -352,17 +351,21 @@ uint64_t const
 CacheManager::
 get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 {
-    SegmentInfo &	segment_info	    = _get_psegment( );   
-    uint64_t		nbcopied	    = 0;
-    uint64_t		nbcopied_total	    = 0;
+    CacheSegment &	segment		= _get_segment( );
+    uint64_t		nbcopied	= 0;
+    uint64_t		nbcopied_total	= 0;
+
+    if (!segment.avail)
+	// TODO: Throw exception.
+	;
 
     for (uint64_t nbrem = buffer_len; (nbrem > 0); nbrem -= nbcopied)
     {
-	_perform_segment_maintenance( segment_info );
+	_perform_segment_maintenance( segment );
 
-	nbcopied = MIN( nbrem, segment_info.segment_end - segment_info.cursor );
-	memcpy( buffer, _cache + segment_info.cursor, nbcopied );
-	segment_info.cursor += nbcopied;
+	nbcopied = MIN( nbrem, segment.size - segment.cursor );
+	memcpy( buffer, segment.memory + segment.cursor, nbcopied );
+	segment.cursor += nbcopied;
 
 	nbcopied_total += nbcopied;
     }
@@ -375,12 +378,214 @@ void
 CacheManager::
 split_at( uint64_t const pos )
 {
-    // TODO: Implement.
-    //	     Place start address of current segment into previous segment.
-    //	     Set size of previous segment.to pos.
-    //	     Set start address of current segment to pos.
-    //	     Set size of current segment to size - pos.
-    //	     Set offset of current segment to offset - pos.
+
+    CacheSegment &	segment		= _get_segment( );
+
+    // Wait until the lower segment has consumed the setaside buffer.
+wait_for_sa_buffer:
+    while (segment.get_sa_buffer_avail( ));
+
+    // If we get here but are not ready to proceed,
+    // then go back and wait some more.
+    if (segment.get_sa_buffer_avail_ATOMIC( ))
+	goto wait_for_sa_buffer;
+
+    // Setup the setaside buffer.
+    segment.sa_buffer_size = pos;
+    segment.set_sa_buffer_avail_ATOMIC( true );
+
+}
+
+
+void
+CacheManager::
+_perform_segment_maintenance( CacheSegment & segment )
+{
+
+    assert( segment.avail );
+
+    CacheSegment &	    hsegment	    = _get_segment( true );
+
+    // If at end of segment and not already in setaside buffer, 
+    // then jump into setaside buffer from higher segment.
+    if (!segment.cursor_in_sa_buffer && (segment.cursor == segment.size))
+    {
+
+	// Wait while higher segment is available 
+	// and its setaside buffer is not ready for consumption.
+	while (hsegment.avail && !hsegment.get_sa_buffer_avail( ));
+
+	// Atomically test that the setaside buffer is available.
+	// If so, then jump into it.
+	if (hsegment.get_sa_buffer_avail_ATOMIC( ))
+	{
+	    segment.cursor_in_sa_buffer	    = true;
+	    segment.cursor		    = 0;
+	}
+
+    } // jump into setaside buffer
+
+    // If at end of setaside buffer...
+    if (    segment.cursor_in_sa_buffer
+	&&  (segment.cursor == hsegment.sa_buffer_size))
+    {
+	
+	// Jump out of setaside buffer and reset it.
+	segment.cursor_in_sa_buffer	= false;
+	segment.cursor			= 0;
+	hsegment.sa_buffer_size		= 0;
+	hsegment.set_sa_buffer_avail_ATOMIC( false );
+
+	// Jump past end of setaside buffer
+	// so as not to clobber what the lower segment will want to use.
+	if (segment.get_sa_buffer_avail_ATOMIC( ))
+	    segment.cursor		= segment.sa_buffer_size;
+	
+	_fill_segment_from_stream( segment );
+	
+    } // refill or mark unavailable
+
+}
+
+
+inline
+bool const
+CacheManager::
+_check_segment_to_fill_ATOMIC( uint32_t const thread_id )
+{
+    uint32_t	segment_idx	= 
+    __sync_and_and_fetch( &_segment_to_fill, (uint32_t)0xffffffff );
+    return (thread_id == segment_idx);
+}
+
+
+inline
+void
+CacheManager::
+_select_segment_to_fill_ATOMIC( )
+{
+    uint32_t	segment_idx =
+    __sync_add_and_fetch( &_segment_to_fill, 1 );
+    if (_number_of_threads == segment_idx)
+	__sync_bool_compare_and_swap(
+	    &_segment_to_fill, _number_of_threads, 0
+	);
+}
+
+
+inline
+CacheManager:: CacheSegment &
+CacheManager::
+_get_segment( bool const higher )
+{
+    uint32_t	    thread_id		= _get_thread_id( );
+    CacheSegment *  segment_PTR		= NULL;
+
+    assert( NULL != _segments );
+
+    // If referring to a segment to snoop,
+    // then index is for the thread with the next higher ID.
+    if (higher) thread_id = ((thread_id + 1) % _number_of_threads);
+
+    segment_PTR	    = _segments[ thread_id ];
+    if (NULL == segment_PTR)
+    {
+	_segments[ thread_id ]	    = new CacheSegment(
+	    thread_id, _segment_size
+	);
+	segment_PTR		    = _segments[ thread_id ];
+	_increment_segment_ref_count_ATOMIC( );
+	_fill_segment_from_stream( *segment_PTR );
+    }
+
+    return *segment_PTR;
+}
+
+
+inline
+void
+CacheManager::
+_fill_segment_from_stream( CacheSegment & segment )
+{
+
+    // Wait while segment not selected and not end of stream.
+wait_to_fill:
+    while ( !_stream_reader_PTR->is_at_end_of_stream( )
+	&&  (_segment_to_fill != segment.thread_id));
+
+    // If at end of stream, then mark segment unavailable.
+    if (_stream_reader_PTR->is_at_end_of_stream( ))
+    {
+	segment.avail		= false;
+	_decrement_segment_ref_count_ATOMIC( );
+    }
+    // Else, refill the segment.
+    else if (_check_segment_to_fill_ATOMIC( segment.thread_id ))
+    {
+	segment.size		=
+	    segment.cursor
+	+   _stream_reader_PTR->read_into_cache(
+		segment.memory + segment.cursor,
+		_segment_size - segment.cursor
+	    );
+	_select_segment_to_fill_ATOMIC( );
+    }
+    // If we somehow get here, then go back and wait some more.
+    else goto wait_to_fill;
+
+}
+
+
+inline
+void
+CacheManager::
+_increment_segment_ref_count_ATOMIC( )
+{
+    __sync_add_and_fetch( &_segment_ref_count, 1 );
+}
+
+
+inline
+void
+CacheManager::
+_decrement_segment_ref_count_ATOMIC( )
+{
+    __sync_sub_and_fetch( &_segment_ref_count, 1 );
+}
+
+inline
+uint32_t const
+CacheManager::
+_get_segment_ref_count_ATOMIC( )
+{
+    return __sync_and_and_fetch( &_segment_ref_count, (uint32_t)0xffffffff );
+}
+
+
+inline
+bool
+CacheManager:: CacheSegment::
+get_sa_buffer_avail( ) const
+{
+    return _sa_buffer_avail;
+}
+
+
+inline
+bool
+CacheManager:: CacheSegment::
+get_sa_buffer_avail_ATOMIC( )
+{
+    return __sync_and_and_fetch( &_sa_buffer_avail, 1 );
+}
+
+
+inline
+void
+CacheManager:: CacheSegment::
+set_sa_buffer_avail_ATOMIC( bool const avail )
+{
+    __sync_bool_compare_and_swap( &_sa_buffer_avail, !avail, avail );
 }
 
 
@@ -389,7 +594,7 @@ uint64_t const
 CacheManager::
 tell( )
 {
-    return _get_psegment( ).cursor;
+    return _get_segment( ).cursor;
 }
 
 
@@ -398,18 +603,18 @@ void
 CacheManager::
 seek( uint64_t const offset, uint8_t const whence )
 {
-    SegmentInfo &	segment_info	    = _get_psegment( );
+    CacheSegment &	segment	    = _get_segment( );
     uint64_t		cursor;
 
     switch (whence)
     {
 
     case SEEK_SET:
-	cursor = segment_info.segment_start + offset;
+	cursor = offset;
 	break;
 
     case SEEK_CUR:
-	cursor = segment_info.cursor + offset;
+	cursor = segment.cursor + offset;
 	break;
 
     default:
@@ -419,146 +624,10 @@ seek( uint64_t const offset, uint8_t const whence )
 
     }
 
-    if (    (cursor < segment_info.segment_start)
-	||  (cursor > segment_info.segment_end))
+    if (cursor > segment.size)  
 	// TODO: Throw SegmentBoundaryError.
 	;
-    segment_info.cursor = cursor;
-}
-
-void
-CacheManager::
-_perform_segment_maintenance( SegmentInfo & psegment_info )
-{
-    SegmentInfo &	    ssegment_info   = _get_ssegment( false );
-
-    // Attempt to merge ssegment into psegment.
-    if (psegment_info.cursor == psegment_info.segment_end)
-    {
-	SegmentInfo &	    npsegment_info  = _get_psegment( true );
-	
-	// Wait while next psegment is not in final state,
-	// and our ssegment has not been made available.
-	while (	(npsegment_info.segment_start != npsegment_info.segment_end)
-	    &&	!ssegment_info.get_availability( ));
-	// Atomically test whether our ssegment is available.
-	// If the test succeeds, then proceed with merge.
-	if (	ssegment_info.get_availability_ATOMIC( )
-	    &&	(ssegment_info.segment_start != ssegment_info.segment_end))
-	{
-	    psegment_info.segment_end = ssegment_info.segment_end;
-	}
-    } // Segment Merge
-
-    // If at EOS, then mark psegment off-line.
-    if (    (psegment_info.cursor == psegment_info.segment_end)
-	&&  _stream_reader_PTR->is_at_end_of_stream( ))
-    {
-	psegment_info.set_availability_ATOMIC( false );
-	psegment_info.segment_end   = 0;
-	psegment_info.segment_start = 0;
-	psegment_info.cursor	    = 0;
-	// TODO? ssegment bookkeeping.
-	return;
-    }
-
-    // Attempt to refill psegment.
-    if (psegment_info.cursor == psegment_info.segment_end)
-    {
-	// Wait while fill cursor is not at psegment start.
-	while (	(_fill_cursor != psegment_info.segment_start)
-	    &&	!_stream_reader_PTR->is_at_end_of_stream( ));
-	// Atomically test whether fill cursor is at our psegment.
-	// If test succeeds, then fill the segment.
-	if (	_check_fill_cursor_ATOMIC( psegment_info.segment_start )
-	    &&	!_stream_reader_PTR->is_at_end_of_stream( ))
-	{
-	    ssegment_info.set_availability_ATOMIC( false );
-	    psegment_info.cursor	= psegment_info.segment_start;
-	    psegment_info.segment_end	= 
-		psegment_info.segment_start
-	    +	_stream_reader_PTR->read_into_cache(
-		    _cache + psegment_info.segment_start, 
-		    psegment_info.segment_end - psegment_info.segment_start
-		);
-	    _set_fill_cursor_ATOMIC( psegment_info.segment_end );
-	}
-    }
-}
-
-
-inline
-bool const
-CacheManager::
-_check_fill_cursor_ATOMIC( uint64_t const pos )
-{
-    return (pos == __sync_val_compare_and_swap( &_fill_cursor, pos, pos ));
-}
-
-
-inline
-void
-CacheManager::
-_set_fill_cursor_ATOMIC( uint64_t const pos )
-{
-    __sync_bool_compare_and_swap( &_fill_cursor, _fill_cursor, pos );
-}
-
-
-inline
-CacheManager:: SegmentInfo &
-CacheManager::
-_get_psegment( bool const higher )
-{
-    uint32_t	    thread_id		= _get_thread_id( );
-    SegmentInfo *   segment_info_PTR	= NULL;
-
-    assert( NULL != _psegment_infos );
-
-    // If referring to a segment to snoop,
-    // then index is for the thread with the next higher ID.
-    if (higher) thread_id = ((thread_id + 1) % _number_of_threads);
-
-    segment_info_PTR = _psegment_infos[ thread_id ];
-    if (NULL == segment_info_PTR)
-    {
-	_psegment_infos[ thread_id ]	= 
-	new SegmentInfo(
-	    thread_id * _segment_size, thread_id * (_segment_size + 1)
-	);
-	segment_info_PTR		= _psegment_infos[ thread_id ];
-    }
-
-    return *segment_info_PTR;
-}
-
-
-inline
-CacheManager:: SegmentInfo &
-CacheManager::
-_get_ssegment( bool const lower )
-{
-    uint32_t	    thread_id		= _get_thread_id( );
-    SegmentInfo *   segment_info_PTR	= NULL;
-
-    assert( NULL != _ssegment_infos );
-
-    // If referring to a split-off segment, 
-    // then index is for the thread with the next lower ID.
-    if (lower)
-    {
-	if (0 == thread_id) thread_id = _number_of_threads - 1;
-	else		    thread_id--;
-    }
-
-    segment_info_PTR = _ssegment_infos[ thread_id ];
-    if (NULL == segment_info_PTR)
-    {
-	_ssegment_infos[ thread_id ]	= new SegmentInfo( 0, 0 );
-	segment_info_PTR		= _psegment_infos[ thread_id ];
-    }
-
-    return *segment_info_PTR;
+    segment.cursor = cursor;
 }
 
 
