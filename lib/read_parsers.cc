@@ -16,7 +16,22 @@ extern "C"
 #   include <sys/syscall.h>
 #endif
 
+#include <ctime>
+
 #include "read_parsers.hh"
+
+
+// Convenience function for getting the difference, in nanoseconds, bewteen 
+// two timespec structures.
+inline
+static
+uint64_t
+_timespec_diff_in_nsecs( timespec & tstart, timespec & tstop )
+{
+    return
+	    ((tstop.tv_sec * 1000000000U) + (uint64_t)tstop.tv_nsec)
+	-   ((tstart.tv_sec * 1000000000U) + (uint64_t)tstart.tv_nsec);
+}
 
 
 namespace khmer
@@ -60,6 +75,7 @@ GzStreamReader( int const fd )
 Bz2StreamReader::
 Bz2StreamReader( int const fd )
 {
+
     if (0 > fd) throw InvalidStreamBuffer( );
     if (NULL == (_stream_handle = fdopen( fd, "r" )))
 	throw InvalidStreamBuffer( );
@@ -291,6 +307,11 @@ CacheSegment( uint32_t const P_thread_id, uint64_t const P_size )
     cursor_in_sa_buffer	= false;
     _sa_buffer_avail	= false;
     sa_buffer_size	= 0;
+    _nsecs_waiting_to_set_sa_buffer	= 0;
+    _nsecs_waiting_to_acquire_sa_buffer	= 0;
+    _nsecs_waiting_to_fill_from_stream	= 0;
+    _nsecs_reading_from_stream		= 0;
+    _nsecs_in_final_sync_barrier	= 0;
     avail		= true;
 }
 
@@ -312,17 +333,26 @@ CacheManager::
 has_more_data( )
 {
     CacheSegment &	segment		= _get_segment( );
+    timespec		tspec_start;
+    timespec		tspec_stop;
 
     // Return true immediately, if segment can provide more data.
     if (segment.avail) return true;
 
     // Block indefinitely, if some other segment can provide more data.
     // (This is a synchronization barrier.)
+    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 sync_barrier:
     while (_segment_ref_count);
 
     // Return false, if no segment can provide more data.
-    if (!_get_segment_ref_count_ATOMIC( )) return false;
+    if (!_get_segment_ref_count_ATOMIC( ))
+    {
+	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
+	segment._nsecs_in_final_sync_barrier =
+	_timespec_diff_in_nsecs( tspec_start, tspec_stop );
+	return false;
+    }
     // If we somehow got here and there are still active segments,
     // then go back to waiting.
     else goto sync_barrier;
@@ -380,8 +410,11 @@ split_at( uint64_t const pos )
 {
 
     CacheSegment &	segment		= _get_segment( );
+    timespec		tspec_start;
+    timespec		tspec_stop;
 
     // Wait until the lower segment has consumed the setaside buffer.
+    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 wait_for_sa_buffer:
     while (segment.get_sa_buffer_avail( ));
 
@@ -389,6 +422,10 @@ wait_for_sa_buffer:
     // then go back and wait some more.
     if (segment.get_sa_buffer_avail_ATOMIC( ))
 	goto wait_for_sa_buffer;
+
+    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
+    segment._nsecs_waiting_to_set_sa_buffer +=
+    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
 
     // Setup the setaside buffer.
     segment.sa_buffer_size = pos;
@@ -404,7 +441,9 @@ _perform_segment_maintenance( CacheSegment & segment )
 
     assert( segment.avail );
 
-    CacheSegment &	    hsegment	    = _get_segment( true );
+    CacheSegment &	hsegment	    = _get_segment( true );
+    timespec		tspec_start;
+    timespec		tspec_stop;
 
     // If at end of segment and not already in setaside buffer, 
     // then jump into setaside buffer from higher segment.
@@ -413,15 +452,23 @@ _perform_segment_maintenance( CacheSegment & segment )
 
 	// Wait while higher segment is available 
 	// and its setaside buffer is not ready for consumption.
+wait_for_sa_buffer:
+	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 	while (hsegment.avail && !hsegment.get_sa_buffer_avail( ));
 
 	// Atomically test that the setaside buffer is available.
 	// If so, then jump into it.
-	if (hsegment.get_sa_buffer_avail_ATOMIC( ))
+	if (hsegment.avail && hsegment.get_sa_buffer_avail_ATOMIC( ))
 	{
+	    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
+	    segment._nsecs_waiting_to_acquire_sa_buffer +=
+	    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
 	    segment.cursor_in_sa_buffer	    = true;
 	    segment.cursor		    = 0;
 	}
+	// If we somehow got here and shouldn't have, 
+	// then go back and wait some more.
+	else goto wait_for_sa_buffer;
 
     } // jump into setaside buffer
 
@@ -507,11 +554,17 @@ void
 CacheManager::
 _fill_segment_from_stream( CacheSegment & segment )
 {
+    timespec tspec_start;
+    timespec tspec_stop;
 
     // Wait while segment not selected and not end of stream.
+    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 wait_to_fill:
     while ( !_stream_reader_PTR->is_at_end_of_stream( )
 	&&  (_segment_to_fill != segment.thread_id));
+    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
+    segment._nsecs_waiting_to_fill_from_stream +=
+    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
 
     // If at end of stream, then mark segment unavailable.
     if (_stream_reader_PTR->is_at_end_of_stream( ))
@@ -522,13 +575,17 @@ wait_to_fill:
     // Else, refill the segment.
     else if (_check_segment_to_fill_ATOMIC( segment.thread_id ))
     {
+	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 	segment.size		=
 	    segment.cursor
 	+   _stream_reader_PTR->read_into_cache(
 		segment.memory + segment.cursor,
 		_segment_size - segment.cursor
 	    );
+	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
 	_select_segment_to_fill_ATOMIC( );
+	segment._nsecs_reading_from_stream +=
+	_timespec_diff_in_nsecs( tspec_start, tspec_stop );
     }
     // If we somehow get here, then go back and wait some more.
     else goto wait_to_fill;

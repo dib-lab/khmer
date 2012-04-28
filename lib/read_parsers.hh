@@ -156,6 +156,12 @@ private:
 	bool		get_sa_buffer_avail_ATOMIC( );
 	void		set_sa_buffer_avail_ATOMIC( bool const avail );
 
+	uint64_t	_nsecs_waiting_to_set_sa_buffer;
+	uint64_t	_nsecs_waiting_to_acquire_sa_buffer;
+	uint64_t	_nsecs_waiting_to_fill_from_stream;
+	uint64_t	_nsecs_reading_from_stream;
+	uint64_t	_nsecs_in_final_sync_barrier;
+
     private:
 	
 	bool		_sa_buffer_avail;
