@@ -38,8 +38,12 @@ set(e10,'color',[1, .05, .5]);
 set(e11,'color','cyan');
 set(e12,'color','green');
 
-set(get(gca,'XLabel'),'String','p');
-set(get(gca,'YLabel'),'String','\theta');
+set(gca,'fontsize',14);
+
+set(get(gca,'XLabel'),'fontsize',14);
+set(get(gca,'YLabel'),'fontsize',14);
+set(get(gca,'XLabel'),'String','p (fraction of active vertices)');
+set(get(gca,'YLabel'),'String','\theta (relative size of largest component)');
 legend('K4','K5','K6','K7','K8','K9','K10','K11','K12');
 %legend('K4','K5','K6','K7');
 %saveas(gcf,'resultPlot.pdf','pdf');

@@ -77,4 +77,11 @@ pylab.legend([p1, p2, p3, p4, p5, p6, p7, p8], legend_labels)
 pylab.xlabel("Number of Kmers (Log)")
 pylab.ylabel("Bits Needed Per K-mer")
 
+ax = pylab.gca()
+
+for tick in ax.xaxis.get_major_ticks():
+   tick.label1.set_fontsize(16)
+for tick in ax.yaxis.get_major_ticks():
+   tick.label1.set_fontsize(16)
+
 pylab.savefig('memusg.pdf')
