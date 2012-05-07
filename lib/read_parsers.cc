@@ -352,14 +352,35 @@ CacheSegment(
 CacheManager:: CacheSegment::
 ~CacheSegment( )
 {
+
     avail		= false;
     _sa_buffer_avail	= false;
     sa_buffer_size	= 0;
     size		= 0;
+
     delete [ ] memory;
     memory		= NULL;
+
+    if (_debug_level && (NULL != trace_file_handle))
+    {
+	fprintf(
+	    trace_file_handle,
+	    "Waited to set my setaside buffer for %.9f seconds.\n" \
+	    "Waited to get higher setaside buffer for %.9f seconds.\n" \
+	    "Waited to fill from stream for %.9f seconds.\n" \
+	    "Read from stream for %.9f seconds.\n" \
+	    "Waited in final synchronization barrier for %.9f seconds.\n",
+	    ((double)_nsecs_waiting_to_set_sa_buffer / 1000000000),
+	    ((double)_nsecs_waiting_to_acquire_sa_buffer / 1000000000),
+	    ((double)_nsecs_waiting_to_fill_from_stream / 1000000000),
+	    ((double)_nsecs_reading_from_stream / 1000000000),
+	    ((double)_nsecs_in_final_sync_barrier / 1000000000)
+	);
+    }
+
     if (_debug_level && (NULL != trace_file_handle))
 	fclose( trace_file_handle );
+
 }
 
 
