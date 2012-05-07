@@ -14,7 +14,7 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=smpFiltering load_graph bittest ktable_test test-StreamReader #graphtest #consume_prof
+DRV_PROGS=smpFiltering load_graph bittest ktable_test test-StreamReader test-CacheManager #graphtest #consume_prof
 
 PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
 
@@ -30,6 +30,7 @@ test: $(DRV_PROGS)
 DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o khmer_config.o $(PARSERS_OBJS)
 DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o khmer_config.o $(PARSERS_OBJS)
 DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o
+DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o
 
 smpFiltering: $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) primes.hh
 	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
@@ -39,6 +40,9 @@ load_graph: $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) primes.hh
 
 test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+
+test-CacheManager: $(DRV_TEST_CACHE_MANAGER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_CACHE_MANAGER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # TODO: Move 'main' to a driver program.
 #parsetest: parsers.o 
