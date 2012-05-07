@@ -431,15 +431,14 @@ get_byte( )
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
 
+    _perform_segment_maintenance( segment );
     if (segment.cursor_in_sa_buffer)
     {
-	CacheSegment &	hsegment	= _get_segment( true );
-	
+	CacheSegment &
+	hsegment    = _get_segment( true );
 	memory	    = hsegment.memory;
     }
     else memory	    = segment.memory;
-
-    _perform_segment_maintenance( segment );
 
     return memory[ segment.cursor++ ];
 }
@@ -457,22 +456,21 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
 
-    if (segment.cursor_in_sa_buffer)
-    {
-	CacheSegment &	hsegment	= _get_segment( true );
-	
-	memory	    = hsegment.memory;
-	size	    = hsegment.sa_buffer_size;
-    }
-    else
-    {
-	memory	    = segment.memory;
-	size	    = segment.size;
-    }
-
     for (uint64_t nbrem = buffer_len; (nbrem > 0); nbrem -= nbcopied)
     {
 	_perform_segment_maintenance( segment );
+	if (segment.cursor_in_sa_buffer)
+	{
+	    CacheSegment &
+	    hsegment	    = _get_segment( true );
+	    memory	    = hsegment.memory;
+	    size	    = hsegment.sa_buffer_size;
+	}
+	else
+	{
+	    memory	    = segment.memory;
+	    size	    = segment.size;
+	}
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
 	if (0 == nbcopied) break;
@@ -581,6 +579,11 @@ _perform_segment_maintenance( CacheSegment & segment )
     // then jump into setaside buffer from higher segment.
     if (!segment.cursor_in_sa_buffer && (segment.cursor == segment.size))
     {
+
+	// If there is only 1 thread, 
+	// then force setaside buffer to be available.
+	if (segment.thread_id == hsegment.thread_id)
+	    hsegment.set_sa_buffer_avail_ATOMIC( true );
 
 	// Wait while higher segment is available 
 	// and its setaside buffer is not ready for consumption.
