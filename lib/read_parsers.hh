@@ -32,6 +32,21 @@ struct InvalidStreamBuffer : public std:: exception
 struct StreamReadError : public std:: exception
 { };
 
+struct CacheSegmentUnavailable : public std:: exception
+{ };
+
+struct CacheSegmentBoundaryViolation : public std:: exception
+{ };
+
+struct TooManyThreads : public std:: exception
+{ };
+
+struct InvalidNumberOfThreadsRequested : public std:: exception
+{ };
+
+struct InvalidCacheSizeRequested : public std:: exception
+{ };
+
 
 struct Read
 {
@@ -116,7 +131,8 @@ struct CacheManager
     CacheManager(
 	IStreamReader *	stream_reader,
 	uint32_t const	number_of_threads,
-	uint64_t const	cache_size
+	uint64_t const	cache_size,
+	uint8_t const	debug_level = 0
     );
     ~CacheManager( );
 
@@ -135,6 +151,12 @@ struct CacheManager
 
     uint64_t const	tell( );
     void		seek( uint64_t const offset, uint8_t const whence );
+
+    // NOTE: The following methods should not be needed in "real world"
+    //	     sitatuions. They exist to help the test harness perform some more
+    //	     intelligent testing.
+    bool const		_in_sa_buffer( );
+    bool const		_sa_buffer_avail( );
     
 private:
     
@@ -149,12 +171,17 @@ private:
 	bool		cursor_in_sa_buffer;
 	uint64_t	sa_buffer_size;
 	
-	CacheSegment( uint32_t const thread_id, uint64_t const size );
+	CacheSegment(
+	    uint32_t const thread_id, uint64_t const size,
+	    uint8_t const debug_level = 0
+	);
 	~CacheSegment( );
 
 	bool		get_sa_buffer_avail( ) const;
 	bool		get_sa_buffer_avail_ATOMIC( );
 	void		set_sa_buffer_avail_ATOMIC( bool const avail );
+
+	FILE *		trace_file_handle;
 
 	uint64_t	_nsecs_waiting_to_set_sa_buffer;
 	uint64_t	_nsecs_waiting_to_acquire_sa_buffer;
@@ -164,9 +191,12 @@ private:
 
     private:
 	
+	uint8_t		_debug_level;
 	bool		_sa_buffer_avail;
 
     }; // struct CacheSegment
+
+    uint8_t		_debug_level;
 
     IStreamReader *	_stream_reader_PTR;
 

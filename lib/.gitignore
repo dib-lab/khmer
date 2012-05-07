@@ -1,4 +1,5 @@
 test-StreamReader
+test-CacheManager
 load_graph
 smpFiltering
 bittest
