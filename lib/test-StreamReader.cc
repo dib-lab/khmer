@@ -89,7 +89,7 @@ int main( int argc, char * argv[ ] )
 
     try
     {
-	if	    (!strcmp( "raw", ifile_type ))
+	if	(!strcmp( "raw", ifile_type ))
 	    sr = new RawStreamReader( ifd );
 	else if (!strcmp( "gz", ifile_type ))
 	    sr = new GzStreamReader( ifd );
