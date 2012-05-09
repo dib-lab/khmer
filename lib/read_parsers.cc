@@ -11,8 +11,10 @@ extern "C"
 #include <cstdio>
 #include <cassert>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #ifdef __linux__
-#   include <sys/types.h>
 #   include <sys/syscall.h>
 #endif
 
@@ -36,6 +38,53 @@ _timespec_diff_in_nsecs( timespec & tstart, timespec & tstop )
 
 namespace khmer
 {
+
+
+ThreadIDMap::
+ThreadIDMap( uint32_t number_of_threads )
+:   _number_of_threads( number_of_threads ),
+    _thread_counter( 0 ),
+    _tid_map_spin_lock( 0 )
+{
+    if (0 == number_of_threads) throw InvalidNumberOfThreadsRequested( );
+}
+
+
+ThreadIDMap::
+~ThreadIDMap( )
+{
+    _thread_id_map.clear( );
+}
+
+
+uint32_t const
+ThreadIDMap::
+get_thread_id( )
+{
+#ifdef __linux__
+    // Note: No error handling because this call always succeeds, allegedly.
+    pid_t native_thread_id = syscall( SYS_gettid ); 
+    std:: map< pid_t, uint32_t > :: iterator match;
+
+#else
+    // TODO: Maybe try something with pthread_self for the general case.
+#endif
+
+    match = _thread_id_map.find( native_thread_id );
+    if (match == _thread_id_map.end( ))
+    {
+	uint32_t thread_id;
+	if (_number_of_threads <= _thread_id_map.size( ))
+	    throw TooManyThreads( );
+	thread_id = __sync_fetch_and_add( &_thread_counter, 1 );
+	while ( !__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ) );
+	_thread_id_map[ native_thread_id ] = thread_id;
+	__sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
+	return thread_id;
+    }
+
+    return (*match).second; // Return the found value.
+}
 
 
 namespace read_parsers
@@ -261,27 +310,24 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
 CacheManager::
 CacheManager(
-    IStreamReader * stream_reader_PTR,
+    IStreamReader & stream_reader,
     uint32_t const  number_of_threads,
     uint64_t const  cache_size,
-    uint8_t const   debug_level
+    uint8_t const   trace_level
 )
+:   _trace_level( trace_level),
+    _stream_reader( stream_reader ),
+    _number_of_threads( number_of_threads ),
+    _thread_id_map( ThreadIDMap( number_of_threads ) ),
+    _segment_ref_count( 0 ),
+    _segment_to_fill( 0 ),
+    _fill_counter( 0 )
 {
-    
-    _debug_level	= debug_level;
-    _stream_reader_PTR	= stream_reader_PTR;
 
-    if (0 == number_of_threads)
-	throw InvalidNumberOfThreadsRequested( );
     if (cache_size < number_of_threads)	throw InvalidCacheSizeRequested( );
-    _number_of_threads	= number_of_threads;
-    _thread_counter	= 0;
-    _tid_map_spin_lock	= 0;
-
     _segment_size	= cache_size / number_of_threads;
     _segments		= new CacheSegment *[ number_of_threads ];
     for (uint32_t i = 0; i < number_of_threads; ++i) _segments[ i ] = NULL;
-    _segment_to_fill	= 0;
 
 }
 
@@ -292,8 +338,11 @@ CacheManager::
 
     for (uint32_t i = 0; i < _number_of_threads; ++i)
     {
-	delete _segments[ i ];
-	_segments[ i ]	= NULL;
+	if (NULL != _segments[ i ])
+	{
+	    delete _segments[ i ];
+	    _segments[ i ]	= NULL;
+	}
     }
     delete [ ] _segments;
     _segments		= NULL;
@@ -303,22 +352,23 @@ CacheManager::
 
 CacheManager:: CacheSegment::
 CacheSegment(
-    uint32_t const P_thread_id, uint64_t const P_size,
-    uint8_t const debug_level
+    uint32_t const  thread_id,
+    uint64_t const  size,
+    uint8_t const   trace_level
 )
+:   thread_id( thread_id ),
+    size( size ),
+    memory( new uint8_t[ size ] ),
+    cursor( 0 ),
+    cursor_in_sa_buffer( false ),
+    fill_id( 0 ),
+    _trace_level( trace_level )
 {
 
-    _debug_level	= debug_level;
-
-    thread_id		= P_thread_id;
-    size		= P_size;
-    memory		= new uint8_t[ P_size ];
-    cursor		= 0;
-    cursor_in_sa_buffer	= false;
     _sa_buffer_avail	= false;
     sa_buffer_size	= 0;
 
-    if (debug_level)
+    if (trace_level)
     {
 	char	    tfile_name[ 1024 ];
 	sprintf(
@@ -361,7 +411,7 @@ CacheManager:: CacheSegment::
     delete [ ] memory;
     memory		= NULL;
 
-    if (_debug_level && (NULL != trace_file_handle))
+    if (_trace_level && (NULL != trace_file_handle))
     {
 	fprintf(
 	    trace_file_handle,
@@ -378,7 +428,7 @@ CacheManager:: CacheSegment::
 	);
     }
 
-    if (_debug_level && (NULL != trace_file_handle))
+    if (_trace_level && (NULL != trace_file_handle))
 	fclose( trace_file_handle );
 
 }
@@ -395,7 +445,7 @@ has_more_data( )
     // Return true immediately, if segment can provide more data.
     if (segment.avail) return true;
 
-    if (1 < _debug_level)
+    if (1 < _trace_level)
     {
 	fprintf(
 	    segment.trace_file_handle,
@@ -410,7 +460,7 @@ has_more_data( )
 sync_barrier:
     for (uint64_t i = 0; _segment_ref_count; ++i)
     {
-	if ((2 < _debug_level) && (0 == i % 100000000))
+	if ((2 < _trace_level) && (0 == i % 100000000))
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -427,7 +477,7 @@ sync_barrier:
 	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
 	segment._nsecs_in_final_sync_barrier =
 	_timespec_diff_in_nsecs( tspec_start, tspec_stop );
-	if (1 < _debug_level)
+	if (1 < _trace_level)
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -505,6 +555,12 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 }
 
 
+uint64_t const
+CacheManager::
+whereis_cursor( )
+{ return _get_segment( ).cursor; }
+
+
 void
 CacheManager::
 split_at( uint64_t const pos )
@@ -514,7 +570,7 @@ split_at( uint64_t const pos )
     timespec		tspec_start;
     timespec		tspec_stop;
 
-    if (1 < _debug_level)
+    if (1 < _trace_level)
     {
 	fprintf(
 	    segment.trace_file_handle,
@@ -529,7 +585,7 @@ split_at( uint64_t const pos )
 wait_for_sa_buffer:
     for (uint64_t i = 0; segment.get_sa_buffer_avail( ); ++i)
     {
-	if ((2 < _debug_level) && (0 == i % 100000000))
+	if ((2 < _trace_level) && (0 == i % 100000000))
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -553,7 +609,7 @@ wait_for_sa_buffer:
     segment.sa_buffer_size = pos;
     segment.set_sa_buffer_avail_ATOMIC( true );
 
-    if (1 < _debug_level)
+    if (1 < _trace_level)
     {
 	fprintf(
 	    segment.trace_file_handle,
@@ -565,24 +621,22 @@ wait_for_sa_buffer:
 }
 
 
+uint64_t const
+CacheManager::
+get_fill_id( )
+{ return _get_segment( ).fill_id; }
+
+
 bool const
 CacheManager::
 _in_sa_buffer( )
-{
-    CacheSegment &	segment		= _get_segment( );
-    
-    return segment.cursor_in_sa_buffer;
-}
+{ return _get_segment( ).cursor_in_sa_buffer; }
 
 
 bool const
 CacheManager::
 _sa_buffer_avail( )
-{
-    CacheSegment &	segment		= _get_segment( );
-    
-    return segment.get_sa_buffer_avail_ATOMIC( );
-}
+{ return _get_segment( ).get_sa_buffer_avail_ATOMIC( ); }
 
 
 void
@@ -614,7 +668,7 @@ wait_for_sa_buffer:
 		hsegment.avail && !hsegment.get_sa_buffer_avail( );
 		++i)
 	{
-	    if ((2 < _debug_level) && (0 == i % 100000000))
+	    if ((2 < _trace_level) && (0 == i % 100000000))
 	    {
 		fprintf(
 		    segment.trace_file_handle,
@@ -634,7 +688,7 @@ wait_for_sa_buffer:
 	    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
 	    segment.cursor_in_sa_buffer	    = true;
 	    segment.cursor		    = 0;
-	    if (1 < _debug_level)
+	    if (1 < _trace_level)
 	    {
 		fprintf(
 		    segment.trace_file_handle,
@@ -669,7 +723,7 @@ wait_for_sa_buffer:
 	segment.cursor			= 0;
 	hsegment.sa_buffer_size		= 0;
 	hsegment.set_sa_buffer_avail_ATOMIC( false );
-	if (1 < _debug_level)
+	if (1 < _trace_level)
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -720,7 +774,7 @@ CacheManager:: CacheSegment &
 CacheManager::
 _get_segment( bool const higher )
 {
-    uint32_t	    thread_id		= _get_thread_id( );
+    uint32_t	    thread_id		= _thread_id_map.get_thread_id( );
     CacheSegment *  segment_PTR		= NULL;
 
     assert( NULL != _segments );
@@ -730,10 +784,12 @@ _get_segment( bool const higher )
     if (higher) thread_id = ((thread_id + 1) % _number_of_threads);
 
     segment_PTR	    = _segments[ thread_id ];
+    // TODO: Protect with a mutex in case another thread 
+    //	     is trying to create the segment at the same time.
     if (NULL == segment_PTR)
     {
 	_segments[ thread_id ]	    = new CacheSegment(
-	    thread_id, _segment_size, _debug_level
+	    thread_id, _segment_size, _trace_level
 	);
 	segment_PTR		    = _segments[ thread_id ];
 	_increment_segment_ref_count_ATOMIC( );
@@ -756,11 +812,11 @@ _fill_segment_from_stream( CacheSegment & segment )
     clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 wait_to_fill:
     for (   uint64_t i = 0;
-	    !_stream_reader_PTR->is_at_end_of_stream( )
+	    !_stream_reader.is_at_end_of_stream( )
 	&&  (_segment_to_fill != segment.thread_id);
 	    ++i)
     {
-	if ((2 < _debug_level) && (0 == i % 100000000))
+	if ((2 < _trace_level) && (0 == i % 100000000))
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -775,9 +831,9 @@ wait_to_fill:
     _timespec_diff_in_nsecs( tspec_start, tspec_stop );
 
     // If at end of stream, then mark segment unavailable.
-    if (_stream_reader_PTR->is_at_end_of_stream( ))
+    if (_stream_reader.is_at_end_of_stream( ))
     {
-	if (1 < _debug_level)
+	if (1 < _trace_level)
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -795,15 +851,16 @@ wait_to_fill:
 	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
 	segment.size		=
 	    segment.cursor
-	+   _stream_reader_PTR->read_into_cache(
+	+   _stream_reader.read_into_cache(
 		segment.memory + segment.cursor,
 		_segment_size - segment.cursor
 	    );
 	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
+	segment.fill_id = _fill_counter++;
 	_select_segment_to_fill_ATOMIC( );
 	segment._nsecs_reading_from_stream +=
 	_timespec_diff_in_nsecs( tspec_start, tspec_stop );
-	if (2 < _debug_level)
+	if (2 < _trace_level)
 	{
 	    fprintf(
 		segment.trace_file_handle,
@@ -873,85 +930,298 @@ set_sa_buffer_avail_ATOMIC( bool const avail )
 }
 
 
-inline
-uint64_t const
-CacheManager::
-tell( )
+IParser:: IParser * const
+IParser::
+get_parser(
+    std:: string const &    ifile_name,
+    uint32_t const	    number_of_threads,
+    uint64_t const	    cache_size,
+    uint8_t const	    trace_level
+)
 {
-    return _get_segment( ).cursor;
-}
+    // TODO: Replace file extension detection with header magic detection.
 
+    IStreamReader * stream_reader   = NULL;
+    IParser *	    parser	    = NULL;
 
-inline
-void
-CacheManager::
-seek( uint64_t const offset, uint8_t const whence )
-{
-    CacheSegment &	segment	    = _get_segment( );
-    uint64_t		cursor;
+    int		    ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
+    if (-1 == ifile_handle)
+	// TODO: Raise exception.
+	;
+    std:: string    ext	    = "";
+    std:: string    ifile_name_chopped( ifile_name );
+    size_t	    ext_pos = ifile_name.find_last_of( "." );
+    bool	    rechop  = false;
 
-    switch (whence)
+    if (0 < ext_pos)
     {
-
-    case SEEK_SET:
-	cursor = offset;
-	break;
-
-    case SEEK_CUR:
-	cursor = segment.cursor + offset;
-	break;
-
-    default:
-	// TODO: UnknownSegmentSeekTypeError.
-	// TEMP: Do nothing.
-	return;
-
+	ext		    = ifile_name.substr( ext_pos + 1 );
+	ifile_name_chopped  = ifile_name.substr( 0, ext_pos );
     }
 
-    if (cursor > segment.size) throw CacheSegmentBoundaryViolation( );
-    segment.cursor = cursor;
-}
-
-
-uint32_t const
-CacheManager::
-_get_thread_id( )
-{
-#ifdef __linux__
-    // Note: No error handling because this call always succeeds, allegedly.
-    pid_t native_thread_id = syscall( SYS_gettid ); 
-    std:: map< pid_t, uint32_t > :: iterator match;
-
-#else
-    // TODO: Maybe try something with pthread_self for the general case.
-#endif
-
-    match = _thread_id_map.find( native_thread_id );
-    if (match == _thread_id_map.end( ))
+    if	    ("gz" == ext)
     {
-	uint32_t	    thread_id;
-	if (_number_of_threads <= _thread_id_map.size( ))
-	    throw TooManyThreads( );
-	thread_id = __sync_fetch_and_add( &_thread_counter, 1 );
-	while ( !__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ) );
-	_thread_id_map[ native_thread_id ] = thread_id;
-	__sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
-	return thread_id;
+	stream_reader	= new GzStreamReader( ifile_handle );
+	rechop		= true;
+    }
+    else if ("bz2" == ext)
+    {
+	stream_reader	= new Bz2StreamReader( ifile_handle );
+	rechop		= true;
+    }
+    else
+	stream_reader	= new RawStreamReader( ifile_handle );
+
+    if (rechop)
+    {
+	ext_pos		    = ifile_name_chopped.find_last_of( "." );
+	ext		    = ifile_name_chopped.substr( ext_pos + 1 );
+	ifile_name_chopped  = ifile_name_chopped.substr( 0, ext_pos );
     }
 
-    return (*match).second; // Return the found value.
+    if (("fq" == ext) || ("fastq" == ext))
+	parser =
+	new FastqParser(
+	    *stream_reader,
+	    number_of_threads,
+	    cache_size,
+	    trace_level
+	);
+    else
+	parser =
+	new FastaParser(
+	    *stream_reader,
+	    number_of_threads,
+	    cache_size,
+	    trace_level
+	);
+
+    return parser;
 }
 
 
 IParser::
-IParser( uint32_t const number_of_threads, uint64_t const cache_size )
+IParser(
+    IStreamReader &  stream_reader,
+    uint32_t const  number_of_threads,
+    uint64_t const  cache_size,
+    uint8_t const   trace_level
+)
+:   _trace_level( trace_level ),
+    _cache_manager(
+	CacheManager(
+	    stream_reader, number_of_threads, cache_size, trace_level
+	)
+    ),
+    _thread_id_map( ThreadIDMap( number_of_threads ) )
 {
-    // TODO: Implement.
+    
+    _states  = new ParserState *[ number_of_threads ];
+    for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
+
 }
 
 
 IParser::
 ~IParser( )
+{ }
+
+
+bool
+IParser::
+is_complete( )
+{ return !_cache_manager.has_more_data( ); }
+
+
+inline
+void
+IParser::
+_copy_line( )
+{
+    ParserState &   state	= _get_state( );
+    uint8_t (&	    buffer)[ ParserState:: BUFFER_SIZE + 1 ]
+				= state.buffer;
+    uint64_t &	    pos		= state.buffer_pos;
+    uint64_t &	    rem		= state.buffer_rem;
+    std:: string &  line	= state.line;
+    uint64_t	    i		= 0;
+    bool	    hit		= false;
+
+    line.clear( );
+
+    while( true )
+    {
+
+	for (i = 0; (i < rem) && ('\n' != buffer[ pos + i ]); i++);
+	if (0 < rem)
+	{
+	    if (i < rem)
+	    {
+		buffer[ pos + i ]   = '\0';
+		hit		    = true;
+	    }
+	    line += (char const *)(buffer + pos);
+	    rem -= (i + 1); pos += (i + 1);
+	    if (hit) break;
+	}
+	
+	if (_cache_manager.has_more_data( ))
+	{
+	    rem = _cache_manager.get_bytes( buffer, ParserState:: BUFFER_SIZE );
+	    pos = 0;
+	}
+	else break;
+
+    }
+
+}
+
+
+inline
+IParser:: ParserState &
+IParser::
+_get_state( )
+{
+    uint32_t	    thread_id		= _thread_id_map.get_thread_id( );
+    ParserState *   state_PTR		= NULL;
+
+    assert( NULL != _states );
+
+    state_PTR	    = _states[ thread_id ];
+    if (NULL == state_PTR)
+    {
+	_states[ thread_id ]	    = new ParserState( );
+	state_PTR		    = _states[ thread_id ];
+    }
+
+    return *state_PTR;
+}
+
+
+IParser:: ParserState::
+ParserState( )
+:   at_start( true ),
+    need_new_line( true ),
+    buffer_pos( 0 ),
+    buffer_rem( 0 )
+{ memset( buffer, 0, BUFFER_SIZE + 1 ); }
+
+
+IParser:: ParserState::
+~ParserState( )
+{ }
+
+
+FastaParser::
+FastaParser(
+    IStreamReader &  stream_reader,
+    uint32_t const  number_of_threads,
+    uint64_t const  cache_size,
+    uint8_t const   trace_level
+)
+: IParser( stream_reader, number_of_threads, cache_size, trace_level )
+{ }
+
+
+FastqParser::
+FastqParser(
+    IStreamReader &  stream_reader,
+    uint32_t const  number_of_threads,
+    uint64_t const  cache_size,
+    uint8_t const   trace_level
+)
+: IParser( stream_reader, number_of_threads, cache_size, trace_level )
+{ }
+
+
+FastaParser::
+~FastaParser( )
+{ }
+
+
+FastqParser::
+~FastqParser( )
+{ }
+
+
+Read
+FastaParser::
+get_next_read( )
+{
+    
+    ParserState &   parser_state    = _get_state( );
+    Read	    the_read;
+    
+    while (_cache_manager.has_more_data( ))
+    {
+	the_read.name	= "";
+	the_read.seq	= "";
+
+	if (parser_state.need_new_line) _copy_line( );
+	parser_state.need_new_line = true;
+
+	// If a cache segment fill occurred during line retrieval, 
+	// then flag the event.
+	if (!parser_state.at_start)
+	    parser_state.at_start =
+	    (parser_state.fill_id != _cache_manager.get_fill_id( ));
+
+	parser_state.fill_id = _cache_manager.get_fill_id( );
+
+	// If at start of file, then error on garbage.
+	// Else, skip forward to next read boundary.
+	if ('>' != parser_state.line[ 0 ])
+	{
+	    if (parser_state.at_start && (0 == parser_state.fill_id))
+		// TODO: Throw exception.
+		;
+	    continue;
+	}
+
+	// Skip over an unmatched second part of a paired read,
+	// when at the beginning of a new fill.
+	if (	parser_state.at_start
+	    &&	(    (parser_state.line.length( ) - 2)
+		 ==  parser_state.line.rfind( "/2" )))
+	{
+	    while (_cache_manager.has_more_data( ))
+	    {
+		_copy_line( );
+		if ('>' == parser_state.line[ 0 ]) break;
+	    }
+	}
+
+	// Split off skipped over data into a setaside buffer.
+	_cache_manager.split_at(
+		_cache_manager.whereis_cursor( )
+	    -   parser_state.line.length( )
+	);
+
+	parser_state.at_start = false;
+
+	// Parse read.
+	the_read.name		    = parser_state.line.substr( 1 );
+	parser_state.need_new_line  = false;
+	while (_cache_manager.has_more_data( ))
+	{
+	    _copy_line( );
+	    if ('>' == parser_state.line[ 0 ]) break;
+	    the_read.seq += parser_state.line;
+	}
+
+	// Discard invalid read.
+	if (std:: string:: npos != the_read.seq.find_first_of( "Nn" )) continue;
+
+	break;
+    } // while invalid read
+
+    return the_read;
+}
+
+
+Read
+FastqParser::
+get_next_read( )
 {
     // TODO: Implement.
 }
