@@ -14,12 +14,43 @@
 #include "zlib/zlib.h"
 #include "bzip2/bzlib.h"
 
+#include "khmer_config.hh"
+
 
 #define MIN( a, b )	((a > b) ? (b) : (a))
 
 
 namespace khmer
 {
+
+
+struct InvalidNumberOfThreadsRequested : public std:: exception
+{ };
+
+struct TooManyThreads : public std:: exception
+{ };
+
+
+struct ThreadIDMap
+{
+
+    ThreadIDMap( uint32_t number_of_threads );
+    ~ThreadIDMap( );
+
+    uint32_t const get_thread_id( );
+
+private:
+
+    uint32_t			    _number_of_threads;
+    uint32_t			    _thread_counter;
+#ifdef __linux__
+    std:: map< pid_t, uint32_t >    _thread_id_map;
+#else
+    // TODO: Maybe try something with pthreads for the general case.
+#endif
+    uint32_t			    _tid_map_spin_lock;
+
+};
 
 
 namespace read_parsers
@@ -36,12 +67,6 @@ struct CacheSegmentUnavailable : public std:: exception
 { };
 
 struct CacheSegmentBoundaryViolation : public std:: exception
-{ };
-
-struct TooManyThreads : public std:: exception
-{ };
-
-struct InvalidNumberOfThreadsRequested : public std:: exception
 { };
 
 struct InvalidCacheSizeRequested : public std:: exception
@@ -129,10 +154,10 @@ struct CacheManager
 {
     
     CacheManager(
-	IStreamReader *	stream_reader,
+	IStreamReader &	stream_reader,
 	uint32_t const	number_of_threads,
 	uint64_t const	cache_size,
-	uint8_t const	debug_level = 0
+	uint8_t const	trace_level = 0
     );
     ~CacheManager( );
 
@@ -147,10 +172,10 @@ struct CacheManager
 	uint8_t * const buffer, uint64_t buffer_len
     );
 
+    uint64_t const	whereis_cursor( );
     void		split_at( uint64_t const pos );
 
-    uint64_t const	tell( );
-    void		seek( uint64_t const offset, uint8_t const whence );
+    uint64_t const	get_fill_id( );
 
     // NOTE: The following methods should not be needed in "real world"
     //	     sitatuions. They exist to help the test harness perform some more
@@ -170,10 +195,12 @@ private:
 	uint64_t	cursor;
 	bool		cursor_in_sa_buffer;
 	uint64_t	sa_buffer_size;
+	uint64_t	fill_id;
 	
 	CacheSegment(
-	    uint32_t const thread_id, uint64_t const size,
-	    uint8_t const debug_level = 0
+	    uint32_t const  thread_id,
+	    uint64_t const  size,
+	    uint8_t const   trace_level = 0
 	);
 	~CacheSegment( );
 
@@ -191,28 +218,23 @@ private:
 
     private:
 	
-	uint8_t		_debug_level;
+	uint8_t		_trace_level;
 	bool		_sa_buffer_avail;
 
     }; // struct CacheSegment
 
-    uint8_t		_debug_level;
+    uint8_t		_trace_level;
 
-    IStreamReader *	_stream_reader_PTR;
+    IStreamReader &	_stream_reader;
 
     uint32_t		_number_of_threads;
-    uint32_t		_thread_counter;
-#ifdef __linux__
-    std:: map< pid_t, uint32_t >    _thread_id_map;
-#else
-    // TODO: Maybe try something with pthreads for the general case.
-#endif
-    uint32_t		_tid_map_spin_lock;
+    ThreadIDMap		_thread_id_map;
 
     uint64_t		_segment_size;
     CacheSegment **	_segments;
     uint32_t		_segment_ref_count;
     uint32_t		_segment_to_fill;
+    uint64_t		_fill_counter;
 
     // Extends or refills segment for current thread, as needed.
     void		_perform_segment_maintenance(
@@ -230,7 +252,6 @@ private:
     void		_increment_segment_ref_count_ATOMIC( );
     void		_decrement_segment_ref_count_ATOMIC( );
     uint32_t const	_get_segment_ref_count_ATOMIC( );
-    uint32_t const	_get_thread_id( );
     
 }; // struct CacheManager
 
@@ -238,31 +259,94 @@ private:
 struct IParser
 {
     
-    // TODO: Get defaults from Config interface.
+    static IParser * const  get_parser(
+	std:: string const &	ifile_name,
+	uint32_t const		number_of_threads   =
+	khmer:: get_active_config( ).get_number_of_threads( ),
+	uint64_t const		cache_size	    =
+	khmer:: get_active_config( ).get_reads_file_chunk_size( ),
+	uint8_t const		trace_level	    = 0
+    );
+    
 	    IParser(
-		uint32_t const number_of_threads,
-		uint64_t const cache_size
-	    );
+	IStreamReader &	stream_reader,
+	uint32_t const	number_of_threads   =
+	khmer:: get_active_config( ).get_number_of_threads( ),
+	uint64_t const	cache_size	    =
+	khmer:: get_active_config( ).get_reads_file_chunk_size( ),
+	uint8_t const	trace_level	    = 0
+    );
     virtual ~IParser( );
 
-    virtual bool	is_complete( )		    = 0;
-    virtual Read	get_next_read( uint32_t )   = 0;
+	    bool	is_complete( );
+    virtual Read	get_next_read( )	    = 0;
 
 protected:
     
-    CacheManager *	_cache_manager;
+    struct ParserState
+    {
+
+	// TODO: Set buffer size from Config.
+	static uint64_t const	BUFFER_SIZE	    = 127;
+	
+	bool		at_start;
+	uint64_t	fill_id;
+
+	std:: string	line;
+	bool		need_new_line;
+
+	uint8_t		buffer[ BUFFER_SIZE + 1 ];
+	uint64_t	buffer_pos;
+	uint64_t	buffer_rem;
+	
+	ParserState( );
+	~ParserState( );
+
+    };
+    
+    uint8_t		_trace_level;
+
+    CacheManager	_cache_manager;
+
+    ThreadIDMap		_thread_id_map;
+
+    ParserState **	_states;
+
+    void		_copy_line( );
+
+    ParserState &	_get_state( );
 
 };
 
 
 struct FastaParser : public IParser
 {
+    
+	    FastaParser(
+	IStreamReader &	stream_reader,
+	uint32_t const	number_of_threads,
+	uint64_t const	cache_size,
+	uint8_t const	trace_level
+    );
+    virtual ~FastaParser( );
+
+    virtual Read    get_next_read( );
 
 };
 
 
 struct FastqParser : public IParser
 {
+
+	    FastqParser(
+	IStreamReader &	stream_reader,
+	uint32_t const	number_of_threads,
+	uint64_t const	cache_size,
+	uint8_t const	trace_level
+    );
+    virtual ~FastqParser( );
+
+    virtual Read    get_next_read( );
 
 };
 

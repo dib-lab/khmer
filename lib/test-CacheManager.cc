@@ -94,7 +94,7 @@ int main( int argc, char * argv[ ] )
 
     uint32_t	    number_of_threads	    = omp_get_max_threads( );
     CacheManager *  cmgr		    = new CacheManager(
-	sr, number_of_threads, cache_size, 3
+	*sr, number_of_threads, cache_size, 3
     );
 
 #pragma omp parallel default( shared )
