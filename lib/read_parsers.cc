@@ -23,21 +23,28 @@ extern "C"
 #include "read_parsers.hh"
 
 
-// Convenience function for getting the difference, in nanoseconds, bewteen 
-// two timespec structures.
-inline
-static
-uint64_t
-_timespec_diff_in_nsecs( timespec & tstart, timespec & tstop )
-{
-    return
-	    ((tstop.tv_sec * 1000000000U) + (uint64_t)tstop.tv_nsec)
-	-   ((tstart.tv_sec * 1000000000U) + (uint64_t)tstart.tv_nsec);
-}
-
-
 namespace khmer
 {
+
+
+IPerformanceMetrics::
+IPerformanceMetrics( )
+{ }
+
+
+IPerformanceMetrics::
+~IPerformanceMetrics( )
+{ }
+
+
+uint64_t const
+IPerformanceMetrics::
+_timespec_diff_in_nsecs( timespec const &start, timespec const &stop )
+{
+    return
+	    ((stop.tv_sec * 1000000000U) + (uint64_t)stop.tv_nsec)
+	-   ((start.tv_sec * 1000000000U) + (uint64_t)start.tv_nsec);
+}
 
 
 ThreadIDMap::
@@ -78,6 +85,9 @@ get_thread_id( )
 	    throw TooManyThreads( );
 	thread_id = __sync_fetch_and_add( &_thread_counter, 1 );
 	while ( !__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ) );
+	// TODO: Consider the case where the map produces an exception inside
+	//	 spinlock. Probably need to catch exception, flag the event, 
+	//	 flip the lock, and rethrow on other side of flipped lock.
 	_thread_id_map[ native_thread_id ] = thread_id;
 	__sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
 	return thread_id;
@@ -91,17 +101,49 @@ namespace read_parsers
 {
 
 
-IStreamReader::
-IStreamReader( )
+StreamReaderPerformanceMetrics::
+StreamReaderPerformanceMetrics( )
+:   IPerformanceMetrics( ),
+    numbytes_read( 0 ),
+    clock_nsecs_reading( 0 ),
+    cpu_nsecs_reading( 0 )
+{ }
+
+
+StreamReaderPerformanceMetrics::
+~StreamReaderPerformanceMetrics( )
+{ }
+
+
+void
+StreamReaderPerformanceMetrics::
+accumulate_timer_deltas( uint32_t metrics_key )
 {
-    
-    at_eos	    = false;
+
+    switch (metrics_key)
+    {
+    case MKEY_TIME_READING:
+	clock_nsecs_reading +=
+	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+	cpu_nsecs_reading   +=
+	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+	break;
+    default: throw InvalidPerformanceMetricsKey( );
+    }
 
 }
 
 
+IStreamReader::
+IStreamReader( )
+:   pmetrics( StreamReaderPerformanceMetrics( ) ),
+    _at_eos( false )
+{ }
+
+
 RawStreamReader::
 RawStreamReader( int const fd )
+: IStreamReader( )
 {
 
     if (0 > fd) throw InvalidStreamBuffer( );
@@ -112,6 +154,7 @@ RawStreamReader( int const fd )
 
 GzStreamReader::
 GzStreamReader( int const fd )
+: IStreamReader( )
 {
 
     if (0 > fd) throw InvalidStreamBuffer( );
@@ -123,6 +166,7 @@ GzStreamReader( int const fd )
 
 Bz2StreamReader::
 Bz2StreamReader( int const fd )
+: IStreamReader( )
 {
 
     if (0 > fd) throw InvalidStreamBuffer( );
@@ -175,9 +219,7 @@ Bz2StreamReader::
 bool const
 IStreamReader::
 is_at_end_of_stream( ) const
-{
-    return at_eos;
-}
+{ return _at_eos; }
 
 
 uint64_t const
@@ -190,16 +232,21 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     assert (NULL != cache);
     if (0 == cache_size) return 0;
 
-    for ( uint64_t nbrem = cache_size; (0 < nbrem) && !at_eos; nbrem -= nbread )
+    for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
     {
+	pmetrics.start_timers( );
 	nbread =
 	read(
 	    _stream_handle, 
 	    cache + nbread_total,
 	    (size_t)( nbrem > SSIZE_MAX ? SSIZE_MAX : nbrem )
 	);
+	pmetrics.stop_timers( );
+	pmetrics.accumulate_timer_deltas(
+	    (uint32_t)StreamReaderPerformanceMetrics:: MKEY_TIME_READING
+	);
 	if (-1 == nbread) throw StreamReadError( );
-	at_eos = !nbread;
+	_at_eos = !nbread;
 	nbread_total += nbread;
     }
 
@@ -217,16 +264,21 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     assert (NULL != cache);
     if (0 == cache_size) return 0;
 
-    for ( uint64_t nbrem = cache_size; (0 < nbrem) && !at_eos; nbrem -= nbread )
+    for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
     {
+	pmetrics.start_timers( );
 	nbread =
 	gzread(
 	    _stream_handle, 
 	    cache + nbread_total,
 	    (unsigned int)( nbrem > INT_MAX ? INT_MAX : nbrem )
 	);
+	pmetrics.stop_timers( );
+	pmetrics.accumulate_timer_deltas(
+	    (uint32_t)StreamReaderPerformanceMetrics:: MKEY_TIME_READING
+	);
 	if (-1 == nbread) throw StreamReadError( );
-	at_eos = !nbread;
+	_at_eos = !nbread;
 	nbread_total += nbread;
     }
 
@@ -249,7 +301,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     assert (NULL != cache);
     if (0 == cache_size) return 0;
 
-    for ( uint64_t nbrem = cache_size; (0 < nbrem) && !at_eos; nbrem -= nbread )
+    for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
     {
 
 	if (NULL == _block_handle)
@@ -264,6 +316,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	    if (BZ_OK != bz2_error) throw InvalidStreamBuffer( );
 	}
 
+	pmetrics.start_timers( );
 	nbread =
 	BZ2_bzRead(
 	    &bz2_error, 
@@ -271,16 +324,20 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	    cache + nbread_total, 
 	    (int)( nbrem > INT_MAX ? INT_MAX : nbrem )
 	);
+	pmetrics.stop_timers( );
+	pmetrics.accumulate_timer_deltas(
+	    (uint32_t)StreamReaderPerformanceMetrics:: MKEY_TIME_READING
+	);
 	switch (bz2_error)
 	{
-	    
-	    case BZ_STREAM_END: block_complete = true;
-	    case BZ_OK:
-		nbread_total += nbread;
-		break;
+	
+	case BZ_STREAM_END: block_complete = true;
+	case BZ_OK:
+	    nbread_total += nbread;
+	    break;
 
-	    // TODO: Inject BZ2 error code or error string into exception.
-	    default: throw StreamReadError( );
+	// TODO: Inject BZ2 error code or error string into exception.
+	default: throw StreamReadError( );
 
 	}
 
@@ -298,13 +355,118 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
 	    BZ2_bzReadClose( &bz2_error, _block_handle );
 	    _block_handle = NULL;
-	    if (feof( _stream_handle )) at_eos = true;
+	    if (feof( _stream_handle )) _at_eos = true;
 	    block_complete = false;
 	}
 
     } // loop to fill cache from disk
 
     return nbread_total;
+}
+
+
+CacheSegmentPerformanceMetrics::
+CacheSegmentPerformanceMetrics( )
+:   IPerformanceMetrics( ),
+    numbytes_filled_from_stream( 0 ),
+    numbytes_copied_from_sa_buffer( 0 ),
+    numbytes_copied_to_caller_buffer( 0 ),
+    clock_nsecs_waiting_to_set_sa_buffer( 0 ),
+    cpu_nsecs_waiting_to_set_sa_buffer( 0 ),
+    clock_nsecs_waiting_to_get_sa_buffer( 0 ),
+    cpu_nsecs_waiting_to_get_sa_buffer( 0 ),
+    clock_nsecs_waiting_to_fill_from_stream( 0 ),
+    cpu_nsecs_waiting_to_fill_from_stream( 0 ),
+    clock_nsecs_filling_from_stream( 0 ),
+    cpu_nsecs_filling_from_stream( 0 ),
+    clock_nsecs_in_sync_barrier( 0 ),
+    cpu_nsecs_in_sync_barrier( 0 ),
+    _accumulated_count( 1 )
+{ }
+
+
+CacheSegmentPerformanceMetrics::
+~CacheSegmentPerformanceMetrics( )
+{ }
+
+
+void
+CacheSegmentPerformanceMetrics::
+accumulate_timer_deltas( uint32_t metrics_key )
+{
+    
+    switch (metrics_key)
+    {
+    case MKEY_TIME_WAITING_TO_SET_SA_BUFFER:
+	clock_nsecs_waiting_to_set_sa_buffer +=
+	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+	cpu_nsecs_waiting_to_set_sa_buffer   +=
+	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+	break;
+    case MKEY_TIME_WAITING_TO_GET_SA_BUFFER:
+	clock_nsecs_waiting_to_get_sa_buffer +=
+	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+	cpu_nsecs_waiting_to_get_sa_buffer   +=
+	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+	break;
+    case MKEY_TIME_WAITING_TO_FILL_FROM_STREAM:
+	clock_nsecs_waiting_to_fill_from_stream +=
+	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+	cpu_nsecs_waiting_to_fill_from_stream   +=
+	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+	break;
+    case MKEY_TIME_FILLING_FROM_STREAM:
+	clock_nsecs_filling_from_stream +=
+	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+	cpu_nsecs_filling_from_stream   +=
+	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+	break;
+    case MKEY_TIME_IN_SYNC_BARRIER:
+	clock_nsecs_in_sync_barrier +=
+	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+	cpu_nsecs_in_sync_barrier   +=
+	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+	break;
+    default: throw InvalidPerformanceMetricsKey( );
+    }
+
+}
+
+
+void
+CacheSegmentPerformanceMetrics::
+accumulate_metrics( CacheSegmentPerformanceMetrics &source )
+{
+
+    numbytes_filled_from_stream		    +=
+    source.numbytes_filled_from_stream;
+    numbytes_copied_from_sa_buffer	    +=
+    source.numbytes_copied_from_sa_buffer;
+    numbytes_copied_to_caller_buffer	    +=
+    source.numbytes_copied_to_caller_buffer;
+    clock_nsecs_waiting_to_set_sa_buffer    +=
+    source.clock_nsecs_waiting_to_set_sa_buffer;
+    cpu_nsecs_waiting_to_set_sa_buffer	    +=
+    source.cpu_nsecs_waiting_to_set_sa_buffer;
+    clock_nsecs_waiting_to_get_sa_buffer    +=
+    source.clock_nsecs_waiting_to_get_sa_buffer;
+    cpu_nsecs_waiting_to_get_sa_buffer	    +=
+    source.cpu_nsecs_waiting_to_get_sa_buffer;
+    clock_nsecs_waiting_to_fill_from_stream +=
+    source.clock_nsecs_waiting_to_fill_from_stream;
+    cpu_nsecs_waiting_to_fill_from_stream   +=
+    source.cpu_nsecs_waiting_to_fill_from_stream;
+    clock_nsecs_filling_from_stream	    +=
+    source.clock_nsecs_filling_from_stream;
+    cpu_nsecs_filling_from_stream	    +=
+    source.cpu_nsecs_filling_from_stream;
+    clock_nsecs_in_sync_barrier		    +=
+    source.clock_nsecs_in_sync_barrier;
+    cpu_nsecs_in_sync_barrier		    +=
+    source.cpu_nsecs_in_sync_barrier;
+    _accumulated_count			    +=
+    source._accumulated_count;
+
 }
 
 
@@ -362,6 +524,7 @@ CacheSegment(
     cursor( 0 ),
     cursor_in_sa_buffer( false ),
     fill_id( 0 ),
+    pmetrics( CacheSegmentPerformanceMetrics( ) ),
     _trace_level( trace_level )
 {
 
@@ -389,12 +552,6 @@ CacheSegment(
     }
     else trace_file_handle = NULL;
 
-    _nsecs_waiting_to_set_sa_buffer	= 0;
-    _nsecs_waiting_to_acquire_sa_buffer	= 0;
-    _nsecs_waiting_to_fill_from_stream	= 0;
-    _nsecs_reading_from_stream		= 0;
-    _nsecs_in_final_sync_barrier	= 0;
-
     avail		= true;
 }
 
@@ -412,23 +569,6 @@ CacheManager:: CacheSegment::
     memory		= NULL;
 
     if (_trace_level && (NULL != trace_file_handle))
-    {
-	fprintf(
-	    trace_file_handle,
-	    "Waited to set my setaside buffer for %.9f seconds.\n" \
-	    "Waited to get higher setaside buffer for %.9f seconds.\n" \
-	    "Waited to fill from stream for %.9f seconds.\n" \
-	    "Read from stream for %.9f seconds.\n" \
-	    "Waited in final synchronization barrier for %.9f seconds.\n",
-	    ((double)_nsecs_waiting_to_set_sa_buffer / 1000000000),
-	    ((double)_nsecs_waiting_to_acquire_sa_buffer / 1000000000),
-	    ((double)_nsecs_waiting_to_fill_from_stream / 1000000000),
-	    ((double)_nsecs_reading_from_stream / 1000000000),
-	    ((double)_nsecs_in_final_sync_barrier / 1000000000)
-	);
-    }
-
-    if (_trace_level && (NULL != trace_file_handle))
 	fclose( trace_file_handle );
 
 }
@@ -439,8 +579,6 @@ CacheManager::
 has_more_data( )
 {
     CacheSegment &	segment		= _get_segment( );
-    timespec		tspec_start;
-    timespec		tspec_stop;
 
     // Return true immediately, if segment can provide more data.
     if (segment.avail) return true;
@@ -456,7 +594,7 @@ has_more_data( )
 
     // Block indefinitely, if some other segment can provide more data.
     // (This is a synchronization barrier.)
-    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
+    segment.pmetrics.start_timers( );
 sync_barrier:
     for (uint64_t i = 0; _segment_ref_count; ++i)
     {
@@ -474,9 +612,10 @@ sync_barrier:
     // Return false, if no segment can provide more data.
     if (!_get_segment_ref_count_ATOMIC( ))
     {
-	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
-	segment._nsecs_in_final_sync_barrier =
-	_timespec_diff_in_nsecs( tspec_start, tspec_stop );
+	segment.pmetrics.stop_timers( );
+	segment.pmetrics.accumulate_timer_deltas(
+	    CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
+	);
 	if (1 < _trace_level)
 	{
 	    fprintf(
@@ -567,8 +706,6 @@ split_at( uint64_t const pos )
 {
 
     CacheSegment &	segment		= _get_segment( );
-    timespec		tspec_start;
-    timespec		tspec_stop;
 
     if (1 < _trace_level)
     {
@@ -581,7 +718,7 @@ split_at( uint64_t const pos )
     }
 
     // Wait until the lower segment has consumed the setaside buffer.
-    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
+    segment.pmetrics.start_timers( );
 wait_for_sa_buffer:
     for (uint64_t i = 0; segment.get_sa_buffer_avail( ); ++i)
     {
@@ -601,9 +738,10 @@ wait_for_sa_buffer:
     if (segment.get_sa_buffer_avail_ATOMIC( ))
 	goto wait_for_sa_buffer;
 
-    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
-    segment._nsecs_waiting_to_set_sa_buffer +=
-    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
+    segment.pmetrics.stop_timers( );
+    segment.pmetrics.accumulate_timer_deltas(
+	CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
+    );
 
     // Setup the setaside buffer.
     segment.sa_buffer_size = pos;
@@ -647,8 +785,6 @@ _perform_segment_maintenance( CacheSegment & segment )
     assert( segment.avail );
 
     CacheSegment &	hsegment	    = _get_segment( true );
-    timespec		tspec_start;
-    timespec		tspec_stop;
 
     // If at end of segment and not already in setaside buffer, 
     // then jump into setaside buffer from higher segment.
@@ -662,7 +798,7 @@ _perform_segment_maintenance( CacheSegment & segment )
 
 	// Wait while higher segment is available 
 	// and its setaside buffer is not ready for consumption.
-	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
+	segment.pmetrics.start_timers( );
 wait_for_sa_buffer:
 	for (	uint64_t i = 0;
 		hsegment.avail && !hsegment.get_sa_buffer_avail( );
@@ -683,9 +819,11 @@ wait_for_sa_buffer:
 	// If so, then jump into it.
 	if (hsegment.get_sa_buffer_avail_ATOMIC( ))
 	{
-	    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
-	    segment._nsecs_waiting_to_acquire_sa_buffer +=
-	    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
+	    segment.pmetrics.stop_timers( );
+	    segment.pmetrics.accumulate_timer_deltas(
+		CacheSegmentPerformanceMetrics:: 
+		MKEY_TIME_WAITING_TO_GET_SA_BUFFER
+	    );
 	    segment.cursor_in_sa_buffer	    = true;
 	    segment.cursor		    = 0;
 	    if (1 < _trace_level)
@@ -805,11 +943,10 @@ void
 CacheManager::
 _fill_segment_from_stream( CacheSegment & segment )
 {
-    timespec tspec_start;
-    timespec tspec_stop;
+    uint64_t	nbfilled    = 0;
 
     // Wait while segment not selected and not end of stream.
-    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
+    segment.pmetrics.start_timers( );
 wait_to_fill:
     for (   uint64_t i = 0;
 	    !_stream_reader.is_at_end_of_stream( )
@@ -826,9 +963,11 @@ wait_to_fill:
 	    fflush( segment.trace_file_handle );
 	}
     }
-    clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
-    segment._nsecs_waiting_to_fill_from_stream +=
-    _timespec_diff_in_nsecs( tspec_start, tspec_stop );
+    segment.pmetrics.stop_timers( );
+    segment.pmetrics.accumulate_timer_deltas(
+	CacheSegmentPerformanceMetrics::
+	MKEY_TIME_WAITING_TO_FILL_FROM_STREAM
+    );
 
     // If at end of stream, then mark segment unavailable.
     if (_stream_reader.is_at_end_of_stream( ))
@@ -848,18 +987,22 @@ wait_to_fill:
     // Else, refill the segment.
     else if (_check_segment_to_fill_ATOMIC( segment.thread_id ))
     {
-	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_start );
+	segment.pmetrics.start_timers( );
 	segment.size		=
 	    segment.cursor
-	+   _stream_reader.read_into_cache(
-		segment.memory + segment.cursor,
-		_segment_size - segment.cursor
-	    );
-	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &tspec_stop );
+	+   (	nbfilled =
+		_stream_reader.read_into_cache(
+		    segment.memory + segment.cursor,
+		    _segment_size - segment.cursor
+		));
+	segment.pmetrics.stop_timers( );
 	segment.fill_id = _fill_counter++;
 	_select_segment_to_fill_ATOMIC( );
-	segment._nsecs_reading_from_stream +=
-	_timespec_diff_in_nsecs( tspec_start, tspec_stop );
+	segment.pmetrics.numbytes_filled_from_stream += nbfilled;
+	segment.pmetrics.accumulate_timer_deltas(
+	    CacheSegmentPerformanceMetrics::
+	    MKEY_TIME_FILLING_FROM_STREAM
+	);
 	if (2 < _trace_level)
 	{
 	    fprintf(

@@ -17,18 +17,55 @@
 #include "khmer_config.hh"
 
 
-#define MIN( a, b )	((a > b) ? (b) : (a))
+#define MIN( a, b )	(((a) > (b)) ? (b) : (a))
 
 
 namespace khmer
 {
 
 
+struct InvalidPerformanceMetricsKey : public std:: exception
+{ };
+
 struct InvalidNumberOfThreadsRequested : public std:: exception
 { };
 
 struct TooManyThreads : public std:: exception
 { };
+
+
+struct IPerformanceMetrics
+{
+
+	    IPerformanceMetrics( );
+    virtual ~IPerformanceMetrics( );
+    
+    inline void	    start_timers( )
+    {
+	clock_gettime( CLOCK_REALTIME, &_temp_clock_start );
+	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &_temp_cpu_start );
+    }
+    inline void	    stop_timers( )
+    {
+	clock_gettime( CLOCK_THREAD_CPUTIME_ID, &_temp_cpu_stop );
+	clock_gettime( CLOCK_REALTIME, &_temp_clock_stop );
+    }
+    virtual void    accumulate_timer_deltas( uint32_t metrics_key )	= 0;
+    
+    // TODO: Add a printing or log file feature.
+
+protected:
+    
+    timespec	_temp_cpu_start;
+    timespec	_temp_cpu_stop;
+    timespec	_temp_clock_start;
+    timespec	_temp_clock_stop;
+
+    uint64_t const  _timespec_diff_in_nsecs(
+	timespec const &start, timespec const &stop
+    );
+
+};
 
 
 struct ThreadIDMap
@@ -73,28 +110,43 @@ struct InvalidCacheSizeRequested : public std:: exception
 { };
 
 
-struct Read
+struct StreamReaderPerformanceMetrics : public IPerformanceMetrics
 {
-    std:: string name;
-    std:: string seq;
+    
+    enum
+    {
+	MKEY_TIME_READING
+    };
+    
+    uint64_t	    numbytes_read;
+    uint64_t	    clock_nsecs_reading;
+    uint64_t	    cpu_nsecs_reading;
+    
+	    StreamReaderPerformanceMetrics( );
+    virtual ~StreamReaderPerformanceMetrics( );
+
+    virtual void    accumulate_timer_deltas( uint32_t metrics_key );
+
 };
 
 
 struct IStreamReader
 {
+
+    StreamReaderPerformanceMetrics  pmetrics;
     
 	    IStreamReader( );
     virtual ~IStreamReader( );
 
-    bool const		    is_at_end_of_stream( ) const;
+    bool const			    is_at_end_of_stream( ) const;
 
-    virtual uint64_t const  read_into_cache(
+    virtual uint64_t const	    read_into_cache(
 	uint8_t * const cache, uint64_t const cache_size
     ) = 0;
 
 protected:
     
-    bool		    at_eos;
+    bool			    _at_eos;
 
 };
 
@@ -150,6 +202,49 @@ private:
 
 };
 
+
+struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics
+{
+    
+    enum
+    {
+	MKEY_TIME_WAITING_TO_SET_SA_BUFFER,
+	MKEY_TIME_WAITING_TO_GET_SA_BUFFER,
+	MKEY_TIME_WAITING_TO_FILL_FROM_STREAM,
+	MKEY_TIME_FILLING_FROM_STREAM,
+	MKEY_TIME_IN_SYNC_BARRIER
+    };
+    
+    uint64_t	    numbytes_filled_from_stream;
+    uint64_t	    numbytes_copied_from_sa_buffer;
+    uint64_t	    numbytes_copied_to_caller_buffer;
+    uint64_t	    clock_nsecs_waiting_to_set_sa_buffer;
+    uint64_t	    cpu_nsecs_waiting_to_set_sa_buffer;
+    uint64_t	    clock_nsecs_waiting_to_get_sa_buffer;
+    uint64_t	    cpu_nsecs_waiting_to_get_sa_buffer;
+    uint64_t	    clock_nsecs_waiting_to_fill_from_stream;
+    uint64_t	    cpu_nsecs_waiting_to_fill_from_stream;
+    uint64_t	    clock_nsecs_filling_from_stream;
+    uint64_t	    cpu_nsecs_filling_from_stream;
+    uint64_t	    clock_nsecs_in_sync_barrier;
+    uint64_t	    cpu_nsecs_in_sync_barrier;
+
+	    CacheSegmentPerformanceMetrics( );
+    virtual ~CacheSegmentPerformanceMetrics( );
+
+    virtual void    accumulate_timer_deltas( uint32_t metrics_key );
+
+    virtual void    accumulate_metrics(
+	CacheSegmentPerformanceMetrics &source
+    );
+
+protected:
+    
+    uint32_t	    _accumulated_count;
+
+};
+
+
 struct CacheManager
 {
     
@@ -188,14 +283,15 @@ private:
     struct CacheSegment
     {
 
-	bool		avail;
-	uint32_t	thread_id;
-	uint64_t	size;
-	uint8_t *	memory;
-	uint64_t	cursor;
-	bool		cursor_in_sa_buffer;
-	uint64_t	sa_buffer_size;
-	uint64_t	fill_id;
+	bool				avail;
+	uint32_t			thread_id;
+	uint64_t			size;
+	uint8_t *			memory;
+	uint64_t			cursor;
+	bool				cursor_in_sa_buffer;
+	uint64_t			sa_buffer_size;
+	uint64_t			fill_id;
+	CacheSegmentPerformanceMetrics	pmetrics;
 	
 	CacheSegment(
 	    uint32_t const  thread_id,
@@ -204,22 +300,16 @@ private:
 	);
 	~CacheSegment( );
 
-	bool		get_sa_buffer_avail( ) const;
-	bool		get_sa_buffer_avail_ATOMIC( );
-	void		set_sa_buffer_avail_ATOMIC( bool const avail );
+	bool				get_sa_buffer_avail( ) const;
+	bool				get_sa_buffer_avail_ATOMIC( );
+	void				set_sa_buffer_avail_ATOMIC( bool const avail );
 
-	FILE *		trace_file_handle;
-
-	uint64_t	_nsecs_waiting_to_set_sa_buffer;
-	uint64_t	_nsecs_waiting_to_acquire_sa_buffer;
-	uint64_t	_nsecs_waiting_to_fill_from_stream;
-	uint64_t	_nsecs_reading_from_stream;
-	uint64_t	_nsecs_in_final_sync_barrier;
+	FILE *				trace_file_handle;
 
     private:
 	
-	uint8_t		_trace_level;
-	bool		_sa_buffer_avail;
+	uint8_t				_trace_level;
+	bool				_sa_buffer_avail;
 
     }; // struct CacheSegment
 
@@ -254,6 +344,13 @@ private:
     uint32_t const	_get_segment_ref_count_ATOMIC( );
     
 }; // struct CacheManager
+
+
+struct Read
+{
+    std:: string name;
+    std:: string seq;
+};
 
 
 struct IParser
