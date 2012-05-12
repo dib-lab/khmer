@@ -24,6 +24,12 @@ namespace khmer
 {
 
 
+struct InvalidStreamBuffer : public std:: exception
+{ };
+
+struct StreamReadError : public std:: exception
+{ };
+
 struct InvalidPerformanceMetricsKey : public std:: exception
 { };
 
@@ -32,6 +38,53 @@ struct InvalidNumberOfThreadsRequested : public std:: exception
 
 struct TooManyThreads : public std:: exception
 { };
+
+
+struct TraceLogger
+{
+    
+    enum
+    {
+	TLVL_ALL	= 0,
+	TLVL_DEBUG9, TLVL_DEBUG8, TLVL_DEBUG7, TLVL_DEBUG6, TLVL_DEBUG5,
+	TLVL_DEBUG4, TLVL_DEBUG3, TLVL_DEBUG2, TLVL_DEBUG1, TLVL_DEBUG0,
+	TLVL_INFO9, TLVL_INFO8, TLVL_INFO7, TLVL_INFO6, TLVL_INFO5,
+	TLVL_INFO4, TLVL_INFO3, TLVL_INFO2, TLVL_INFO1, TLVL_INFO0,
+	TLVL_WARNING	= 30,
+	TLVL_ERROR	= 40,
+	TLVL_CRITICAL	= 50,
+	TLVL_NONE
+    };
+    
+    TraceLogger( uint8_t const level, FILE * stream_handle );
+    TraceLogger(
+	uint8_t const level, char const * const file_name_format, ...
+    );
+    ~TraceLogger( );
+
+    inline void	    operator( )(
+	uint8_t const level, char const * const format, ...
+    ) const
+    {
+	va_list varargs;
+	
+	if (_level <= level)
+	{
+	    va_start( varargs, format );
+	    vfprintf( _stream_handle, format, varargs );
+	    va_end( varargs );
+	    fflush( _stream_handle );
+	}
+
+    }
+
+private:
+    
+    uint8_t	    _level;
+    bool	    _shared_stream;
+    FILE *	    _stream_handle;
+
+};
 
 
 struct IPerformanceMetrics
@@ -92,13 +145,6 @@ private:
 
 namespace read_parsers
 {
-
-
-struct InvalidStreamBuffer : public std:: exception
-{ };
-
-struct StreamReadError : public std:: exception
-{ };
 
 struct CacheSegmentUnavailable : public std:: exception
 { };
@@ -217,6 +263,7 @@ struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics
     
     uint64_t	    numbytes_filled_from_stream;
     uint64_t	    numbytes_copied_from_sa_buffer;
+    uint64_t	    numbytes_reserved_as_sa_buffer;
     uint64_t	    numbytes_copied_to_caller_buffer;
     uint64_t	    clock_nsecs_waiting_to_set_sa_buffer;
     uint64_t	    cpu_nsecs_waiting_to_set_sa_buffer;
@@ -292,6 +339,7 @@ private:
 	uint64_t			sa_buffer_size;
 	uint64_t			fill_id;
 	CacheSegmentPerformanceMetrics	pmetrics;
+	TraceLogger			trace_logger;
 	
 	CacheSegment(
 	    uint32_t const  thread_id,
@@ -304,11 +352,8 @@ private:
 	bool				get_sa_buffer_avail_ATOMIC( );
 	void				set_sa_buffer_avail_ATOMIC( bool const avail );
 
-	FILE *				trace_file_handle;
-
     private:
 	
-	uint8_t				_trace_level;
 	bool				_sa_buffer_avail;
 
     }; // struct CacheSegment

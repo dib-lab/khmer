@@ -8,6 +8,7 @@ extern "C"
 #endif
 #include <cstring>
 
+#include <cstdarg>
 #include <cstdio>
 #include <cassert>
 
@@ -25,6 +26,43 @@ extern "C"
 
 namespace khmer
 {
+
+
+TraceLogger::
+TraceLogger( uint8_t const level, FILE * stream_handle )
+: _level( level ), _shared_stream( true ), _stream_handle( stream_handle )
+{ assert( NULL != stream_handle ); }
+
+
+TraceLogger::
+TraceLogger( uint8_t const level, char const * const file_name_format, ... )
+: _level( level ), _shared_stream( false )
+{
+    char	tfile_name[ FILENAME_MAX + 1 ];
+    va_list	varargs;
+
+    tfile_name[ FILENAME_MAX ] = '\0';
+    va_start( varargs, file_name_format );
+    vsnprintf( tfile_name, FILENAME_MAX, file_name_format, varargs );
+    va_end( varargs );
+
+    _stream_handle = fopen( tfile_name, "w" );
+    if (NULL == _stream_handle) throw InvalidStreamBuffer( );
+
+}
+
+
+TraceLogger::
+~TraceLogger( )
+{
+
+    if ((!_shared_stream) && (NULL != _stream_handle))
+    {
+	fclose( _stream_handle );
+	_stream_handle = NULL;
+    }
+
+}
 
 
 IPerformanceMetrics::
@@ -370,6 +408,7 @@ CacheSegmentPerformanceMetrics( )
 :   IPerformanceMetrics( ),
     numbytes_filled_from_stream( 0 ),
     numbytes_copied_from_sa_buffer( 0 ),
+    numbytes_reserved_as_sa_buffer( 0 ),
     numbytes_copied_to_caller_buffer( 0 ),
     clock_nsecs_waiting_to_set_sa_buffer( 0 ),
     cpu_nsecs_waiting_to_set_sa_buffer( 0 ),
@@ -442,6 +481,8 @@ accumulate_metrics( CacheSegmentPerformanceMetrics &source )
     source.numbytes_filled_from_stream;
     numbytes_copied_from_sa_buffer	    +=
     source.numbytes_copied_from_sa_buffer;
+    numbytes_reserved_as_sa_buffer	    +=
+    source.numbytes_reserved_as_sa_buffer;
     numbytes_copied_to_caller_buffer	    +=
     source.numbytes_copied_to_caller_buffer;
     clock_nsecs_waiting_to_set_sa_buffer    +=
@@ -525,34 +566,23 @@ CacheSegment(
     cursor_in_sa_buffer( false ),
     fill_id( 0 ),
     pmetrics( CacheSegmentPerformanceMetrics( ) ),
-    _trace_level( trace_level )
+    trace_logger(
+	TraceLogger(
+	    trace_level, "cmgr-%lu.log", (unsigned long int)thread_id
+	)
+    )
 {
 
     _sa_buffer_avail	= false;
     sa_buffer_size	= 0;
 
-    if (trace_level)
-    {
-	char	    tfile_name[ 1024 ];
-	sprintf(
-	    tfile_name,
-	    "cmgr_trace-thread_%lu",
-	    (unsigned long int)thread_id
-	);
-	trace_file_handle  = fopen( tfile_name, "w" );
-	if (NULL == trace_file_handle)
-	    // TODO: Throw exception.
-	    ;
-	fprintf(
-	    trace_file_handle,
-	    "Trace of thread %lu started.\n",
-	    (unsigned long int)thread_id
-	);
-	fflush( trace_file_handle );
-    }
-    else trace_file_handle = NULL;
+    trace_logger(
+	TraceLogger:: TLVL_INFO0, 
+	"Trace of thread %lu started.\n", (unsigned long int)thread_id
+    );
 
     avail		= true;
+
 }
 
 
@@ -568,9 +598,6 @@ CacheManager:: CacheSegment::
     delete [ ] memory;
     memory		= NULL;
 
-    if (_trace_level && (NULL != trace_file_handle))
-	fclose( trace_file_handle );
-
 }
 
 
@@ -583,14 +610,10 @@ has_more_data( )
     // Return true immediately, if segment can provide more data.
     if (segment.avail) return true;
 
-    if (1 < _trace_level)
-    {
-	fprintf(
-	    segment.trace_file_handle,
-	    "Before 'has_more_data' synchronization barrier.\n"
-	);
-	fflush( segment.trace_file_handle );
-    }
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG1,
+	"Before 'has_more_data' synchronization barrier.\n"
+    );
 
     // Block indefinitely, if some other segment can provide more data.
     // (This is a synchronization barrier.)
@@ -598,15 +621,12 @@ has_more_data( )
 sync_barrier:
     for (uint64_t i = 0; _segment_ref_count; ++i)
     {
-	if ((2 < _trace_level) && (0 == i % 100000000))
-	{
-	    fprintf(
-		segment.trace_file_handle,
+	if (0 == i % 100000000)
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
 		"Waited in synchronization barrier for %llu iterations.\n",
 		(unsigned long long int)i
 	    );
-	    fflush( segment.trace_file_handle );
-	}
     }
 
     // Return false, if no segment can provide more data.
@@ -616,14 +636,11 @@ sync_barrier:
 	segment.pmetrics.accumulate_timer_deltas(
 	    CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
 	);
-	if (1 < _trace_level)
-	{
-	    fprintf(
-		segment.trace_file_handle,
-		"After 'has_more_data' synchronization barrier.\n"
-	    );
-	    fflush( segment.trace_file_handle );
-	}
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG1,
+	    "After 'has_more_data' synchronization barrier.\n"
+	);
+
 	return false;
     }
     // If we somehow got here and there are still active segments,
@@ -636,7 +653,7 @@ uint8_t const
 CacheManager::
 get_byte( )
 {
-    CacheSegment &	segment		= _get_segment( );
+    CacheSegment	&segment	= _get_segment( );
     uint8_t *		memory		= NULL;
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
@@ -644,11 +661,15 @@ get_byte( )
     _perform_segment_maintenance( segment );
     if (segment.cursor_in_sa_buffer)
     {
-	CacheSegment &
-	hsegment    = _get_segment( true );
+	CacheSegment
+	&hsegment   = _get_segment( true );
 	memory	    = hsegment.memory;
     }
     else memory	    = segment.memory;
+
+    segment.pmetrics.numbytes_copied_to_caller_buffer++;
+    if (segment.cursor_in_sa_buffer)
+	segment.pmetrics.numbytes_copied_from_sa_buffer++;
 
     return memory[ segment.cursor++ ];
 }
@@ -658,7 +679,7 @@ uint64_t const
 CacheManager::
 get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 {
-    CacheSegment &	segment		= _get_segment( );
+    CacheSegment	&segment	= _get_segment( );
     uint64_t		nbcopied	= 0;
     uint64_t		nbcopied_total	= 0;
     uint8_t *		memory		= NULL;
@@ -671,8 +692,8 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	_perform_segment_maintenance( segment );
 	if (segment.cursor_in_sa_buffer)
 	{
-	    CacheSegment &
-	    hsegment	    = _get_segment( true );
+	    CacheSegment
+	    &hsegment	    = _get_segment( true );
 	    memory	    = hsegment.memory;
 	    size	    = hsegment.sa_buffer_size;
 	}
@@ -687,6 +708,9 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	memcpy( buffer, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
 
+	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
+	if (segment.cursor_in_sa_buffer)
+	    segment.pmetrics.numbytes_copied_from_sa_buffer += nbcopied;
 	nbcopied_total += nbcopied;
     }
 
@@ -707,30 +731,23 @@ split_at( uint64_t const pos )
 
     CacheSegment &	segment		= _get_segment( );
 
-    if (1 < _trace_level)
-    {
-	fprintf(
-	    segment.trace_file_handle,
-	    "Splitting off setaside buffer at byte %llu.\n",
-	    (unsigned long long int)pos
-	);
-	fflush( segment.trace_file_handle );
-    }
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG2,
+	"Splitting off setaside buffer at byte %llu.\n",
+	(unsigned long long int)pos
+    );
 
     // Wait until the lower segment has consumed the setaside buffer.
     segment.pmetrics.start_timers( );
 wait_for_sa_buffer:
     for (uint64_t i = 0; segment.get_sa_buffer_avail( ); ++i)
     {
-	if ((2 < _trace_level) && (0 == i % 100000000))
-	{
-	    fprintf(
-		segment.trace_file_handle,
+	if (0 == i % 100000000)
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
 		"Waited to set setaside buffer for %llu iterations.\n",
 		(unsigned long long int)i
 	    );
-	    fflush( segment.trace_file_handle );
-	}
     }
 
     // If we get here but are not ready to proceed,
@@ -745,16 +762,12 @@ wait_for_sa_buffer:
 
     // Setup the setaside buffer.
     segment.sa_buffer_size = pos;
+    segment.pmetrics.numbytes_reserved_as_sa_buffer += pos;
     segment.set_sa_buffer_avail_ATOMIC( true );
 
-    if (1 < _trace_level)
-    {
-	fprintf(
-	    segment.trace_file_handle,
-	    "Finished 'split_at'.\n"
-	);
-	fflush( segment.trace_file_handle );
-    }
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG2, "Finished 'split_at'.\n"
+    );
 
 }
 
@@ -804,15 +817,12 @@ wait_for_sa_buffer:
 		hsegment.avail && !hsegment.get_sa_buffer_avail( );
 		++i)
 	{
-	    if ((2 < _trace_level) && (0 == i % 100000000))
-	    {
-		fprintf(
-		    segment.trace_file_handle,
+	    if (0 == i % 100000000)
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG3,
 		    "Waited to get setaside buffer for %llu iterations.\n",
 		    (unsigned long long int)i
 		);
-		fflush( segment.trace_file_handle );
-	    }
 	}
 
 	// Atomically test that the setaside buffer is available.
@@ -826,14 +836,9 @@ wait_for_sa_buffer:
 	    );
 	    segment.cursor_in_sa_buffer	    = true;
 	    segment.cursor		    = 0;
-	    if (1 < _trace_level)
-	    {
-		fprintf(
-		    segment.trace_file_handle,
-		    "Jumped into setaside buffer.\n"
-		);
-		fflush( segment.trace_file_handle );
-	    }
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG2, "Jumped into setaside buffer.\n"
+	    );
 	}
 
 	// If the higher segment is no longer available,
@@ -861,14 +866,9 @@ wait_for_sa_buffer:
 	segment.cursor			= 0;
 	hsegment.sa_buffer_size		= 0;
 	hsegment.set_sa_buffer_avail_ATOMIC( false );
-	if (1 < _trace_level)
-	{
-	    fprintf(
-		segment.trace_file_handle,
-		"Jumped out of setaside buffer.\n"
-	    );
-	    fflush( segment.trace_file_handle );
-	}
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG2, "Jumped out of setaside buffer.\n"
+	);
 
 	// Jump past end of setaside buffer
 	// so as not to clobber what the lower segment will want to use.
@@ -953,15 +953,12 @@ wait_to_fill:
 	&&  (_segment_to_fill != segment.thread_id);
 	    ++i)
     {
-	if ((2 < _trace_level) && (0 == i % 100000000))
-	{
-	    fprintf(
-		segment.trace_file_handle,
+	if (0 == i % 100000000)
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
 		"Waited to fill segment for %llu iterations.\n",
 		(unsigned long long int)i
 	    );
-	    fflush( segment.trace_file_handle );
-	}
     }
     segment.pmetrics.stop_timers( );
     segment.pmetrics.accumulate_timer_deltas(
@@ -972,14 +969,9 @@ wait_to_fill:
     // If at end of stream, then mark segment unavailable.
     if (_stream_reader.is_at_end_of_stream( ))
     {
-	if (1 < _trace_level)
-	{
-	    fprintf(
-		segment.trace_file_handle,
-		"At end of input stream.\n"
-	    );
-	    fflush( segment.trace_file_handle );
-	}
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG1, "At end of input stream.\n"
+	);
 	segment.avail		= false;
 	_decrement_segment_ref_count_ATOMIC( );
     }
@@ -988,7 +980,7 @@ wait_to_fill:
     else if (_check_segment_to_fill_ATOMIC( segment.thread_id ))
     {
 	segment.pmetrics.start_timers( );
-	segment.size		=
+	segment.size =
 	    segment.cursor
 	+   (	nbfilled =
 		_stream_reader.read_into_cache(
@@ -996,22 +988,18 @@ wait_to_fill:
 		    _segment_size - segment.cursor
 		));
 	segment.pmetrics.stop_timers( );
-	segment.fill_id = _fill_counter++;
+	segment.fill_id	= _fill_counter++;
 	_select_segment_to_fill_ATOMIC( );
 	segment.pmetrics.numbytes_filled_from_stream += nbfilled;
 	segment.pmetrics.accumulate_timer_deltas(
 	    CacheSegmentPerformanceMetrics::
 	    MKEY_TIME_FILLING_FROM_STREAM
 	);
-	if (2 < _trace_level)
-	{
-	    fprintf(
-		segment.trace_file_handle,
-		"Read %llu bytes into segment.\n",
-		(unsigned long long int)segment.size
-	    );
-	    fflush( segment.trace_file_handle );
-	}
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG2,
+	    "Read %llu bytes into segment.\n",
+	    (unsigned long long int)segment.size
+	);
     }
 
     // If we somehow get here, then go back and wait some more.
