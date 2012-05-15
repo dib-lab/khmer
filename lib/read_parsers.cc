@@ -119,19 +119,30 @@ get_thread_id( )
     if (match == _thread_id_map.end( ))
     {
 	uint32_t thread_id;
-	if (_number_of_threads <= _thread_id_map.size( ))
-	    throw TooManyThreads( );
-	thread_id = __sync_fetch_and_add( &_thread_counter, 1 );
-	while ( !__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ) );
-	// TODO: Consider the case where the map produces an exception inside
-	//	 spinlock. Probably need to catch exception, flag the event, 
-	//	 flip the lock, and rethrow on other side of flipped lock.
-	_thread_id_map[ native_thread_id ] = thread_id;
+
+	while (!__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ));
+
+	thread_id = _thread_counter++;
+
+	try
+	{
+	    if (_number_of_threads <= _thread_counter)
+		throw TooManyThreads( );
+	    _thread_id_map[ native_thread_id ] = thread_id;
+	}
+	catch (...)
+	{
+	    _thread_counter--;
+	    __sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
+	    throw;
+	}
+
 	__sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
+
 	return thread_id;
     }
 
-    return (*match).second; // Return the found value.
+    return (*match).second;
 }
 
 
@@ -1061,10 +1072,29 @@ set_sa_buffer_avail_ATOMIC( bool const avail )
 }
 
 
+ParserPerformanceMetrics::
+ParserPerformanceMetrics( )
+:   numlines_copied( 0 ),
+    numreads_parsed_total( 0 ),
+    numreads_parsed_valid( 0 )
+{ }
+
+
+ParserPerformanceMetrics::
+~ParserPerformanceMetrics( )
+{ }
+
+
+void
+ParserPerformanceMetrics::
+accumulate_timer_deltas( uint32_t metrics_key )
+{ }
+
+
 IParser:: IParser * const
 IParser::
 get_parser(
-    std:: string const &    ifile_name,
+    std:: string const	    &ifile_name,
     uint32_t const	    number_of_threads,
     uint64_t const	    cache_size,
     uint8_t const	    trace_level
@@ -1076,9 +1106,7 @@ get_parser(
     IParser *	    parser	    = NULL;
 
     int		    ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
-    if (-1 == ifile_handle)
-	// TODO: Raise exception.
-	;
+    if (-1 == ifile_handle) throw InvalidStreamHandle( );
     std:: string    ext	    = "";
     std:: string    ifile_name_chopped( ifile_name );
     size_t	    ext_pos = ifile_name.find_last_of( "." );
@@ -1133,7 +1161,7 @@ get_parser(
 
 IParser::
 IParser(
-    IStreamReader &  stream_reader,
+    IStreamReader   &stream_reader,
     uint32_t const  number_of_threads,
     uint64_t const  cache_size,
     uint8_t const   trace_level
@@ -1158,23 +1186,36 @@ IParser::
 { }
 
 
-bool
-IParser::
-is_complete( )
-{ return !_cache_manager.has_more_data( ); }
+IParser:: ParserState::
+ParserState( uint32_t const thread_id, uint8_t const trace_level )
+:   at_start( true ),
+    need_new_line( true ),
+    buffer_pos( 0 ),
+    buffer_rem( 0 ),
+    pmetrics( ParserPerformanceMetrics( ) ),
+    trace_logger(
+	TraceLogger(
+	    trace_level, "parser-%lu.log", (unsigned long int)thread_id
+	)
+    )
+{ memset( buffer, 0, BUFFER_SIZE + 1 ); }
+
+
+IParser:: ParserState::
+~ParserState( )
+{ }
 
 
 inline
 void
 IParser::
-_copy_line( )
+_copy_line( ParserState &state )
 {
-    ParserState &   state	= _get_state( );
-    uint8_t (&	    buffer)[ ParserState:: BUFFER_SIZE + 1 ]
+    uint8_t	    (&buffer)[ ParserState:: BUFFER_SIZE + 1 ]
 				= state.buffer;
-    uint64_t &	    pos		= state.buffer_pos;
-    uint64_t &	    rem		= state.buffer_rem;
-    std:: string &  line	= state.line;
+    uint64_t	    &pos	= state.buffer_pos;
+    uint64_t	    &rem	= state.buffer_rem;
+    std:: string    &line	= state.line;
     uint64_t	    i		= 0;
     bool	    hit		= false;
 
@@ -1205,6 +1246,8 @@ _copy_line( )
 
     }
 
+    state.pmetrics.numlines_copied++;
+
 }
 
 
@@ -1213,34 +1256,20 @@ IParser:: ParserState &
 IParser::
 _get_state( )
 {
-    uint32_t	    thread_id		= _thread_id_map.get_thread_id( );
-    ParserState *   state_PTR		= NULL;
+    uint32_t	    thread_id	= _thread_id_map.get_thread_id( );
+    ParserState *   state_PTR	= NULL;
 
     assert( NULL != _states );
 
     state_PTR	    = _states[ thread_id ];
     if (NULL == state_PTR)
     {
-	_states[ thread_id ]	    = new ParserState( );
-	state_PTR		    = _states[ thread_id ];
+	_states[ thread_id ]	= new ParserState( thread_id, _trace_level );
+	state_PTR		= _states[ thread_id ];
     }
 
     return *state_PTR;
 }
-
-
-IParser:: ParserState::
-ParserState( )
-:   at_start( true ),
-    need_new_line( true ),
-    buffer_pos( 0 ),
-    buffer_rem( 0 )
-{ memset( buffer, 0, BUFFER_SIZE + 1 ); }
-
-
-IParser:: ParserState::
-~ParserState( )
-{ }
 
 
 FastaParser::
@@ -1280,7 +1309,13 @@ FastaParser::
 get_next_read( )
 {
     
-    ParserState &   parser_state    = _get_state( );
+    ParserState	    &state	    = _get_state( );
+    uint64_t	    &fill_id	    = state.fill_id;
+    bool	    &at_start	    = state.at_start;
+    bool	    &need_new_line  = state.need_new_line;
+    std:: string    &line	    = state.line;
+    TraceLogger	    &trace_logger   = state.trace_logger;
+    uint64_t	    split_pos	    = 0;
     Read	    the_read;
     
     while (_cache_manager.has_more_data( ))
@@ -1288,61 +1323,85 @@ get_next_read( )
 	the_read.name	= "";
 	the_read.seq	= "";
 
-	if (parser_state.need_new_line) _copy_line( );
-	parser_state.need_new_line = true;
+	if (need_new_line) _copy_line( state );
+	need_new_line = true;
 
 	// If a cache segment fill occurred during line retrieval, 
 	// then flag the event.
-	if (!parser_state.at_start)
-	    parser_state.at_start =
-	    (parser_state.fill_id != _cache_manager.get_fill_id( ));
+	if (!at_start) at_start = (fill_id != _cache_manager.get_fill_id( ));
 
-	parser_state.fill_id = _cache_manager.get_fill_id( );
+	fill_id = _cache_manager.get_fill_id( );
 
 	// If at start of file, then error on garbage.
 	// Else, skip forward to next read boundary.
-	if ('>' != parser_state.line[ 0 ])
+	if ('>' != line[ 0 ])
 	{
-	    if (parser_state.at_start && (0 == parser_state.fill_id))
-		// TODO: Throw exception.
-		;
+	    if (at_start && (0 == fill_id)) throw InvalidFASTAFileFormat( );
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7, "Scanning to start of a read...\n"
+	    );
 	    continue;
 	}
 
 	// Skip over an unmatched second part of a paired read,
 	// when at the beginning of a new fill.
-	if (	parser_state.at_start
-	    &&	(    (parser_state.line.length( ) - 2)
-		 ==  parser_state.line.rfind( "/2" )))
+	if (	at_start && (0 != fill_id)
+	    && ((line.length( ) - 2) == line.rfind( "/2" )))
 	{
 	    while (_cache_manager.has_more_data( ))
 	    {
-		_copy_line( );
-		if ('>' == parser_state.line[ 0 ]) break;
+		_copy_line( state );
+		trace_logger(
+		    TraceLogger:: TLVL_DEBUG7, "Copied a line.\n"
+		);
+		if ('>' == line[ 0 ]) break;
 	    }
 	}
 
 	// Split off skipped over data into a setaside buffer.
-	_cache_manager.split_at(
-		_cache_manager.whereis_cursor( )
-	    -   parser_state.line.length( )
+	split_pos = _cache_manager.whereis_cursor( ) - line.length( );
+	_cache_manager.split_at( split_pos );
+	trace_logger(
+	    TraceLogger:: TLVL_DEBUG6,
+	    "Skipped %llu bytes of data.",
+	    (unsigned long long int)split_pos
 	);
 
-	parser_state.at_start = false;
+	at_start = false;
 
 	// Parse read.
-	the_read.name		    = parser_state.line.substr( 1 );
-	parser_state.need_new_line  = false;
+	the_read.name	= line.substr( 1 );
+	need_new_line	= false;
 	while (_cache_manager.has_more_data( ))
 	{
-	    _copy_line( );
-	    if ('>' == parser_state.line[ 0 ]) break;
-	    the_read.seq += parser_state.line;
+	    _copy_line( state );
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7, "Copied a line.\n"
+	    );
+	    if ('>' == line[ 0 ]) break;
+	    the_read.seq += line;
 	}
 
-	// Discard invalid read.
-	if (std:: string:: npos != the_read.seq.find_first_of( "Nn" )) continue;
+	state.pmetrics.numreads_parsed_total++;
 
+	// Discard invalid read.
+	if (std:: string:: npos != the_read.seq.find_first_of( "Nn" ))
+	{
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG6,
+		"Discarded invalid read of length %lu.\n",
+		(unsigned long int)the_read.seq.length( )
+	    );
+	    continue;
+	}
+	else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG6,
+		"Accepted valid read of length %lu.\n",
+		(unsigned long int)the_read.seq.length( )
+	    );
+
+	state.pmetrics.numreads_parsed_valid++;
 	break;
     } // while invalid read
 
@@ -1354,7 +1413,14 @@ Read
 FastqParser::
 get_next_read( )
 {
+    
+    ParserState	    &parser_state   = _get_state( );
+    std:: string    &line	    = parser_state.line;
+    Read	    the_read;
+
     // TODO: Implement.
+    
+    return the_read;
 }
 
 
