@@ -24,6 +24,9 @@ namespace khmer
 {
 
 
+struct InvalidStreamHandle : public std:: exception
+{ };
+
 struct InvalidStreamBuffer : public std:: exception
 { };
 
@@ -145,6 +148,13 @@ private:
 
 namespace read_parsers
 {
+
+
+struct InvalidFASTAFileFormat: public std:: exception
+{ };
+
+struct InvalidFASTQFileFormat: public std:: exception
+{ };
 
 struct CacheSegmentUnavailable : public std:: exception
 { };
@@ -398,11 +408,26 @@ struct Read
 };
 
 
+struct ParserPerformanceMetrics: public IPerformanceMetrics
+{
+    
+    uint64_t	    numlines_copied;
+    uint64_t	    numreads_parsed_total;
+    uint64_t	    numreads_parsed_valid;
+
+	    ParserPerformanceMetrics( );
+    virtual ~ParserPerformanceMetrics( );
+
+    virtual void    accumulate_timer_deltas( uint32_t metrics_key );
+
+};
+
+
 struct IParser
 {
     
     static IParser * const  get_parser(
-	std:: string const &	ifile_name,
+	std:: string const 	&ifile_name,
 	uint32_t const		number_of_threads   =
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const		cache_size	    =
@@ -411,7 +436,7 @@ struct IParser
     );
     
 	    IParser(
-	IStreamReader &	stream_reader,
+	IStreamReader	&stream_reader,
 	uint32_t const	number_of_threads   =
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const	cache_size	    =
@@ -420,8 +445,9 @@ struct IParser
     );
     virtual ~IParser( );
 
-	    bool	is_complete( );
-    virtual Read	get_next_read( )	    = 0;
+    inline bool		is_complete( )
+    { return !_cache_manager.has_more_data( ); }
+    virtual Read	get_next_read( )    = 0;
 
 protected:
     
@@ -429,22 +455,27 @@ protected:
     {
 
 	// TODO: Set buffer size from Config.
-	static uint64_t const	BUFFER_SIZE	    = 127;
-	
-	bool		at_start;
-	uint64_t	fill_id;
+	static uint64_t const	    BUFFER_SIZE		= 127;
 
-	std:: string	line;
-	bool		need_new_line;
-
-	uint8_t		buffer[ BUFFER_SIZE + 1 ];
-	uint64_t	buffer_pos;
-	uint64_t	buffer_rem;
+	uint32_t		    thread_id;
 	
-	ParserState( );
+	bool			    at_start;
+	uint64_t		    fill_id;
+
+	std:: string		    line;
+	bool			    need_new_line;
+
+	uint8_t			    buffer[ BUFFER_SIZE + 1 ];
+	uint64_t		    buffer_pos;
+	uint64_t		    buffer_rem;
+
+	ParserPerformanceMetrics    pmetrics;
+	TraceLogger		    trace_logger;
+	
+	ParserState( uint32_t const thread_id, uint8_t const trace_level );
 	~ParserState( );
 
-    };
+    }; // struct ParserState
     
     uint8_t		_trace_level;
 
@@ -454,11 +485,11 @@ protected:
 
     ParserState **	_states;
 
-    void		_copy_line( );
+    void		_copy_line( ParserState &state );
 
-    ParserState &	_get_state( );
+    ParserState		&_get_state( );
 
-};
+}; // struct IParser
 
 
 struct FastaParser : public IParser
