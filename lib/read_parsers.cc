@@ -1,14 +1,17 @@
 #include <climits>
+#if (__cplusplus >= 201103L)
+#   include <cstdint>
+#else
 extern "C"
 {
-#include <stdint.h>
+#   include <stdint.h>
 }
+#endif
 #ifndef SSIZE_MAX
 #   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
 #endif
 #include <cstring>
 
-#include <cstdarg>
 #include <cstdio>
 #include <cassert>
 
@@ -126,7 +129,7 @@ get_thread_id( )
 
 	try
 	{
-	    if (_number_of_threads <= _thread_counter)
+	    if (_number_of_threads < _thread_counter)
 		throw TooManyThreads( );
 	    _thread_id_map[ native_thread_id ] = thread_id;
 	}
@@ -698,7 +701,7 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
 
-    for (uint64_t nbrem = buffer_len; (nbrem > 0); nbrem -= nbcopied)
+    for (uint64_t nbrem = buffer_len; (0 < nbrem); nbrem -= nbcopied)
     {
 	_perform_segment_maintenance( segment );
 	if (segment.cursor_in_sa_buffer)
@@ -716,7 +719,7 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
 	if (0 == nbcopied) break;
-	memcpy( buffer, memory + segment.cursor, nbcopied );
+	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
 
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
@@ -1172,13 +1175,10 @@ IParser(
 	    stream_reader, number_of_threads, cache_size, trace_level
 	)
     ),
-    _thread_id_map( ThreadIDMap( number_of_threads ) )
-{
-    
-    _states  = new ParserState *[ number_of_threads ];
-    for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
-
-}
+    _thread_id_map( ThreadIDMap( number_of_threads ) ),
+    _unithreaded( 1 == number_of_threads ),
+    _states( new ParserState *[ number_of_threads ] )
+{ for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL; }
 
 
 IParser::
@@ -1212,30 +1212,33 @@ IParser::
 _copy_line( ParserState &state )
 {
     uint8_t	    (&buffer)[ ParserState:: BUFFER_SIZE + 1 ]
-				= state.buffer;
-    uint64_t	    &pos	= state.buffer_pos;
-    uint64_t	    &rem	= state.buffer_rem;
-    std:: string    &line	= state.line;
-    uint64_t	    i		= 0;
-    bool	    hit		= false;
+				    = state.buffer;
+    uint64_t	    &pos	    = state.buffer_pos;
+    uint64_t	    &rem	    = state.buffer_rem;
+    std:: string    &line	    = state.line;
+    uint64_t	    i		    = 0;
+    bool	    hit		    = false;
 
     line.clear( );
 
-    while( true )
+    while (true)
     {
 
 	for (i = 0; (i < rem) && ('\n' != buffer[ pos + i ]); i++);
-	if (0 < rem)
+	if (i < rem)
 	{
-	    if (i < rem)
-	    {
-		buffer[ pos + i ]   = '\0';
-		hit		    = true;
-	    }
-	    line += (char const *)(buffer + pos);
-	    rem -= (i + 1); pos += (i + 1);
-	    if (hit) break;
+	    buffer[ pos + i ]   = '\0';
+	    hit			= true;
 	}
+
+	line += (char const *)(buffer + pos);
+
+	if (hit)
+	{
+	    rem -= (i + 1); pos += (i + 1);
+	    break;
+	}
+	else { rem = 0; pos += i; }
 	
 	if (_cache_manager.has_more_data( ))
 	{
@@ -1318,17 +1321,27 @@ get_next_read( )
     uint64_t	    split_pos	    = 0;
     Read	    the_read;
     
-    while (_cache_manager.has_more_data( ))
+    while (!is_complete( ))
     {
 	the_read.name	= "";
 	the_read.seq	= "";
 
-	if (need_new_line) _copy_line( state );
+	if (need_new_line)
+	{
+	    _copy_line( state );
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"Copied a line of length %llu.\n",
+		(unsigned long long int)line.length( )
+	    );
+	}
 	need_new_line = true;
 
 	// If a cache segment fill occurred during line retrieval, 
 	// then flag the event.
-	if (!at_start) at_start = (fill_id != _cache_manager.get_fill_id( ));
+	if (!at_start)
+	    at_start =
+	    !_unithreaded && (fill_id != _cache_manager.get_fill_id( ));
 
 	fill_id = _cache_manager.get_fill_id( );
 
@@ -1348,35 +1361,44 @@ get_next_read( )
 	if (	at_start && (0 != fill_id)
 	    && ((line.length( ) - 2) == line.rfind( "/2" )))
 	{
-	    while (_cache_manager.has_more_data( ))
+	    while (!is_complete( ))
 	    {
-		_copy_line( state );
 		trace_logger(
-		    TraceLogger:: TLVL_DEBUG7, "Copied a line.\n"
+		    TraceLogger:: TLVL_DEBUG7,
+		    "Skipped a line of length %llu.\n",
+		    (unsigned long long int)line.length( )
 		);
+		_copy_line( state );
 		if ('>' == line[ 0 ]) break;
 	    }
 	}
 
 	// Split off skipped over data into a setaside buffer.
-	split_pos = _cache_manager.whereis_cursor( ) - line.length( );
-	_cache_manager.split_at( split_pos );
-	trace_logger(
-	    TraceLogger:: TLVL_DEBUG6,
-	    "Skipped %llu bytes of data.",
-	    (unsigned long long int)split_pos
-	);
+	if (at_start)
+	{
+	    split_pos =
+		_cache_manager.whereis_cursor( )
+	    -   (state.buffer_rem + 1) - line.length( );
+	    _cache_manager.split_at( split_pos );
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG6,
+		"Skipped %llu bytes of data.\n",
+		(unsigned long long int)split_pos
+	    );
+	}
 
 	at_start = false;
 
 	// Parse read.
 	the_read.name	= line.substr( 1 );
 	need_new_line	= false;
-	while (_cache_manager.has_more_data( ))
+	while (!is_complete( ))
 	{
 	    _copy_line( state );
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7, "Copied a line.\n"
+		TraceLogger:: TLVL_DEBUG7,
+		"Copied a line of length %llu.\n",
+		(unsigned long long int)line.length( )
 	    );
 	    if ('>' == line[ 0 ]) break;
 	    the_read.seq += line;
