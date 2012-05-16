@@ -2,6 +2,8 @@
 #define READ_PARSERS_HH
 
 
+#include <cstdarg>
+
 #include <string>
 #include <map>
 
@@ -447,6 +449,7 @@ struct IParser
 
     inline bool		is_complete( )
     { return !_cache_manager.has_more_data( ); }
+
     virtual Read	get_next_read( )    = 0;
 
 protected:
@@ -482,6 +485,7 @@ protected:
     CacheManager	_cache_manager;
 
     ThreadIDMap		_thread_id_map;
+    bool		_unithreaded;
 
     ParserState **	_states;
 
