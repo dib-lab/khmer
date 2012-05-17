@@ -4218,6 +4218,7 @@ static PyMethodDef KhmerMethods[] = {
 
 DL_EXPORT(void) init_khmer(void)
 {
+  khmer_ConfigType.ob_type = &PyType_Type;
   khmer_KTableType.ob_type = &PyType_Type;
   khmer_KCountingHashType.ob_type = &PyType_Type;
 
