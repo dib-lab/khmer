@@ -125,6 +125,7 @@ int main( int argc, char * argv[ ] )
 		ofile_handle, "%s[%llu]\n",
 		the_read.seq.c_str( ), (unsigned long long int)seq_len
 	    );
+	    fflush( ofile_handle );
 
 	}
 

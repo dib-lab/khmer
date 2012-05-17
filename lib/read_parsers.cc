@@ -663,43 +663,25 @@ sync_barrier:
 }
 
 
-uint8_t const
-CacheManager::
-get_byte( )
-{
-    CacheSegment	&segment	= _get_segment( );
-    uint8_t *		memory		= NULL;
-
-    if (!segment.avail) throw CacheSegmentUnavailable( );
-
-    _perform_segment_maintenance( segment );
-    if (segment.cursor_in_sa_buffer)
-    {
-	CacheSegment
-	&hsegment   = _get_segment( true );
-	memory	    = hsegment.memory;
-    }
-    else memory	    = segment.memory;
-
-    segment.pmetrics.numbytes_copied_to_caller_buffer++;
-    if (segment.cursor_in_sa_buffer)
-	segment.pmetrics.numbytes_copied_from_sa_buffer++;
-
-    return memory[ segment.cursor++ ];
-}
-
-
 uint64_t const
 CacheManager::
-get_bytes( uint8_t * const buffer, uint64_t buffer_len )
+get_bytes(
+    uint8_t * const buffer,
+    uint64_t buffer_len,
+    uint64_t &segment_cut_pos
+)
 {
     CacheSegment	&segment	= _get_segment( );
     uint64_t		nbcopied	= 0;
     uint64_t		nbcopied_total	= 0;
     uint8_t *		memory		= NULL;
     uint64_t		size		= 0;
+    bool		in_sa_buffer	= false;
+    bool		in_segment	= false;
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
+
+    segment_cut_pos = 0;
 
     for (uint64_t nbrem = buffer_len; (0 < nbrem); nbrem -= nbcopied)
     {
@@ -710,15 +692,27 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	    &hsegment	    = _get_segment( true );
 	    memory	    = hsegment.memory;
 	    size	    = hsegment.sa_buffer_size;
+	    in_sa_buffer    = true;
+	    if (in_segment)
+	    {
+		segment_cut_pos	= nbcopied_total;
+		in_segment	= false;
+	    }
 	}
 	else
 	{
 	    memory	    = segment.memory;
 	    size	    = segment.size;
+	    in_segment	    = true;
+	    if (in_sa_buffer)
+	    {
+		segment_cut_pos	= nbcopied_total;
+		in_sa_buffer	= false;
+	    }
 	}
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
-	if (0 == nbcopied) break;
+	// if (0 == nbcopied) break;
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
 
@@ -1191,7 +1185,8 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
 :   at_start( true ),
     need_new_line( true ),
     buffer_pos( 0 ),
-    buffer_rem( 0 ),
+    buffer_rem( 0 ), 
+    buffer_wrap( 0 ),
     pmetrics( ParserPerformanceMetrics( ) ),
     trace_logger(
 	TraceLogger(
@@ -1242,7 +1237,9 @@ _copy_line( ParserState &state )
 	
 	if (_cache_manager.has_more_data( ))
 	{
-	    rem = _cache_manager.get_bytes( buffer, ParserState:: BUFFER_SIZE );
+	    rem = _cache_manager.get_bytes(
+		buffer, ParserState:: BUFFER_SIZE, state.buffer_wrap
+	    );
 	    pos = 0;
 	}
 	else break;
@@ -1334,6 +1331,15 @@ get_next_read( )
 		"Copied a line of length %llu.\n",
 		(unsigned long long int)line.length( )
 	    );
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"Memory cursor at byte %llu.\n" \
+		"Parser buffer has %llu bytes remaining.\n" \
+		"New segment starts at byte %llu in buffer.\n",
+		(unsigned long long int)_cache_manager.whereis_cursor( ),
+		(unsigned long long int)state.buffer_rem,
+		(unsigned long long int)state.buffer_wrap
+	    );
 	}
 	need_new_line = true;
 
@@ -1341,9 +1347,13 @@ get_next_read( )
 	// then flag the event.
 	if (!at_start)
 	    at_start =
-	    !_unithreaded && (fill_id != _cache_manager.get_fill_id( ));
+		!_unithreaded
+	    &&	(fill_id != _cache_manager.get_fill_id( ))
+	    &&  (state.buffer_rem <= _cache_manager.whereis_cursor( ));
 
-	fill_id = _cache_manager.get_fill_id( );
+	// Update fill number once we are truly in the new segment.
+	if (at_start)
+	    fill_id = _cache_manager.get_fill_id( );
 
 	// If at start of file, then error on garbage.
 	// Else, skip forward to next read boundary.
@@ -1376,8 +1386,19 @@ get_next_read( )
 	// Split off skipped over data into a setaside buffer.
 	if (at_start)
 	{
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"Memory cursor at byte %llu.\n" \
+		"Parsed line is %llu bytes long.\n" \
+		"Parser buffer has %llu bytes remaining.\n" \
+		"New segment starts at byte %llu in buffer.\n",
+		(unsigned long long int)_cache_manager.whereis_cursor( ),
+		(unsigned long long int)line.length( ),
+		(unsigned long long int)state.buffer_rem,
+		(unsigned long long int)state.buffer_wrap
+	    );
 	    split_pos =
-		_cache_manager.whereis_cursor( )
+		_cache_manager.whereis_cursor( ) + state.buffer_wrap
 	    -   (state.buffer_rem + 1) - line.length( );
 	    _cache_manager.split_at( split_pos );
 	    trace_logger(
@@ -1399,6 +1420,15 @@ get_next_read( )
 		TraceLogger:: TLVL_DEBUG7,
 		"Copied a line of length %llu.\n",
 		(unsigned long long int)line.length( )
+	    );
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"Memory cursor at byte %llu.\n" \
+		"Parser buffer has %llu bytes remaining.\n" \
+		"New segment starts at byte %llu in buffer.\n",
+		(unsigned long long int)_cache_manager.whereis_cursor( ),
+		(unsigned long long int)state.buffer_rem,
+		(unsigned long long int)state.buffer_wrap
 	    );
 	    if ('>' == line[ 0 ]) break;
 	    the_read.seq += line;
