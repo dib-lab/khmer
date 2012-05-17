@@ -103,6 +103,7 @@ int main( int argc, char * argv[ ] )
 	drand48_data    rng_state;
 	long int	randnum		    = 0;
 	uint8_t		buffer[ 127 ];
+	uint64_t	segment_cut_pos	    = 0;
 	uint64_t	nbread		    = 0;
 	uint64_t	nbread_total	    = 0;
 	timespec	sleep_duration;
@@ -129,7 +130,7 @@ int main( int argc, char * argv[ ] )
 	    lrand48_r( &rng_state, &randnum );
 	    randnum %= 128;
 	    nbread  = cmgr->get_bytes(
-		(uint8_t * const)buffer, (uint64_t)randnum
+		(uint8_t * const)buffer, (uint64_t)randnum, segment_cut_pos
 	    ); 
 	    nbread_total += nbread;
 

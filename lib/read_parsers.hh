@@ -321,9 +321,8 @@ struct CacheManager
     // Returns false, if no threads have more bytes to consume.
     bool const		has_more_data( );
 
-    uint8_t const	get_byte( );
     uint64_t const	get_bytes(
-	uint8_t * const buffer, uint64_t buffer_len
+	uint8_t * const buffer, uint64_t buffer_len, uint64_t &segment_cut_pos
     );
 
     uint64_t const	whereis_cursor( );
@@ -471,6 +470,7 @@ protected:
 	uint8_t			    buffer[ BUFFER_SIZE + 1 ];
 	uint64_t		    buffer_pos;
 	uint64_t		    buffer_rem;
+	uint64_t		    buffer_wrap;
 
 	ParserPerformanceMetrics    pmetrics;
 	TraceLogger		    trace_logger;
