@@ -712,7 +712,6 @@ get_bytes(
 	}
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
-	// if (0 == nbcopied) break;
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
 
@@ -1206,6 +1205,9 @@ void
 IParser::
 _copy_line( ParserState &state )
 {
+    TraceLogger	    &trace_logger   = state.trace_logger;
+    bool	    &at_start	    = state.at_start;
+    uint64_t	    &fill_id	    = state.fill_id;
     uint8_t	    (&buffer)[ ParserState:: BUFFER_SIZE + 1 ]
 				    = state.buffer;
     uint64_t	    &pos	    = state.buffer_pos;
@@ -1219,6 +1221,12 @@ _copy_line( ParserState &state )
     while (true)
     {
 
+	if (!at_start)
+	    at_start =
+		!_unithreaded
+	    &&  (fill_id != _cache_manager.get_fill_id( ))
+	    &&  (rem <= _cache_manager.whereis_cursor( ));
+
 	for (i = 0; (i < rem) && ('\n' != buffer[ pos + i ]); i++);
 	if (i < rem)
 	{
@@ -1226,6 +1234,10 @@ _copy_line( ParserState &state )
 	    hit			= true;
 	}
 
+	trace_logger(
+	    TraceLogger:: TLVL_DEBUG8,
+	    "Detected line fragment: \"%s\"\n", (char const *)(buffer + pos)
+	);
 	line += (char const *)(buffer + pos);
 
 	if (hit)
@@ -1331,6 +1343,7 @@ get_next_read( )
 		"Copied a line of length %llu.\n",
 		(unsigned long long int)line.length( )
 	    );
+	    /*
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
 		"Memory cursor at byte %llu.\n" \
@@ -1340,16 +1353,9 @@ get_next_read( )
 		(unsigned long long int)state.buffer_rem,
 		(unsigned long long int)state.buffer_wrap
 	    );
+	    */
 	}
 	need_new_line = true;
-
-	// If a cache segment fill occurred during line retrieval, 
-	// then flag the event.
-	if (!at_start)
-	    at_start =
-		!_unithreaded
-	    &&	(fill_id != _cache_manager.get_fill_id( ))
-	    &&  (state.buffer_rem <= _cache_manager.whereis_cursor( ));
 
 	// Update fill number once we are truly in the new segment.
 	if (at_start)
@@ -1399,7 +1405,7 @@ get_next_read( )
 	    );
 	    split_pos =
 		_cache_manager.whereis_cursor( ) + state.buffer_wrap
-	    -   (state.buffer_rem + 1) - line.length( );
+	    -   state.buffer_rem - (line.length( ) + 1);
 	    _cache_manager.split_at( split_pos );
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG6,
@@ -1421,6 +1427,7 @@ get_next_read( )
 		"Copied a line of length %llu.\n",
 		(unsigned long long int)line.length( )
 	    );
+	    /*
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
 		"Memory cursor at byte %llu.\n" \
@@ -1430,6 +1437,8 @@ get_next_read( )
 		(unsigned long long int)state.buffer_rem,
 		(unsigned long long int)state.buffer_wrap
 	    );
+	    */
+	    if (at_start) break;
 	    if ('>' == line[ 0 ]) break;
 	    the_read.seq += line;
 	}
