@@ -13,7 +13,6 @@ extern "C"
 #include <cstring>
 
 #include <cstdio>
-#include <cassert>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -695,7 +694,7 @@ get_bytes(
 	    in_sa_buffer    = true;
 	    if (in_segment)
 	    {
-		segment_cut_pos	= nbcopied_total;
+		//segment_cut_pos	= nbcopied_total;
 		in_segment	= false;
 	    }
 	}
@@ -1260,27 +1259,6 @@ _copy_line( ParserState &state )
 
     state.pmetrics.numlines_copied++;
 
-}
-
-
-inline
-IParser:: ParserState &
-IParser::
-_get_state( )
-{
-    uint32_t	    thread_id	= _thread_id_map.get_thread_id( );
-    ParserState *   state_PTR	= NULL;
-
-    assert( NULL != _states );
-
-    state_PTR	    = _states[ thread_id ];
-    if (NULL == state_PTR)
-    {
-	_states[ thread_id ]	= new ParserState( thread_id, _trace_level );
-	state_PTR		= _states[ thread_id ];
-    }
-
-    return *state_PTR;
 }
 
 

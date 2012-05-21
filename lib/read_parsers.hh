@@ -2,6 +2,7 @@
 #define READ_PARSERS_HH
 
 
+#include <cassert>
 #include <cstdarg>
 
 #include <string>
@@ -426,7 +427,7 @@ struct ParserPerformanceMetrics: public IPerformanceMetrics
 
 struct IParser
 {
-    
+
     static IParser * const  get_parser(
 	std:: string const 	&ifile_name,
 	uint32_t const		number_of_threads   =
@@ -447,7 +448,7 @@ struct IParser
     virtual ~IParser( );
 
     inline bool		is_complete( )
-    { return !_cache_manager.has_more_data( ); }
+    { return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem; }
 
     virtual Read	get_next_read( )    = 0;
 
@@ -491,7 +492,23 @@ protected:
 
     void		_copy_line( ParserState &state );
 
-    ParserState		&_get_state( );
+    inline ParserState	&_get_state( )
+    {
+	uint32_t	thread_id	= _thread_id_map.get_thread_id( );
+	ParserState *	state_PTR	= NULL;
+
+	assert( NULL != _states );
+
+	state_PTR = _states[ thread_id ];
+	if (NULL == state_PTR)
+	{
+	    _states[ thread_id ]    =
+	    new ParserState( thread_id, _trace_level );
+	    state_PTR		    = _states[ thread_id ];
+	}
+
+	return *state_PTR;
+    }
 
 }; // struct IParser
 
