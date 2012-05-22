@@ -332,8 +332,7 @@ struct CacheManager
     uint64_t const	get_fill_id( );
 
     // NOTE: The following methods should not be needed in "real world"
-    //	     sitatuions. They exist to help the test harness perform some more
-    //	     intelligent testing.
+    //	     situations; they exist to help testing and tracing.
     bool const		_in_sa_buffer( );
     bool const		_sa_buffer_avail( );
     
