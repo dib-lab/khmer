@@ -676,6 +676,7 @@ get_bytes(
     uint8_t *		memory		= NULL;
     uint64_t		size		= 0;
     bool		in_sa_buffer	= false;
+    TraceLogger		&trace_logger	= segment.trace_logger;
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
 
@@ -706,6 +707,13 @@ get_bytes(
 	nbcopied = MIN( nbrem, size - segment.cursor );
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
+
+	trace_logger(
+	    TraceLogger:: TLVL_DEBUG8,
+	    "get_bytes: Copied %llu bytes from %s.\n",
+	    (unsigned long long int)nbcopied,
+	    in_sa_buffer ? "setaside buffer" : "cache segment"
+	);
 
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
 	if (segment.cursor_in_sa_buffer)
@@ -1325,8 +1333,10 @@ get_next_read( )
 	{
 	    if (at_start && (0 == fill_id)) throw InvalidFASTAFileFormat( );
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7, "Scanning to start of a read...\n"
+		TraceLogger:: TLVL_DEBUG7,
+		"get_next_read: Scanning to start of a read...\n"
 	    );
+	    split_pos += (line.length( ) + 1);
 	    continue;
 	}
 
@@ -1339,47 +1349,53 @@ get_next_read( )
 	    {
 		trace_logger(
 		    TraceLogger:: TLVL_DEBUG7,
-		    "Skipped a line of length %llu, looking for next read.\n",
+		    "get_next_read: Skipped a line of length %llu, " \
+		    "looking for next read.\n",
 		    (unsigned long long int)line.length( )
 		);
+		split_pos += (line.length( ) + 1);
 		_copy_line( state );
 		if ('>' == line[ 0 ]) break;
 	    }
 	}
 
 	// Split off skipped over data into a setaside buffer.
-	if (at_start)
+	if (at_start && (0 != fill_id))
 	{
 
 	    if (_cache_manager._in_sa_buffer( ))
 		trace_logger(
 		    TraceLogger:: TLVL_DEBUG7,
-		    "Memory cursor is at byte %llu in the setaside buffer " \
-		    "(fill %llu).\n",
+		    "get_next_read: Memory cursor is at byte %llu " \
+		    "in the setaside buffer (extending fill %llu).\n",
 		    (unsigned long long int)_cache_manager.whereis_cursor( ),
 		    (unsigned long long int)_cache_manager.get_fill_id( )
 		);
 	    else
 		trace_logger(
 		    TraceLogger:: TLVL_DEBUG7,
-		    "Memory cursor is at byte %llu in segment (fill %llu).\n",
+		    "get_next_read: Memory cursor is at byte %llu " \
+		    "in segment (fill %llu).\n",
 		    (unsigned long long int)_cache_manager.whereis_cursor( ),
 		    (unsigned long long int)_cache_manager.get_fill_id( )
 		);
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
-		"Parser buffer has %llu bytes remaining.\n", 
+		"get_next_read: Parser buffer has %llu bytes remaining.\n", 
 		(unsigned long long int)state.buffer_rem
 	    );
 
+	    /*
 	    split_pos =
 		_cache_manager.whereis_cursor( ) + state.buffer_wrap
 	    -   state.buffer_rem - (line.length( ) + 1);
+	    */
 	    _cache_manager.split_at( split_pos );
 
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG6,
-		"Skipped %llu bytes of data total at segment start.\n",
+		"get_next_read: Skipped %llu bytes of data total " \
+		"at segment start.\n",
 		(unsigned long long int)split_pos
 	    );
 
@@ -1405,7 +1421,7 @@ get_next_read( )
 	{
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG6,
-		"Discarded read \"%s\" (length %lu).\n",
+		"get_next_read: Discarded read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.seq.length( )
 	    );
@@ -1414,7 +1430,7 @@ get_next_read( )
 	else
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG6,
-		"Accepted read \"%s\" (length %lu).\n",
+		"get_next_read: Accepted read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.seq.length( )
 	    );
