@@ -684,7 +684,9 @@ get_bytes(
 
     for (uint64_t nbrem = buffer_len; (0 < nbrem); nbrem -= nbcopied)
     {
+
 	_perform_segment_maintenance( segment );
+
 	if (segment.cursor_in_sa_buffer)
 	{
 	    CacheSegment
@@ -697,6 +699,7 @@ get_bytes(
 	{
 	    memory	    = segment.memory;
 	    size	    = segment.size;
+	    if (!segment.avail) break;
 	    if (in_sa_buffer)
 	    {
 		segment_cut_pos	= nbcopied_total;
@@ -704,6 +707,12 @@ get_bytes(
 	    }
 	}
 
+	trace_logger(
+	    TraceLogger:: TLVL_DEBUG8,
+	    "get_bytes: Memory cursor at byte %llu.\n" \
+	    "get_bytes: %llu bytes available for copying.\n",
+	    segment.cursor, size
+	);
 	nbcopied = MIN( nbrem, size - segment.cursor );
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
@@ -716,7 +725,7 @@ get_bytes(
 	);
 
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
-	if (segment.cursor_in_sa_buffer)
+	if (in_sa_buffer)
 	    segment.pmetrics.numbytes_copied_from_sa_buffer += nbcopied;
 	nbcopied_total += nbcopied;
     }
@@ -855,6 +864,11 @@ wait_for_sa_buffer:
 	{
 	    segment.cursor_in_sa_buffer	    = true;
 	    segment.cursor		    = hsegment.sa_buffer_size;
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG2,
+		"Jumped into dummy setaside buffer. " \
+		"(Higher cache segment unavailable.)\n"
+	    );
 	}
 
 	// If we somehow got here and shouldn't have, 
@@ -979,7 +993,8 @@ wait_to_fill:
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG1, "At end of input stream.\n"
 	);
-	segment.avail		= false;
+	segment.size	= 0;
+	segment.avail	= false;
 	_decrement_segment_ref_count_ATOMIC( );
     }
 
@@ -1363,33 +1378,19 @@ get_next_read( )
 	if (at_start && (0 != fill_id))
 	{
 
-	    if (_cache_manager._in_sa_buffer( ))
-		trace_logger(
-		    TraceLogger:: TLVL_DEBUG7,
-		    "get_next_read: Memory cursor is at byte %llu " \
-		    "in the setaside buffer (extending fill %llu).\n",
-		    (unsigned long long int)_cache_manager.whereis_cursor( ),
-		    (unsigned long long int)_cache_manager.get_fill_id( )
-		);
-	    else
-		trace_logger(
-		    TraceLogger:: TLVL_DEBUG7,
-		    "get_next_read: Memory cursor is at byte %llu " \
-		    "in segment (fill %llu).\n",
-		    (unsigned long long int)_cache_manager.whereis_cursor( ),
-		    (unsigned long long int)_cache_manager.get_fill_id( )
-		);
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"get_next_read: Memory cursor is at byte %llu " \
+		"in segment (fill %llu).\n",
+		(unsigned long long int)_cache_manager.whereis_cursor( ),
+		(unsigned long long int)_cache_manager.get_fill_id( )
+	    );
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
 		"get_next_read: Parser buffer has %llu bytes remaining.\n", 
 		(unsigned long long int)state.buffer_rem
 	    );
 
-	    /*
-	    split_pos =
-		_cache_manager.whereis_cursor( ) + state.buffer_wrap
-	    -   state.buffer_rem - (line.length( ) + 1);
-	    */
 	    _cache_manager.split_at( split_pos );
 
 	    trace_logger(
