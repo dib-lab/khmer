@@ -129,9 +129,8 @@ int main( int argc, char * argv[ ] )
 	    
 	    lrand48_r( &rng_state, &randnum );
 	    randnum %= 128;
-	    nbread  = cmgr->get_bytes(
-		(uint8_t * const)buffer, (uint64_t)randnum, segment_cut_pos
-	    ); 
+	    nbread  =
+	    cmgr->get_bytes( (uint8_t * const)buffer, (uint64_t)randnum ); 
 	    nbread_total += nbread;
 
 	    // Pretend to work for a random duration.

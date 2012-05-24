@@ -664,11 +664,7 @@ sync_barrier:
 
 uint64_t const
 CacheManager::
-get_bytes(
-    uint8_t * const buffer,
-    uint64_t buffer_len,
-    uint64_t &segment_cut_pos
-)
+get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 {
     CacheSegment	&segment	= _get_segment( );
     uint64_t		nbcopied	= 0;
@@ -679,8 +675,6 @@ get_bytes(
     TraceLogger		&trace_logger	= segment.trace_logger;
 
     if (!segment.avail) throw CacheSegmentUnavailable( );
-
-    segment_cut_pos = 0;
 
     for (uint64_t nbrem = buffer_len; (0 < nbrem); nbrem -= nbcopied)
     {
@@ -700,19 +694,9 @@ get_bytes(
 	    memory	    = segment.memory;
 	    size	    = segment.size;
 	    if (!segment.avail) break;
-	    if (in_sa_buffer)
-	    {
-		segment_cut_pos	= nbcopied_total;
-		in_sa_buffer	= false;
-	    }
+	    if (in_sa_buffer) in_sa_buffer = false;
 	}
 
-	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
-	    "get_bytes: Memory cursor at byte %llu.\n" \
-	    "get_bytes: %llu bytes available for copying.\n",
-	    segment.cursor, size
-	);
 	nbcopied = MIN( nbrem, size - segment.cursor );
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
@@ -1200,7 +1184,6 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
     need_new_line( true ),
     buffer_pos( 0 ),
     buffer_rem( 0 ), 
-    buffer_wrap( 0 ),
     pmetrics( ParserPerformanceMetrics( ) ),
     trace_logger(
 	TraceLogger(
@@ -1265,15 +1248,12 @@ _copy_line( ParserState &state )
 	
 	if (_cache_manager.has_more_data( ))
 	{
-	    rem = _cache_manager.get_bytes(
-		buffer, ParserState:: BUFFER_SIZE, state.buffer_wrap
-	    );
+	    rem = _cache_manager.get_bytes( buffer, ParserState:: BUFFER_SIZE );
 	    pos = 0;
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG8,
-		"_copy_line: Copied %llu bytes into parser buffer " \
-		"with segment cut at byte %llu.\n",
-		(unsigned long long int)rem, state.buffer_wrap
+		"_copy_line: Copied %llu bytes into parser buffer.\n",
+		(unsigned long long int)rem
 	    );
 	}
 	else break;
