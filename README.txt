@@ -4,6 +4,10 @@ The official repository is at
 
     https://github.com/ged-lab/khmer
 
+and you can read the docs online here:
+
+    http://readthedocs.org/docs/khmer/en/latest/
+
 As of August 2011, there's a khmer mailing list at librelist.com that
 you can use to get help with khmer.  To sign up, just shoot
 'khmer@librelist.com' an e-mail and it will subscribe you; then send
