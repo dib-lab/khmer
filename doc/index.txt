@@ -6,6 +6,11 @@
 khmer -- k-mer counting & filtering FTW
 =======================================
 
+There is a khmer mailing list at librelist.com that you can use to get
+help with khmer.  To sign up, just shoot 'khmer@librelist.com' an
+e-mail and it will subscribe you; then send your question/comment
+there.
+
 Contents:
 
 .. toctree::
@@ -17,6 +22,7 @@ Contents:
    methods
    scripts
    blog-posts
+   choosing-hash-sizes
    partitioning-big-data
    details
    development
