@@ -1,15 +1,3 @@
-#include <climits>
-#if (__cplusplus >= 201103L)
-#   include <cstdint>
-#else
-extern "C"
-{
-#   include <stdint.h>
-}
-#endif
-#ifndef SSIZE_MAX
-#   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
-#endif
 #include <cstring>
 
 #include <cstdio>
@@ -531,7 +519,7 @@ CacheManager(
     uint64_t const  cache_size,
     uint8_t const   trace_level
 )
-:   _trace_level( trace_level),
+:   _trace_level( trace_level ),
     _stream_reader( stream_reader ),
     _number_of_threads( number_of_threads ),
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
