@@ -78,7 +78,7 @@ int main( int argc, char * argv[ ] )
     uint32_t	    number_of_threads	    = omp_get_max_threads( );
     IParser *	    parser		    = IParser:: get_parser(
 	ifile_name_STRING, number_of_threads, cache_size,
-	TraceLogger:: TLVL_DEBUG8
+	TraceLogger:: TLVL_DEBUG3
     );
 
 #pragma omp parallel default( shared )
@@ -109,7 +109,7 @@ int main( int argc, char * argv[ ] )
 	for (uint64_t readnum = 0; !parser->is_complete( ); ++readnum)
 	{
 
-	    //if (0 == readnum % 100000) 
+	    if (0 == readnum % 100000) 
 		fprintf(
 		    stderr,
 		    "OMP thread %lu is on read number %llu.\n",
@@ -119,12 +119,14 @@ int main( int argc, char * argv[ ] )
 
 	    the_read = parser->get_next_read( );
 
-	    fprintf( ofile_handle, ">%s\n", the_read.name.c_str( ) );
+	    //fprintf( ofile_handle, ">%s\n", the_read.name.c_str( ) );
 	    seq_len = the_read.seq.length( );
+	    /*
 	    fprintf(
 		ofile_handle, "%s[%llu]\n",
 		the_read.seq.c_str( ), (unsigned long long int)seq_len
 	    );
+	    */
 	    fflush( ofile_handle );
 
 	}
