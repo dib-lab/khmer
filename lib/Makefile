@@ -14,7 +14,7 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=smpFiltering load_graph bittest ktable_test test-StreamReader test-CacheManager test-Parser
+DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser test-HashTables smpFiltering 
 DRV_PROGS+=#graphtest #consume_prof
 
 PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
@@ -28,26 +28,28 @@ clean:
 
 test: $(DRV_PROGS)
 
-DRV_LOAD_GRAPH_OBJS=load_graph.o counting.o hashbits.o hashtable.o subset.o ktable.o khmer_config.o $(PARSERS_OBJS)
-DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o khmer_config.o $(PARSERS_OBJS)
-DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o
-DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o
-DRV_TEST_PARSER_OBJS=test-Parser.o read_parsers.o
+DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o $(ZLIB_OBJS) $(BZIP2_OBJS)
+DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o $(ZLIB_OBJS) $(BZIP2_OBJS)
+DRV_TEST_PARSER_OBJS=test-Parser.o read_parsers.o $(ZLIB_OBJS) $(BZIP2_OBJS)
+DRV_TEST_HASHTABLES_OBJS= \
+	test-HashTables.o counting.o hashbits.o hashtable.o \
+	subset.o ktable.o khmer_config.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o ktable.o khmer_config.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 
-smpFiltering: $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) primes.hh
-	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(LIBS)
 
-load_graph: $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) primes.hh
-	$(CXX) -o $@ $(DRV_LOAD_GRAPH_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+test-CacheManager: $(DRV_TEST_CACHE_MANAGER_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_CACHE_MANAGER_OBJS) $(LIBS)
 
-test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+test-Parser: $(DRV_TEST_PARSER_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_PARSER_OBJS) $(LIBS)
 
-test-CacheManager: $(DRV_TEST_CACHE_MANAGER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ $(DRV_TEST_CACHE_MANAGER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_HASHTABLES_OBJS) $(LIBS)
 
-test-Parser: $(DRV_TEST_PARSER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ $(DRV_TEST_PARSER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+smpFiltering: $(DRV_SMP_FILTERING_OBJS) primes.hh
+	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(LIBS)
 
 # TODO: Move 'main' to a driver program.
 #parsetest: parsers.o 
@@ -56,8 +58,8 @@ test-Parser: $(DRV_TEST_PARSER_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 bittest: bittest.o ktable.o
 	$(CXX) -o $@ bittest.o ktable.o
 
-ktable_test: ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ ktable_test.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+ktable_test: ktable_test.o khmer_config.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	$(CXX) -o $@ ktable_test.o khmer_config.o ktable.o hashtable.o $(PARSERS_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # NOTE: Disabled due to broken constructor call.
 #graphtest: graphtest.o ktable.o hashtable.o
@@ -96,3 +98,5 @@ test-StreamReader.o: read_parsers.hh
 test-CacheManager.o: read_parsers.hh
 
 test-Parser.o: read_parsers.hh
+
+test-HashTables.o: read_parsers.hh primes.hh
