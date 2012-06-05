@@ -2,6 +2,18 @@
 #define READ_PARSERS_HH
 
 
+#include <climits>
+#if (__cplusplus >= 201103L)
+#   include <cstdint>
+#else
+extern "C"
+{
+#   include <stdint.h>
+}
+#endif
+#ifndef SSIZE_MAX
+#   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
+#endif
 #include <cassert>
 #include <cstdarg>
 
@@ -59,7 +71,7 @@ struct TraceLogger
 	TLVL_WARNING	= 30,
 	TLVL_ERROR	= 40,
 	TLVL_CRITICAL	= 50,
-	TLVL_NONE
+	TLVL_NONE	= 255
     };
     
     TraceLogger( uint8_t const level, FILE * stream_handle );
@@ -312,7 +324,7 @@ struct CacheManager
 	IStreamReader &	stream_reader,
 	uint32_t const	number_of_threads,
 	uint64_t const	cache_size,
-	uint8_t const	trace_level = 0
+	uint8_t const	trace_level = TraceLogger:: TLVL_NONE
     );
     ~CacheManager( );
 
@@ -355,13 +367,15 @@ private:
 	CacheSegment(
 	    uint32_t const  thread_id,
 	    uint64_t const  size,
-	    uint8_t const   trace_level = 0
+	    uint8_t const   trace_level = TraceLogger:: TLVL_NONE
 	);
 	~CacheSegment( );
 
 	bool				get_sa_buffer_avail( ) const;
 	bool				get_sa_buffer_avail_ATOMIC( );
-	void				set_sa_buffer_avail_ATOMIC( bool const avail );
+	void				set_sa_buffer_avail_ATOMIC(
+	    bool const avail
+	);
 
     private:
 	
@@ -433,7 +447,7 @@ struct IParser
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const		cache_size	    =
 	khmer:: get_active_config( ).get_reads_file_chunk_size( ),
-	uint8_t const		trace_level	    = 0
+	uint8_t const		trace_level	    = TraceLogger:: TLVL_NONE
     );
     
 	    IParser(
@@ -442,7 +456,7 @@ struct IParser
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const	cache_size	    =
 	khmer:: get_active_config( ).get_reads_file_chunk_size( ),
-	uint8_t const	trace_level	    = 0
+	uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
     );
     virtual ~IParser( );
 
