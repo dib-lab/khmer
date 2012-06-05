@@ -1,7 +1,7 @@
 test-StreamReader
 test-CacheManager
 test-Parser
-load_graph
+test-HashTables
 smpFiltering
 bittest
 ktable_test
