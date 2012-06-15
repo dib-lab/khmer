@@ -517,6 +517,35 @@ typedef struct {
   khmer::Hashbits * hashbits;
 } khmer_KHashbitsObject;
 
+static void khmer_hashbits_dealloc(PyObject *);
+static PyObject * khmer_hashbits_getattr(PyObject * obj, char * name);
+
+static PyTypeObject khmer_KHashbitsType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "KHashbits", sizeof(khmer_KHashbitsObject),
+    0,
+    khmer_hashbits_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_hashbits_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "hashbits object",           /* tp_doc */
+};
+
+#define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
+
 typedef struct {
   PyObject_HEAD
   khmer::ReadMaskTable * mask;
@@ -589,7 +618,6 @@ static PyTypeObject khmer_MinMaxType = {
 
 
 static void khmer_counting_dealloc(PyObject *);
-static void khmer_hashbits_dealloc(PyObject *);
 
 static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
 {
@@ -3212,32 +3240,6 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 {
   return Py_FindMethod(khmer_hashbits_methods, obj, name);
 }
-
-#define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
-
-static PyTypeObject khmer_KHashbitsType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "KHashbits", sizeof(khmer_KHashbitsObject),
-    0,
-    khmer_hashbits_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_hashbits_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "hashbits object",           /* tp_doc */
-};
 
 //
 // new_hashbits
