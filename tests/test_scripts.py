@@ -558,6 +558,9 @@ def test_abundance_dist():
 
 
 def test_count_overlap():
+    # @CTB fix hashsize => lower
+    raise Exception
+    
     seqfile1 = utils.get_test_data('test-overlap1.fa')
     seqfile2 = utils.get_test_data('test-overlap2.fa')
     in_dir = os.path.dirname(seqfile1)
