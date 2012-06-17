@@ -207,26 +207,6 @@ def test_normalize_by_median_2():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
 
-def test_normalize_by_min():
-    CUTOFF='5'
-
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = scriptpath('normalize-by-min.py')
-    args = ['-C', CUTOFF, '-k', '17', infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
-
-    outfile = infile + '.minkeep'
-    assert os.path.exists(outfile), outfile
-
-    seqs = [ r.sequence for r in screed.open(outfile) ]
-    assert len(seqs) == 5, seqs
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'
