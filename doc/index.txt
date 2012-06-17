@@ -6,6 +6,10 @@
 khmer -- k-mer counting & filtering FTW
 =======================================
 
+:Authors: C. Titus Brown, Jason Pell, and Adina Howe.
+:Contact: ctb@msu.edu
+:License: BSD
+
 There is a khmer mailing list at librelist.com that you can use to get
 help with khmer.  To sign up, just shoot 'khmer@librelist.com' an
 e-mail and it will subscribe you; then send your question/comment
