@@ -600,4 +600,3 @@ def test_count_overlap():
     assert '752053 238627' in data
     assert os.path.exists(figurefile), curvefile
 
-#test_count_overlap()
