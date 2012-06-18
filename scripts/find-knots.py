@@ -30,7 +30,8 @@ DEFAULT_COUNTING_HT_N=4                     # number of counting hash tables
 ## don't change these!
 EXCURSION_DISTANCE=40
 EXCURSION_KMER_THRESHOLD=200
-EXCURSION_KMER_COUNT_THRESHOLD=5
+EXCURSION_KMER_COUNT_THRESHOLD=2
+#EXCURSION_KMER_COUNT_THRESHOLD=5 # -- works ok for non-diginormed data
 
 ###
 
