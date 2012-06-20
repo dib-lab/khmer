@@ -31,6 +31,17 @@ graphtest: graphtest.o ktable.o hashtable.o
 consume_prof: consume_prof.o hashtable.o ktable.o
 	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
 
+newtest: newtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o readaligner.o scoringmatrix.o astarsearchnode.o nodeenumerator.o
+	$(CXX) -pg -o newtest newtest.o readaligner.o scoringmatrix.o astarsearchnode.o nodeenumerator.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+
+astarsearchnode.o: astarsearchnode.cc astarsearchnode.hh
+
+scoringmatrix.o: scoringmatrix.cc scoringmatrix.hh
+
+nodeenumerator.o: nodeenumerator.cc nodeenumerator.hh
+
+readaligner.o: readaligner.cc readaligner.hh
+
 parsers.o: parsers.cc parsers.hh
 
 ktable.o: ktable.cc ktable.hh
