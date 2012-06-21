@@ -7,7 +7,7 @@ DYLIB_EXT=.dylib
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
-all: zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+all: zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o readaligner.o scoringmatrix.o astarsearchnode.o nodeenumerator.o
 
 clean:
 	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)

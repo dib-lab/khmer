@@ -136,7 +136,7 @@ CandidateAlignment* ReadAligner::align(khmer::Hashbits * hb,
    return aln;
 }
 
-CandidateAlignment ReadAligner::alignRead(khmer::Hashbits* hb, std::string read) {
+CandidateAlignment ReadAligner::alignRead(std::string read) {
    int k = hb->ksize();   
 
    std::set<CandidateAlignment*> alignments;
