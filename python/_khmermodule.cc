@@ -11,6 +11,7 @@
 #include "hashbits.hh"
 #include "counting.hh"
 #include "storage.hh"
+#include "readaligner.hh"
 
 //
 // Function necessary for Python loading:
@@ -521,6 +522,12 @@ typedef struct {
   PyObject_HEAD
   khmer::ReadMaskTable * mask;
 } khmer_ReadMaskObject;
+
+/* GRAPHALIGN addition */
+typedef struct {
+  PyObject_HEAD
+  ReadAligner * aligner;
+} khmer_ReadAlignerObject;
 
 #define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
 
@@ -3215,6 +3222,47 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 
 #define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
 
+//
+// GRAPHALIGN addition
+//
+
+static PyObject * readaligner_align(PyObject * self, PyObject * args)
+{
+  khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
+  ReadAligner * aligner = me->aligner;
+
+  char * read;
+
+  if (!PyArg_ParseTuple(args, "s", &read)) {
+    return NULL;
+  }
+
+  if (strlen(read) < (unsigned int)aligner->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+                    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  CandidateAlignment aln = aligner->alignRead(read);
+
+  // check for nulls?
+
+  return Py_BuildValue("ssi", aln.alignment.c_str(),
+                              aln.getReadAlignment(read).c_str(),
+                              aln.score);
+}
+
+static PyMethodDef khmer_ReadAligner_methods[] = {
+  {"align", readaligner_align, METH_VARARGS, ""},
+  {NULL, NULL, 0, NULL}
+};
+
+static PyObject *
+khmer_readaligner_getattr(PyObject * obj, char * name)
+{
+  return Py_FindMethod(khmer_ReadAligner_methods, obj, name);
+}
+
 static PyTypeObject khmer_KHashbitsType = {
     PyObject_HEAD_INIT(NULL)
     0,
@@ -3238,6 +3286,65 @@ static PyTypeObject khmer_KHashbitsType = {
     Py_TPFLAGS_DEFAULT,		/*tp_flags*/
     "hashbits object",           /* tp_doc */
 };
+
+//
+// khmer_readaligner_dealloc -- clean up readaligner object
+// GRAPHALIGN addition
+//
+static void khmer_readaligner_dealloc(PyObject* self)
+{
+  khmer_ReadAlignerObject * obj = (khmer_ReadAlignerObject *) self;
+  delete obj->aligner;
+  obj->aligner = NULL;
+}
+
+
+static PyTypeObject khmer_ReadAlignerType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "ReadAligner", sizeof(khmer_ReadAlignerObject),
+    0,
+    khmer_readaligner_dealloc,     /*tp_dealloc*/
+    0,                          /*tp_print*/
+    khmer_readaligner_getattr,     /*tp_getattr*/
+    0,                          /*tp_setattr*/
+    0,                          /*tp_compare*/
+    0,                          /*tp_repr*/
+    0,                          /*tp_as_number*/
+    0,                          /*tp_as_sequence*/
+    0,                          /*tp_as_mapping*/
+    0,                          /*tp_hash */
+    0,                          /*tp_call*/
+    0,                          /*tp_str*/
+    0,                          /*tp_getattro*/
+    0,                          /*tp_setattro*/
+    0,                          /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,         /*tp_flags*/
+    "ReadAligner object",           /* tp_doc */
+};
+
+
+//
+// new_readaligner
+// GRAPHALIGN addition
+//
+static PyObject* new_readaligner(PyObject * self, PyObject * args)
+{
+  PyObject * py_obj;
+
+  if(!PyArg_ParseTuple(args, "O", &py_obj)) {
+    return NULL;
+  }
+
+  khmer_KHashbitsObject * hb = (khmer_KHashbitsObject *) py_obj;
+
+  khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
+    PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
+
+  readaligner_obj->aligner = new ReadAligner(hb->hashbits);
+
+  return (PyObject *) readaligner_obj; 
+}
 
 //
 // new_hashbits
@@ -3849,6 +3956,7 @@ static PyMethodDef KhmerMethods[] = {
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty single-table counting hash" },
   { "_new_counting_hash", _new_counting_hash, METH_VARARGS, "Create an empty counting hash" },
   { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
+  { "new_readaligner", new_readaligner, METH_VARARGS, "create a read aligner" },
   { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
   { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },

@@ -406,26 +406,3 @@ Read FastqGzParser::get_next_read()
 
    return next_read;
 }
-
-
-int main()
-{
-   IParser* parser = IParser::get_parser("test.fasta.gz");
-   
-   while(!parser->is_complete())  {
-      Read next_read = parser->get_next_read();
-      std::cout << next_read.name << ": " << next_read.seq << std::endl;
-   }
-
-   delete parser;
-
-   IParser* parser2 = IParser::get_parser("test.fq.gz");
-   while (!parser2->is_complete()) {
-      Read next_read = parser2->get_next_read();
-      std::cout << next_read.name << ": " << next_read.seq << std::endl;
-   }
-
-   delete parser2;
-
-   return 0;
-}

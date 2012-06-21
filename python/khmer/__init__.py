@@ -5,6 +5,7 @@ from _khmer import new_ktable
 from _khmer import new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
+from _khmer import new_readaligner
 from _khmer import new_readmask
 from _khmer import new_minmax
 from _khmer import consume_genome

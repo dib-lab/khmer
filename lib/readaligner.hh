@@ -13,6 +13,7 @@
 class ReadAligner {
    khmer::Hashbits * hb;
    ScoringMatrix * sm;
+   int k;
 
 private:
    AStarSearchNode* subalign(AStarSearchNode*, NodeEnumerator*, int,
@@ -25,13 +26,18 @@ public:
    ReadAligner(khmer::Hashbits* _hb) {
       hb = _hb;
       sm = new ScoringMatrix();
+      k = hb->ksize();
+   }
+
+   int ksize() {
+      return k;
    }
 
    ~ReadAligner() {
       delete sm;
    }
 
-   CandidateAlignment alignRead(khmer::Hashbits*, std::string);
+   CandidateAlignment alignRead(std::string);
 };
 
 #endif //READALIGNER_HH
