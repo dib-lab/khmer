@@ -2,6 +2,8 @@
 Ready-made khmer scripts
 ========================
 
+For -x and -N parameters, see :doc:`choosing-hash-sizes`.
+
 k-mer counting
 ==============
 
