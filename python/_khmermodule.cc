@@ -3336,12 +3336,12 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer_KHashbitsObject * hb = (khmer_KHashbitsObject *) py_obj;
+  khmer_KCountingHashObject * ch = (khmer_KCountingHashObject *) py_obj;
 
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  readaligner_obj->aligner = new ReadAligner(hb->hashbits);
+  readaligner_obj->aligner = new ReadAligner(ch->counting);
 
   return (PyObject *) readaligner_obj; 
 }

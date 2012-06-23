@@ -16,7 +16,7 @@ char NodeEnumerator::getNextNucl(int base) {
 } 
 
 std::queue<AStarSearchNode*> NodeEnumerator::enumerateNodes(AStarSearchNode * curr,
-                                                    khmer::Hashbits * hb) {
+                                                    khmer::CountingHash * ch) {
    std::queue<AStarSearchNode*> ret;
 
    int remaining;
@@ -33,7 +33,7 @@ std::queue<AStarSearchNode*> NodeEnumerator::enumerateNodes(AStarSearchNode * cu
       nextNucl = getNextNucl(i);
       nextKmer = makeNextKmer(forward, nextNucl, curr);
 
-      if (!hb->get_count(nextKmer.c_str())) {
+      if (!ch->get_count(nextKmer.c_str())) {
          continue;
       }
 
