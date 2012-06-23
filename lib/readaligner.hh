@@ -8,10 +8,10 @@
 #include <queue>
 #include <deque>
 #include <vector>
-#include "hashbits.hh"
+#include "counting.hh"
 
 class ReadAligner {
-   khmer::Hashbits * hb;
+   khmer::CountingHash * ch;
    ScoringMatrix * sm;
    int k;
 
@@ -19,14 +19,14 @@ private:
    AStarSearchNode* subalign(AStarSearchNode*, NodeEnumerator*, int,
                              std::set<AStarSearchNode*>*);
    std::string extractString(AStarSearchNode*, char, std::map<int,int>*);
-   CandidateAlignment* align(khmer::Hashbits*, std::string, std::string, int);
+   CandidateAlignment* align(khmer::CountingHash*, std::string, std::string, int);
    void clearSet(std::set<AStarSearchNode*>* s);
 
 public:
-   ReadAligner(khmer::Hashbits* _hb) {
-      hb = _hb;
+   ReadAligner(khmer::CountingHash* _ch) {
+      ch = _ch;
       sm = new ScoringMatrix();
-      k = hb->ksize();
+      k = ch->ksize();
    }
 
    int ksize() {

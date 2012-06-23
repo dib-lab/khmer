@@ -22,7 +22,7 @@ AStarSearchNode* ReadAligner::subalign(AStarSearchNode* startVert,
          return curr;
       }
 
-      std::queue<AStarSearchNode*> nodes = enumerator->enumerateNodes(curr, hb);
+      std::queue<AStarSearchNode*> nodes = enumerator->enumerateNodes(curr, ch);
       while (!nodes.empty()) {
          AStarSearchNode* next = nodes.front();
          nodes.pop();
@@ -77,7 +77,7 @@ std::string ReadAligner::extractString(AStarSearchNode* goal,
    return ret;
 }
 
-CandidateAlignment* ReadAligner::align(khmer::Hashbits * hb,
+CandidateAlignment* ReadAligner::align(khmer::CountingHash * ch,
                                       std::string seq,
                                       std::string kmer,
                                       int index) {
@@ -137,20 +137,20 @@ CandidateAlignment* ReadAligner::align(khmer::Hashbits * hb,
 }
 
 CandidateAlignment ReadAligner::alignRead(std::string read) {
-   int k = hb->ksize();   
+   int k = ch->ksize();   
 
    std::set<CandidateAlignment*> alignments;
 
    for (int i = 0; i < (int)read.length() - k + 1; i++) {
       std::string kmer = read.substr(i, read.length()-k+1);
-      
-      if (hb->get_count(kmer.c_str())) {
-         CandidateAlignment* aln = align(hb, read, kmer, i);
+   
+      if (ch->get_count(kmer.c_str())) {
+         CandidateAlignment* aln = align(ch, read, kmer, i);
          if (aln != NULL) {
             alignments.insert(aln);
          }
       }
-   } 
+   }
 
    // find the best alignment...
    CandidateAlignment* best = NULL;
@@ -164,10 +164,16 @@ CandidateAlignment ReadAligner::alignRead(std::string read) {
       }
    }
 
-   CandidateAlignment ret = CandidateAlignment(best->readDeletions,
-                                               best->alignment,
-                                               best->score);
-   return ret;
+   if (best != NULL) {
+      CandidateAlignment ret = CandidateAlignment(best->readDeletions,
+                                                  best->alignment,
+                                                  best->score);
+      return ret;
+   }  else  {
+      std::map<int,int> emptyMap;
+      CandidateAlignment ret = CandidateAlignment(emptyMap, "", 0);
+      return ret;
+   }
 }
 
 void ReadAligner::clearSet(std::set<AStarSearchNode*>* s) {

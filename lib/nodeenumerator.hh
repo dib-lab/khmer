@@ -5,7 +5,7 @@
 #include <queue>
 #include "astarsearchnode.hh"
 #include "scoringmatrix.hh"
-#include "hashbits.hh"
+#include "counting.hh"
 
 class NodeEnumerator {
    ScoringMatrix * sm;
@@ -31,7 +31,7 @@ public:
    }
 
    std::queue<AStarSearchNode*> enumerateNodes(AStarSearchNode * curr,
-                                        khmer::Hashbits *);
+                                        khmer::CountingHash *);
 };
 
 #endif //NODEENUMERATOR_HH
