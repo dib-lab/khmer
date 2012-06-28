@@ -52,6 +52,7 @@ struct TraceLogger
     inline void	    operator( )(
 	uint8_t const level, char const * const format, ...
     ) const
+#ifdef WITH_INTERNAL_TRACING
     {
 	va_list varargs;
 	
@@ -64,6 +65,9 @@ struct TraceLogger
 	}
 
     }
+#else	// WITH_INTERNAL_TRACING
+    { }
+#endif	// !WITH_INTERNAL_TRACING
 
 private:
     
