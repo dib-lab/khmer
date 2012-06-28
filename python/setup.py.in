@@ -66,9 +66,9 @@ extension_mod = \
 py_mod = 'khmer'
 setup_metadata = \
     {
-	"name": "khmer", "version": "0.2",
+	"name": "khmer", "version": "0.4",
 	"description": 'khmer k-mer counting library',
-	"author": 'C. Titus Brown and Jason Pell',
+	"author": 'C. Titus Brown, Jason Pell, and Adina Howe',
 	"author_email": 'ctb@msu.edu',
 	"url": 'http://ged.msu.edu/',
 	"license": 'New BSD License',
