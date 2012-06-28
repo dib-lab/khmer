@@ -33,8 +33,8 @@ DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o $(CORE_OBJS) $(ZL
 DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_TEST_PARSER_OBJS=test-Parser.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_TEST_HASHTABLES_OBJS= \
-	test-HashTables.o counting.o hashbits.o hashtable.o \
-	subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	test-HashTables.o counting.o hashbits.o hashtable.o subset.o \
+	$(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 
 test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS)
