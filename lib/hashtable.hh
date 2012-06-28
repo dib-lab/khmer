@@ -118,7 +118,8 @@ namespace khmer {
     HashIntoType bitmask;
     unsigned int _nbits_sub_1;
 
-    Hashtable(WordLength ksize) : _ksize(ksize) {
+    Hashtable(WordLength ksize) : _ksize(ksize)
+    {
       _init_bitstuff();
     }
 

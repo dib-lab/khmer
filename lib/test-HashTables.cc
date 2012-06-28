@@ -10,8 +10,10 @@
 #include <error.h>
 #include <getopt.h>
 
-//#define HASH_TYPE_TO_TEST   1 // Counting Hash
-#define HASH_TYPE_TO_TEST   2 // Bit Hash
+#include <omp.h>
+
+#define HASH_TYPE_TO_TEST   1 // Counting Hash
+//#define HASH_TYPE_TO_TEST   2 // Bit Hash
 
 #define OUTPUT_HASHTABLE
 
@@ -85,6 +87,9 @@ int main( int argc, char * argv[ ] )
 
     unsigned int	    reads_total		= 0;
     unsigned long long int  n_consumed		= 0;
+
+    Config		    &the_config		= get_active_config( );
+    the_config.set_number_of_threads( omp_get_max_threads( ) );
 
 #if HASH_TYPE_TO_TEST == 1
     CountingHash ht( kmer_length, ht_sizes );

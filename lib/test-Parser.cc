@@ -78,7 +78,7 @@ int main( int argc, char * argv[ ] )
     uint32_t	    number_of_threads	    = omp_get_max_threads( );
     IParser *	    parser		    = IParser:: get_parser(
 	ifile_name_STRING, number_of_threads, cache_size,
-	TraceLogger:: TLVL_DEBUG3
+	TraceLogger:: TLVL_DEBUG6
     );
 
 #pragma omp parallel default( shared )
