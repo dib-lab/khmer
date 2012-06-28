@@ -13,8 +13,8 @@ extra_objs = [ ]
 extra_objs.extend( map(
     lambda bn: path_join( path_pardir, "lib", bn + ".o" ),
     [ 
-	"khmer_config", "ktable", "hashtable", "parsers", "threadedParsers",
-	"hashbits", "counting", "subset",
+	"khmer_config", "ktable", "hashtable", "parsers", "trace_logger", 
+	"threadedParsers", "read_parsers", "hashbits", "counting", "subset",
     ]
 ) )
 extra_objs.extend( map(
@@ -23,6 +23,13 @@ extra_objs.extend( map(
 	"adler32", "compress", "crc32", "deflate", "gzio", 
 	"infback", "inffast", "inflate", "inftrees", "trees", "uncompr", 
 	"zutil",
+    ]
+) )
+extra_objs.extend( map(
+    lambda bn: path_join( path_pardir, "lib", "bzip2", bn + ".o" ),
+    [
+	"blocksort", "huffman", "crctable", "randtable", "compress",
+	"decompress", "bzlib",
     ]
 ) )
 
