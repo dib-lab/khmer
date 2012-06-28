@@ -20,6 +20,10 @@ WANT_EXTRA_SANITY_CHECKING=false
 # Set this variable to true if you wish the codes to be built with debugging symbols (increases code size and does not always produce accurate stepping in a debugger when optimization is turned on).
 WANT_DEBUGGING=true
 
+# Compile with tracing logic turned on?
+# Set this variable to true if you want to use instrumentation provided in the sources for debugging purposes and are willing to accept the overhead such instrumentation introduces.
+WITH_INTERNAL_TRACING=true
+
 # Use Cython?
 # Set this variable to true if you wish to build the Python wrapper with Cython rather than the directly using the Python C API.
 USE_CYTHON=false
@@ -65,6 +69,10 @@ endif
 ifeq ($(PROFILER_OF_CHOICE), gprof)
 CXXFLAGS+= -pg
 endif
+endif
+
+ifeq ($(WITH_INTERNAL_TRACING), true)
+CXXFLAGS+= -DWITH_INTERNAL_TRACING
 endif
 
 ifeq ($(USE_CYTHON), true)
