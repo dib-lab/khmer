@@ -1,4 +1,4 @@
-__version__ = "0.2"
+__version__ = "0.4"
 
 import _khmer
 from _khmer import get_config

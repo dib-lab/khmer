@@ -17,11 +17,6 @@ from screed.fasta import fasta_iter
 import argparse
 import os
 import math
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 
 
 ###
@@ -70,7 +65,7 @@ hashsize / 8)' % (args.n_hashes * args.hashsize / 8.)
     fafile = args.fafile
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
-    figure_filename = curve_filename + '.png'
+
 
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
@@ -99,14 +94,6 @@ dataset2: %s
     for i in range(100):
         to_print = str(list[100+i]) + ' ' + str(list[i]) + '\n'
         f_curve_obj.write(to_print)
-        figure_list2.append(list[i])
-        figure_list1.append(list[100+i])
-
-    plt.xlabel('number of unique k-mers in consumed reads')
-    plt.ylabel('number of overlap unique k-mers')
-    plt.plot(figure_list1,figure_list2,'ro')
-    plt.savefig(figure_filename)
-
 
 
 

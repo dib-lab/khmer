@@ -1037,7 +1037,7 @@ accumulate_timer_deltas( uint32_t metrics_key )
 { }
 
 
-IParser:: IParser * const
+IParser * const
 IParser::
 get_parser(
     std:: string const	    &ifile_name,

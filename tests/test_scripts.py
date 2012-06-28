@@ -577,7 +577,6 @@ def test_count_overlap():
     seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
     outfile = utils.get_temp_filename('overlap.out', in_dir)
     curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
-    figurefile = utils.get_temp_filename('overlap.out.curve.png', in_dir)
     shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, K=20)
@@ -598,4 +597,3 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
-    assert os.path.exists(figurefile), curvefile
