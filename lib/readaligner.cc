@@ -1,9 +1,38 @@
 #include "readaligner.hh"
 
+AStarSearchNode * assn_set_find(std::set<AStarSearchNode*>* a,
+                               AStarSearchNode* val) {
+
+   std::set<AStarSearchNode*>::iterator it;
+   
+   for (it = a->begin(); it != a->end(); it++) {
+      if (**it == *val) {
+         return *it;
+      }
+   }
+
+   return NULL;
+}
+
+AStarSearchNode * assn_vector_find(std::vector<AStarSearchNode*>* a,
+                                  AStarSearchNode* val) {
+
+   std::vector<AStarSearchNode*>::iterator it;
+
+   for (it = a->begin(); it != a->end(); it++) {
+      if (**it == *val) {
+         return (*it);
+      }
+   }
+
+   return NULL;
+}
+
 AStarSearchNode* ReadAligner::subalign(AStarSearchNode* startVert,
                                        NodeEnumerator* enumerator,
                                        int seqLen,
-                                       std::set<AStarSearchNode*>* closed) {
+                                       std::set<AStarSearchNode*>* closed,
+                                       std::string seq) {
    std::vector<AStarSearchNode*> open;
 
    open.push_back(startVert);
@@ -15,30 +44,44 @@ AStarSearchNode* ReadAligner::subalign(AStarSearchNode* startVert,
       curr = open.front();
       std::pop_heap(open.begin(), open.end(), ASSNCompare());
       open.pop_back();
+     
       closed->insert(curr);
+
+      int max = 0;
+
+      if (curr->stateNo > max) {
+         max = curr->stateNo;
+         //std::cout << closed->size() << " " << open.size() << " " << curr->deletes << " " << curr->kmer << " " << curr->stateNo << std::endl;
+      }
 
       if (curr->stateNo == seqLen -1 ||
           curr->stateNo == 0) {
+         std::cout << "returning curr " << closed->size() << " " << open.size() << std::endl;
          return curr;
       }
 
       std::queue<AStarSearchNode*> nodes = enumerator->enumerateNodes(curr, ch);
+      
       while (!nodes.empty()) {
          AStarSearchNode* next = nodes.front();
          nodes.pop();
 
-         // override equals operator?
-         std::vector<AStarSearchNode*>::iterator where = std::find(open.begin(),
-                                                        open.end(),
-                                                        next);
-         if (closed->find(next) == closed->end() &&
-               (where == open.end() ||
-               next->score > (*where)->score)) {
+         AStarSearchNode* where = assn_vector_find(&open, next);
+         AStarSearchNode* in_closed = assn_set_find(closed, next);
+         if (in_closed == NULL &&
+               (where == NULL ||
+               next->score > (where)->score)) {
+         
+            int inClosed = (in_closed == NULL)? 0 : 1;
+            int inOpen = (where == NULL)? 0 : 1;
+
+            //std::cout << next->kmer << " " << next->state << " " << next->stateNo << " " << inClosed << " " << inOpen << std::endl;
             open.push_back(next);
             std::push_heap(open.begin(), open.end(), ASSNCompare());
          }
       }
    }   
+   std::cout << "returning NULL " << closed->size() << std::endl;
    return NULL;
 }
 
@@ -96,11 +139,15 @@ CandidateAlignment* ReadAligner::align(khmer::CountingHash * ch,
    AStarSearchNode * leftGoal = subalign(leftStart, 
                                          new NodeEnumerator(0, seq, sm),
                                          seq.length(), 
-                                         &leftClosed);
+                                         &leftClosed,
+                                         seq);
+   //rightStart->snps = leftGoal->snps;
    AStarSearchNode * rightGoal = subalign(rightStart,
                                           new NodeEnumerator(1, seq, sm),
                                           seq.length(),
-                                          &rightClosed);
+                                          &rightClosed,
+                                          seq);
+
    if (leftGoal == NULL || rightGoal == NULL) {
       return NULL;
    }
@@ -142,7 +189,11 @@ CandidateAlignment ReadAligner::alignRead(std::string read) {
    std::set<CandidateAlignment*> alignments;
 
    for (int i = 0; i < (int)read.length() - k + 1; i++) {
-      std::string kmer = read.substr(i, read.length()-k+1);
+      std::string kmer = read.substr(i, k);  
+
+      std::cout << kmer << std::endl;
+
+      assert(kmer.length() == k);
    
       if (ch->get_count(kmer.c_str())) {
          CandidateAlignment* aln = align(ch, read, kmer, i);

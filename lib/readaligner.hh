@@ -16,8 +16,10 @@ class ReadAligner {
    int k;
 
 private:
+//   AStarSearchNode* subalign(AStarSearchNode*, NodeEnumerator*, int,
+//                             std::set<AStarSearchNode*>*);
    AStarSearchNode* subalign(AStarSearchNode*, NodeEnumerator*, int,
-                             std::set<AStarSearchNode*>*);
+                             std::set<AStarSearchNode*>*, std::string);
    std::string extractString(AStarSearchNode*, char, std::map<int,int>*);
    CandidateAlignment* align(khmer::CountingHash*, std::string, std::string, int);
    void clearSet(std::set<AStarSearchNode*>* s);
