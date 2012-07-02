@@ -639,6 +639,41 @@ void CountingHash::get_median_count(const std::string &s,
   median = counts[counts.size() / 2]; // rounds down
 }
 
+void CountingHash::get_kadian_count(const std::string &s,
+				    BoundedCounterType &kadian,
+				    unsigned int nk)
+{
+  BoundedCounterType count;
+  std::vector<BoundedCounterType> counts;
+  KMerIterator kmers(s.c_str(), _ksize);
+
+  while(!kmers.done()) {
+    HashIntoType kmer = kmers.next();
+    count = this->get_count(kmer);
+    counts.push_back(count);
+  }
+
+  assert(counts.size());
+  unsigned int kpos = nk*_ksize;
+  
+  if (counts.size() < kpos) {
+    kadian = 0;
+
+    return;
+  }
+
+  sort(counts.begin(), counts.end());
+  kadian = counts[kpos - 1];
+
+#if 0
+  std::cout << "k " << kpos << ": ";
+  for (unsigned int i = 0; i < counts.size(); i++) {
+    std::cout << i << "-" << counts[i] << " ";
+  }
+  std::cout << "\n";
+#endif // 0
+}
+
 
 void CountingHash::get_kmer_abund_mean(const std::string &filename,
 				       unsigned long long &total,
@@ -802,6 +837,41 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 }
 
 
+unsigned int CountingHash::trim_below_abundance(std::string seq,
+						BoundedCounterType max_abund)
+  const
+{
+  if (!check_read(seq)) {
+    return 0;
+  }
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+
+  SeenSet path;
+
+  HashIntoType kmer;
+
+  if (kmers.done()) { return 0; }
+  kmer = kmers.next();
+
+  if (kmers.done() || get_count(kmer) > max_abund) {
+    return 0;
+  }
+
+  unsigned int i = _ksize;
+  while (!kmers.done()) {
+    kmer = kmers.next();
+
+    if (get_count(kmer) > max_abund) {
+      return i;
+    }
+    i++;
+  }
+
+  return seq.length();
+}
+
+
 void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
 {
    std::string filename(infilename);
@@ -840,6 +910,7 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
   unsigned char version, ht_type, use_bigcount;
 
   ifstream infile(infilename.c_str(), ios::binary);
+  assert(infile.is_open());
 
   infile.read((char *) &version, 1);
   infile.read((char *) &ht_type, 1);
@@ -1055,3 +1126,93 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
   gzclose(outfile);
 }
 
+void CountingHash::collect_high_abundance_kmers(const std::string &filename,
+						unsigned int lower_count,
+						unsigned int upper_count,
+						SeenSet& found_kmers)
+{
+  unsigned long long total_reads = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string currName = "";
+  string currSeq = "";
+
+  //
+  // iterate through the FASTA file & consume the reads, until we hit
+  // upper_count.
+  //
+
+  bool done = false;
+  while(!parser->is_complete() && !done)  {
+    read = parser->get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
+
+    // do we want to process it?
+    if (check_read(currSeq)) {
+      const char * sp = currSeq.c_str();
+
+      KMerIterator kmers(sp, _ksize);
+      HashIntoType kmer;
+
+      while(!kmers.done()) {
+	kmer = kmers.next();
+
+	count(kmer);
+	if (get_count(kmer) >= upper_count) {
+	  done = true;
+	}
+      }
+    }
+	       
+    // increment read number
+    total_reads++;
+
+    if (total_reads % 100000 == 0) {
+      std::cout << "..." << total_reads << "\n";
+    }
+  }
+
+  delete parser; parser = NULL;
+
+  unsigned long long stop_at_read = total_reads;
+
+  //
+  // go back through the file again, and store all k-mers >= lower_count
+  //
+
+  parser = IParser::get_parser(filename.c_str());
+
+  total_reads = 0;
+  while(!parser->is_complete() && total_reads != stop_at_read)  {
+    read = parser->get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
+
+    // do we want to process it?
+    if (check_read(currSeq)) {
+      const char * sp = currSeq.c_str();
+
+      KMerIterator kmers(sp, _ksize);
+      HashIntoType kmer;
+
+      while(!kmers.done()) {
+	kmer = kmers.next();
+
+	if (get_count(kmer) >= lower_count) {
+	  found_kmers.insert(kmer);
+	}
+      }
+    }
+	       
+    // increment read number
+    total_reads++;
+
+    if (total_reads % 100000 == 0) {
+      std::cout << "... x 2 " << total_reads << "\n";
+    }
+  }
+  delete parser; parser = NULL;
+}

@@ -1,38 +1,42 @@
+#! /usr/bin/env python
+"""
+Trim sequences at k-mers in the given stoptags file.  Output sequences
+will be placed in 'infile.stopfilt'.
+
+% python scripts/filter-stoptags.py <stoptags> <data1> [ <data2> <...> ]
+
+Use '-h' for parameter help.
+"""
+
 import sys, screed.fasta, os
 import khmer
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
+import argparse
+from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
-K = 32
-
-WORKER_THREADS=8
-GROUPSIZE=100
+# @CTB K should be loaded from file...
+DEFAULT_K = 32
 
 ###
 
 def main():
-    stoptags = sys.argv[1]
-    infile = sys.argv[2]
-        
-    outfile = os.path.basename(infile) + '.stopfilt'
-    if len(sys.argv) >= 4:
-        outfile = sys.argv[3]
+    parser = argparse.ArgumentParser()
 
-    print 'file with stop tags: %s' % stoptags
-    print 'input file to filter: %s' % infile
-    print 'filtering to output:', outfile
-    print '-- settings:'
-    print 'K', K
-    print 'N THREADS', WORKER_THREADS
-    print '--'
+    parser.add_argument('-k', default=DEFAULT_K, type=int, help='k-mer size',
+                        dest='ksize')
+    parser.add_argument('stoptags_file')
+    parser.add_argument('input_filenames', nargs='+')
 
-    print 'making hashtable'
+    args = parser.parse_args()
+    K = args.ksize
+
+    stoptags = args.stoptags_file
+    infiles = args.input_filenames
+
+    print 'loading stop tags, with K', K
     ht = khmer.new_hashbits(K, 1, 1)
-
     ht.load_stop_tags(stoptags)
 
-    outfp = open(outfile, 'w')
-
-    def process_fn(record, ht=ht):
+    def process_fn(record):
         name = record['name']
         seq = record['sequence']
         if 'N' in seq:
@@ -45,11 +49,17 @@ def main():
 
         return None, None
 
-    tsp = ThreadedSequenceProcessor(process_fn, WORKER_THREADS, GROUPSIZE)
+    ### the filtering loop
+    for infile in infiles:
+       print 'filtering', infile
+       outfile = os.path.basename(infile) + '.stopfilt'
 
-    ###
+       outfp = open(outfile, 'w')
 
-    tsp.start(verbose_fasta_iter(infile), outfp)
+       tsp = ThreadedSequenceProcessor(process_fn)
+       tsp.start(verbose_loader(infile), outfp)
+
+       print 'output in', outfile
 
 if __name__ == '__main__':
     main()

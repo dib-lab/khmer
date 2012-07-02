@@ -1,9 +1,9 @@
 import os
 import gzip
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
 
 import khmer
+import khmer_tst_utils as utils
+
 MAX_COUNT=255
 MAX_BIGCOUNT=65535
 
@@ -18,6 +18,9 @@ PRIMES_4b = [4000000007, 4000000009]
 PRIMES_8b = [8000000011, 8000000051]
 
 DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC"
+
+def teardown():
+    utils.cleanup()
 
 class Test_CountingHash(object):
     def setup(self):
@@ -158,10 +161,93 @@ def test_simple_median():
     assert average == 2.5
     assert int(stddev*100) == 50        # .5
 
+def test_simple_kadian():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG") == 1
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #           ---------------^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #           ---------------^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGtGCTAcG")
+    #           --------------^^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 1, x
+
+def test_simple_kadian_2():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG") == 1
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACaGCTATCTCTAGAGCTATG")
+    #           --^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACaGCTATCTCTAGAcCTATG")
+    #           --^          --^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 1, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCgCTAGAGCTATG")
+    #                  --^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
+    assert x == 2, x
+
+def test_2_kadian():
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 1
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #           ---------------^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTAGAcCTAtG")
+    #           ---------------^---^
+    assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 2
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTATCTCTACtcCTAtG")
+    #           --------------^^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
+    assert x == 2, x
+
+    hi = khmer.new_counting_hash(6, 1e6, 2)
+    hi.consume("ACTGCTATCTCTAGAGCTATG")
+    hi.consume("ACTGCTgTCTCTACtcCTAtG")
+    #           ------^-------^^---^
+    x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
+    assert x == 1, x
+
 def test_save_load():
-    thisdir = os.path.dirname(__file__)
-    inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
-    savepath = os.path.join(thisdir, 'tempcountingsave0.ht')
+    inpath = utils.get_test_data('random-20-a.fa')
+    savepath = utils.get_temp_filename('tempcountingsave0.ht')
     
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
@@ -183,10 +269,10 @@ def test_save_load():
     assert x == y, (x,y)
 
 def test_load_gz():
-    thisdir = os.path.dirname(__file__)
-    inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
-    savepath = os.path.join(thisdir, 'tempcountingsave1.ht')
-    loadpath = os.path.join(thisdir, 'tempcountingsave1.ht.gz')
+    inpath = utils.get_test_data('random-20-a.fa')
+
+    savepath = utils.get_temp_filename('tempcountingsave1.ht')
+    loadpath = utils.get_temp_filename('tempcountingsave1.ht.gz')
     
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
@@ -217,9 +303,8 @@ def test_load_gz():
     assert x == y, (x,y)
 
 def test_save_load_gz():
-    thisdir = os.path.dirname(__file__)
-    inpath = os.path.join(thisdir, 'test-data/random-20-a.fa')    
-    savepath = os.path.join(thisdir, 'tempcountingsave2.ht.gz')
+    inpath = utils.get_test_data('random-20-a.fa')
+    savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
     
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
@@ -305,8 +390,7 @@ def test_maxcount_with_bigcount_save():
         kh.count('AAAA')
         c = kh.get('AAAA')
 
-    thisdir = os.path.dirname(__file__)
-    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    savepath = utils.get_temp_filename('tempcountingsave.ht')
     kh.save(savepath)
 
     kh = khmer.new_counting_hash(1, 1, 1)
@@ -321,8 +405,7 @@ def test_bigcount_save():
     kh = khmer.new_counting_hash(4, 4**4, 4)
     kh.set_use_bigcount(True)
     
-    thisdir = os.path.dirname(__file__)
-    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    savepath = utils.get_temp_filename('tempcountingsave.ht')
     kh.save(savepath)
 
     kh = khmer.new_counting_hash(1, 1, 1)
@@ -343,8 +426,7 @@ def test_nobigcount_save():
     kh = khmer.new_counting_hash(4, 4**4, 4)
     # kh.set_use_bigcount(False) <-- this is the default
     
-    thisdir = os.path.dirname(__file__)
-    savepath = os.path.join(thisdir, 'tempcountingsave.ht')
+    savepath = utils.get_temp_filename('tempcountingsave.ht')
     kh.save(savepath)
 
     kh = khmer.new_counting_hash(1, 1, 1)
@@ -366,8 +448,7 @@ def test_bigcount_abund_dist():
     tracking = khmer.new_hashbits(18, 1e7, 4)
     kh.set_use_bigcount(True)
 
-    thisdir = os.path.dirname(__file__)
-    seqpath = os.path.join(thisdir, 'test-abund-read-2.fa')
+    seqpath = utils.get_test_data('test-abund-read-2.fa')
 
     kh.consume_fasta(seqpath)
 
@@ -382,8 +463,7 @@ def test_bigcount_abund_dist_2():
     tracking = khmer.new_hashbits(18, 1e7, 4)
     kh.set_use_bigcount(True)
 
-    thisdir = os.path.dirname(__file__)
-    seqpath = os.path.join(thisdir, 'test-abund-read.fa')
+    seqpath = utils.get_test_data('test-abund-read.fa')
 
     kh.consume_fasta(seqpath)
     for i in range(1000):
@@ -409,5 +489,11 @@ def test_get_ksize():
     assert kh.ksize() == 22
 
 def test_get_hashsizes():
-   kh = khmer.new_counting_hash(22, 100, 4)
-   assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
+    kh = khmer.new_counting_hash(22, 100, 4)
+    assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
+
+def test_collect_high_abundance_kmers():
+    seqpath = utils.get_test_data('test-abund-read-2.fa')
+
+    kh = khmer.new_counting_hash(18, 1e6, 4)
+    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)

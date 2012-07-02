@@ -1,7 +1,7 @@
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "parsers.hh"
-
+#include <iostream>
 #define MAX_KEEPER_SIZE int(1e6)
 
 using namespace std;
@@ -20,7 +20,7 @@ void Hashbits::save(std::string outfilename)
   unsigned char version = SAVED_FORMAT_VERSION;
   outfile.write((const char *) &version, 1);
 
-  unsigned char ht_type = SAVED_COUNTING_HT;
+  unsigned char ht_type = SAVED_HASHBITS;
   outfile.write((const char *) &ht_type, 1);
 
   outfile.write((const char *) &save_ksize, sizeof(save_ksize));
@@ -58,7 +58,7 @@ void Hashbits::load(std::string infilename)
   infile.read((char *) &version, 1);
   infile.read((char *) &ht_type, 1);
   assert(version == SAVED_FORMAT_VERSION);
-  assert(ht_type == SAVED_COUNTING_HT);
+  assert(ht_type == SAVED_HASHBITS);
 
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   infile.read((char *) &save_n_tables, sizeof(save_n_tables));
@@ -180,9 +180,17 @@ void Hashbits::save_tagset(std::string outfilename)
 {
   ofstream outfile(outfilename.c_str(), ios::binary);
   const unsigned int tagset_size = all_tags.size();
+  unsigned int save_ksize = _ksize;
 
   HashIntoType * buf = new HashIntoType[tagset_size];
 
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_TAGS;
+  outfile.write((const char *) &ht_type, 1);
+
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
   outfile.write((const char *) &tagset_size, sizeof(tagset_size));
   outfile.write((const char *) &_tag_density, sizeof(_tag_density));
 
@@ -207,7 +215,19 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
     all_tags.clear();
   }
 
+  unsigned char version, ht_type;
+  unsigned int save_ksize = 0;
+
   unsigned int tagset_size = 0;
+
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_TAGS);
+  
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  assert(save_ksize == _ksize);
+
   infile.read((char *) &tagset_size, sizeof(tagset_size));
   infile.read((char *) &_tag_density, sizeof(_tag_density));
 
@@ -218,7 +238,7 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
   for (unsigned int i = 0; i < tagset_size; i++) {
     all_tags.insert(buf[i]);
   }
-  
+
   delete buf;
 }
 
@@ -299,37 +319,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     // n_consumed += this_n_consumed;
 
     if (check_read(seq)) {	// process?
-      bool is_new_kmer;
-
-      KMerIterator kmers(seq.c_str(), _ksize);
-      HashIntoType kmer;
-
-      unsigned int since = _tag_density / 2 + 1;
-
-      while(!kmers.done()) {
-	kmer = kmers.next();
-
-	is_new_kmer = (bool) !get_count(kmer);
-	if (is_new_kmer) {
-	  count(kmer);
-	  n_consumed++;
-	}
-
-	if (!is_new_kmer && set_contains(all_tags, kmer)) {
-	  since = 1;
-	} else {
-	  since++;
-	}
-
-	if (since >= _tag_density) {
-	  all_tags.insert(kmer);
-	  since = 1;
-	}
-      }
-
-      if (since >= _tag_density/2 - 1) {
-	all_tags.insert(kmer);	// insert the last k-mer, too.
-      }
+      consume_sequence_and_tag(seq, n_consumed);
     }
 	       
     // reset the sequence info, increment read number
@@ -348,6 +338,46 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     }
   }
   delete parser;
+}
+
+void Hashbits::consume_sequence_and_tag(const std::string& seq,
+					unsigned long long& n_consumed,
+					SeenSet * found_tags)
+{
+  bool is_new_kmer;
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+  HashIntoType kmer;
+
+  unsigned int since = _tag_density / 2 + 1;
+
+  while(!kmers.done()) {
+    kmer = kmers.next();
+
+    is_new_kmer = (bool) !get_count(kmer);
+    if (is_new_kmer) {
+      count(kmer);
+      n_consumed++;
+    }
+
+    if (!is_new_kmer && set_contains(all_tags, kmer)) {
+      since = 1;
+      if (found_tags) { found_tags->insert(kmer); }
+    } else {
+      since++;
+    }
+
+    if (since >= _tag_density) {
+      all_tags.insert(kmer);
+      if (found_tags) { found_tags->insert(kmer); }
+      since = 1;
+    }
+  }
+
+  if (since >= _tag_density/2 - 1) {
+    all_tags.insert(kmer);	// insert the last k-mer, too.
+    if (found_tags) { found_tags->insert(kmer); }
+  }
 }
 
 //
@@ -1417,7 +1447,18 @@ void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
     stop_tags.clear();
   }
 
+  unsigned char version, ht_type;
+  unsigned int save_ksize = 0;
+
   unsigned int tagset_size = 0;
+
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  assert(version == SAVED_FORMAT_VERSION);
+  assert(ht_type == SAVED_STOPTAGS);
+  
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  assert(save_ksize == _ksize);
   infile.read((char *) &tagset_size, sizeof(tagset_size));
 
   HashIntoType * buf = new HashIntoType[tagset_size];
@@ -1438,6 +1479,14 @@ void Hashbits::save_stop_tags(std::string outfilename)
 
   HashIntoType * buf = new HashIntoType[tagset_size];
 
+  unsigned char version = SAVED_FORMAT_VERSION;
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = SAVED_STOPTAGS;
+  outfile.write((const char *) &ht_type, 1);
+
+  unsigned int save_ksize = _ksize;
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
   outfile.write((const char *) &tagset_size, sizeof(tagset_size));
 
   unsigned int i = 0;
@@ -1458,6 +1507,20 @@ void Hashbits::print_stop_tags(std::string infilename)
 
   unsigned int i = 0;
   for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
+	 pi++, i++) {
+    std::string kmer = _revhash(*pi, _ksize);
+    printfile << kmer << "\n";
+  }
+  
+  printfile.close();
+}
+
+void Hashbits::print_tagset(std::string infilename)
+{
+  ofstream printfile(infilename.c_str());
+
+  unsigned int i = 0;
+  for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
 	 pi++, i++) {
     std::string kmer = _revhash(*pi, _ksize);
     printfile << kmer << "\n";
@@ -1647,6 +1710,8 @@ void Hashbits::extract_unique_paths(std::string seq,
   unsigned int n_already_seen = 0;
   unsigned int n_kmers = 0;
 
+  // first, put together an array for presence/absence of the k-mer
+  // at each given position.
   while (!kmers.done()) {
     kmer = kmers.next();
 
@@ -1659,22 +1724,31 @@ void Hashbits::extract_unique_paths(std::string seq,
     n_kmers++;
   }
 
+  // next, run through this array with 'i'.
+
   unsigned int i = 0;
   while (i < n_kmers - min_length) {
-    unsigned int seen_counter = 0;
-    unsigned int j;
+    unsigned int seen_counter, j;
+
+    // For each starting 'i', count the number of 'seen' k-mers in the
+    // given window.
 
     // yes, inefficient n^2 algorithm.  sue me.
-    for (j = 0; j < min_length; j++) {
+    for (seen_counter = 0, j = 0; j < min_length; j++) {
       if (seen_queue[i + j]) {
 	seen_counter++;
       }
     }
 
+    // If the fraction seen is small enough to be interesting, suggesting
+    // that this, in fact, a "new" window -- extend until it isn't, and
+    // then extract.
+
     assert(j == min_length);
     if ( ((float)seen_counter / (float) j) <= max_seen) {
       unsigned int start = i;
 
+      // extend the window until the end of the sequence...
       while ((start + min_length) < n_kmers) {
 	if (seen_queue[start]) {
 	  seen_counter--;
@@ -1684,11 +1758,13 @@ void Hashbits::extract_unique_paths(std::string seq,
 	}
 	start++;
 
+	// ...or until we've seen too many of the k-mers.
 	if (((float)seen_counter / (float) min_length) > max_seen) {
 	  break;
 	}
       }
 
+      // adjust for ending point.
       if (start + min_length == n_kmers) {	// potentially decrement twice at end
 	if (((float)seen_counter / (float) min_length) > max_seen) {
 	  start--;
@@ -1699,6 +1775,8 @@ void Hashbits::extract_unique_paths(std::string seq,
 	start -= 2;
       }
 
+      // ...and now extract the relevant portion of the sequence, and adjust
+      // starting pos'n.
       results.push_back(seq.substr(i, start + min_length + _ksize - i));
 
       i = start + min_length + 1;
@@ -1707,3 +1785,179 @@ void Hashbits::extract_unique_paths(std::string seq,
     }
   }
 }
+
+
+// for counting overlap k-mers specifically!!
+
+//
+// check_and_process_read: checks for non-ACGT characters before consuming
+//
+
+unsigned int Hashbits::check_and_process_read_overlap(const std::string &read,
+					    bool &is_valid,HashIntoType lower_bound,
+                                            HashIntoType upper_bound,
+                                            Hashbits &ht2)
+{
+   is_valid = check_read(read);
+
+   if (!is_valid) { return 0; }
+
+   return consume_string_overlap(read, lower_bound, upper_bound, ht2);
+}
+
+//
+// consume_fasta: consume a FASTA file of reads
+//
+
+void Hashbits::consume_fasta_overlap(const std::string &filename,
+                                        HashIntoType curve[2][100],Hashbits &ht2,
+			      unsigned int &total_reads,
+			      unsigned long long &n_consumed,
+			      HashIntoType lower_bound,
+			      HashIntoType upper_bound,
+			      ReadMaskTable ** orig_readmask,
+			      bool update_readmask,
+			      CallbackFn callback,
+			      void * callback_data)
+{
+  total_reads = 0;
+  n_consumed = 0;
+  Read read;
+
+//get total number of reads in dataset
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    total_reads++;
+  }
+//block size for curve
+  int block_size = total_reads/100;
+  
+  total_reads = 0;
+  khmer::HashIntoType start = 0, stop = 0;
+  parser = IParser::get_parser(filename.c_str());
+
+
+
+  string currName = "";
+  string currSeq = "";
+
+  //
+  // readmask stuff: were we given one? do we want to update it?
+  // 
+
+  ReadMaskTable * readmask = NULL;
+  std::list<unsigned int> masklist;
+
+  if (orig_readmask && *orig_readmask) {
+    readmask = *orig_readmask;
+  }
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    currSeq = read.seq;
+    currName = read.name; 
+
+    // do we want to process it?
+    if (!readmask || readmask->get(total_reads)) {
+
+      // yep! process.
+      unsigned int this_n_consumed;
+      bool is_valid;
+
+      this_n_consumed = check_and_process_read_overlap(currSeq,
+					       is_valid,
+					       lower_bound,
+					       upper_bound,ht2);
+
+      // was this an invalid sequence -> mark as bad?
+      if (!is_valid && update_readmask) {
+        if (readmask) {
+	  readmask->set(total_reads, false);
+	} else {
+	  masklist.push_back(total_reads);
+	}
+      } else {		// nope -- count it!
+        n_consumed += this_n_consumed;
+      }
+    }
+	       
+    // reset the sequence info, increment read number
+
+    total_reads++;
+
+    if (total_reads%block_size == 0) {
+        curve[0][total_reads/block_size-1] = n_overlap_kmers(start,stop);
+        curve[1][total_reads/block_size-1] = n_kmers(start,stop);
+    }
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("consume_fasta", callback_data, total_reads, n_consumed);
+      } catch (...) {
+        throw;
+      }
+    }
+//   count<<curve[0][0]<<" ";
+//   count<< curve[0][1]<<" ";
+
+  }
+
+
+  //
+  // We've either updated the readmask in place, OR we need to create a
+  // new one.
+  //
+
+  if (orig_readmask && update_readmask && readmask == NULL) {
+    // allocate, fill in from masklist
+    readmask = new ReadMaskTable(total_reads);
+
+    list<unsigned int>::const_iterator it;
+    for(it = masklist.begin(); it != masklist.end(); ++it) {
+      readmask->set(*it, false);
+    }
+    *orig_readmask = readmask;
+  }
+}
+
+//
+// consume_string: run through every k-mer in the given string, & hash it.
+//
+
+unsigned int Hashbits::consume_string_overlap(const std::string &s,
+				       HashIntoType lower_bound,
+				       HashIntoType upper_bound,Hashbits &ht2)
+{
+  const char * sp = s.c_str();
+  unsigned int n_consumed = 0;
+
+  bool bounded = true;
+
+  KMerIterator kmers(sp, _ksize);
+  HashIntoType kmer;
+
+  if (lower_bound == upper_bound && upper_bound == 0) {
+    bounded = false;
+  }
+
+  while(!kmers.done()) {
+    kmer = kmers.next();
+  
+    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+      count_overlap(kmer,ht2);
+      n_consumed++;
+    }
+  }
+
+  return n_consumed;
+}
+
+
+
+

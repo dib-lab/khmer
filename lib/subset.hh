@@ -62,11 +62,13 @@ namespace khmer {
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
 		       SeenSet& tagged_kmers,
 		       const SeenSet& all_tags,
-		       bool break_on_stop_tags=false);
+		       bool break_on_stop_tags=false,
+		       bool stop_big_traversals=false);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
 		      bool break_on_stop_tags=false,
+		      bool stop_big_traversals=false,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
 
@@ -78,6 +80,12 @@ namespace khmer {
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
 					 void * callback_data=0);
+
+    unsigned int find_unpart(const std::string infilename,
+			     bool traverse,
+			     bool stop_big_traversals,
+			     CallbackFn callback=0,
+			     void * callback_data=0);
 
     bool is_single_partition(std::string sequence);
 

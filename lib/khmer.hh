@@ -1,4 +1,4 @@
-#define VERSION "0.3"
+#define VERSION "0.4"
 
 #define MAX_COUNT 255
 #define MAX_BIGCOUNT 65535
@@ -8,9 +8,12 @@
 #define CIRCUM_RADIUS 2		// @CTB remove
 #define CIRCUM_MAX_VOL 200	// @CTB remove
 
-#define SAVED_FORMAT_VERSION 2
+#define SAVED_FORMAT_VERSION 3
 #define SAVED_COUNTING_HT 1
 #define SAVED_HASHBITS 2
+#define SAVED_TAGS 3
+#define SAVED_STOPTAGS 4
+#define SAVED_SUBSET 5
 
 #define VERBOSE_REPARTITION 0
 

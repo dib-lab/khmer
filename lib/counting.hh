@@ -199,6 +199,10 @@ namespace khmer {
 			  float &average,
 			  float &stddev);
 
+    void get_kadian_count(const std::string &s,
+			  BoundedCounterType &kadian,
+			  unsigned int nk = 1);
+
     HashIntoType * abundance_distribution(std::string filename,
 					  Hashbits * tracking,
 					  CallbackFn callback = NULL,
@@ -229,6 +233,13 @@ namespace khmer {
 
     unsigned int trim_on_abundance(std::string seq,
 				   BoundedCounterType min_abund) const;
+    unsigned int trim_below_abundance(std::string seq,
+				      BoundedCounterType max_abund) const;
+
+    void collect_high_abundance_kmers(const std::string &infilename,
+				      unsigned int lower_count,
+				      unsigned int upper_count,
+				      SeenSet& kmers);
   };
 
 

@@ -2,202 +2,240 @@
 Ready-made khmer scripts
 ========================
 
-While khmer is research software (and will probably remain research
-software for a while!) there are a bunch of scripts that can be used
-out of the box.  Below is a quick-n-dirty guide to these scripts.
+For -x and -N parameters, see :doc:`choosing-hash-sizes`.
 
-Basic k-mer filtering
-=====================
+k-mer counting
+==============
 
-filter-exact.py
+**load-into-counting.py**: build a counting hash.
 
-Quality trimming
-~~~~~~~~~~~~~~~~
+   Usage::
 
-quality-trim.py -- Filter Illumina data sets by removing reads
-containing too many Ns, and truncate reads at QV=2 bases.
-Preprocessing before any further steps.
+	load-into-counting.py [ options ] <output.kh> <file1> <file2> ...
 
-Usage::
+   Build a counting hash table using the sequences in <file1-N>, and save it
+   to <output.kh>.
 
-   %% quality-trim.py <fastq input filename> <fastq output filename>
+   Example::
 
-This script can be applied to multiple data sets in parallel or in series.
+	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
-Removing reads by k-mer match
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**abundance-dist.py**: calculate the abundance distribution.
 
-filter-if-present.py -- Remove reads from a FASTA/FASTQ file that contain
-any of the k-mers present in another FASTA/FASTQ file.  Used to remove
-rRNA, repeats, Illumina primers, etc.
+   Usage::
+	
+	scripts/abundance-dist.py [ options ] <input.kh> <datafile> <histout>
 
-Usage::
+   Use a counting hash table to count the k-mer abundance distribution in
+   <datafile>; output distribution to <histout>.
 
-   %% filter-if-present.py <mask FASTA/FASTQ filename> <FASTA/FASTQ to filter>
+   Example::
 
-Output is placed in a file named after the FASTA/FASTQ file filtered,
-with the suffix '.masked'.
+	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+	scripts/abundance-dist.py -z out.kh data/100k-filtered.fa out.hist
 
-This script can be applied to multiple data sets in parallel or in series,
-as long as the same mask file is used.
+   The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
+   are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
+   of total distinct k-mers.
 
-Abundance filtering
--------------------
+**filter-abund.py**: trim sequences at a min k-mer abundance.
 
-To use a probabilistic counting hash table to filter out reads
-containing low-abundance k-mers, see the scripts 'filter-inexact-*.py'.
+   Usage::
+	
+	filter-abund.py [ -C <cutoff> ] <input.kh> <file1> <file2> ...
 
-An "All k-mers" filter
-~~~~~~~~~~~~~~~~~~~~~~
+   Load a counting hash table from <input.kh> and use it to trim the
+   sequences in <file1-N>.  Trimmed sequences will be placed in
+   <fileN>.abundfilt.
 
-filter-inexact-all.py -- removes reads containing any k-mer with
-an abundance of 1 (technically, < 2 ;).
+   Example::
 
-This is an all-by-all process; filter **all your data** together in
-one go, or else you will erroneously eliminate reads.  (Consider the
-situation where a k-mer is present in precisely two reads, one in
-`file1` and one in `file2`.  Both reads will be eliminated if `file1`
-and `file2` are filtered separately.
+	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
+	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
 
-A few points: 
+**count-median.py**: count median, average, and stddev of k-mer abundance in sequences.
 
- - this code uses only a few hundred megabytes beyond the hash table,
-   so make the hashtable size as close to your available physical memory
-   as you can.
+   Usage::
 
- - the one-sided counting error means that some reads with low-abundance
-   k-mers *might* be kept, but no reads will erroneously be removed.  You
-   can run it iteratively, with different hash table sizes each time, to
-   decrease the error rate.
+        count-median.py <input.kh> <input sequence file> <output file>
 
- - increase MIN_ABUNDANCE beyond 2 to eliminate higher abundance reads.
-   For example, setting MIN_ABUNDANCE to 5 will eliminate reads that
-   contain k-mers with 4 or fewer abundance across the data set.
-
- - if you run this script iteratively on a data set, it will continue
-   to eliminate reads.  Consider the situation where a k-mer A is
-   present in the same read as a k-mer B, but k-mer B is also in
-   another read.  If the first read (containing both k-mers A and B)
-   is eliminated because k-mer A is low-abundance, then in the
-   filtered data set, k-mer B will now be low-abundance and the second
-   read will be eliminated in the next pass.  In comparison,
-   'filter-inexact-any.py' (below) is invariant.
+   Load a counting hash table from <input.kh> and use it to calculate the
+   median, average, and stddev k-mer count for each sequence in the
+   <input sequence file>.  Output counts are placed in <output file>,
+   in the format "name median average stddev sequence_length".
    
-Other k-mer filters
-~~~~~~~~~~~~~~~~~~~
+   
+**count-overlap.py**: count the overlap k-mers, which are the k-mers
+   apperaring in two sequence datasets.
 
-We have not found these filters to be as useful as 'filter-inexact-all.py',
-but they should work:
+   Usage::
+   
+        count-overlap.py [options] <first_filename> <second_filename> <report_filename>
 
-filter-inexact-any.py -- remove 
+   Note: "curve_report_filename" is optional. If it is provided, the script will
+   generate a report of the increase of overlap k-mers as the number of
+   sequences in the second dataset increases. The report can be used to generate
+   a curve to show that trend easily.The report file contains the numbers of
+   unique k-mers in the two datasets seperately and the number of overlap k-mers
+   appearing in both datasets..
 
-filter-inexact-once.py
 
-filter-inexact-run.py
-
-De Bruijn graph analysis and manipulation
-=========================================
-
-Graph size filtering
-~~~~~~~~~~~~~~~~~~~~
-
-graph-size-py.py - eliminate reads belonging to small de Bruijn graphs
+"""
 
 Partitioning
-~~~~~~~~~~~~
-
-do-th-subset-calc.py (-save, -load below, but in memory)
-
-Pipeline:
-
-do-th-subset-save.py - to do local graph traversal and produce partition maps
-
-do-subset-merge.py - to merge partition maps
-
-(optional, inexact) filter-subsets-by-partsize.py - to eliminate small partitions
-
-do-th-subset-load.py - to annotate sequences with their partition ID
-
-(optional) combine-pe.py - to combine partitions that are joined by paired ends
-
-extract-partitions.py - to extract reads into groups, grouped by partition
-
-(utility) multi-abyss.py / multi-velvet.py - to assemble
-
-(reporting) subset-report.py
-
-Hashtable/tagset utilities
-==========================
-
-load-ht-and-tags.py
-
-
-Miscellaneous utilities
-=======================
-
-assemstats.py
-
-assemstats2.py
-
-fastq-to-fasta.py
-
-strip-partition.py
-
-join_pe.py
-
-extract-long-sequences.py
-
-Miscellaneous read analysis
-===========================
-
-abundance-hist-by-position.py
-
-hi-lo-abundance-by-position.py
-
-Support code
 ============
 
-test_scripts.py
+**load-graph.py**: load sequences into the compressible graph format.
 
-velvet-assemble.sh
+   Usage::
 
-make-random.py
+        load-graph.py [ options ] <graphbase> <file1> [ <file2> ... ]
+
+   Load in a set of sequences, marking waypoints as you go, and save
+   into a ht/tagset pair of files.  See 'extract-partitions' for a
+   complete workflow.
+
+**partition-graph.py**: partition a graph based on waypoint connectivity.
+
+   Usage::
+
+	partition-graph.py [ options ] <graphbase>
+
+   Partition the given graph (ht + tagset) into disconnected subgraphs,
+   and save the resulting partitionmap(s) as *.pmap files.
+
+   See 'Artifact removal' to understand the stoptags argument.
+
+**merge-partitions.py**: merge pmap files into a single merged pmap file.
+
+   Usage::
+
+        merge-partitions.py [ options ] <graphbase>
+
+   Take the <graphbase>.subset.N.pmap files and merge them all into a
+   single <graphbase>.pmap.merged file for annotate-partitions to use.
+
+**annotate-partitions.py**: annotate sequences with partition IDs.
+
+   Usage::
+
+	annotate-partitions.py [ -k <ksize> ] <pmap.merged> <file1> [ <file2> ... ]
+
+   Load in a partitionmap (generally produced by
+   partition-graph.py/merge-partitins.py) and annotate the sequences
+   in the given files with their partition IDs.  Use
+   'extract-partitions.py' to actually extract sequences into separate
+   group files.
+
+   Example (results will be in ``random-20-a.fa.part``)::
+
+	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/partition-graph.py example
+	scripts/merge-partitions.py -k 20 example
+	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
+
+**extract-partitions.py**: separate sequences annotated with partitions into group files
+
+   Usage::
+
+	extract-partitions.py [ options ] <prefix> <file1.part> [ <file2.part> ... ]
+
+   Example (results will be in ``example.group0000.fa``)::
+
+	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/partition-graph.py example
+	scripts/merge-partitions.py -k 20 example
+	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
+	scripts/extract-partitions.py example random-20-a.fa.part
 
 
-To remove?
-==========
+Artifact removal
+----------------
 
-agglom.py
+The following scripts are specialized scripts for finding and removing
+highly-connected k-mers (HCKs).  See :doc:`partitioning-big-data`.
 
-ctb-iterative-bench*
+**make-initial-stoptags.py**: find an initial set of HCKs
 
-do-intertable-part.py
+   Usage::
 
-extract-surrender.py
+	make-initial-stoptags.py [ options ] <graphbase>
 
-To classify
-===========
+   Load a ht/tagset created by load-graph.py, and do a small set of
+   traversals from graph waypoints; on these traversals, look for
+   k-mers that are repeatedly traversed in high-density regions of the
+   graph, i.e. are highly connected.  Output those k-mers as an
+   initial set of stoptags, which can be fed into partition-graph.py,
+   find-knots.py, and filter-stoptags.py.
 
-extract-single-partition.py
+   The hashtable size options parameters are for a counting hash to
+   keep track of repeatedly-traversed k-mers.  The subset size option
+   specifies the number of waypoints from which to traverse; for
+   highly connected data sets, the default (1000) is probably ok.
 
-fasta-to-abundance-hist.py
+**find-knots.py**: find all HCKs
 
-get-occupancy.py
+   Usage::
 
-graph-partition-separate.py
+       find-knots.py [ options ] <graphbase>
 
-graph-size-py-th.py
-graph-size.py
+   Load an ht/tagset created by load-graph, and a set of pmap files
+   created by partition-graph.  Go through each pmap file, select the
+   largest partition in each, and do the same kind of traversal as in
+   make-initial-stoptags from each of the waypoints in that partition;
+   this should identify all of the HCKs in that partition.  These HCKs
+   are output to <graphbase>.stoptags after each pmap file.
 
-kmer-abundance-hist.py
+   Parameter choice is reasonably important.  See the pipeline in
+   :doc:`partitioning-big-data` for an example run.
 
-length-dist.py
+   This script is not very scalable and may blow up memory and die
+   horribly.  You should be able to use the intermediate stoptags to
+   restart the process, and if you eliminate the already-processed
+   pmap files, you can continue where you left off.
 
-occupy.py
+**filter-stoptags.py**: trim sequences at stoptags.
 
-partition-size-dist.py
+   Usage::
 
-readmask-do-filter.py
+	filter-stoptags.py [ -k <ksize> ] <input.stoptags> <file1> [ <file2> ... ]
 
-test.sh
+   Load stoptags in from the given .stoptags file and use them to trim
+   or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
+   <fileN>.stopfilt.
 
+Digital normalization
+=====================
+
+**normalize-by-min.py**: do digital normalization (remove entirely
+redundant sequences)
+
+   Usage::
+
+	normalize-by-min.py [ options ] <file1> <file2> ...
+
+   Discard sequences based on whether or not their **minimum** k-mer
+   abundance lies above a specified cutoff.  Kept sequences will be
+   placed in <fileN>.keep.
+
+   Note: this is, in theory, a loss-less operation.  Only sequences that
+   contribute no novel k-mers will be discarded.
+
+   Example::
+
+	scripts/normalize-by-min.py -k 17 tests/test-data/test-abund-read-2.fa
+
+**normalize-by-median.py**: do digital normalization (remove mostly
+redundant sequences)
+
+   Usage::
+
+	normalize-by-median.py [ options ] <file1> <file2> ...
+
+   Discard sequences based on whether or not their **median** k-mer
+   abundance lies above a specified cutoff.  Kept sequences will be
+   placed in <fileN>.keep.
+
+   Example::
+
+	scripts/normalize-by-min.py -k 17 tests/test-data/test-abund-read-2.fa

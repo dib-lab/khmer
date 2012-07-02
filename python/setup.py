@@ -57,9 +57,12 @@ extension_mod = Extension("khmer._khmer",
 # python modules: only 'khmer'
 py_mod = 'khmer'
 
-setup(name = "khmer", version = "0.2",
+# update version here, and in doc/conf.py, python/khmer/__init__.py,
+#      and lib/khmer.hh.
+
+setup(name = "khmer", version = "0.4",
       description = 'khmer k-mer counting library',
-      author = 'C. Titus Brown and Jason Pell',
+      author = 'C. Titus Brown, Jason Pell, and Adina Howe',
       author_email = 'ctb@msu.edu',
       url = 'http://ged.msu.edu/',
       license='New BSD License',
