@@ -1,3 +1,8 @@
+PDBG BRANCH NOTE: To reproduce the results of the paper, "Scaling metagenome 
+sequence assembly with probabilistic de Bruijn graphs," follow  the 
+instructions below then go to the figuregen directory and take a 
+look at the README there.
+
 Welcome to khmer, k-mer counting, filtering and graph traversal FTW!
 
 The official repository is at
