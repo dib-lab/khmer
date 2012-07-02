@@ -42,23 +42,33 @@ std::queue<AStarSearchNode*> NodeEnumerator::enumerateNodes(AStarSearchNode * cu
       next->hcost = remaining * bestMatch;
       next->fval = (int) next->score + next->hcost;
       next->deletes = curr->deletes;
+      next->snps = curr->snps;
       ret.push(next);
 
-      next = new AStarSearchNode(curr, nextNucl, curr->stateNo, 'i', nextKmer);
-      next->score = curr->score + sm->score(nextNucl, '-');
-      next->hcost = remaining * bestMatch;
-      next->fval = (int) next->score + next->hcost;
-      next->deletes = curr->deletes;
-      ret.push(next); 
+      if (curr->state != 'd') {
+         next = new AStarSearchNode(curr, nextNucl, curr->stateNo, 'i', nextKmer);
+         next->score = curr->score + sm->score(nextNucl, '-');
+         next->hcost = (remaining + 1) * bestMatch;
+         next->fval = (int) next->score + next->hcost;
+         next->deletes = curr->deletes;
+         next->snps = curr->snps + 1;
+         ret.push(next);
+      } 
    }
 
    // now handle deletion
-   next = new AStarSearchNode(curr, '-', index, 'd', curr->kmer);
-   next->score = curr->score + sm->score('-', seq[index]);
-   next->hcost = remaining * bestMatch;
-   next->fval = (int) next->score + next->hcost;
-   next->deletes = curr->deletes + 1;
-   ret.push(next);
+   if (curr->state != 'i') {
+      next = new AStarSearchNode(curr, '-', index, 'd', curr->kmer);
+      next->score = curr->score + sm->score('-', seq[index]);
+      next->hcost = remaining * bestMatch;
+      next->fval = (int) next->score + next->hcost;
+      next->deletes = curr->deletes + 1;
+      next->snps = curr->snps + 1;
+   }
+      
+   if (next->snps <= 3) {
+      ret.push(next);
+   }
 
    return ret;
 }

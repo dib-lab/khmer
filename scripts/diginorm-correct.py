@@ -64,8 +64,7 @@ def main():
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
-#            if n > 0 and n % 100000 == 0:
-            if n > 0 and n % 100 == 0:
+            if n > 0 and n % 100000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
                     int(100. - discarded / float(total) * 100.), '%'
                 print '... in file', input_filename
@@ -86,6 +85,7 @@ def main():
             if med >= DESIRED_COVERAGE:
                 discarded += 1
             else:
+                # bug is in align() :-/
                 graphAlign, readAlign, score = aligner.align(seq)
                 corr_seq = graphAlign.replace('-', '')
                 if corr_seq == "" or score < (len(seq)*5 - 6):

@@ -8,6 +8,6 @@ def test_readalign():
    ch.consume("GCTTTTAAAAAGGTTCGACAAAGGCCCGGG")
    graphAlign, readAlign, score = aligner.align(read)
 
-   assert graphAlign == 'AGCTAGGTTCGACAA-GT-CC'
-   assert readAlign == 'ACCTAGGTTCGAC-ATGTACC'
+   assert readAlign == 'ACCTAGGTTCGACATGTACC'
+   assert graphAlign  == 'AGCTAGGTTCGACAAGT-CC'
    assert score == 75
