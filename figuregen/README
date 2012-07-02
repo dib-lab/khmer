@@ -9,6 +9,22 @@ Currently, the easiest way to obtain the data is through Amazon's
 EBS. The snapshot ID is snap-5b1b473. If you would like to obtain 
 the data through a different method, email jason.pell@gmail.com.
 
+The other method is to first obtain the following SRA datasets:
+SRA050710.1 (MSB2 soil)
+SRX000429 (E. coli Illumina)
+SRX000430 (E. coli Illumina)
+
+The MSB2 dataset should be conservatively quality trimmed 
+with sequences that have a quality score of B removed. Call this 
+file msb2.fq.
+
+The E. coli Illumina datasets should be combined into one file 
+called reads.fa
+
+Finally, obtain the E. coli genome (GenBank: U00096.2) and call it 
+ecoli.fa.
+
+
 IMPORTANT: Once you have the data, you need to create a directory 
 called 'data' in this directory that contains the following 3 files:
 
