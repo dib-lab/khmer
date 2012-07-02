@@ -5,19 +5,17 @@ import threading, Queue
 import sys
 import screed
 
-def verbose_fasta_iter(filename):
+DEFAULT_WORKER_THREADS=8
+DEFAULT_GROUPSIZE=100
+
+def verbose_loader(filename):
     it = screed.open(filename)
     for n, record in enumerate(it):
-        if n % 10000 == 0:
+        if n % 100000 == 0:
             print >>sys.stderr, '... filtering', n
         yield record
 
-def verbose_fastq_iter(filename):
-    it = screed.open(filename)
-    for n, record in enumerate(it):
-        if n % 10000 == 0:
-            print >>sys.stderr, '... filtering', n
-        yield record
+verbose_fasta_iter = verbose_loader
 
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
@@ -33,7 +31,8 @@ def is_pair(r1, r2):
 class ThreadedSequenceProcessor(object):
     QUEUESIZE = 50
     
-    def __init__(self, process_fn, n_workers, group_size, verbose=True):
+    def __init__(self, process_fn, n_workers=DEFAULT_WORKER_THREADS,
+                 group_size=DEFAULT_GROUPSIZE, verbose=True):
         self.process_fn = process_fn
         self.n_workers = n_workers
         self.group_size = group_size
@@ -138,13 +137,16 @@ class ThreadedSequenceProcessor(object):
             self.bp_processed += bp_processed
             self.bp_written += bp_written
             
-            if self.verbose and self.n_processed % 100000 == 0:
+            if self.verbose and self.n_processed % 500000 == 0:
                 print >>sys.stderr, "processed %d / wrote %d / removed %d" % \
                       (self.n_processed, self.n_written,
                        self.n_processed - self.n_written)
                 print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
                       (self.bp_processed, self.bp_written,
                        self.bp_processed - self.bp_written)
+                discarded = self.bp_processed - self.bp_written
+                f = float(discarded) / float(self.bp_processed) * 100
+                print >>sys.stderr, "discarded %.1f%%" % f
 
         # end of thread; exit, decrement worker count.
         self.worker_count -= 1
@@ -167,6 +169,9 @@ class ThreadedSequenceProcessor(object):
             print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
                   (self.bp_processed, self.bp_written,
                    self.bp_processed - self.bp_written)
+            discarded = self.bp_processed - self.bp_written
+            f = float(discarded) / float(self.bp_processed) * 100
+            print >>sys.stderr, "discarded %.1f%%" % f
         
 
                 

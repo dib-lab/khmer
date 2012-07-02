@@ -1,10 +1,11 @@
-import os
-import tempfile
-import shutil
-
 import khmer
 
+import khmer_tst_utils as utils
+
 READTABLE_SIZE=50
+
+def teardown():
+    utils.cleanup()
 
 class Test_Basic(object):
     def __init__(self):
@@ -116,13 +117,10 @@ class Test_Basic(object):
 class Test_Filestuff(object):
     def __init__(self):
         self.rt = khmer.new_readmask(READTABLE_SIZE)
-        self.tempdir = tempfile.mkdtemp()
-        self.filename = os.path.join(self.tempdir, 'tst')
-
-    def teardown(self):
-        shutil.rmtree(self.tempdir)
 
     def test_saveload(self):
+        filename = utils.get_temp_filename('tst')
+
         rt = self.rt
         
         rt.set(0, True)
@@ -131,15 +129,17 @@ class Test_Filestuff(object):
         rt.set(3, False)
         rt.set(4, True)
 
-        rt.save(self.filename)
+        rt.save(filename)
         
         rt2 = khmer.new_readmask(0)
-        rt2.load(self.filename)
+        rt2.load(filename)
 
         for i in range(5):
             assert rt.get(i) == rt2.get(i), i
 
     def test_save_no_load(self):
+        filename = utils.get_temp_filename('tst')
+
         rt = self.rt
         
         rt.set(0, True)
@@ -148,7 +148,7 @@ class Test_Filestuff(object):
         rt.set(3, False)
         rt.set(4, True)
 
-        rt.save(self.filename)
+        rt.save(filename)
         
         rt2 = khmer.new_readmask(READTABLE_SIZE)
         # no load!

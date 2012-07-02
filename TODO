@@ -1,3 +1,51 @@
+@@ merge refactor => master
+@@ review site for paper?
+
+auto-memory setting.
+
+find-knot speedup:
+   - too many redundant rounds of partitioning?
+
+memory improvement for counting hash
+
+sequence loading into both counting & hashbits
+
+graphsize filtering with stop-big-traversal
+
+why does stop-big-traversal still connect???
+
+cython integrate!
+
+pull reads into partitions?
+
+----
+
+counting hash generalization to n < 8 bits => memory efficiency
+
+load-counting/bigcount loading is slooooow
+
+----
+
+screed bzip
+screed slice
+screed fasta/fastq output
+
+screed streaming foo
+
+---
+
+fix tests cleanup
+pyrex/cython stuff
+script testing
+docs!
+
+---
+
+the N dilemma
+
+---
+
+
 put in logging.
 
 fix tests and test cases to properly isolate/remove temp files.

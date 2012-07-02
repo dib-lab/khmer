@@ -1,4 +1,4 @@
-__version__ = "0.2"
+__version__ = "0.4"
 
 import _khmer
 from _khmer import new_ktable
@@ -45,6 +45,20 @@ def reset_reporting_callback():
     set_reporting_callback(_default_reporting_callback)
 
 reset_reporting_callback()
+
+def calc_expected_collisions(ht):
+    """
+    A quick & dirty expected collision rate calculation
+    """
+    sizes = ht.hashsizes()
+    n_ht = float(len(sizes))
+    occupancy = float(ht.n_occupied())
+    min_size = min(sizes)
+
+    fp_one = occupancy / min_size
+    fp_all = fp_one ** n_ht
+
+    return fp_all
 
 ###
 

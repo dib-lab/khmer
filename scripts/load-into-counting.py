@@ -1,45 +1,25 @@
-# /usr/bin/env python
+#! /usr/bin/env python
 """
 Build a counting Bloom filter from the given sequences, save in <htname>.
 
 % python scripts/load-into-counting.py <htname> <data1> [ <data2> <...> ]
 
-Parameters to adjust: K, HT_SIZE.  HT_SIZE should be set to about 1/4 of the
-available system memory.
+Use '-h' for parameter help.
+
+@CTB enable/disable bigcount via command-line parameters.
 """
 
-import sys, screed, os
+import sys, screed
 import khmer
-import argparse
+from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+###
 
-def build_common_args():
+def main():
+    parser = build_construct_args()
+    parser.add_argument('output_filename')
+    parser.add_argument('input_filenames', nargs='+')
 
-    parser = argparse.ArgumentParser(description=
-                                     'Build & load a counting Bloom filter.')
-
-    env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
-    env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_MIN_HASHSIZE)
-
-    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
-                        action='store_true')
-    parser.add_argument('--ksize', '-k', type=int, dest='ksize',
-                        default=env_ksize,
-                        help='k-mer size to use')
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
-                        default=env_n_hashes,
-                        help='number of hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
-                        default=env_hashsize,
-                        help='lower bound on hashsize to use')
-
-    return parser
-
-def parse_args(parser):
     args = parser.parse_args()
 
     if not args.quiet:
@@ -54,16 +34,6 @@ def parse_args(parser):
         print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
         print>>sys.stderr, '-'*8
 
-    return args
-
-###
-
-def main():
-    parser = build_common_args()
-    parser.add_argument('output_filename')
-    parser.add_argument('input_filenames', nargs='+')
-
-    args = parse_args(parser)
 
     K=args.ksize
     HT_SIZE=args.min_hashsize
@@ -92,7 +62,23 @@ def main():
 
     print 'saving', base
     ht.save(base)
-    open(base + '.info', 'w').write('through end: %s' % filename)
+
+    info_fp = open(base + '.info', 'w')
+    info_fp.write('through end: %s\n' % filename)
+
+    # Change 0.2 only if you really grok it.  HINT: You don't.
+    fp_rate = khmer.calc_expected_collisions(ht)
+    print 'fp rate estimated to be %1.3f' % fp_rate
+    print >>info_fp, 'fp rate estimated to be %1.3f' % fp_rate
+
+    if fp_rate > 0.20:
+        print >>sys.stderr, "**"
+        print >>sys.stderr, "** ERROR: the counting hash is too small for"
+        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >>sys.stderr, "**"
+        sys.exit(-1)
+
+    print 'DONE.'
 
 if __name__ == '__main__':
     main()
