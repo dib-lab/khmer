@@ -210,8 +210,8 @@ namespace khmer {
 
     HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
 					 const unsigned int max_read_len,
-					 BoundedCounterType limit_by_count=0,
 					 ReadMaskTable * old_readmask = NULL,
+					 BoundedCounterType limit_by_count=0,
 						 CallbackFn callback = NULL,
 						 void * callback_data = NULL);
 

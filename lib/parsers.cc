@@ -70,7 +70,6 @@ FastaParser::FastaParser(const std::string &inputfile) :
 
    if (infile.eof())
    {
-      infile.close();
       one_read_left = true;
    }
 
@@ -172,7 +171,6 @@ Read FastaParser::get_next_read()
       if ((int)seq.find('N') == -1)  {
          valid_read = 1;
       }  else if (infile.eof())  {
-         infile.close();
          one_read_left = false;
          break;
       }
@@ -181,7 +179,6 @@ Read FastaParser::get_next_read()
       seq = "";
 
       if (infile.eof()) {
-         infile.close();
          one_read_left = true;
       }
 
@@ -332,7 +329,6 @@ Read FastqParser::get_next_read()
       getline(infile, current_read.name);
 
       if (infile.eof())  {
-         infile.close();
          return next_read;
       }
 

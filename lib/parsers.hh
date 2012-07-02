@@ -34,7 +34,7 @@ private:
    bool one_read_left;
 public:
    FastaParser(const std::string &inputfile);
-   ~FastaParser() { infile.close(); }
+   ~FastaParser() { infile.close();  }
    Read get_next_read();
    bool is_complete() { return !one_read_left && infile.eof(); } 
 };
