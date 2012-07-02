@@ -24,7 +24,6 @@ called reads.fa
 Finally, obtain the E. coli genome (GenBank: U00096.2) and call it 
 ecoli.fa.
 
-
 IMPORTANT: Once you have the data, you need to create a directory 
 called 'data' in this directory that contains the following 3 files:
 
