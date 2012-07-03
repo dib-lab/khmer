@@ -18,6 +18,7 @@ TraceLogger( uint8_t const level, FILE * stream_handle )
 TraceLogger::
 TraceLogger( uint8_t const level, char const * const file_name_format, ... )
 : _level( level ), _shared_stream( false )
+#ifdef WITH_INTERNAL_TRACING
 {
     char	tfile_name[ FILENAME_MAX + 1 ];
     va_list	varargs;
@@ -31,10 +32,14 @@ TraceLogger( uint8_t const level, char const * const file_name_format, ... )
     if (NULL == _stream_handle) throw InvalidStreamBuffer( );
 
 }
+#else	// WITH_INTERNAL_TRACING
+{ }
+#endif	// !WITH_INTERNAL_TRACING
 
 
 TraceLogger::
 ~TraceLogger( )
+#ifdef WITH_INTERNAL_TRACING
 {
 
     if ((!_shared_stream) && (NULL != _stream_handle))
@@ -44,6 +49,9 @@ TraceLogger::
     }
 
 }
+#else	// WITH_INTERNAL_TRACING
+{ }
+#endif	// !WITH_INTENRAL_TRACING
 
 } // namespace khmer
 
