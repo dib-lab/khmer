@@ -62,6 +62,8 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 // consume_fasta: consume a FASTA file of reads
 //
 
+#define USE_NEW_PARSER	  1
+
 void Hashtable::consume_fasta(const std::string &filename,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
@@ -72,7 +74,7 @@ void Hashtable::consume_fasta(const std::string &filename,
 			      CallbackFn callback,
 			      void * callback_data)
 {
-#if (0)
+#ifndef USE_NEW_PARSER
   using namespace khmer:: parsers;
 #else
   using namespace khmer:: read_parsers;
@@ -81,12 +83,15 @@ void Hashtable::consume_fasta(const std::string &filename,
   total_reads = 0;
   n_consumed = 0;
 
-  //IParser* parser = IParser::get_parser(filename);
+#ifndef USE_NEW_PARSER
+  IParser* parser = IParser::get_parser(filename);
+#else
   IParser *	  parser = 
   IParser::get_parser(
     filename, omp_get_max_threads( ), 2*1024*1024*1024U,
-    TraceLogger:: TLVL_DEBUG5
+    TraceLogger:: TLVL_NONE
   );
+#endif
 
   //
   // readmask stuff: were we given one? do we want to update it?
@@ -102,13 +107,15 @@ void Hashtable::consume_fasta(const std::string &filename,
   //
   // iterate through the FASTA file & consume the reads.
   //
-#pragma omp parallel default( shared ) 
+#ifdef USE_NEW_PARSER
+# pragma omp parallel default( shared ) 
   {
+#endif
     Read read;
     string currName = "";
     string currSeq = "";
   
-#if (1)
+#if (0)
   // DEBUG
   TraceLogger	    trace_logger(
     TraceLogger:: TLVL_DEBUG5,
@@ -124,7 +131,7 @@ void Hashtable::consume_fasta(const std::string &filename,
     
 #if (0)
     // DEBUG
-    //if (0 == (total_reads % 100000))
+    if (0 == (total_reads % 1000))
       trace_logger(
 	TraceLogger:: TLVL_DEBUG3,
 	"Total number of reads processed: %llu\n",
@@ -153,15 +160,20 @@ void Hashtable::consume_fasta(const std::string &filename,
       // was this an invalid sequence -> mark as bad?
       if (!is_valid && update_readmask) {
 	if (readmask) {
-#pragma omp critical (set_read_mask)
+#ifdef USE_NEW_PARSER
+# pragma omp critical (set_read_mask)
+#endif
 	  readmask->set(total_reads, false);
 	} else {
-#pragma omp critical (append_to_masklist)
+#ifdef USE_NEW_PARSER
+# pragma omp critical (append_to_masklist)
+#endif
 	  masklist.push_back(total_reads);
 	}
       } else {		// nope -- count it!
 	__sync_add_and_fetch( &n_consumed, this_n_consumed );
       }
+
     } // check masked read
 	       
     // reset the sequence info, increment read number
@@ -175,10 +187,12 @@ void Hashtable::consume_fasta(const std::string &filename,
 	throw;
       }
     }
-#endif
+#endif // readmask section enabler
   } // while reads left for parser
 
+#ifdef USE_NEW_PARSER
   } // parallel region
+#endif
 
   //
   // We've either updated the readmask in place, OR we need to create a
@@ -213,39 +227,47 @@ unsigned int Hashtable::consume_string(const std::string &s,
   KMerIterator kmers(sp, _ksize);
   HashIntoType kmer;
 
+#if (0)
   // DEBUG
   TraceLogger	trace_logger(
     TraceLogger:: TLVL_DEBUG5,
     "consume_string-%lu.log",
     (unsigned long int)omp_get_thread_num( )
   );
+#endif
 
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
 
+#if (0)
   // DEBUG
   trace_logger( TraceLogger:: TLVL_DEBUG3, "Starting trace...\n" );
+#endif
 
   while(!kmers.done()) {
     kmer = kmers.next();
   
     if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
 
+#if (0)
       // DEBUG
       trace_logger(
 	TraceLogger:: TLVL_DEBUG4, "Processing kmer: %llu\n",
 	(unsigned long long int)kmer
       );
+#endif
 
 // #pragma omp critical (count_kmer)
       count(kmer);
       n_consumed++;
 
+#if (0)
       // DEBUG
       trace_logger(
 	TraceLogger:: TLVL_DEBUG4, "Processed kmer.\n"
       );
+#endif
 
     }
   }

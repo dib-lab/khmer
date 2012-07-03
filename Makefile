@@ -22,7 +22,7 @@ WANT_DEBUGGING=true
 
 # Compile with tracing logic turned on?
 # Set this variable to true if you want to use instrumentation provided in the sources for debugging purposes and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_TRACING=true
+WITH_INTERNAL_TRACING=false
 
 # Use Cython?
 # Set this variable to true if you wish to build the Python wrapper with Cython rather than the directly using the Python C API.
