@@ -81,6 +81,7 @@ def main():
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
+	n = -1
         for n, batch in enumerate(batchwise(screed.open(input_filename), batch_size)):
             if n > 0 and n % 100000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
@@ -125,9 +126,11 @@ def main():
             else:
                 discarded += len(batch)
 
-        print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
-            total, 'or', int(100. - discarded / float(total) * 100.), '%'
-        print 'output in', output_name
+	if -1 < n:
+	    print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
+		total, 'or', int(100. - discarded / float(total) * 100.), '%'
+	    print 'output in', output_name
+	else: print 'SKIPPED empty file', input_filename
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
