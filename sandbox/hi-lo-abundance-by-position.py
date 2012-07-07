@@ -17,5 +17,5 @@ ht.load(hashfile)
 x = ht.fasta_count_kmers_by_position(filename, 100, 1)
 write_dist(x, open(outfile + '.pos.abund=1', 'w'))
 
-#y = ht.fasta_count_kmers_by_position(filename, 100, 255)
-#write_dist(y, open(outfile + '.pos.abund=255', 'w'))
+y = ht.fasta_count_kmers_by_position(filename, 100, 255)
+write_dist(y, open(outfile + '.pos.abund=255', 'w'))
