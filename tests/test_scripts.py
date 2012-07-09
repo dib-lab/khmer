@@ -221,6 +221,40 @@ def test_normalize_by_median_2():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
 
+def test_normalize_by_median_paired():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 2, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
+
+def test_normalize_by_median_impaired():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status != 0
+
 def test_normalize_by_median_empty():
     CUTOFF='1'
 
