@@ -78,5 +78,7 @@ def main():
         print >>sys.stderr, "**"
         sys.exit(-1)
 
+    print 'DONE.'
+
 if __name__ == '__main__':
     main()

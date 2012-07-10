@@ -50,7 +50,7 @@ def main():
         print>>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print>>sys.stderr, ' - paired = %d' % args.paired
+        print>>sys.stderr, ' - paired =	      %s \t\t(-p)' % args.paired
         print>>sys.stderr, ''
         print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
         print>>sys.stderr, '-'*8
@@ -81,6 +81,7 @@ def main():
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
+	n = -1
         for n, batch in enumerate(batchwise(screed.open(input_filename), batch_size)):
             if n > 0 and n % 100000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
@@ -92,7 +93,7 @@ def main():
                         1. - (discarded / float(total))
                     report_fp.flush()
 
-            total += len(batch)
+            total += batch_size
 
             # If in paired mode, check that the reads are properly interleaved
             if args.paired:
@@ -104,6 +105,13 @@ def main():
             passed = False
             for record in batch:
                 if len(record.sequence) < K:
+		    # QUESTION: Are you sure that this is right?
+		    #		Titus' original code would discard any read 
+		    #		shorter than the k-mer length.
+		    #		The modified code allows for a shorter read to 
+		    #		be emitted, as long as its pair mate
+		    #		is of sufficient length (and meets the other 
+		    #		criterion.)
                     continue
 
                 seq = record.sequence.replace('N', 'A')
@@ -123,11 +131,13 @@ def main():
                     else:
                         outfp.write('>%s\n%s\n' % (record.name, record.sequence))
             else:
-                discarded += len(batch)
+                discarded += batch_size
 
-        print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
-            total, 'or', int(100. - discarded / float(total) * 100.), '%'
-        print 'output in', output_name
+	if -1 < n:
+	    print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
+		total, 'or', int(100. - discarded / float(total) * 100.), '%'
+	    print 'output in', output_name
+	else: print 'SKIPPED empty file', input_filename
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
