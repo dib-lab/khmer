@@ -101,8 +101,8 @@ def main():
                     print >>sys.stderr, 'Error: Improperly interleaved pairs %s %s' % (batch[0].name, batch[1].name)
                     sys.exit(-1)
 
-            # Check if any record in the batch passed the filter
-            # JS 10/07/12 Discard reads if either one is shorter than K
+            # Emit the batch of reads if any read passes the filter
+            # and all reads are longer than K
             passed_filter = False
             passed_length = True
             for record in batch:
