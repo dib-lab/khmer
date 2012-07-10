@@ -102,9 +102,12 @@ def main():
                     sys.exit(-1)
 
             # Check if any record in the batch passed the filter
-            num_passed = 0
+            # JS 10/07/12 Discard reads if either one is shorter than K
+            passed_filter = False
+            passed_length = True
             for record in batch:
                 if len(record.sequence) < K:
+                    passed_length = False
                     continue
 
                 seq = record.sequence.replace('N', 'A')
@@ -112,10 +115,10 @@ def main():
 
                 if med < DESIRED_COVERAGE:
                     ht.consume(seq)
-                    num_passed += 1
+                    passed_filter = True
             
             # Emit records if any passed
-            if num_passed == batch_size:
+            if passed_length and passed_filter:
                 for record in batch:
                     if hasattr(record,'accuracy'):
                         outfp.write('@%s\n%s\n+\n%s\n' % (record.name, 
