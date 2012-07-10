@@ -102,16 +102,9 @@ def main():
                     sys.exit(-1)
 
             # Check if any record in the batch passed the filter
-            passed = False
+            num_passed = 0
             for record in batch:
                 if len(record.sequence) < K:
-		    # QUESTION: Are you sure that this is right?
-		    #		Titus' original code would discard any read 
-		    #		shorter than the k-mer length.
-		    #		The modified code allows for a shorter read to 
-		    #		be emitted, as long as its pair mate
-		    #		is of sufficient length (and meets the other 
-		    #		criterion.)
                     continue
 
                 seq = record.sequence.replace('N', 'A')
@@ -119,10 +112,10 @@ def main():
 
                 if med < DESIRED_COVERAGE:
                     ht.consume(seq)
-                    passed = True
+                    num_passed += 1
             
             # Emit records if any passed
-            if passed:
+            if num_passed == batch_size:
                 for record in batch:
                     if hasattr(record,'accuracy'):
                         outfp.write('@%s\n%s\n+\n%s\n' % (record.name, 
