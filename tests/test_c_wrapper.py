@@ -76,6 +76,9 @@ def test_raise_in_fasta_file_to_minmax():
 def test_raise_in_filter_fasta_file_max():
     return ## @CTB
     ht = khmer.new_hashtable(4, 4**4)
+
+    khmer.reset_reporting_callback()
+
     mmt = ht.fasta_file_to_minmax(reads_filename, N_READS)
 
     try:
@@ -99,6 +102,9 @@ def test_bad_mmt_in_filter_fasta_file_max():
 
 def test_bad_readmask_in_filter_fasta_file_limit_n():
     ht = khmer.new_hashtable(4, 4**4)
+
+    khmer.reset_reporting_callback()
+
     mmt = ht.fasta_file_to_minmax(reads_filename, N_READS)
 
     try:
@@ -111,6 +117,9 @@ def test_bad_readmask_in_filter_fasta_file_limit_n():
         
 def test_bad_readmask_in_filter_fasta_file_max():
     ht = khmer.new_hashtable(4, 4**4)
+
+    khmer.reset_reporting_callback()
+
     mmt = ht.fasta_file_to_minmax(reads_filename, N_READS)
 
     try:
