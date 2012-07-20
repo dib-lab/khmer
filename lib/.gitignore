@@ -5,4 +5,5 @@ test-HashTables
 smpFiltering
 bittest
 ktable_test
+ht-diff
 *.swp

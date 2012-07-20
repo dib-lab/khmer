@@ -27,7 +27,7 @@ clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS)
 
-test: $(DRV_PROGS)
+test: $(DRV_PROGS) ht-diff
 
 DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
@@ -36,6 +36,7 @@ DRV_TEST_HASHTABLES_OBJS= \
 	test-HashTables.o counting.o hashbits.o hashtable.o subset.o \
 	$(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+HT_DIFF_OBJS=ht-diff.o counting.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 
 test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS)
 	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(LIBS)
@@ -51,6 +52,9 @@ test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
 
 smpFiltering: $(DRV_SMP_FILTERING_OBJS) primes.hh
 	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(LIBS)
+
+ht-diff: $(HT_DIFF_OBJS)
+	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
 
 # TODO: Move 'main' to a driver program.
 #parsetest: parsers.o 
@@ -103,3 +107,6 @@ test-CacheManager.o: read_parsers.hh
 test-Parser.o: read_parsers.hh
 
 test-HashTables.o: read_parsers.hh primes.hh
+
+ht-diff.o: counting.hh hashtable.hh ktable.hh khmer.hh
+
