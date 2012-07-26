@@ -37,3 +37,5 @@ namespace khmer {
 			     unsigned long long other);
 
 };
+
+#define MIN( a, b )	(((a) > (b)) ? (b) : (a))

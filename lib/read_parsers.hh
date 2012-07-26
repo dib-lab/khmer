@@ -33,9 +33,6 @@ extern "C"
 #include "trace_logger.hh"
 
 
-#define MIN( a, b )	(((a) > (b)) ? (b) : (a))
-
-
 namespace khmer
 {
 

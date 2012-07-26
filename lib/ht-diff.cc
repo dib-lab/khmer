@@ -8,6 +8,14 @@
 // Also, any differences in count or bigcount values are reported in
 // human-readable form.
 
+#if (__cplusplus >= 201103L)
+#   include <cstdint>
+#else
+extern "C"
+{
+#   include <stdint.h>
+}
+#endif
 #include <cstring>
 #include <cstdio>
 #include <cerrno>
@@ -23,17 +31,16 @@ using namespace std;
 using namespace khmer;
 
 
-static const char *	    SHORT_OPTS		= "k:N:x:";	
+static const char *	    SHORT_OPTS		= "C:R";	
 
 
 int main( int argc, char * argv[ ] )
 {
-    float		ht_size_FP	    = 1.0E6;
-    unsigned long	ht_count	    = 4;
-
     int			rc		    = 0;
     int			opt		    = -1;
     char *		conv_residue	    = NULL;
+    uint32_t		max_count	    = MAX_COUNT;
+    bool		report_all	    = false;
     string		ifile_name_1;
     string		ifile_name_2;
 
@@ -42,6 +49,14 @@ int main( int argc, char * argv[ ] )
 
 	switch (opt)
 	{
+	case 'C':
+	    max_count = (uint32_t)strtoul( optarg, &conv_residue, 10 );
+	    if (!strcmp( optarg, conv_residue ))
+		error( EINVAL, EINVAL, "Invalid count threshold" );
+	    break;
+	case 'R':
+	    report_all = true;
+	    break;
 	default:
 	    error( 0, 0, "Skipping unknown arg, '%c'", optopt );
 	}
@@ -100,17 +115,21 @@ int main( int argc, char * argv[ ] )
 	}
     }
 
+    uint32_t count1, count2;
     printf( "Scanning hash key space....\n" );
     for (i = 0; i < max_ht_size; ++i)
     {
-	// TODO: Allow for "error" from MT sloppy hashing....
-	if (ht1.get_count( i ) != ht2.get_count( i ))
+	// Truncate counts at specified saturation threshold.
+	// (This accounts for the sloppy counting used for >1 threads.)
+	count1 = MIN( ht1.get_count( i ), max_count );
+	count2 = MIN( ht2.get_count( i ), max_count );
+	if (count1 != count2)
 	{
 	    fprintf(
 		stderr, "Hash key %llu has mismatched counts of %u and %u.\n",
 		i, ht1.get_count( i ), ht2.get_count( i )
 	    );
-	    exit( 1 );
+	    if (!report_all) exit( 1 );
 	}
     }
     // TODO: Implement bigcount checking.
