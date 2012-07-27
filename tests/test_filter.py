@@ -101,59 +101,6 @@ class Test_Filter(object):
         names = load_fa_seq_names(outname)
         assert names == ['1', '2', '3']
 
-    def test_consume_build_readmask(self):
-        ht = khmer.new_hashtable(10, 4**10)
-
-        filename = utils.get_test_data('simple_2.fa')
-        outname = utils.get_temp_filename('test_filter.out')
-
-        # sequence #4 (index 3) is bad; the new readmask should have that.
-        x = ht.consume_fasta_build_readmask(filename)
-        (total_reads, n_consumed, readmask) = x
-        
-        assert total_reads == 4, total_reads
-        assert n_consumed == 63, n_consumed
-        assert readmask.get(0)
-        assert readmask.get(1)
-        assert readmask.get(2)
-        assert not readmask.get(3)
-        
-    def test_consume_update_readmask(self):
-        ht = khmer.new_hashtable(10, 4**10)
-
-        filename = utils.get_test_data('simple_2.fa')
-        outname = utils.get_temp_filename('test_filter.out')
-
-        readmask = khmer.new_readmask(4)
-
-        # sequence #4 (index 3) is bad; the new readmask should have that.
-        (total_reads, n_consumed) = ht.consume_fasta(filename, 0, 0,
-                                                     readmask, True)
-        assert total_reads == 4, total_reads
-        assert n_consumed == 63, n_consumed
-        assert readmask.get(0)
-        assert readmask.get(1)
-        assert readmask.get(2)
-        assert not readmask.get(3)
-
-    def test_consume_no_update_readmask(self):
-        ht = khmer.new_hashtable(10, 4**10)
-
-        filename = utils.get_test_data('simple_2.fa')
-        outname = utils.get_temp_filename('test_filter.out')
-
-        readmask = khmer.new_readmask(4)
-
-        # sequence #4 (index 3) is bad; the new readmask should NOT have that.
-        (total_reads, n_consumed) = ht.consume_fasta(filename, 0, 0,
-                                                     readmask, False)
-        assert total_reads == 4, total_reads
-        assert n_consumed == 63, n_consumed
-        assert readmask.get(0)
-        assert readmask.get(1)
-        assert readmask.get(2)
-        assert readmask.get(3)          # NOT updated
-
     def test_readmask_1(self):
         filename = utils.get_test_data('simple_2.fa')
         outname = utils.get_temp_filename('test_filter.out')

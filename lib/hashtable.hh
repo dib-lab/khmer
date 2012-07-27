@@ -185,8 +185,6 @@ namespace khmer {
 		       unsigned long long &n_consumed,
 		       HashIntoType lower_bound = 0,
 		       HashIntoType upper_bound = 0,
-		       ReadMaskTable ** readmask = NULL,
-		       bool update_readmask = true,
 		       CallbackFn callback = NULL,
 		       void * callback_data = NULL);
   };
