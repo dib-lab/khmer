@@ -69,8 +69,6 @@ void Hashtable::consume_fasta(const std::string &filename,
 			      unsigned long long &n_consumed,
 			      HashIntoType lower_bound,
 			      HashIntoType upper_bound,
-			      ReadMaskTable ** orig_readmask,
-			      bool update_readmask,
 			      CallbackFn callback,
 			      void * callback_data)
 {
@@ -92,17 +90,6 @@ void Hashtable::consume_fasta(const std::string &filename,
     TraceLogger:: TLVL_NONE
   );
 #endif
-
-  //
-  // readmask stuff: were we given one? do we want to update it?
-  // 
-
-  ReadMaskTable * readmask = NULL;
-  std::list<unsigned int> masklist;
-
-  if (orig_readmask && *orig_readmask) {
-    readmask = *orig_readmask;
-  }
 
   //
   // iterate through the FASTA file & consume the reads.
@@ -143,40 +130,16 @@ void Hashtable::consume_fasta(const std::string &filename,
     currSeq = read.seq;
     currName = read.name; 
 
-#if (1)
-    // do we want to process it?
-    if (!readmask || readmask->get(total_reads)) {
-
-      // yep! process.
-      unsigned int this_n_consumed;
-      bool is_valid;
+    unsigned int this_n_consumed;
+    bool is_valid;
 
 //#pragma omp critical (process_read)
-      this_n_consumed = check_and_process_read(currSeq,
-					       is_valid,
-					       lower_bound,
-					       upper_bound);
+    this_n_consumed = check_and_process_read(currSeq,
+					     is_valid,
+					     lower_bound,
+					     upper_bound);
 
-      // was this an invalid sequence -> mark as bad?
-      if (!is_valid && update_readmask) {
-	if (readmask) {
-#ifdef USE_NEW_PARSER
-# pragma omp critical (set_read_mask)
-#endif
-	  readmask->set(total_reads, false);
-	} else {
-#ifdef USE_NEW_PARSER
-# pragma omp critical (append_to_masklist)
-#endif
-	  masklist.push_back(total_reads);
-	}
-      } else {		// nope -- count it!
-	__sync_add_and_fetch( &n_consumed, this_n_consumed );
-      }
-
-    } // check masked read
-	       
-    // reset the sequence info, increment read number
+    __sync_add_and_fetch( &n_consumed, this_n_consumed );
     __sync_add_and_fetch( &total_reads, 1 );
 
     // run callback, if specified
@@ -187,28 +150,12 @@ void Hashtable::consume_fasta(const std::string &filename,
 	throw;
       }
     }
-#endif // readmask section enabler
+
   } // while reads left for parser
 
 #ifdef USE_NEW_PARSER
   } // parallel region
 #endif
-
-  //
-  // We've either updated the readmask in place, OR we need to create a
-  // new one.
-  //
-
-  if (orig_readmask && update_readmask && readmask == NULL) {
-    // allocate, fill in from masklist
-    readmask = new ReadMaskTable(total_reads);
-
-    list<unsigned int>::const_iterator it;
-    for(it = masklist.begin(); it != masklist.end(); ++it) {
-      readmask->set(*it, false);
-    }
-    *orig_readmask = readmask;
-  }
 }
 
 //

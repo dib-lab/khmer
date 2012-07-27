@@ -233,7 +233,7 @@ cdef extern from "../lib/counting.hh" namespace "khmer":
                                          void*) except *
       unsigned int consume_string(char*, HashIntoType, HashIntoType)
       void consume_fasta(char*, unsigned int&, unsigned long long&,
-                         HashIntoType, HashIntoType, ReadMaskTable**, bool,
+                         HashIntoType, HashIntoType, 
                          CallbackFn, void*) except *
       void set_use_bigcount(bool)
       bool get_use_bigcount()
@@ -336,8 +336,6 @@ cdef extern from "../lib/hashbits.hh" namespace "khmer":
       void consume_fasta(char*, unsigned int&, unsigned long long&,
                          HashIntoType lower_bound, 
                          HashIntoType upper_bound, 
-                         ReadMaskTable** readmask,
-                         bool update_readmask, 
                          CallbackFn, void*) except *
       void add_tag(HashIntoType)
       void add_stop_tag(HashIntoType)
@@ -647,35 +645,15 @@ cdef class _new_counting_hash:
          positions.append(cpositions[i])
       return positions
    def consume_fasta(self, char* filename, HashIntoType lower_bound=0,
-                     HashIntoType upper_bound=0, new_readmask readmask=None, 
-                     bool update_readmask=1, callback_obj=None):
+                     HashIntoType upper_bound=0, callback_obj=None):
       global _callback_obj
       cdef unsigned long long n_consumed
       cdef unsigned int total_reads
       if callback_obj is not None:
          _callback_obj = callback_obj
-      cdef ReadMaskTable* rm=NULL
-      if readmask is not None:
-         rm = <ReadMaskTable*> readmask.thisptr
       self.thisptr.consume_fasta(filename, total_reads, n_consumed, lower_bound,
-                                 upper_bound, &rm, update_readmask,
-                                 _report_fn, <void*>_callback_obj)
+                                 upper_bound, _report_fn, <void*>_callback_obj)
       return total_reads, n_consumed
-   def consume_fasta_build_readmask(self, char* filename, HashIntoType lower_bound=0,
-                                    HashIntoType upper_bound=0, callback_obj=None):
-      global _callback_obj
-      if callback_obj is not None:
-         _callback_obj = callback_obj
-      cdef unsigned long long n_consumed
-      cdef unsigned int total_reads
-      cdef ReadMaskTable * readmask = NULL
-      cdef bool update_readmask = 1
-      self.thisptr.consume_fasta(filename, total_reads, n_consumed, 
-                                 lower_bound, upper_bound, &readmask, update_readmask,
-                                 _report_fn, <void*>_callback_obj)
-      rm = new_readmask()
-      rm.thisptr = readmask
-      return total_reads, n_consumed, rm
    def fasta_dump_kmers_by_abundance(self, char* inputfile, new_readmask rm, 
                                      BoundedCounterType limit_by_count, callback_obj=None):
       global _callback_obj
@@ -817,8 +795,7 @@ cdef class _new_hashbits:
    def consume(self, char* s, HashIntoType lower = 0, HashIntoType upper = 0):
       return self.thisptr.consume_string(s, lower, upper)
    def consume_fasta(self, char* filename, HashIntoType lower=0, 
-                     HashIntoType upper=0, new_readmask readmask=None,
-                     bool update_readmask=1, callback_obj=None):
+                     HashIntoType upper=0, callback_obj=None):
       global _callback_obj
       cdef unsigned long long n_consumed
       cdef unsigned int total_reads
@@ -827,7 +804,7 @@ cdef class _new_hashbits:
          _callback_obj = callback_obj
 
       self.thisptr.consume_fasta(filename, total_reads, n_consumed, lower, upper, 
-                                 NULL, update_readmask, _report_fn, <void*>callback_obj)
+                                 _report_fn, <void*>callback_obj)
       return n_consumed, total_reads
    def do_subset_partition(self, HashIntoType start, HashIntoType end, bool break_stop=0, bool stop_big_traversal=0,
                            callback_obj=None):

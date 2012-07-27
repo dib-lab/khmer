@@ -1226,34 +1226,12 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * filename;
-  PyObject * readmask_obj = NULL;
-  PyObject * update_readmask_bool = NULL;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|iiOOO", &filename, &lower_bound, &upper_bound,
-			&readmask_obj, &update_readmask_bool,
+  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
 			&callback_obj)) {
     return NULL;
-  }
-
-  // set C++ parameters accordingly
-  bool update_readmask = false;
-  khmer::ReadMaskTable * readmask = NULL;
-
-  if (readmask_obj && readmask_obj != Py_None) {
-    if (update_readmask_bool != NULL &&
-	PyObject_IsTrue(update_readmask_bool)) {
-      update_readmask = true;
-    }
-
-    if (!is_readmask_obj(readmask_obj)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fourth argument must be None or a readmask object");
-      return NULL;
-    }
-    
-    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
   }
 
   // call the C++ function, and trap signals => Python
@@ -1263,58 +1241,13 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
   try {
     counting->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn, callback_obj);
+			     lower_bound, upper_bound, 
+			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
 
-  // error checking -- this should still be null!
-  if (!update_readmask && !readmask_obj) {
-    assert(readmask == NULL);
-  }
-
   return Py_BuildValue("iL", total_reads, n_consumed);
-}
-
-static PyObject * hash_consume_fasta_build_readmask(PyObject * self, PyObject * args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
-			&callback_obj)) {
-    return NULL;
-  }
-
-  khmer::ReadMaskTable * readmask = NULL;
-  unsigned int total_reads;
-  unsigned long long n_consumed;
-
-  // this will allocate 'readmask' and fill it in.
-  try {
-      counting->consume_fasta(filename, total_reads, n_consumed,
-			      lower_bound, upper_bound, &readmask, true,
-			      _report_fn, callback_obj);
-  } catch  (_khmer_signal &e) {
-    return NULL;
-  }
-
-  if (!readmask) {
-    PyErr_SetString(PyExc_RuntimeError,
-		    "unexpected error in C++/consume_fasta; die die die.");
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-  readmask_obj->mask = readmask;
-
-  return Py_BuildValue("iLO", total_reads, n_consumed, readmask_obj);
 }
 
 static PyObject * hash_consume(PyObject * self, PyObject * args)
@@ -1797,7 +1730,6 @@ static PyMethodDef khmer_counting_methods[] = {
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
-  { "consume_fasta_build_readmask", hash_consume_fasta_build_readmask, METH_VARARGS, "Count all k-mers in a given file, creating a readmask object to mask off bad reads" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "filter_fasta_file_limit_n", hash_filter_fasta_file_limit_n, METH_VARARGS, "" },
   { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
@@ -2501,35 +2433,12 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * filename;
-  PyObject * readmask_obj = NULL;
-  PyObject * update_readmask_bool = NULL;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|iiOOO", &filename, &lower_bound, &upper_bound,
-			&readmask_obj, &update_readmask_bool,
+  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
 			&callback_obj)) {
     return NULL;
-  }
-
-  bool update_readmask = false;
-  khmer::ReadMaskTable * readmask = NULL;
-
-  // set C++ parameters accordingly
-
-  if (readmask_obj && readmask_obj != Py_None) {
-    if (update_readmask_bool != NULL &&
-	PyObject_IsTrue(update_readmask_bool)) {
-      update_readmask = true;
-    }
-
-    if (!is_readmask_obj(readmask_obj)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fourth argument must be None or a readmask object");
-      return NULL;
-    }
-    
-    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
   }
 
   // call the C++ function, and trap signals => Python
@@ -2539,15 +2448,10 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
   try {
     hashbits->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn, callback_obj);
+			     lower_bound, upper_bound, 
+			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
-  }
-
-  // error checking -- this should still be null!
-  if (!update_readmask && !readmask_obj) {
-    assert(readmask == NULL);
   }
 
   return Py_BuildValue("iL", total_reads, n_consumed);
