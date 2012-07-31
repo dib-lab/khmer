@@ -647,8 +647,8 @@ cdef class _new_counting_hash:
    def consume_fasta(self, char* filename, HashIntoType lower_bound=0,
                      HashIntoType upper_bound=0, callback_obj=None):
       global _callback_obj
-      cdef unsigned long long n_consumed
-      cdef unsigned int total_reads
+      cdef unsigned long long n_consumed = 0
+      cdef unsigned int total_reads = 0
       if callback_obj is not None:
          _callback_obj = callback_obj
       self.thisptr.consume_fasta(filename, total_reads, n_consumed, lower_bound,

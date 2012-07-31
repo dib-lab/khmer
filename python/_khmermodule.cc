@@ -1236,8 +1236,8 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 
   // call the C++ function, and trap signals => Python
 
-  unsigned long long n_consumed;
-  unsigned int total_reads;
+  unsigned long long  n_consumed = 0;
+  unsigned int	      total_reads = 0;
 
   try {
     counting->consume_fasta(filename, total_reads, n_consumed,
