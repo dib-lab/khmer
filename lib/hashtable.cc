@@ -2,8 +2,6 @@
 #include "hashtable.hh"
 #include "parsers.hh"
 
-#include <omp.h>
-
 // Note: This simple inlined code should be quicker than a call to a 
 //	 'toupper' function in the C library.
 //	 This should boil down to one integer compare, one branch, and 
@@ -78,108 +76,90 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 // consume_fasta: consume a FASTA file of reads
 //
 
-#define USE_NEW_PARSER	  1
-
-void Hashtable::consume_fasta(const std::string &filename,
-			      unsigned int &total_reads,
-			      unsigned long long &n_consumed,
-			      HashIntoType lower_bound,
-			      HashIntoType upper_bound,
-			      CallbackFn callback,
-			      void * callback_data)
+// TODO? Inline in header.
+void
+Hashtable::
+consume_fasta(
+  std:: string const  &filename,
+  unsigned int	      &total_reads, unsigned long long	&n_consumed,
+  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
+  CallbackFn	      callback,	    void *		callback_data
+)
 {
-#ifndef USE_NEW_PARSER
-  using namespace khmer:: parsers;
-#else
   using namespace khmer:: read_parsers;
-#endif
 
-  total_reads = 0;
-  n_consumed = 0;
-
-  // TODO? Lookup parser by filename.
-  //	   Use an empty string for STDIN.
-  //	   If no parser exists for filename, then create one.
-  //	   Else, re-use existing one.
-  //	   Alternatively, we might be able to get clever in the Python wrapper.
-#ifndef USE_NEW_PARSER
-  IParser* parser = IParser::get_parser(filename);
-#else
+  // TODO: Get defaults from config.
+  // Note: Always assume only 1 thread if invoked this way.
   IParser *	  parser = 
   IParser::get_parser(
-    filename, omp_get_max_threads( ), 2*1024*1024*1024U,
-    TraceLogger:: TLVL_NONE
+    filename, 1, 2*1024*1024*1024U, TraceLogger:: TLVL_NONE
   );
-#endif
 
-  //
-  // iterate through the FASTA file & consume the reads.
-  //
-#ifdef USE_NEW_PARSER
-# pragma omp parallel default( shared ) 
-  {
-#endif
-    Read read;
-    string currName = "";
-    string currSeq = "";
+  consume_fasta(
+    parser, 
+    total_reads, n_consumed, 
+    lower_bound, upper_bound, 
+    callback, callback_data
+  );
+}
+
+void
+Hashtable::
+consume_fasta(
+  read_parsers:: IParser *	      parser,
+  unsigned int	      &total_reads, unsigned long long  &n_consumed,
+  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
+  CallbackFn	      callback,	    void *		callback_data
+)
+{
+  using namespace khmer:: read_parsers;
+
+  Hasher		  &hasher		= _get_hasher( );
+  unsigned int		  total_reads_LOCAL	= 0;
+  unsigned long long int  n_consumed_LOCAL	= 0;
+  Read			  read;
   
-  // TODO: Move TraceLogger instances into Hasher.
-#if (0)
-  // DEBUG
-  TraceLogger	    trace_logger(
-    TraceLogger:: TLVL_DEBUG5,
-    "consume_fasta-%lu.log",
-    (unsigned long int)omp_get_thread_num( )
+  hasher.trace_logger(
+    TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
   );
 
-  // DEBUG
-  trace_logger( TraceLogger:: TLVL_DEBUG2, "Starting trace...\n" );
-#endif
+  // Iterate through the reads and consume their kmers.
+  while (!parser->is_complete( ))
+  {
+    unsigned int  this_n_consumed;
+    bool	  is_valid;
 
-  while(!parser->is_complete())  {
-    
-#if (0)
-    // DEBUG
-    if (0 == (total_reads % 1000))
-      trace_logger(
+    read      = parser->get_next_read();
+
+    this_n_consumed = 
+    check_and_process_read(read.seq, is_valid, lower_bound, upper_bound);
+
+    n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+    total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+
+    if (0 == (total_reads_LOCAL % 10000))
+      hasher.trace_logger(
 	TraceLogger:: TLVL_DEBUG3,
 	"Total number of reads processed: %llu\n",
-	(unsigned long long int)total_reads
+	(unsigned long long int)total_reads_LOCAL
       );
-#endif
 
-    read = parser->get_next_read();
-    currSeq = read.seq;
-    currName = read.name; 
-
-    unsigned int this_n_consumed;
-    bool is_valid;
-
-//#pragma omp critical (process_read)
-    this_n_consumed = check_and_process_read(currSeq,
-					     is_valid,
-					     lower_bound,
-					     upper_bound);
-
-    // TODO: Get back return values with atomic operations
-    //	     to use in reporting below.
-    __sync_add_and_fetch( &n_consumed, this_n_consumed );
-    __sync_add_and_fetch( &total_reads, 1 );
     // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-      try {
-	callback("consume_fasta", callback_data, total_reads, n_consumed);
-      } catch (...) {
-	throw;
+    if (callback && (0 == (total_reads_LOCAL % CALLBACK_PERIOD)))
+    {
+      try 
+      {
+	callback(
+	  "consume_fasta", callback_data,
+	  total_reads_LOCAL, n_consumed_LOCAL
+	);
       }
+      catch (...) { throw; }
     }
 
   } // while reads left for parser
 
-#ifdef USE_NEW_PARSER
-  } // parallel region
-#endif
-}
+} // consume_fasta
 
 //
 // consume_string: run through every k-mer in the given string, & hash it.
@@ -197,47 +177,17 @@ unsigned int Hashtable::consume_string(const std::string &s,
   KMerIterator kmers(sp, _ksize);
   HashIntoType kmer;
 
-#if (0)
-  // DEBUG
-  TraceLogger	trace_logger(
-    TraceLogger:: TLVL_DEBUG5,
-    "consume_string-%lu.log",
-    (unsigned long int)omp_get_thread_num( )
-  );
-#endif
-
   if (lower_bound == upper_bound && upper_bound == 0) {
     bounded = false;
   }
-
-#if (0)
-  // DEBUG
-  trace_logger( TraceLogger:: TLVL_DEBUG3, "Starting trace...\n" );
-#endif
 
   while(!kmers.done()) {
     kmer = kmers.next();
   
     if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
 
-#if (0)
-      // DEBUG
-      trace_logger(
-	TraceLogger:: TLVL_DEBUG4, "Processing kmer: %llu\n",
-	(unsigned long long int)kmer
-      );
-#endif
-
-// #pragma omp critical (count_kmer)
       count(kmer);
       n_consumed++;
-
-#if (0)
-      // DEBUG
-      trace_logger(
-	TraceLogger:: TLVL_DEBUG4, "Processed kmer.\n"
-      );
-#endif
 
     }
   }

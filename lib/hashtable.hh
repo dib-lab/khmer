@@ -28,6 +28,7 @@ extern "C"
 #define CALLBACK_PERIOD 100000
 
 namespace khmer {
+
   typedef unsigned int PartitionID;
   typedef std::set<HashIntoType> SeenSet;
   typedef std::set<PartitionID> PartitionSet;
@@ -260,16 +261,32 @@ namespace khmer {
 					HashIntoType lower_bound = 0,
 					HashIntoType upper_bound = 0);
     
-    // count every k-mer in the FASTA file.
-    void consume_fasta(const std::string &filename,
-		       unsigned int &total_reads,
-		       unsigned long long &n_consumed,
-		       HashIntoType lower_bound = 0,
-		       HashIntoType upper_bound = 0,
-		       CallbackFn callback = NULL,
-		       void * callback_data = NULL);
-  };
+    // Count every k-mer in a FASTA or FASTQ file.
+    // Note: Yes, the name 'comsume_fasta' is a bit misleading, 
+    //	     but the FASTA format is effectively a subset of the FASTQ format
+    //	     and the FASTA portion is what we care about in this case.
+    void consume_fasta(
+	std::string const   &filename,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	HashIntoType	    lower_bound	    = 0,
+	HashIntoType	    upper_bound	    = 0,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads, 
+    // using the supplied parser.
+    void consume_fasta(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	HashIntoType	    lower_bound	    = 0,
+	HashIntoType	    upper_bound	    = 0,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
 
+  };
 			  
 
 };
