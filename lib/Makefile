@@ -7,7 +7,7 @@ DYLIB_EXT=.dylib
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
-all: zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o readaligner.o scoringmatrix.o astarsearchnode.o nodeenumerator.o
+all: zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
 
 clean:
 	rm -f *.o $(Z_LIB_DIR)/*.o $(Z_LIB_DIR)/libz$(SO_EXT).1.2.3$(DYLIB_EXT)
@@ -31,16 +31,16 @@ graphtest: graphtest.o ktable.o hashtable.o
 consume_prof: consume_prof.o hashtable.o ktable.o
 	$(CXX) -pg -o consume_prof consume_prof.o hashtable.o ktable.o
 
-newtest: newtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o readaligner.o scoringmatrix.o astarsearchnode.o nodeenumerator.o
-	$(CXX) -pg -o newtest newtest.o readaligner.o scoringmatrix.o astarsearchnode.o nodeenumerator.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+aligntest: aligntest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
-astarsearchnode.o: astarsearchnode.cc astarsearchnode.hh
+kmer.o: kmer.cc kmer.hh
+
+node.o: node.cc node.hh
+
+aligner.o: aligner.cc aligner.hh
 
 scoringmatrix.o: scoringmatrix.cc scoringmatrix.hh
-
-nodeenumerator.o: nodeenumerator.cc nodeenumerator.hh
-
-readaligner.o: readaligner.cc readaligner.hh
 
 parsers.o: parsers.cc parsers.hh
 
