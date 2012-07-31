@@ -16,6 +16,7 @@ BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
 DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser test-HashTables smpFiltering 
 DRV_PROGS+=#graphtest #consume_prof
+AUX_PROGS=ht-diff
 
 CORE_OBJS= khmer_config.o trace_logger.o ktable.o
 PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
@@ -25,9 +26,9 @@ all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbit
 clean:
 	(cd $(ZLIB_DIR) && make clean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
-	rm -f *.o $(DRV_PROGS)
+	rm -f *.o $(DRV_PROGS) $(AUX_PROGS)
 
-test: $(DRV_PROGS) ht-diff
+test: $(DRV_PROGS) $(AUX_PROGS)
 
 DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
