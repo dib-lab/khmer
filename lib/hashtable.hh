@@ -1,6 +1,15 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
+#if (__cplusplus >= 201103L)
+#   include <cstdint>
+#else
+extern "C"
+{
+#   include <stdint.h>
+}
+#endif
+
 #include <vector>
 #include <iostream>
 #include <list>
@@ -14,6 +23,7 @@
 
 #include "khmer.hh"
 #include "storage.hh"
+#include "read_parsers.hh"
 
 #define CALLBACK_PERIOD 100000
 
@@ -113,17 +123,68 @@ namespace khmer {
   class ReadMaskTable;
 
   class Hashtable {		// Base class implementation of a Bloom ht.
-  protected:
-    WordLength _ksize;
-    HashIntoType bitmask;
-    unsigned int _nbits_sub_1;
 
-    Hashtable(WordLength ksize) : _ksize(ksize)
+  protected:
+
+    struct Hasher
     {
-      _init_bitstuff();
+
+	uint32_t			thread_id;
+	// TODO: Add HasherPerformanceMetrics instance.
+	TraceLogger			trace_logger;
+
+	Hasher(
+	    uint32_t const  thread_id,
+	    uint8_t const   trace_level = TraceLogger:: TLVL_NONE
+	);
+	~Hasher( );
+
+    }; // struct Hasher
+    
+    uint8_t	    _trace_level;
+
+    uint32_t	    _number_of_threads;
+    ThreadIDMap	    _thread_id_map;
+    Hasher **	    _hashers;
+
+    WordLength	    _ksize;
+    HashIntoType    bitmask;
+    unsigned int    _nbits_sub_1;
+
+    Hashtable(
+	WordLength	ksize,
+	// TODO: Get default number of threads from config.
+	uint32_t const	number_of_threads   = 1,
+	uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
+    )
+    :	_trace_level( trace_level ),
+	_number_of_threads( number_of_threads ), 
+	_thread_id_map( ThreadIDMap( number_of_threads ) ),
+	_ksize( ksize )
+    {
+
+	_hashers = new Hasher *[ number_of_threads ];
+	for (uint32_t i = 0; i < number_of_threads; ++i) _hashers[ i ] = NULL;
+
+	_init_bitstuff();
+
     }
 
-    virtual ~Hashtable() {}
+    virtual ~Hashtable( )
+    {
+	
+	for (uint32_t i = 0; i < _number_of_threads; ++i)
+	{
+	    if (NULL != _hashers[ i ])
+	    {
+		delete _hashers[ i ];
+		_hashers[ i ]	= NULL;
+	    }
+	}
+	delete [ ] _hashers;
+	_hashers    = NULL;
+
+    }
 
     void _init_bitstuff() {
       bitmask = 0;
@@ -132,6 +193,26 @@ namespace khmer {
       }
       _nbits_sub_1 = (_ksize*2 - 2);
     }
+
+
+    inline Hasher   &_get_hasher( )
+    {
+	uint32_t	thread_id	= _thread_id_map.get_thread_id( );
+	Hasher *	hasher_PTR	= NULL;
+
+	assert( NULL != _hashers );
+
+	hasher_PTR = _hashers[ thread_id ];
+	if (NULL == hasher_PTR)
+	{
+	    _hashers[ thread_id ]   =
+	    new Hasher( thread_id, _trace_level );
+	    hasher_PTR		    = _hashers[ thread_id ];
+	}
+
+	return *hasher_PTR;
+    }
+
 
     HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const {
       // left-shift the previous hash over
