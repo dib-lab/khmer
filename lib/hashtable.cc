@@ -1,7 +1,6 @@
 #include "khmer.hh"
 #include "hashtable.hh"
 #include "parsers.hh"
-#include "read_parsers.hh"
 
 #include <omp.h>
 
@@ -15,6 +14,23 @@
 
 using namespace khmer;
 using namespace std;
+
+
+Hashtable:: Hasher::
+Hasher( uint32_t const thread_id, uint8_t const	trace_level )
+: thread_id( thread_id ),
+  trace_logger(
+    TraceLogger(
+      trace_level, "hastable-%lu.log", (unsigned long int)thread_id
+    )
+  )
+{ }
+
+
+Hashtable:: Hasher::
+~Hasher( )
+{ }
+
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -81,6 +97,11 @@ void Hashtable::consume_fasta(const std::string &filename,
   total_reads = 0;
   n_consumed = 0;
 
+  // TODO? Lookup parser by filename.
+  //	   Use an empty string for STDIN.
+  //	   If no parser exists for filename, then create one.
+  //	   Else, re-use existing one.
+  //	   Alternatively, we might be able to get clever in the Python wrapper.
 #ifndef USE_NEW_PARSER
   IParser* parser = IParser::get_parser(filename);
 #else
@@ -102,6 +123,7 @@ void Hashtable::consume_fasta(const std::string &filename,
     string currName = "";
     string currSeq = "";
   
+  // TODO: Move TraceLogger instances into Hasher.
 #if (0)
   // DEBUG
   TraceLogger	    trace_logger(
@@ -139,9 +161,10 @@ void Hashtable::consume_fasta(const std::string &filename,
 					     lower_bound,
 					     upper_bound);
 
+    // TODO: Get back return values with atomic operations
+    //	     to use in reporting below.
     __sync_add_and_fetch( &n_consumed, this_n_consumed );
     __sync_add_and_fetch( &total_reads, 1 );
-
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
       try {
