@@ -1,20 +1,25 @@
+#ifndef SCORINGMATRIX_HH
+#define SCORINGMATRIX_HH
+
 class ScoringMatrix {
-   int sm[5][5];
+   double sm[5][5];
 
 private:
    int assign(char);
 
 public:
    ScoringMatrix() {
-      sm = 
+      sm =
       {
-      { 5, -4, -4, -4, -2},
-      {-4,  5, -4, -4, -2},
-      {-4, -4,  5, -4, -2},
-      {-4, -4, -4,  5, -2},
-      {-2, -2, -2, -2, -1}
+      { 0, -9, -9, -9, -7},
+      {-9,  0, -9, -9, -7},
+      {-9, -9,  0, -9, -7},
+      {-9, -9, -9,  0, -7},
+      {-7, -7, -7, -7, -6}
       };
    }
    
    int score(char, char);
 };
+
+#endif // SCORINGMATRIX_HH

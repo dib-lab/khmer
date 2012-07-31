@@ -11,7 +11,7 @@
 #include "hashbits.hh"
 #include "counting.hh"
 #include "storage.hh"
-#include "readaligner.hh"
+#include "aligner.hh"
 
 //
 // Function necessary for Python loading:
@@ -526,7 +526,7 @@ typedef struct {
 /* GRAPHALIGN addition */
 typedef struct {
   PyObject_HEAD
-  ReadAligner * aligner;
+  Aligner * aligner;
 } khmer_ReadAlignerObject;
 
 #define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
@@ -3229,7 +3229,7 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 static PyObject * readaligner_align(PyObject * self, PyObject * args)
 {
   khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-  ReadAligner * aligner = me->aligner;
+  Aligner * aligner = me->aligner;
 
   char * read;
 
@@ -3245,11 +3245,13 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
 
   CandidateAlignment aln = aligner->alignRead(read);
 
-  // check for nulls?
-
-  return Py_BuildValue("ssi", aln.alignment.c_str(),
-                              aln.getReadAlignment(read).c_str(),
-                              aln.score);
+  const char* alignment = aln.alignment.c_str();
+  const char* readAlignment = aln.getReadAlignment(read).c_str();
+  int score = aln.score;
+  
+  return Py_BuildValue("ssi", alignment,
+                              readAlignment,
+                              score);
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {
@@ -3341,7 +3343,7 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  readaligner_obj->aligner = new ReadAligner(ch->counting);
+  readaligner_obj->aligner = new Aligner(ch->counting);
 
   return (PyObject *) readaligner_obj; 
 }

@@ -55,7 +55,6 @@ def main():
         print 'making hashtable'
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
-    aligner = khmer.new_readaligner(ht)
 
     total = 0
     discarded = 0
@@ -64,7 +63,7 @@ def main():
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
-            if n > 0 and n % 100000 == 0:
+            if n > 0 and n % 10000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
                     int(100. - discarded / float(total) * 100.), '%'
                 print '... in file', input_filename
@@ -82,20 +81,27 @@ def main():
             seq = record.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
+            print n, med
+
             if med >= DESIRED_COVERAGE:
                 discarded += 1
+                print 'discarded read'
             else:
-                # bug is in align() :-/
+                aligner = khmer.new_readaligner(ht)
                 graphAlign, readAlign, score = aligner.align(seq)
+                del aligner
                 corr_seq = graphAlign.replace('-', '')
-                if corr_seq == "" or score < (len(seq)*5 - 6):
+                if corr_seq == "":
+                    print 'consuming read'
                     ht.consume(seq)
                     outfp.write('>%s\n%s\n' % (record.name, record.sequence))
                 else:
                     corr_med, _, _ = ht.get_median_count(corr_seq)
                     if corr_med >= DESIRED_COVERAGE:
+                        print corr_med, 'discarded read'
                         discarded += 1
                     else:
+                        print 'consuming corrected read'
                         ht.consume(corr_seq)
                         outfp.write('>%s\n%s\n' % \
                                     (record.name, record.sequence))
