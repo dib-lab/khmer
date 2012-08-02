@@ -19,4 +19,7 @@ Adina Howe, Rosangela Canino-Koning, and Arend Hintze contributed
 significantly to discussions of approaches and algorithms; Adina wrote
 a number of scripts.
 
-CTB 8/10
+Jared T. Simpson (University of Cambridge, Sanger Institute) contributed 
+paired-end support for digital normalization.
+
+EM 8/12
