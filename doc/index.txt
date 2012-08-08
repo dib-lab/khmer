@@ -25,6 +25,7 @@ Contents:
    ktable
    methods
    scripts
+   guide
    blog-posts
    choosing-hash-sizes
    partitioning-big-data
