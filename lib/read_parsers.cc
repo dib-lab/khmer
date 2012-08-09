@@ -1264,8 +1264,10 @@ get_next_read( )
     
     while (!is_complete( ))
     {
-	the_read.name	= "";
-	the_read.seq	= "";
+	the_read.name		= "";
+	the_read.annotations	= "";
+	the_read.sequence	= "";
+	the_read.accuracy	= "";
 
 	if (need_new_line) _copy_line( state );
 	need_new_line = true;
@@ -1343,19 +1345,19 @@ get_next_read( )
 	    _copy_line( state );
 	    if (at_start) break;
 	    if ('>' == line[ 0 ]) break;
-	    the_read.seq += line;
+	    the_read.sequence += line;
 	}
 
 	state.pmetrics.numreads_parsed_total++;
 
 	// Discard invalid read.
-	if (std:: string:: npos != the_read.seq.find_first_of( "Nn" ))
+	if (std:: string:: npos != the_read.sequence.find_first_of( "Nn" ))
 	{
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG6,
 		"get_next_read: Discarded read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
-		(unsigned long int)the_read.seq.length( )
+		(unsigned long int)the_read.sequence.length( )
 	    );
 	    continue;
 	}
@@ -1364,7 +1366,7 @@ get_next_read( )
 		TraceLogger:: TLVL_DEBUG6,
 		"get_next_read: Accepted read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
-		(unsigned long int)the_read.seq.length( )
+		(unsigned long int)the_read.sequence.length( )
 	    );
 
 	state.pmetrics.numreads_parsed_valid++;

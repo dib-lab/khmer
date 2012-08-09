@@ -132,7 +132,7 @@ consume_fasta(
     read      = parser->get_next_read();
 
     this_n_consumed = 
-    check_and_process_read(read.seq, is_valid, lower_bound, upper_bound);
+    check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
 
     n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
     total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );

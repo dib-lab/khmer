@@ -367,7 +367,9 @@ private:
 struct Read
 {
     std:: string name;
-    std:: string seq;
+    std:: string annotations;
+    std:: string sequence;
+    std:: string accuracy;
 };
 
 

@@ -26,7 +26,7 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
 
    while(!parser->is_complete()) {
      read = parser->get_next_read();
-     seq = read.seq;
+     seq = read.sequence;
 
      bool valid_read = true;
      if (!readmask || readmask->get(read_num)) {
@@ -128,7 +128,7 @@ ReadMaskTable * CountingHash::filter_fasta_file_limit_n(const std::string &reads
 
    while(!parser->is_complete()) {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
      
       if (readmask->get(read_num)) {
          int numPos = seq.length() - _ksize + 1;
@@ -232,7 +232,7 @@ ReadMaskTable * CountingHash::filter_fasta_file_run(const std::string &inputfile
 
    while(parser->is_complete()) {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
 
       if (readmask->get(read_num)) {
          bool keep = false;
@@ -292,7 +292,7 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
 
    while(!parser->is_complete()) {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
 
       int numPos = seq.length() - _ksize + 1;
 
@@ -326,7 +326,7 @@ unsigned long long khmer::output_filtered_fasta_file(const std::string &inputfil
    while(!parser->is_complete()) {
       read = parser->get_next_read();
 
-      seq = read.seq;
+      seq = read.sequence;
       name = read.name;
 
       if (readmask->get(read_num)) {
@@ -436,7 +436,7 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       HashIntoType kmer;
@@ -494,7 +494,7 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
    while(!parser->is_complete()) {
       read = parser->get_next_read();
 
-      seq = read.seq;
+      seq = read.sequence;
       bool valid_read = true;
 	 
       if (!readmask || readmask->get(read_num)) {
@@ -547,7 +547,7 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
   while(!parser->is_complete()) {
     read = parser->get_next_read();
     bool valid_read = true;
-    seq = read.seq;
+    seq = read.sequence;
 
     if (!readmask || readmask->get(read_num)) {
       valid_read = check_and_normalize_read(seq);
@@ -693,7 +693,7 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -740,7 +740,7 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -1148,7 +1148,7 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
   bool done = false;
   while(!parser->is_complete() && !done)  {
     read = parser->get_next_read();
-    currSeq = read.seq;
+    currSeq = read.sequence;
     currName = read.name; 
 
     // do we want to process it?
@@ -1189,7 +1189,7 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
   total_reads = 0;
   while(!parser->is_complete() && total_reads != stop_at_read)  {
     read = parser->get_next_read();
-    currSeq = read.seq;
+    currSeq = read.sequence;
     currName = read.name; 
 
     // do we want to process it?
