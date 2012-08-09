@@ -474,7 +474,7 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 
   while(!parser->is_complete())  {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     read_tags.clear();
 
@@ -630,7 +630,7 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 
   while(!parser->is_complete())  {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
@@ -686,7 +686,7 @@ void Hashbits::filter_if_present(const std::string infilename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       KMerIterator kmers(seq.c_str(), _ksize);
@@ -1485,7 +1485,7 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -1643,7 +1643,7 @@ void Hashbits::traverse_from_reads(std::string filename,
 
   while(!parser->is_complete())  {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {	// process?
       const char * last_kmer = seq.c_str() + seq.length() - _ksize;
@@ -1699,7 +1699,7 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
 
   while(!parser->is_complete())  {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {	// process?
       KMerIterator kmers(seq.c_str(), _ksize);
@@ -1937,7 +1937,7 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 
   while(!parser->is_complete())  {
     read = parser->get_next_read();
-    currSeq = read.seq;
+    currSeq = read.sequence;
     currName = read.name; 
 
     // do we want to process it?

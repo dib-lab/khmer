@@ -120,7 +120,7 @@ int main( int argc, char * argv[ ] )
 	    the_read = parser->get_next_read( );
 
 	    //fprintf( ofile_handle, ">%s\n", the_read.name.c_str( ) );
-	    seq_len = the_read.seq.length( );
+	    seq_len = the_read.sequence.length( );
 	    /*
 	    fprintf(
 		ofile_handle, "%s[%llu]\n",
