@@ -21,7 +21,7 @@ DEFAULT_MAX_SIZE=int(1e6)
 DEFAULT_THRESHOLD=5
 
 def read_partition_file(filename):
-    for n, record in enumerate(screed.open(filename)):
+    for n, record in enumerate(screed.open(filename, parse_description=False)):
         name = record.name
         name, partition_id = name.rsplit('\t', 1)
         yield n, name, int(partition_id), record.sequence
