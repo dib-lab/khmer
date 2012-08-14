@@ -1,3 +1,5 @@
+from libc.stdint cimport uint8_t, uint32_t, uint64_t
+from libcpp.string cimport string
 from libcpp.map cimport map
 from libcpp.pair cimport pair
 from libcpp.set cimport set
@@ -108,7 +110,77 @@ cdef class get_config:
       return self.thisref.get_hash_count_threshold( )
    def get_hash_bigcount_threshold( self ): 
       return self.thisref.get_hash_bigcount_threshold( )
+
+cdef extern from "../lib/read_parsers.hh" namespace "khmer:: read_parsers":
+   
+   cdef cppclass Read:
+      
+      Read( ) except +
+      
+      string name
+      string annotations
+      string sequence
+      string accuracy
     
+   cdef cppclass IParser:
+
+      #IParser( ) except + # TODO: Fill out parameters.
+
+      bool is_complete( )
+      Read get_next_read( )
+
+
+cdef extern from "../lib/read_parsers.hh" \
+namespace "khmer:: read_parsers:: IParser":
+   
+   cdef IParser * get_parser(
+      string ifile_name, uint32_t number_of_threads, 
+      uint64_t cache_size, uint8_t trace_level
+   )
+
+
+cdef class _Read:
+   
+   name        = ""
+   annotations = ""
+   sequence    = ""
+   accuracy    = ""
+
+   def __cinit__(
+      self, char * name, char * annotations, char * sequence, char * accuracy
+   ):
+      self.name         = name
+      self.annotations  = annotations
+      self.sequence     = sequence
+      self.accuracy     = accuracy
+
+
+cdef class _ReadParser:
+
+   cdef IParser *     thisref
+
+   def __cinit__(
+      self,
+      char * ifile_name, uint32_t number_of_threads, uint64_t cache_size, uint8_t trace_level
+   ): 
+      cdef string    ifile_name_STRING = string( ifile_name )
+
+      self.thisref = \
+      get_parser(
+         ifile_name_STRING, number_of_threads, cache_size, trace_level
+      )
+
+   def is_complete( self ):
+      return self.thisref.is_complete( )
+
+   def get_next_read( self ):
+      cdef Read the_read
+      the_read = self.thisref.get_next_read( )
+      return _Read(
+         the_read.name.c_str( ), the_read.annotations.c_str( ),
+         the_read.sequence.c_str( ), the_read.accuracy.c_str( )
+      ) 
+  
 
 cdef extern from "../lib/ktable.hh" namespace "khmer":
    HashIntoType _hash(char*, WordLength)
