@@ -34,6 +34,9 @@ consume_prof: consume_prof.o hashtable.o ktable.o
 aligntest: aligntest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
 	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
+bugtest: bugtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+
 kmer.o: kmer.cc kmer.hh
 
 node.o: node.cc node.hh
