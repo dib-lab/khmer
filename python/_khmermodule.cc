@@ -3246,9 +3246,14 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
   CandidateAlignment aln = aligner->alignRead(read);
 
   const char* alignment = aln.alignment.c_str();
-  const char* readAlignment = aln.getReadAlignment(read).c_str();
+  std::string rA = aln.getReadAlignment(read);
+  const char* readAlignment = rA.c_str();
   int score = aln.score;
-  
+ 
+  //std::cout << "returning: " << readAlignment << std::endl; 
+  //std::cout << ".........: " << aln.getReadAlignment(read) << std::endl;
+  //std::cout << "alignment: " << alignment << std::endl;
+
   return Py_BuildValue("ssi", alignment,
                               readAlignment,
                               score);
