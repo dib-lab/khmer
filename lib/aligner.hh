@@ -12,9 +12,10 @@ class CandidateAlignment {
 public:
    std::map<int,int> readDeletions;
    std::string alignment;
-   int score;
+   double score;
 
-   CandidateAlignment(std::map<int,int> _readDel, std::string _aln, int _score)
+   CandidateAlignment(std::map<int,int> _readDel, std::string _aln, 
+                      double _score)
    {
       readDeletions = _readDel;
       alignment = _aln;
@@ -23,7 +24,7 @@ public:
 
    CandidateAlignment() {
       alignment = "";
-      score = 1; // a positive score isn't possible!
+      score = -1.0; // a negative score isn't possible
    }
 
    bool operator<(const CandidateAlignment& param) const {
@@ -72,6 +73,8 @@ class Aligner {
    khmer::CountingHash * ch;
    ScoringMatrix * sm;
    int k;
+   double lambdaOne; // error distribution parameter
+   double lambdaTwo; // non-error distribution parameter
 
 public:
    Node * subalign(Node *, unsigned int, unsigned char, std::set<Node*>&, 
@@ -80,10 +83,12 @@ public:
    CandidateAlignment align(khmer::CountingHash*, const std::string&, 
                             const std::string&, int);
 
-   Aligner(khmer::CountingHash* _ch) {
+   Aligner(khmer::CountingHash* _ch, double lOne=0, double lTwo=0) {
       ch = _ch;
       sm = new ScoringMatrix();
       k = ch->ksize();
+      lambdaOne=lOne;
+      lambdaTwo=lTwo;
    }
 
    int ksize() {

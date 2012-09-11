@@ -6,6 +6,8 @@
 #include "scoringmatrix.hh"
 #include <queue>
 
+#include <cmath>
+
 class Node;
 
 class Node {
@@ -32,13 +34,14 @@ public:
    Kmer makeNextKmer(unsigned char forward, char b);
 
    std::queue<Node*> enumerate(CountingHash *, ScoringMatrix * sm, 
-                            unsigned char forward, const std::string&);
+                            unsigned char forward, const std::string&,
+                            double lambdaOne=0, double lambdaTwo=0);
 };
 
 class NodeCompare {
 public:
    bool operator()(Node* o1, Node* o2) {
-      if (o1->fval < o2-> fval) {
+      if (o1->fval > o2->fval) {
          return true;
       } else {
          return false;

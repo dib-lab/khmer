@@ -62,7 +62,9 @@ Node * Aligner::subalign(Node * startVert,
          return curr;
       }
 
-      std::queue<Node*> nodes = curr->enumerate(ch, sm, forward, seq);
+      std::queue<Node*> nodes = curr->enumerate(ch, sm, forward, seq,
+                                                lambdaOne,
+                                                lambdaTwo);
 
       while (!nodes.empty()) {
          Node * next = nodes.front();
@@ -73,7 +75,7 @@ Node * Aligner::subalign(Node * startVert,
 
          if (in_closed == closed.end() &&
              (where == open.end() ||
-              next->gval > (*where)->gval)) {
+              next->gval < (*where)->gval)) {
             open.push_back(next);
             std::push_heap(open.begin(), open.end(), NodeCompare());
          } else {
@@ -167,7 +169,7 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
                        extractString(rightGoal, 1, &readDels);
 
    // score up the alignment
-   int score = 0;
+   double score = 0;
    int readIndex = 0;
    int tmpDels = 0;
    for (int i = 0; i < (int)align.length(); i++) {
@@ -209,7 +211,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
             CandidateAlignment aln = align(ch, read, kmer, i);
             if (aln.alignment != "")  {
                alignments.insert(aln);
-               if (aln.score > best.score || best.score == 1) {
+               if (aln.score < best.score || best.score == -1) {
                   best = aln;
                }
             }
@@ -230,7 +232,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
       }
    }
 */
-   if (best.score < 1) {
+   if (best.score >= 0) {
       return best;
    } else {
       return CandidateAlignment();

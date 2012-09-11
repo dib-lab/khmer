@@ -3248,13 +3248,13 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
   const char* alignment = aln.alignment.c_str();
   std::string rA = aln.getReadAlignment(read);
   const char* readAlignment = rA.c_str();
-  int score = aln.score;
+  double score = aln.score;
  
   //std::cout << "returning: " << readAlignment << std::endl; 
   //std::cout << ".........: " << aln.getReadAlignment(read) << std::endl;
   //std::cout << "alignment: " << alignment << std::endl;
 
-  return Py_BuildValue("ssi", alignment,
+  return Py_BuildValue("ssd", alignment,
                               readAlignment,
                               score);
 }
@@ -3338,8 +3338,10 @@ static PyTypeObject khmer_ReadAlignerType = {
 static PyObject* new_readaligner(PyObject * self, PyObject * args)
 {
   PyObject * py_obj;
+  double lambdaOne = 0.0;
+  double lambdaTwo = 0.0;
 
-  if(!PyArg_ParseTuple(args, "O", &py_obj)) {
+  if(!PyArg_ParseTuple(args, "O|dd", &py_obj, &lambdaOne, &lambdaTwo)) {
     return NULL;
   }
 
@@ -3348,7 +3350,11 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  readaligner_obj->aligner = new Aligner(ch->counting);
+  if (lambdaOne == 0.0 && lambdaTwo == 0.0)
+    readaligner_obj->aligner = new Aligner(ch->counting);
+  else
+    readaligner_obj->aligner = new Aligner(ch->counting, 
+                                           lambdaOne, lambdaTwo);
 
   return (PyObject *) readaligner_obj; 
 }
