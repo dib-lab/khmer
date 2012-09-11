@@ -2,6 +2,27 @@
 
 enum { A, C, G, T };
 
+unsigned int factorial(unsigned int n) {
+   int ret = 1;
+
+   if (n == 0 || n == 1)
+      return 1;
+
+   for (unsigned int i = 2; i <= n; i++) {
+      ret = ret * i;
+   }
+
+   return ret;
+}
+
+double pois(double l, unsigned int k) {
+   return (pow(l,k)/factorial(k))*exp(0-l);
+}
+
+double weight_nonerror(unsigned int kCov, double lambOne, double lambTwo) {
+   return 0-log((pois(lambTwo, kCov))/(pois(lambOne, kCov) + pois(lambTwo, kCov)));
+}
+
 char getNextNucl(int base) {
    if (base == A) {
       return 'A';
@@ -81,15 +102,27 @@ Node::Node(Node* _parent,
 std::queue<Node*> Node::enumerate(CountingHash* ch,
                          ScoringMatrix* sm,
                          unsigned char forward,
-                         const std::string& seq) {
+                         const std::string& seq,
+                         double lambdaOne,
+                         double lambdaTwo) {
    std::queue<Node*> ret;
 
    int index;
    int remaining;
+   double bestMatch = sm->score('A','A');
+
+   // incorporate into kmer.hh so we only calculate once?
+   //int kmerCov = ch->get_count(kmer.getUniqueHash());
+   //double curr_kmer_prob;
+   //if (lambdaOne == 0 && lambdaTwo == 0) 
+   //   curr_kmer_prob = 0;
+   //else
+   //   curr_kmer_prob = weight_nonerror(kmerCov, lambdaOne, lambdaTwo);
 
    if (forward) {
       index = stateNo + 1;
-      remaining = kmer.getK();      
+      //remaining = kmer.getK(); 
+      remaining = seq.size() - index;     
    } else {
       index = stateNo - 1;
       remaining = index;
@@ -104,14 +137,21 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
          continue;
       }
 
+      int nextKmerCov = ch->get_count(nextKmer.getUniqueHash());
+      double next_kmer_prob;
+      if (lambdaOne == 0 && lambdaTwo == 0)
+         next_kmer_prob = 0;
+      else
+         next_kmer_prob = weight_nonerror(nextKmerCov, lambdaOne, lambdaTwo);
+
       // match
       Node * nextMatch = new Node(this,
                                 nextNucl,
                                 index,
                                 'm',
                                 nextKmer);
-      nextMatch->gval = gval + sm->score(nextNucl, seq[index]);
-      nextMatch->hval = 0;
+      nextMatch->gval = gval + sm->score(nextNucl, seq[index]) + next_kmer_prob;
+      nextMatch->hval = bestMatch * remaining;
       nextMatch->fval = nextMatch->gval + nextMatch->hval;
       
       if (nextNucl == seq[index]) {
@@ -120,11 +160,13 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
          nextMatch->diff = diff + 1;
       }
 
-      if (nextMatch->diff <= 3) {
-         ret.push(nextMatch);
-      } else {
-         delete nextMatch;
-      }
+      ret.push(nextMatch);
+
+//      if (nextMatch->diff <= 3) {
+//         ret.push(nextMatch);
+//      } else {
+//         delete nextMatch;
+//      }
 
       // insertion
       if (state != 'd') {
@@ -133,17 +175,19 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
                                  stateNo,
                                  'i',
                                  nextKmer);
-         nextIns->gval = gval + sm->score(nextNucl, '-');
-         nextIns->hval = 0;
+         nextIns->gval = gval + sm->score(nextNucl, '-') + next_kmer_prob;
+         nextIns->hval = bestMatch * (remaining + 1);
          nextIns->fval = nextIns->gval + nextIns->hval;
 
          nextIns->diff = diff + 1;
 
-         if (nextIns->diff <= 3) {
-            ret.push(nextIns);
-         } else {
-            delete nextIns;
-         }
+         ret.push(nextIns);
+
+//         if (nextIns->diff <= 3) {
+//            ret.push(nextIns);
+//         } else {
+//            delete nextIns;
+//         }
       }
    }
 
@@ -155,16 +199,18 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
                           'd',
                           kmer);
       nextDel->gval = gval + sm->score('-', seq[index]);
-      nextDel->hval = 0;
+      nextDel->hval = bestMatch * remaining;
       nextDel->fval = nextDel->gval + nextDel->hval;
 
       nextDel->diff = diff + 1;
 
-      if (nextDel->diff <= 3) {
-         ret.push(nextDel);
-      } else {
-         delete nextDel;
-      }
+      ret.push(nextDel);
+
+//      if (nextDel->diff <= 3) {
+//         ret.push(nextDel);
+//      } else {
+//         delete nextDel;
+//      }
    }
 
    return ret;

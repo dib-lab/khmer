@@ -1,4 +1,5 @@
 #include "scoringmatrix.hh"
+#include <cmath>
 
 using namespace std;
 
@@ -15,9 +16,19 @@ int ScoringMatrix::assign(char b) {
    return 4;
 }
 
-int ScoringMatrix::score(char ref, char qry) {
-   int r = assign(ref);
-   int q = assign(qry);
+double ScoringMatrix::score(char ref, char qry) {
+   //int r = assign(ref);
+   //int q = assign(qry);
 
-   return ScoringMatrix::sm[r][q];
+   if (ref == qry) { // match
+      return 0-log2(probs[MAT]); 
+   } else if (ref == '-') { // deletion
+      return 0-log2(probs[DEL]);
+   } else if (qry == '-') { // insertion
+      return 0-(log2(probs[INS])/4.0);
+   } else { // snp
+      return 0-(log2(probs[SNP])/3.0);
+   }   
+
+   //return ScoringMatrix::sm[r][q];
 }
