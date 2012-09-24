@@ -8,17 +8,23 @@
 
 class ScoringMatrix {
    //double sm[5][5];
-   double probs[4]; 
+   double scores[4]; 
 
 private:
    int assign(char);
 
 public:
    ScoringMatrix() {
-      probs[MAT] = .98;
-      probs[SNP] = .0066;
-      probs[INS] = .0066;
-      probs[DEL] = .0066;
+      /*
+      scores[MAT] = .96;
+      scores[SNP] = .02;
+      scores[INS] = .01;
+      scores[DEL] = .01;
+      */
+      scores[MAT] = 0.0;
+      scores[SNP] = 8.0;
+      scores[INS] = 4.0;
+      scores[DEL] = 4.0;
       /*
       sm =
       {

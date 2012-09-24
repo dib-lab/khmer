@@ -57,6 +57,8 @@ Node * Aligner::subalign(Node * startVert,
 
       closed.insert(curr);
 
+      std::cout << seqLen << " " << curr->stateNo << " " << curr->kmer.toString() << " " << curr->fval << " " << curr->gval << " " << curr->state << std::endl;
+
       if (curr->stateNo == seqLen-1 ||
           curr->stateNo == 0) {
          return curr;
@@ -93,6 +95,8 @@ std::string Aligner::extractString(Node* goal,
    std::string ret;
 
    while (goal->parent != NULL) {
+      //std::cout << " " << goal->kmer.toString() << " " << goal->state << std::endl;
+
       char b = goal->emission;
 
       ret += b;
@@ -131,6 +135,8 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
    std::vector<Node*> leftOpen;
    std::vector<Node*> rightOpen;
 
+   //std::cout << "begin align" << std::endl;
+
    Node * leftStart = new Node(NULL,
                          kmer[0],
                          index,
@@ -147,12 +153,14 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
                               leftClosed,
                               leftOpen,
                               seq);
+   //std::cout << "returned left" << std::endl;
    Node * rightGoal = subalign(rightStart,
                                seq.length(),
                                1,
                                rightClosed,
                                rightOpen,
                                seq);
+   //std::cout << "returned right" << std::endl;
 
    if (leftGoal == NULL || rightGoal == NULL) {
       for_each(leftOpen.begin(), leftOpen.end(), del_fun<Node>());

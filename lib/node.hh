@@ -17,9 +17,9 @@ public:
    char emission; // change to enum
    unsigned int stateNo;
    char state; //change to enum
-   int fval;
-   int hval;
-   int gval;
+   double fval;
+   double hval;
+   double gval;
 
    unsigned int diff;
 

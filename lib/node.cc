@@ -23,6 +23,16 @@ double weight_nonerror(unsigned int kCov, double lambOne, double lambTwo) {
    return 0-log((pois(lambTwo, kCov))/(pois(lambOne, kCov) + pois(lambTwo, kCov)));
 }
 
+bool isCorrectKmer(unsigned int kCov, double lambOne, double lambTwo) {
+   double probCorrect = 0-log((pois(lambTwo, kCov))/(pois(lambOne, kCov) + pois(lambTwo, kCov)));
+
+   if (probCorrect >= .5) {
+      return true;
+   } else {
+      return false;
+   }
+}
+
 char getNextNucl(int base) {
    if (base == A) {
       return 'A';
@@ -110,6 +120,7 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
    int index;
    int remaining;
    double bestMatch = sm->score('A','A');
+   double errorOffset = 10.0;
 
    // incorporate into kmer.hh so we only calculate once?
    //int kmerCov = ch->get_count(kmer.getUniqueHash());
@@ -138,11 +149,11 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
       }
 
       int nextKmerCov = ch->get_count(nextKmer.getUniqueHash());
-      double next_kmer_prob;
-      if (lambdaOne == 0 && lambdaTwo == 0)
-         next_kmer_prob = 0;
-      else
-         next_kmer_prob = weight_nonerror(nextKmerCov, lambdaOne, lambdaTwo);
+      //double error_weight;
+      //if (lambdaOne == 0 && lambdaTwo == 0)
+      //   next_kmer_prob = 0;
+      //else
+      //   next_kmer_prob = weight_nonerror(nextKmerCov, lambdaOne, lambdaTwo);
 
       // match
       Node * nextMatch = new Node(this,
@@ -150,7 +161,11 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
                                 index,
                                 'm',
                                 nextKmer);
-      nextMatch->gval = gval + sm->score(nextNucl, seq[index]) + next_kmer_prob;
+      nextMatch->gval = gval + sm->score(nextNucl, seq[index]);
+      if (!isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo))
+      {
+         nextMatch->gval += errorOffset;
+      }
       nextMatch->hval = bestMatch * remaining;
       nextMatch->fval = nextMatch->gval + nextMatch->hval;
       
@@ -160,7 +175,11 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
          nextMatch->diff = diff + 1;
       }
 
+//      if (fval <= nextMatch->fval)
       ret.push(nextMatch);
+//      else {
+//         delete nextMatch;
+//      }
 
 //      if (nextMatch->diff <= 3) {
 //         ret.push(nextMatch);
@@ -175,13 +194,23 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
                                  stateNo,
                                  'i',
                                  nextKmer);
-         nextIns->gval = gval + sm->score(nextNucl, '-') + next_kmer_prob;
+         nextIns->gval = gval + sm->score(nextNucl, '-');
+         if (!isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo))
+         {
+            nextIns->gval += errorOffset;
+         }
+
          nextIns->hval = bestMatch * (remaining + 1);
          nextIns->fval = nextIns->gval + nextIns->hval;
 
          nextIns->diff = diff + 1;
 
+//         if (fval <= nextIns->fval)
          ret.push(nextIns);
+//         else {
+//            std::cout << "overflow error..." << std::endl;
+//            delete nextIns;
+//         }
 
 //         if (nextIns->diff <= 3) {
 //            ret.push(nextIns);
@@ -193,18 +222,29 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 
    // deletion
    if (state != 'i') {
+      int kmerCov = ch->get_count(kmer.getUniqueHash());
       Node * nextDel = new Node(this,
                           '-',
                           index,
                           'd',
                           kmer);
       nextDel->gval = gval + sm->score('-', seq[index]);
+      if (!isCorrectKmer(kmerCov, lambdaOne, lambdaTwo))
+      {
+         nextDel->gval += errorOffset;
+      }
+
       nextDel->hval = bestMatch * remaining;
       nextDel->fval = nextDel->gval + nextDel->hval;
 
       nextDel->diff = diff + 1;
 
-      ret.push(nextDel);
+//      if (fval <= nextDel->fval)
+         ret.push(nextDel);
+//      else {
+//         std::cout << "overflow error..." << std::endl;
+//         delete nextDel;
+//      }
 
 //      if (nextDel->diff <= 3) {
 //         ret.push(nextDel);

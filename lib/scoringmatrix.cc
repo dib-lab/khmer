@@ -21,13 +21,17 @@ double ScoringMatrix::score(char ref, char qry) {
    //int q = assign(qry);
 
    if (ref == qry) { // match
-      return 0-log2(probs[MAT]); 
+      //return 0-log2(probs[MAT]); 
+      return scores[MAT];
    } else if (ref == '-') { // deletion
-      return 0-log2(probs[DEL]);
+      //return 0-log2(probs[DEL]);
+      return scores[DEL];
    } else if (qry == '-') { // insertion
-      return 0-(log2(probs[INS])/4.0);
+      //return 0-(log2(probs[INS])/4.0);
+      return scores[INS];
    } else { // snp
-      return 0-(log2(probs[SNP])/3.0);
+      //return 0-(log2(probs[SNP])/3.0);
+      return scores[SNP];
    }   
 
    //return ScoringMatrix::sm[r][q];
