@@ -47,6 +47,7 @@ Node * Aligner::subalign(Node * startVert,
                         std::vector<Node*>& open,
                         const std::string& seq) {
 
+   make_heap(open.begin(), open.end());
    open.push_back(startVert);
    std::push_heap(open.begin(), open.end(), NodeCompare());
 
@@ -57,10 +58,12 @@ Node * Aligner::subalign(Node * startVert,
 
       closed.insert(curr);
 
-      std::cout << seqLen << " " << curr->stateNo << " " << curr->kmer.toString() << " " << curr->fval << " " << curr->gval << " " << curr->state << std::endl;
+      //std::cout << seqLen << " " << curr->stateNo << " " << curr->kmer.toString() << " " << curr->fval << " " << curr->fval << " " << curr->gval << " " << curr->state << std::endl;
 
       if (curr->stateNo == seqLen-1 ||
           curr->stateNo == 0) {
+
+         std::cout << curr->kmer.toString() << " " << curr->stateNo << std::endl;
          return curr;
       }
 
@@ -75,11 +78,16 @@ Node * Aligner::subalign(Node * startVert,
          std::vector<Node*>::iterator where = node_vector_find(open, next);
          std::set<Node*>::iterator in_closed = node_set_find(closed, next);
 
+         //std::cout << " considering: " << next->kmer.toString() << " " << next->state << " " << next->fval << std::endl;
+
          if (in_closed == closed.end() &&
              (where == open.end() ||
               next->gval < (*where)->gval)) {
             open.push_back(next);
             std::push_heap(open.begin(), open.end(), NodeCompare());
+           
+            //std::cout << " added: " << next->kmer.toString() << " " << next->state << " " << next->fval << std::endl;
+
          } else {
             delete next;
          }

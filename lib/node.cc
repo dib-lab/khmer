@@ -24,9 +24,7 @@ double weight_nonerror(unsigned int kCov, double lambOne, double lambTwo) {
 }
 
 bool isCorrectKmer(unsigned int kCov, double lambOne, double lambTwo) {
-   double probCorrect = 0-log((pois(lambTwo, kCov))/(pois(lambOne, kCov) + pois(lambTwo, kCov)));
-
-   if (probCorrect >= .5) {
+   if (pois(lambTwo, kCov) >= pois(lambOne, kCov)) {
       return true;
    } else {
       return false;
@@ -122,14 +120,6 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
    double bestMatch = sm->score('A','A');
    double errorOffset = 10.0;
 
-   // incorporate into kmer.hh so we only calculate once?
-   //int kmerCov = ch->get_count(kmer.getUniqueHash());
-   //double curr_kmer_prob;
-   //if (lambdaOne == 0 && lambdaTwo == 0) 
-   //   curr_kmer_prob = 0;
-   //else
-   //   curr_kmer_prob = weight_nonerror(kmerCov, lambdaOne, lambdaTwo);
-
    if (forward) {
       index = stateNo + 1;
       //remaining = kmer.getK(); 
@@ -149,12 +139,6 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
       }
 
       int nextKmerCov = ch->get_count(nextKmer.getUniqueHash());
-      //double error_weight;
-      //if (lambdaOne == 0 && lambdaTwo == 0)
-      //   next_kmer_prob = 0;
-      //else
-      //   next_kmer_prob = weight_nonerror(nextKmerCov, lambdaOne, lambdaTwo);
-
       // match
       Node * nextMatch = new Node(this,
                                 nextNucl,
@@ -175,18 +159,7 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
          nextMatch->diff = diff + 1;
       }
 
-//      if (fval <= nextMatch->fval)
       ret.push(nextMatch);
-//      else {
-//         delete nextMatch;
-//      }
-
-//      if (nextMatch->diff <= 3) {
-//         ret.push(nextMatch);
-//      } else {
-//         delete nextMatch;
-//      }
-
       // insertion
       if (state != 'd') {
          Node * nextIns = new Node(this,
@@ -205,18 +178,7 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 
          nextIns->diff = diff + 1;
 
-//         if (fval <= nextIns->fval)
          ret.push(nextIns);
-//         else {
-//            std::cout << "overflow error..." << std::endl;
-//            delete nextIns;
-//         }
-
-//         if (nextIns->diff <= 3) {
-//            ret.push(nextIns);
-//         } else {
-//            delete nextIns;
-//         }
       }
    }
 
@@ -239,18 +201,7 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 
       nextDel->diff = diff + 1;
 
-//      if (fval <= nextDel->fval)
-         ret.push(nextDel);
-//      else {
-//         std::cout << "overflow error..." << std::endl;
-//         delete nextDel;
-//      }
-
-//      if (nextDel->diff <= 3) {
-//         ret.push(nextDel);
-//      } else {
-//         delete nextDel;
-//      }
+      ret.push(nextDel);
    }
 
    return ret;
