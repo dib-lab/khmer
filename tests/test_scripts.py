@@ -221,25 +221,55 @@ def test_normalize_by_median_2():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
 
-def test_normalize_by_min():
-    CUTOFF='5'
+def test_normalize_by_median_paired():
+    CUTOFF='1'
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
 
-    script = scriptpath('normalize-by-min.py')
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 2, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
+
+def test_normalize_by_median_impaired():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status != 0
+
+def test_normalize_by_median_empty():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-k', '17', infile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
 
-    outfile = infile + '.minkeep'
+    outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
-
-    seqs = [ r.sequence for r in screed.open(outfile) ]
-    assert len(seqs) == 5, seqs
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')
@@ -570,30 +600,3 @@ def test_abundance_dist():
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
 
-
-def test_count_overlap():
-    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
-    in_dir = os.path.dirname(seqfile1)
-    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
-    outfile = utils.get_temp_filename('overlap.out', in_dir)
-    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
-    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
-    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
-    htfile = _make_graph(seqfile1, K=20)
-    ht_dir = os.path.dirname(htfile)
-    script = scriptpath('count-overlap.py')
-    args = ['--ksize', '20', '--n_hashes', '2', '--hashsize','10000000',\
-            htfile+'.ht',seqfile2,outfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    data = [ x.strip() for x in open(outfile) ]
-    data = set(data)
-    assert '# of unique k-mers in dataset2: 759047' in data
-    assert '# of overlap unique k-mers: 245621' in data
-    assert os.path.exists(curvefile), curvefile
-    data = [ x.strip() for x in open(curvefile) ]
-    data = set(data)
-    assert '178633 1155' in data
-    assert '496285 2970' in data
-    assert '752053 238627' in data

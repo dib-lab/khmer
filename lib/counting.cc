@@ -474,8 +474,8 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
 
 HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &inputfile,
 					     const unsigned int max_read_len,
-					     BoundedCounterType limit_by_count,
 					     ReadMaskTable * readmask,
+					     BoundedCounterType limit_by_count,
 					     CallbackFn callback,
 					     void * callback_data)
 {

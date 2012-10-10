@@ -113,6 +113,15 @@ class Test_KTable:
 
         for i in range(0, kt.n_entries()):
             assert(kt.get(i) == 1)
+    
+    def test_operator_in( self ):
+        kt = self.kt
+
+        s = "ATGAGAGACACAGGGAGAGACCCAATTAGAGAATTGGACC"
+        kt.consume(s)
+
+	assert "CCCAA" in kt
+	assert not "GGGGG" in kt
 
     def test_intersection(self):
         kt = self.kt

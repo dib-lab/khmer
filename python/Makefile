@@ -12,6 +12,7 @@ setup.py: setup.py.in
 		setup.py.in > setup.py
 
 test:	all
+	nosetests -v -x
 
 clean:
 	-python setup.py clean
