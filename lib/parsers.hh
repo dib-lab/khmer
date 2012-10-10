@@ -21,6 +21,7 @@ namespace khmer
 	    //std::string quality;
 	};
 
+
 	class IParser
 	{
 	public:
