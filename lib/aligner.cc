@@ -62,8 +62,6 @@ Node * Aligner::subalign(Node * startVert,
 
       if (curr->stateNo == seqLen-1 ||
           curr->stateNo == 0) {
-
-         std::cout << curr->kmer.toString() << " " << curr->stateNo << std::endl;
          return curr;
       }
 
@@ -212,45 +210,125 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
 }
 
 CandidateAlignment Aligner::alignRead(const std::string& read) {
+   std::vector<unsigned int> markers;
+   bool toggleError = 1;
+
    unsigned int k = ch->ksize();
 
    std::set<CandidateAlignment> alignments;
    CandidateAlignment best = CandidateAlignment();
+
+   std::string graphAlign = "";
 
    for (unsigned int i = 0; i < read.length() - k + 1; i++) {
       std::string kmer = read.substr(i, k);
 
       assert(kmer.length() == k);
 
-      if (ch->get_count(kmer.c_str())) {
-         if (best.alignment.find(kmer) == std::string::npos) {
-            CandidateAlignment aln = align(ch, read, kmer, i);
-            if (aln.alignment != "")  {
-               alignments.insert(aln);
-               if (aln.score < best.score || best.score == -1) {
-                  best = aln;
-               }
-            }
-         }
+      int kCov = ch->get_count(kmer.c_str());
+
+      bool isCorrect = isCorrectKmer(kCov, lambdaOne, lambdaTwo);
+
+      if (toggleError && isCorrect) {
+         markers.push_back(i);
+         toggleError = 0;
+      } else if (!toggleError && !isCorrect) {
+         markers.push_back(i-1);
+         toggleError = 1;
       }
+
+      //std::cout << isCorrect;
+   }
+   //std::cout << std::endl;
+
+   for (unsigned int i = 0; i < markers.size(); i++) {
+      //std::cout << markers[i] << " ";
+   }
+   //std::cout << std::endl;
+
+   // couldn't find a seed k-mer
+   if (markers.size() == 0) {
+      return best;
    }
 
-/*
-   // find the best alignment...
-   CandidateAlignment * best = NULL;
-   std::set<CandidateAlignment>::iterator it;
-   for (it=alignments.begin(); it != alignments.end(); it++) {
-      CandidateAlignment curr = (*it);
-      if (best == NULL) {
-         best = &curr;
-      } else if (best->score < curr.score) {
-         best = &curr;
+   // read appears to be error free
+   if (markers.size() == 1 && markers[0] == 0) {
+      std::map<int,int> readDels;
+      CandidateAlignment retAln = CandidateAlignment(readDels, read, 0.0);
+      return retAln;
+   }
+   
+   unsigned int startIndex = 0;
+
+   if (markers[0] != 0) {
+      unsigned int index = markers[0];
+      CandidateAlignment aln = align(ch,
+                                     read.substr(0, index+k),
+                                     read.substr(index, k),
+                                     index);
+
+      graphAlign += aln.alignment.substr(0,aln.alignment.length()-k); 
+      startIndex++;
+
+      //std::cout << "case 1: " << aln.alignment.substr(0,aln.alignment.length()-k) << std::endl;
+
+      if (markers.size() > 1) {
+         //std::cout << "case 2: " << read.substr(index, markers[1]-index) << std::endl;
+         graphAlign += read.substr(index, markers[1]-index);
+      } else {
+         //std::cout << "case 9: " << read.substr(index) << std::endl;
+         graphAlign += read.substr(index);
+      }
+   } else {
+      //std::cout << "case 8: " << read.substr(0, markers[1]-markers[0]) << std::endl;
+      graphAlign += read.substr(0, markers[1]-markers[0]);
+      startIndex++;
+   }
+
+   for (unsigned int i = startIndex; i < markers.size(); i+=2) {
+      unsigned int index = markers[i];
+
+      //std::cout << i << std::endl;
+
+      if (i == markers.size()-1) {
+         CandidateAlignment aln = align(ch,
+                                        read.substr(index),
+                                        read.substr(index, k),
+                                        0);
+         graphAlign += aln.alignment.substr(0,aln.alignment.length());
+         //std::cout << "case 3: " << aln.alignment.substr(0,aln.alignment.length()) << std::endl;
+         break;
+      } else {
+         CandidateAlignment aln = align(ch, 
+                                        read.substr(index, markers[i+1]-index+k),
+                                        read.substr(index, k),
+                                        0);
+         size_t kmerInd = aln.alignment.rfind(read.substr(markers[i+1], k));
+         if (kmerInd == std::string::npos) {
+            return best; // change this to, um, worst at some point
+         } else {
+            //std::cout << kmerInd << std::endl << aln.alignment << std::endl;
+            graphAlign += aln.alignment.substr(0, kmerInd);
+            //std::cout << "case 4: " << aln.alignment.substr(0, kmerInd) << std::endl;
+         }
+         //graphAlign += aln.alignment.substr(0);
+         //graphAlign += aln.alignment.substr(0, aln.alignment.length()-k);
+         //std::cout << "case 4: " << aln.alignment.substr(0, aln.alignment.length()-k) << std::endl;
+      }
+
+      // add next correct region to alignment
+      if (i+1 != markers.size()-1) {
+         graphAlign += read.substr(markers[i+1], markers[i+2]-markers[i+1]);
+         //std::cout << "case 5: " << read.substr(markers[i+1], markers[i+2]-markers[i+1]) << std::endl;
+      } else {
+         //std::cout << "case 6: " << read.substr(markers[i+1]) << std::endl;
+         graphAlign += read.substr(markers[i+1]);
+         //std::cout << "case 6: " << read.substr(markers[i+1]+k) << std::endl;
+         //graphAlign += read.substr(markers[i+1]+k);
       }
    }
-*/
-   if (best.score >= 0) {
-      return best;
-   } else {
-      return CandidateAlignment();
-   }
+   
+   std::map<int,int> readDels;
+   CandidateAlignment retAln = CandidateAlignment(readDels, graphAlign, 0.0);
+   return retAln;
 }

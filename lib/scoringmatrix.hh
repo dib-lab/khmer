@@ -22,7 +22,7 @@ public:
       scores[DEL] = .01;
       */
       scores[MAT] = 0.0;
-      scores[SNP] = 8.0;
+      scores[SNP] = 7.0;
       scores[INS] = 4.0;
       scores[DEL] = 4.0;
       /*
