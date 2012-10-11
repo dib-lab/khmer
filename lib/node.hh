@@ -8,6 +8,11 @@
 
 #include <cmath>
 
+extern unsigned int factorial(unsigned int n);
+extern double pois(double l, unsigned int k);
+extern double weight_nonerror(unsigned int kCov, double lambOne, double lambTwo);
+extern bool isCorrectKmer(unsigned int kCov, double lambOne, double lambTwo);
+
 class Node;
 
 class Node {
