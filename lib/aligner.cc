@@ -58,8 +58,6 @@ Node * Aligner::subalign(Node * startVert,
 
       closed.insert(curr);
 
-      //std::cout << seqLen << " " << curr->stateNo << " " << curr->kmer.toString() << " " << curr->fval << " " << curr->fval << " " << curr->gval << " " << curr->state << std::endl;
-
       if (curr->stateNo == seqLen-1 ||
           curr->stateNo == 0) {
          return curr;
@@ -76,15 +74,12 @@ Node * Aligner::subalign(Node * startVert,
          std::vector<Node*>::iterator where = node_vector_find(open, next);
          std::set<Node*>::iterator in_closed = node_set_find(closed, next);
 
-         //std::cout << " considering: " << next->kmer.toString() << " " << next->state << " " << next->fval << std::endl;
-
          if (in_closed == closed.end() &&
              (where == open.end() ||
               next->gval < (*where)->gval)) {
             open.push_back(next);
             std::push_heap(open.begin(), open.end(), NodeCompare());
            
-            //std::cout << " added: " << next->kmer.toString() << " " << next->state << " " << next->fval << std::endl;
 
          } else {
             delete next;
@@ -101,8 +96,6 @@ std::string Aligner::extractString(Node* goal,
    std::string ret;
 
    while (goal->parent != NULL) {
-      //std::cout << " " << goal->kmer.toString() << " " << goal->state << std::endl;
-
       char b = goal->emission;
 
       ret += b;
@@ -141,8 +134,6 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
    std::vector<Node*> leftOpen;
    std::vector<Node*> rightOpen;
 
-   //std::cout << "begin align" << std::endl;
-
    Node * leftStart = new Node(NULL,
                          kmer[0],
                          index,
@@ -159,14 +150,12 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
                               leftClosed,
                               leftOpen,
                               seq);
-   //std::cout << "returned left" << std::endl;
    Node * rightGoal = subalign(rightStart,
                                seq.length(),
                                1,
                                rightClosed,
                                rightOpen,
                                seq);
-   //std::cout << "returned right" << std::endl;
 
    if (leftGoal == NULL || rightGoal == NULL) {
       for_each(leftOpen.begin(), leftOpen.end(), del_fun<Node>());
@@ -236,15 +225,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
          markers.push_back(i-1);
          toggleError = 1;
       }
-
-      //std::cout << isCorrect;
    }
-   //std::cout << std::endl;
-
-   for (unsigned int i = 0; i < markers.size(); i++) {
-      //std::cout << markers[i] << " ";
-   }
-   //std::cout << std::endl;
 
    // couldn't find a seed k-mer
    if (markers.size() == 0) {
@@ -270,17 +251,12 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
       graphAlign += aln.alignment.substr(0,aln.alignment.length()-k); 
       startIndex++;
 
-      //std::cout << "case 1: " << aln.alignment.substr(0,aln.alignment.length()-k) << std::endl;
-
       if (markers.size() > 1) {
-         //std::cout << "case 2: " << read.substr(index, markers[1]-index) << std::endl;
          graphAlign += read.substr(index, markers[1]-index);
       } else {
-         //std::cout << "case 9: " << read.substr(index) << std::endl;
          graphAlign += read.substr(index);
       }
    } else {
-      //std::cout << "case 8: " << read.substr(0, markers[1]-markers[0]) << std::endl;
       graphAlign += read.substr(0, markers[1]-markers[0]);
       startIndex++;
    }
@@ -288,15 +264,12 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
    for (unsigned int i = startIndex; i < markers.size(); i+=2) {
       unsigned int index = markers[i];
 
-      //std::cout << i << std::endl;
-
       if (i == markers.size()-1) {
          CandidateAlignment aln = align(ch,
                                         read.substr(index),
                                         read.substr(index, k),
                                         0);
          graphAlign += aln.alignment.substr(0,aln.alignment.length());
-         //std::cout << "case 3: " << aln.alignment.substr(0,aln.alignment.length()) << std::endl;
          break;
       } else {
          CandidateAlignment aln = align(ch, 
@@ -307,23 +280,15 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
          if (kmerInd == std::string::npos) {
             return best; // change this to, um, worst at some point
          } else {
-            //std::cout << kmerInd << std::endl << aln.alignment << std::endl;
             graphAlign += aln.alignment.substr(0, kmerInd);
-            //std::cout << "case 4: " << aln.alignment.substr(0, kmerInd) << std::endl;
          }
-         //graphAlign += aln.alignment.substr(0);
-         //graphAlign += aln.alignment.substr(0, aln.alignment.length()-k);
-         //std::cout << "case 4: " << aln.alignment.substr(0, aln.alignment.length()-k) << std::endl;
       }
 
       // add next correct region to alignment
       if (i+1 != markers.size()-1) {
          graphAlign += read.substr(markers[i+1], markers[i+2]-markers[i+1]);
-         //std::cout << "case 5: " << read.substr(markers[i+1], markers[i+2]-markers[i+1]) << std::endl;
       } else {
-         //std::cout << "case 6: " << read.substr(markers[i+1]) << std::endl;
          graphAlign += read.substr(markers[i+1]);
-         //std::cout << "case 6: " << read.substr(markers[i+1]+k) << std::endl;
          //graphAlign += read.substr(markers[i+1]+k);
       }
    }
