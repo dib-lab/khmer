@@ -769,6 +769,17 @@ static PyObject * ktable__getitem__(PyObject * self, Py_ssize_t index)
   return PyInt_FromLong(count);
 }
 
+static int ktable__contains__( PyObject * self, PyObject * val )
+{
+  khmer_KTableObject * me = (khmer_KTableObject *) self;
+  khmer::KTable * ktable = me->ktable;
+  // TODO: Consider other object types.
+  char * kmer_str = PyString_AsString( val );
+
+  if (kmer_str) return (int)(bool)ktable->get_count( kmer_str );
+  return -1;
+}
+
 static PyObject * ktable_set(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
@@ -892,6 +903,8 @@ static PySequenceMethods khmer_KTable_SequenceMethods = {
   ktable__getitem__,
   0,
   0,
+  0,
+  ktable__contains__,
   0,
   0
 };
@@ -1814,7 +1827,7 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
 
   unsigned long long * counts;
   counts = counting->fasta_count_kmers_by_position(inputfile, max_read_len,
-						    limit_by, readmask,
+						    readmask, limit_by, 
 						    _report_fn, callback_obj);
 					 
   PyObject * x = PyList_New(max_read_len);
