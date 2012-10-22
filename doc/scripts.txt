@@ -207,24 +207,6 @@ highly-connected k-mers (HCKs).  See :doc:`partitioning-big-data`.
 Digital normalization
 =====================
 
-**normalize-by-min.py**: do digital normalization (remove entirely
-redundant sequences)
-
-   Usage::
-
-	normalize-by-min.py [ options ] <file1> <file2> ...
-
-   Discard sequences based on whether or not their **minimum** k-mer
-   abundance lies above a specified cutoff.  Kept sequences will be
-   placed in <fileN>.keep.
-
-   Note: this is, in theory, a loss-less operation.  Only sequences that
-   contribute no novel k-mers will be discarded.
-
-   Example::
-
-	scripts/normalize-by-min.py -k 17 tests/test-data/test-abund-read-2.fa
-
 **normalize-by-median.py**: do digital normalization (remove mostly
 redundant sequences)
 
@@ -236,6 +218,12 @@ redundant sequences)
    abundance lies above a specified cutoff.  Kept sequences will be
    placed in <fileN>.keep.
 
+   Paired end reads can be considered together if the ``-p`` flag is set.
+
    Example::
 
-	scripts/normalize-by-min.py -k 17 tests/test-data/test-abund-read-2.fa
+	scripts/normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
+
+   Example::
+
+	scripts/normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
