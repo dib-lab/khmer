@@ -1051,12 +1051,12 @@ get_parser(
     IStreamReader * stream_reader   = NULL;
     IParser *	    parser	    = NULL;
 
-    int		    ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
-    if (-1 == ifile_handle) throw InvalidStreamHandle( );
     std:: string    ext	    = "";
     std:: string    ifile_name_chopped( ifile_name );
     size_t	    ext_pos = ifile_name.find_last_of( "." );
     bool	    rechop  = false;
+
+    int		    ifile_handle    = -1;
 
     if (0 < ext_pos)
     {
@@ -1066,16 +1066,42 @@ get_parser(
 
     if	    ("gz" == ext)
     {
+	ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
+	if (-1 == ifile_handle) throw InvalidStreamHandle( );
+#ifdef __linux__
+	posix_fadvise(
+	    ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
+	);
+#endif
 	stream_reader	= new GzStreamReader( ifile_handle );
 	rechop		= true;
     }
     else if ("bz2" == ext)
     {
+	ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
+	if (-1 == ifile_handle) throw InvalidStreamHandle( );
+#ifdef __linux__
+	posix_fadvise(
+	    ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
+	);
+#endif
 	stream_reader	= new Bz2StreamReader( ifile_handle );
 	rechop		= true;
     }
     else
+    {
+	// TODO: Support O_DIRECT flag. Be careful about pipes and ttys.
+	//	 Tell RawStreamReader about need for aligned reads.
+	ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
+	if (-1 == ifile_handle) throw InvalidStreamHandle( );
+	// TEMP: Use fadvise for now until O_DIRECT support where it needed.
+#ifdef __linux__
+	posix_fadvise(
+	    ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
+	);
+#endif
 	stream_reader	= new RawStreamReader( ifile_handle );
+    }
 
     if (rechop)
     {
