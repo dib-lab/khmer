@@ -152,8 +152,8 @@ namespace khmer {
 
     Hashtable(
 	WordLength	ksize,
-	// TODO: Get default number of threads from config.
-	uint32_t const	number_of_threads   = 1,
+	uint32_t const	number_of_threads   = 
+	get_active_config( ).get_number_of_threads( ),
 	uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
     )
     :	_trace_level( trace_level ),
