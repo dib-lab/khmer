@@ -1188,7 +1188,7 @@ _copy_line( ParserState &state )
 	    "_copy_line: Detected line fragment: \"%s\"[%llu]\n",
 	    (char const *)(buffer + pos), (unsigned long long int)i
 	);
-	line += (char const *)(buffer + pos);
+	line.append( (char const *)(buffer + pos), i );
 
 	if (hit)
 	{
