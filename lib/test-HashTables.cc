@@ -17,6 +17,7 @@
 
 #define OUTPUT_HASHTABLE
 
+#include "read_parsers.hh"
 #if HASH_TYPE_TO_TEST == 1
 #  include "counting.hh"
 #elif HASH_TYPE_TO_TEST == 2
@@ -28,6 +29,7 @@
 
 using namespace std;
 using namespace khmer;
+using namespace khmer:: read_parsers;
 
 
 static const char *	    SHORT_OPTS		= "k:N:x:";	
@@ -93,7 +95,11 @@ int main( int argc, char * argv[ ] )
 
 #if HASH_TYPE_TO_TEST == 1
     CountingHash ht( kmer_length, ht_sizes );
-    ht.consume_fasta( ifile_name, reads_total, n_consumed );
+    IParser * parser = IParser:: get_parser( ifile_name );
+#pragma omp parallel shared( reads_total, n_consumed )
+    {
+    ht.consume_fasta( parser, reads_total, n_consumed );
+    }
 #elif HASH_TYPE_TO_TEST == 2
     Hashbits ht( kmer_length, ht_sizes );
     ht.consume_fasta_and_tag( ifile_name, reads_total, n_consumed );
