@@ -157,6 +157,8 @@ struct IStreamReader
 	    IStreamReader( );
     virtual ~IStreamReader( );
 
+    size_t const		    get_memory_alignment( ) const;
+
     bool const			    is_at_end_of_stream( ) const;
 
     virtual uint64_t const	    read_into_cache(
@@ -164,6 +166,9 @@ struct IStreamReader
     ) = 0;
 
 protected:
+
+    size_t			    _alignment;
+    size_t			    _max_aligned;
     
     bool			    _at_eos;
 
@@ -173,7 +178,7 @@ protected:
 struct RawStreamReader : public IStreamReader
 {
     
-	    RawStreamReader( int const fd );
+	    RawStreamReader( int const fd, size_t const alignment = 0 );
     virtual ~RawStreamReader( );
 
     virtual uint64_t const  read_into_cache(
@@ -304,6 +309,7 @@ private:
 	bool				avail;
 	uint32_t			thread_id;
 	uint64_t			size;
+	size_t				alignment;
 	uint8_t *			memory;
 	uint64_t			cursor;
 	bool				cursor_in_sa_buffer;
@@ -315,6 +321,7 @@ private:
 	CacheSegment(
 	    uint32_t const  thread_id,
 	    uint64_t const  size,
+	    size_t const    alignment = 0,
 	    uint8_t const   trace_level = TraceLogger:: TLVL_NONE
 	);
 	~CacheSegment( );
@@ -338,6 +345,7 @@ private:
     uint32_t		_number_of_threads;
     ThreadIDMap		_thread_id_map;
 
+    size_t		_alignment;
     uint64_t		_segment_size;
     CacheSegment **	_segments;
     uint32_t		_segment_ref_count;
