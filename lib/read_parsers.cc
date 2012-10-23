@@ -1,12 +1,15 @@
 #include <cstring>
 
+#include <cstdlib>
 #include <cstdio>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #ifdef __linux__
+#   include <sys/ioctl.h>
 #   include <sys/syscall.h>
+#   include <linux/fs.h>
 #endif
 
 #include <ctime>
@@ -139,16 +142,27 @@ accumulate_timer_deltas( uint32_t metrics_key )
 IStreamReader::
 IStreamReader( )
 :   pmetrics( StreamReaderPerformanceMetrics( ) ),
+    _alignment( 0 ),
+    _max_aligned( SSIZE_MAX ),
     _at_eos( false )
 { }
 
 
 RawStreamReader::
-RawStreamReader( int const fd )
+RawStreamReader( int const fd, size_t const alignment )
 : IStreamReader( )
 {
 
     if (0 > fd) throw InvalidStreamBuffer( );
+
+#ifdef __linux__
+    if (alignment)
+    {
+	_alignment	= alignment;
+	_max_aligned	= _alignment * (SSIZE_MAX / _alignment);
+    }
+#endif
+	
     _stream_handle    = fd;
 
 }
@@ -224,24 +238,37 @@ is_at_end_of_stream( ) const
 { return _at_eos; }
 
 
+size_t const
+IStreamReader::
+get_memory_alignment( ) const
+{ return _alignment; }
+
+
 uint64_t const
 RawStreamReader::
 read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 {
+    uint64_t	cache_size_adjusted = cache_size;
     ssize_t	nbread		    = 0;
     uint64_t	nbread_total	    = 0;
 
     assert (NULL != cache);
     if (0 == cache_size) return 0;
 
-    for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
+#ifdef __linux__
+    if (_alignment && (0 != (cache_size % _alignment)))
+	cache_size_adjusted = _alignment * ((cache_size / _alignment) + 1);
+#endif
+    for (uint64_t nbrem = cache_size_adjusted;
+	 (0 < nbrem) && !_at_eos;
+	 nbrem -= nbread)
     {
 	pmetrics.start_timers( );
 	nbread =
 	read(
 	    _stream_handle, 
 	    cache + nbread_total,
-	    (size_t)( nbrem > SSIZE_MAX ? SSIZE_MAX : nbrem )
+	    (size_t)(nbrem > _max_aligned ? _max_aligned : nbrem )
 	);
 	pmetrics.stop_timers( );
 	pmetrics.accumulate_timer_deltas(
@@ -493,6 +520,14 @@ CacheManager(
 
     if (cache_size < number_of_threads)	throw InvalidCacheSizeRequested( );
     _segment_size	= cache_size / number_of_threads;
+    _alignment		= stream_reader.get_memory_alignment( );
+#ifdef __linux__
+    if (_alignment)
+    {
+	_segment_size = _alignment * (_segment_size / _alignment);
+	if (!_segment_size) _segment_size = _alignment;
+    }
+#endif
     _segments		= new CacheSegment *[ number_of_threads ];
     for (uint32_t i = 0; i < number_of_threads; ++i) _segments[ i ] = NULL;
 
@@ -521,11 +556,12 @@ CacheManager:: CacheSegment::
 CacheSegment(
     uint32_t const  thread_id,
     uint64_t const  size,
+    size_t const    alignment,
     uint8_t const   trace_level
 )
 :   thread_id( thread_id ),
     size( size ),
-    memory( new uint8_t[ size ] ),
+    alignment( alignment ),
     cursor( 0 ),
     cursor_in_sa_buffer( false ),
     fill_id( 0 ),
@@ -536,6 +572,18 @@ CacheSegment(
 	)
     )
 {
+    
+#ifdef __linux__
+    if (alignment)
+    {
+	if (!posix_memalign(
+	    (void **)&memory, alignment, size * sizeof( uint8_t )
+	))
+	    throw std:: bad_alloc( );
+    }
+    else
+#endif
+	memory = new uint8_t[ size ];
 
     _sa_buffer_avail	= false;
     sa_buffer_size	= 0;
@@ -559,7 +607,11 @@ CacheManager:: CacheSegment::
     sa_buffer_size	= 0;
     size		= 0;
 
-    delete [ ] memory;
+#ifdef __linux__
+    if (alignment) free( memory );
+    else
+#endif
+	delete [ ] memory;
     memory		= NULL;
 
 }
@@ -883,7 +935,7 @@ _get_segment( bool const higher )
     if (NULL == segment_PTR)
     {
 	_segments[ thread_id ]	    = new CacheSegment(
-	    thread_id, _segment_size, _trace_level
+	    thread_id, _segment_size, _alignment, _trace_level
 	);
 	segment_PTR		    = _segments[ thread_id ];
 	_increment_segment_ref_count_ATOMIC( );
@@ -1057,6 +1109,7 @@ get_parser(
     bool	    rechop  = false;
 
     int		    ifile_handle    = -1;
+    int		    ifile_flags	    = O_RDONLY;
 
     if (0 < ext_pos)
     {
@@ -1066,7 +1119,7 @@ get_parser(
 
     if	    ("gz" == ext)
     {
-	ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
+	ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
 	if (-1 == ifile_handle) throw InvalidStreamHandle( );
 #ifdef __linux__
 	posix_fadvise(
@@ -1078,7 +1131,7 @@ get_parser(
     }
     else if ("bz2" == ext)
     {
-	ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
+	ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
 	if (-1 == ifile_handle) throw InvalidStreamHandle( );
 #ifdef __linux__
 	posix_fadvise(
@@ -1088,19 +1141,32 @@ get_parser(
 	stream_reader	= new Bz2StreamReader( ifile_handle );
 	rechop		= true;
     }
-    else
+    else // Uncompressed file.
     {
-	// TODO: Support O_DIRECT flag. Be careful about pipes and ttys.
-	//	 Tell RawStreamReader about need for aligned reads.
-	ifile_handle    = open( ifile_name.c_str( ), O_RDONLY );
-	if (-1 == ifile_handle) throw InvalidStreamHandle( );
-	// TEMP: Use fadvise for now until O_DIRECT support where it needed.
+	size_t	alignment   = 0;	// 512 bytes is Chaotic Good?
+
+	ifile_handle	= open( ifile_name.c_str( ), ifile_flags | O_DIRECT );
+	if (-1 != ifile_handle)
+	{
+	    if (0 > ioctl( ifile_handle, BLKSSZGET, &alignment ))
+	    {
+		close( ifile_handle );
+		ifile_handle = -1;
+		alignment    = 0;
+	    }
+	}
+	if (-1 == ifile_handle)
+	{
+	    ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
+	    if (-1 == ifile_handle) throw InvalidStreamHandle( );
+	}
 #ifdef __linux__
-	posix_fadvise(
-	    ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
-	);
+	if (!alignment) // Lawful Evil
+	    posix_fadvise(
+		ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
+	    );
 #endif
-	stream_reader	= new RawStreamReader( ifile_handle );
+	stream_reader	= new RawStreamReader( ifile_handle, alignment );
     }
 
     if (rechop)
