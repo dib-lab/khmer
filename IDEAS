@@ -13,3 +13,20 @@ TODO in the future
 ----
 
 put locks around the I/O functions.
+
+Distribute distribute_setup.py alongside setup.py.
+    (Allows us to cleanly rely upon a modern setuptools.)
+    (Can always evaluate distutils2/packaging when it becomes viable....)
+
+Get rid of Makefiles. Drive entire build from setup.py.
+    (Removes dual Make/setup.py build system.)
+    (Improves chance of building on Windows. No nmake or VS crap.)
+
+Remove dependency on screed.
+    (Not in PyPI - pain to install.)
+
+Add dependency on argparse. Ditch argparse distributed with khmer.
+    (Can be automatically installed for Pythons which don't have it.)
+
+Use SWIG for Python wrapper around C++.
+    (Pure Cython - atomic ops? I/O performance tuning? probably bad idea...)
