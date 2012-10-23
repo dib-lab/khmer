@@ -18,7 +18,7 @@ DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser te
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=ht-diff
 
-CORE_OBJS= khmer_config.o trace_logger.o ktable.o
+CORE_OBJS= khmer_config.o trace_logger.o perf_metrics.o  ktable.o
 PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test
@@ -84,6 +84,8 @@ $(BZIP2_OBJS):
 khmer_config.o: khmer_config.cc khmer_config.hh
 
 trace_logger.o: trace_logger.cc trace_logger.hh
+
+perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
 

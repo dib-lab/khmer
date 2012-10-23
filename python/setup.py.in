@@ -13,8 +13,9 @@ extra_objs = [ ]
 extra_objs.extend( map(
     lambda bn: path_join( path_pardir, "lib", bn + ".o" ),
     [ 
-	"khmer_config", "ktable", "hashtable", "parsers", "trace_logger", 
-	"threadedParsers", "read_parsers", "hashbits", "counting", "subset",
+	"khmer_config", "trace_logger", "perf_metrics", 
+	"parsers", "threadedParsers", "read_parsers", 
+	"ktable", "hashtable", "hashbits", "counting", "subset",
     ]
 ) )
 extra_objs.extend( map(
