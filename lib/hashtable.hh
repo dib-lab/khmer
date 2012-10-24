@@ -43,6 +43,18 @@ namespace khmer {
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 
+  struct HashTableReadConsumerPerformanceMetrics : public IPerformanceMetrics
+  {
+	
+	enum
+	{
+	    // TODO: Declare.
+	};
+
+	// TODO: Declare.
+
+  };
+
   //
   // Sequence iterator class, test.  Not really a C++ iterator yet.
   //
@@ -119,7 +131,8 @@ namespace khmer {
     HashIntoType next() { return next(_kmer_f, _kmer_r); }
 
     bool done() { return index >= length; }
-  };
+  }; // class KMerIterator
+
 
   class Hashtable {		// Base class implementation of a Bloom ht.
 
@@ -145,6 +158,8 @@ namespace khmer {
     uint32_t	    _number_of_threads;
     ThreadIDMap	    _thread_id_map;
     Hasher **	    _hashers;
+    unsigned int    _max_count;
+    unsigned int    _max_bigcount;
 
     WordLength	    _ksize;
     HashIntoType    bitmask;
@@ -164,6 +179,18 @@ namespace khmer {
 
 	_hashers = new Hasher *[ number_of_threads ];
 	for (uint32_t i = 0; i < number_of_threads; ++i) _hashers[ i ] = NULL;
+
+	// TODO: Transplant this logic to someplace more common.
+	if (1 == number_of_threads)
+	{
+	    _max_count	    = MAX_COUNT;
+	    _max_bigcount   = MAX_BIGCOUNT;
+	}
+	else
+	{
+	    _max_count	    = MAX_COUNT - number_of_threads + 1;
+	    _max_bigcount   = MAX_BIGCOUNT - number_of_threads + 1;
+	}
 
 	_init_bitstuff();
 
