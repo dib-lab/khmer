@@ -102,43 +102,39 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
+
       unsigned int  n_full	  = 0;
-      Config	    config	  = get_active_config( );
-      unsigned int  max_count	  = config.get_hash_count_threshold( );
-      unsigned int  max_bigcount  = config.get_hash_bigcount_threshold( );
-//#pragma omp critical (update_counts)
+
+      // TODO: Time how long this loop takes with PerformanceMetrics.
       for (unsigned int i = 0; i < _n_tables; i++) {
 	const HashIntoType bin = khash % _tablesizes[i];
-#ifdef KHMER_THREADED
 	// NOTE: Technically, multiple threads can cause the bin to spill 
 	//	 over max_count a little, if they all read it as less than 
 	//	 max_count before any of them increment it.
 	//	 However, do we actually care if there is a little 
 	//	 bit of slop here? It can always be trimmed off later, if 
 	//	 that would help with stats.
-	if ( max_count > _counts[ i ][ bin ] )
+	if ( _max_count > _counts[ i ][ bin ] )
+#ifdef KHMER_THREADED
 	  __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+#else
+	  _counts[i][bin] += 1;
+#endif
 	else
 	  n_full++;
-#else
-	if (_counts[i][bin] < max_count) {
-	  _counts[i][bin] += 1;
-	} else {
-	  n_full++;
-	}
-#endif
       } // for each table
 
       if (n_full == _n_tables && _use_bigcount) {
-#pragma omp critical (update_bigcounts)
+	// TODO: Make thread-safe.
 	if (_bigcounts[khash] == 0) {
-	  _bigcounts[khash] = max_count + 1;
+	  _bigcounts[khash] = _max_count + 1;
 	} else {
-	  if (_bigcounts[khash] < max_bigcount) {
+	  if (_bigcounts[khash] < _max_bigcount) {
 	    _bigcounts[khash] += 1;
 	  }
 	}
       }
+
     }
 
     // get the count for the given k-mer.

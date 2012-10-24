@@ -62,6 +62,7 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
     return false;
   }
 
+  // TODO: Time this with performance metrics.
   for (unsigned int i = 0; i < read.length(); i++)  {
     read[ i ] = quick_toupper( read[ i ] ); // normalize to uppercase letters
     if (!is_valid_dna(read[i])) {
@@ -134,6 +135,7 @@ consume_fasta(
     this_n_consumed = 
     check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
 
+    // TODO: Time atomic tallies with PerformanceMetrics.
     n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
     total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
 
