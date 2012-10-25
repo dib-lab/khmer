@@ -43,15 +43,27 @@ namespace khmer {
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 
-  struct HashTableReadConsumerPerformanceMetrics : public IPerformanceMetrics
+  struct HashTablePerformanceMetrics : public IPerformanceMetrics
   {
 	
 	enum
 	{
-	    // TODO: Declare.
+	    MKEY_TIME_NORM_READ,
+	    MKEY_TIME_HASH_KMER,
+	    MKEY_TIME_UPDATE_TALLIES
 	};
 
-	// TODO: Declare.
+	uint64_t	clock_nsecs_norm_read;
+	uint64_t	cpu_nsecs_norm_read;
+	uint64_t	clock_nsecs_hash_kmer;
+	uint64_t	cpu_nsecs_hash_kmer;
+	uint64_t	clock_nsecs_update_tallies;
+	uint64_t	cpu_nsecs_update_tallies;
+
+		HashTablePerformanceMetrics( );
+	virtual ~HashTablePerformanceMetrics( );
+
+	virtual void	accumulate_timer_deltas( uint32_t metrics_key );
 
   };
 
@@ -142,7 +154,7 @@ namespace khmer {
     {
 
 	uint32_t			thread_id;
-	// TODO: Add HasherPerformanceMetrics instance.
+	HashTablePerformanceMetrics	pmetrics;
 	TraceLogger			trace_logger;
 
 	Hasher(

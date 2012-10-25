@@ -14,12 +14,61 @@ using namespace khmer;
 using namespace std;
 
 
+HashTablePerformanceMetrics::
+HashTablePerformanceMetrics( )
+: IPerformanceMetrics( ),
+  clock_nsecs_norm_read( 0 ),
+  cpu_nsecs_norm_read( 0 ),
+  clock_nsecs_hash_kmer( 0 ),
+  cpu_nsecs_hash_kmer( 0 ),
+  clock_nsecs_update_tallies( 0 ),
+  cpu_nsecs_update_tallies( 0 )
+{ }
+
+
+HashTablePerformanceMetrics::
+~HashTablePerformanceMetrics( )
+{ }
+
+
+void
+HashTablePerformanceMetrics::
+accumulate_timer_deltas( uint32_t metrics_key )
+{
+
+  switch (metrics_key)
+  {
+  case MKEY_TIME_NORM_READ:
+    clock_nsecs_norm_read +=
+    _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+    cpu_nsecs_norm_read   +=
+    _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+    break;
+  case MKEY_TIME_HASH_KMER:
+    clock_nsecs_hash_kmer +=
+    _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+    cpu_nsecs_hash_kmer   +=
+    _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+    break;
+  case MKEY_TIME_UPDATE_TALLIES:
+    clock_nsecs_update_tallies +=
+    _timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
+    cpu_nsecs_update_tallies   +=
+    _timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
+    break;
+  default: throw InvalidPerformanceMetricsKey( );
+  }
+
+}
+
+
 Hashtable:: Hasher::
 Hasher( uint32_t const thread_id, uint8_t const	trace_level )
 : thread_id( thread_id ),
+  pmetrics( HashTablePerformanceMetrics( ) ),
   trace_logger(
     TraceLogger(
-      trace_level, "hastable-%lu.log", (unsigned long int)thread_id
+      trace_level, "hashtable-%lu.log", (unsigned long int)thread_id
     )
   )
 { }
@@ -58,19 +107,40 @@ unsigned int Hashtable::check_and_process_read(std::string &read,
 
 bool Hashtable::check_and_normalize_read(std::string &read) const
 {
+  bool rc = true;
+  char c;
+  //Hasher		  &hasher		= _get_hasher( );
+
   if (read.length() < _ksize) {
     return false;
   }
 
-  // TODO: Time this with performance metrics.
+  //hasher.pmetrics.start_timers( );
   for (unsigned int i = 0; i < read.length(); i++)  {
+    c = read[ i ];
+    if (0x60 <= c)
+      read[ i ] = (c -= 0x20);
+    if (!is_valid_dna( c ))
+    {
+      rc = false;
+      break;
+    }
+#if (0)
     read[ i ] = quick_toupper( read[ i ] ); // normalize to uppercase letters
     if (!is_valid_dna(read[i])) {
-      return false;
+      rc = false;
+      break;
     }
+#endif
   }
+  /*
+  hasher.pmetrics.stop_timers( );
+  hasher.pmetrics.accumulate_timer_deltas(
+    (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_NORM_READ
+  );
+  */
 
-  return true;
+  return rc;
 }
 
 //
@@ -135,9 +205,13 @@ consume_fasta(
     this_n_consumed = 
     check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
 
-    // TODO: Time atomic tallies with PerformanceMetrics.
+    hasher.pmetrics.start_timers( );
     n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
     total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+    hasher.pmetrics.stop_timers( );
+    hasher.pmetrics.accumulate_timer_deltas(
+      (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
+    );
 
     if (0 == (total_reads_LOCAL % 10000))
       hasher.trace_logger(
