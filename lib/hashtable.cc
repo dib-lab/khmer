@@ -205,13 +205,17 @@ consume_fasta(
     this_n_consumed = 
     check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
 
+#ifdef WITH_INTERNAL_METRICS
     hasher.pmetrics.start_timers( );
+#endif
     n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
     total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+#ifdef WITH_INTERNAL_METRICS
     hasher.pmetrics.stop_timers( );
     hasher.pmetrics.accumulate_timer_deltas(
       (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
     );
+#endif
 
     if (0 == (total_reads_LOCAL % 10000))
       hasher.trace_logger(

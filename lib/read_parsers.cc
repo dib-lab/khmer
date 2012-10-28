@@ -241,17 +241,21 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	 (0 < nbrem) && !_at_eos;
 	 nbrem -= nbread)
     {
+#ifdef WITH_INTERNAL_METRICS
 	pmetrics.start_timers( );
+#endif
 	nbread =
 	read(
 	    _stream_handle, 
 	    cache + nbread_total,
 	    (size_t)(nbrem > _max_aligned ? _max_aligned : nbrem )
 	);
+#ifdef WITH_INTERNAL_METRICS
 	pmetrics.stop_timers( );
 	pmetrics.accumulate_timer_deltas(
 	    (uint32_t)StreamReaderPerformanceMetrics:: MKEY_TIME_READING
 	);
+#endif
 	if (-1 == nbread) throw StreamReadError( );
 	_at_eos = !nbread;
 	nbread_total += nbread;
@@ -273,17 +277,21 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
     for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
     {
+#ifdef WITH_INTERNAL_METRICS
 	pmetrics.start_timers( );
+#endif
 	nbread =
 	gzread(
 	    _stream_handle, 
 	    cache + nbread_total,
 	    (unsigned int)( nbrem > INT_MAX ? INT_MAX : nbrem )
 	);
+#ifdef WITH_INTERNAL_METRICS
 	pmetrics.stop_timers( );
 	pmetrics.accumulate_timer_deltas(
 	    (uint32_t)StreamReaderPerformanceMetrics:: MKEY_TIME_READING
 	);
+#endif
 	if (-1 == nbread) throw StreamReadError( );
 	_at_eos = !nbread;
 	nbread_total += nbread;
@@ -323,7 +331,9 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	    if (BZ_OK != bz2_error) throw InvalidStreamBuffer( );
 	}
 
+#ifdef WITH_INTERNAL_METRICS
 	pmetrics.start_timers( );
+#endif
 	nbread =
 	BZ2_bzRead(
 	    &bz2_error, 
@@ -331,10 +341,12 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	    cache + nbread_total, 
 	    (int)( nbrem > INT_MAX ? INT_MAX : nbrem )
 	);
+#ifdef WITH_INTERNAL_METRICS
 	pmetrics.stop_timers( );
 	pmetrics.accumulate_timer_deltas(
 	    (uint32_t)StreamReaderPerformanceMetrics:: MKEY_TIME_READING
 	);
+#endif
 	switch (bz2_error)
 	{
 	
@@ -611,7 +623,9 @@ has_more_data( )
 
     // Block indefinitely, if some other segment can provide more data.
     // (This is a synchronization barrier.)
+#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
+#endif
 sync_barrier:
     for (uint64_t i = 0; _segment_ref_count; ++i)
     {
@@ -626,10 +640,12 @@ sync_barrier:
     // Return false, if no segment can provide more data.
     if (!_get_segment_ref_count_ATOMIC( ))
     {
+#ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.stop_timers( );
 	segment.pmetrics.accumulate_timer_deltas(
 	    CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
 	);
+#endif
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG1,
 	    "After 'has_more_data' synchronization barrier.\n"
@@ -689,9 +705,11 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	    in_sa_buffer ? "setaside buffer" : "cache segment"
 	);
 
+#ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
 	if (in_sa_buffer)
 	    segment.pmetrics.numbytes_copied_from_sa_buffer += nbcopied;
+#endif
 	nbcopied_total += nbcopied;
     }
 
@@ -719,7 +737,9 @@ split_at( uint64_t const pos )
     );
 
     // Wait until the lower segment has consumed the setaside buffer.
+#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
+#endif
 wait_for_sa_buffer:
     for (uint64_t i = 0; segment.get_sa_buffer_avail( ); ++i)
     {
@@ -736,14 +756,18 @@ wait_for_sa_buffer:
     if (segment.get_sa_buffer_avail_ATOMIC( ))
 	goto wait_for_sa_buffer;
 
+#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.stop_timers( );
     segment.pmetrics.accumulate_timer_deltas(
 	CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
     );
+#endif
 
     // Setup the setaside buffer.
     segment.sa_buffer_size = pos;
+#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.numbytes_reserved_as_sa_buffer += pos;
+#endif
     segment.set_sa_buffer_avail_ATOMIC( true );
 
     segment.trace_logger(
@@ -792,7 +816,9 @@ _perform_segment_maintenance( CacheSegment &segment )
 
 	// Wait while higher segment is available 
 	// and its setaside buffer is not ready for consumption.
+#ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.start_timers( );
+#endif
 wait_for_sa_buffer:
 	for (	uint64_t i = 0;
 		hsegment.avail && !hsegment.get_sa_buffer_avail( );
@@ -810,11 +836,13 @@ wait_for_sa_buffer:
 	// If so, then jump into it.
 	if (hsegment.get_sa_buffer_avail_ATOMIC( ))
 	{
+#ifdef WITH_INTERNAL_METRICS
 	    segment.pmetrics.stop_timers( );
 	    segment.pmetrics.accumulate_timer_deltas(
 		CacheSegmentPerformanceMetrics:: 
 		MKEY_TIME_WAITING_TO_GET_SA_BUFFER
 	    );
+#endif
 	    segment.cursor_in_sa_buffer	    = true;
 	    segment.cursor		    = 0;
 	    segment.trace_logger(
@@ -932,7 +960,9 @@ _fill_segment_from_stream( CacheSegment & segment )
     uint64_t	nbfilled    = 0;
 
     // Wait while segment not selected and not end of stream.
+#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
+#endif
 wait_to_fill:
     for (   uint64_t i = 0;
 	    !_stream_reader.is_at_end_of_stream( )
@@ -946,11 +976,13 @@ wait_to_fill:
 		(unsigned long long int)i
 	    );
     }
+#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.stop_timers( );
     segment.pmetrics.accumulate_timer_deltas(
 	CacheSegmentPerformanceMetrics::
 	MKEY_TIME_WAITING_TO_FILL_FROM_STREAM
     );
+#endif
 
     // If at end of stream, then mark segment unavailable.
     if (_stream_reader.is_at_end_of_stream( ))
@@ -966,7 +998,9 @@ wait_to_fill:
     // Else, refill the segment.
     else if (_check_segment_to_fill_ATOMIC( segment.thread_id ))
     {
+#ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.start_timers( );
+#endif
 	segment.size =
 	    segment.cursor
 	+   (	nbfilled =
@@ -974,14 +1008,18 @@ wait_to_fill:
 		    segment.memory + segment.cursor,
 		    _segment_size - segment.cursor
 		));
+#ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.stop_timers( );
+#endif
 	segment.fill_id	= _fill_counter++;
 	_select_segment_to_fill_ATOMIC( );
+#ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_filled_from_stream += nbfilled;
 	segment.pmetrics.accumulate_timer_deltas(
 	    CacheSegmentPerformanceMetrics::
 	    MKEY_TIME_FILLING_FROM_STREAM
 	);
+#endif
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG2,
 	    "Read %llu bytes into segment.\n",
@@ -1281,7 +1319,9 @@ _copy_line( ParserState &state )
 
     }
 
+#ifdef WITH_INTERNAL_METRICS
     state.pmetrics.numlines_copied++;
+#endif
 
 }
 
@@ -1418,7 +1458,9 @@ get_next_read( )
 	    the_read.sequence += line;
 	}
 
+#ifdef WITH_INTERNAL_METRICS
 	state.pmetrics.numreads_parsed_total++;
+#endif
 
 	// Discard invalid read.
 	if (std:: string:: npos != the_read.sequence.find_first_of( "Nn" ))
@@ -1439,7 +1481,9 @@ get_next_read( )
 		(unsigned long int)the_read.sequence.length( )
 	    );
 
+#ifdef WITH_INTERNAL_METRICS
 	state.pmetrics.numreads_parsed_valid++;
+#endif
 	break;
     } // while invalid read
 
