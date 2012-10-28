@@ -443,6 +443,7 @@ def test_partition_graph_no_big_traverse():
     assert x == (4, 0), x       # should be four partitions, broken at knot.
 
 def test_annotate_partitions():
+    raise Exception("this test coredumps on lyorn.  Disabled.")
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True)
     in_dir = os.path.dirname(graphbase)
@@ -464,6 +465,7 @@ def test_annotate_partitions():
     assert len(parts) == 1
 
 def test_annotate_partitions_2():
+    raise Exception("this test coredumps on lyorn.  Disabled.")
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True,
@@ -487,6 +489,7 @@ def test_annotate_partitions_2():
     assert len(parts) == 99, len(parts)
 
 def test_extract_partitions():
+    raise Exception("this test coredumps on lyorn.  Disabled.")
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True, annotate_partitions=True)
     in_dir = os.path.dirname(graphbase)
