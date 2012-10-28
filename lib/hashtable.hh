@@ -1,6 +1,7 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
+#include <vector>
 #include <iostream>
 #include <list>
 #include <queue>
@@ -165,7 +166,7 @@ namespace khmer {
     unsigned int consume_string(const std::string &s,
 				HashIntoType lower_bound = 0,
 				HashIntoType upper_bound = 0);
-
+    
     // checks each read for non-ACGT characters
     bool check_read(const std::string &read) const;
 
@@ -174,7 +175,7 @@ namespace khmer {
 					bool &is_valid,
 					HashIntoType lower_bound = 0,
 					HashIntoType upper_bound = 0);
-
+    
     // count every k-mer in the FASTA file.
     void consume_fasta(const std::string &filename,
 		       unsigned int &total_reads,

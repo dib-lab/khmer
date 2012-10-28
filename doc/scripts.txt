@@ -218,6 +218,12 @@ redundant sequences)
    abundance lies above a specified cutoff.  Kept sequences will be
    placed in <fileN>.keep.
 
+   Paired end reads can be considered together if the ``-p`` flag is set.
+
    Example::
 
-	scripts/normalize-by-min.py -k 17 tests/test-data/test-abund-read-2.fa
+	scripts/normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
+
+   Example::
+
+	scripts/normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
