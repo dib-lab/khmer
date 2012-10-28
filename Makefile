@@ -24,6 +24,10 @@ WANT_DEBUGGING=true
 # Set this variable to true if you want to use instrumentation provided in the sources for debugging purposes and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_TRACING=false
 
+# Compile with performance metrics turned on?
+# Set this variable to true if you want to use instrumentation provided in the sources for performance measurement purposes and are willing to accept the overhead such instrumentation introduces.
+WITH_INTERNAL_METRICS=false
+
 # Use Cython?
 # Set this variable to true if you wish to build the Python wrapper with Cython rather than the directly using the Python C API.
 USE_CYTHON=false
@@ -73,6 +77,10 @@ endif
 
 ifeq ($(WITH_INTERNAL_TRACING), true)
 CXXFLAGS+= -DWITH_INTERNAL_TRACING
+endif
+
+ifeq ($(WITH_INTERNAL_METRICS), true)
+CXXFLAGS+= -DWITH_INTERNAL_METRICS
 endif
 
 ifeq ($(USE_CYTHON), true)
