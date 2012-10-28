@@ -2,7 +2,7 @@
 #include "subset.hh"
 #include "parsers.hh"
 
-#define IO_BUF_SIZE 1000*1000*1000
+#define IO_BUF_SIZE 1000*1000*20
 
 #define BIG_TRAVERSALS_ARE 200
 
