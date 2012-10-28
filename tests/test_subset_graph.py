@@ -181,6 +181,7 @@ class Test_RandomData(object):
 
 class Test_SaveLoadPmap(object):
     def test_save_load_merge(self):
+        raise Exception("this test coredumps on lyorn.  Disabled.")
         ht = khmer.new_hashbits(20, 4**14+1)
         filename = utils.get_test_data('test-graph2.fa')
 
@@ -213,6 +214,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
         
     def test_save_load_merge_2(self):
+        raise Exception("this test coredumps on lyorn.  Disabled.")
         ht = khmer.new_hashbits(20, 4**14+1)
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -243,6 +245,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_save_merge_from_disk(self):
+        raise Exception("this test coredumps on lyorn.  Disabled.")
         ht = khmer.new_hashbits(20, 4**14+1)
         filename = utils.get_test_data('test-graph2.fa')
 
@@ -272,6 +275,7 @@ class Test_SaveLoadPmap(object):
         assert n_partitions == 1, n_partitions        # combined.
         
     def test_save_merge_from_disk_2(self):
+        raise Exception("this test coredumps on lyorn.  Disabled.")
         ht = khmer.new_hashbits(20, 4**14+1)
         filename = utils.get_test_data('random-20-a.fa')
 
