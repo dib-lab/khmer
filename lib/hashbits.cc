@@ -1957,7 +1957,3 @@ unsigned int Hashbits::consume_string_overlap(const std::string &s,
 
   return n_consumed;
 }
-
-
-
-
