@@ -4,13 +4,13 @@ WANT_THREADING=true
 
 # Profile?
 # Set this variable to true if you wish to profile the codes.
-WANT_PROFILING=false
+WANT_PROFILING=true
 
 # Which profiling tool to use?
 # Assuming you have TAU installed and setup properly, you can instrument codes with it to get detailed multi-threaded profiling.
 # Otherwise, gprof is able to give you some information without threading info.
 # Choose one of: gprof, TAU
-PROFILER_OF_CHOICE=TAU
+PROFILER_OF_CHOICE=gprof
 
 # Perform extra sanity checking?
 # Set this variable to true if you wish the codes to perform extra sanity checking (to the possible detriment of performance).
@@ -22,7 +22,7 @@ WANT_DEBUGGING=true
 
 # Compile with tracing logic turned on?
 # Set this variable to true if you want to use instrumentation provided in the sources for debugging purposes and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_TRACING=false
+WITH_INTERNAL_TRACING=true
 
 # Compile with performance metrics turned on?
 # Set this variable to true if you want to use instrumentation provided in the sources for performance measurement purposes and are willing to accept the overhead such instrumentation introduces.
@@ -71,7 +71,9 @@ ifeq ($(PROFILER_OF_CHOICE), TAU)
 CXX=tau_cxx.sh
 endif
 ifeq ($(PROFILER_OF_CHOICE), gprof)
+PROFILING_LIBS=-pg
 CXXFLAGS+= -pg
+LIBS+= $(PROFILING_LIBS)
 endif
 endif
 
