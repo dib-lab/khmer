@@ -24,7 +24,7 @@ PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test
 
 clean:
-	(cd $(ZLIB_DIR) && make clean)
+	-(cd $(ZLIB_DIR) && make clean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS) $(AUX_PROGS)
 
