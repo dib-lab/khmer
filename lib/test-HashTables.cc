@@ -32,7 +32,7 @@ using namespace khmer;
 using namespace khmer:: read_parsers;
 
 
-static const char *	    SHORT_OPTS		= "k:N:x:";	
+static const char *	    SHORT_OPTS		= "k:N:x:s:";
 
 
 int main( int argc, char * argv[ ] )
@@ -40,7 +40,7 @@ int main( int argc, char * argv[ ] )
     unsigned long	kmer_length	    = 32;
     float		ht_size_FP	    = 1.0E6;
     unsigned long	ht_count	    = 4;
-    // unsigned long	input_chunk_size    = 104857600;
+    uint64_t		cache_size	    = 4L * 1024 * 1024 * 1024;
 
     int			rc		    = 0;
     int			opt		    = -1;
@@ -54,21 +54,31 @@ int main( int argc, char * argv[ ] )
 
 	switch (opt)
 	{
+
 	case 'k':
 	    kmer_length = strtoul( optarg, &conv_residue, 10 );
 	    if (!strcmp( optarg, conv_residue ))
 		error( EINVAL, EINVAL, "Invalid kmer length" );
 	    break;
+
 	case 'N':
 	    ht_count = strtoul( optarg, &conv_residue, 10 );
 	    if (!strcmp( optarg, conv_residue ))
 		error( EINVAL, EINVAL, "Invalid number of hashtables" );
 	    break;
+
 	case 'x':
 	    ht_size_FP = strtof( optarg, &conv_residue );
 	    if (!strcmp( optarg, conv_residue ))
 		error( EINVAL, EINVAL, "Invalid hashtable size" );
 	    break;
+	
+	case 's':
+	    cache_size = strtoull( optarg, &conv_residue, 10 );
+	    if (!strcmp( optarg, conv_residue ))
+		error( EINVAL, EINVAL, "Invalid cache size" );
+	    break;
+
 	default:
 	    error( 0, 0, "Skipping unknown arg, '%c'", optopt );
 	}
@@ -95,7 +105,9 @@ int main( int argc, char * argv[ ] )
 
 #if HASH_TYPE_TO_TEST == 1
     CountingHash ht( kmer_length, ht_sizes );
-    IParser * parser = IParser:: get_parser( ifile_name );
+    IParser * parser = IParser:: get_parser(
+	ifile_name, the_config.get_number_of_threads( ), cache_size
+    );
 #pragma omp parallel shared( reads_total, n_consumed )
     {
     ht.consume_fasta( parser, reads_total, n_consumed );
