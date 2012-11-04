@@ -13,6 +13,8 @@ Contents:
 
 This is a test!
 
+Another test!
+
 Indices and tables
 ==================
 
