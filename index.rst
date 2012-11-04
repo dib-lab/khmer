@@ -44,7 +44,6 @@ I've put up a short blog post `here <http://ivory.idyll.org/blog/rtd-comments-an
 
 --titus
 
-(This is a test)
 
 Indices and tables
 ==================
