@@ -37,6 +37,8 @@ For now, you can't disable the editing functionality, but if you
 delete the google_analytics and disqus_shortname it should disable
 that functionality on your site.
 
+(This is a test edit.)
+
 Indices and tables
 ==================
 
