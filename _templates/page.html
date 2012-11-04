@@ -1,5 +1,82 @@
 {% extends "!page.html" %}
 
+{###############################}
+{# for plone-derived "edit me" #}
+{###############################}
+
+{#
+
+  Add Editor Help Pop Up HTML.
+
+  Enable Analytics tracking on the docs.
+
+#}
+
+{% block footer %}
+{{ super() }}
+
+<div id="editor-trap">
+      <h3>Edit this document!</h3>
+
+      <p>
+        This file can be edited directly through the Web. Anyone can
+        update and fix errors in this document with few clicks --
+        no downloads needed.
+      <p>
+
+      <ol>
+
+        <li>
+          Go to
+        <a href="https://github.com/ctb/labibi/blob/master/{{ pagename }}.rst">
+          {{ title }}
+        </a> on GitHub.
+      </li>
+
+        <li>
+        <b>Edit</b> files using GitHub's text editor in your web browser (see the 'Edit' tab on the top right of the file)
+      </li>
+
+      <li>
+        Fill in the <b>Commit message</b> text box at the bottom of the page describing <i>why</i>
+        you made the changes. Press the <b>Propose file change</b> button next to it when done.
+      </li>
+
+      <li>
+        Then click <b>Send a pull request</b>.
+      </li>
+
+      <li>
+        Your changes are now queued for review under the project's <a href="https://github.com/ctb/labibi/pulls">Pull requests</a> tab on Github!
+      </li>
+      </ol>
+
+      <p>
+        For an introduction to the documentation format please see <a href="http://docutils.sourceforge.net/docs/user/rst/quickstart.html">the reST primer</a>.
+      </p>
+
+  </div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36028965-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+{% endblock %}
+
+{#########################}
+{# for disqus commenting #}
+{#########################}
+
 {% macro comments() %}
 
 <div id="disqus_thread"></div>
@@ -20,6 +97,8 @@
 {% endmacro %}
 
 {% block extrahead %}
+<script src="{{ pathto('_static/labibi.js', 1) }}"></script>
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
