@@ -11,10 +11,6 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-This is a test!
-
-Another test!
-
 Indices and tables
 ==================
 
