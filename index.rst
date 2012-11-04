@@ -37,7 +37,8 @@ For now, you can't disable the editing functionality, but if you
 delete the google_analytics and disqus_shortname it should disable
 that functionality on your site.
 
-(This is a test edit.)
+The labibi source code is `here <https://github.com/ctb/labibi>`__ for
+your checking-out pleasure.
 
 Indices and tables
 ==================
