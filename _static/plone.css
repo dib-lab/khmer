@@ -1,0 +1,161 @@
+@import url('default.css');
+body {
+    font: 100% Arial, FreeSans, sans-serif;
+    background: White;
+    color: Black;
+}
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+    color: Black;
+    background-color: White;
+    font-weight: bold;
+    line-height: 125%;
+    border: none;
+    font: "Helvetica Neue",Arial,FreeSans,sans-serif;
+}
+
+
+div.document {
+    background-color: White;
+}
+
+div.sphinxsidebar {
+    background-color: #f6f6f6;
+    border: 1px solid #eeeeee;
+}
+
+div.sphinxsidebar h3 {
+    margin-left: -11px;
+    margin-right: -6px;
+    line-height: 1.5em;
+}
+
+div.sphinxsidebar h3,
+div.sphinxsidebar h3 a {
+    background-color: #76ad17;
+    color: White;
+    padding: 0 0.5em;
+}
+
+div.sphinxsidebar h3 a:hover {
+    color: White;
+}
+
+div.sphinxsidebar h4,
+div.sphinxsidebar h4 a {
+    color: #205c90;
+}
+
+div.sphinxsidebar a,
+div.sphinxsidebar p {
+    color: #205c90;
+}
+
+div.related {
+    background-color: #329fd7;
+}
+
+div.related a:hover {
+    color: Black;
+}
+
+a:link, a:visited {
+    color: #205c90;
+    text-decoration: none;
+}
+
+a:link:hover,
+a:visited:hover {
+    color: #75ad0a;
+}
+
+
+/* Styles for floating Edit on GitHub box */
+#editor-trap {
+    margin: 1em;
+    padding: 1em;
+    border: 1px solid black;
+    box-shadow: 0 0 3px black;
+    width: 200px;
+
+    background: #fefabc;
+    position: fixed;
+    bottom: 1em;
+    left: 1em;
+    font-size: 60%;
+    text-align: left;
+    z-index: 2;
+
+    -moz-transform: rotate(-4deg);
+    -webkit-transform: rotate(-4deg);
+    -o-transform: rotate(-4deg);
+    -ms-transform: rotate(-4deg);
+    transform: rotate(-4deg);
+    box-shadow: 0px 4px 6px #333;
+    -moz-box-shadow: 0px 4px 6px #333;
+    -webkit-box-shadow: 0px 4px 6px #333;
+
+
+    cursor: pointer;
+}
+
+#editor-trap h3 {
+    margin: 0 0 0.5em 0;
+    padding: 0;
+    background: transparent;
+}
+
+#editor-trap ol {
+    margin: 0;
+    padding: 0 0 0 2em;
+}
+
+/* Hide trick */
+
+#editor-trap.toggled > * {
+    display: none;
+}
+
+
+#editor-trap.toggled > h3 {
+    display: block;
+}
+
+/* Special classes on doc front page */
+#dragon-warning {
+    padding: 1em;
+    background-color: #FFE4E4;
+    border: 1px solid #FF6666;
+}
+
+#dragons-are-coming {
+    text-align: center;
+    font-size: 120%;
+}
+
+.itwillhurt {
+    display: inline-block;
+    font-size: 45px;
+    color: gray;
+    margin: 0 10px;
+}
+
+/* Loogo hack up */
+
+#logo-link {
+    display: block;
+    float: left;
+    margin: 0 5px 5px 0;
+}
+
+#logo-tagline {
+    display: inline;
+    vertical-align: top;
+}
+
+

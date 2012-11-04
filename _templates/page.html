@@ -1,0 +1,107 @@
+{#
+  Drop version number from the HTML documentation title
+#}
+{%- set docstitle = "Laibibi!" %}
+
+{% extends "!page.html" %}
+
+{% block extrahead %}
+<!-- XXX CTB -->
+{% endblock %}
+
+{#
+  Remove version number from the top and bottom path bars
+#}
+{%- block rootrellink %}
+    <li><a href="{{ pathto(master_doc) }}">Home{{ reldelim1 }}</li>
+{%- endblock %}
+
+{% block header %}
+<div style="display: none" id="dragon-warning">
+
+    <div id="dragons-are-coming">
+        <span class="itwillhurt">
+            ☠
+        </span>
+        <b>Beyond this point lie the ancient dragons</b>
+        <span class="itwillhurt">
+            ☠
+        </span>
+    </div>
+
+    <p>
+        This section of <b><a href="http://plone.org">Plone content management system</a></b> Developer Documentation is no longer under active maintance.
+        The section is included as the reference for older technologies (Plone 2.x, Plone 3.x).
+        Some of the practices described in this documents may still work, but are not recommended
+        to be used in your active Plone development. Use at your own risk.
+    </p>
+
+    <p>
+        If you arrived at this page by a web search we recommend to also see the
+        <a href="http://developer.plone.org">Plone Developer Documentation front page</a> .
+    </p>
+
+</div>
+{{ super() }}
+{% endblock %}
+
+
+{#
+
+  Add Editor Help Pop Up HTML.
+
+#}
+
+{% block footer %}
+{{ super() }}
+
+<div id="editor-trap">
+      <h3>Edit this document</h3>
+
+      <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+      <p>
+
+      <ol>
+
+        <li>
+          Go to
+        <a href="https://github.com/collective/collective.developermanual/blob/master/source/{{ pagename }}.rst">
+          {{ title }}
+        </a> on GitHub.
+      </li>
+
+        <li>
+          Press the <b>Fork</b> button. This will create your own personal copy of the documentation.
+      </li>
+
+        <li>
+        <b>Edit</b> files using GitHub's text editor in your web browser
+      </li>
+
+      <li>
+        Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+        you did the changes. Press the <b>Propose file change</b> button next to it when done.
+      </li>
+
+
+      <li>
+        Then head to the <i>Send a pull request</i> page (you won't need to fill in any additional text). Just
+        press <b>Send pull request</b> button.
+      </li>
+
+      <li>
+        Your changes are now queued for review under project's <a href="https://github.com/collective/collective.developermanual/pulls">Pull requests</a> tab on Github.
+      </li>
+      </ol>
+
+      <p>
+        For basic information about updating this manual
+        and Sphinx format please see <a href="http://developer.plone.org/reference_manuals/active/writing/writing.html">
+        Writing and updating the manual</a> guide.
+      </p>
+
+  </div>
+{% endblock %}
