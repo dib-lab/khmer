@@ -40,6 +40,11 @@ that functionality on your site.
 The labibi source code is `here <https://github.com/ctb/labibi>`__ for
 your checking-out pleasure.
 
+I've put up a short blog post `here <http://ivory.idyll.org/blog/rtd-comments-and-editing.html>`__.
+
+--titus
+
+
 Indices and tables
 ==================
 
