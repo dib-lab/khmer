@@ -2,6 +2,8 @@
 Blog posts and additional documentation
 =======================================
 
+There is a handbook for khmer available here: http://ivory.idyll.org/blog/an-assembly-handbook-for-khmer.html
+
 Hashtable and filtering
 =======================
 
