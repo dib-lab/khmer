@@ -2,14 +2,6 @@
 #include "hashtable.hh"
 #include "parsers.hh"
 
-// Note: This simple inlined code should be quicker than a call to a 
-//	 'toupper' function in the C library.
-//	 This should boil down to one integer compare, one branch, and 
-//	 maybe one integer subtraction.
-//	 This will be potentially called on trillions of bytes, 
-//	 so efficiency probably matters some.
-#define quick_toupper( c )  (0x61 <= (c) ? (c) - 0x20 : (c))
-
 using namespace khmer;
 using namespace std;
 
@@ -108,7 +100,6 @@ unsigned int Hashtable::check_and_process_read(std::string &read,
 bool Hashtable::check_and_normalize_read(std::string &read) const
 {
   bool rc = true;
-  char c;
   //Hasher		  &hasher		= _get_hasher( );
 
   if (read.length() < _ksize) {
@@ -117,21 +108,12 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
 
   //hasher.pmetrics.start_timers( );
   for (unsigned int i = 0; i < read.length(); i++)  {
-    c = read[ i ];
-    if (0x60 <= c)
-      read[ i ] = (c -= 0x20);
-    if (!is_valid_dna( c ))
+    read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
+    if (!is_valid_dna( read[ i ] ))
     {
       rc = false;
       break;
     }
-#if (0)
-    read[ i ] = quick_toupper( read[ i ] ); // normalize to uppercase letters
-    if (!is_valid_dna(read[i])) {
-      rc = false;
-      break;
-    }
-#endif
   }
   /*
   hasher.pmetrics.stop_timers( );
