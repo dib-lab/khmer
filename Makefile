@@ -4,7 +4,7 @@ WANT_THREADING=true
 
 # Profile?
 # Set this variable to true if you wish to profile the codes.
-WANT_PROFILING=true
+WANT_PROFILING=false
 
 # Which profiling tool to use?
 # Assuming you have TAU installed and setup properly, you can instrument codes with it to get detailed multi-threaded profiling.

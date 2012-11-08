@@ -15,7 +15,7 @@
 #define HASH_TYPE_TO_TEST   1 // Counting Hash
 //#define HASH_TYPE_TO_TEST   2 // Bit Hash
 
-#define OUTPUT_HASHTABLE
+// #define OUTPUT_HASHTABLE
 
 #include "read_parsers.hh"
 #if HASH_TYPE_TO_TEST == 1
