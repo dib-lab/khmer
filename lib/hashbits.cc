@@ -3,7 +3,9 @@
 #include "hashbits.hh"
 #include "read_parsers.hh"
 #include "threadedParsers.hh"
+#ifdef KHMER_THREADED
 #include <omp.h>
+#endif
 #define MAX_KEEPER_SIZE int(1e6)
 
 using namespace std;
