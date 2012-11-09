@@ -3,7 +3,9 @@
 #include "hashbits.hh"
 #include "read_parsers.hh"
 #include "threadedParsers.hh"
+#ifdef KHMER_THREADED
 #include <omp.h>
+#endif
 #define MAX_KEEPER_SIZE int(1e6)
 
 using namespace std;
@@ -339,7 +341,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
     while(!parser->is_complete())  {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
 
       // n_consumed += this_n_consumed;
 
