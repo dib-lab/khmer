@@ -339,7 +339,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 
     while(!parser->is_complete())  {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
 
       // n_consumed += this_n_consumed;
 
