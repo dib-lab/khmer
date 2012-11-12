@@ -304,83 +304,51 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 				      CallbackFn callback,
 				      void * callback_data)
 {
-#ifndef KHMER_THREADED
   using namespace khmer:: read_parsers;
-#else
-  using namespace khmer:: threaded_parsers;
-#endif
 
   total_reads = 0;
   n_consumed = 0;
 
   unsigned int total_reads_TL = 0;
 
-#ifndef KHMER_THREADED
   IParser *		    parser  = IParser::get_parser(filename.c_str());
   Read read;
-#else
-  ThreadedIParserFactory *  pf	    = ThreadedIParserFactory:: get_parser( filename.c_str( ), THREADED_PARSER_CHUNK_SIZE );
-  ThreadedIParser *	    parser  = NULL;
-#endif
 
   string seq = "";
 
   //
   // iterate through the FASTA file & consume the reads.
   //
-  
-#ifdef KHMER_THREADED
-#pragma omp parallel default( shared ) private( parser, seq, total_reads_TL )
-//  shared( pf, total_reads, n_consumed, callback, callback_data ) 
-//  firstprivate( parser, seq, total_reads_TL )
-  while ( !pf->is_complete( ) )
-  {
-    Read read;
-    parser    = pf->get_next_parser( );
-#endif
 
-    while(!parser->is_complete())  {
-      read = parser->get_next_read();
-      seq = read.sequence;
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.sequence;
 
-      // n_consumed += this_n_consumed;
+    // n_consumed += this_n_consumed;
 
-	if (check_and_normalize_read(seq)) {	// process?
+      if (check_and_normalize_read(seq)) {	// process?
 //#pragma omp critical (consume_and_tag_seq)
-	  consume_sequence_and_tag(seq, n_consumed);
+	consume_sequence_and_tag(seq, n_consumed);
+      }
+
+      // reset the sequence info, increment read number
+      total_reads_TL = __sync_add_and_fetch( &total_reads, 1 );
+
+      // run callback, if specified
+      if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
+	std::cout << "n tags: " << all_tags.size() << "\n";
+	try {
+	  callback("consume_fasta_and_tag", callback_data, total_reads_TL,
+		   n_consumed);
+	} catch (...) {
+	  delete parser;
+	  throw;
 	}
+      }
 
-	// reset the sequence info, increment read number
-#ifdef KHMER_THREADED
-	total_reads_TL = __sync_add_and_fetch( &total_reads, 1 );
-#else
-	total_reads_TL = ++total_reads;
-#endif
+  } // while reads left for parser
 
-	// run callback, if specified
-	if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
-	  std::cout << "n tags: " << all_tags.size() << "\n";
-	  try {
-	    callback("consume_fasta_and_tag", callback_data, total_reads_TL,
-		     n_consumed);
-	  } catch (...) {
-	    delete parser;
-#ifdef KHMER_THREADED
-	    // delete pf;
-#endif
-	    throw;
-	  }
-	}
-
-    } // while reads left for parser
-
-    delete parser;
-
-#ifdef KHMER_THREADED
-  } // while parser factory is still doling out chunk parsers
-  
-  delete pf;
-#endif
+  delete parser;
 
 }
 
