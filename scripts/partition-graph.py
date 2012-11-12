@@ -16,6 +16,17 @@ import gc
 import os.path
 import argparse
 
+# Debugging Support
+import re
+import platform
+if "Linux" == platform.system( ):
+    def __debug_vm_usage( msg ):
+	print "===> DEBUG: " + msg
+	for vmstat in re.findall( r".*Vm.*", file( "/proc/self/status" ).read( ) ):
+	    print vmstat
+else:
+    def __debug_vm_usage( msg ): pass
+
 import khmer
 
 DEFAULT_SUBSET_SIZE = int(1e5)
