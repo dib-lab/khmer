@@ -91,6 +91,11 @@ else
 CYTHON_ENABLED_BOOL=False
 endif
 
+# Place POSIX threads last in linking order, if needed.
+ifneq ($(shell uname), Linux)
+LIBS+= -pthread
+endif
+
 all: lib_files python_files
 
 clean:
