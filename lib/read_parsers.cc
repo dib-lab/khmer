@@ -1144,7 +1144,7 @@ get_parser(
 #endif
 	stream_reader	= new GzStreamReader( ifile_handle );
 	rechop		= true;
-    }
+    } // gz
     else if ("bz2" == ext)
     {
 	ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
@@ -1156,11 +1156,12 @@ get_parser(
 #endif
 	stream_reader	= new Bz2StreamReader( ifile_handle );
 	rechop		= true;
-    }
+    } // bz2
     else // Uncompressed file.
     {
 	size_t	alignment   = 0;	// 512 bytes is Chaotic Good?
 
+#ifdef __linux__
 	ifile_handle	= open( ifile_name.c_str( ), ifile_flags | O_DIRECT );
 	if (-1 != ifile_handle)
 	{
@@ -1171,6 +1172,9 @@ get_parser(
 		alignment    = 0;
 	    }
 	}
+#else
+	ifile_handle    = -1;
+#endif
 	if (-1 == ifile_handle)
 	{
 	    ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
@@ -1183,7 +1187,7 @@ get_parser(
 	    );
 #endif
 	stream_reader	= new RawStreamReader( ifile_handle, alignment );
-    }
+    } // uncompressed
 
     if (rechop)
     {
