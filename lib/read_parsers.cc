@@ -19,6 +19,7 @@ namespace khmer
 {
 
 
+// TODO: Place in separate implementation file.
 ThreadIDMap::
 ThreadIDMap( uint32_t number_of_threads )
 :   _number_of_threads( number_of_threads ),
@@ -29,6 +30,7 @@ ThreadIDMap( uint32_t number_of_threads )
 }
 
 
+// TODO: Place in separate implementation file.
 ThreadIDMap::
 ~ThreadIDMap( )
 {
@@ -36,17 +38,23 @@ ThreadIDMap::
 }
 
 
+// TODO: Place in separate implementation file.
 uint32_t const
 ThreadIDMap::
 get_thread_id( )
 {
-#ifdef __linux__
+#if defined (__linux__)
     // Note: No error handling because this call always succeeds, allegedly.
     pid_t native_thread_id = syscall( SYS_gettid ); 
     std:: map< pid_t, uint32_t > :: iterator match;
-
+#elif defined (__APPLE__) && defined (__MACH__)
+    // TODO? Error handling.
+    mach_port_t native_thread_id = pthread_mach_thread_np( pthread_self( ) );
+    std:: map< mach_port_t, uint32_t > :: iterator match;
 #else
-    // TODO: Maybe try something with pthread_self for the general case.
+    // TODO? Error handling.
+    pthread_t native_thread_id = pthread_self( );
+    std:: map< pthread_t, uint32_t > :: iterator match;
 #endif
 
     match = _thread_id_map.find( native_thread_id );
