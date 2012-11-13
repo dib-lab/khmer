@@ -115,11 +115,7 @@ namespace khmer {
 	//	 bit of slop here? It can always be trimmed off later, if 
 	//	 that would help with stats.
 	if ( _max_count > _counts[ i ][ bin ] )
-#ifdef KHMER_THREADED
 	  __sync_add_and_fetch( *(_counts + i) + bin, 1 );
-#else
-	  _counts[i][bin] += 1;
-#endif
 	else
 	  n_full++;
       } // for each table

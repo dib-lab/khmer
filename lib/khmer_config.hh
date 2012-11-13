@@ -35,15 +35,11 @@ namespace khmer
     const bool has_extra_sanity_checks( void );
     
     const unsigned int get_number_of_threads( void );
-#ifdef KHMER_THREADED
     void set_number_of_threads( const unsigned int );
-#endif
     
     // Control multi-threaded parsing of reads files.
     const bool get_reads_parser_threading( void );
-#ifdef KHMER_THREADED
     void set_reads_parser_threading( const bool );
-#endif
     const unsigned long long get_reads_file_chunk_size( void );
     void set_reads_file_chunk_size( const unsigned long long );
 

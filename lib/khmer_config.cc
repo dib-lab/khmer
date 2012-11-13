@@ -26,19 +26,10 @@ namespace khmer
 
 
   inline
-  const
-  unsigned int
+  unsigned int const
   Config::
   detected_number_of_threads( void ) const
-  {
-#ifdef KHMER_THREADED
-    // NOTE: Assume OpenMP for now.
-    //return omp_get_num_threads( );
-    return 1;
-#else
-    return 1;
-#endif
-  }
+  { return 1; }
 
 
   Config::
@@ -46,17 +37,10 @@ namespace khmer
   {
     char      buf[ 1024 ];
     
-#ifdef KHMER_THREADED
     _config_data[ "is_threaded" ]	      = string( "true" );
     sprintf( buf, "%u", detected_number_of_threads( ) );
     _config_data[ "number_of_threads" ]	      = string( buf );
     _config_data[ "reads_parser_threading" ]  = string( "true" );
-#else
-    _config_data[ "is_threaded" ]	      = string( "false" );
-    sprintf( buf, "%u", 1 );
-    _config_data[ "number_of_threads" ]	      = string( buf );
-    _config_data[ "reads_parser_threading" ]  = string( "false" );
-#endif
 #ifdef KHMER_EXTRA_SANITY_CHECKS
     _config_data[ "has_extra_sanity_checks" ] = string( "true" );
 #else
@@ -67,22 +51,19 @@ namespace khmer
   }
 
 
-  const
-  bool
+  bool const
   Config::
   is_threaded( void ) 
   { return !_config_data[ "is_threaded" ].compare( "true" ); }
 
 
-  const
-  bool
+  bool const
   Config::
   has_extra_sanity_checks( void )
   { return !_config_data[ "has_extra_sanity_checks" ].compare( "true" ); }
 
 
-  const
-  unsigned int
+  unsigned int const
   Config::
   get_number_of_threads( void ) 
   { 
@@ -96,7 +77,6 @@ namespace khmer
   }
 
 
-#ifdef KHMER_THREADED
   void
   Config::
   set_number_of_threads( const unsigned int number_of_threads )
@@ -110,17 +90,14 @@ namespace khmer
     sprintf( buf, "%u", number_of_threads );
     _config_data[ "number_of_threads" ] = buf;
   }
-#endif
   
 
-  const
-  bool
+  bool const
   Config::
   get_reads_parser_threading( void )
   { return !_config_data[ "reads_parser_threading" ].compare( "true" ); }
 
 
-#ifdef KHMER_THREADED
   void
   Config::
   set_reads_parser_threading( const bool threading )
@@ -128,11 +105,9 @@ namespace khmer
     _config_data[ "reads_parser_threading" ] = 
       threading ? string( "true" ) : string( "false" );
   }
-#endif
 
 
-  const
-  unsigned long long
+  unsigned long long const
   Config::
   get_reads_file_chunk_size( void )
   {
@@ -159,33 +134,23 @@ namespace khmer
   }
 
 
-  const
-  Byte
+  Byte const
   Config::
   get_hash_count_threshold( void )
   {
-#ifdef KHMER_THREADED
     unsigned int    number_of_threads	    = get_number_of_threads( );
     if (1 == number_of_threads) return (Byte)MAX_COUNT;
     return (Byte)(MAX_COUNT - get_number_of_threads( ) + 1);
-#else
-    return (Byte)MAX_COUNT;
-#endif
   }
 
 
-  const
-  BoundedCounterType
+  BoundedCounterType const
   Config::
   get_hash_bigcount_threshold( void )
   {
-#ifdef KHMER_THREADED
     unsigned int    number_of_threads	    = get_number_of_threads( );
     if (1 == number_of_threads) return (BoundedCounterType)MAX_BIGCOUNT;
     return (BoundedCounterType)(MAX_BIGCOUNT - get_number_of_threads( ) + 1);
-#else
-    return (BoundedCounterType)MAX_BIGCOUNT;
-#endif
   }
 
 }
