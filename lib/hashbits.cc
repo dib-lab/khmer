@@ -2,10 +2,6 @@
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "read_parsers.hh"
-#include "threadedParsers.hh"
-#ifdef KHMER_THREADED
-#include <omp.h>
-#endif
 #define MAX_KEEPER_SIZE int(1e6)
 
 using namespace std;
@@ -327,7 +323,7 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
     // n_consumed += this_n_consumed;
 
       if (check_and_normalize_read(seq)) {	// process?
-//#pragma omp critical (consume_and_tag_seq)
+	// TODO? Place spinlock here.
 	consume_sequence_and_tag(seq, n_consumed);
       }
 
@@ -373,11 +369,7 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     // twice. This way is also easier to add thread safety at an atomic level.
 #if (1)
     if ((is_new_kmer = test_and_set_bits( kmer )))
-#ifdef KHMER_THREADED
       __sync_add_and_fetch( &n_consumed, 1 );
-#else
-      n_consumed++;
-#endif
 #else
     is_new_kmer = (bool) !get_count(kmer);
     if (is_new_kmer) {
@@ -386,9 +378,7 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     }
 #endif
 
-#ifdef KHMER_THREADED
-# pragma omp critical (add_found_tags)
-#endif
+    // TODO? Place spinlock here.
     {
       if (!is_new_kmer && set_contains(all_tags, kmer)) {
 	since = 1;
@@ -405,9 +395,7 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     } // critical section
   } // iteration over kmers
 
-#ifdef KHMER_THREADED
-# pragma omp critical (update_all_tags)
-#endif
+  // TODO? Place spinlock here.
   if (since >= _tag_density/2 - 1) {
     all_tags.insert(kmer);	// insert the last k-mer, too.
     if (found_tags) { found_tags->insert(kmer); }
