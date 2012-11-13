@@ -3248,15 +3248,9 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
   const char* alignment = aln.alignment.c_str();
   std::string rA = aln.getReadAlignment(read);
   const char* readAlignment = rA.c_str();
-  double score = aln.score;
  
-  //std::cout << "returning: " << readAlignment << std::endl; 
-  //std::cout << ".........: " << aln.getReadAlignment(read) << std::endl;
-  //std::cout << "alignment: " << alignment << std::endl;
-
-  return Py_BuildValue("ssd", alignment,
-                              readAlignment,
-                              score);
+  return Py_BuildValue("ss", alignment,
+                              readAlignment);
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {

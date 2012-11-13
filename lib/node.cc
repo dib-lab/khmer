@@ -118,7 +118,7 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
    int index;
    int remaining;
    double bestMatch = sm->score('A','A');
-   double errorOffset = 10.0;
+   double errorOffset = 20.0;
 
    if (forward) {
       index = stateNo + 1;
@@ -146,7 +146,8 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
                                 'm',
                                 nextKmer);
       nextMatch->gval = gval + sm->score(nextNucl, seq[index]);
-      if (!isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo))
+      int isCorrect = isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo);
+      if (!isCorrect)
       {
          nextMatch->gval += errorOffset;
       }
@@ -159,7 +160,12 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
          nextMatch->diff = diff + 1;
       }
 
-      ret.push(nextMatch);
+      if (isCorrect) {
+         ret.push(nextMatch);
+      }  else {
+         delete nextMatch;
+      }
+
       // insertion
       if (state != 'd') {
          Node * nextIns = new Node(this,
@@ -168,7 +174,7 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
                                  'i',
                                  nextKmer);
          nextIns->gval = gval + sm->score(nextNucl, '-');
-         if (!isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo))
+         if (!isCorrect)
          {
             nextIns->gval += errorOffset;
          }
@@ -178,20 +184,25 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 
          nextIns->diff = diff + 1;
 
-         ret.push(nextIns);
+         if (isCorrect) {
+            ret.push(nextIns);
+         } else {
+            delete nextIns;
+         }
       }
    }
 
    // deletion
    if (state != 'i') {
       int kmerCov = ch->get_count(kmer.getUniqueHash());
+      int isCorrect = isCorrectKmer(kmerCov, lambdaOne, lambdaTwo);
       Node * nextDel = new Node(this,
                           '-',
                           index,
                           'd',
                           kmer);
       nextDel->gval = gval + sm->score('-', seq[index]);
-      if (!isCorrectKmer(kmerCov, lambdaOne, lambdaTwo))
+      if (!isCorrect)
       {
          nextDel->gval += errorOffset;
       }
@@ -201,7 +212,11 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 
       nextDel->diff = diff + 1;
 
-      ret.push(nextDel);
+      if (isCorrect) {
+         ret.push(nextDel);
+      } else {
+         delete nextDel;
+      }
    }
 
    return ret;
