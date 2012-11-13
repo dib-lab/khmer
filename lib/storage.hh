@@ -57,13 +57,7 @@ namespace khmer {
 
     void set(unsigned long long index, bool keep) {
       if (index >= _tablesize) { return; } // @CTB throw?
-
-#ifdef KHMER_THREADED
       __sync_val_compare_and_swap( _mask + index, (unsigned char)(!keep), (unsigned char)keep );
-#else
-      //_mask[index] = keep ? 1 : 0;
-      _mask[index] = (unsigned char)keep;
-#endif
     }
 
     void merge(ReadMaskTable &other) {

@@ -247,40 +247,17 @@ namespace khmer {
 	HashIntoType byte = bin / 8;
 	unsigned char bit = (unsigned char)(1 << (bin % 8));
 
-#ifdef KHMER_THREADED
 	unsigned char bits_orig = __sync_fetch_and_or( *(_counts + i) + byte, bit );
 	if (!(bits_orig & bit))
 	{
 	  __sync_add_and_fetch( &_occupied_bins, 1 );
 	  is_new_kmer = true;
 	}
-#else
-#if (0)
-	unsigned char bits_orig = _counts[ i ][ byte ];
-	_counts[ i ][ byte ] |= bit;
-	if (!(bits_orig & bit))
-	{
-	  _occupied_bins++;
-	  is_new_kmer = true;
-	}
-#else
-	if (!(_counts[ i ][ byte ] & bit))
-	{
-	  _counts[ i ][ byte ] |= bit;
-	  _occupied_bins++;
-	  is_new_kmer = true;
-	}
-#endif
-#endif
       } // iteration over hashtables
 
       if (is_new_kmer)
       {
-#ifdef KHMER_THREADED
 	__sync_add_and_fetch( &_n_unique_kmers, 1 );
-#else
-	_n_unique_kmers++;
-#endif
 	return true; // kmer not seen before
       }
 
