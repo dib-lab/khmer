@@ -14,12 +14,12 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser test-HashTables smpFiltering 
+DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=ht-diff
 
 CORE_OBJS= khmer_config.o trace_logger.o perf_metrics.o  ktable.o
-PARSERS_OBJS=parsers.o threadedParsers.o read_parsers.o
+PARSERS_OBJS=parsers.o read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test
 
@@ -36,7 +36,6 @@ DRV_TEST_PARSER_OBJS=test-Parser.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZ
 DRV_TEST_HASHTABLES_OBJS= \
 	test-HashTables.o counting.o hashbits.o hashtable.o subset.o \
 	$(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-DRV_SMP_FILTERING_OBJS=smpFiltering.o counting.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 HT_DIFF_OBJS=ht-diff.o counting.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 
 test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS)
@@ -50,9 +49,6 @@ test-Parser: $(DRV_TEST_PARSER_OBJS)
 
 test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
 	$(CXX) -o $@ $(DRV_TEST_HASHTABLES_OBJS) $(LIBS)
-
-smpFiltering: $(DRV_SMP_FILTERING_OBJS) primes.hh
-	$(CXX) -o $@ $(DRV_SMP_FILTERING_OBJS) $(LIBS)
 
 ht-diff: $(HT_DIFF_OBJS)
 	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
@@ -88,8 +84,6 @@ trace_logger.o: trace_logger.cc trace_logger.hh
 perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
-
-threadedParsers.o: threadedParsers.cc threadedParsers.hh
 
 parsers.o: parsers.cc parsers.hh
 
