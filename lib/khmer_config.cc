@@ -46,7 +46,7 @@ namespace khmer
 #else
     _config_data[ "has_extra_sanity_checks" ] = string( "false" );
 #endif
-    sprintf( buf, "%ull", 104857600 );
+    sprintf( buf, "%ull", 512U*1024*1024 );
     _config_data[ "reads_file_chunk_size" ]   = string( buf );
   }
 

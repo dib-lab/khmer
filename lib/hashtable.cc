@@ -141,11 +141,13 @@ consume_fasta(
 {
   using namespace khmer:: read_parsers;
 
-  // TODO: Get defaults from config.
+  khmer:: Config    &the_config	  = khmer:: get_active_config( );
+
   // Note: Always assume only 1 thread if invoked this way.
   IParser *	  parser = 
   IParser::get_parser(
-    filename, 1, 2*1024*1024*1024U, TraceLogger:: TLVL_NONE
+    filename, 1, the_config.get_reads_file_chunk_size( ),
+    TraceLogger:: TLVL_NONE
   );
 
   consume_fasta(
