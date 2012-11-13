@@ -12,19 +12,15 @@ class CandidateAlignment {
 public:
    std::map<int,int> readDeletions;
    std::string alignment;
-   double score;
 
-   CandidateAlignment(std::map<int,int> _readDel, std::string _aln, 
-                      double _score)
+   CandidateAlignment(std::map<int,int> _readDel, std::string _aln)
    {
       readDeletions = _readDel;
       alignment = _aln;
-      score = _score;
    }
 
    CandidateAlignment() {
       alignment = "";
-      score = -1.0; // a negative score isn't possible
    }
 
    bool operator<(const CandidateAlignment& param) const {

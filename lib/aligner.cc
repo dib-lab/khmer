@@ -171,6 +171,7 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
                        kmer +
                        extractString(rightGoal, 1, &readDels);
 
+   /*
    // score up the alignment
    double score = 0;
    int readIndex = 0;
@@ -188,6 +189,7 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
          readIndex++;
       }
    }
+   */
   
    // memory cleanup!
    for_each(leftOpen.begin(), leftOpen.end(), del_fun<Node>());
@@ -195,7 +197,7 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
    for_each(leftClosed.begin(), leftClosed.end(), del_fun<Node>());
    for_each(rightClosed.begin(), rightClosed.end(), del_fun<Node>()); 
 
-   return CandidateAlignment(readDels, align, score);
+   return CandidateAlignment(readDels, align);
 }
 
 CandidateAlignment Aligner::alignRead(const std::string& read) {
@@ -235,7 +237,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
    // read appears to be error free
    if (markers.size() == 1 && markers[0] == 0) {
       std::map<int,int> readDels;
-      CandidateAlignment retAln = CandidateAlignment(readDels, read, 0.0);
+      CandidateAlignment retAln = CandidateAlignment(readDels, read);
       return retAln;
    }
    
@@ -278,7 +280,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
                                         0);
          size_t kmerInd = aln.alignment.rfind(read.substr(markers[i+1], k));
          if (kmerInd == std::string::npos) {
-            return best; // change this to, um, worst at some point
+            return best;
          } else {
             graphAlign += aln.alignment.substr(0, kmerInd);
          }
@@ -289,11 +291,10 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
          graphAlign += read.substr(markers[i+1], markers[i+2]-markers[i+1]);
       } else {
          graphAlign += read.substr(markers[i+1]);
-         //graphAlign += read.substr(markers[i+1]+k);
       }
    }
    
    std::map<int,int> readDels;
-   CandidateAlignment retAln = CandidateAlignment(readDels, graphAlign, 0.0);
+   CandidateAlignment retAln = CandidateAlignment(readDels, graphAlign);
    return retAln;
 }
