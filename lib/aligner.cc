@@ -204,6 +204,9 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
    std::vector<unsigned int> markers;
    bool toggleError = 1;
 
+   unsigned int longestErrorRegion = 0;
+   unsigned int currentErrorRegion = 0;
+
    unsigned int k = ch->ksize();
 
    std::set<CandidateAlignment> alignments;
@@ -220,6 +223,18 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
 
       bool isCorrect = isCorrectKmer(kCov, lambdaOne, lambdaTwo);
 
+      if (isCorrect && currentErrorRegion) {
+         currentErrorRegion = 0;
+      }
+
+      if (!isCorrect) {
+         currentErrorRegion++;
+
+         if (currentErrorRegion > longestErrorRegion) {
+            longestErrorRegion = currentErrorRegion;
+         }
+      }
+
       if (toggleError && isCorrect) {
          markers.push_back(i);
          toggleError = 0;
@@ -231,6 +246,11 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
 
    // couldn't find a seed k-mer
    if (markers.size() == 0) {
+      return best;
+   }
+
+   // exceeded max error region parameter
+   if (longestErrorRegion > maxErrorRegion && maxErrorRegion >= 0) {
       return best;
    }
 

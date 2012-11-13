@@ -71,6 +71,7 @@ class Aligner {
    int k;
    double lambdaOne; // error distribution parameter
    double lambdaTwo; // non-error distribution parameter
+   int maxErrorRegion;
 
 public:
    Node * subalign(Node *, unsigned int, unsigned char, std::set<Node*>&, 
@@ -79,12 +80,14 @@ public:
    CandidateAlignment align(khmer::CountingHash*, const std::string&, 
                             const std::string&, int);
 
-   Aligner(khmer::CountingHash* _ch, double lOne=0, double lTwo=0) {
+   Aligner(khmer::CountingHash* _ch, 
+           double lOne=0, double lTwo=0, int maxErrorReg=-1) {
       ch = _ch;
       sm = new ScoringMatrix();
       k = ch->ksize();
       lambdaOne=lOne;
       lambdaTwo=lTwo;
+      maxErrorRegion = maxErrorReg;
    }
 
    int ksize() {
