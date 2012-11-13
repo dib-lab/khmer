@@ -222,7 +222,6 @@ config_get_number_of_threads( PyObject * self, PyObject * args )
   return PyInt_FromSize_t( (size_t)config->get_number_of_threads( ) );
 }
 
-#ifdef KHMER_THREADED
 static
 PyObject *
 config_set_number_of_threads( PyObject * self, PyObject * args )
@@ -248,7 +247,6 @@ config_set_number_of_threads( PyObject * self, PyObject * args )
   Py_INCREF(Py_None);
   return Py_None;
 }
-#endif
 
 
 static
@@ -262,7 +260,6 @@ config_get_reads_parser_threading( PyObject * self, PyObject * args )
 }
 
 
-#ifdef KHMER_THREADED
 static
 PyObject *
 config_set_reads_parser_threading( PyObject * self, PyObject * args )
@@ -279,7 +276,6 @@ config_set_reads_parser_threading( PyObject * self, PyObject * args )
   Py_INCREF(Py_None);
   return Py_None;
 }
-#endif
 
 
 static
@@ -334,13 +330,9 @@ static PyMethodDef khmer_config_methods[] = {
   { "is_threaded", config_is_threaded, METH_VARARGS, "Compiled with threading support?" },
   { "has_extra_sanity_checks", config_has_extra_sanity_checks, METH_VARARGS, "Compiled with extra sanity checking?" },
   { "get_number_of_threads", config_get_number_of_threads, METH_VARARGS, "Get the number of threads to use." },
-#ifdef KHMER_THREADED
   { "set_number_of_threads", config_set_number_of_threads, METH_VARARGS, "Set the number of threads to use." },
-#endif
   { "get_reads_parser_threading", config_get_reads_parser_threading, METH_VARARGS, "Does the reads parser use multiple threads?" },
-#ifdef KHMER_THREADED
   { "set_reads_parser_threading", config_set_reads_parser_threading, METH_VARARGS, "Choose whether the reads parser uses mutliple threads." },
-#endif
   { "get_reads_file_chunk_size", config_get_reads_file_chunk_size, METH_VARARGS, "Get the chunk size used by the threaded reads file parser." },
   { "set_reads_file_chunk_size", config_set_reads_file_chunk_size, METH_VARARGS, "Set the chunk size used by the threaded reads file parser." },
   { "get_hash_count_threshold", config_get_hash_count_threshold, METH_VARARGS, "Get the maximum count held by a Bloom filter hash bin." },

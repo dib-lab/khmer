@@ -1,7 +1,3 @@
-# Use multiple threads?
-# Set this variable to true if you wish the codes to use multiple threads when they can.
-WANT_THREADING=true
-
 # Profile?
 # Set this variable to true if you wish to profile the codes.
 WANT_PROFILING=false
@@ -54,18 +50,6 @@ else
 DEFINE_KHMER_EXTRA_SANITY_CHECKS=
 endif
 
-ifeq ($(WANT_THREADING), true)
-DEFINE_KHMER_THREADED=-DKHMER_THREADED
-CXX_THREADING_FLAGS=-fopenmp
-THREADING_LIBS=-fopenmp
-CXXFLAGS+= $(DEFINE_KHMER_THREADED) $(CXX_THREADING_FLAGS)
-LIBS+= $(THREADING_LIBS)
-else
-DEFINE_KHMER_THREADED=
-CXX_THREADING_FLAGS=
-THREADING_LIBS=
-endif
-
 ifeq ($(WANT_PROFILING), true)
 ifeq ($(PROFILER_OF_CHOICE), TAU)
 CXX=tau_cxx.sh
@@ -112,11 +96,8 @@ lib_files:
 
 python_files: lib_files
 	cd python && \
-	make 	DEFINE_KHMER_THREADED="$(DEFINE_KHMER_THREADED)" \
-		DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
+	make 	DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
 		CXX_DEBUG_FLAGS="$(CXX_DEBUG_FLAGS)" \
-		CXX_THREADING_FLAGS="$(CXX_THREADING_FLAGS)" \
-		THREADING_LIBS="$(THREADING_LIBS)" \
 		CYTHON_ENABLED_BOOL="$(CYTHON_ENABLED_BOOL)"
 #	python setup.py build_ext -i
 

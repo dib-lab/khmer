@@ -42,13 +42,13 @@ test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS)
 	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(LIBS)
 
 test-CacheManager: $(DRV_TEST_CACHE_MANAGER_OBJS)
-	$(CXX) -o $@ $(DRV_TEST_CACHE_MANAGER_OBJS) $(LIBS)
+	$(CXX) -o $@ $(DRV_TEST_CACHE_MANAGER_OBJS) $(LIBS) -fopenmp
 
 test-Parser: $(DRV_TEST_PARSER_OBJS)
-	$(CXX) -o $@ $(DRV_TEST_PARSER_OBJS) $(LIBS)
+	$(CXX) -o $@ $(DRV_TEST_PARSER_OBJS) $(LIBS) -fopenmp
 
 test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
-	$(CXX) -o $@ $(DRV_TEST_HASHTABLES_OBJS) $(LIBS)
+	$(CXX) -o $@ $(DRV_TEST_HASHTABLES_OBJS) $(LIBS) -fopenmp
 
 ht-diff: $(HT_DIFF_OBJS)
 	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
@@ -99,11 +99,14 @@ counting.o: counting.cc counting.hh hashtable.hh ktable.hh khmer.hh
 
 test-StreamReader.o: read_parsers.hh
 
-test-CacheManager.o: read_parsers.hh
+test-CacheManager.o: test-CacheManager.cc read_parsers.hh
+	$(CXX) $(CXXFLAGS) -c -o $@ test-CacheManager.cc -fopenmp
 
 test-Parser.o: read_parsers.hh
+	$(CXX) $(CXXFLAGS) -c -o $@ test-Parser.cc -fopenmp
 
 test-HashTables.o: read_parsers.hh primes.hh
+	$(CXX) $(CXXFLAGS) -c -o $@ test-HashTables.cc -fopenmp
 
 ht-diff.o: counting.hh hashtable.hh ktable.hh khmer.hh
 
