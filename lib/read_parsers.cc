@@ -637,12 +637,18 @@ has_more_data( )
 sync_barrier:
     for (uint64_t i = 0; _segment_ref_count; ++i)
     {
-	if (0 == i % 100000000)
-	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG3,
-		"Waited in synchronization barrier for %llu iterations.\n",
-		(unsigned long long int)i
-	    );
+	// TODO: Determine optimal period. (Probably arch-dependent.)
+	if (0 == i % 100000)
+	{
+	    if (0 == i % 100000000)
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG3,
+		    "Waited in synchronization barrier for %llu iterations.\n",
+		    (unsigned long long int)i
+		);
+	    // HACK: Occasionally issue a memory barrier to break things up.
+	    _get_segment_ref_count_ATOMIC( );
+	}
     }
 
     // Return false, if no segment can provide more data.
@@ -751,12 +757,18 @@ split_at( uint64_t const pos )
 wait_for_sa_buffer:
     for (uint64_t i = 0; segment.get_sa_buffer_avail( ); ++i)
     {
-	if (0 == i % 100000000)
-	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG3,
-		"Waited to set setaside buffer for %llu iterations.\n",
-		(unsigned long long int)i
-	    );
+	// TODO: Determine optimal period. (Probably arch-dependent.)
+	if (0 == i % 100000)
+	{
+	    if (0 == i % 100000000)
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG3,
+		    "Waited to set setaside buffer for %llu iterations.\n",
+		    (unsigned long long int)i
+		);
+	    // HACK: Occasionally issue a memory barrier to break things up.
+	    segment.get_sa_buffer_avail_ATOMIC( );
+	}
     }
 
     // If we get here but are not ready to proceed,
@@ -832,12 +844,18 @@ wait_for_sa_buffer:
 		hsegment.avail && !hsegment.get_sa_buffer_avail( );
 		++i)
 	{
-	    if (0 == i % 100000000)
-		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG3,
-		    "Waited to get setaside buffer for %llu iterations.\n",
-		    (unsigned long long int)i
-		);
+	    // TODO: Determine optimal period. (Probably arch-dependent.)
+	    if (0 == i % 100000)
+	    {
+		if (0 == i % 100000000)
+		    segment.trace_logger(
+			TraceLogger:: TLVL_DEBUG3,
+			"Waited to get setaside buffer for %llu iterations.\n",
+			(unsigned long long int)i
+		    );
+		// HACK: Occasionally issue a memory barrier to break things up.
+		hsegment.get_sa_buffer_avail_ATOMIC( );
+	    }
 	}
 
 	// Atomically test that the setaside buffer is available.
