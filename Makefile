@@ -18,7 +18,7 @@ WANT_DEBUGGING=true
 
 # Compile with tracing logic turned on?
 # Set this variable to true if you want to use instrumentation provided in the sources for debugging purposes and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_TRACING=true
+WITH_INTERNAL_TRACING=false
 
 # Compile with performance metrics turned on?
 # Set this variable to true if you want to use instrumentation provided in the sources for performance measurement purposes and are willing to accept the overhead such instrumentation introduces.
