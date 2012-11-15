@@ -419,6 +419,7 @@ khmer_read_getattr( PyObject * self, char * attr_name )
     value_OBJECT = PyString_FromString( (read->annotations).c_str( ) );
   else if (!strcmp( attr_name, "accuracy" ))
     value_OBJECT = PyString_FromString( (read->accuracy).c_str( ) );
+  // TODO? Handle other fields.
   else
   {
     PyErr_SetString( PyExc_KeyError, "invalid member attribute name" );
