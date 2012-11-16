@@ -35,7 +35,6 @@ def test_EXISTENCE_OTHERS( ):
 	[
 	    "set_number_of_threads", "get_number_of_threads", 
 	    "get_reads_input_buffer_size", "set_reads_input_buffer_size",
-	    "get_hash_count_threshold", "get_hash_bigcount_threshold",
 	]:
 	yield check_attribute_exists, config, attr_name
 
@@ -80,28 +79,4 @@ def test_USE_set_reads_input_buffer_size( ):
     assert 123456789L == config.get_reads_input_buffer_size( )
 
 
-def check_hash_count_threshold( config, i, max_count, count_func_name ):
-    """
-	Verify that sloppiness thresholds for counting hashes change appropriately with number of threads.
-    """
-    number_of_threads = 2**i
-    config.set_number_of_threads( number_of_threads )
-    if 0 == i:	assert max_count == getattr( config, count_func_name )( )
-    else:	assert (max_count - number_of_threads + 1) == getattr( config, count_func_name )( )
-
-def test_EFFECTS_set_number_of_threads( ):
-    """
-	Verify that the effects of changing the number of threads are proper.
-    """
-    config = get_active_config( )
-    config.set_number_of_threads( 1 )
-    max_count	= config.get_hash_count_threshold( )
-    max_bigcount	= config.get_hash_bigcount_threshold( )
-    # Descend from greater number of threads to 1 thread as extra assurance 
-    # that same answer is produced again after various ops.
-    for i in reversed( xrange( 4 ) ):
-	yield check_hash_count_threshold, config, i, max_count, "get_hash_count_threshold"
-	yield check_hash_count_threshold, config, i, max_bigcount, "get_hash_bigcount_threshold"
-
-
-# vim: set sts=4 sw=4:
+# vim: set ft=python sts=4 sw=4 tw=79:

@@ -141,8 +141,7 @@ namespace khmer {
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-      Config		  config	= get_active_config( );
-      unsigned int	  max_count	= config.get_hash_count_threshold( );
+      unsigned int	  max_count	= _max_count;
       BoundedCounterType  min_count	= max_count;
       for (unsigned int i = 0; i < _n_tables; i++) {
 	BoundedCounterType the_count = _counts[i][khash % _tablesizes[i]];

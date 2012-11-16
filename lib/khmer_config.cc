@@ -19,7 +19,7 @@ get_active_config( void )
 
 
 void
-set_active_config( Config & config )
+set_active_config( Config &config )
 {
     the_config = config;
 }
@@ -92,20 +92,6 @@ set_reads_input_buffer_size( uint64_t const reads_input_buffer_size )
 
     _reads_input_buffer_size = reads_input_buffer_size;
 }
-
-
-// TODO: Move this hash table logic.
-Byte const
-Config::
-get_hash_count_threshold( void )
-{ return (Byte)(MAX_COUNT - get_number_of_threads( ) + 1); }
-
-
-// TODO: Move this hash table logic.
-BoundedCounterType const
-Config::
-get_hash_bigcount_threshold( void )
-{ return (BoundedCounterType)(MAX_BIGCOUNT - get_number_of_threads( ) + 1); }
 
 } // namespace khmer
 

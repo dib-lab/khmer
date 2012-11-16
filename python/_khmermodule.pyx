@@ -64,9 +64,6 @@ cdef extern from "../lib/khmer_config.hh"	namespace "khmer":
       uint64_t get_reads_input_buffer_size( )
       void set_reads_input_buffer_size( uint64_t )
 
-      Byte get_hash_count_threshold( )
-      BoundedCounterType get_hash_bigcount_threshold( )
-
   cdef Config get_active_config( )
 
 cdef class get_config:
@@ -95,11 +92,6 @@ cdef class get_config:
    def set_reads_input_buffer_size( self, uint64_t reads_input_buffer_size ):
       # TODO? Handle exceptions from C++ code.
       self.thisref.set_reads_input_buffer_size( reads_input_buffer_size )
-
-   def get_hash_count_threshold( self ): 
-      return self.thisref.get_hash_count_threshold( )
-   def get_hash_bigcount_threshold( self ): 
-      return self.thisref.get_hash_bigcount_threshold( )
 
 cdef extern from "../lib/read_parsers.hh" namespace "khmer:: read_parsers":
    
