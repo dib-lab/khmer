@@ -260,25 +260,6 @@ config_set_reads_input_buffer_size( PyObject * self, PyObject * args )
   return Py_None;
 }
 
-
-static
-PyObject *
-config_get_hash_count_threshold( PyObject * self, PyObject * args )
-{
-  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
-  khmer::Config *	  config    = me->config;
-  return PyInt_FromSize_t( (size_t)config->get_hash_count_threshold( ) );
-}
-
-static
-PyObject *
-config_get_hash_bigcount_threshold( PyObject * self, PyObject * args )
-{
-  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
-  khmer::Config *	  config    = me->config;
-  return PyInt_FromSize_t( (size_t)config->get_hash_bigcount_threshold( ) );
-}
-
 static PyMethodDef khmer_config_methods[] = {
   { "has_extra_sanity_checks", config_has_extra_sanity_checks,
     METH_VARARGS, "Compiled with extra sanity checking?" },
@@ -290,10 +271,6 @@ static PyMethodDef khmer_config_methods[] = {
     METH_VARARGS, "Get the buffer size used by the reads file parser." },
   { "set_reads_input_buffer_size", config_set_reads_input_buffer_size,
     METH_VARARGS, "Set the buffer size used by the reads file parser." },
-  { "get_hash_count_threshold", config_get_hash_count_threshold, 
-    METH_VARARGS, "Get the maximum count held by a Bloom filter hash bin." },
-  { "get_hash_bigcount_threshold", config_get_hash_bigcount_threshold,
-    METH_VARARGS, "Get the maximum count held by an overflow hash bin." },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

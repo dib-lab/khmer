@@ -24,11 +24,6 @@ struct Config
     uint64_t const get_reads_input_buffer_size( void );
     void set_reads_input_buffer_size( uint64_t const );
 
-    // TODO: Move these to hash table logic.
-    // Calculate the saturation thresholds for hash counts.
-    Byte const get_hash_count_threshold( void );
-    BoundedCounterType const get_hash_bigcount_threshold( void );
-
 private:
     
     bool	_has_extra_sanity_checks;

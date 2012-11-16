@@ -1,15 +1,6 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-#if (__cplusplus >= 201103L)
-#   include <cstdint>
-#else
-extern "C"
-{
-#   include <stdint.h>
-}
-#endif
-
 #include <vector>
 #include <iostream>
 #include <list>
@@ -186,23 +177,13 @@ namespace khmer {
     :	_trace_level( trace_level ),
 	_number_of_threads( number_of_threads ), 
 	_thread_id_map( ThreadIDMap( number_of_threads ) ),
+	_max_count( MAX_COUNT - number_of_threads + 1 ),
+	_max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
 	_ksize( ksize )
     {
 
 	_hashers = new Hasher *[ number_of_threads ];
 	for (uint32_t i = 0; i < number_of_threads; ++i) _hashers[ i ] = NULL;
-
-	// TODO: Transplant this logic to someplace more common.
-	if (1 == number_of_threads)
-	{
-	    _max_count	    = MAX_COUNT;
-	    _max_bigcount   = MAX_BIGCOUNT;
-	}
-	else
-	{
-	    _max_count	    = MAX_COUNT - number_of_threads + 1;
-	    _max_bigcount   = MAX_BIGCOUNT - number_of_threads + 1;
-	}
 
 	_init_bitstuff();
 
