@@ -146,7 +146,7 @@ consume_fasta(
   // Note: Always assume only 1 thread if invoked this way.
   IParser *	  parser = 
   IParser::get_parser(
-    filename, 1, the_config.get_reads_file_chunk_size( ),
+    filename, 1, the_config.get_reads_input_buffer_size( ),
     TraceLogger:: TLVL_NONE
   );
 

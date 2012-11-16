@@ -381,7 +381,7 @@ struct IParser
 	uint32_t const		number_of_threads   =
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const		cache_size	    =
-	khmer:: get_active_config( ).get_reads_file_chunk_size( ),
+	khmer:: get_active_config( ).get_reads_input_buffer_size( ),
 	uint8_t const		trace_level	    = TraceLogger:: TLVL_NONE
     );
     
@@ -390,7 +390,7 @@ struct IParser
 	uint32_t const	number_of_threads   =
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const	cache_size	    =
-	khmer:: get_active_config( ).get_reads_file_chunk_size( ),
+	khmer:: get_active_config( ).get_reads_input_buffer_size( ),
 	uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
     );
     virtual ~IParser( );

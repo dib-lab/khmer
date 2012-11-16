@@ -56,16 +56,13 @@ cdef extern from "../lib/khmer_config.hh"	namespace "khmer":
   cdef cppclass Config:
       Config( )
 
-      bool is_threaded( )
       bool has_extra_sanity_checks( )
 
-      unsigned int get_number_of_threads( )
-      void set_number_of_threads( unsigned int )
+      uint32_t get_number_of_threads( )
+      void set_number_of_threads( uint32_t )
 
-      bool get_reads_parser_threading( )
-      void set_reads_parser_threading( bool )
-      unsigned long long get_reads_file_chunk_size( )
-      void set_reads_file_chunk_size( unsigned long long )
+      uint64_t get_reads_input_buffer_size( )
+      void set_reads_input_buffer_size( uint64_t )
 
       Byte get_hash_count_threshold( )
       BoundedCounterType get_hash_bigcount_threshold( )
@@ -84,27 +81,20 @@ cdef class get_config:
       # references.
       self.thisref = new Config( )
 
-   def is_threaded( self ): return self.thisref.is_threaded( )
    def has_extra_sanity_checks( self ):
       return self.thisref.has_extra_sanity_checks( )
 
    def get_number_of_threads( self ): 
       return self.thisref.get_number_of_threads( )
-   def set_number_of_threads( self, unsigned int number_of_threads ):
-      if 0 >= number_of_threads:
-         raise ValueError( "Number of threads must be > 0." )
+   def set_number_of_threads( self, uint32_t number_of_threads ):
+      # TODO? Handle exceptions from C++ side.
       self.thisref.set_number_of_threads( number_of_threads )
 
-   def get_reads_parser_threading( self ):
-      return self.thisref.get_reads_parser_threading( )
-   def set_reads_parser_threading( self, bool reads_parser_threading ):
-      self.thisref.set_reads_parser_threading( reads_parser_threading )
-   def get_reads_file_chunk_size( self ):
-      return self.thisref.get_reads_file_chunk_size( )
-   def set_reads_file_chunk_size( self, unsigned long long reads_file_chunk_size ):
-      if 0 >= reads_file_chunk_size:
-         raise ValueError( "Reads file chunk size must be > 0." )
-      self.thisref.set_reads_file_chunk_size( reads_file_chunk_size )
+   def get_reads_input_buffer_size( self ):
+      return self.thisref.get_reads_input_buffer_size( )
+   def set_reads_input_buffer_size( self, uint64_t reads_input_buffer_size ):
+      # TODO? Handle exceptions from C++ code.
+      self.thisref.set_reads_input_buffer_size( reads_input_buffer_size )
 
    def get_hash_count_threshold( self ): 
       return self.thisref.get_hash_count_threshold( )
@@ -121,6 +111,7 @@ cdef extern from "../lib/read_parsers.hh" namespace "khmer:: read_parsers":
       string annotations
       string sequence
       string accuracy
+      # TODO? Add 'description'.
     
    cdef cppclass IParser:
 

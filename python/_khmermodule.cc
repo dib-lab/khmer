@@ -195,16 +195,6 @@ khmer_config_dealloc( PyObject* self )
 
 static
 PyObject *
-config_is_threaded( PyObject * self, PyObject * args )
-{
-  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
-  khmer::Config *	  config    = me->config;
-  if (config->is_threaded( )) Py_RETURN_TRUE;
-  Py_RETURN_FALSE;
-}
-
-static
-PyObject *
 config_has_extra_sanity_checks( PyObject * self, PyObject * args )
 {
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
@@ -231,17 +221,9 @@ config_set_number_of_threads( PyObject * self, PyObject * args )
   if (!PyArg_ParseTuple( args, "i", &number_of_threads ))
     return NULL;
 
-  if (0 >= number_of_threads)
-  {
-    PyErr_SetString(
-      PyExc_ValueError,
-      "number of threads must be greater than zero"
-    );
-    return NULL;
-  }
-
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
   khmer::Config *	  config    = me->config;
+  // TODO: Catch exceptions and set errors as appropriate.
   config->set_number_of_threads( number_of_threads );
 
   Py_INCREF(Py_None);
@@ -251,57 +233,28 @@ config_set_number_of_threads( PyObject * self, PyObject * args )
 
 static
 PyObject *
-config_get_reads_parser_threading( PyObject * self, PyObject * args )
+config_get_reads_input_buffer_size( PyObject * self, PyObject * args )
 {
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
   khmer::Config *	  config    = me->config;
-  if (config->get_reads_parser_threading( )) Py_RETURN_TRUE;
-  Py_RETURN_FALSE;
+  // TODO: More safely match type with uint64_t.
+  return PyLong_FromUnsignedLongLong( config->get_reads_input_buffer_size( ) );
 }
 
 
 static
 PyObject *
-config_set_reads_parser_threading( PyObject * self, PyObject * args )
+config_set_reads_input_buffer_size( PyObject * self, PyObject * args )
 {
-  unsigned char	reads_parser_threading;
+  unsigned long long reads_input_buffer_size;
 
-  if (!PyArg_ParseTuple( args, "B", &reads_parser_threading ))
+  if (!PyArg_ParseTuple( args, "K", &reads_input_buffer_size ))
     return NULL;
 
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
   khmer::Config *	  config    = me->config;
-  config->set_reads_parser_threading( reads_parser_threading ? 1 : 0 );
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-
-static
-PyObject *
-config_get_reads_file_chunk_size( PyObject * self, PyObject * args )
-{
-  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
-  khmer::Config *	  config    = me->config;
-  return PyLong_FromUnsignedLongLong( config->get_reads_file_chunk_size( ) );
-}
-
-
-static
-PyObject *
-config_set_reads_file_chunk_size( PyObject * self, PyObject * args )
-{
-  unsigned long long reads_file_chunk_size;
-
-  if (!PyArg_ParseTuple( args, "K", &reads_file_chunk_size ))
-    return NULL;
-
-  // TODO: ensure value > 0.
-
-  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
-  khmer::Config *	  config    = me->config;
-  config->set_reads_file_chunk_size( reads_file_chunk_size );
+  // Catch exceptions and set errors as appropriate.
+  config->set_reads_input_buffer_size( reads_input_buffer_size );
 
   Py_INCREF(Py_None);
   return Py_None;
@@ -327,16 +280,20 @@ config_get_hash_bigcount_threshold( PyObject * self, PyObject * args )
 }
 
 static PyMethodDef khmer_config_methods[] = {
-  { "is_threaded", config_is_threaded, METH_VARARGS, "Compiled with threading support?" },
-  { "has_extra_sanity_checks", config_has_extra_sanity_checks, METH_VARARGS, "Compiled with extra sanity checking?" },
-  { "get_number_of_threads", config_get_number_of_threads, METH_VARARGS, "Get the number of threads to use." },
-  { "set_number_of_threads", config_set_number_of_threads, METH_VARARGS, "Set the number of threads to use." },
-  { "get_reads_parser_threading", config_get_reads_parser_threading, METH_VARARGS, "Does the reads parser use multiple threads?" },
-  { "set_reads_parser_threading", config_set_reads_parser_threading, METH_VARARGS, "Choose whether the reads parser uses mutliple threads." },
-  { "get_reads_file_chunk_size", config_get_reads_file_chunk_size, METH_VARARGS, "Get the chunk size used by the threaded reads file parser." },
-  { "set_reads_file_chunk_size", config_set_reads_file_chunk_size, METH_VARARGS, "Set the chunk size used by the threaded reads file parser." },
-  { "get_hash_count_threshold", config_get_hash_count_threshold, METH_VARARGS, "Get the maximum count held by a Bloom filter hash bin." },
-  { "get_hash_bigcount_threshold", config_get_hash_bigcount_threshold, METH_VARARGS, "Get the maximum count held by an overflow hash bin." },
+  { "has_extra_sanity_checks", config_has_extra_sanity_checks,
+    METH_VARARGS, "Compiled with extra sanity checking?" },
+  { "get_number_of_threads", config_get_number_of_threads,
+    METH_VARARGS, "Get the number of threads to use." },
+  { "set_number_of_threads", config_set_number_of_threads,
+    METH_VARARGS, "Set the number of threads to use." },
+  { "get_reads_input_buffer_size", config_get_reads_input_buffer_size, 
+    METH_VARARGS, "Get the buffer size used by the reads file parser." },
+  { "set_reads_input_buffer_size", config_set_reads_input_buffer_size,
+    METH_VARARGS, "Set the buffer size used by the reads file parser." },
+  { "get_hash_count_threshold", config_get_hash_count_threshold, 
+    METH_VARARGS, "Get the maximum count held by a Bloom filter hash bin." },
+  { "get_hash_bigcount_threshold", config_get_hash_bigcount_threshold,
+    METH_VARARGS, "Get the maximum count held by an overflow hash bin." },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -477,9 +434,9 @@ PyObject *
 new_read_parser( PyObject * self, PyObject * args )
 {
   char *      ifile_name_CSTR;
-  // TODO? Set defaults from config.
+  // TODO: Set defaults from config.
   uint32_t    number_of_threads	  = 1;
-  uint64_t    cache_size	  = 4 * 1024 * 1024 * 1024U;
+  uint64_t    cache_size	  = 512U * 1024 * 1024;
   uint8_t     trace_level	  = khmer:: TraceLogger:: TLVL_NONE;
 
   if (!PyArg_ParseTuple(
