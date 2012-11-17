@@ -5,6 +5,7 @@ from libcpp.pair cimport pair
 from libcpp.set cimport set
 from libcpp.vector cimport vector
 from libcpp cimport bool
+from cpython cimport bool as pybool
 from libc.string cimport strlen
 from cython.operator cimport dereference as deref, preincrement as inc
 
@@ -279,8 +280,8 @@ cdef extern from "../lib/counting.hh" namespace "khmer":
                                             CallbackFn,
                                             void*) except *
       HashIntoType * fasta_count_kmers_by_position(char*, unsigned int,
-                                                   BoundedCounterType,
                                                    ReadMaskTable*,
+                                                   BoundedCounterType,
                                                    CallbackFn,
                                                    void*) except *
       void fasta_dump_kmers_by_abundance(char*, ReadMaskTable*, BoundedCounterType,
@@ -303,7 +304,6 @@ cdef extern from "../lib/counting.hh" namespace "khmer":
       unsigned int trim_on_abundance(char*, BoundedCounterType)
       # TODO: Take care of corresponding test when this is modified.
       # void collect_high_abundance_kmers(char*, unsigned int, unsigned int, ) @CTB
-
 
 cdef extern from "../lib/subset.hh" namespace "khmer":
    cdef cppclass Hashbits
@@ -479,6 +479,8 @@ cdef class new_ktable:
    def intersect(self, new_ktable ktbl2):
       result = new_ktable(self, ktbl2)
       return result
+   def __contains__( self, char *kmer ):
+      return int( pybool( self.thisptr.get_count( kmer ) ) )
 
 cdef class new_readmask:
    cdef ReadMaskTable *thisptr
@@ -694,7 +696,7 @@ cdef class _new_counting_hash:
          in_rm = <ReadMaskTable*> in_readmask.thisptr  
       positions = []
       cpositions = self.thisptr.fasta_count_kmers_by_position(inputfile, max_read_len,
-                                                              limit_by_count, in_rm, 
+                                                              in_rm, limit_by_count,
                                                               _report_fn, <void*>_callback_obj)
       for i in range(max_read_len):
          positions.append(cpositions[i])
@@ -852,8 +854,8 @@ cdef class _new_hashbits:
    def consume_fasta(self, char* filename, HashIntoType lower=0, 
                      HashIntoType upper=0, callback_obj=None):
       global _callback_obj
-      cdef unsigned long long n_consumed
-      cdef unsigned int total_reads
+      cdef unsigned long long n_consumed  = 0
+      cdef unsigned int total_reads       = 0
 
       if callback_obj is not None:
          _callback_obj = callback_obj
@@ -1007,11 +1009,11 @@ cdef class _new_hashbits:
    def hitraverse_to_stoptags(self, char* filename, _new_counting_hash ch, unsigned int cutoff):
       self.thisptr.hitraverse_to_stoptags(filename, ch.thisptr[0], cutoff)
    def find_radius_for_volume(self, char* kmer, unsigned long max_count, unsigned long max_radius):
-      cdef HashIntoType kmer_f, kmer_r
+      cdef HashIntoType kmer_f = 0, kmer_r = 0
       _hash(kmer, self.ksize(), kmer_f, kmer_r)
       return self.thisptr.find_radius_for_volume(kmer_f, kmer_r, max_count, max_radius)
    def count_kmers_on_radius(self, char* kmer, unsigned int radius, unsigned int max_volume):
-      cdef HashIntoType kmer_f, kmer_r
+      cdef HashIntoType kmer_f = 0, kmer_r = 0
       _hash(kmer, self.ksize(), kmer_f, kmer_r)
       return self.thisptr.count_kmers_on_radius(kmer_f, kmer_r, radius, max_volume)
    def repartition_largest_partition(self, _new_subsetpartition subset_o, 
@@ -1042,8 +1044,8 @@ cdef class _new_hashbits:
       return dist, n_unassigned
    def find_all_tags(self, char* kmer_s):
       cdef HashIntoType kmer
-      cdef HashIntoType kmer_f
-      cdef HashIntoType kmer_r
+      cdef HashIntoType kmer_f = 0
+      cdef HashIntoType kmer_r = 0
       kmer = _hash(kmer_s, self.thisptr.ksize(), kmer_f, kmer_r)
       ppi = _pre_partition_info(kmer)
       self.thisptr.partition.find_all_tags(kmer_f, kmer_r, ppi.thisptr.tagged_kmers, 

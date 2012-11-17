@@ -34,13 +34,7 @@ public:
   _khmer_signal(std::string message) : _khmer_exception(message) { };
 };
 
-class _pre_partition_info {
-public:
-  khmer::HashIntoType kmer;
-  khmer::SeenSet tagged_kmers;
-
-  _pre_partition_info(khmer::HashIntoType _kmer) : kmer(_kmer) {};
-};
+typedef khmer:: pre_partition_info _pre_partition_info;
 
 // Python exception to raise
 static PyObject *KhmerError;
@@ -935,6 +929,7 @@ static PyObject * ktable_intersect(PyObject * self, PyObject * args)
   return (PyObject *) ktable_obj;
 }
 
+#if (0) // Does not seem to be used anywhere important....
 PyObject * consume_genome(PyObject * self, PyObject * args)
 {
   unsigned int size;
@@ -957,6 +952,7 @@ PyObject * consume_genome(PyObject * self, PyObject * args)
 
   return (PyObject *) ktable_obj;
 }
+#endif // 0
 
 /***********************************************************************/
 
@@ -4299,7 +4295,9 @@ static PyMethodDef KhmerMethods[] = {
   { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
   { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
   { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
+#if (0)
   { "consume_genome", consume_genome, METH_VARARGS, "Create a new ktable from a genome" },
+#endif
   { "forward_hash", forward_hash, METH_VARARGS, "", },
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
   { "reverse_hash", reverse_hash, METH_VARARGS, "", },
