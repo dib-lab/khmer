@@ -1,5 +1,3 @@
-#include <ctime>
-
 #include "perf_metrics.hh"
 
 namespace khmer
