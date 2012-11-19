@@ -2,43 +2,17 @@
 #define READ_PARSERS_HH
 
 
-#include <climits>
-#if (__cplusplus >= 201103L)
-#   include <cstdint>
-#else
-extern "C"
-{
-#   include <stdint.h>
-}
-#endif
-#ifndef SSIZE_MAX
-#   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
-#endif
 #include <cassert>
 #include <cstdarg>
 
 #include <string>
-#include <map>
-
-// TODO: Move to a separate header.
-// TODO? Just use 'pthread_t' everywhere.
-// Linux uses standard PIDs for thread IDs.
-#if defined (__linux__)
-#   include <sys/types.h>
-// MacOS X uses Mach kernel ports for thread IDs.
-#elif defined (__APPLE__) && defined (__MACH__)
-#   include <mach/mach.h>
-#   include <pthread.h>
-// Else, hope that some POSIX threads implementation is available.
-// If so, then try to use 'pthread_t' instances as thread IDs.
-#else
-#   include <pthread.h>
-#endif
 
 #include "zlib/zlib.h"
 #include "bzip2/bzlib.h"
 
+#include "khmer.hh"
 #include "khmer_config.hh"
+#include "thread_id_map.hh"
 #include "trace_logger.hh"
 #include "perf_metrics.hh"
 
@@ -52,37 +26,6 @@ struct InvalidStreamHandle : public std:: exception
 
 struct StreamReadError : public std:: exception
 { };
-
-struct InvalidNumberOfThreadsRequested : public std:: exception
-{ };
-
-struct TooManyThreads : public std:: exception
-{ };
-
-
-// TODO: Move to a separate header.
-struct ThreadIDMap
-{
-
-    ThreadIDMap( uint32_t number_of_threads );
-    ~ThreadIDMap( );
-
-    uint32_t const get_thread_id( );
-
-private:
-
-    uint32_t				_number_of_threads;
-    uint32_t				_thread_counter;
-#if defined (__linux__)
-    std:: map< pid_t, uint32_t >	_thread_id_map;
-#elif defined (__APPLE__) && defined (__MACH__)
-    std:: map< mach_port_t, uint32_t >	_thread_id_map;
-#else
-    std:: map< pthread_t, uint32_t >	_thread_id_map;
-#endif
-    uint32_t				_tid_map_spin_lock;
-
-};
 
 
 namespace read_parsers
