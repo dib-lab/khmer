@@ -10,6 +10,11 @@ extern "C"
 #	include <stdint.h>
 }
 #   endif
+// Provide standard limits to all.
+#include <climits>
+#ifndef SSIZE_MAX
+#   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
+#endif
 
 #   define VERSION "0.4"
 
