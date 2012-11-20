@@ -28,16 +28,14 @@ using namespace khmer;
 using namespace khmer:: read_parsers;
 
 
-// t: Stream Type
 // s: Cache Size
-static char const *	    SHORT_OPTS	    = "t:s:";
+static char const *	    SHORT_OPTS	    = "s:";
 
 
 int main( int argc, char * argv[ ] )
 {
     int		    rc		    = 0;
-    char *	    ifile_type	    = (char *)"raw";
-    uint64_t	    cache_size	    = 4L * 1024 * 1024 * 1024;
+    uint64_t	    cache_size	    = 512U * 1024 * 1024;
     char *	    ifile_name	    = NULL;
 
     int		    opt		    = -1;
@@ -47,16 +45,6 @@ int main( int argc, char * argv[ ] )
 	
 	switch (opt)
 	{
-
-	case 't':
-	    if (    strcmp( optarg, "raw" ) 
-		&&  strcmp( optarg, "gz" )
-		&&  strcmp( optarg, "bz2" )
-	       )
-		error( EINVAL, EINVAL, "Invalid file type" );
-	    ifile_type = new char[ strlen( optarg ) ];
-	    strcpy( ifile_type, optarg );
-	    break;
 	
 	case 's':
 	    cache_size = strtoull( optarg, &conv_residue, 10 );
@@ -118,6 +106,9 @@ int main( int argc, char * argv[ ] )
 		);
 
 	    the_read = parser->get_next_read( );
+
+	    // DEBUG
+	    printf( ">%s\n%s\n", the_read.name.c_str( ), the_read.sequence.c_str( ) );
 
 	    //fprintf( ofile_handle, ">%s\n", the_read.name.c_str( ) );
 	    seq_len = the_read.sequence.length( );

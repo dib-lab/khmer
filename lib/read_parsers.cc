@@ -1317,8 +1317,114 @@ FastqParser::
 { }
 
 
-Read
+inline
+void
 FastaParser::
+_parse_read( ParserState &state, Read &the_read )
+{
+    bool	    &at_start	    = state.at_start;
+    std:: string    &line	    = state.line;
+    bool	    ignore_start    = at_start;
+
+    // Validate and consume the 'name' field.
+    if ('>' != line[ 0 ]) throw InvalidFASTAFileFormat( );    
+    the_read.name = line.substr( 1 );
+    the_read.bytes_consumed += (line.length( ) + 1);
+
+    // Grab sequence lines until exit conditions are met.
+    while (!is_complete( ))
+    {
+	_copy_line( state );
+
+	// If a new fill is detected, then assume record is complete.
+	if (!ignore_start && at_start) break;
+	// If a new record is detected, then existing one is complete.
+	if ('>' == line[ 0 ]) break;
+
+	// TODO? Uppercase and validate entire sequence here.
+	the_read.sequence += line;
+	the_read.bytes_consumed += (line.length( ) + 1);
+    }
+}
+
+
+/* WARNING!
+ * Under the following extremely rare condition, 
+ * this method will incorrectly parse a FASTQ record:
+ *  * A thread begins parsing in the quality scores section.
+ *  * There are four or more lines of quality scores remaining.
+ *  * The first line starts with '@'.
+ *  * The second line starts with an alphabetic character.
+ *  * The third line starts with '+' or '#'.
+ *  * The fourth line is the same length as the second line.
+ * Even rarer cases may occur if the third line starts with an alphabetic 
+ * character and the fifth and sixth lines are the same length in total as 
+ * the second and third lines, etc....
+ * NOTE: This potential problem can be made even rarer by validating sequences 
+ * at parse time.
+ * This potential bug cannot occur if only one thread is being used to parse.
+ */
+inline
+void
+FastqParser::
+_parse_read( ParserState &state, Read &the_read )
+{
+    bool	    &at_start	    = state.at_start;
+    std:: string    &line	    = state.line;
+    bool	    ignore_start    = at_start;
+
+    // Validate and consume the 'name' field.
+    if ('@' != line[ 0 ]) throw InvalidFASTQFileFormat( );    
+    the_read.name = line.substr( 1 );
+    the_read.bytes_consumed += (line.length( ) + 1);
+
+    // Grab sequence lines until exit conditions are met.
+    while (!is_complete( ))
+    {
+	_copy_line( state );
+
+	// If a new fill is detected, then assume record is corrupt.
+	if (!ignore_start && at_start) throw InvalidFASTQFileFormat( );
+	// If separator line is detected, then assume sequence is complete.
+	if (('+' == line[ 0 ]) || ('#' == line[ 0 ])) break;
+	// TODO? Uppercase and validate entire sequence here.
+	// If line starts with non-alphabetic character, 
+	// then record is corrupt.
+	if (	!(('A' <= line[ 0 ]) && ('Z' >= line[ 0 ]))
+	    &&	!(('a' <= line[ 0 ]) && ('z' >= line[ 0 ])))
+	    throw InvalidFASTQFileFormat( );
+
+	the_read.sequence += line;
+	the_read.bytes_consumed += (line.length( ) + 1);
+    }
+
+    // Ignore repeated name field.
+    the_read.bytes_consumed += (line.length( ) + 1);
+
+    // Grab quality score lines until exit conditions are met.
+    while (	!is_complete( )
+	    &&	(the_read.accuracy.length( ) < the_read.sequence.length( )))
+    {
+	_copy_line( state );
+
+	// If a new fill is detected, then assume record is corrupt.
+	if (!ignore_start && at_start) throw InvalidFASTQFileFormat( );
+
+	the_read.accuracy += line;
+	the_read.bytes_consumed += (line.length( ) + 1);
+    }
+
+    // Validate quality score lines versus sequence lines.
+    if (the_read.accuracy.length( ) != the_read.sequence.length( ))
+	throw InvalidFASTQFileFormat( );
+
+    // Prefetch next line. (Needed to be consistent with FASTA logic.)
+    _copy_line( state );
+}
+
+
+Read
+IParser::
 get_next_read( )
 {
     
@@ -1326,17 +1432,14 @@ get_next_read( )
     uint64_t	    &fill_id	    = state.fill_id;
     bool	    &at_start	    = state.at_start;
     bool	    &need_new_line  = state.need_new_line;
-    std:: string    &line	    = state.line;
     TraceLogger	    &trace_logger   = state.trace_logger;
     uint64_t	    split_pos	    = 0;
+    bool	    skip_read	    = false;
     Read	    the_read;
     
     while (!is_complete( ))
     {
-	the_read.name		= "";
-	the_read.annotations	= "";
-	the_read.sequence	= "";
-	the_read.accuracy	= "";
+	the_read.reset( );
 
 	if (need_new_line) _copy_line( state );
 	need_new_line = true;
@@ -1344,40 +1447,39 @@ get_next_read( )
 	// Update fill number once we are truly in the new segment.
 	if (at_start) fill_id = _cache_manager.get_fill_id( );
 
+	// Attempt to parse a read.
 	// If at start of file, then error on garbage.
 	// Else, skip forward to next read boundary.
-	if ('>' != line[ 0 ])
+	try { _parse_read( state, the_read ); }
+	catch (InvalidReadFileFormat &exc)
 	{
-	    if (at_start && (0 == fill_id)) throw InvalidFASTAFileFormat( );
+	    if (at_start && (0 == fill_id)) throw;
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
 		"get_next_read: Scanning to start of a read...\n"
 	    );
-	    split_pos += (line.length( ) + 1);
+	    split_pos += the_read.bytes_consumed;
 	    continue;
 	}
 
 	// Skip over an unmatched second part of a paired read,
 	// when at the beginning of a new fill.
-	if (	at_start && (0 != fill_id)
-	    && ((line.length( ) - 2) == line.rfind( "/2" )))
+	skip_read =
+		at_start && (0 != fill_id)
+	    && ((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
+	if (skip_read)
 	{
-	    while (!is_complete( ))
-	    {
-		trace_logger(
-		    TraceLogger:: TLVL_DEBUG7,
-		    "get_next_read: Skipped a line of length %llu, " \
-		    "looking for next read.\n",
-		    (unsigned long long int)line.length( )
-		);
-		split_pos += (line.length( ) + 1);
-		_copy_line( state );
-		if ('>' == line[ 0 ]) break;
-	    }
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"get_next_read: Skipped a split pair, using %llu bytes, " \
+		"looking for next read.\n",
+		(unsigned long long int)the_read.bytes_consumed
+	    );
+	    split_pos += the_read.bytes_consumed;
 	}
 
 	// Split off skipped over data into a setaside buffer.
-	if (at_start && (0 != fill_id))
+	if (split_pos)
 	{
 
 	    trace_logger(
@@ -1404,18 +1506,10 @@ get_next_read( )
 
 	}
 
-	at_start = false;
-
-	// Parse read.
-	the_read.name	= line.substr( 1 );
+	split_pos	= 0;
+	at_start	= false;
 	need_new_line	= false;
-	while (!is_complete( ))
-	{
-	    _copy_line( state );
-	    if (at_start) break;
-	    if ('>' == line[ 0 ]) break;
-	    the_read.sequence += line;
-	}
+	if (skip_read) continue;
 
 #ifdef WITH_INTERNAL_METRICS
 	state.pmetrics.numreads_parsed_total++;
@@ -1446,21 +1540,6 @@ get_next_read( )
 	break;
     } // while invalid read
 
-    return the_read;
-}
-
-
-Read
-FastqParser::
-get_next_read( )
-{
-    
-    ParserState	    &parser_state   = _get_state( );
-    std:: string    &line	    = parser_state.line;
-    Read	    the_read;
-
-    // TODO: Implement.
-    
     return the_read;
 }
 
