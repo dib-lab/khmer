@@ -32,10 +32,13 @@ namespace read_parsers
 {
 
 
-struct InvalidFASTAFileFormat: public std:: exception
+struct InvalidReadFileFormat: public std:: exception
 { };
 
-struct InvalidFASTQFileFormat: public std:: exception
+struct InvalidFASTAFileFormat: public InvalidReadFileFormat
+{ };
+
+struct InvalidFASTQFileFormat: public InvalidReadFileFormat
 { };
 
 struct CacheSegmentUnavailable : public std:: exception
@@ -293,11 +296,21 @@ private:
 
 struct Read
 {
-    std:: string name;
-    std:: string annotations;
-    std:: string sequence;
-    std:: string accuracy;
+    std:: string    name;
+    std:: string    annotations;
+    std:: string    sequence;
+    std:: string    accuracy;
     // TODO? Add description field.
+    uint64_t	    bytes_consumed;
+
+    inline void reset ( )
+    {
+	name.clear( );
+	annotations.clear( );
+	sequence.clear( );
+	accuracy.clear( );
+	bytes_consumed = 0;
+    }
 };
 
 
@@ -341,7 +354,7 @@ struct IParser
     inline bool		is_complete( )
     { return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem; }
 
-    virtual Read	get_next_read( )    = 0;
+    virtual Read	get_next_read( );
 
 protected:
     
@@ -382,6 +395,8 @@ protected:
 
     void		_copy_line( ParserState &state );
 
+    virtual void	_parse_read( ParserState &, Read &)	    = 0;
+
     inline ParserState	&_get_state( )
     {
 	uint32_t	thread_id	= _thread_id_map.get_thread_id( );
@@ -414,7 +429,7 @@ struct FastaParser : public IParser
     );
     virtual ~FastaParser( );
 
-    virtual Read    get_next_read( );
+    virtual void    _parse_read( ParserState &, Read &);
 
 };
 
@@ -430,7 +445,7 @@ struct FastqParser : public IParser
     );
     virtual ~FastqParser( );
 
-    virtual Read    get_next_read( );
+    virtual void    _parse_read( ParserState &, Read &);
 
 };
 
