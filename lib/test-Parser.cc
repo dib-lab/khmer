@@ -108,7 +108,12 @@ int main( int argc, char * argv[ ] )
 	    the_read = parser->get_next_read( );
 
 	    // DEBUG
-	    printf( ">%s\n%s\n", the_read.name.c_str( ), the_read.sequence.c_str( ) );
+	    printf(
+		"@%s\n%s\n+\n%s\n",
+		the_read.name.c_str( ),
+		the_read.sequence.c_str( ),
+		the_read.accuracy.c_str( )
+	    );
 
 	    //fprintf( ofile_handle, ">%s\n", the_read.name.c_str( ) );
 	    seq_len = the_read.sequence.length( );

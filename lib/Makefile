@@ -99,15 +99,15 @@ subset.o: subset.cc subset.hh hashbits.hh ktable.hh khmer.hh
 
 counting.o: counting.cc counting.hh hashtable.hh ktable.hh khmer.hh
 
-test-StreamReader.o: read_parsers.hh
+test-StreamReader.o: test-StreamReader.cc read_parsers.hh
 
 test-CacheManager.o: test-CacheManager.cc read_parsers.hh
 	$(CXX) $(CXXFLAGS) -c -o $@ test-CacheManager.cc -fopenmp
 
-test-Parser.o: read_parsers.hh
+test-Parser.o: test-Parser.cc read_parsers.hh
 	$(CXX) $(CXXFLAGS) -c -o $@ test-Parser.cc -fopenmp
 
-test-HashTables.o: read_parsers.hh primes.hh
+test-HashTables.o: test-HashTables.cc read_parsers.hh primes.hh
 	$(CXX) $(CXXFLAGS) -c -o $@ test-HashTables.cc -fopenmp
 
 ht-diff.o: counting.hh hashtable.hh ktable.hh khmer.hh
