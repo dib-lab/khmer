@@ -27,27 +27,28 @@ set_active_config( Config &config )
 
 Config::
 Config( void )
-{
+:
 #ifdef KHMER_EXTRA_SANITY_CHECKS
-    _has_extra_sanity_checks	= true;
+    _has_extra_sanity_checks( true ),
 #else
-    _has_extra_sanity_checks	= false;
+    _has_extra_sanity_checks( false ),
 #endif
-    _number_of_threads		= 1;
-    _reads_input_buffer_size	= 512U*1024*1024;
-    // TODO? Precalculate hash count thresholds.
-}
+    _number_of_threads( 1 ),
+    _reads_input_buffer_size( 512U*1024*1024 ),
+    _ibmgr_trace_level( 255U ),
+    _rparser_trace_level( 255U )
+{ }
 
 
 bool const
 Config::
-has_extra_sanity_checks( void )
+has_extra_sanity_checks( void ) const
 { return _has_extra_sanity_checks; }
 
 
 uint32_t const
 Config::
-get_number_of_threads( void ) 
+get_number_of_threads( void ) const
 { return _number_of_threads; } 
 
 
@@ -77,7 +78,7 @@ set_number_of_threads( uint32_t const number_of_threads )
 
 uint64_t const
 Config::
-get_reads_input_buffer_size( void )
+get_reads_input_buffer_size( void ) const
 { return _reads_input_buffer_size; }
 
 
@@ -92,6 +93,31 @@ set_reads_input_buffer_size( uint64_t const reads_input_buffer_size )
 
     _reads_input_buffer_size = reads_input_buffer_size;
 }
+
+
+uint8_t const
+Config::
+get_input_buffer_trace_level( void ) const
+{ return _ibmgr_trace_level; }
+
+
+void
+Config::
+set_input_buffer_trace_level( uint8_t trace_level )
+{ _ibmgr_trace_level = trace_level; }
+
+
+uint8_t const
+Config::
+get_reads_parser_trace_level( void ) const
+{ return _rparser_trace_level; }
+
+
+void
+Config::
+set_reads_parser_trace_level( uint8_t trace_level )
+{ _rparser_trace_level = trace_level; }
+
 
 } // namespace khmer
 

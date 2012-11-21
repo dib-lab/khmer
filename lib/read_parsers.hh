@@ -199,7 +199,8 @@ struct CacheManager
 	IStreamReader &	stream_reader,
 	uint32_t const	number_of_threads,
 	uint64_t const	cache_size,
-	uint8_t const	trace_level = TraceLogger:: TLVL_NONE
+	uint8_t const	trace_level =
+	khmer:: get_active_config( ).get_input_buffer_trace_level( )
     );
     ~CacheManager( );
 
@@ -244,7 +245,8 @@ private:
 	    uint32_t const  thread_id,
 	    uint64_t const  size,
 	    size_t const    alignment = 0,
-	    uint8_t const   trace_level = TraceLogger:: TLVL_NONE
+	    uint8_t const   trace_level = 
+	    khmer:: get_active_config( ).get_input_buffer_trace_level( )
 	);
 	~CacheSegment( );
 
@@ -338,7 +340,8 @@ struct IParser
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const		cache_size	    =
 	khmer:: get_active_config( ).get_reads_input_buffer_size( ),
-	uint8_t const		trace_level	    = TraceLogger:: TLVL_NONE
+	uint8_t const		trace_level	    =
+	khmer:: get_active_config( ).get_reads_parser_trace_level( )
     );
     
 	    IParser(
@@ -347,7 +350,8 @@ struct IParser
 	khmer:: get_active_config( ).get_number_of_threads( ),
 	uint64_t const	cache_size	    =
 	khmer:: get_active_config( ).get_reads_input_buffer_size( ),
-	uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
+	uint8_t const	trace_level	    = 
+	khmer:: get_active_config( ).get_reads_parser_trace_level( )
     );
     virtual ~IParser( );
 
