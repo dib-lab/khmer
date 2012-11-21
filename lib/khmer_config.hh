@@ -16,19 +16,29 @@ struct Config
 
     Config( void );
 
-    bool const has_extra_sanity_checks( void );
+    bool const has_extra_sanity_checks( void ) const;
 
-    uint32_t const get_number_of_threads( void );
+    uint32_t const get_number_of_threads( void ) const;
     void set_number_of_threads( uint32_t const );
 
-    uint64_t const get_reads_input_buffer_size( void );
+    uint64_t const get_reads_input_buffer_size( void ) const;
     void set_reads_input_buffer_size( uint64_t const );
+
+    uint8_t const get_input_buffer_trace_level( void ) const;
+    void set_input_buffer_trace_level( uint8_t const );
+    uint8_t const get_reads_parser_trace_level( void ) const;
+    void set_reads_parser_trace_level( uint8_t const );
 
 private:
     
     bool	_has_extra_sanity_checks;
+
     uint32_t	_number_of_threads;
+
     uint64_t	_reads_input_buffer_size;
+
+    uint8_t	_ibmgr_trace_level;
+    uint8_t	_rparser_trace_level;
 
 };
 

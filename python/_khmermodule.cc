@@ -247,12 +247,69 @@ config_set_reads_input_buffer_size( PyObject * self, PyObject * args )
 
   khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
   khmer::Config *	  config    = me->config;
-  // Catch exceptions and set errors as appropriate.
+  // TODO: Catch exceptions and set errors as appropriate.
   config->set_reads_input_buffer_size( reads_input_buffer_size );
 
   Py_INCREF(Py_None);
   return Py_None;
 }
+
+
+static
+PyObject *
+config_get_input_buffer_trace_level( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  return PyInt_FromSize_t( (size_t)config->get_input_buffer_trace_level( ) );
+}
+
+
+static
+PyObject *
+config_set_input_buffer_trace_level( PyObject * self, PyObject * args )
+{
+  unsigned char trace_level;
+
+  if (!PyArg_ParseTuple( args, "B", &trace_level )) return NULL;
+
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  // TODO: Catch exceptions and set errors as appropriate.
+  config->set_input_buffer_trace_level( (uint8_t)trace_level );
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+
+static
+PyObject *
+config_get_reads_parser_trace_level( PyObject * self, PyObject * args )
+{
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  return PyInt_FromSize_t( (size_t)config->get_reads_parser_trace_level( ) );
+}
+
+
+static
+PyObject *
+config_set_reads_parser_trace_level( PyObject * self, PyObject * args )
+{
+  unsigned char trace_level;
+
+  if (!PyArg_ParseTuple( args, "B", &trace_level )) return NULL;
+
+  khmer_ConfigObject *	  me	    = (khmer_ConfigObject *) self;
+  khmer::Config *	  config    = me->config;
+  // TODO: Catch exceptions and set errors as appropriate.
+  config->set_reads_parser_trace_level( (uint8_t)trace_level );
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 
 static PyMethodDef khmer_config_methods[] = {
   { "has_extra_sanity_checks", config_has_extra_sanity_checks,
@@ -265,6 +322,14 @@ static PyMethodDef khmer_config_methods[] = {
     METH_VARARGS, "Get the buffer size used by the reads file parser." },
   { "set_reads_input_buffer_size", config_set_reads_input_buffer_size,
     METH_VARARGS, "Set the buffer size used by the reads file parser." },
+  { "get_input_buffer_trace_level", config_get_input_buffer_trace_level,
+    METH_VARARGS, "Get the trace level of the input buffer manager." },
+  { "set_input_buffer_trace_level", config_set_input_buffer_trace_level,
+    METH_VARARGS, "Set the trace level of the input buffer manager." },
+  { "get_reads_parser_trace_level", config_get_reads_parser_trace_level,
+    METH_VARARGS, "Get the trace level of the reads file parser." },
+  { "set_reads_parser_trace_level", config_set_reads_parser_trace_level,
+    METH_VARARGS, "Set the trace level of the reads file parser." },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

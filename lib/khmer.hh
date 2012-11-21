@@ -16,6 +16,9 @@ extern "C"
 #   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
 #endif
 
+// C++ standard exceptions are subclassed almost ubiquitously.
+#include <exception>
+
 #   define VERSION "0.4"
 
 #   define MAX_COUNT 255
@@ -56,6 +59,9 @@ namespace khmer {
   typedef void (*CallbackFn)(const char * info, void * callback_data,
 			     unsigned long long n_reads,
 			     unsigned long long other);
+
+  struct InvalidStreamBuffer : public std:: exception
+  { };
 
 }
 

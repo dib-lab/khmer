@@ -1,30 +1,14 @@
 #ifndef TRACE_LOGGER_HH
 #define TRACE_LOGGER_HH
 
-
-#include <climits>
-#if (__cplusplus >= 201103L)
-#   include <cstdint>
-#else
-extern "C"
-{
-#   include <stdint.h>
-}
-#endif
-
 #include <cstdarg>
 #include <cstdio>
 
-#include <exception>
+#include "khmer.hh"
 
 
 namespace khmer
 {
-
-
-// TODO: Move to a more generic location.
-struct InvalidStreamBuffer : public std:: exception
-{ };
 
 
 struct TraceLogger
