@@ -1327,9 +1327,9 @@ _parse_read( ParserState &state, Read &the_read )
     bool	    ignore_start    = at_start;
 
     // Validate and consume the 'name' field.
+    the_read.bytes_consumed += (line.length( ) + 1);
     if ('>' != line[ 0 ]) throw InvalidFASTAFileFormat( );    
     the_read.name = line.substr( 1 );
-    the_read.bytes_consumed += (line.length( ) + 1);
 
     // Grab sequence lines until exit conditions are met.
     while (!is_complete( ))
@@ -1374,9 +1374,9 @@ _parse_read( ParserState &state, Read &the_read )
     bool	    ignore_start    = at_start;
 
     // Validate and consume the 'name' field.
+    the_read.bytes_consumed += (line.length( ) + 1);
     if ('@' != line[ 0 ]) throw InvalidFASTQFileFormat( );    
     the_read.name = line.substr( 1 );
-    the_read.bytes_consumed += (line.length( ) + 1);
 
     // Grab sequence lines until exit conditions are met.
     while (!is_complete( ))
