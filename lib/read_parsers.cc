@@ -753,6 +753,18 @@ _perform_segment_maintenance( CacheSegment &segment )
 
     CacheSegment	&hsegment	    = _get_segment( true );
 
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG3,
+	"Performing segment maintenance... (Cursor at %llu.)\n",
+	(unsigned long long int)segment.cursor
+    );
+    if (segment.cursor_in_sa_buffer)
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG3,
+	    "\tIn %llu-byte long setaside buffer.\n",
+	    (unsigned long long int)hsegment.sa_buffer_size
+	);
+
     // If at end of segment and not already in setaside buffer, 
     // then jump into setaside buffer from higher segment.
     if (!segment.cursor_in_sa_buffer && (segment.cursor == segment.size))
@@ -839,6 +851,7 @@ wait_for_sa_buffer:
 	    TraceLogger:: TLVL_DEBUG2, "Jumped out of setaside buffer.\n"
 	);
 
+	// NOTE: This hackishness is a good case for copyaside buffers.
 	// Jump past end of setaside buffer
 	// so as not to clobber what the lower segment will want to use.
 	if (segment.get_sa_buffer_avail_ATOMIC( ))
@@ -1453,7 +1466,7 @@ get_next_read( )
 	try { _parse_read( state, the_read ); }
 	catch (InvalidReadFileFormat &exc)
 	{
-	    if (at_start && (0 == fill_id)) throw;
+	    if (!at_start || (at_start && (0 == fill_id))) throw;
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
 		"get_next_read: Scanning to start of a read...\n"
@@ -1466,7 +1479,7 @@ get_next_read( )
 	// when at the beginning of a new fill.
 	skip_read =
 		at_start && (0 != fill_id)
-	    && ((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
+	    &&	((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
 	if (skip_read)
 	{
 	    trace_logger(
