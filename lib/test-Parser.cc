@@ -3,15 +3,6 @@
 
 
 #include <cerrno>
-#include <climits>
-#if (__cplusplus >= 201103L)
-#   include <cstdint>
-#else
-extern "C"
-{
-#   include <stdint.h>
-}
-#endif
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
@@ -22,6 +13,9 @@ extern "C"
 #include <omp.h>
 
 #include "read_parsers.hh"
+
+
+// #define WRITE_SUMMARY
 
 
 using namespace khmer;
@@ -35,7 +29,9 @@ static char const *	    SHORT_OPTS	    = "s:";
 int main( int argc, char * argv[ ] )
 {
     int		    rc		    = 0;
-    uint64_t	    cache_size	    = 512U * 1024 * 1024;
+    Config	    &the_config	    = get_active_config( );
+    uint64_t	    cache_size	    =
+    the_config.get_reads_input_buffer_size( );
     char *	    ifile_name	    = NULL;
 
     int		    opt		    = -1;
@@ -77,7 +73,9 @@ int main( int argc, char * argv[ ] )
 	char		ofile_name[ FILENAME_MAX + 1 ];
 	FILE *		ofile_handle	    = NULL;
 
+#ifdef WRITE_SUMMARY
 	ofile_name[ FILENAME_MAX ] = '\0';
+#endif
 
 	fprintf(
 	    stderr,
@@ -85,6 +83,7 @@ int main( int argc, char * argv[ ] )
 	    (unsigned long int)thread_id
 	);
 
+#ifdef WRITE_SUMMARY
 	snprintf(
 	    ofile_name, FILENAME_MAX, "summary-%lu.log",
 	    (unsigned long int)thread_id
@@ -93,6 +92,7 @@ int main( int argc, char * argv[ ] )
 	if (NULL == ofile_handle)
 	    // TODO: Report an error.
 	    ;
+#endif
 
 	for (uint64_t readnum = 0; !parser->is_complete( ); ++readnum)
 	{
@@ -107,27 +107,24 @@ int main( int argc, char * argv[ ] )
 
 	    the_read = parser->get_next_read( );
 
-	    // DEBUG
+#if (0)
 	    printf(
 		"@%s\n%s\n+\n%s\n",
 		the_read.name.c_str( ),
 		the_read.sequence.c_str( ),
 		the_read.accuracy.c_str( )
 	    );
+#endif
 
-	    //fprintf( ofile_handle, ">%s\n", the_read.name.c_str( ) );
-	    seq_len = the_read.sequence.length( );
-	    /*
-	    fprintf(
-		ofile_handle, "%s[%llu]\n",
-		the_read.seq.c_str( ), (unsigned long long int)seq_len
-	    );
-	    */
+#ifdef WRITE_SUMMARY
 	    fflush( ofile_handle );
+#endif
 
 	}
 
+#ifdef WRITE_SUMMARY
 	fclose( ofile_handle );
+#endif
 
     } // parallel region
 
