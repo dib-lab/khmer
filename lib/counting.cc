@@ -1,7 +1,7 @@
 #include "hashtable.hh"
 #include "counting.hh"
 #include "hashbits.hh"
-#include "parsers.hh"
+#include "read_parsers.hh"
 
 #include "zlib/zlib.h"
 #include <math.h>

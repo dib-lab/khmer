@@ -59,6 +59,7 @@ int main( int argc, char * argv[ ] )
     else error( EINVAL, 0, "Input file name required" );
     std:: string    ifile_name_STRING( ifile_name );
 
+    the_config.set_input_buffer_trace_level( TraceLogger:: TLVL_ALL );
     uint32_t	    number_of_threads	    = omp_get_max_threads( );
     IParser *	    parser		    = IParser:: get_parser(
 	ifile_name_STRING, number_of_threads, cache_size,
@@ -107,7 +108,7 @@ int main( int argc, char * argv[ ] )
 
 	    the_read = parser->get_next_read( );
 
-#if (0)
+#if (1)
 	    printf(
 		"@%s\n%s\n+\n%s\n",
 		the_read.name.c_str( ),

@@ -1,6 +1,6 @@
 #include "hashbits.hh"
 #include "subset.hh"
-#include "parsers.hh"
+#include "read_parsers.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
 
@@ -9,7 +9,7 @@
 // #define VALIDATE_PARTITIONS
 
 using namespace khmer;
-using namespace khmer:: parsers;
+using namespace khmer:: read_parsers;
 using namespace std;
 
 #if 0
@@ -90,7 +90,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (_ht->check_and_normalize_read(seq)) {
       const char * kmer_s = seq.c_str();
@@ -186,7 +186,7 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
     if (_ht->check_and_normalize_read(seq)) {
       unsigned long long n_consumed = 0;

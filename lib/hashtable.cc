@@ -1,6 +1,6 @@
 #include "khmer.hh"
 #include "hashtable.hh"
-#include "parsers.hh"
+#include "read_parsers.hh"
 
 using namespace khmer;
 using namespace std;
@@ -147,7 +147,7 @@ consume_fasta(
   IParser *	  parser = 
   IParser::get_parser(
     filename, 1, the_config.get_reads_input_buffer_size( ),
-    TraceLogger:: TLVL_NONE
+    the_config.get_reads_parser_trace_level( )
   );
 
   consume_fasta(

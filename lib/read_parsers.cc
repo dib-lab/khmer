@@ -490,7 +490,7 @@ CacheSegment(
     size( size ),
     alignment( alignment ),
     cursor( 0 ),
-    cursor_in_sa_buffer( false ),
+    cursor_in_ca_buffer( false ),
     fill_id( 0 ),
     pmetrics( CacheSegmentPerformanceMetrics( ) ),
     trace_logger(
@@ -512,9 +512,6 @@ CacheSegment(
 #endif
 	memory = new uint8_t[ size ];
 
-    _sa_buffer_avail	= false;
-    sa_buffer_size	= 0;
-
     trace_logger(
 	TraceLogger:: TLVL_INFO0, 
 	"Trace of thread %lu started.\n", (unsigned long int)thread_id
@@ -530,9 +527,8 @@ CacheManager:: CacheSegment::
 {
 
     avail		= false;
-    _sa_buffer_avail	= false;
-    sa_buffer_size	= 0;
     size		= 0;
+    ca_buffer.clear( );
 
 #ifdef __linux__
     if (alignment) free( memory );
@@ -621,12 +617,10 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 
 	_perform_segment_maintenance( segment );
 
-	if (segment.cursor_in_sa_buffer)
+	if (segment.cursor_in_ca_buffer)
 	{
-	    CacheSegment
-	    &hsegment	    = _get_segment( true );
-	    memory	    = hsegment.memory;
-	    size	    = hsegment.sa_buffer_size;
+	    memory	    = (uint8_t *)segment.ca_buffer.c_str( );
+	    size	    = (uint64_t)segment.ca_buffer.length( );
 	    in_sa_buffer    = true;
 	}
 	else
@@ -662,10 +656,17 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 
 uint64_t const
 CacheManager::
-whereis_cursor( )
+whereis_cursor( void )
 { return _get_segment( ).cursor; }
 
 
+bool const
+CacheManager::
+is_cursor_in_ca_buffer( void )
+{ return _get_segment( ).cursor_in_ca_buffer; }
+
+
+// TODO? Change type of 'pos' to 'size_t'.
 void
 CacheManager::
 split_at( uint64_t const pos )
@@ -673,55 +674,50 @@ split_at( uint64_t const pos )
 
     CacheSegment &	segment		= _get_segment( );
 
+    if (1 == _number_of_threads) return;
+
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG2,
-	"Splitting off setaside buffer at byte %llu.\n",
-	(unsigned long long int)pos
+	"Creating copyaside buffer for fill ID %llu up to byte %llu....\n",
+	(unsigned long long int)segment.fill_id, (unsigned long long int)pos
     );
 
-    // Wait until the lower segment has consumed the setaside buffer.
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
 #endif
-wait_for_sa_buffer:
-    for (uint64_t i = 0; segment.get_sa_buffer_avail( ); ++i)
+    // Acquire copyaside buffers spinlock.
+    for (   uint64_t i = 0;
+	    !__sync_bool_compare_and_swap( &_ca_spin_lock, 0, 1 );
+	    ++i
+	)
     {
-	// TODO: Determine optimal period. (Probably arch-dependent.)
-	if (0 == i % 100000)
-	{
-	    if (0 == i % 100000000)
-		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG3,
-		    "Waited to set setaside buffer for %llu iterations.\n",
-		    (unsigned long long int)i
-		);
-	    // HACK: Occasionally issue a memory barrier to break things up.
-	    segment.get_sa_buffer_avail_ATOMIC( );
-	}
+	if (0 == i % 100000000)
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
+		"Waited to acquire copyaside buffers spinlock " \
+		"for %llu iterations.\n",
+		(unsigned long long int)i
+	    );
     }
-
-    // If we get here but are not ready to proceed,
-    // then go back and wait some more.
-    if (segment.get_sa_buffer_avail_ATOMIC( ))
-	goto wait_for_sa_buffer;
-
+    // Create and register copyaside buffer,
+    // keyed to segment's current fill ID.
+    _ca_buffers[ segment.fill_id ].append(
+	(char *)segment.memory, (size_t)pos
+    );
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG3,
+	"Contents of created copyaside buffer: %s\n",
+	_ca_buffers[ segment.fill_id ].c_str( )
+    );
+    // Release copyaside buffers spinlock.
+    __sync_bool_compare_and_swap( &_ca_spin_lock, 1, 0 );
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.stop_timers( );
     segment.pmetrics.accumulate_timer_deltas(
 	CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
     );
-#endif
-
-    // Setup the setaside buffer.
-    segment.sa_buffer_size = pos;
-#ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.numbytes_reserved_as_sa_buffer += pos;
 #endif
-    segment.set_sa_buffer_avail_ATOMIC( true );
-
-    segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG2, "Finished 'split_at'.\n"
-    );
 
 }
 
@@ -732,18 +728,6 @@ get_fill_id( )
 { return _get_segment( ).fill_id; }
 
 
-bool const
-CacheManager::
-_in_sa_buffer( )
-{ return _get_segment( ).cursor_in_sa_buffer; }
-
-
-bool const
-CacheManager::
-_sa_buffer_avail( )
-{ return _get_segment( ).get_sa_buffer_avail_ATOMIC( ); }
-
-
 void
 CacheManager::
 _perform_segment_maintenance( CacheSegment &segment )
@@ -751,115 +735,133 @@ _perform_segment_maintenance( CacheSegment &segment )
 
     assert( segment.avail );
 
-    CacheSegment	&hsegment	    = _get_segment( true );
-
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG3,
-	"Performing segment maintenance... (Cursor at %llu.)\n",
-	(unsigned long long int)segment.cursor
+	"Performing segment maintenance....\n"
     );
-    if (segment.cursor_in_sa_buffer)
+    if (segment.cursor_in_ca_buffer)
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG3,
-	    "\tIn %llu-byte long setaside buffer.\n",
-	    (unsigned long long int)hsegment.sa_buffer_size
+	    "\tCursor at byte %llu in copyaside buffer for fill %llu.\n",
+	    (unsigned long long int)segment.cursor,
+	    (unsigned long long int)(segment.fill_id + 1)
+	);
+    else
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG3,
+	    "\tCursor at byte %llu in fill %llu.\n",
+	    (unsigned long long int)segment.cursor,
+	    (unsigned long long int)segment.fill_id
 	);
 
-    // If at end of segment and not already in setaside buffer, 
-    // then jump into setaside buffer from higher segment.
-    if (!segment.cursor_in_sa_buffer && (segment.cursor == segment.size))
+    // If at end of segment and not already in copyaside buffer, 
+    // then jump into copyaside buffer from next fill.
+    if (!segment.cursor_in_ca_buffer && (segment.cursor == segment.size))
     {
-
-	// If there is only 1 thread, 
-	// then force setaside buffer to be available.
-	if (segment.thread_id == hsegment.thread_id)
-	    hsegment.set_sa_buffer_avail_ATOMIC( true );
-
-	// Wait while higher segment is available 
-	// and its setaside buffer is not ready for consumption.
-#ifdef WITH_INTERNAL_METRICS
-	segment.pmetrics.start_timers( );
-#endif
-wait_for_sa_buffer:
-	for (	uint64_t i = 0;
-		hsegment.avail && !hsegment.get_sa_buffer_avail( );
-		++i)
+	if (1 == _number_of_threads)
 	{
-	    // TODO: Determine optimal period. (Probably arch-dependent.)
-	    if (0 == i % 100000)
+	    segment.ca_buffer.clear( );
+	    segment.cursor_in_ca_buffer = true;
+	    segment.cursor		= 0;
+	}
+
+	else // multi-threaded
+	{
+
+	    std:: map< uint64_t, std:: string >:: iterator ca_buffers_ITER;
+
+	    // Loop while copyaside buffer from next fill does not exist.
+	    // (TODO: And there is a next fill and EOS not reached.)
+	    for (uint64_t j = 0; !segment.cursor_in_ca_buffer; ++j)
 	    {
-		if (0 == i % 100000000)
+		
+		// If there are no more fills and EOS has been reached,
+		// then we know that no copyaside buffer will be found.
+		if (    (_fill_counter == (segment.fill_id + 1))
+		    &&  _stream_reader.is_at_end_of_stream( ))
+		{
+		    segment.ca_buffer.clear( );
+		    segment.cursor_in_ca_buffer = true;
+		    segment.cursor		= 0;
+		    break;
+		}
+
+    #ifdef WITH_INTERNAL_METRICS
+		segment.pmetrics.start_timers( );
+    #endif
+
+		// Acquire copyaside buffers spinlock.
+		for (   uint64_t i = 0;
+			!__sync_bool_compare_and_swap( &_ca_spin_lock, 0, 1 );
+			++i
+		    )
+		{
+		    if (0 == i % 100000000)
+			segment.trace_logger(
+			    TraceLogger:: TLVL_DEBUG3,
+			    "Waited to acquire copyaside buffers spinlock " \
+			    "for %llu iterations.\n",
+			    (unsigned long long int)i
+			);
+		}
+
+		// Test for existence of copyaside buffer from next fill.
+		// If copyaside buffer exists, then copy it local.
+		ca_buffers_ITER = _ca_buffers.find( segment.fill_id + 1 );
+		if (ca_buffers_ITER != _ca_buffers.end( ))
+		{
+		    segment.cursor_in_ca_buffer = true;
+		    segment.ca_buffer = _ca_buffers[ segment.fill_id + 1 ];
+		    _ca_buffers.erase( ca_buffers_ITER );
+		}
+
+		// Release copyaside buffers spinlock.
+		__sync_bool_compare_and_swap( &_ca_spin_lock, 1, 0 );
+
+    #ifdef WITH_INTERNAL_METRICS
+		segment.pmetrics.stop_timers( );
+		segment.pmetrics.accumulate_timer_deltas(
+		    CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
+		);
+    #endif
+
+		if (0 == j % 100000000)
 		    segment.trace_logger(
 			TraceLogger:: TLVL_DEBUG3,
-			"Waited to get setaside buffer for %llu iterations.\n",
-			(unsigned long long int)i
+			"Waited for copyaside buffer from next fill " \
+			"for %llu iterations.\n",
+			(unsigned long long int)j
 		    );
-		// HACK: Occasionally issue a memory barrier to break things up.
-		hsegment.get_sa_buffer_avail_ATOMIC( );
-	    }
-	}
 
-	// Atomically test that the setaside buffer is available.
-	// If so, then jump into it.
-	if (hsegment.get_sa_buffer_avail_ATOMIC( ))
-	{
-#ifdef WITH_INTERNAL_METRICS
-	    segment.pmetrics.stop_timers( );
-	    segment.pmetrics.accumulate_timer_deltas(
-		CacheSegmentPerformanceMetrics:: 
-		MKEY_TIME_WAITING_TO_GET_SA_BUFFER
-	    );
-#endif
-	    segment.cursor_in_sa_buffer	    = true;
-	    segment.cursor		    = 0;
-	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG2, "Jumped into setaside buffer.\n"
-	    );
-	}
+	    } // loop until copyaside buffer created
 
-	// If the higher segment is no longer available,
-	// and its setaside buffer was never set,
-	// then jump into a dummy buffer with no bytes remaining.
-	else if (!hsegment.avail)
-	{
-	    segment.cursor_in_sa_buffer	    = true;
-	    segment.cursor		    = hsegment.sa_buffer_size;
-	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG2,
-		"Jumped into dummy setaside buffer. " \
-		"(Higher cache segment unavailable.)\n"
-	    );
-	}
+	    if (segment.cursor_in_ca_buffer)
+		segment.cursor = 0;
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG2, "Jumped into copyaside buffer.\n"
+		);
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG3,
+		    "Contents of copyaside buffer in use: %s\n",
+		    segment.ca_buffer.c_str( )
+		);
 
-	// If we somehow got here and shouldn't have, 
-	// then go back and wait some more.
-	else goto wait_for_sa_buffer;
+	} // if multi-threaded
 
-    } // jump into setaside buffer
+    } // end of segment
 
-    // If at end of setaside buffer...
-    if (    segment.cursor_in_sa_buffer
-	&&  (segment.cursor == hsegment.sa_buffer_size))
+    // If at end of copyaside buffer...
+    if (    segment.cursor_in_ca_buffer
+	&&  (segment.cursor == segment.ca_buffer.length( )))
     {
-	
-	// Jump out of setaside buffer and reset it.
-	segment.cursor_in_sa_buffer	= false;
+	segment.cursor_in_ca_buffer	= false;
 	segment.cursor			= 0;
-	hsegment.sa_buffer_size		= 0;
-	hsegment.set_sa_buffer_avail_ATOMIC( false );
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG2, "Jumped out of setaside buffer.\n"
+	    TraceLogger:: TLVL_DEBUG2, "Jumped out of copyaside buffer.\n"
 	);
-
-	// NOTE: This hackishness is a good case for copyaside buffers.
-	// Jump past end of setaside buffer
-	// so as not to clobber what the lower segment will want to use.
-	if (segment.get_sa_buffer_avail_ATOMIC( ))
-	    segment.cursor		= segment.sa_buffer_size;
 	
 	_fill_segment_from_stream( segment );
-	
-    } // refill or mark unavailable
+    } // end of copyaside buffer
 
 }
 
@@ -1024,33 +1026,6 @@ CacheManager::
 _get_segment_ref_count_ATOMIC( )
 {
     return __sync_and_and_fetch( &_segment_ref_count, (uint32_t)0xffffffff );
-}
-
-
-inline
-bool
-CacheManager:: CacheSegment::
-get_sa_buffer_avail( ) const
-{
-    return _sa_buffer_avail;
-}
-
-
-inline
-bool
-CacheManager:: CacheSegment::
-get_sa_buffer_avail_ATOMIC( )
-{
-    return __sync_and_and_fetch( &_sa_buffer_avail, 1 );
-}
-
-
-inline
-void
-CacheManager:: CacheSegment::
-set_sa_buffer_avail_ATOMIC( bool const avail )
-{
-    __sync_bool_compare_and_swap( &_sa_buffer_avail, !avail, avail );
 }
 
 
@@ -1235,8 +1210,6 @@ IParser::
 _copy_line( ParserState &state )
 {
     TraceLogger	    &trace_logger   = state.trace_logger;
-    bool	    &at_start	    = state.at_start;
-    uint64_t	    &fill_id	    = state.fill_id;
     uint8_t	    (&buffer)[ ParserState:: BUFFER_SIZE + 1 ]
 				    = state.buffer;
     uint64_t	    &pos	    = state.buffer_pos;
@@ -1249,12 +1222,6 @@ _copy_line( ParserState &state )
 
     while (true)
     {
-
-	if (!at_start)
-	    at_start =
-		!_unithreaded
-	    &&  (fill_id != _cache_manager.get_fill_id( ))
-	    &&  (rem <= _cache_manager.whereis_cursor( ));
 
 	for (i = 0; (i < rem) && ('\n' != buffer[ pos + i ]); i++);
 	if (i < rem)
@@ -1289,7 +1256,7 @@ _copy_line( ParserState &state )
 	}
 	else break;
 
-    }
+    } // while true
 
 #ifdef WITH_INTERNAL_METRICS
     state.pmetrics.numlines_copied++;
@@ -1335,11 +1302,13 @@ void
 FastaParser::
 _parse_read( ParserState &state, Read &the_read )
 {
-    bool	    &at_start	    = state.at_start;
     std:: string    &line	    = state.line;
-    bool	    ignore_start    = at_start;
 
     // Validate and consume the 'name' field.
+    state.trace_logger(
+	TraceLogger:: TLVL_DEBUG9,
+	"_parse_read: Read Name: %s\n", line.c_str( )
+    );
     the_read.bytes_consumed += (line.length( ) + 1);
     if ('>' != line[ 0 ]) throw InvalidFASTAFileFormat( );    
     the_read.name = line.substr( 1 );
@@ -1349,8 +1318,11 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
-	// If a new fill is detected, then assume record is complete.
-	if (!ignore_start && at_start) break;
+	state.trace_logger(
+	    TraceLogger:: TLVL_DEBUG9,
+	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
+	);
+
 	// If a new record is detected, then existing one is complete.
 	if ('>' == line[ 0 ]) break;
 
@@ -1358,6 +1330,12 @@ _parse_read( ParserState &state, Read &the_read )
 	the_read.sequence += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
     }
+
+    state.trace_logger(
+	TraceLogger:: TLVL_DEBUG8,
+	"_parse_read: Successfully parsed FASTA record of %llu bytes.\n",
+	the_read.bytes_consumed
+    );
 }
 
 
@@ -1382,11 +1360,13 @@ void
 FastqParser::
 _parse_read( ParserState &state, Read &the_read )
 {
-    bool	    &at_start	    = state.at_start;
     std:: string    &line	    = state.line;
-    bool	    ignore_start    = at_start;
 
     // Validate and consume the 'name' field.
+    state.trace_logger(
+	TraceLogger:: TLVL_DEBUG9,
+	"_parse_read: Read Name: %s\n", line.c_str( )
+    );
     the_read.bytes_consumed += (line.length( ) + 1);
     if ('@' != line[ 0 ]) throw InvalidFASTQFileFormat( );    
     the_read.name = line.substr( 1 );
@@ -1396,8 +1376,11 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
-	// If a new fill is detected, then assume record is corrupt.
-	if (!ignore_start && at_start) throw InvalidFASTQFileFormat( );
+	state.trace_logger(
+	    TraceLogger:: TLVL_DEBUG9,
+	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
+	);
+
 	// If separator line is detected, then assume sequence is complete.
 	if (('+' == line[ 0 ]) || ('#' == line[ 0 ])) break;
 	// TODO? Uppercase and validate entire sequence here.
@@ -1420,8 +1403,11 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
-	// If a new fill is detected, then assume record is corrupt.
-	if (!ignore_start && at_start) throw InvalidFASTQFileFormat( );
+	state.trace_logger(
+	    TraceLogger:: TLVL_DEBUG9,
+	    "_parse_read: Read Quality Scores (candidate): %s\n",
+	    line.c_str( )
+	);
 
 	the_read.accuracy += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
@@ -1430,6 +1416,12 @@ _parse_read( ParserState &state, Read &the_read )
     // Validate quality score lines versus sequence lines.
     if (the_read.accuracy.length( ) != the_read.sequence.length( ))
 	throw InvalidFASTQFileFormat( );
+
+    state.trace_logger(
+	TraceLogger:: TLVL_DEBUG8,
+	"_parse_read: Successfully parsed FASTQ record of %llu bytes.\n",
+	the_read.bytes_consumed
+    );
 
     // Prefetch next line. (Needed to be consistent with FASTA logic.)
     _copy_line( state );
@@ -1457,8 +1449,17 @@ get_next_read( )
 	if (need_new_line) _copy_line( state );
 	need_new_line = true;
 
-	// Update fill number once we are truly in the new segment.
+	if (!at_start)
+	    at_start =
+		!_unithreaded
+	    &&  (fill_id != _cache_manager.get_fill_id( ))
+	    &&  (state.buffer_rem <= _cache_manager.whereis_cursor( ));
 	if (at_start) fill_id = _cache_manager.get_fill_id( );
+	trace_logger(
+	    TraceLogger:: TLVL_DEBUG8,
+	    "_get_next_read: fill_id = %llu, at_start = %d\n",
+	    (unsigned long long int)fill_id, at_start
+	);
 
 	// Attempt to parse a read.
 	// If at start of file, then error on garbage.
@@ -1466,11 +1467,17 @@ get_next_read( )
 	try { _parse_read( state, the_read ); }
 	catch (InvalidReadFileFormat &exc)
 	{
-	    if (!at_start || (at_start && (0 == fill_id))) throw;
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
-		"get_next_read: Scanning to start of a read...\n"
+		"get_next_read: Parse error on line: %s\n" \
+		"\t(fill_id = %llu, at_start = %d)\n",
+		state.line.c_str( ),
+		(unsigned long long int)fill_id,
+		at_start
 	    );
+
+	    if (!at_start || (at_start && (0 == fill_id))) throw;
+
 	    split_pos += the_read.bytes_consumed;
 	    continue;
 	}
@@ -1491,8 +1498,8 @@ get_next_read( )
 	    split_pos += the_read.bytes_consumed;
 	}
 
-	// Split off skipped over data into a setaside buffer.
-	if (split_pos)
+	// Copy skipped over data into copyaside buffer.
+	if (at_start)
 	{
 
 	    trace_logger(
