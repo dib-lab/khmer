@@ -14,7 +14,7 @@ namespace khmer
 struct Config
 {
 
-    Config( void );
+    Config( );
 
     bool const has_extra_sanity_checks( void ) const;
 

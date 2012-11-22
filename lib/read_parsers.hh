@@ -214,16 +214,12 @@ struct CacheManager
 	uint8_t * const buffer, uint64_t buffer_len
     );
 
-    uint64_t const	whereis_cursor( );
+    uint64_t const	whereis_cursor( void );
+    bool const		is_cursor_in_ca_buffer( void );
     void		split_at( uint64_t const pos );
 
     uint64_t const	get_fill_id( );
 
-    // NOTE: The following methods should not be needed in "real world"
-    //	     situations; they exist to help testing and tracing.
-    bool const		_in_sa_buffer( );
-    bool const		_sa_buffer_avail( );
-    
 private:
     
     struct CacheSegment
@@ -235,8 +231,8 @@ private:
 	size_t				alignment;
 	uint8_t *			memory;
 	uint64_t			cursor;
-	bool				cursor_in_sa_buffer;
-	uint64_t			sa_buffer_size;
+	bool				cursor_in_ca_buffer;
+	std:: string			ca_buffer;
 	uint64_t			fill_id;
 	CacheSegmentPerformanceMetrics	pmetrics;
 	TraceLogger			trace_logger;
@@ -249,16 +245,6 @@ private:
 	    khmer:: get_active_config( ).get_input_buffer_trace_level( )
 	);
 	~CacheSegment( );
-
-	bool				get_sa_buffer_avail( ) const;
-	bool				get_sa_buffer_avail_ATOMIC( );
-	void				set_sa_buffer_avail_ATOMIC(
-	    bool const avail
-	);
-
-    private:
-	
-	bool				_sa_buffer_avail;
 
     }; // struct CacheSegment
 
@@ -275,6 +261,10 @@ private:
     uint32_t		_segment_ref_count;
     uint32_t		_segment_to_fill;
     uint64_t		_fill_counter;
+
+    // Copyaside buffers.
+    std:: map< uint64_t, std:: string >	_ca_buffers;
+    uint32_t				_ca_spin_lock;
 
     // Extends or refills segment for current thread, as needed.
     void		_perform_segment_maintenance(

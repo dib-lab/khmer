@@ -150,7 +150,9 @@ int main( int argc, char * argv[ ] )
 	    // when opportunity exists.
 	    lrand48_r( &rng_state, &randnum );
 	    if (    (0 == randnum % 1024)
+#if (0) // TODO: Rethink this.
 		&&  (!cmgr->_sa_buffer_avail( ))
+#endif
 		&&  (!sr->is_at_end_of_stream( )))
 	    {
 		lrand48_r( &rng_state, &randnum );

@@ -26,7 +26,7 @@ set_active_config( Config &config )
 
 
 Config::
-Config( void )
+Config( )
 :
 #ifdef KHMER_EXTRA_SANITY_CHECKS
     _has_extra_sanity_checks( true ),

@@ -66,8 +66,11 @@ def test_USE_set_number_of_threads( ):
 	Verify that the number of threads set is what is reported.
     """
     config = get_active_config( )
+    tnum = config.get_number_of_threads( )
     config.set_number_of_threads( 8 )
     assert 8 == config.get_number_of_threads( )
+    config.set_number_of_threads( tnum )
+    assert tnum == config.get_number_of_threads( )
 
 
 def test_USE_set_reads_input_buffer_size( ):
@@ -75,8 +78,11 @@ def test_USE_set_reads_input_buffer_size( ):
 	Verify that the reads file chunk size is what is reported.
     """
     config = get_active_config( )
+    bufsz = config.get_reads_input_buffer_size( )
     config.set_reads_input_buffer_size( 123456789L )
     assert 123456789L == config.get_reads_input_buffer_size( )
+    config.set_reads_input_buffer_size( bufsz )
+    assert bufsz == config.get_reads_input_buffer_size( )
 
 
 # vim: set ft=python sts=4 sw=4 tw=79:
