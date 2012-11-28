@@ -45,14 +45,16 @@ namespace khmer {
     KmerCountMap _bigcounts;
 
     CountingHash(WordLength ksize, HashIntoType single_tablesize) :
-      khmer::Hashtable(ksize), _use_bigcount(false) {
+      khmer::Hashtable(ksize), _use_bigcount(false), 
+      _bigcount_spin_lock(false) {
       _tablesizes.push_back(single_tablesize);
       
       _allocate_counters();
     }
 
     CountingHash(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      khmer::Hashtable(ksize), _use_bigcount(false), _tablesizes(tablesizes) {
+      khmer::Hashtable(ksize), _use_bigcount(false), _bigcount_spin_lock(false),
+      _tablesizes(tablesizes) {
 
       _allocate_counters();
     }
