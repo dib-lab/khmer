@@ -26,6 +26,7 @@ namespace khmer {
 
   protected:
     bool _use_bigcount;		// keep track of counts > Bloom filter hash count threshold?
+    uint32_t _bigcount_spin_lock;
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
 
@@ -121,7 +122,7 @@ namespace khmer {
       } // for each table
 
       if (n_full == _n_tables && _use_bigcount) {
-	// TODO: Make thread-safe.
+	while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
 	if (_bigcounts[khash] == 0) {
 	  _bigcounts[khash] = _max_count + 1;
 	} else {
@@ -129,9 +130,10 @@ namespace khmer {
 	    _bigcounts[khash] += 1;
 	  }
 	}
+	__sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
       }
 
-    }
+    } // count
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
