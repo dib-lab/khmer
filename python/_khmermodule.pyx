@@ -558,7 +558,8 @@ cdef class _new_hashbits
 
 cdef class _new_counting_hash:
    cdef CountingHash *thisptr
-   def __cinit__(self, WordLength ksize, arg):
+   # TODO: Handle the 'n_threads' argument.
+   def __cinit__(self, WordLength ksize, arg, n_threads = 1):
       cdef vector[HashIntoType] v = vector[HashIntoType]()
       if isinstance(arg, long) or isinstance(arg, int):
          self.thisptr = new CountingHash(ksize, <HashIntoType>arg)
