@@ -2038,8 +2038,9 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
 {
   unsigned int k = 0;
   PyObject* sizes_list_o = NULL;
+  unsigned int n_threads = 1;
 
-  if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+  if (!PyArg_ParseTuple(args, "IO|I", &k, &sizes_list_o, &n_threads)) {
     return NULL;
   }
 
@@ -2048,18 +2049,11 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
     PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
     sizes.push_back(PyLong_AsLongLong(size_o));
   }
-  /*
-  if (PyErr_Occurred( ))
-  {
-    std:: cerr << "DEBUG: Error while creating list of hashtable sizes." << std:: endl;
-    PyErr_Print( );
-  }
-  */
 
   khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
     PyObject_New(khmer_KCountingHashObject, &khmer_KCountingHashType);
 
-  kcounting_obj->counting = new khmer::CountingHash(k, sizes);
+  kcounting_obj->counting = new khmer::CountingHash(k, sizes, n_threads);
 
   return (PyObject *) kcounting_obj;
 }

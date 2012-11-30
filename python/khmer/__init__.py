@@ -30,10 +30,10 @@ def new_hashbits(k, starting_size, n_tables=2):
     
     return _new_hashbits(k, primes)
 
-def new_counting_hash(k, starting_size, n_tables=2):
+def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
     primes = get_n_primes_above_x(n_tables, starting_size)
     
-    return _new_counting_hash(k, primes)
+    return _new_counting_hash(k, primes, n_threads)
 
 def load_hashbits(filename):
     ht = _new_hashbits(1, [1])

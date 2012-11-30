@@ -12,11 +12,13 @@ Use '-h' for parameter help.
 import sys, screed
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.threading_args import add_threading_args
 
 ###
 
 def main():
     parser = build_construct_args()
+    add_threading_args( parser )
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
 
