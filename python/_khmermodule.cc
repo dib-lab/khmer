@@ -470,10 +470,10 @@ PyObject *
 new_read_parser( PyObject * self, PyObject * args )
 {
   char *      ifile_name_CSTR;
-  // TODO: Set defaults from config.
-  uint32_t    number_of_threads	  = 1;
-  uint64_t    cache_size	  = 512U * 1024 * 1024;
-  uint8_t     trace_level	  = khmer:: TraceLogger:: TLVL_NONE;
+  khmer:: Config  &the_config	  = khmer:: get_active_config( );
+  uint32_t    number_of_threads	  = the_config.get_number_of_threads( );
+  uint64_t    cache_size	  = the_config.get_reads_input_buffer_size( );
+  uint8_t     trace_level	  = the_config.get_reads_parser_trace_level( );
 
   if (!PyArg_ParseTuple(
 	args, "s|IKH",
@@ -1451,9 +1451,10 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
-			&callback_obj)) {
-    return NULL;
+  if (!PyArg_ParseTuple(
+    args, "s|iiO", &filename, &lower_bound, &upper_bound, &callback_obj
+  )) {
+      return NULL;
   }
 
   // call the C++ function, and trap signals => Python
@@ -1463,6 +1464,45 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     counting->consume_fasta(filename, total_reads, n_consumed,
 			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
+static PyObject * hash_consume_fasta_with_reads_parser(
+  PyObject * self, PyObject * args
+)
+{
+  khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting  = me->counting;
+
+  PyObject * rparser_obj = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(
+    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
+  )) {
+      return NULL;
+  }
+
+  // TODO: Add type-checking.
+  khmer_ReadParserObject * my_rparser	  = 
+  (khmer_ReadParserObject *)rparser_obj;
+  khmer:: read_parsers::IParser * rparser = my_rparser->parser;
+
+  // call the C++ function, and trap signals => Python
+  unsigned long long  n_consumed    = 0;
+  unsigned int	      total_reads   = 0;
+  try {
+    // TODO: Extend thread toggle into exception handler.
+    Py_BEGIN_ALLOW_THREADS
+    counting->consume_fasta(rparser, total_reads, n_consumed,
+			     lower_bound, upper_bound, 
+			     _report_fn, callback_obj);
+    Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -1950,6 +1990,8 @@ static PyMethodDef khmer_counting_methods[] = {
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
+    METH_VARARGS, "Count all k-mers in a given file" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "filter_fasta_file_limit_n", hash_filter_fasta_file_limit_n, METH_VARARGS, "" },
   { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
