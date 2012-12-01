@@ -208,6 +208,9 @@ consume_fasta(
 	(unsigned long long int)total_reads_LOCAL
       );
 
+    // TODO: Figure out alternative to callback into Python VM
+    //       Cannot use in multi-threaded operation.
+#if (0)
     // run callback, if specified
     if (callback && (0 == (total_reads_LOCAL % CALLBACK_PERIOD)))
     {
@@ -220,6 +223,7 @@ consume_fasta(
       }
       catch (...) { throw; }
     }
+#endif // 0
 
   } // while reads left for parser
 
