@@ -50,6 +50,11 @@ def main():
     print 'preparing hist...'
     z = ht.abundance_distribution(datafile, tracking)
     total = sum(z)
+
+    if 0 == total:
+	print >>sys.stderr, "ERROR: abundance distribution is uniformly zero; nothing to report."
+	print >>sys.stderr, "\tPlease verify that the input files are valid."
+	sys.exit( -1 )
         
     fp = open(histout, 'w')
 
