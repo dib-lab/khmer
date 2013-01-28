@@ -174,18 +174,11 @@ htmlhelp_basename = 'labibidoc'
 ##
 # Various settings to pass to templates:
 
-google_analytics_id = 'UA-36028965-1'
-disqus_shortname = 'labibi'
-github_base_account = 'ctb'
-github_project = 'labibi'
-
-# pass these to all the template pages:
-
 html_context = {
-  "google_analytics_id": google_analytics_id,
-  "disqus_shortname": disqus_shortname,
-  "github_base_account": github_base_account,
-  "github_project": github_project,
+   "google_analytics_id" : 'UA-36028965-1',
+   "disqus_shortname" : 'labibi',
+   "github_base_account" : 'ctb',
+   "github_project" : 'labibi',
 }
 
 
