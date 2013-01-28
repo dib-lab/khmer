@@ -2,14 +2,17 @@
 
 {# To customize for your project, search and replace 'labibi' stuff.
    You might also want to replace the UA- string for google analytics.
+   
+   Set what you need in conf.py
 #}
 
-{% set google_analytics_id = 'UA-36028965-1' %}
-{% set disqus_shortname = 'labibi' %}
+{#  set in conf.py: google_analytics_id = 'UA-36028965-1' #}
+{#  set in conf.py: disqus_shortname = 'labibi' #}
 
-{# note, currently these must be set... #}
-{% set github_base_account = 'ctb' %}
-{% set github_project = 'labibi' %}
+{# set these in conf.py:
+  github_base_account = 'ctb'
+  github_project = 'labibi'
+#}
 
 {##################################################}
 {# for plone-derived "edit me" & Google analytics #}
@@ -19,6 +22,7 @@
 {{ super() }}
 
 {# Add plone-derived 'edit me' sticky note #}
+{% if github_base_account %}
 <div id="editor-trap">
       <h3>Edit this document!</h3>
 
@@ -60,6 +64,8 @@
       </p>
 
   </div>
+
+{% endif %}
 
 <script type="text/javascript">
 
