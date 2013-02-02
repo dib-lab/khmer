@@ -2,6 +2,10 @@ NO_UNIQUE_RC=0
 
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
+# comment out whichever is appropriate.  can probably make this automatic ;)
+#SO_EXT=.so
+DYLIB_EXT=.dylib
+
 ZLIB_DIR=zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
@@ -14,9 +18,9 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser test-HashTables
+DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
-AUX_PROGS=ht-diff
+AUX_PROGS=#ht-diff
 
 CORE_OBJS= khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
 PARSERS_OBJS=parsers.o read_parsers.o
@@ -72,7 +76,7 @@ ktable_test: ktable_test.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS)
 #	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
 
 $(ZLIB_OBJS):
-	(cd $(ZLIB_DIR) && ./configure --shared && make libz.so.1.2.3)
+	(cd $(ZLIB_DIR) && ./configure --shared && make libz$(SO_EXT).1.2.3$(DYLIB_EXT))
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
