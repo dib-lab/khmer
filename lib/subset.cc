@@ -3,7 +3,6 @@
 #include "parsers.hh"
 
 #define IO_BUF_SIZE 250*1000*1000
-
 #define BIG_TRAVERSALS_ARE 200
 
 // #define VALIDATE_PARTITIONS
