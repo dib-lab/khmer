@@ -78,7 +78,7 @@ ktable_test: ktable_test.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS)
 #	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
 
 $(ZLIB_OBJS):
-	(cd $(ZLIB_DIR) && ./configure --shared && make libz.so.1.2.3)
+	(cd $(ZLIB_DIR) && ./configure --shared && make libz$(SO_EXT).1.2.3$(DYLIB_EXT))
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
