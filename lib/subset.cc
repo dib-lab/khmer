@@ -2,7 +2,7 @@
 #include "subset.hh"
 #include "parsers.hh"
 
-#define IO_BUF_SIZE 1000*1000*1000
+#define IO_BUF_SIZE 250*1000*1000
 
 #define BIG_TRAVERSALS_ARE 200
 
@@ -814,6 +814,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
     // _merge_from_disk_consolidate(diskp_to_pp);
   }
+
+  delete buf;
 }
 
 // Save a partition map to disk.
