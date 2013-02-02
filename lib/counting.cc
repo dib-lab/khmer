@@ -593,53 +593,6 @@ void CountingHash::load(std::string infilename)
   CountingHashFile::load(infilename, *this);
 }
 
-// technically, get medioid count... our "median" is always a member of the
-// population.
-
-void CountingHash::get_median_count(const std::string &s,
-				    BoundedCounterType &median,
-				    float &average,
-				    float &stddev)
-{
-  BoundedCounterType count;
-  std::vector<BoundedCounterType> counts;
-  KMerIterator kmers(s.c_str(), _ksize);
-
-  while(!kmers.done()) {
-    HashIntoType kmer = kmers.next();
-    count = this->get_count(kmer);
-    counts.push_back(count);
-  }
-
-  assert(counts.size());
-
-  if (!counts.size()) {
-    median = 0;
-    average = 0;
-    stddev = 0;
-
-    return;
-  }
-
-  average = 0;
-  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-       i != counts.end(); i++) {
-    average += *i;
-  }
-  average /= float(counts.size());
-
-  stddev = 0;
-  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-       i != counts.end(); i++) {
-    stddev += (float(*i) - average) * (float(*i) - average);
-  }
-  stddev /= float(counts.size());
-  stddev = sqrt(stddev);
-
-  sort(counts.begin(), counts.end());
-  median = counts[counts.size() / 2]; // rounds down
-}
-
 void CountingHash::get_kadian_count(const std::string &s,
 				    BoundedCounterType &kadian,
 				    unsigned int nk)
