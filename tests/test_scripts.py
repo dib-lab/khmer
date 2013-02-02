@@ -51,6 +51,37 @@ def runscript(scriptname, args, in_directory=None):
 
     return status, out, err
 
+def DEBUG_runscript(scriptname, args, in_directory=None):
+    """
+    Run the given Python script, with the given args, in the given directory,
+    using 'execfile'.
+    """
+    sysargs = [scriptname]
+    sysargs.extend(args)
+
+    cwd = os.getcwd()
+
+    try:
+        oldargs = sys.argv
+        sys.argv = sysargs
+
+        if in_directory:
+            os.chdir(in_directory)
+
+        try:
+            print 'running:', scriptname, 'in:', in_directory
+            execfile(scriptname, { '__name__' : '__main__' })
+            status = 0
+        except:
+            traceback.print_exc(file=sys.stderr)
+            status = -1
+    finally:
+        sys.argv = oldargs
+
+        os.chdir(cwd)
+
+    return status, "", ""
+
 ####
 
 def test_load_into_counting():
@@ -83,20 +114,6 @@ def test_load_into_counting_fail():
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20):
     script = scriptpath('load-into-counting.py')
-    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
-    
-    outfile = utils.get_temp_filename('out.kh')
-
-    args.extend([outfile, infilename])
-
-    (status, out, err) = runscript(script, args)
-    assert status == 0
-    assert os.path.exists(outfile)
-
-    return outfile
-
-def _make_graph(infilename, SIZE=1e7, N=2, K=20):
-    script = scriptpath('load-graph.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
     
     outfile = utils.get_temp_filename('out.kh')
@@ -220,6 +237,40 @@ def test_normalize_by_median_2():
     assert len(seqs) == 2, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
+
+def test_normalize_by_median_paired():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 2, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
+
+def test_normalize_by_median_impaired():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status != 0
 
 def test_normalize_by_median_empty():
     CUTOFF='1'
@@ -348,6 +399,63 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
 
             in_dir = os.path.dirname(outfile)
             (status, out, err) = runscript(script, args, in_dir)
+            assert status == 0
+
+            baseinfile = os.path.basename(infilename)
+            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
+
+    return outfile
+
+def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
+                do_partition=False,
+                annotate_partitions=False,
+                stop_big_traverse=False):
+    script = scriptpath('load-graph.py')
+    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data(infilename)
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = DEBUG_runscript(script, args)
+    assert status == 0
+
+    ht_file = outfile + '.ht'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    if do_partition:
+	print ">>>> DEBUG: Partitioning <<<"
+        script = scriptpath('partition-graph.py')
+        args = [outfile]
+        if stop_big_traverse:
+            args.insert(0, '--no-big-traverse')
+        (status, out, err) = DEBUG_runscript(script, args)
+        print out
+        print err
+        assert status == 0
+
+	print ">>>> DEBUG: Merging Partitions <<<"
+        script = scriptpath('merge-partitions.py')
+        args = [outfile, '-k', str(K)]
+        (status, out, err) = DEBUG_runscript(script, args)
+        print out
+        print err
+        assert status == 0
+
+        final_pmap_file = outfile + '.pmap.merged'
+        assert os.path.exists(final_pmap_file)
+
+        if annotate_partitions:
+	    print ">>>> DEBUG: Annotating Partitions <<<"
+            script = scriptpath('annotate-partitions.py')
+            args = ["-k", str(K), outfile, infilename]
+
+            in_dir = os.path.dirname(outfile)
+            (status, out, err) = DEBUG_runscript(script, args, in_dir)
             assert status == 0
 
             baseinfile = os.path.basename(infilename)

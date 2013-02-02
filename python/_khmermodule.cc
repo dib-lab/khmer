@@ -252,6 +252,17 @@ static PyObject * ktable__getitem__(PyObject * self, Py_ssize_t index)
   return PyInt_FromLong(count);
 }
 
+static int ktable__contains__( PyObject * self, PyObject * val )
+{
+  khmer_KTableObject * me = (khmer_KTableObject *) self;
+  khmer::KTable * ktable = me->ktable;
+  // TODO: Consider other object types.
+  char * kmer_str = PyString_AsString( val );
+
+  if (kmer_str) return (int)(bool)ktable->get_count( kmer_str );
+  return -1;
+}
+
 static PyObject * ktable_set(PyObject * self, PyObject * args)
 {
   khmer_KTableObject * me = (khmer_KTableObject *) self;
@@ -375,6 +386,8 @@ static PySequenceMethods khmer_KTable_SequenceMethods = {
   ktable__getitem__,
   0,
   0,
+  0,
+  ktable__contains__,
   0,
   0
 };
