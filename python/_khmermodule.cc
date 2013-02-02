@@ -3676,6 +3676,31 @@ static PyObject * hashbits_extract_unique_paths(PyObject * self, PyObject * args
   return x;
 }
 
+static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * long_str;
+
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+    return NULL;
+  }
+
+  if (strlen(long_str) < hashbits->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  khmer::BoundedCounterType med = 0;
+  float average = 0, stddev = 0;
+
+  hashbits->get_median_count(long_str, med, average, stddev);
+
+  return Py_BuildValue("iff", med, average, stddev);
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
   { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
@@ -3745,6 +3770,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "hitraverse_to_stoptags", hashbits_hitraverse_to_stoptags, METH_VARARGS, "" },
   { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
   { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
+  { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };

@@ -2,6 +2,12 @@ NO_UNIQUE_RC=0
 
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
+# comment out whichever is appropriate.  can probably make this automatic ;)
+SO_EXT=.so
+#DYLIB_EXT=.dylib
+Z_LIB_DIR=zlib-1.2.3
+Z_LIB_FILES=$(Z_LIB_DIR)/*.o
+
 ZLIB_DIR=zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
@@ -72,7 +78,7 @@ ktable_test: ktable_test.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS)
 #	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
 
 $(ZLIB_OBJS):
-	(cd $(ZLIB_DIR) && ./configure --shared && make libz.so.1.2.3)
+	(cd $(ZLIB_DIR) && ./configure --shared && make libz$(SO_EXT).1.2.3$(DYLIB_EXT))
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
