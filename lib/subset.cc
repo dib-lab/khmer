@@ -541,8 +541,6 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
     pp = _join_partitions_by_tags(tagged_kmers, kmer);
     return_val = *pp;
   } else {
-    PartitionMap::iterator pi = partition_map.find(kmer);
-
     partition_map.erase(kmer);
     return_val = 0;
   }
