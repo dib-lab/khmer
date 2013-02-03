@@ -1,0 +1,124 @@
+Sequence access patterns in khmer
+=================================
+
+(Developer docs)
+
+These are the patterns for which we want to provide both flexible and fast
+parsing options.
+
+Pattern 1: read, no write, with modify data structures
+------------------------------------------------------
+
+Used by load-into-counting and load-graph.
+
+Single-threaded
+~~~~~~~~~~~~~~~
+
+Pseudocode::
+
+   for read in dataset:
+      hash.update(read)
+
+Multi-threaded
+~~~~~~~~~~~~~~
+
+Here, threaded_fn is a function that's called by multiple threads, so
+e.g. 'hash.update' might be being called simultaneously. ::
+
+   def threaded_fn(list_of_reads):
+      for read in list_of_reads:
+         hash.update(read)
+
+Pattern 2: read and write, with static data structures
+------------------------------------------------------
+
+Used by filter-abund.
+
+Single-threaded
+~~~~~~~~~~~~~~~
+
+Here, ro_hash is a read-only data structure; it is not being updated by
+anyone. ::
+
+   for read in dataset:
+      read = ro_hash.modify(read)
+      if read:
+         output(read)
+
+Multi-threaded
+~~~~~~~~~~~~~~
+
+Again, ro_hash is entirely read-only and not being updated or modified at all::
+
+   def threaded_fn(list_of_reads):
+      for read in list_of_reads:
+      	  read = ro_hash.modify(read)
+	  if read:
+	     output(read)
+
+Pattern 3: read, write, and modify data structures
+--------------------------------------------------
+
+Used by normalize-by-median.  This pattern is the most general,
+so if we can implement if efficiently in all cases, then 
+
+Single-threaded
+~~~~~~~~~~~~~~~
+
+Code::
+
+   for read in dataset:
+      read = hash.modify(read)
+      if condition:
+         output(read)
+
+Multi-threaded
+~~~~~~~~~~~~~~
+
+Code::
+
+   def threaded_fn(list_of_reads):
+      for read in list_of_reads:
+      	  read = hash.modify(read)
+	  if condition:
+	     output(read)
+
+Notes on parallelization
+------------------------
+
+Re multi-chassis parallelization, the 'hash' objects above are large
+(often multiple GB) and so our primary focus has been on big,
+multi-threaded SMP machines, rather than on distributing the
+processing across multiple machines.
+
+Paired-end reads
+----------------
+
+There are a number of situations where we want to get a pair of reads,
+if such are available; e.g. instead of::
+
+  for read in list_of_reads
+
+we want ::
+
+  for a, b in list_of_reads
+
+Note that in some cases either a or b may be None, i.e. we may be dealing
+with orphaned reads.
+
+Delivering k-mers rather than reads
+-----------------------------------
+
+In some cases - long sequences/chromosomes, for example -- it may be
+more efficient to have a k-mer data pump rather than a read data pump.
+Thoughts for the future.
+
+Hash function thoughts
+----------------------
+
+Another thought for the future is that we may want to have multiple
+distinct hash functions; probably the best way to do this is to
+allow each Hashtable object to have its own hash function.  This
+way we can take advantage of double-stranded hash functions (the
+current), single-stranded hash functions, and alternative implementations
+of either (e.g. cyclic hashes like Jordan is using).
