@@ -194,21 +194,24 @@ def test_simple_kadian_2():
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACaGCTATCTCTAGAGCTATG")
+    #hi.consume("ACaGCTATCTCTAGAGCTATG")
+    hi.consume("ACAGCTATCTCTAGAGCTATG")
     #           --^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
     assert x == 2, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACaGCTATCTCTAGAcCTATG")
+    #hi.consume("ACaGCTATCTCTAGAcCTATG")
+    hi.consume("ACAGCTATCTCTAGACCTATG")
     #           --^          --^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
     assert x == 1, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCgCTAGAGCTATG")
+    #hi.consume("ACTGCTATCgCTAGAGCTATG")
+    hi.consume("ACTGCTATCGCTAGAGCTATG")
     #                  --^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG")
     assert x == 2, x
@@ -220,27 +223,31 @@ def test_2_kadian():
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGAcCTATG")
+    #hi.consume("ACTGCTATCTCTAGAcCTATG")
+    hi.consume("ACTGCTATCTCTAGACCTATG")
     #           ---------------^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 2, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTAGAcCTAtG")
+    #hi.consume("ACTGCTATCTCTAGAcCTAtG")
+    hi.consume("ACTGCTATCTCTAGACCTATG")
     #           ---------------^---^
     assert hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2) == 2
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTATCTCTACtcCTAtG")
+    #hi.consume("ACTGCTATCTCTACtcCTAtG")
+    hi.consume("ACTGCTATCTCTACTCCTATG")
     #           --------------^^---^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 2, x
 
     hi = khmer.new_counting_hash(6, 1e6, 2)
     hi.consume("ACTGCTATCTCTAGAGCTATG")
-    hi.consume("ACTGCTgTCTCTACtcCTAtG")
+    #hi.consume("ACTGCTgTCTCTACtcCTAtG")
+    hi.consume("ACTGCTGTCTCTACTCCTATG")
     #           ------^-------^^---^
     x = hi.get_kadian_count("ACTGCTATCTCTAGAGCTATG", 2)
     assert x == 1, x
@@ -492,8 +499,8 @@ def test_get_hashsizes():
     kh = khmer.new_counting_hash(22, 100, 4)
     assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
 
-def test_collect_high_abundance_kmers():
-    seqpath = utils.get_test_data('test-abund-read-2.fa')
-
-    kh = khmer.new_counting_hash(18, 1e6, 4)
-    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
+#def test_collect_high_abundance_kmers():
+#    seqpath = utils.get_test_data('test-abund-read-2.fa')
+#
+#    kh = khmer.new_counting_hash(18, 1e6, 4)
+#    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)

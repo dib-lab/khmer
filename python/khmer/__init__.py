@@ -1,13 +1,23 @@
 __version__ = "0.4"
 
 import _khmer
+from _khmer import get_config
+try: # CPython API
+    #from _khmer import Read
+    from _khmer import new_read_parser	as ReadParser
+except ImportError: # Cython
+    from _khmer import _Read		as Read
+    from _khmer import _ReadParser	as ReadParser
 from _khmer import new_ktable
-from _khmer import new_hashtable
+try: # CPython API
+    from _khmer import new_hashtable
+except ImportError: # Cython
+    from _khmer import _new_counting_hash as new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
 from _khmer import new_readmask
 from _khmer import new_minmax
-from _khmer import consume_genome
+#from _khmer import consume_genome
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback
 
@@ -20,10 +30,10 @@ def new_hashbits(k, starting_size, n_tables=2):
     
     return _new_hashbits(k, primes)
 
-def new_counting_hash(k, starting_size, n_tables=2):
+def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
     primes = get_n_primes_above_x(n_tables, starting_size)
     
-    return _new_counting_hash(k, primes)
+    return _new_counting_hash(k, primes, n_threads)
 
 def load_hashbits(filename):
     ht = _new_hashbits(1, [1])

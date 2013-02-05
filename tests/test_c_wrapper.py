@@ -21,25 +21,13 @@ def setup():
 
 def teardown():
     khmer.reset_reporting_callback()
-    
-def test_raise_in_consume_fasta_build_readmask():
-    return ## @CTB
-    kh = khmer.new_hashtable(4, 4**4)
-
-    try:
-        kh.consume_fasta_build_readmask(reads_filename, 0, 0, callback_raise)
-        assert 0
-    except GoodException:
-        pass
-    except:
-        raise
 
 def test_raise_in_consume_fasta():
     return ## @CTB
     kh = khmer.new_hashtable(4, 4**4)
 
     try:
-        n, _ = kh.consume_fasta(reads_filename, 0, 0, None, False, callback_raise)
+        n, _ = kh.consume_fasta(reads_filename, 0, 0, callback_raise)
         print n
         assert 0
     except GoodException:
@@ -127,19 +115,6 @@ def test_bad_readmask_in_filter_fasta_file_max():
         assert 0
     except TypeError:
         pass                            # expected
-    except:
-        raise
-
-def test_nonbool_in_consume_fasta():
-    return ## @CTB
-
-    kh = khmer.new_hashtable(4, 4**4)
-
-    try:
-        kh.consume_fasta(reads_filename, 0, 0, "hi", False, callback_raise)
-        assert 0
-    except TypeError:
-        pass
     except:
         raise
 

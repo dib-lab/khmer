@@ -2,6 +2,7 @@
 #define COUNTING_HH
 
 #include <vector>
+#include "khmer_config.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
 
@@ -24,7 +25,8 @@ namespace khmer {
     friend class CountingHashGzFileWriter;
 
   protected:
-    bool _use_bigcount;		// keep track of counts > MAX_COUNT?
+    bool _use_bigcount;		// keep track of counts > Bloom filter hash count threshold?
+    uint32_t _bigcount_spin_lock;
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
 
@@ -42,15 +44,26 @@ namespace khmer {
   public:
     KmerCountMap _bigcounts;
 
-    CountingHash(WordLength ksize, HashIntoType single_tablesize) :
-      khmer::Hashtable(ksize), _use_bigcount(false) {
+    CountingHash(
+      WordLength ksize, HashIntoType single_tablesize,
+      uint32_t const number_of_threads =
+      get_active_config( ).get_number_of_threads( )
+    ) :
+      khmer::Hashtable(ksize, number_of_threads), 
+      _use_bigcount(false), _bigcount_spin_lock(false) {
       _tablesizes.push_back(single_tablesize);
       
       _allocate_counters();
     }
 
-    CountingHash(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      khmer::Hashtable(ksize), _use_bigcount(false), _tablesizes(tablesizes) {
+    CountingHash(
+      WordLength ksize, std::vector<HashIntoType>& tablesizes,
+      uint32_t const number_of_threads =
+      get_active_config( ).get_number_of_threads( )
+    ) :
+      khmer::Hashtable(ksize, number_of_threads), 
+      _use_bigcount(false), _bigcount_spin_lock(false),
+      _tablesizes(tablesizes) {
 
       _allocate_counters();
     }
@@ -101,27 +114,37 @@ namespace khmer {
     }
 
     virtual void count(HashIntoType khash) {
-      unsigned int n_full = 0;
+
+      unsigned int  n_full	  = 0;
+
+      // TODO: Time how long this loop takes with PerformanceMetrics.
       for (unsigned int i = 0; i < _n_tables; i++) {
 	const HashIntoType bin = khash % _tablesizes[i];
-
-	if (_counts[i][bin] < MAX_COUNT) {
-	  _counts[i][bin] += 1;
-	} else {
+	// NOTE: Technically, multiple threads can cause the bin to spill 
+	//	 over max_count a little, if they all read it as less than 
+	//	 max_count before any of them increment it.
+	//	 However, do we actually care if there is a little 
+	//	 bit of slop here? It can always be trimmed off later, if 
+	//	 that would help with stats.
+	if ( _max_count > _counts[ i ][ bin ] )
+	  __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+	else
 	  n_full++;
-	}
-      }
+      } // for each table
 
       if (n_full == _n_tables && _use_bigcount) {
+	while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
 	if (_bigcounts[khash] == 0) {
-	  _bigcounts[khash] = MAX_COUNT + 1;
+	  _bigcounts[khash] = _max_count + 1;
 	} else {
-	  if (_bigcounts[khash] < MAX_BIGCOUNT) {
+	  if (_bigcounts[khash] < _max_bigcount) {
 	    _bigcounts[khash] += 1;
 	  }
 	}
+	__sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
       }
-    }
+
+    } // count
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
@@ -131,14 +154,15 @@ namespace khmer {
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-      BoundedCounterType min_count = MAX_COUNT;
+      unsigned int	  max_count	= _max_count;
+      BoundedCounterType  min_count	= max_count;
       for (unsigned int i = 0; i < _n_tables; i++) {
 	BoundedCounterType the_count = _counts[i][khash % _tablesizes[i]];
 	if (the_count < min_count) {
 	  min_count = the_count;
 	}
       }
-      if (min_count == MAX_COUNT && _use_bigcount) {
+      if (min_count == max_count && _use_bigcount) {
 	KmerCountMap::const_iterator it = _bigcounts.find(khash);
 	if (it != _bigcounts.end()) {
 	  min_count = it->second;
@@ -207,8 +231,8 @@ namespace khmer {
 					 const unsigned int max_read_len,
 					 ReadMaskTable * old_readmask = NULL,
 					 BoundedCounterType limit_by_count=0,
-						 CallbackFn callback = NULL,
-						 void * callback_data = NULL);
+					 CallbackFn callback = NULL,
+					 void * callback_data = NULL);
 
     void fasta_dump_kmers_by_abundance(const std::string &inputfile,
 				       ReadMaskTable * readmask,
@@ -267,3 +291,5 @@ namespace khmer {
 };
 
 #endif // COUNTING_HH
+
+// vim: set sts=2 sw=2:
