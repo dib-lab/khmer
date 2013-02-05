@@ -20,6 +20,13 @@ k-mer counting
 
 	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
+   Multiple threads can be used to accelerate the process, if you have extra
+   cores to spare.
+
+   Example::
+	
+	scripts/load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+
 **abundance-dist.py**: calculate the abundance distribution.
 
    Usage::

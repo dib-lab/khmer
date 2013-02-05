@@ -10,13 +10,16 @@ Use '-h' for parameter help.
 """
 
 import sys, screed
+import threading
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.threading_args import add_threading_args
 
 ###
 
 def main():
     parser = build_construct_args()
+    add_threading_args( parser )
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
 
@@ -41,6 +44,7 @@ def main():
 
     base = args.output_filename
     filenames = args.input_filenames
+    n_threads = int( args.n_threads )
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
@@ -48,12 +52,25 @@ def main():
     ###
     
     print 'making hashtable'
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
     ht.set_use_bigcount(True)
 
     for n, filename in enumerate(filenames):
+
+       rparser = khmer.ReadParser( filename, n_threads )
+       threads = [ ]
        print 'consuming input', filename
-       ht.consume_fasta(filename)
+       for tnum in xrange( n_threads ):
+           t = \
+           threading.Thread(
+               target = ht.consume_fasta_with_reads_parser, 
+               args = ( rparser, )
+           )
+           threads.append( t )
+           t.start( )
+           #ht.consume_fasta(filename)
+        
+       for t in threads: t.join( )
 
        if n > 0 and n % 10 == 0:
            print 'mid-save', base
@@ -82,3 +99,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
