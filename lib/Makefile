@@ -19,7 +19,7 @@ DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=ht-diff
 
 CORE_OBJS= khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
-PARSERS_OBJS=parsers.o read_parsers.o
+PARSERS_OBJS= read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test
 
@@ -53,10 +53,6 @@ test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
 ht-diff: $(HT_DIFF_OBJS)
 	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
 
-# TODO: Move 'main' to a driver program.
-#parsetest: parsers.o 
-#	$(CXX) -o $@ parsers.o $(ZLIB_OBJS)
-
 bittest: bittest.o ktable.o
 	$(CXX) -o $@ bittest.o ktable.o
 
@@ -86,8 +82,6 @@ trace_logger.o: trace_logger.cc trace_logger.hh
 perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
-
-parsers.o: parsers.cc parsers.hh
 
 ktable.o: ktable.cc ktable.hh
 
