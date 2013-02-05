@@ -673,3 +673,40 @@ def test_abundance_dist():
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
+
+def test_do_partition():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = scriptpath('do-partition.py')
+    args = ["-k", "20", graphbase, seqfile]
+
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0, (out,err)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    parts = set(parts)
+    assert '2' in parts
+    assert len(parts) == 1
+
+def test_do_partition_2():
+    # test with K=21 (no joining of sequences)
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = scriptpath('do-partition.py')
+    args = ["-k", "21", graphbase, seqfile]
+
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0, (out,err)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    parts = set(parts)
+
+    assert len(parts) == 99, len(parts)
