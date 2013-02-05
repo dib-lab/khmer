@@ -4,7 +4,6 @@
 #include <fstream>
 #include "khmer.hh"
 #include "ktable.hh"
-#include "hashtable.hh"
 
 namespace khmer {
   class ReadMaskTable;
@@ -58,8 +57,7 @@ namespace khmer {
 
     void set(unsigned long long index, bool keep) {
       if (index >= _tablesize) { return; } // @CTB throw?
-
-      _mask[index] = keep ? 1 : 0;
+      __sync_val_compare_and_swap( _mask + index, (unsigned char)(!keep), (unsigned char)keep );
     }
 
     void merge(ReadMaskTable &other) {
@@ -219,3 +217,5 @@ namespace khmer {
 }
 
 #endif // STORAGE_HH
+
+// vim: set sts=2 sw=2:

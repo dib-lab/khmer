@@ -1,14 +1,15 @@
 #include "hashtable.hh"
 #include "counting.hh"
 #include "hashbits.hh"
-#include "parsers.hh"
+#include "read_parsers.hh"
 
-#include "zlib-1.2.3/zlib.h"
+#include "zlib/zlib.h"
 #include <math.h>
 #include <algorithm>
 
 using namespace std;
 using namespace khmer;
+using namespace khmer:: read_parsers;
 
 MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
 					      unsigned long long total_reads,
@@ -25,11 +26,11 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(const std::string &inputfile,
 
    while(!parser->is_complete()) {
      read = parser->get_next_read();
-     seq = read.seq;
+     seq = read.sequence;
 
      bool valid_read = true;
      if (!readmask || readmask->get(read_num)) {
-       valid_read = check_read(seq);
+       valid_read = check_and_normalize_read(seq);
 
        if (valid_read) {
          BoundedCounterType minval = get_min_count(seq);
@@ -127,7 +128,7 @@ ReadMaskTable * CountingHash::filter_fasta_file_limit_n(const std::string &reads
 
    while(!parser->is_complete()) {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
      
       if (readmask->get(read_num)) {
          int numPos = seq.length() - _ksize + 1;
@@ -231,7 +232,7 @@ ReadMaskTable * CountingHash::filter_fasta_file_run(const std::string &inputfile
 
    while(parser->is_complete()) {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
 
       if (readmask->get(read_num)) {
          bool keep = false;
@@ -291,7 +292,7 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
 
    while(!parser->is_complete()) {
       read = parser->get_next_read();
-      seq = read.seq;
+      seq = read.sequence;
 
       int numPos = seq.length() - _ksize + 1;
 
@@ -325,7 +326,7 @@ unsigned long long khmer::output_filtered_fasta_file(const std::string &inputfil
    while(!parser->is_complete()) {
       read = parser->get_next_read();
 
-      seq = read.seq;
+      seq = read.sequence;
       name = read.name;
 
       if (readmask->get(read_num)) {
@@ -435,9 +436,9 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       HashIntoType kmer;
       KMerIterator kmers(seq.c_str(), _ksize);
 
@@ -493,11 +494,11 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
    while(!parser->is_complete()) {
       read = parser->get_next_read();
 
-      seq = read.seq;
+      seq = read.sequence;
       bool valid_read = true;
 	 
       if (!readmask || readmask->get(read_num)) {
-	valid_read = check_read(seq);
+	valid_read = check_and_normalize_read(seq);
 
 	if (valid_read) {
 	  for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -546,10 +547,10 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
   while(!parser->is_complete()) {
     read = parser->get_next_read();
     bool valid_read = true;
-    seq = read.seq;
+    seq = read.sequence;
 
     if (!readmask || readmask->get(read_num)) {
-      valid_read = check_read(seq);
+      valid_read = check_and_normalize_read(seq);
 
       if (valid_read) {
         for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -590,53 +591,6 @@ void CountingHash::save(std::string outfilename)
 void CountingHash::load(std::string infilename)
 {
   CountingHashFile::load(infilename, *this);
-}
-
-// technically, get medioid count... our "median" is always a member of the
-// population.
-
-void CountingHash::get_median_count(const std::string &s,
-				    BoundedCounterType &median,
-				    float &average,
-				    float &stddev)
-{
-  BoundedCounterType count;
-  std::vector<BoundedCounterType> counts;
-  KMerIterator kmers(s.c_str(), _ksize);
-
-  while(!kmers.done()) {
-    HashIntoType kmer = kmers.next();
-    count = this->get_count(kmer);
-    counts.push_back(count);
-  }
-
-  assert(counts.size());
-
-  if (!counts.size()) {
-    median = 0;
-    average = 0;
-    stddev = 0;
-
-    return;
-  }
-
-  average = 0;
-  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-       i != counts.end(); i++) {
-    average += *i;
-  }
-  average /= float(counts.size());
-
-  stddev = 0;
-  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-       i != counts.end(); i++) {
-    stddev += (float(*i) - average) * (float(*i) - average);
-  }
-  stddev /= float(counts.size());
-  stddev = sqrt(stddev);
-
-  sort(counts.begin(), counts.end());
-  median = counts[counts.size() / 2]; // rounds down
 }
 
 void CountingHash::get_kadian_count(const std::string &s,
@@ -692,9 +646,9 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	string kmer = seq.substr(i, i + _ksize);
 	BoundedCounterType n = get_count(kmer.c_str());
@@ -739,9 +693,9 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
-    if (check_read(seq)) {
+    if (check_and_normalize_read(seq)) {
       for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
 	string kmer = seq.substr(i, i + _ksize);
 	BoundedCounterType n = get_count(kmer.c_str());
@@ -806,7 +760,7 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 					     BoundedCounterType min_abund)
   const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
 
@@ -841,7 +795,7 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
 						BoundedCounterType max_abund)
   const
 {
-  if (!check_read(seq)) {
+  if (!check_and_normalize_read(seq)) {
     return 0;
   }
 
@@ -1147,11 +1101,11 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
   bool done = false;
   while(!parser->is_complete() && !done)  {
     read = parser->get_next_read();
-    currSeq = read.seq;
+    currSeq = read.sequence;
     currName = read.name; 
 
     // do we want to process it?
-    if (check_read(currSeq)) {
+    if (check_and_normalize_read(currSeq)) {
       const char * sp = currSeq.c_str();
 
       KMerIterator kmers(sp, _ksize);
@@ -1188,11 +1142,11 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
   total_reads = 0;
   while(!parser->is_complete() && total_reads != stop_at_read)  {
     read = parser->get_next_read();
-    currSeq = read.seq;
+    currSeq = read.sequence;
     currName = read.name; 
 
     // do we want to process it?
-    if (check_read(currSeq)) {
+    if (check_and_normalize_read(currSeq)) {
       const char * sp = currSeq.c_str();
 
       KMerIterator kmers(sp, _ksize);

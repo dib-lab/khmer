@@ -20,6 +20,13 @@ k-mer counting
 
 	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
+   Multiple threads can be used to accelerate the process, if you have extra
+   cores to spare.
+
+   Example::
+	
+	scripts/load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+
 **abundance-dist.py**: calculate the abundance distribution.
 
    Usage::
@@ -84,6 +91,20 @@ k-mer counting
 
 Partitioning
 ============
+
+**do-partition.py**: load, partition, and annotate sequences.
+
+   Usage::
+
+        do-partiton.py [ options] <graphbase> <file1> [ <file2> ... ]
+
+   Load in a set of sequences, partition them, merge the partitions,
+   and annotate the original sequences files with the partition information.
+
+   This script combines the functionality of load-graph, partition-graph,
+   merge-partitions, and annotate-partitions into one script.  This
+   is convenient but should probably not be used for large data sets,
+   because do-partition.py doesn't provide save/resume functionality.
 
 **load-graph.py**: load sequences into the compressible graph format.
 
