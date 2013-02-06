@@ -172,13 +172,11 @@ namespace khmer {
 
     // for overlap k-mer counting
     void consume_fasta_overlap(const std::string &filename,HashIntoType curve[2][100],
-                                      khmer::Hashbits &ht2,
+                              khmer::Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
 			      HashIntoType lower_bound,
 			      HashIntoType upper_bound,
-			      ReadMaskTable ** orig_readmask,
-			      bool update_readmask,
 			      CallbackFn callback,
 			      void * callback_data);
 

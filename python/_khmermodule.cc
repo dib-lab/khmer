@@ -1041,40 +1041,6 @@ static PyTypeObject khmer_KHashbitsType = {
 
 typedef struct {
   PyObject_HEAD
-  khmer::ReadMaskTable * mask;
-} khmer_ReadMaskObject;
-
-#define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
-
-static void khmer_readmask_dealloc(PyObject *);
-static PyObject * khmer_readmask_getattr(PyObject *, char *);
-
-static PyTypeObject khmer_ReadMaskType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "ReadMask", sizeof(khmer_ReadMaskObject),
-    0,
-    khmer_readmask_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_readmask_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "readmask object",           /* tp_doc */
-};
-
-typedef struct {
-  PyObject_HEAD
   khmer::MinMaxTable * mmt;
 } khmer_MinMaxObject;
 
@@ -1217,27 +1183,16 @@ static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
 
   char * filename;
   unsigned int total_reads;
-  PyObject * readmask_obj = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "si|OO", &filename, &total_reads,
-			&readmask_obj, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "si|O", &filename, &total_reads,
+			&callback_obj)) {
     return NULL;
-  }
-
-  khmer::ReadMaskTable * readmask = NULL;
-  if (readmask_obj && readmask_obj != Py_None) {
-    if (!is_readmask_obj(readmask_obj)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "third argument must be None or a readmask object");
-      return NULL;
-    }
-    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
   }
 
   khmer::MinMaxTable * mmt;
   try {
-    mmt = counting->fasta_file_to_minmax(filename, total_reads, readmask,
+    mmt = counting->fasta_file_to_minmax(filename, total_reads, 
 					  _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -1249,197 +1204,6 @@ static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
   minmax_obj->mmt = mmt;
 
   return (PyObject *) minmax_obj;
-}
-
-static PyObject * hash_filter_fasta_file_limit_n(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  unsigned int threshold, n;
-  char * filename;
-  PyObject * o1 = NULL, * o2 = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "sOii|OO", &filename, &o1, &threshold, &n, &o2, &callback_obj)) {
-    return NULL;
-  }
-
-  if (!is_minmax_obj(o1)) {
-    PyErr_SetString(PyExc_TypeError,
-                    "third argument must be a minmax object");
-    return NULL;
-  }
-  khmer::MinMaxTable * mmt = ((khmer_MinMaxObject *) o1)->mmt;
-
-  khmer::ReadMaskTable * old_readmask = NULL;
-  if (o2 && o2 != Py_None) {
-    if (!is_readmask_obj(o2)) {
-      PyErr_SetString(PyExc_TypeError,
-                      "sixth must be None or a readmask object");
-      return NULL;
-    }
-    old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
-  }
-
-  khmer::ReadMaskTable * readmask;
-  try {
-    readmask = counting->filter_fasta_file_limit_n(filename, *mmt, threshold,
-                                                n, old_readmask,
-                                                _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-
-  readmask_obj->mask = readmask;
-
-  return (PyObject *) readmask_obj;
-
-}
-
-static PyObject * hash_filter_fasta_file_any(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  unsigned int threshold;
-
-  PyObject * o1 = NULL, * o2 = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "Oi|OO", &o1, &threshold, &o2, &callback_obj)) {
-    return NULL;
-  }
-
-  if (!is_minmax_obj(o1)) {
-    PyErr_SetString(PyExc_TypeError,
-		    "second argument must be a minmax object");
-    return NULL;
-  }
-  khmer::MinMaxTable * mmt = ((khmer_MinMaxObject *) o1)->mmt;
-
-  khmer::ReadMaskTable * old_readmask = NULL;
-  if (o2 && o2 != Py_None) {
-    if (!is_readmask_obj(o2)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fourth argument must be None or a readmask object");
-      return NULL;
-    }
-    old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
-  }
-
-  khmer::ReadMaskTable * readmask;
-  try {
-    readmask = counting->filter_fasta_file_any(*mmt, threshold,
-						old_readmask,
-						_report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-
-  readmask_obj->mask = readmask;
-
-  return (PyObject *) readmask_obj;
-}
-
-static PyObject * hash_filter_fasta_file_all(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  unsigned int threshold;
-
-  PyObject * o1 = NULL, * o2 = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "Oi|OO", &o1, &threshold, &o2, &callback_obj)) {
-    return NULL;
-  }
-
-  if (!is_minmax_obj(o1)) {
-    PyErr_SetString(PyExc_TypeError,
-		    "second argument must be a minmax object");
-    return NULL;
-  }
-  khmer::MinMaxTable * mmt = ((khmer_MinMaxObject *) o1)->mmt;
-
-  khmer::ReadMaskTable * old_readmask = NULL;
-  if (o2 && o2 != Py_None) {
-    if (!is_readmask_obj(o2)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fourth argument must be None or a readmask object");
-      return NULL;
-    }
-    old_readmask = ((khmer_ReadMaskObject *) o2)->mask;
-  }
-
-  khmer::ReadMaskTable * readmask;
-  try {
-    readmask = counting->filter_fasta_file_all(*mmt, threshold,
-						old_readmask,
-						_report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-
-  readmask_obj->mask = readmask;
-
-  return (PyObject *) readmask_obj;
-}
-
-static PyObject * hash_filter_fasta_file_run(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  char * filename;
-  unsigned int threshold;
-  unsigned int total_reads;
-  unsigned int runlength;
-
-  PyObject * o1 = NULL;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "siii|OO", &filename, &total_reads, &threshold,
-			&runlength, &o1, &callback_obj)) {
-    return NULL;
-  }
-
-  khmer::ReadMaskTable * old_readmask = NULL;
-  if (o1 && o1 != Py_None) {
-    if (!is_readmask_obj(o1)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fifth argument must be None or a readmask object");
-      return NULL;
-    }
-    old_readmask = ((khmer_ReadMaskObject *) o1)->mask;
-  }
-
-  khmer::ReadMaskTable * readmask;
-  try {
-    readmask = counting->filter_fasta_file_run(filename, total_reads,
-						threshold, runlength,
-						old_readmask,
-						_report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-
-  readmask_obj->mask = readmask;
-
-  return (PyObject *) readmask_obj;
 }
 
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
@@ -1809,28 +1573,16 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
   char * inputfile;
   int max_read_len;
   int limit_by = 0;
-  PyObject * readmask_obj = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "sii|OO", &inputfile, &max_read_len, &limit_by,
-			&readmask_obj, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sii|O", &inputfile, &max_read_len, &limit_by,
+			&callback_obj)) {
     return NULL;
   }
 
-  khmer::ReadMaskTable * readmask = NULL;
-  if (readmask_obj && readmask_obj != Py_None){
-    if (!is_readmask_obj(readmask_obj)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fourth argument must be None or a readmask object");
-      return NULL;
-    }
-    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
-  }
-    
-
   unsigned long long * counts;
   counts = counting->fasta_count_kmers_by_position(inputfile, max_read_len,
-						    readmask, limit_by, 
+						    limit_by, 
 						    _report_fn, callback_obj);
 					 
   PyObject * x = PyList_New(max_read_len);
@@ -1850,27 +1602,15 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self, PyObject *
 
   char * inputfile;
   int limit_by = 0;
-  PyObject * readmask_obj = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "si|OO", &inputfile, &limit_by,
-			&readmask_obj, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "si|O", &inputfile, &limit_by,
+			&callback_obj)) {
     return NULL;
   }
 
-  khmer::ReadMaskTable * readmask = NULL;
-  if (readmask_obj && readmask_obj != Py_None){
-    if (!is_readmask_obj(readmask_obj)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "third argument must be None or a readmask object");
-      return NULL;
-    }
-    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
-  }
-    
-
   counting->fasta_dump_kmers_by_abundance(inputfile,
-					   readmask, limit_by,
+					   limit_by,
 					   _report_fn, callback_obj);
 					 
 
@@ -1993,10 +1733,6 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
     METH_VARARGS, "Count all k-mers in a given file" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
-  { "filter_fasta_file_limit_n", hash_filter_fasta_file_limit_n, METH_VARARGS, "" },
-  { "filter_fasta_file_any", hash_filter_fasta_file_any, METH_VARARGS, "" },
-  { "filter_fasta_file_all", hash_filter_fasta_file_all, METH_VARARGS, "" },
-  { "filter_fasta_file_run", hash_filter_fasta_file_run, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
@@ -2127,39 +1863,16 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
   khmer_KHashbitsObject * ht2_argu;
   char * filename;
-  PyObject * readmask_obj = NULL;
-  PyObject * update_readmask_bool = NULL;
   khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
   khmer::Hashbits * ht2;
 
-  if (!PyArg_ParseTuple(args, "sO|iiOOO", &filename, &ht2_argu,&lower_bound, &upper_bound,
-			&readmask_obj, &update_readmask_bool,
+  if (!PyArg_ParseTuple(args, "sO|iiO", &filename, &ht2_argu,&lower_bound, &upper_bound,
 			&callback_obj)) {
     return NULL;
   }
 
   ht2 = ht2_argu->hashbits;
-
-  bool update_readmask = false;
-  khmer::ReadMaskTable * readmask = NULL;
-
-  // set C++ parameters accordingly
-
-  if (readmask_obj && readmask_obj != Py_None) {
-    if (update_readmask_bool != NULL &&
-	PyObject_IsTrue(update_readmask_bool)) {
-      update_readmask = true;
-    }
-
-    if (!is_readmask_obj(readmask_obj)) {
-      PyErr_SetString(PyExc_TypeError,
-		      "fourth argument must be None or a readmask object");
-      return NULL;
-    }
-    
-    readmask = ((khmer_ReadMaskObject *) readmask_obj)->mask;
-  }
 
   // call the C++ function, and trap signals => Python
 
@@ -2169,16 +1882,11 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
 
   try {
     hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed,
-			     lower_bound, upper_bound, &readmask,
-			     update_readmask, _report_fn, callback_obj);
+			     lower_bound, upper_bound, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
 
-  // error checking -- this should still be null!
-  if (!update_readmask && !readmask_obj) {
-    assert(readmask == NULL);
-  }
     khmer::HashIntoType start = 0, stop = 0;
 
     khmer::HashIntoType n = hashbits->n_kmers(start, stop);
@@ -3865,243 +3573,6 @@ static void khmer_hashbits_dealloc(PyObject* self)
 }
 
 //
-// ReadMask object
-//
-
-static PyObject * readmask_get(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-  khmer::ReadMaskTable * mask = me->mask;
-
-  khmer::BoundedCounterType val;
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  val = mask->get(index);
-
-  return PyBool_FromLong(val);
-}
-
-static PyObject * readmask_n_kept(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-  khmer::ReadMaskTable * mask = me->mask;
-
-  unsigned int n_kept;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  n_kept = mask->n_kept();
-
-  return PyInt_FromLong(n_kept);
-}
-
-static PyObject * readmask_set(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-  khmer::ReadMaskTable * mask = me->mask;
-
-  unsigned int index;
-  unsigned int setval;
-
-  if (!PyArg_ParseTuple(args, "II", &index, &setval)) {
-    return NULL;
-  }
-
-  if (setval) { mask->set(index, 1); }
-  else { mask->set(index, 0); }
-  
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * readmask_and(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-  khmer::ReadMaskTable * mask = me->mask;
-
-  khmer::BoundedCounterType val;
-  unsigned int index;
-  unsigned int setval;
-
-  if (!PyArg_ParseTuple(args, "II", &index, &setval)) {
-    return NULL;
-  }
-
-  val = mask->get(index);
-
-  if (setval && val) { val = 1; } 
-  else { val = 0; }
-
-  mask->set(index, val);
-  
-  return PyBool_FromLong(val);
-}
-
-
-static PyObject * readmask_merge(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-  PyObject * other_py_obj;
-
-  khmer::ReadMaskTable * mask = me->mask;
-
-  if (!PyArg_ParseTuple(args, "O", &other_py_obj)) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * other = (khmer_ReadMaskObject *) other_py_obj;
-
-  mask->merge(*(other->mask));
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * readmask_save(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-
-  khmer::ReadMaskTable * mask = me->mask;
-  char * filename;
-
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-  }
-
-  mask->save(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * readmask_load(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-
-  khmer::ReadMaskTable * mask = me->mask;
-  char * filename;
-
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-  }
-
-  mask->load(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * readmask_invert(PyObject * self, PyObject * args)
-{
-  khmer_ReadMaskObject * me = (khmer_ReadMaskObject *) self;
-  khmer::ReadMaskTable * mask = me->mask;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  mask->invert();
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * readmask_filter_fasta_file(PyObject * self, PyObject *args)
-{
-  char * inputfilename;
-  char * outputfilename;
-  khmer::ReadMaskTable * readmask = ((khmer_ReadMaskObject *) self)->mask;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "ss|O", &inputfilename, &outputfilename,
-			&callback_obj)) {
-    return NULL;
-  }
-
-  unsigned int n_kept;
-  try {
-    n_kept = readmask->filter_fasta_file(inputfilename, outputfilename,
-					 _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(n_kept);
-}
-
-
-static PyObject * readmask_tablesize(PyObject * self, PyObject * args)
-{
-  khmer::ReadMaskTable * readmask = ((khmer_ReadMaskObject *) self)->mask;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(readmask->get_tablesize());
-}
-
-
-static PyMethodDef khmer_readmask_methods[] = {
-  { "n_kept", readmask_n_kept, METH_VARARGS, "" },
-  { "tablesize", readmask_tablesize, METH_VARARGS, "" },
-  { "get", readmask_get, METH_VARARGS, "" },
-  { "set", readmask_set, METH_VARARGS, "" },
-  { "do_and", readmask_and, METH_VARARGS, "" },
-  { "merge", readmask_merge, METH_VARARGS, "" },
-  { "invert", readmask_invert, METH_VARARGS, "" },
-  { "save", readmask_save, METH_VARARGS, "" },
-  { "load", readmask_load, METH_VARARGS, "" },
-  { "filter_fasta_file", readmask_filter_fasta_file, METH_VARARGS, "" },
-  {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static PyObject *
-khmer_readmask_getattr(PyObject * obj, char * name)
-{
-  return Py_FindMethod(khmer_readmask_methods, obj, name);
-}
-
-//
-// new_readmask
-//
-
-static PyObject* new_readmask(PyObject * self, PyObject * args)
-{
-  unsigned int size = 0;
-
-  if (!PyArg_ParseTuple(args, "I", &size)) {
-    return NULL;
-  }
-
-  khmer_ReadMaskObject * readmask_obj = (khmer_ReadMaskObject *) \
-    PyObject_New(khmer_ReadMaskObject, &khmer_ReadMaskType);
-
-  readmask_obj->mask = new khmer::ReadMaskTable(size);
-
-  return (PyObject *) readmask_obj;
-}
-
-//
-// khmer_readmask_dealloc -- clean up a readmask object.
-//
-
-static void khmer_readmask_dealloc(PyObject* self)
-{
-  khmer_ReadMaskObject * obj = (khmer_ReadMaskObject *) self;
-  delete obj->mask;
-  obj->mask = NULL;
-  
-  PyObject_Del((PyObject *) obj);
-}
-
-//
 // MinMaxTable object
 //
 
@@ -4395,7 +3866,6 @@ static PyMethodDef KhmerMethods[] = {
   { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty single-table counting hash" },
   { "_new_counting_hash", _new_counting_hash, METH_VARARGS, "Create an empty counting hash" },
   { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
-  { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
   { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
   { "forward_hash", forward_hash, METH_VARARGS, "", },
   { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },

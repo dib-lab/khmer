@@ -197,7 +197,5 @@ occupy.py
 
 partition-size-dist.py
 
-readmask-do-filter.py
-
 test.sh
 

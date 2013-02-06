@@ -171,41 +171,10 @@ namespace khmer {
       return min_count;
     }
 
-    //
-
     MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
-				       unsigned long long total_reads,
-				       ReadMaskTable * readmask = NULL,
-				       CallbackFn callback = NULL,
-				       void * callback_data = NULL);
-
-    ReadMaskTable * filter_fasta_file_any(MinMaxTable &minmax,
-					  BoundedCounterType threshold,
-					  ReadMaskTable * readmask = NULL,
-					  CallbackFn callback = NULL,
-					  void * callback_data = NULL);
-
-    ReadMaskTable * filter_fasta_file_all(MinMaxTable &minmax,
-					  BoundedCounterType threshold,
-					  ReadMaskTable * readmask = NULL,
-					  CallbackFn callback = NULL,
-					  void * callback_data = NULL);
-
-    ReadMaskTable * filter_fasta_file_limit_n(const std::string &readsfile,
-                                              MinMaxTable &minmax,
-                                              BoundedCounterType threshold,
-                                              BoundedCounterType n, 
-                                              ReadMaskTable * old_readmask = NULL,
-                                              CallbackFn callback = NULL,
-                                              void * callback_data = NULL);
-
-    ReadMaskTable * filter_fasta_file_run(const std::string &inputfile,
-					  unsigned long long total_reads,
-					  BoundedCounterType threshold,
-					  unsigned int runlength,
-					  ReadMaskTable * old_readmask = NULL,
-					  CallbackFn callback = NULL,
-					  void * callback_data = NULL);
+				      unsigned long long total_reads,
+				      CallbackFn callback = NULL,
+				      void * callback_data = NULL);
 
     void output_fasta_kmer_pos_freq(const std::string &inputfile,
                                     const std::string &outputfile);
@@ -229,13 +198,11 @@ namespace khmer {
 
     HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
 					 const unsigned int max_read_len,
-					 ReadMaskTable * old_readmask = NULL,
 					 BoundedCounterType limit_by_count=0,
 					 CallbackFn callback = NULL,
 					 void * callback_data = NULL);
 
     void fasta_dump_kmers_by_abundance(const std::string &inputfile,
-				       ReadMaskTable * readmask,
 				       BoundedCounterType limit_by_count,
 				       CallbackFn callback = NULL,
 				       void * callback_data = NULL);
