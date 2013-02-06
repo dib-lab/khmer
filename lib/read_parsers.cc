@@ -1173,6 +1173,7 @@ IParser(
 	    stream_reader, number_of_threads, cache_size, trace_level
 	)
     ),
+    _number_of_threads( number_of_threads ),
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _unithreaded( 1 == number_of_threads ),
     _states( new ParserState *[ number_of_threads ] )
@@ -1181,7 +1182,16 @@ IParser(
 
 IParser::
 ~IParser( )
-{ }
+{
+    for (uint32_t i = 0; i < _number_of_threads; ++i)
+    {
+	if (_states[ i ])
+	{
+	    delete _states[ i ];
+	    _states[ i ] = NULL;
+	}
+    }
+}
 
 
 IParser:: ParserState::

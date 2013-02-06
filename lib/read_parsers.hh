@@ -382,6 +382,7 @@ protected:
 
     CacheManager	_cache_manager;
 
+    uint32_t		_number_of_threads;
     ThreadIDMap		_thread_id_map;
     bool		_unithreaded;
 
