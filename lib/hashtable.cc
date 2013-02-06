@@ -158,6 +158,8 @@ consume_fasta(
     lower_bound, upper_bound, 
     callback, callback_data
   );
+
+  delete parser;
 }
 
 void
