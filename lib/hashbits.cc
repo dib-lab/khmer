@@ -1843,13 +1843,11 @@ unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
 //
 
 void Hashbits::consume_fasta_overlap(const std::string &filename,
-                                        HashIntoType curve[2][100],Hashbits &ht2,
+                              HashIntoType curve[2][100],Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
 			      HashIntoType lower_bound,
 			      HashIntoType upper_bound,
-			      ReadMaskTable ** orig_readmask,
-			      bool update_readmask,
 			      CallbackFn callback,
 			      void * callback_data)
 {
@@ -1879,17 +1877,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
   string currSeq = "";
 
   //
-  // readmask stuff: were we given one? do we want to update it?
-  // 
-
-  ReadMaskTable * readmask = NULL;
-  std::list<unsigned int> masklist;
-
-  if (orig_readmask && *orig_readmask) {
-    readmask = *orig_readmask;
-  }
-
-  //
   // iterate through the FASTA file & consume the reads.
   //
 
@@ -1898,10 +1885,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     currSeq = read.sequence;
     currName = read.name; 
 
-    // do we want to process it?
-    if (!readmask || readmask->get(total_reads)) {
-
-      // yep! process.
       unsigned int this_n_consumed;
       bool is_valid;
 
@@ -1910,17 +1893,7 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 					       lower_bound,
 					       upper_bound,ht2);
 
-      // was this an invalid sequence -> mark as bad?
-      if (!is_valid && update_readmask) {
-        if (readmask) {
-	  readmask->set(total_reads, false);
-	} else {
-	  masklist.push_back(total_reads);
-	}
-      } else {		// nope -- count it!
         n_consumed += this_n_consumed;
-      }
-    }
 	       
     // reset the sequence info, increment read number
 
@@ -1938,27 +1911,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
         throw;
       }
     }
-//   count<<curve[0][0]<<" ";
-//   count<< curve[0][1]<<" ";
 
-  }
-
-
-  //
-  // We've either updated the readmask in place, OR we need to create a
-  // new one.
-  //
-
-  if (orig_readmask && update_readmask && readmask == NULL) {
-    // allocate, fill in from masklist
-    readmask = new ReadMaskTable(total_reads);
-
-    list<unsigned int>::const_iterator it;
-    for(it = masklist.begin(); it != masklist.end(); ++it) {
-      readmask->set(*it, false);
-    }
-    *orig_readmask = readmask;
-  }
+  } // while
 }
 
 //

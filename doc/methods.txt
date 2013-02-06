@@ -42,8 +42,6 @@ consume
 
 consume_fasta
 
-consume_fasta_build_readmask
-
 fasta_file_to_minmax
 
 filter_fasta_file_max
@@ -53,25 +51,6 @@ get
 get_min_count
 
 get_max_count
-
-readmask methods
-----------------
-
-n_kept
-
-get
-
-set
-
-do_and
-
-merge
-
-save
-
-load
-
-filter_fasta_file
 
 minmaxtable methods
 -------------------
@@ -98,8 +77,6 @@ module methods
 new_ktable
 
 new_hashtable
-
-new_readmask
 
 new_minmax
 
