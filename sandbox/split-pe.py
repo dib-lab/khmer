@@ -21,4 +21,4 @@ for n, record in enumerate(screed.open(sys.argv[1])):
         n2 += 1
 
 print >>sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
-      (n + 1, n1, n2)
+    (n + 1, n1, n2)

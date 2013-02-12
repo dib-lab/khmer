@@ -9,10 +9,12 @@ Results end up in <search reads>.sweep2.
 Use '-h' for parameter help.
 """
 
-import sys, khmer
+import sys
+import khmer
 import os.path
 import screed
 from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+
 
 def main():
     parser = build_construct_args()
@@ -30,12 +32,13 @@ def main():
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8)' % (args.n_hashes * args.min_hashsize / 8.)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8)' % (
+            args.n_hashes * args.min_hashsize / 8.)
+        print>>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
     inp = args.input_filename
     readsfile = args.read_filename

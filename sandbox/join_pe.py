@@ -2,14 +2,17 @@
 import sys
 from screed.fasta import fasta_iter
 
+
 def get_name(r):
     name = r['name'].split()[0]
     name = name.rsplit('/', 1)[0]
     return name
 
+
 def _exhaust(h):
     while 1:
         yield h.next()
+
 
 def join_pe(i1, i2, count_d):
     h1 = iter(i1)
@@ -45,7 +48,7 @@ def join_pe(i1, i2, count_d):
 
             yield r2
 
-        ### 
+        ###
 
         assert n1 == n2
         yield r1

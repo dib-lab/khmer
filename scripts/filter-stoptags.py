@@ -8,7 +8,9 @@ will be placed in 'infile.stopfilt'.
 Use '-h' for parameter help.
 """
 
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 import argparse
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
@@ -17,6 +19,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 DEFAULT_K = 32
 
 ###
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -51,15 +54,15 @@ def main():
 
     ### the filtering loop
     for infile in infiles:
-       print 'filtering', infile
-       outfile = os.path.basename(infile) + '.stopfilt'
+        print 'filtering', infile
+        outfile = os.path.basename(infile) + '.stopfilt'
 
-       outfp = open(outfile, 'w')
+        outfp = open(outfile, 'w')
 
-       tsp = ThreadedSequenceProcessor(process_fn)
-       tsp.start(verbose_loader(infile), outfp)
+        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp.start(verbose_loader(infile), outfp)
 
-       print 'output in', outfile
+        print 'output in', outfile
 
 if __name__ == '__main__':
     main()

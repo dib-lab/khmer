@@ -1,13 +1,15 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 31                                  # use K-1 for assembly K
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE = int(4e9)
 N_HT = 4
 
 ###
 
-MAX_DEGREE=int(sys.argv[4])
+MAX_DEGREE = int(sys.argv[4])
 
 repfile = sys.argv[1]
 infile = sys.argv[2]
@@ -41,6 +43,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
     # component.
 
     if trim_at > K:
-        print >>lowfp, '>%s %d %d %d\n%s' % (name, trim_at, len(seq), len(trim_seq), trim_seq)
+        print >>lowfp, '>%s %d %d %d\n%s' % (
+            name, trim_at, len(seq), len(trim_seq), trim_seq)
     else:
         print >>highfp, '>%s\n%s' % (name, seq)

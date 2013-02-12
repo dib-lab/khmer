@@ -1,29 +1,34 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
-import threading, Queue
+import threading
+import Queue
 import gc
 
 K = 31                                  # use K-1 for assembly K
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE = int(4e9)
 N_HT = 4
 
 ###
 
-MAX_DEGREE=4
+MAX_DEGREE = 4
 
 ###
 
-WORKER_THREADS=8
-GROUPSIZE=100
+WORKER_THREADS = 8
+GROUPSIZE = 100
+
 
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
 
+
 def process(inq, outq, ht):
     global worker_count
-    
+
     while not done or not inq.empty():
         try:
             g = inq.get(True, 1)
@@ -40,7 +45,7 @@ def process(inq, outq, ht):
             if trim_at > K:
                 x.append(record)
 
-        y = [ (record['name'], record['sequence']) for record in x ]
+        y = [(record['name'], record['sequence']) for record in x]
 
         gg = SequenceGroup(g.order, y)
         outq.put(gg)
@@ -48,6 +53,7 @@ def process(inq, outq, ht):
         gc.collect()
 
     worker_count -= 1
+
 
 def write(outq, outfp):
     global worker_count
@@ -74,11 +80,12 @@ def write(outq, outfp):
         if len(groups) > 20:
             print 'WAITAMINIT: len(groups) is', len(groups)
 
+
 def main():
     global ht, done, worker_count
     done = False
     worker_count = 0
-    
+
     repfile = sys.argv[1]
     infile = sys.argv[2]
     outprefix = sys.argv[3]
@@ -93,7 +100,7 @@ def main():
     ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 
     lowfp = open(lowfile, 'w')
-    #highfp = open(highfile, 'w')
+    # highfp = open(highfile, 'w')
 
     print 'eating', repfile
     ht.consume_fasta(repfile)

@@ -9,7 +9,8 @@ Use '-h' for parameter help.
 @CTB enable/disable bigcount via command-line parameters.
 """
 
-import sys, screed
+import sys
+import screed
 import threading
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
@@ -17,9 +18,10 @@ from khmer.threading_args import add_threading_args
 
 ###
 
+
 def main():
     parser = build_construct_args()
-    add_threading_args( parser )
+    add_threading_args(parser)
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
 
@@ -34,48 +36,49 @@ def main():
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
+            args.n_hashes * args.min_hashsize)
+        print>>sys.stderr, '-' * 8
 
-
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
     base = args.output_filename
     filenames = args.input_filenames
-    n_threads = int( args.n_threads )
+    n_threads = int(args.n_threads)
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
 
     ###
-    
+
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
     ht.set_use_bigcount(True)
 
     for n, filename in enumerate(filenames):
 
-       rparser = khmer.ReadParser( filename, n_threads )
-       threads = [ ]
-       print 'consuming input', filename
-       for tnum in xrange( n_threads ):
-           t = \
-           threading.Thread(
-               target = ht.consume_fasta_with_reads_parser, 
-               args = ( rparser, )
-           )
-           threads.append( t )
-           t.start( )
-           #ht.consume_fasta(filename)
-        
-       for t in threads: t.join( )
+        rparser = khmer.ReadParser(filename, n_threads)
+        threads = []
+        print 'consuming input', filename
+        for tnum in xrange(n_threads):
+            t = \
+                threading.Thread(
+                    target=ht.consume_fasta_with_reads_parser,
+                    args=(rparser, )
+                )
+            threads.append(t)
+            t.start()
+            # ht.consume_fasta(filename)
 
-       if n > 0 and n % 10 == 0:
-           print 'mid-save', base
-           ht.save(base)
-           open(base + '.info', 'w').write('through %s' % filename)
+        for t in threads:
+            t.join()
+
+        if n > 0 and n % 10 == 0:
+            print 'mid-save', base
+            ht.save(base)
+            open(base + '.info', 'w').write('through %s' % filename)
 
     print 'saving', base
     ht.save(base)

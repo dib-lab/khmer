@@ -1,9 +1,10 @@
 #! /usr/bin/env python
-import khmer, sys
+import khmer
+import sys
 from screed.fasta import fasta_iter
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE = int(8e9)
 N_HT = 4
 
 outfp = open(sys.argv[2], 'w')
@@ -19,7 +20,7 @@ for n, record in enumerate(fasta_iter(open(sys.argv[1]))):
 
     seq = record['sequence']
     for pos in range(0, len(seq) - K + 1):
-        kmer = seq[pos:pos+K]
+        kmer = seq[pos:pos + K]
         count = ht.kmer_degree(kmer)
 
         hist[pos] += count
@@ -30,5 +31,5 @@ for i in range(len(hist)):
     count = histcount[i]
     if not count:
         continue
-    
+
     print >>outfp, i, total, count, total / float(count)

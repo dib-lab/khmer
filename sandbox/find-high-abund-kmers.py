@@ -3,14 +3,16 @@
 @@
 """
 
-import sys, screed
+import sys
+import screed
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
-DEFAULT_LOWER_CUTOFF=2000
-DEFAULT_UPPER_CUTOFF=65535
+DEFAULT_LOWER_CUTOFF = 2000
+DEFAULT_UPPER_CUTOFF = 65535
 
 ###
+
 
 def main():
     parser = build_construct_args()
@@ -18,7 +20,7 @@ def main():
                         default=DEFAULT_LOWER_CUTOFF)
     parser.add_argument('-u', '--upper-cutoff', type=int, dest='upper_cutoff',
                         default=DEFAULT_UPPER_CUTOFF)
-    
+
     parser.add_argument('output_filename')
     parser.add_argument('input_filename')
 
@@ -33,13 +35,13 @@ def main():
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
+            args.n_hashes * args.min_hashsize)
+        print>>sys.stderr, '-' * 8
 
-
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
     output = args.output_filename
     input = args.input_filename
@@ -50,7 +52,7 @@ def main():
     print 'Loading sequences in %s' % input
 
     ###
-    
+
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
     ht.set_use_bigcount(True)
@@ -62,6 +64,6 @@ def main():
 
     print 'saving stoptags', output
     hb.save_stop_tags(output)
-    
+
 if __name__ == '__main__':
     main()

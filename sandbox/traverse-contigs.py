@@ -2,12 +2,15 @@
 """
 """
 
-import khmer, sys
+import khmer
+import sys
 import os.path
 
-import sys, screed
+import sys
+import screed
 import khmer
 from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+
 
 def main():
     parser = build_construct_args()
@@ -28,24 +31,25 @@ def main():
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8)' % (args.n_hashes * args.min_hashsize / 8.)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8)' % (
+            args.n_hashes * args.min_hashsize / 8.)
+        print>>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
     base = args.input_contigs
     filenames = args.input_reads
 
     ###
-    
+
     print 'making hashtable'
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
 
     for filename in filenames:
-       print 'consuming input', filename
-       ht.consume_fasta(filename)
+        print 'consuming input', filename
+        ht.consume_fasta(filename)
 
     ###
 
@@ -55,7 +59,7 @@ def main():
 
     for contig in screed.open(base):
         seq = contig.sequence
-        
+
         n_not_found = 0
         found = True
         for start in range(0, len(seq) - K):
@@ -65,7 +69,8 @@ def main():
                 found = False
 
         if not found:
-            fp.write('>%s %d %d\n%s\n' % (contig.name, n_not_found, len(contig.sequence), contig.sequence))
+            fp.write('>%s %d %d\n%s\n' % (contig.name,
+                     n_not_found, len(contig.sequence), contig.sequence))
 
 if __name__ == '__main__':
     main()

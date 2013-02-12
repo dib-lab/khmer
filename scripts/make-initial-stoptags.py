@@ -10,9 +10,9 @@ import argparse
 import os
 import khmer
 
-DEFAULT_SUBSET_SIZE=int(1e4)
-DEFAULT_COUNTING_HT_SIZE=3e6                # number of bytes
-DEFAULT_COUNTING_HT_N=4                     # number of counting hash tables
+DEFAULT_SUBSET_SIZE = int(1e4)
+DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
+DEFAULT_COUNTING_HT_N = 4                     # number of counting hash tables
 
 # Lump removal parameters.  Probably shouldn't be changed, but who knows?
 #
@@ -25,14 +25,16 @@ DEFAULT_COUNTING_HT_N=4                     # number of counting hash tables
 # we will mark it as BAD and make it a stop tag for traversal.
 
 ## don't change these!
-EXCURSION_DISTANCE=40
-EXCURSION_KMER_THRESHOLD=200
-EXCURSION_KMER_COUNT_THRESHOLD=5
+EXCURSION_DISTANCE = 40
+EXCURSION_KMER_THRESHOLD = 200
+EXCURSION_KMER_COUNT_THRESHOLD = 5
 
 ##
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Find an initial set of highly connected k-mers.")
+    parser = argparse.ArgumentParser(
+        description="Find an initial set of highly connected k-mers.")
 
     parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
                         default=DEFAULT_COUNTING_HT_N,
@@ -55,7 +57,7 @@ def main():
     if args.stoptags:
         print 'loading stoptags from', args.stoptags
         ht.load_stop_tags(args.stoptags)
-    
+
     print 'loading ht %s.ht' % graphbase
     ht = khmer.load_hashbits(graphbase + '.ht')
 

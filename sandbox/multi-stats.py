@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 import os
-import sys, time
+import sys
+import time
 import subprocess
 
 localdir = os.path.dirname(__file__)
 localdir = os.path.abspath(localdir)
 
-COMMAND="%(localdir)s/stats-assemble.sh %(localdir)s %(filename)s"
+COMMAND = "%(localdir)s/stats-assemble.sh %(localdir)s %(filename)s"
 
 
 N_PROCESSES = 8

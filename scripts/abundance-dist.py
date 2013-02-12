@@ -6,13 +6,16 @@ Produce the k-mer abundance distribution for the given file.
 
 Use '-h' for parameter help.
 """
-import sys, khmer
+import sys
+import khmer
 import argparse
 import os
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Output k-mer abundance distribution.")
-    
+    parser = argparse.ArgumentParser(
+        description="Output k-mer abundance distribution.")
+
     parser.add_argument('hashname')
     parser.add_argument('datafile')
     parser.add_argument('histout')
@@ -44,7 +47,7 @@ def main():
         if not args.squash_output:
             print >>sys.stderr, 'ERROR: %s exists; not squashing.' % histout
             sys.exit(-1)
-        
+
         print '** squashing existing file %s' % histout
 
     print 'preparing hist...'
@@ -52,10 +55,10 @@ def main():
     total = sum(z)
 
     if 0 == total:
-	print >>sys.stderr, "ERROR: abundance distribution is uniformly zero; nothing to report."
-	print >>sys.stderr, "\tPlease verify that the input files are valid."
-	sys.exit( -1 )
-        
+        print >>sys.stderr, "ERROR: abundance distribution is uniformly zero; nothing to report."
+        print >>sys.stderr, "\tPlease verify that the input files are valid."
+        sys.exit(-1)
+
     fp = open(histout, 'w')
 
     sofar = 0

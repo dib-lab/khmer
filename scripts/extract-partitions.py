@@ -17,8 +17,9 @@ import os.path
 import screed
 import argparse
 
-DEFAULT_MAX_SIZE=int(1e6)
-DEFAULT_THRESHOLD=5
+DEFAULT_MAX_SIZE = int(1e6)
+DEFAULT_THRESHOLD = 5
+
 
 def read_partition_file(filename):
     for n, record in enumerate(screed.open(filename, parse_description=False)):
@@ -27,6 +28,7 @@ def read_partition_file(filename):
         yield n, name, int(partition_id), record.sequence
 
 ###
+
 
 def main():
     parser = argparse.ArgumentParser(description="Extract partitioned seqs.")
@@ -91,7 +93,7 @@ def main():
         unassigned_fp.close()
 
     if 0 in count:                          # eliminate unpartitioned sequences
-       del count[0]
+        del count[0]
 
     # develop histogram of partition sizes
     dist = {}
@@ -105,7 +107,7 @@ def main():
     wtotal = 0
     for c, n in sorted(dist.items()):
         total += n
-        wtotal += c*n
+        wtotal += c * n
         distfp.write('%d %d %d %d\n' % (c, n, total, wtotal))
     distfp.close()
 
@@ -113,8 +115,8 @@ def main():
         sys.exit(0)
 
     # sort groups by size
-    divvy = sorted(count.items(), key=lambda y:y[1])
-    divvy = filter(lambda y:y[1] > THRESHOLD, divvy)
+    divvy = sorted(count.items(), key=lambda y: y[1])
+    divvy = filter(lambda y: y[1] > THRESHOLD, divvy)
 
     ## divvy up into different groups, based on having MAX_SIZE sequences
     ## in each group.
@@ -129,7 +131,7 @@ def main():
         if total > MAX_SIZE:
             for partition_id in group:
                 group_d[partition_id] = group_n
-                #print 'group_d', partition_id, group_n
+                # print 'group_d', partition_id, group_n
 
             group_n += 1
             group = set()
@@ -138,9 +140,8 @@ def main():
     if group:
         for partition_id in group:
             group_d[partition_id] = group_n
-            #print 'group_d', partition_id, group_n
+            # print 'group_d', partition_id, group_n
         group_n += 1
-
 
     print '%d groups' % group_n
     if group_n == 0:

@@ -20,9 +20,9 @@ import math
 
 
 ###
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_HASHSIZE = 1e6
 
 
 def main():
@@ -56,16 +56,15 @@ want to increase this!\n** Please read the docs!"
         print>>sys.stderr, ' - hashsize = %-5.2g \t(-x)' % args.hashsize
         print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x \
 hashsize / 8)' % (args.n_hashes * args.hashsize / 8.)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.hashsize
+    N_HT = args.n_hashes
     htfile = args.htfile
     fafile = args.fafile
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
-
 
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
@@ -76,7 +75,7 @@ hashsize / 8)' % (args.n_hashes * args.hashsize / 8.)
 
     ht2 = khmer.new_hashbits(K, HT_SIZE, N_HT)
 
-    (n_unique,n_overlap,list) = ht2.count_overlap(fafile,ht1)
+    (n_unique, n_overlap, list) = ht2.count_overlap(fafile, ht1)
 
     printout1 = """\
 dataset1(ht file): %s
@@ -87,15 +86,13 @@ dataset2: %s
 
 """ % (htfile, fafile, n_unique, n_overlap)
     output.write(printout1)
-    
+
     figure_list1 = []
     figure_list2 = []
 
     for i in range(100):
-        to_print = str(list[100+i]) + ' ' + str(list[i]) + '\n'
+        to_print = str(list[100 + i]) + ' ' + str(list[i]) + '\n'
         f_curve_obj.write(to_print)
-
-
 
 
 if __name__ == '__main__':

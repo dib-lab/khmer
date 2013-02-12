@@ -12,7 +12,7 @@ filename = '/scratch/gpgc/iowa/850.2.fq'
 for n, record in enumerate(fastq_iter(open(filename))):
     if n % 10000 == 0:
         print>>sys.stderr, '...', n
-    if n > 10**6:
+    if n > 10 ** 6:
         break
 
     sequence = record['sequence']

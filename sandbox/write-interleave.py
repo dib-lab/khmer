@@ -6,7 +6,7 @@ import os.path
 for filename in sys.argv[1:]:
     assert 'R1' in filename
     filename2 = filename.replace('R1', 'R2')
-    
+
     r1 = iter(screed.open(filename)).next()
     r2 = iter(screed.open(filename2)).next()
 

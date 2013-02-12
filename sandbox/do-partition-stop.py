@@ -1,14 +1,15 @@
-import khmer, sys
+import khmer
+import sys
 import threading
 import Queue
 import gc
 import os.path
 
-K=32
-HASHTABLE_SIZE=int(1e9)
-N_HT=4
+K = 32
+HASHTABLE_SIZE = int(1e9)
+N_HT = 4
 
-COUNTING_SIZE=int(1e8)
+COUNTING_SIZE = int(1e8)
 
 
 SUBSET_SIZE = int(1e4)
@@ -31,6 +32,7 @@ if not save_merged_pmap and remove_orig_pmap:
 
 ###
 
+
 def worker(q, basename):
     while 1:
         try:
@@ -43,7 +45,7 @@ def worker(q, basename):
         if os.path.exists(outfile):
             print 'SKIPPING', basename, ' -- already exists'
             continue
-        
+
         print 'starting:', basename, n
         subset = ht.do_subset_partition(start, stop)
 
@@ -52,9 +54,10 @@ def worker(q, basename):
         del subset
         gc.collect()
 
+
 def main(filename):
     global ht
-    
+
     basename = os.path.basename(filename)
 
     print 'input file to partition: %s' % filename
@@ -67,7 +70,7 @@ def main(filename):
     print '--'
 
     ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
-    
+
     # populate the hash table and tag set
     if not load_ht:
         print 'reading sequences and loading tagset from %s...' % (filename,)
@@ -79,7 +82,7 @@ def main(filename):
             ht.save(basename + '.ht')
             print 'saving tagset...'
             ht.save_tagset(basename + '.tagset')
-            
+
         # calculate the hashtable occupancy
         print '---'
         print 'hashtable occupancy:', ht.n_occupied() / float(HASHTABLE_SIZE)
@@ -137,7 +140,7 @@ def main(filename):
 
     for i in range(0, n_subsets):
         start = divvy[i]
-        end = divvy[i+1]
+        end = divvy[i + 1]
         worker_q.put((ht, i, start, end))
 
     print 'enqueued %d subset tasks' % n_subsets
@@ -175,7 +178,7 @@ def main(filename):
 
     # save merged partitionmap
     if save_merged_pmap:
-        print 'saving merged pmap to %s.pmap.merged' % basename 
+        print 'saving merged pmap to %s.pmap.merged' % basename
         ht.save_partitionmap(basename + '.pmap.merged')
 
     if remove_orig_pmap:
@@ -190,7 +193,7 @@ def main(filename):
     print 'output partitions:', n_partitions
     print 'pmap partitions:', n_partitions
     print 'singletons:', n_singletons
-    
+
 
 if __name__ == '__main__':
     main(sys.argv[1])

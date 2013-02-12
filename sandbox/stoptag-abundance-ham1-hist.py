@@ -1,5 +1,7 @@
 #! /usr/bin/env python
-import sys, khmer, os
+import sys
+import khmer
+import os
 from pylab import *
 
 hashfile = sys.argv[1]
