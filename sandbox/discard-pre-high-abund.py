@@ -2,20 +2,23 @@
 """
 Eliminate reads with median k-mer abundance higher than DESIRED_COVERAGE.
 
-Parameters to adjust: DESIRED_COVERAGE, 
+Parameters to adjust: DESIRED_COVERAGE,
 """
 
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 import random
 
-DEFAULT_DESIRED_COVERAGE=20
+DEFAULT_DESIRED_COVERAGE = 20
 
 import argparse
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_MIN_HASHSIZE = 1e6
+
 
 def build_common_args():
 
@@ -40,6 +43,7 @@ def build_common_args():
 
     return parser
 
+
 def parse_args(parser):
     args = parser.parse_args()
 
@@ -52,10 +56,12 @@ def parse_args(parser):
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
+            args.n_hashes * args.min_hashsize)
+        print>>sys.stderr, '-' * 8
 
     return args
+
 
 def main():
     parser = build_common_args()
@@ -68,10 +74,10 @@ def main():
 
     args = parse_args(parser)
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
-    DESIRED_COVERAGE=args.cutoff
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
+    DESIRED_COVERAGE = args.cutoff
 
     input_name_list = args.input_filenames
 

@@ -7,11 +7,13 @@ Do all the partition steps in one script.
 Use '-h' for parameter help.
 """
 
-import khmer, sys
+import khmer
+import sys
 import threading
 import Queue
 import gc
-import os.path, os
+import os.path
+import os
 import argparse
 import screed
 import khmer
@@ -20,18 +22,20 @@ import glob
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
-DEFAULT_K=32
+DEFAULT_K = 32
 
 # Debugging Support
 import re
 import platform
 if "Linux" == platform.system():
     def __debug_vm_usage(msg):
-	print "===> DEBUG: " + msg
-	for vmstat in re.findall( r".*Vm.*", file( "/proc/self/status" ).read( ) ):
-	    print vmstat
+        print "===> DEBUG: " + msg
+        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
+            print vmstat
 else:
-    def __debug_vm_usage(msg): pass
+    def __debug_vm_usage(msg):
+        pass
+
 
 def worker(q, basename, stop_big_traversals):
     while 1:
@@ -45,7 +49,7 @@ def worker(q, basename, stop_big_traversals):
         if os.path.exists(outfile):
             print 'SKIPPING', outfile, ' -- already exists'
             continue
-        
+
         print 'starting:', basename, n
 
         # pay attention to stoptags when partitioning; take command line
@@ -56,6 +60,7 @@ def worker(q, basename, stop_big_traversals):
         ht.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
+
 
 def main():
     parser = build_construct_args()
@@ -89,12 +94,13 @@ def main():
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8)' % (args.n_hashes * args.min_hashsize / 8.)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8)' % (
+            args.n_hashes * args.min_hashsize / 8.)
+        print>>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
     base = args.graphbase
     filenames = args.input_filenames
@@ -108,13 +114,13 @@ def main():
     print '--'
 
     ### load-graph
-    
+
     print 'making hashtable'
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
 
     for n, filename in enumerate(filenames):
-       print 'consuming input', filename
-       ht.consume_fasta_and_tag(filename)
+        print 'consuming input', filename
+        ht.consume_fasta_and_tag(filename)
 
     fp_rate = khmer.calc_expected_collisions(ht)
     print 'fp rate estimated to be %1.3f' % fp_rate
@@ -149,7 +155,7 @@ def main():
     # break up the subsets into a list of worker tasks
     for i in range(0, n_subsets):
         start = divvy[i]
-        end = divvy[i+1]
+        end = divvy[i + 1]
         worker_q.put((ht, i, start, end))
 
     print 'enqueued %d subset tasks' % n_subsets

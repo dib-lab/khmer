@@ -1,15 +1,17 @@
 #! /usr/bin/env python
-import khmer, sys, screed
+import khmer
+import sys
+import screed
 
-K=20
-HASHTABLE_SIZE=int(2.5e8)
-N_HT=4
+K = 20
+HASHTABLE_SIZE = int(2.5e8)
+N_HT = 4
 
-UNIQUE_LEN=100
-UNIQUE_F=0.9
+UNIQUE_LEN = 100
+UNIQUE_F = 0.9
 
-OUTPUT_WINDOW=100
-OUTPUT_OVERLAP=10
+OUTPUT_WINDOW = 100
+OUTPUT_OVERLAP = 10
 
 kh = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 
@@ -23,7 +25,8 @@ for filename in sys.argv[1:]:
     for n, record in enumerate(screed.open(filename)):
         if n > 0 and n % 10000 == 0:
             print >>sys.stderr, '...', n, discarded
-            print >>sys.stderr, '==>', total_kmers, kept_kmers, int(float(kept_kmers) / float(total_kmers) * 100.)
+            print >>sys.stderr, '==>', total_kmers, kept_kmers, int(
+                float(kept_kmers) / float(total_kmers) * 100.)
         seq = record.sequence
         seq = seq.replace('N', 'G')
 

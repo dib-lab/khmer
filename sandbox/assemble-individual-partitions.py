@@ -6,6 +6,7 @@ import shutil
 import os.path
 import subprocess
 
+
 def load_sequences(filename):
     d = {}
     records = list(fasta_iter(open(filename), parse_description=False))
@@ -21,6 +22,7 @@ def load_sequences(filename):
 
     return len(records), d
 
+
 def assemble_sequences(records, k, length_cutoff=1000):
     dirname = tempfile.mkdtemp()
     os.chdir(dirname)
@@ -32,17 +34,21 @@ def assemble_sequences(records, k, length_cutoff=1000):
             fp.write('>%s\n%s\n' % (r['name'].split()[0], r['sequence']))
         fp.close()
 
-        p = subprocess.Popen('python /root/khmer/scripts/strip-and-split-for-assembly.py seqs.fa seqs.fa', shell=True)
+        p = subprocess.Popen(
+            'python /root/khmer/scripts/strip-and-split-for-assembly.py seqs.fa seqs.fa', shell=True)
         p.communicate()
         assert p.returncode == 0
 
         assemble_dir = os.path.join(dirname, 'assemble')
-        p = subprocess.Popen('velveth %s %d -shortPaired %s.pe -short %s.se' % (assemble_dir, k, seqfile, seqfile), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen('velveth %s %d -shortPaired %s.pe -short %s.se' % (
+            assemble_dir, k, seqfile, seqfile), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
         assert p.returncode == 0, (stdout, stderr)
 
-        p = subprocess.Popen('velvetg %s -read_trkg yes -exp_cov auto -cov_cutoff 0' % (assemble_dir,),
-                             shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            'velvetg %s -read_trkg yes -exp_cov auto -cov_cutoff 0' % (
+                assemble_dir,),
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
         assert p.returncode == 0, (stdout, stderr)
 
@@ -57,13 +63,14 @@ def assemble_sequences(records, k, length_cutoff=1000):
         return total, x
     finally:
         shutil.rmtree(dirname)
-        #print 'XXX', dirname
+        # print 'XXX', dirname
+
 
 def best_assemble_sequences(r, try_k=(33, 35, 37, 39, 41, 43, 45, 47, 49, 51)):
 
     best_k = try_k[0]
     best_total, best_records = assemble_sequences(r, best_k)
-    
+
     for k in try_k[1:]:
         total, records = assemble_sequences(r, k)
         if total > best_total:
@@ -84,7 +91,7 @@ for pid in partitions:
     k, total, records = best_assemble_sequences(records)
     print 'best assembly for part %d: k=%d, %d bp' % (pid, k, total)
 
-    for n,r in enumerate(records):
+    for n, r in enumerate(records):
         fp.write('>part%d.%d\n%s\n' % (pid, n, r['sequence']))
 
 fp.close()

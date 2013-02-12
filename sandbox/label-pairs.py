@@ -1,5 +1,7 @@
 #! /usr/bin/env python
-import screed, sys, itertools
+import screed
+import sys
+import itertools
 
 s1_file = sys.argv[1]
 
@@ -10,7 +12,7 @@ for r in screed.open(s1_file):
     name = r.name
     if n % 2 == 0:
         if not name.endswith('/2'):
-           name += '/2'
+            name += '/2'
     elif not name.endswith('/1'):
         name += '/1'
 

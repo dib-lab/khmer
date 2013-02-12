@@ -1,12 +1,14 @@
-import khmer, sys, os
+import khmer
+import sys
+import os
 import gc
 import glob
 
 K = 32
 
-filename=sys.argv[1]
+filename = sys.argv[1]
 basename = os.path.basename(filename)
-subset_filenames=sys.argv[2:]
+subset_filenames = sys.argv[2:]
 
 if not os.path.exists(filename):
     print '%s doesn\'t exist! dying.' % filename
@@ -19,7 +21,7 @@ print '---'
 
 # create a fake-ish ht; K matters, but not hashtable size.
 ht = khmer.new_hashbits(K, 1, 1)
- 
+
 # load & merge
 for subset_file in subset_filenames:
     print '<-', subset_file

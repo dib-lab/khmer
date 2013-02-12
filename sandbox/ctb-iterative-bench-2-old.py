@@ -79,10 +79,10 @@ for n, prime in enumerate(primes):
     x = khmer.filter_fasta_file(ht, this_filename, total_reads, next_filename,
                                 5)
     _, n_seq_kept = x
-        
+
     print '%d: ate %d k-mers of %d reads' % (n, n_consumed, total_reads)
 
-    print '%d: kept %d of %d (%.1f%%)' % (n, n_seq_kept, total_reads, n_seq_kept/float(total_reads)*100)
+    print '%d: kept %d of %d (%.1f%%)' % (n, n_seq_kept, total_reads, n_seq_kept / float(total_reads) * 100)
 
     fp.write('%d %d %d\n' % (n, n_seq_kept, ht.n_occupied()))
     fp.flush()
@@ -90,4 +90,3 @@ for n, prime in enumerate(primes):
     this_filename = next_filename
 
 ###
-

@@ -1,16 +1,18 @@
 # saved for posterity; DO NOT USE.
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE = int(8e9)
 N_HT = 4
 
 ###
 
-RADIUS=2
-MAX_CIRCUM=4                            # 4 seems to eliminate lump in 1m.fa
-MAX_VOLUME=200
+RADIUS = 2
+MAX_CIRCUM = 4                            # 4 seems to eliminate lump in 1m.fa
+MAX_VOLUME = 200
 
 infile = sys.argv[1]
 outprefix = sys.argv[2]
@@ -34,7 +36,7 @@ print 'eating', infile
 ht.consume_fasta(infile)
 
 start = RADIUS
-incr = 2*RADIUS
+incr = 2 * RADIUS
 
 for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
                                                    parse_description=False)):
@@ -43,18 +45,17 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 
     seq = record['sequence']
 
-
     # between [RADIUS:-RADIUS] kmers, calculate circumference every 2*RADIUS
-    end = len(seq) - K + 1 - incr/2
+    end = len(seq) - K + 1 - incr / 2
 
     is_high = False
     circums = []
     for pos in range(end, start, -incr):
-        circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
+        circum = ht.count_kmers_on_radius(seq[pos:pos + K], RADIUS, MAX_VOLUME)
 
         circums.append((circum, pos))
         print >>circfp, circum
-        
+
         if circum >= MAX_CIRCUM:
             is_high = True
 
@@ -76,8 +77,8 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 
         # make sure we're not missing anything in the middle that wasn't
         # trimmed on either side:
-        if max([ circ for (circ,_) in circums ]) < MAX_CIRCUM and \
-               chop_end - chop_start >= 0:
+        if max([ circ for (circ, _) in circums ]) < MAX_CIRCUM and \
+                chop_end - chop_start >= 0:
 
             # do the trimming & rewrite the name
             sequence = record['sequence'][chop_start:chop_end + K]
@@ -93,5 +94,5 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         fp = highfp
     else:
         fp = lowfp
-        
+
     print >>fp, '>%s\n%s' % (record['name'], record['sequence'])

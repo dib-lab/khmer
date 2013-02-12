@@ -1,9 +1,10 @@
 import os
 import argparse
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_MIN_HASHSIZE = 1e6
+
 
 def build_construct_args():
 
@@ -27,6 +28,7 @@ def build_construct_args():
                         help='lower bound on hashsize to use')
 
     return parser
+
 
 def build_counting_multifile_args():
     parser = argparse.ArgumentParser(description=

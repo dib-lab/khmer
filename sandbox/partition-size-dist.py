@@ -2,7 +2,7 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=5000
+MAX_SIZE = 5000
 
 distfp = open(sys.argv[2], 'w')
 count = {}
@@ -24,7 +24,7 @@ for n, record in enumerate(fasta_iter(open(sys.argv[1]), parse_description=False
     partition = int(record['name'].rsplit('\t', 1)[1])
     if partition not in count:
         continue
-    
+
     c = count[partition]
     if partition == 0:
         c = 0

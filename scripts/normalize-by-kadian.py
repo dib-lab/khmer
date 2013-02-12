@@ -8,11 +8,14 @@ DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keepkad'.
 Use '-h' for parameter help.
 """
 
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
-DEFAULT_DESIRED_COVERAGE=5
+DEFAULT_DESIRED_COVERAGE = 5
+
 
 def main():
     parser = build_construct_args()
@@ -34,13 +37,14 @@ def main():
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
+            args.n_hashes * args.min_hashsize)
+        print>>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
-    DESIRED_COVERAGE=args.cutoff
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
+    DESIRED_COVERAGE = args.cutoff
 
     filenames = args.input_filenames
 

@@ -3,7 +3,7 @@ import sys
 import screed
 import os.path
 
-ROTARY_SIZE=100
+ROTARY_SIZE = 100
 
 prefix = os.path.basename(sys.argv[1])
 

@@ -1,23 +1,26 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 31                                  # use K-1 for part/assembly with K
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE = int(4e9)
 N_HT = 4
-MAX_DEGREE=3
+MAX_DEGREE = 3
 
-WORKER_THREADS=8
-GROUPSIZE=100
+WORKER_THREADS = 8
+GROUPSIZE = 100
 
 ###
+
 
 def main():
     repfile = sys.argv[1]
     infile = sys.argv[1]
     if len(sys.argv) >= 3:
         infile = sys.argv[2]
-        
+
     outfile = os.path.basename(infile) + '.low'
     if len(sys.argv) >= 4:
         outprefix = sys.argv[3]

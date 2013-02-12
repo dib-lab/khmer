@@ -7,5 +7,5 @@ for record in screed.open(sys.argv[1]):
     sequence = record['sequence']
 
     name = name.split()[0]
-    
+
     print '>%s\n%s' % (name, sequence,)

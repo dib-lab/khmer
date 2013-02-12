@@ -8,13 +8,16 @@ Parameters to adjust: K, HT_SIZE.  HT_SIZE should be set to about 2x the
 available system memory.
 """
 
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 import argparse
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_MIN_HASHSIZE = 1e6
+
 
 def build_common_args():
 
@@ -39,6 +42,7 @@ def build_common_args():
 
     return parser
 
+
 def parse_args(parser):
     args = parser.parse_args()
 
@@ -51,12 +55,14 @@ def parse_args(parser):
         print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
         print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8 bits/byte)' % (args.n_hashes * args.min_hashsize / 8.)
-        print>>sys.stderr, '-'*8
+        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize / 8 bits/byte)' % (
+            args.n_hashes * args.min_hashsize / 8.)
+        print>>sys.stderr, '-' * 8
 
     return args
 
 ###
+
 
 def main():
     parser = build_common_args()
@@ -65,9 +71,9 @@ def main():
 
     args = parse_args(parser)
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
     base = args.output_filename
     filenames = args.input_filenames
@@ -76,18 +82,18 @@ def main():
     print 'Loading kmers from sequences in %s' % repr(filenames)
 
     ###
-    
+
     print 'making hashtable'
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
 
     for n, filename in enumerate(filenames):
-       print 'consuming input', filename
-       ht.consume_fasta(filename)
+        print 'consuming input', filename
+        ht.consume_fasta(filename)
 
-       if n > 0 and n % 10 == 0:
-           print 'mid-save', base
-           ht.save(base)
-           open(base + '.info', 'w').write('through %s' % filename)
+        if n > 0 and n % 10 == 0:
+            print 'mid-save', base
+            ht.save(base)
+            open(base + '.info', 'w').write('through %s' % filename)
 
     print 'saving', base
     ht.save(base)

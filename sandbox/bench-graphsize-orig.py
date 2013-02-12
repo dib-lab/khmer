@@ -7,8 +7,8 @@ import zlib
 import gzip
 
 K = 14
-HASHTABLE_SIZE=int(1e9)
-THRESHOLD=100
+HASHTABLE_SIZE = int(1e9)
+THRESHOLD = 100
 
 print 'ht size'
 ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 1)
@@ -29,7 +29,7 @@ for filename in sys.argv[1:]:
 
 for filename in sys.argv[1:]:
     outfp = open(filename[:-3] + '.graphsize', 'w')
-    
+
     n_kept = 0
 
     for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):

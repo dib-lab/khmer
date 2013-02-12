@@ -1,5 +1,7 @@
 #! /usr/bin/env python
-import screed, sys, itertools
+import screed
+import sys
+import itertools
 
 s1_file = sys.argv[1]
 s2_file = sys.argv[2]
