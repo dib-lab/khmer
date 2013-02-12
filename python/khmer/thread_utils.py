@@ -146,7 +146,8 @@ class ThreadedSequenceProcessor(object):
                 print >>sys.stderr, "processed %d / wrote %d / removed %d" % \
                     (self.n_processed, self.n_written,
                      self.n_processed - self.n_written)
-                print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
+                print >>sys.stderr, \
+                    "processed %d bp / wrote %d bp / removed %d bp" % \
                     (self.bp_processed, self.bp_written,
                      self.bp_processed - self.bp_written)
                 discarded = self.bp_processed - self.bp_written
@@ -168,12 +169,16 @@ class ThreadedSequenceProcessor(object):
                 outfp.write('>%s\n%s\n' % (name, seq,))
 
         if self.verbose:
-            print >>sys.stderr, "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
+            print >>sys.stderr, \
+                "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
                 (self.n_processed, self.n_written,
                  self.n_processed - self.n_written)
-            print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
+            print >>sys.stderr, \
+                "processed %d bp / wrote %d bp / removed %d bp" % \
                 (self.bp_processed, self.bp_written,
                  self.bp_processed - self.bp_written)
             discarded = self.bp_processed - self.bp_written
             f = float(discarded) / float(self.bp_processed) * 100
             print >>sys.stderr, "discarded %.1f%%" % f
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

@@ -55,7 +55,9 @@ def main():
     total = sum(z)
 
     if 0 == total:
-        print >>sys.stderr, "ERROR: abundance distribution is uniformly zero; nothing to report."
+        print >>sys.stderr, \
+            "ERROR: abundance distribution is uniformly zero; " \
+            "nothing to report."
         print >>sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(-1)
 
@@ -76,3 +78,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
