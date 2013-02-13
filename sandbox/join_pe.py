@@ -57,14 +57,16 @@ def join_pe(i1, i2, count_d):
 filename1, filename2 = sys.argv[1:3]
 
 name_count = {}
-for n, record in enumerate(fasta_iter(open(filename1), parse_description=False)):
+for n, record in enumerate(
+        fasta_iter(open(filename1), parse_description=False)):
     if n % 10000 == 0:
         sys.stderr.write('...%d\n' % n)
 
     name = get_name(record)
     name_count[name] = 1
 
-for n, record in enumerate(fasta_iter(open(filename2), parse_description=False)):
+for n, record in enumerate(
+        fasta_iter(open(filename2), parse_description=False)):
     if n % 10000 == 0:
         sys.stderr.write('...%d, x2\n' % n)
 
@@ -76,3 +78,5 @@ i2 = fasta_iter(open(filename2), parse_description=False)
 
 for record in join_pe(i1, i2, name_count):
     print '>%s\n%s' % (record['name'], record['sequence'])
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

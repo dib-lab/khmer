@@ -22,8 +22,8 @@ import glob
 
 def trimLens(lens, minLen):
     '''
-    Eliminates any reads below a certain threshold.  Function assumes that input
-    list lens is sorted smallest to largest.
+    Eliminates any reads below a certain threshold.
+    Function assumes that input list lens is sorted smallest to largest.
     '''
 
     index = 0
@@ -112,10 +112,13 @@ def main():
             statN50, statN50Len = calcNXX(trimmedLens, 50)
             statN90, statN90Len = calcNXX(trimmedLens, 90)
 
-            print str (filename) + " " + str(statSum) + " " + str(statN) + " " + \
-                str(statTrimmedN) + " " + str(statMin) + " " + str(statMed) + \
-                " " + str(statMean) + " " + str(statMax) + " " + str(statN50) \
-                + " " + str(statN50Len) + " " + str(statN90) + " " + \
-                  str(statN90Len)
+            print str(filename) + " " + str(statSum) + " " + str(statN) + \
+                " " + str(statTrimmedN) + " " + str(statMin) + \
+                " " + str(statMed) + " " + str(statMean) + \
+                " " + str(statMax) + " " + str(statN50) + \
+                " " + str(statN50Len) + " " + str(statN90) + " " + \
+                str(statN90Len)
 
 main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

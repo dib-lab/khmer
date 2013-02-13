@@ -16,7 +16,10 @@ if 0:
                                                           '.15.exact',
                                                           5)
 
-    print 'kept %d of %d (%.1f%%)' % (n_seq_kept, total_reads, n_seq_kept / float(total_reads) * 100)
+    print 'kept %d of %d (%.1f%%)' % (
+        n_seq_kept, total_reads, n_seq_kept / float(total_reads) * 100)
 
 print 'counting!'
 print '%d total k-mers' % (ht_full.n_occupied())
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

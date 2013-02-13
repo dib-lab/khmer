@@ -48,7 +48,8 @@ while filenames or running:
             report_fp.write('\nOutput:\n%s\n---' % out)
             report_fp.write('\nError:\n%s\n---' % err)
 
-            print 'done! %d of ~%d' % (report_number + 1, report_number + len(running) + len(filenames))
+            print 'done! %d of ~%d' % (report_number + 1, report_number +
+                                       len(running) + len(filenames))
             report_number += 1
             running.remove((cmd, p))
         else:
@@ -57,3 +58,5 @@ while filenames or running:
     time.sleep(1)
 
 print '\n** done **\n'
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

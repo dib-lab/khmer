@@ -12,7 +12,8 @@ for m, filename in enumerate(sys.argv[1:]):
 
     for n, record in enumerate(screed.open(filename)):
         if n % 100000 == 0 and n > 0:
-            print '... %d, in %s -- %d of %d files' % (n, filename, m, len(sys.argv) - 1)
+            print '... %d, in %s -- %d of %d files' % \
+                (n, filename, m, len(sys.argv) - 1)
         file_bp += len(record.sequence)
 
     file_seqs = n
@@ -23,3 +24,5 @@ for m, filename in enumerate(sys.argv[1:]):
     total_seqs += file_seqs
 
 print >>fp, '%d %d %s' % (total_seqs, total_bp, 'total')
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

@@ -35,13 +35,16 @@ def assemble_sequences(records, k, length_cutoff=1000):
         fp.close()
 
         p = subprocess.Popen(
-            'python /root/khmer/scripts/strip-and-split-for-assembly.py seqs.fa seqs.fa', shell=True)
+            ['python', '/root/khmer/scripts/strip-and-split-for-assembly.py',
+             'seqs.fa seqs.fa'], shell=True)
         p.communicate()
         assert p.returncode == 0
 
         assemble_dir = os.path.join(dirname, 'assemble')
-        p = subprocess.Popen('velveth %s %d -shortPaired %s.pe -short %s.se' % (
-            assemble_dir, k, seqfile, seqfile), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            'velveth %s %d -shortPaired %s.pe -short %s.se' % (
+            assemble_dir, k, seqfile, seqfile),
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
         assert p.returncode == 0, (stdout, stderr)
 
@@ -95,3 +98,5 @@ for pid in partitions:
         fp.write('>part%d.%d\n%s\n' % (pid, n, r['sequence']))
 
 fp.close()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

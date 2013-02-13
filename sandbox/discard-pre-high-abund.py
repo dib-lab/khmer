@@ -49,16 +49,22 @@ def parse_args(parser):
 
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print>>sys.stderr, "** WARNING: hashsize is default!  You absodefly want to increase this!\n** Please read the docs!"
+            print >>sys.stderr, \
+                "** WARNING: hashsize is default!  ", \
+                "You absodefly want to increase this!\n** " \
+                "Please read the docs!"
 
-        print>>sys.stderr, '\nPARAMETERS:'
-        print>>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (
+        print >>sys.stderr, '\nPARAMETERS:'
+        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
+        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
+        print >>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % \
+            args.min_hashsize
+        print >>sys.stderr, ''
+        print >>sys.stderr, \
+            'Estimated memory usage is %.2g bytes ' \
+            '(n_hashes x min_hashsize)' % (
             args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-' * 8
+        print >>sys.stderr, '-' * 8
 
     return args
 
@@ -96,7 +102,8 @@ def main():
 
         for n, record in enumerate(screed.open(input_filename)):
             if n > 0 and n % 10000 == 0:
-                print '... kept', total - discarded, 'of', total, ', or', int(100. - discarded / float(total) * 100.), '%'
+                print '... kept', total - discarded, 'of', total, ', or', \
+                    int(100. - discarded / float(total) * 100.), '%'
                 print '... in file', input_filename
 
             total += 1
@@ -114,7 +121,8 @@ def main():
             else:
                 discarded += 1
 
-        print 'DONE with', input_filename, '; kept', total - discarded, 'of', total, 'or', int(100. - discarded / float(total) * 100.), '%'
+        print 'DONE with', input_filename, '; kept', total - discarded, 'of', \
+            total, 'or', int(100. - discarded / float(total) * 100.), '%'
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
@@ -123,3 +131,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
