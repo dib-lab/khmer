@@ -120,8 +120,8 @@ def main():
     x = []
     i = 0
     group_n = 0
-    for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
-                                                       parse_description=False)):
+    for n, record in enumerate(
+            screed.fasta.fasta_iter(open(infile), parse_description=False)):
         if n % 10000 == 0:
             print '...', n
 
@@ -145,3 +145,5 @@ def main():
     done = True
 
 main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

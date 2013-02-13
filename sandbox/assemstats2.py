@@ -22,8 +22,8 @@ import glob
 
 def trimLens(lens, minLen):
     '''
-    Eliminates any reads below a certain threshold.  Function assumes that input
-    list lens is sorted smallest to largest.
+    Eliminates any reads below a certain threshold.
+    Function assumes that input list lens is sorted smallest to largest.
     '''
 
     index = 0
@@ -126,3 +126,5 @@ def main():
             print 'N90 Length', str(statN90Len)
 
 main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

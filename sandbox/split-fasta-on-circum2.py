@@ -77,7 +77,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 
         # make sure we're not missing anything in the middle that wasn't
         # trimmed on either side:
-        if max([ circ for (circ, _) in circums ]) < MAX_CIRCUM and \
+        if max([circ for (circ, _) in circums]) < MAX_CIRCUM and \
                 chop_end - chop_start >= 0:
 
             # do the trimming & rewrite the name
@@ -96,3 +96,5 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         fp = lowfp
 
     print >>fp, '>%s\n%s' % (record['name'], record['sequence'])
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

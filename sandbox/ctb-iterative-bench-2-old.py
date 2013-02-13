@@ -82,7 +82,8 @@ for n, prime in enumerate(primes):
 
     print '%d: ate %d k-mers of %d reads' % (n, n_consumed, total_reads)
 
-    print '%d: kept %d of %d (%.1f%%)' % (n, n_seq_kept, total_reads, n_seq_kept / float(total_reads) * 100)
+    print '%d: kept %d of %d (%.1f%%)' % (
+        n, n_seq_kept, total_reads, n_seq_kept / float(total_reads) * 100)
 
     fp.write('%d %d %d\n' % (n, n_seq_kept, ht.n_occupied()))
     fp.flush()
@@ -90,3 +91,5 @@ for n, prime in enumerate(primes):
     this_filename = next_filename
 
 ###
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

@@ -16,3 +16,5 @@ total, count, mean = ht.get_kmer_abund_mean(filename)
 abs_dev = ht.get_kmer_abund_abs_deviation(filename, mean)
 
 print total, count, mean, abs_dev
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

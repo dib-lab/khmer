@@ -19,7 +19,8 @@ for filename in sys.argv[1:]:
     ht.consume_fasta(filename)
 
     if 0:
-        print 'processing file: ' + filename + ' reads processed: ' + str(read_count)
+        print 'processing file: ' + filename + ' reads processed: ' + \
+            str(read_count)
         for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):
             read_count += 1
             ht.consume(record['sequence'])
@@ -41,3 +42,5 @@ for filename in sys.argv[1:]:
 
         if n % 10000 == 0:
             print '...', n, n_kept, n - n_kept + 1
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

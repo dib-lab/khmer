@@ -18,7 +18,8 @@ read_count = 0
 files = sys.argv[1:]
 
 for filename in files:
-    print "processing file: " + filename + " reads processed: " + str(read_count)
+    print "processing file: " + filename + " reads processed: " + \
+        str(read_count)
 
     for n, record in enumerate(screed.fasta.fasta_iter(open(filename))):
         read_count += 1
@@ -29,3 +30,5 @@ for filename in files:
             print str(read_count), str(ht.n_occupied())
 
 print str(read_count), str(ht.n_occupied())
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
