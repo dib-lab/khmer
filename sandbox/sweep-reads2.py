@@ -62,6 +62,9 @@ def main():
     n = 0
     m = 0
     for record in screed.open(readsfile):
+        if len(record.sequence) < K:
+            continue
+
         if n % 10000 == 0:
             print '...', n, m
 
