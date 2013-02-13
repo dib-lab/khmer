@@ -53,13 +53,14 @@ def main():
     args = parser.parse_args()
 
     graphbase = args.graphbase
+
+    print 'loading ht %s.ht' % graphbase
+    ht = khmer.load_hashbits(graphbase + '.ht')
+
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print 'loading stoptags from', args.stoptags
         ht.load_stop_tags(args.stoptags)
-
-    print 'loading ht %s.ht' % graphbase
-    ht = khmer.load_hashbits(graphbase + '.ht')
 
     print 'loading tagset %s.tagset...' % graphbase
     ht.load_tagset(graphbase + '.tagset')
