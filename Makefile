@@ -3,30 +3,46 @@
 WANT_PROFILING=false
 
 # Which profiling tool to use?
-# Assuming you have TAU installed and setup properly, you can instrument codes with it to get detailed multi-threaded profiling.
+# Assuming you have TAU installed and setup properly, 
+# you can instrument codes with it to get detailed multi-threaded profiling.
 # Otherwise, gprof is able to give you some information without threading info.
 # Choose one of: gprof, TAU
 PROFILER_OF_CHOICE=gprof
 
 # Perform extra sanity checking?
-# Set this variable to true if you wish the codes to perform extra sanity checking (to the possible detriment of performance).
+# Set this variable to true 
+# if you wish the codes to perform extra sanity checking 
+# (to the possible detriment of performance).
 WANT_EXTRA_SANITY_CHECKING=false
 
 # Compile with debugging symbols?
-# Set this variable to true if you wish the codes to be built with debugging symbols (increases code size and does not always produce accurate stepping in a debugger when optimization is turned on).
+# Set this variable to true 
+# if you wish the codes to be built with debugging symbols 
+# (increases code size and does not always produce accurate stepping in a debugger 
+# when optimization is turned on).
 WANT_DEBUGGING=false
 
 # Compile with tracing logic turned on?
-# Set this variable to true if you want to use instrumentation provided in the sources for debugging purposes and are willing to accept the overhead such instrumentation introduces.
+# Set this variable to true if you want to use instrumentation provided 
+# in the sources for debugging purposes 
+# and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_TRACING=false
 
 # Compile with performance metrics turned on?
-# Set this variable to true if you want to use instrumentation provided in the sources for performance measurement purposes and are willing to accept the overhead such instrumentation introduces.
+# Set this variable to true if you want to use instrumentation provided 
+# in the sources for performance measurement purposes 
+# and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_METRICS=false
 
 # Use Cython?
-# Set this variable to true if you wish to build the Python wrapper with Cython rather than the directly using the Python C API.
+# Set this variable to true if you wish to build the Python wrapper 
+# with Cython rather than the directly using the Python C API.
+# (Do not set this to true if you do not have Cython installed.)
 USE_CYTHON=false
+
+
+### NOTE: No user-servicable parts below this line! ###
+
 
 CXXFLAGS=
 CXX_WARNING_FLAGS=-Wall
