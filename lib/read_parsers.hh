@@ -7,6 +7,11 @@
 
 #include <string>
 
+extern "C"
+{
+#include <regex.h>
+}
+
 #include "zlib/zlib.h"
 #include "bzip2/bzlib.h"
 
@@ -369,6 +374,8 @@ protected:
 	uint8_t			    buffer[ BUFFER_SIZE + 1 ];
 	uint64_t		    buffer_pos;
 	uint64_t		    buffer_rem;
+
+	regex_t			    re_read_2;
 
 	ParserPerformanceMetrics    pmetrics;
 	TraceLogger		    trace_logger;

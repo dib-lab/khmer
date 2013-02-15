@@ -1206,12 +1206,19 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
 	    trace_level, "parser-%lu.log", (unsigned long int)thread_id
 	)
     )
-{ memset( buffer, 0, BUFFER_SIZE + 1 ); }
+{
+    memset( buffer, 0, BUFFER_SIZE + 1 );
+    regcomp(
+	&re_read_2,
+	".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
+	REG_EXTENDED | REG_NOSUB
+    );
+}
 
 
 IParser:: ParserState::
 ~ParserState( )
-{ }
+{ regfree( &re_read_2 ); }
 
 
 inline
@@ -1496,7 +1503,10 @@ get_next_read( )
 	// when at the beginning of a new fill.
 	skip_read =
 		at_start && (0 != fill_id)
-	    &&	((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
+//	    &&	((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
+	    &&	!regexec(
+		    &state.re_read_2, the_read.name.c_str( ), 0, NULL, 0
+		);
 	if (skip_read)
 	{
 	    trace_logger(
