@@ -32,6 +32,9 @@ struct InvalidStreamHandle : public std:: exception
 struct StreamReadError : public std:: exception
 { };
 
+struct NoMoreReadsAvailable : public std:: exception
+{ };
+
 
 namespace read_parsers
 {
