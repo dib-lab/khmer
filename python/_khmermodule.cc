@@ -437,6 +437,8 @@ typedef struct
 
 static void	    khmer_read_parser_dealloc( PyObject * );
 static PyObject *   khmer_read_parser_getattr( PyObject * obj, char * name );
+static PyObject *   khmer_read_parser_iter( PyObject * self );
+static PyObject *   khmer_read_parser_iternext( PyObject * self );
 
 static PyTypeObject khmer_ReadParserType =
 {
@@ -461,7 +463,13 @@ static PyTypeObject khmer_ReadParserType =
     0,				/*tp_setattro*/
     0,				/*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "read parser object",	/* tp_doc */
+    "read parser object",	/*tp_doc*/
+    0,				/*tp_traverse*/
+    0,				/*tp_clear*/
+    0,				/*tp_richcompare*/
+    0,				/*tp_weaklistoffset*/
+    khmer_read_parser_iter,	/*tp_iter*/
+    khmer_read_parser_iternext,	/*tp_iternext*/
 };
 
 
@@ -517,6 +525,60 @@ khmer_read_parser_dealloc( PyObject * self )
 
 static
 PyObject *
+khmer_read_parser_iter( PyObject * self )
+{
+  Py_INCREF( self );
+  return self;
+}
+
+
+static
+PyObject *
+khmer_read_parser_iternext( PyObject * self )
+{
+  khmer_ReadParserObject *	    myself  = (khmer_ReadParserObject *) self;
+  khmer:: read_parsers:: IParser *  parser  = myself->parser;
+
+  bool				    stop_iteration	= false;
+  bool				    invalid_file_format	= false;
+  khmer:: read_parsers:: Read *	    the_read		= 
+  new khmer:: read_parsers:: Read( );
+
+  Py_BEGIN_ALLOW_THREADS
+  stop_iteration = parser->is_complete( );
+  if (!stop_iteration)
+    try
+    {
+      // TODO: Assign a pointer rather than copy by value.
+      *the_read = parser->get_next_read( );
+    }
+    catch (khmer:: read_parsers:: InvalidFASTAFileFormat &exc)
+    {
+      invalid_file_format = true;
+    }
+  Py_END_ALLOW_THREADS
+
+  // Note: Can simply return NULL instead of setting the StopIteration 
+  //	   exception.
+  if (stop_iteration)
+    return NULL;
+
+  if (invalid_file_format)
+  {
+    PyErr_SetString( PyExc_ValueError, "invalid FASTA file" );
+    return NULL;
+  }
+
+  khmer_ReadObject *		    the_read_PYTHON = 
+  (khmer_ReadObject *)PyObject_New( khmer_ReadObject, &khmer_ReadType );
+  the_read_PYTHON->read = the_read;
+  return (PyObject *)the_read_PYTHON;
+}
+
+
+#if (0)
+static
+PyObject *
 khmer_read_parser_is_complete( PyObject * self, PyObject * dummy )
 {
   khmer_ReadParserObject *	    me	    = (khmer_ReadParserObject *) self;
@@ -534,6 +596,7 @@ khmer_read_parser_is_complete( PyObject * self, PyObject * dummy )
 }
 
 
+// TODO: Consider merging this with 'khmer_read_parser_iternext'.
 static
 PyObject *
 khmer_read_parser_get_next_read( PyObject * self, PyObject * dummy )
@@ -569,14 +632,17 @@ khmer_read_parser_get_next_read( PyObject * self, PyObject * dummy )
 
   return (PyObject *)read_OBJECT;
 }
+#endif // 0
 
 
 static PyMethodDef khmer_read_parser_methods[ ] =
 {
+#if 0
   { "is_complete",    khmer_read_parser_is_complete,
       METH_NOARGS, "No more reads to parse?" },
   { "get_next_read",  khmer_read_parser_get_next_read,
       METH_NOARGS, "Fetch next read from stream." },
+#endif // 0
   { NULL,	      NULL,
       0,	      NULL }  /* sentinel */
 };
