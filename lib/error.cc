@@ -10,10 +10,11 @@ void error( int status, int errnum, char const * format, ... )
 
     fflush( stdout );
     if (errnum)
-        fprintf( stderr, "%s: ", strerror( errnum ) );
+        fprintf( stderr, "\n%s: ", strerror( errnum ) );
     va_start( posargs, format );
     vfprintf( stderr, format, posargs );
     va_end( posargs );
+    fprintf( stderr, "\n" );
     fflush( stderr );
     exit( status );
 }
