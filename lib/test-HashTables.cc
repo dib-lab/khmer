@@ -7,7 +7,6 @@
 #include <cerrno>
 #include <cstdlib>
 #include <unistd.h>
-#include <error.h>
 #include <getopt.h>
 
 #include <omp.h>
@@ -17,6 +16,8 @@
 
 // #define OUTPUT_HASHTABLE
 
+
+#include "error.hh"
 #include "read_parsers.hh"
 #if HASH_TYPE_TO_TEST == 1
 #  include "counting.hh"

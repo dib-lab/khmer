@@ -20,11 +20,11 @@ extern "C"
 #include <cstdio>
 #include <cerrno>
 #include <cstdlib>
-#include <error.h>
 
 #include <string>
 
 #include "khmer.hh"
+#include "error.hh"
 #include "counting.hh"
 
 using namespace std;

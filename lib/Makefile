@@ -24,7 +24,7 @@ DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser te
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=ht-diff
 
-CORE_OBJS= khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
+CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
 PARSERS_OBJS= read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test
@@ -78,6 +78,8 @@ $(ZLIB_OBJS):
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
+
+error.o: error.cc error.hh
 
 khmer_config.o: khmer_config.cc khmer_config.hh
 
