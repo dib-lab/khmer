@@ -442,7 +442,8 @@ CacheManager(
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _segment_ref_count( 0 ),
     _segment_to_fill( 0 ),
-    _fill_counter( 0 )
+    _fill_counter( 0 ),
+    _ca_spin_lock( 0 )
 {
 
     if (cache_size < number_of_threads)	throw InvalidCacheSizeRequested( );
@@ -692,12 +693,19 @@ split_at( uint64_t const pos )
 	)
     {
 	if (0 == i % 100000000)
+	{
 	    segment.trace_logger(
 		TraceLogger:: TLVL_DEBUG3,
 		"Waited to acquire copyaside buffers spinlock " \
-		"for %llu iterations.\n",
+		"for %llu iterations. [write buffer]\n",
 		(unsigned long long int)i
 	    );
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG4,
+		"\tSpinlock is probably %s.\n",
+		_ca_spin_lock ? "set" : "unset"
+	    );
+	}
     }
     // Create and register copyaside buffer,
     // keyed to segment's current fill ID.
@@ -797,12 +805,19 @@ _perform_segment_maintenance( CacheSegment &segment )
 		    )
 		{
 		    if (0 == i % 100000000)
+		    {
 			segment.trace_logger(
 			    TraceLogger:: TLVL_DEBUG3,
 			    "Waited to acquire copyaside buffers spinlock " \
-			    "for %llu iterations.\n",
+			    "for %llu iterations. [read buffer]\n",
 			    (unsigned long long int)i
 			);
+			segment.trace_logger(
+			    TraceLogger:: TLVL_DEBUG4,
+			    "\tSpinlock is probably %s.\n",
+			    _ca_spin_lock ? "set" : "unset"
+			);
+		    }
 		}
 
 		// Test for existence of copyaside buffer from next fill.
