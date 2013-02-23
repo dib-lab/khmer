@@ -74,9 +74,6 @@ def test_with_multiple_threads( ):
     config.set_reads_input_buffer_size( N_THREADS * 64 * 1024 )
     threads = [ ]
     reads_counts_per_thread = [ 0 ] * N_THREADS
-    # Note: This file, when used in conjunction with a 64 KiB per-thread
-    #       prefetch buffer, also tests the paired read mating logic with the
-    #       Casava >= 1.8 read name format.
     rparser = ReadParser( utils.get_test_data( "test-reads.fq.bz2" ), N_THREADS )
     for tnum in xrange( N_THREADS ):
         t = \
@@ -91,6 +88,70 @@ def test_with_multiple_threads( ):
     config.set_reads_input_buffer_size( bufsz )
 
     assert reads_count_1thr == sum( reads_counts_per_thread )
+
+
+def test_old_illumina_pair_mating( ):
+    
+    import threading
+
+    config = khmer.get_config( )
+    bufsz = config.get_reads_input_buffer_size( )
+    config.set_reads_input_buffer_size( 65600 * 2 )
+    # Note: This file, when used in conjunction with a 65600 byte per-thread
+    #       prefetch buffer, tests the paired read mating logic with the
+    #       old Illumina read name format.
+    rparser = ReadParser( utils.get_test_data( "test-reads.fa" ), 2 )
+
+    def thread_1_runtime( rparser ):
+        for read in rparser: pass
+
+    def thread_2_runtime( rparser ):
+        for readnum, read in enumerate( rparser ):
+            if 0 == readnum:
+                assert "850:2:1:1198:16820/1" == read.name
+
+    t1 = threading.Thread( target = thread_1_runtime, args = [ rparser ] )
+    t2 = threading.Thread( target = thread_2_runtime, args = [ rparser ] )
+
+    t1.start( )
+    t2.start( )
+
+    t1.join( )
+    t2.join( )
+
+    config.set_reads_input_buffer_size( bufsz )
+
+
+def test_casava_1_8_pair_mating( ):
+    
+    import threading
+
+    config = khmer.get_config( )
+    bufsz = config.get_reads_input_buffer_size( )
+    config.set_reads_input_buffer_size( 128 * 1024 )
+    # Note: This file, when used in conjunction with a 64 KiB per-thread
+    #       prefetch buffer, tests the paired read mating logic with the
+    #       Casava >= 1.8 read name format.
+    rparser = ReadParser( utils.get_test_data( "test-reads.fq.bz2" ), 2 )
+
+    def thread_1_runtime( rparser ):
+        for read in rparser: pass
+
+    def thread_2_runtime( rparser ):
+        for readnum, read in enumerate( rparser ):
+            if 0 == readnum:
+                assert "895:1:1:1761:13189 2:N:0:NNNNN" == read.name
+
+    t1 = threading.Thread( target = thread_1_runtime, args = [ rparser ] )
+    t2 = threading.Thread( target = thread_2_runtime, args = [ rparser ] )
+
+    t1.start( )
+    t2.start( )
+
+    t1.join( )
+    t2.join( )
+
+    config.set_reads_input_buffer_size( bufsz )
 
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
