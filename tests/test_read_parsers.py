@@ -6,6 +6,23 @@ from khmer import ReadParser
 import khmer_tst_utils as utils
 
 
+# TODO: Test with a FASTQ read instead of a FASTA read.
+def test_read_properties( ):
+    
+    # Note: Using a data file with only one read.
+    rparser = ReadParser( utils.get_test_data( "test-abund-read.fa" ) )
+
+    # Check the properties of all one reads in data set.
+    for read in rparser:
+        assert read.name == "895:1:37:17593:9954/1"
+        assert  \
+                read.sequence \
+            ==  "GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGCAGCTGTCGTCA" \
+                "GGGGATTTCCGGGGCGGAGGCCGCAGACGCGAGTGGTGGAGGGAGAAGGCCTGACG"
+        assert read.annotations == ""
+        assert read.accuracy == ""
+
+
 def test_with_default_arguments( ):
     
     read_names = [ ]
