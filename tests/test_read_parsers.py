@@ -36,13 +36,33 @@ def test_with_default_arguments( ):
         assert m == n
 
 
+def test_gzip_decompression( ):
+    
+    reads_count = 0
+    rparser = ReadParser( utils.get_test_data( "100-reads.fq.gz" ) )
+    for read in rparser:
+        reads_count += 1
+
+    assert 100 == reads_count
+
+
+def test_bzip2_decompression( ):
+    
+    reads_count = 0
+    rparser = ReadParser( utils.get_test_data( "100-reads.fq.bz2" ) )
+    for read in rparser:
+        reads_count += 1
+
+    assert 100 == reads_count
+
+
 def test_with_multiple_threads( ):
     
     import operator
     import threading
 
     reads_count_1thr = 0
-    rparser = ReadParser( utils.get_test_data( "test-reads.fa" ) )
+    rparser = ReadParser( utils.get_test_data( "test-reads.fq.bz2" ) )
     for read in rparser: reads_count_1thr += 1
 
     def count_reads( rparser, counters, tnum ):
@@ -54,7 +74,10 @@ def test_with_multiple_threads( ):
     config.set_reads_input_buffer_size( N_THREADS * 64 * 1024 )
     threads = [ ]
     reads_counts_per_thread = [ 0 ] * N_THREADS
-    rparser = ReadParser( utils.get_test_data( "test-reads.fa" ), N_THREADS )
+    # Note: This file, when used in conjunction with a 64 KiB per-thread
+    #       prefetch buffer, also tests the paired read mating logic with the
+    #       Casava >= 1.8 read name format.
+    rparser = ReadParser( utils.get_test_data( "test-reads.fq.bz2" ), N_THREADS )
     for tnum in xrange( N_THREADS ):
         t = \
         threading.Thread(
@@ -68,9 +91,6 @@ def test_with_multiple_threads( ):
     config.set_reads_input_buffer_size( bufsz )
 
     assert reads_count_1thr == sum( reads_counts_per_thread )
-
-
-# TODO: Write more tests.
 
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
