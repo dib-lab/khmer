@@ -4,8 +4,9 @@
 
 #include <algorithm>
 
-using namespace khmer;
 using namespace std;
+using namespace khmer;
+using namespace khmer:: read_parsers;
 
 
 HashTablePerformanceMetrics::
@@ -141,8 +142,6 @@ consume_fasta(
   CallbackFn	      callback,	    void *		callback_data
 )
 {
-  using namespace khmer:: read_parsers;
-
   khmer:: Config    &the_config	  = khmer:: get_active_config( );
 
   // Note: Always assume only 1 thread if invoked this way.
@@ -171,8 +170,6 @@ consume_fasta(
   CallbackFn	      callback,	    void *		callback_data
 )
 {
-  using namespace khmer:: read_parsers;
-
   Hasher		  &hasher		= _get_hasher( );
   unsigned int		  total_reads_LOCAL	= 0;
   unsigned long long int  n_consumed_LOCAL	= 0;
