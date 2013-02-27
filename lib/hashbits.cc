@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace khmer;
+using namespace khmer:: read_parsers;
 
 void Hashbits::save(std::string outfilename)
 {
@@ -300,8 +301,6 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 				      CallbackFn callback,
 				      void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
 
@@ -414,8 +413,6 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 						   CallbackFn callback,
 						   void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
 
@@ -568,8 +565,6 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 					  CallbackFn callback,
 					  void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
 
@@ -628,8 +623,6 @@ void Hashbits::filter_if_present(const std::string infilename,
 				 CallbackFn callback,
 				 void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   IParser* parser = IParser::get_parser(infilename);
   ofstream outfile(outputfile.c_str());
 
@@ -1433,8 +1426,6 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 				      CountingHash &counting,
 				      unsigned int cutoff)
 {
-  using namespace khmer:: read_parsers;
-
   Read read;
   IParser* parser = IParser::get_parser(filename);
   string name;
@@ -1584,8 +1575,6 @@ void Hashbits::traverse_from_reads(std::string filename,
 				   unsigned int transfer_threshold,
 				   CountingHash &counting)
 {
-  using namespace khmer:: read_parsers;
-
   unsigned long long total_reads = 0;
   unsigned long long total_stop = 0;
 
@@ -1642,8 +1631,6 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
 					  unsigned int transfer_threshold,
 					  CountingHash &counting)
 {
-  using namespace khmer:: read_parsers;
-
   unsigned long long total_reads = 0;
 
   IParser* parser = IParser::get_parser(filename.c_str());
@@ -1851,8 +1838,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 			      CallbackFn callback,
 			      void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
   Read read;
