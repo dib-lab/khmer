@@ -75,7 +75,6 @@ def main():
                 )
             threads.append(t)
             t.start()
-            # ht.consume_fasta(filename)
 
         for t in threads:
             t.join()
