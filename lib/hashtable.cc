@@ -164,10 +164,10 @@ consume_fasta(
 void
 Hashtable::
 consume_fasta(
-  read_parsers:: IParser *	      parser,
-  unsigned int	      &total_reads, unsigned long long  &n_consumed,
-  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
-  CallbackFn	      callback,	    void *		callback_data
+  read_parsers:: IParser *  parser,
+  unsigned int		    &total_reads, unsigned long long  &n_consumed,
+  HashIntoType		    lower_bound,  HashIntoType	      upper_bound,
+  CallbackFn		    callback,	  void *	      callback_data
 )
 {
   Hasher		  &hasher		= _get_hasher( );
@@ -179,13 +179,13 @@ consume_fasta(
     TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
   );
 
-  // Iterate through the reads and consume their kmers.
+  // Iterate through the reads and consume their k-mers.
   while (!parser->is_complete( ))
   {
     unsigned int  this_n_consumed;
     bool	  is_valid;
 
-    read      = parser->get_next_read();
+    read = parser->get_next_read( );
 
     this_n_consumed = 
     check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
