@@ -141,11 +141,25 @@ namespace khmer {
 
     void clear_tags() { all_tags.clear(); }
 
-    void consume_fasta_and_tag(const std::string &filename,
-			       unsigned int &total_reads,
-			       unsigned long long &n_consumed,
-			       CallbackFn callback = 0,
-			       void * callback_data = 0);
+    // Count every k-mer in a FASTA or FASTQ file.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+      std::string const	  &filename,
+      unsigned int	  &total_reads,
+      unsigned long long  &n_consumed,
+      CallbackFn	  callback	  = NULL,
+      void *		  callback_data	  = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads, 
+    // using the supplied parser.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
 
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,

@@ -295,40 +295,90 @@ const
 //     so often.
 //
 
-void Hashbits::consume_fasta_and_tag(const std::string &filename,
-				      unsigned int &total_reads,
-				      unsigned long long &n_consumed,
-				      CallbackFn callback,
-				      void * callback_data)
+// TODO? Inline in header.
+void
+Hashbits::
+consume_fasta_and_tag(
+  std:: string const  &filename,
+  unsigned int	      &total_reads, unsigned long long	&n_consumed,
+  CallbackFn	      callback,	    void *		callback_data
+)
 {
+  khmer:: Config    &the_config	  = khmer:: get_active_config( );
+
+  // Note: Always assume only 1 thread if invoked this way.
+  IParser *	  parser = 
+  IParser::get_parser(
+    filename, 1, the_config.get_reads_input_buffer_size( ),
+    the_config.get_reads_parser_trace_level( )
+  );
+
+
+  consume_fasta_and_tag(
+    parser,
+    total_reads, n_consumed,
+    callback, callback_data
+  );
+
+  delete parser;
+}
+
+void
+Hashbits::
+consume_fasta_and_tag(
+  read_parsers:: IParser *  parser,
+  unsigned int		    &total_reads,   unsigned long long	&n_consumed,
+  CallbackFn		    callback,	    void *		callback_data
+)
+{
+  Hasher		  &hasher		= _get_hasher( );
+  unsigned int		  total_reads_LOCAL	= 0;
+  unsigned long long int  n_consumed_LOCAL	= 0;
+  Read			  read;
+
+  // TODO? Delete the following assignments.
   total_reads = 0;
   n_consumed = 0;
+  
+  hasher.trace_logger(
+    TraceLogger:: TLVL_DEBUG2,
+    "Starting trace of 'consume_fasta_and_tag'....\n"
+  );
 
-  unsigned int total_reads_TL = 0;
+  // Iterate through the reads and consume their k-mers.
+  while (!parser->is_complete( ))
+  {
+    unsigned long long this_n_consumed   = 0;
 
-  IParser *		    parser  = IParser::get_parser(filename.c_str());
-  Read read;
+    read = parser->get_next_read( );
 
-  string seq = "";
+    if (check_and_normalize_read( read.sequence ))
+    {
+      consume_sequence_and_tag( read.sequence, this_n_consumed );
 
-  //
-  // iterate through the FASTA file & consume the reads.
-  //
+#ifdef WITH_INTERNAL_METRICS
+      hasher.pmetrics.start_timers( );
+#endif
+      n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+      total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+#ifdef WITH_INTERNAL_METRICS
+      hasher.pmetrics.stop_timers( );
+      hasher.pmetrics.accumulate_timer_deltas(
+	(uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
+      );
+#endif
+    }
 
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    seq = read.sequence;
+    if (0 == (total_reads_LOCAL % 10000))
+      hasher.trace_logger(
+	TraceLogger:: TLVL_DEBUG3,
+	"Total number of reads processed: %llu\n",
+	(unsigned long long int)total_reads_LOCAL
+      );
 
-    // n_consumed += this_n_consumed;
-
-      if (check_and_normalize_read(seq)) {	// process?
-	// TODO? Place spinlock here.
-	consume_sequence_and_tag(seq, n_consumed);
-      }
-
-      // reset the sequence info, increment read number
-      total_reads_TL = __sync_add_and_fetch( &total_reads, 1 );
-
+    // TODO: Figure out alternative to callback into Python VM
+    //       Cannot use in multi-threaded operation.
+#if (0)
       // run callback, if specified
       if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
 	std::cout << "n tags: " << all_tags.size() << "\n";
@@ -340,10 +390,9 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  throw;
 	}
       }
+#endif // 0
 
   } // while reads left for parser
-
-  delete parser;
 
 }
 
