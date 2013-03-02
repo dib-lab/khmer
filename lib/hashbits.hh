@@ -50,6 +50,8 @@ namespace khmer {
       }
     }
 
+    uint32_t _all_tags_spin_lock;
+
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
@@ -60,14 +62,17 @@ namespace khmer {
       if (partition) { partition->_validate_pmap(); }
     }
 
-    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      khmer::Hashtable(ksize), _tablesizes(tablesizes) {
+    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
+    : khmer::Hashtable(ksize),
+      _tablesizes(tablesizes),
+      _all_tags_spin_lock( 0 )
+    {
       _tag_density = DEFAULT_TAG_DENSITY;
       assert(_tag_density % 2 == 0);
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
       _n_unique_kmers = 0;
-	  _n_overlap_kmers = 0;
+      _n_overlap_kmers = 0;
 
       _allocate_counters();
     }

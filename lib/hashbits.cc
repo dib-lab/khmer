@@ -414,33 +414,40 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     // and report on whether or not they had already been set.
     // This is probably better than first testing and then setting the bits, 
     // as a failed test essentially results in doing the same amount of work 
-    // twice. This way is also easier to add thread safety at an atomic level.
-#if (1)
+    // twice.
     if ((is_new_kmer = test_and_set_bits( kmer )))
-      __sync_add_and_fetch( &n_consumed, 1 );
-#else
-    is_new_kmer = (bool) !get_count(kmer);
-    if (is_new_kmer) {
-      count(kmer);
-      n_consumed++;
-    }
-#endif
+      ++n_consumed;
 
-    // TODO? Place spinlock here.
+    // Note: We assume that each set of 'found_tags' is thread-local.
+    //	     Therefore, access protection is only needed for 'all_tags'.
+    // Acquire spinlock for 'all_tags'.
+    for (   uint64_t i = 0;
+	    !__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 );
+	    ++i
+	)
     {
-      if (!is_new_kmer && set_contains(all_tags, kmer)) {
-	since = 1;
-	if (found_tags) { found_tags->insert(kmer); }
-      } else {
-	since++;
+      if (0 == i % 100000000)
+      {
+	// TODO? Add logging.
       }
+    } // try to acquire spinlock
 
-      if (since >= _tag_density) {
-	all_tags.insert(kmer);
-	if (found_tags) { found_tags->insert(kmer); }
-	since = 1;
-      }
-    } // critical section
+    if (!is_new_kmer && set_contains(all_tags, kmer)) {
+      since = 1;
+      if (found_tags) { found_tags->insert(kmer); }
+    } else {
+      since++;
+    }
+
+    if (since >= _tag_density) {
+      all_tags.insert(kmer);
+      if (found_tags) { found_tags->insert(kmer); }
+      since = 1;
+    }
+
+    // Release spinlock for 'all_tags'.
+    __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
+
   } // iteration over kmers
 
   // TODO? Place spinlock here.
