@@ -81,7 +81,7 @@ public:
                             const std::string&, int);
 
    Aligner(khmer::CountingHash* _ch, 
-           double lOne=0, double lTwo=0, int maxErrorReg=-1) {
+           double lOne=0.0, double lTwo=0.0, int maxErrorReg=-1) {
       ch = _ch;
       sm = new ScoringMatrix();
       k = ch->ksize();
@@ -98,6 +98,7 @@ public:
       delete sm;
    }
 
+   void printErrorFootprint(const std::string& read);
    CandidateAlignment alignRead(const std::string&);
 };
 

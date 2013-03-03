@@ -200,6 +200,24 @@ CandidateAlignment Aligner::align(khmer::CountingHash * ch,
    return CandidateAlignment(readDels, align);
 }
 
+void Aligner::printErrorFootprint(const std::string& read) {
+   unsigned int k = ch->ksize();
+
+   for (unsigned int i = 0; i < read.length() - k + 1; i++) {
+      std::string kmer = read.substr(i, k);
+
+      assert(kmer.length() == k);
+
+      int kCov = ch->get_count(kmer.c_str());
+
+      bool isCorrect = isCorrectKmer(kCov, lambdaOne, lambdaTwo);
+
+      std::cout << isCorrect;
+   }
+
+   std::cout << std::endl;
+}
+
 CandidateAlignment Aligner::alignRead(const std::string& read) {
    std::vector<unsigned int> markers;
    bool toggleError = 1;
@@ -246,6 +264,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
 
    // couldn't find a seed k-mer
    if (markers.size() == 0) {
+      //std::cout << "Couldn't find a seed k-mer." << std::endl;
       return best;
    }
 

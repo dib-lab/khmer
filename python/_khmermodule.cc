@@ -3253,8 +3253,33 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
                               readAlignment);
 }
 
+static PyObject * readaligner_printErrorFootprint(PyObject * self, 
+                                                PyObject * args)
+{
+  khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
+  Aligner * aligner = me->aligner;
+
+  char * read;
+
+  if (!PyArg_ParseTuple(args, "s", &read)) {
+    return NULL;
+  }
+
+  if (strlen(read) < (unsigned int)aligner->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+                    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  aligner->printErrorFootprint(read);
+  
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef khmer_ReadAligner_methods[] = {
   {"align", readaligner_align, METH_VARARGS, ""},
+  {"printErrorFootprint", readaligner_printErrorFootprint, METH_VARARGS, ""},
   {NULL, NULL, 0, NULL}
 };
 
@@ -3346,15 +3371,17 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == -1)
+  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == -1) { 
     readaligner_obj->aligner = new Aligner(ch->counting);
-  else if (maxErrorRegion == -1 && !(lambdaOne == 0.0 && lambdaTwo == 0.0))
+  } else if (maxErrorRegion == -1 && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
     readaligner_obj->aligner = new Aligner(ch->counting, 
                                            lambdaOne, lambdaTwo);
-  else
+  } else {
     readaligner_obj->aligner = new Aligner(ch->counting, 
                                            lambdaOne, lambdaTwo, 
                                            maxErrorRegion);
+
+  }
 
   return (PyObject *) readaligner_obj; 
 }
