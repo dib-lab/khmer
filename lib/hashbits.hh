@@ -443,6 +443,14 @@ namespace khmer {
   };
 };
 
+
+#define ACQUIRE_ALL_TAGS_SPIN_LOCK \
+  while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));
+
+#define RELEASE_ALL_TAGS_SPIN_LOCK \
+  __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
+
+
 #include "counting.hh"
 
 #endif // HASHBITS_HH
