@@ -1324,18 +1324,19 @@ static PyObject * hash_consume_fasta_with_reads_parser(
   khmer:: read_parsers::IParser * rparser = my_rparser->parser;
 
   // call the C++ function, and trap signals => Python
-  unsigned long long  n_consumed    = 0;
-  unsigned int	      total_reads   = 0;
+  unsigned long long  n_consumed  = 0;
+  unsigned int	      total_reads = 0;
+  bool		      exc_raised  = false;
+  Py_BEGIN_ALLOW_THREADS
   try {
-    // TODO: Extend thread toggle into exception handler.
-    Py_BEGIN_ALLOW_THREADS
     counting->consume_fasta(rparser, total_reads, n_consumed,
 			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
-    Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
-    return NULL;
+    exc_raised = true;
   }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
 
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
