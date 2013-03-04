@@ -401,6 +401,7 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
 					SeenSet * found_tags)
 {
   bool is_new_kmer;
+  bool kmer_tagged;
 
   KMerIterator kmers(seq.c_str(), _ksize);
   HashIntoType kmer;
@@ -418,41 +419,43 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     if ((is_new_kmer = test_and_set_bits( kmer )))
       ++n_consumed;
 
-    // Note: We assume that each set of 'found_tags' is thread-local.
-    //	     Therefore, access protection is only needed for 'all_tags'.
-    // Acquire spinlock for 'all_tags'.
-    for (   uint64_t i = 0;
-	    !__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 );
-	    ++i
-	)
+#if (1)
+    if (is_new_kmer) ++since;
+    else
     {
-      if (0 == i % 100000000)
+      ACQUIRE_ALL_TAGS_SPIN_LOCK
+      kmer_tagged = set_contains(all_tags, kmer);
+      RELEASE_ALL_TAGS_SPIN_LOCK
+      if (kmer_tagged)
       {
-	// TODO? Add logging.
+	since = 1;
+	if (found_tags) { found_tags->insert(kmer); }
       }
-    } // try to acquire spinlock
-
+      else ++since;
+    }
+#else
     if (!is_new_kmer && set_contains(all_tags, kmer)) {
       since = 1;
       if (found_tags) { found_tags->insert(kmer); }
     } else {
       since++;
     }
+#endif
 
     if (since >= _tag_density) {
+      ACQUIRE_ALL_TAGS_SPIN_LOCK
       all_tags.insert(kmer);
+      RELEASE_ALL_TAGS_SPIN_LOCK
       if (found_tags) { found_tags->insert(kmer); }
       since = 1;
     }
 
-    // Release spinlock for 'all_tags'.
-    __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
-
   } // iteration over kmers
 
-  // TODO? Place spinlock here.
   if (since >= _tag_density/2 - 1) {
+    ACQUIRE_ALL_TAGS_SPIN_LOCK
     all_tags.insert(kmer);	// insert the last k-mer, too.
+    RELEASE_ALL_TAGS_SPIN_LOCK
     if (found_tags) { found_tags->insert(kmer); }
   }
 }
