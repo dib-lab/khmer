@@ -1263,7 +1263,7 @@ static PyObject * hash_consume_fasta_with_reads_parser(
       return NULL;
   }
 
-  khmer:: read_parsers::IParser * rparser = 
+  khmer:: read_parsers:: IParser * rparser = 
   _PyObject_to_khmer_read_parser( rparser_obj );
 
   // call the C++ function, and trap signals => Python
@@ -1741,7 +1741,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
-    METH_VARARGS, "Count all k-mers in a given file" },
+    METH_VARARGS, "Count all k-mers using a given reads parser" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
@@ -2526,13 +2526,25 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
   if (!PyArg_ParseTuple( args, "O|O", &rparser_obj, &callback_obj ))
     return NULL;
 
-  // TODO: Add type-checking.
-  khmer_ReadParserObject * my_rparser	    = 
-  (khmer_ReadParserObject *)rparser_obj;
-  khmer:: read_parsers:: IParser * rparser  = my_rparser->parser;
+  khmer:: read_parsers:: IParser * rparser =
+  _PyObject_to_khmer_read_parser( rparser_obj );
 
-  // TODO: Finish implementing.
+  // call the C++ function, and trap signals => Python
+  unsigned long long  n_consumed  = 0;
+  unsigned int	      total_reads = 0;
+  bool		      exc_raised  = false;
+  Py_BEGIN_ALLOW_THREADS
+  try {
+    hashbits->consume_fasta_and_tag(
+      rparser, total_reads, n_consumed, _report_fn, callback_obj
+    );
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
 
+  return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
 static PyObject * hashbits_consume_fasta_and_tag_with_stoptags(PyObject * self, PyObject * args)
@@ -3485,6 +3497,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag_with_reads_parser, 
+    METH_VARARGS, "Count all k-mers using a given reads parser" },
   { "traverse_from_reads", hashbits_traverse_from_reads, METH_VARARGS, "" },
   { "consume_fasta_and_traverse", hashbits_consume_fasta_and_traverse, METH_VARARGS, "" },
   { "consume_fasta_and_tag_with_stoptags", hashbits_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
