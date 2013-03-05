@@ -576,73 +576,8 @@ khmer_read_parser_iternext( PyObject * self )
 }
 
 
-#if (0)
-static
-PyObject *
-khmer_read_parser_is_complete( PyObject * self, PyObject * dummy )
-{
-  khmer_ReadParserObject *	    me	    = (khmer_ReadParserObject *) self;
-  khmer:: read_parsers:: IParser *  parser  = me->parser;
-
-  // Note: 'is_complete' can block if no more data from stream
-  //	   but other parser threads are still working.
-  bool complete = false;
-  Py_BEGIN_ALLOW_THREADS
-  complete = parser->is_complete( );  
-  Py_END_ALLOW_THREADS
-
-  if (complete) Py_RETURN_TRUE;
-  Py_RETURN_FALSE;
-}
-
-
-// TODO: Consider merging this with 'khmer_read_parser_iternext'.
-static
-PyObject *
-khmer_read_parser_get_next_read( PyObject * self, PyObject * dummy )
-{
-  bool	  invalid_fasta_file	= false;
-
-  khmer_ReadParserObject *	    me	      = (khmer_ReadParserObject *) self;
-  khmer:: read_parsers:: IParser *  parser    = me->parser;
-  khmer:: read_parsers:: Read *	    read      =
-  new khmer:: read_parsers:: Read( );
-
-  Py_BEGIN_ALLOW_THREADS
-  try
-  {
-    *read = parser->get_next_read( );
-  }
-  catch (khmer:: read_parsers:: InvalidFASTAFileFormat &exc)
-  {
-    invalid_fasta_file = true;
-  }
-  // TODO: Handle case when this is called with no more reads left on stream.
-  Py_END_ALLOW_THREADS
-
-  if (invalid_fasta_file)
-  {
-    PyErr_SetString( PyExc_ValueError, "invalid FASTA file" );
-    return NULL;
-  }
-
-  khmer_ReadObject *		    read_OBJECT = 
-  (khmer_ReadObject *)PyObject_New( khmer_ReadObject, &khmer_ReadType );
-  read_OBJECT->read = read;
-
-  return (PyObject *)read_OBJECT;
-}
-#endif // 0
-
-
 static PyMethodDef khmer_read_parser_methods[ ] =
 {
-#if 0
-  { "is_complete",    khmer_read_parser_is_complete,
-      METH_NOARGS, "No more reads to parse?" },
-  { "get_next_read",  khmer_read_parser_get_next_read,
-      METH_NOARGS, "Fetch next read from stream." },
-#endif // 0
   { NULL,	      NULL,
       0,	      NULL }  /* sentinel */
 };
@@ -652,6 +587,16 @@ static
 PyObject *
 khmer_read_parser_getattr( PyObject * obj, char * name )
 { return Py_FindMethod(khmer_read_parser_methods, obj, name); }
+
+
+static
+khmer:: read_parsers:: IParser *
+_PyObject_to_khmer_read_parser( PyObject * py_object )
+{
+  // TODO: Add type-checking.
+
+  return ((khmer_ReadParserObject *)py_object)->parser;
+}
 
 
 /***********************************************************************/
@@ -1318,10 +1263,8 @@ static PyObject * hash_consume_fasta_with_reads_parser(
       return NULL;
   }
 
-  // TODO: Add type-checking.
-  khmer_ReadParserObject * my_rparser	  = 
-  (khmer_ReadParserObject *)rparser_obj;
-  khmer:: read_parsers::IParser * rparser = my_rparser->parser;
+  khmer:: read_parsers::IParser * rparser = 
+  _PyObject_to_khmer_read_parser( rparser_obj );
 
   // call the C++ function, and trap signals => Python
   unsigned long long  n_consumed  = 0;
@@ -2568,6 +2511,28 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * arg
   }
 
   return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
+static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
+  PyObject * self, PyObject * args
+)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * rparser_obj = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple( args, "O|O", &rparser_obj, &callback_obj ))
+    return NULL;
+
+  // TODO: Add type-checking.
+  khmer_ReadParserObject * my_rparser	    = 
+  (khmer_ReadParserObject *)rparser_obj;
+  khmer:: read_parsers:: IParser * rparser  = my_rparser->parser;
+
+  // TODO: Finish implementing.
+
 }
 
 static PyObject * hashbits_consume_fasta_and_tag_with_stoptags(PyObject * self, PyObject * args)
