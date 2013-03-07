@@ -34,7 +34,7 @@ int main( int argc, char * argv[ ] )
 {
     int		    rc		    = 0;
     char *	    ifile_type	    = (char *)"raw";
-    uint64_t	    cache_size	    = 4L * 1024 * 1024 * 1024;
+    uint64_t	    cache_size	    = 64U * 1024 * 1024;
     char *	    ifile_name	    = NULL;
     int		    ifd		    = -1;
     IStreamReader * sr		    = NULL;
@@ -97,13 +97,14 @@ int main( int argc, char * argv[ ] )
 	*sr, number_of_threads, cache_size, 3
     );
 
+    srand( getpid( ) );
+
 #pragma omp parallel default( shared )
     {
 	uint32_t	thread_id	    = (uint32_t)omp_get_thread_num( );
-	drand48_data    rng_state;
+	// drand48_data    rng_state;
 	long int	randnum		    = 0;
 	uint8_t		buffer[ 127 ];
-	uint64_t	segment_cut_pos	    = 0;
 	uint64_t	nbread		    = 0;
 	uint64_t	nbread_total	    = 0;
 	timespec	sleep_duration;
@@ -115,7 +116,7 @@ int main( int argc, char * argv[ ] )
 	    (unsigned long int)thread_id
 	);
 
-	srand48_r( (long int)thread_id, &rng_state ); 
+	// srand48_r( (long int)thread_id, &rng_state ); 
 	for (uint64_t i = 1; cmgr->has_more_data( ); ++i)
 	{
 
@@ -127,16 +128,18 @@ int main( int argc, char * argv[ ] )
 		    (unsigned long long int)i
 		);
 	    
-	    lrand48_r( &rng_state, &randnum );
+	    // lrand48_r( &rng_state, &randnum );
+#pragma omp critical (rand_read_len)
+	    randnum = rand( );
 	    randnum %= 128;
 	    nbread  =
 	    cmgr->get_bytes( (uint8_t * const)buffer, (uint64_t)randnum ); 
 	    nbread_total += nbread;
 
-	    // Pretend to work for a random duration.
-	    lrand48_r( &rng_state, &randnum );
-	    //sleep_duration_rem.tv_sec	    = randnum / 1000000000;
-	    //sleep_duration_rem.tv_nsec    = randnum % 1000000000;
+	    // Pretend to work for a random duration. (The code, not me!)
+	    // lrand48_r( &rng_state, &randnum );
+#pragma omp critical (rand_sleep_time)
+	    randnum = rand( );
 	    sleep_duration_rem.tv_sec	= 0;
 	    sleep_duration_rem.tv_nsec	= randnum % 1000000;
 	    while ( sleep_duration_rem.tv_sec && sleep_duration_rem.tv_nsec )
@@ -146,16 +149,17 @@ int main( int argc, char * argv[ ] )
 		nanosleep( &sleep_duration, &sleep_duration_rem );
 	    }
 
-	    // Occasionally split setaside buffer,
+	    // Occasionally create copyaside buffer,
 	    // when opportunity exists.
-	    lrand48_r( &rng_state, &randnum );
+	    // lrand48_r( &rng_state, &randnum );
+#pragma omp critical (rand_split_choice)
+	    randnum = rand( );
 	    if (    (0 == randnum % 1024)
-#if (0) // TODO: Rethink this.
-		&&  (!cmgr->_sa_buffer_avail( ))
-#endif
 		&&  (!sr->is_at_end_of_stream( )))
 	    {
-		lrand48_r( &rng_state, &randnum );
+		// lrand48_r( &rng_state, &randnum );
+#pragma omp critical (rand_split_offset)
+		randnum = rand( );
 		randnum %= 1024;
 		cmgr->split_at( (uint64_t)randnum );
 	    }
