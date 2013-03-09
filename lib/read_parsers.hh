@@ -6,6 +6,7 @@
 #include <cstdarg>
 
 #include <string>
+#include <utility>
 
 extern "C"
 {
@@ -313,6 +314,8 @@ struct Read
     }
 };
 
+typedef std:: pair< Read, Read >	ReadPair;
+
 
 struct ParserPerformanceMetrics: public IPerformanceMetrics
 {
@@ -331,6 +334,13 @@ struct ParserPerformanceMetrics: public IPerformanceMetrics
 
 struct IParser
 {
+    
+    enum
+    {
+	PAIR_MODE_ALLOW_UNPAIRED = 0,
+	PAIR_MODE_IGNORE_UNPAIRED,
+	PAIR_MODE_ERROR_ON_UNPAIRED
+    };
 
     static IParser * const  get_parser(
 	std:: string const 	&ifile_name,
@@ -358,6 +368,13 @@ struct IParser
 
     virtual Read	get_next_read( );
 
+    virtual ReadPair	get_next_read_pair(
+	uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
+    );
+    virtual void	_get_next_read_pair_in_allow_mode( ReadPair & the_pair );
+    virtual void	_get_next_read_pair_in_ignore_mode( ReadPair & the_pair );
+    virtual void	_get_next_read_pair_in_error_mode( ReadPair & the_pair );
+
 protected:
     
     struct ParserState
@@ -378,6 +395,7 @@ protected:
 	uint64_t		    buffer_pos;
 	uint64_t		    buffer_rem;
 
+	regex_t			    re_read_1;
 	regex_t			    re_read_2;
 
 	ParserPerformanceMetrics    pmetrics;
