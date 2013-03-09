@@ -1224,6 +1224,11 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
 {
     memset( buffer, 0, BUFFER_SIZE + 1 );
     regcomp(
+	&re_read_1,
+	"^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
+	REG_EXTENDED | REG_NOSUB
+    );
+    regcomp(
 	&re_read_2,
 	// ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
 	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
@@ -1234,7 +1239,7 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
 
 IParser:: ParserState::
 ~ParserState( )
-{ regfree( &re_read_2 ); }
+{ regfree( &re_read_1 ); regfree( &re_read_2 ); }
 
 
 inline
@@ -1599,7 +1604,76 @@ get_next_read( )
 	throw NoMoreReadsAvailable( );
 
     return the_read;
+} // get_next_read
+
+
+// TODO? Pass in by reference to eliminate copy on return.
+ReadPair
+IParser::
+get_next_read_pair( uint8_t mode )
+{
+    ReadPair the_pair;
+
+    switch (mode)
+    {
+    case IParser:: PAIR_MODE_ALLOW_UNPAIRED:
+	_get_next_read_pair_in_allow_mode( the_pair );
+	break;
+    case IParser:: PAIR_MODE_IGNORE_UNPAIRED:
+	_get_next_read_pair_in_ignore_mode( the_pair );
+	break;
+    case IParser:: PAIR_MODE_ERROR_ON_UNPAIRED:
+	_get_next_read_pair_in_error_mode( the_pair );
+	break;
+    default:
+	// TODO: Throw exception.
+	;
+    }
+
+    return the_pair;
 }
+
+
+void
+IParser::
+_get_next_read_pair_in_allow_mode( ReadPair & the_pair )
+{
+    // TODO: Implement.
+}
+
+
+void
+IParser::
+_get_next_read_pair_in_ignore_mode( ReadPair & the_pair )
+{
+    // TODO: Implement.
+}
+
+
+void
+IParser::
+_get_next_read_pair_in_error_mode( ReadPair & the_pair )
+{
+
+    ParserState	    &state	    = _get_state( );
+
+    // Note: We let any exception, which flies out of the following,
+    //	     pass through unhandled.
+    the_pair.first =	get_next_read( );
+    the_pair.second =	get_next_read( );
+
+    // NOTE: Save positions of matches so that we know where to chop the
+    //	     substrings for name matching.
+    // Is the first read really the first member of a pair?
+    if (regexec( &state.re_read_1, the_pair.first.name.c_str( ), 0, NULL, 0 ))
+	// TODO: Throw exception.
+	;
+    // Is the second read really the second member of a pair?
+    if (regexec( &state.re_read_2, the_pair.second.name.c_str( ), 0, NULL, 0 ))
+	// TODO: Throw exception.
+	;
+
+} // get_next_read_pair
 
 
 } // namespace read_parsers
