@@ -10,25 +10,27 @@ khmer -- k-mer counting & filtering FTW
 :Contact: ctb@msu.edu
 :License: BSD
 
-There is a khmer mailing list at librelist.com that you can use to get
-help with khmer.  To sign up, just shoot 'khmer@librelist.com' an
-e-mail and it will subscribe you; then send your question/comment
-there.
+There are two khmer mailing lists.
+
+The first, khmer-announce@lists.idyll.org, is for announcements only.  Subscribe
+at `the khmer-announce page <http://lists.idyll.org/listinfo/khmer-announce>`__.
+
+The second, khmer@lists.idyll.org, is for discussion and help.
+Subscribe at `the khmer lists page <http://lists.idyll.org/listinfo/khmer>`__.
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    introduction
    install
-   ktable
-   methods
-   scripts
    guide
+   scripts
    blog-posts
    choosing-hash-sizes
    partitioning-big-data
+   ktable
    details
    development
    contributors
