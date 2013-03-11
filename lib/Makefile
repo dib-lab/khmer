@@ -8,6 +8,7 @@ SO_EXT=.so
 Z_LIB_DIR=zlib-1.2.3
 Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
+<<<<<<< HEAD
 ZLIB_DIR=zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
@@ -79,6 +80,7 @@ $(ZLIB_OBJS):
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
 
+
 khmer_config.o: khmer_config.cc khmer_config.hh
 
 thread_id_map.o: thread_id_map.cc thread_id_map.hh
@@ -88,6 +90,20 @@ trace_logger.o: trace_logger.cc trace_logger.hh
 perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
+
+aligntest: aligntest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+
+bugtest: bugtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+
+kmer.o: kmer.cc kmer.hh
+
+node.o: node.cc node.hh
+
+aligner.o: aligner.cc aligner.hh
+
+scoringmatrix.o: scoringmatrix.cc scoringmatrix.hh
 
 ktable.o: ktable.cc ktable.hh
 
