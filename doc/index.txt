@@ -10,13 +10,13 @@ khmer -- k-mer counting & filtering FTW
 :Contact: ctb@msu.edu
 :License: BSD
 
-There are two khmer mailing lists.
+There are two mailing lists dedicated to khmer, an announcements-only list and
+a discussion list. To search their archives and sign-up for them, please visit
+the following URLs:
+    
+    * Discussion: http://lists.idyll.org/listinfo/khmer
 
-The first, khmer-announce@lists.idyll.org, is for announcements only.  Subscribe
-at `the khmer-announce page <http://lists.idyll.org/listinfo/khmer-announce>`__.
-
-The second, khmer@lists.idyll.org, is for discussion and help.
-Subscribe at `the khmer lists page <http://lists.idyll.org/listinfo/khmer>`__.
+    * Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
 Contents:
 
