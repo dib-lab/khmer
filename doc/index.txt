@@ -21,17 +21,16 @@ the following URLs:
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    introduction
    install
-   ktable
-   methods
-   scripts
    guide
+   scripts
    blog-posts
    choosing-hash-sizes
    partitioning-big-data
+   ktable
    details
    development
    contributors
