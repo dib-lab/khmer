@@ -38,3 +38,11 @@ But this seems complicated.
 CTB: should we squash output files (overwrite them if they exist), or not?
 So far, leaning towards 'not', as that way no one is surprised and loses
 their data.
+
+----
+
+CLI reading:
+
+   http://stackoverflow.com/questions/1183876/what-are-the-best-practices-for-implementing-a-cli-tool-in-perl
+
+   http://catb.org/esr/writings/taoup/html/ch11s06.html
