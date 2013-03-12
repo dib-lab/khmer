@@ -46,6 +46,7 @@ class ThreadedSequenceProcessor(object):
         self.outqueue = Queue.Queue(self.QUEUESIZE)
 
         self.worker_count = 0
+        self.worker_count_lock = threading.Lock()
         self.done = False
         self.verbose = verbose
 
@@ -155,7 +156,8 @@ class ThreadedSequenceProcessor(object):
                 print >>sys.stderr, "discarded %.1f%%" % f
 
         # end of thread; exit, decrement worker count.
-        self.worker_count -= 1
+        with self.worker_count_lock:
+            self.worker_count -= 1
 
     def do_write(self, outfp):
         outq = self.outqueue
