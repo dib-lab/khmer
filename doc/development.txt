@@ -46,3 +46,5 @@ CLI reading:
    http://stackoverflow.com/questions/1183876/what-are-the-best-practices-for-implementing-a-cli-tool-in-perl
 
    http://catb.org/esr/writings/taoup/html/ch11s06.html
+
+   http://figshare.com/articles/tutorial_pdf/643388
