@@ -14,10 +14,10 @@ On OS X, you'll need XCode installed, I believe.
 
 Then, check out screed and khmer::
 
-  git clone git://github.com/ctb/screed.git
-  git clone git://github.com/ctb/khmer.git
+  git clone git://github.com/ged-lab/screed.git
+  git clone git://github.com/ged-lab/khmer.git
 
-Create and activae a virtualenv working environment::
+Create and activate a virtualenv working environment::
 
  python -m virtualenv env
  . env/bin/activate
@@ -46,4 +46,4 @@ OR by setting the PYTHONPATH::
 
  export PYTHONPATH=/path/to/khmer/python
 
-The scripts are all located in khmer/scripts.
+The scripts are all located in khmer/scripts and khmer/sandbox.
