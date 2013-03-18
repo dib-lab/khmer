@@ -1192,7 +1192,24 @@ IParser(
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _unithreaded( 1 == number_of_threads ),
     _states( new ParserState *[ number_of_threads ] )
-{ for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL; }
+{
+    for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
+
+    assert( !regcomp(
+	&_re_read_2_nosub,
+	// ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
+	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
+	REG_EXTENDED | REG_NOSUB
+    ) );
+    assert( !regcomp(
+	&_re_read_1,
+	"^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
+    ) );
+    assert( !regcomp(
+	&_re_read_2,
+	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
+    ) );
+}
 
 
 IParser::
@@ -1206,6 +1223,9 @@ IParser::
 	    _states[ i ] = NULL;
 	}
     }
+
+    regfree( &_re_read_2_nosub );
+    regfree( &_re_read_1 ); regfree( &_re_read_2 ); 
 }
 
 
@@ -1221,25 +1241,12 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
 	    trace_level, "parser-%lu.log", (unsigned long int)thread_id
 	)
     )
-{
-    memset( buffer, 0, BUFFER_SIZE + 1 );
-    regcomp(
-	&re_read_1,
-	"^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
-	REG_EXTENDED | REG_NOSUB
-    );
-    regcomp(
-	&re_read_2,
-	// ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
-	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
-	REG_EXTENDED | REG_NOSUB
-    );
-}
+{ memset( buffer, 0, BUFFER_SIZE + 1 ); }
 
 
 IParser:: ParserState::
 ~ParserState( )
-{ regfree( &re_read_1 ); regfree( &re_read_2 ); }
+{ }
 
 
 inline
@@ -1525,7 +1532,7 @@ get_next_read( )
 	skip_read =
 		at_start && (0 != fill_id)
 	    &&	!regexec(
-		    &state.re_read_2, the_read.name.c_str( ), 0, NULL, 0
+		    &_re_read_2_nosub, the_read.name.c_str( ), 0, NULL, 0
 		);
 	if (skip_read)
 	{
@@ -1612,68 +1619,116 @@ ReadPair
 IParser::
 get_next_read_pair( uint8_t mode )
 {
-    ReadPair the_pair;
-
     switch (mode)
     {
+#if (0)
     case IParser:: PAIR_MODE_ALLOW_UNPAIRED:
-	_get_next_read_pair_in_allow_mode( the_pair );
-	break;
+	return _get_next_read_pair_in_allow_mode( );
+#endif
     case IParser:: PAIR_MODE_IGNORE_UNPAIRED:
-	_get_next_read_pair_in_ignore_mode( the_pair );
-	break;
+	return _get_next_read_pair_in_ignore_mode( );
     case IParser:: PAIR_MODE_ERROR_ON_UNPAIRED:
-	_get_next_read_pair_in_error_mode( the_pair );
-	break;
+	return _get_next_read_pair_in_error_mode( );
     default:
-	// TODO: Throw exception.
-	;
+	throw UnknownPairReadingMode( );
     }
+}
+
+
+#if (0)
+ReadPair
+IParser::
+_get_next_read_pair_in_allow_mode( )
+{
+    // TODO: Implement.
+    //	     Probably need caching of reads between invocations 
+    //	     and the ability to return pairs which are half empty. 
+}
+#endif
+
+
+ReadPair
+IParser::
+_get_next_read_pair_in_ignore_mode( )
+{
+    ReadPair	    the_pair;
+    regmatch_t	    match_1, match_2;
+
+    // Hunt for a read pair until one is found or end of reads is reached.
+    while (true)
+    {
+
+	// Toss out all reads which are not marked as first of a pair.
+	// Note: We let any exception, which flies out of the following,
+	//	 pass through unhandled.
+	while (true)
+	{
+	    the_pair.first = get_next_read( );  
+	    if (!regexec(
+		&_re_read_1, the_pair.first.name.c_str( ), 1, &match_1, 0
+	    )) break;
+	}
+
+	// If first read of a pair was found, then insist upon second read.
+	// If not found, then restart search for pair.
+	// If found, then validate match.
+	// If invalid pair, then restart search for pair.
+	the_pair.second = get_next_read( );
+	if (!regexec(
+	    &_re_read_2, the_pair.second.name.c_str( ), 1, &match_2, 0
+	))
+	{
+	    if (_is_valid_read_pair( the_pair, match_1, match_2 ))
+		break;
+	}
+
+    } // while pair not found
 
     return the_pair;
 }
 
 
-void
+ReadPair
 IParser::
-_get_next_read_pair_in_allow_mode( ReadPair & the_pair )
+_get_next_read_pair_in_error_mode( )
 {
-    // TODO: Implement.
-}
-
-
-void
-IParser::
-_get_next_read_pair_in_ignore_mode( ReadPair & the_pair )
-{
-    // TODO: Implement.
-}
-
-
-void
-IParser::
-_get_next_read_pair_in_error_mode( ReadPair & the_pair )
-{
-
-    ParserState	    &state	    = _get_state( );
+    ReadPair	    the_pair;
+    regmatch_t	    match_1, match_2;
 
     // Note: We let any exception, which flies out of the following,
     //	     pass through unhandled.
-    the_pair.first =	get_next_read( );
-    the_pair.second =	get_next_read( );
+    the_pair.first	= get_next_read( );
+    the_pair.second	= get_next_read( );
 
-    // NOTE: Save positions of matches so that we know where to chop the
-    //	     substrings for name matching.
     // Is the first read really the first member of a pair?
-    if (regexec( &state.re_read_1, the_pair.first.name.c_str( ), 0, NULL, 0 ))
-	// TODO: Throw exception.
-	;
+    if (REG_NOMATCH == regexec(
+	&_re_read_1, the_pair.first.name.c_str( ), 1, &match_1, 0
+    )) throw InvalidReadPair( );
     // Is the second read really the second member of a pair?
-    if (regexec( &state.re_read_2, the_pair.second.name.c_str( ), 0, NULL, 0 ))
-	// TODO: Throw exception.
-	;
+    if (REG_NOMATCH == regexec(
+	&_re_read_2, the_pair.second.name.c_str( ), 1, &match_2, 0
+    )) throw InvalidReadPair( );
+
+    // Is the pair valid?
+    if (!_is_valid_read_pair( the_pair, match_1, match_2 ))
+	throw InvalidReadPair( );
+
+    return the_pair;
 
 } // get_next_read_pair
+
+
+bool
+IParser::
+_is_valid_read_pair(
+    ReadPair &the_pair, regmatch_t &match_1, regmatch_t &match_2
+)
+{
+    return	(match_1.rm_so == match_2.rm_so)
+	    &&	(match_1.rm_eo == match_2.rm_eo)
+	    &&	(	the_pair.first.name.substr( 0, match_1.rm_so )
+		    ==	the_pair.second.name.substr( 0, match_1.rm_so ));
+}
 
 
 } // namespace read_parsers

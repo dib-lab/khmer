@@ -33,9 +33,6 @@ struct InvalidStreamHandle : public std:: exception
 struct StreamReadError : public std:: exception
 { };
 
-struct NoMoreReadsAvailable : public std:: exception
-{ };
-
 
 namespace read_parsers
 {
@@ -57,6 +54,15 @@ struct CacheSegmentBoundaryViolation : public std:: exception
 { };
 
 struct InvalidCacheSizeRequested : public std:: exception
+{ };
+
+struct NoMoreReadsAvailable : public std:: exception
+{ };
+
+struct UnknownPairReadingMode : public std:: exception
+{ };
+
+struct InvalidReadPair : public std:: exception
 { };
 
 
@@ -371,9 +377,6 @@ struct IParser
     virtual ReadPair	get_next_read_pair(
 	uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
-    virtual void	_get_next_read_pair_in_allow_mode( ReadPair & the_pair );
-    virtual void	_get_next_read_pair_in_ignore_mode( ReadPair & the_pair );
-    virtual void	_get_next_read_pair_in_error_mode( ReadPair & the_pair );
 
 protected:
     
@@ -395,9 +398,6 @@ protected:
 	uint64_t		    buffer_pos;
 	uint64_t		    buffer_rem;
 
-	regex_t			    re_read_1;
-	regex_t			    re_read_2;
-
 	ParserPerformanceMetrics    pmetrics;
 	TraceLogger		    trace_logger;
 	
@@ -416,9 +416,22 @@ protected:
 
     ParserState **	_states;
 
+    regex_t		_re_read_2_nosub;
+    regex_t		_re_read_1;
+    regex_t		_re_read_2;
+
     void		_copy_line( ParserState &state );
 
     virtual void	_parse_read( ParserState &, Read &)	    = 0;
+
+#if (0)
+    ReadPair		_get_next_read_pair_in_allow_mode( );
+#endif
+    ReadPair		_get_next_read_pair_in_ignore_mode( );
+    ReadPair		_get_next_read_pair_in_error_mode( );
+    bool		_is_valid_read_pair(
+	ReadPair &, regmatch_t &, regmatch_t &
+    );
 
     inline ParserState	&_get_state( )
     {
