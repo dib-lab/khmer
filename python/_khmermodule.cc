@@ -468,7 +468,7 @@ static PyTypeObject khmer_ReadParserType =
     0,				/*tp_clear*/
     0,				/*tp_richcompare*/
     0,				/*tp_weaklistoffset*/
-    khmer_read_parser_iter,	/*tp_iter*/
+    PyObject_SelfIter,		/*tp_iter*/
     khmer_read_parser_iternext,	/*tp_iternext*/
 };
 
@@ -525,18 +525,9 @@ khmer_read_parser_dealloc( PyObject * self )
 
 static
 PyObject *
-khmer_read_parser_iter( PyObject * self )
-{
-  Py_INCREF( self );
-  return self;
-}
-
-
-static
-PyObject *
 khmer_read_parser_iternext( PyObject * self )
 {
-  khmer_ReadParserObject *	    myself  = (khmer_ReadParserObject *) self;
+  khmer_ReadParserObject *	    myself  = (khmer_ReadParserObject *)self;
   khmer:: read_parsers:: IParser *  parser  = myself->parser;
 
   bool				    stop_iteration	= false;
@@ -552,7 +543,7 @@ khmer_read_parser_iternext( PyObject * self )
       // TODO: Assign a pointer rather than copy by value.
       *the_read = parser->get_next_read( );
     }
-    catch (khmer:: read_parsers:: InvalidFASTAFileFormat &exc)
+    catch (khmer:: read_parsers:: InvalidReadFileFormat &exc)
     {
       invalid_file_format = true;
     }
@@ -565,7 +556,7 @@ khmer_read_parser_iternext( PyObject * self )
 
   if (invalid_file_format)
   {
-    PyErr_SetString( PyExc_ValueError, "invalid FASTA file" );
+    PyErr_SetString( PyExc_ValueError, "invalid FAST{A,Q} file" );
     return NULL;
   }
 
