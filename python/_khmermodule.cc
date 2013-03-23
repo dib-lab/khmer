@@ -432,17 +432,21 @@ khmer_read_getattr( PyObject * self, char * attr_name )
 
 typedef struct
 {
-  PyObject_HEAD
-  khmer:: read_parsers:: IParser *  parser;
+    PyObject_HEAD
+    khmer:: read_parsers:: IParser *  parser;
 } khmer_ReadParser_Object;
 
-
-// TODO: Implement.
-
+typedef struct
+{
+    PyObject_HEAD
+    // Pointer to mother ship for reference counting purposes.
+    PyObject *	parent;
+    // Persistent value of pair mode across invocations.
+    uint8_t	pair_mode;
+} khmer_ReadPairIterator_Object;
 
 static void	    khmer_read_parser_dealloc( PyObject * );
 static PyObject *   khmer_read_parser_getattr( PyObject * obj, char * name );
-static PyObject *   khmer_read_parser_iter( PyObject * self );
 static PyObject *   khmer_read_parser_iternext( PyObject * self );
 
 static PyTypeObject khmer_ReadParser_Type =
@@ -478,13 +482,18 @@ static PyTypeObject khmer_ReadParser_Type =
 }; // PyTypeObject khmer_ReadParser_Type
 
 
+static void	    khmer_read_pair_iterator_dealloc( PyObject * );
+//static PyObject *   khmer_read_pair_iterator_getattr( PyObject *, char * );
+static PyObject *   khmer_read_pair_iterator_iternext( PyObject * );
+
 static PyTypeObject khmer_ReadPairIterator_Type =
 {
     PyVarObject_HEAD_INIT( NULL /* should be: &PyType_Type */, 0 )
     "ReadPairIterator",				  // tp_name
-    sizeof( khmer_ReadParser_Object ),		  // tp_basicsize
+    sizeof( khmer_ReadPairIterator_Object ),	  // tp_basicsize
     0,						  // tp_itemsize
-    (destructor)NULL,				  // tp_dealloc
+    (destructor)khmer_read_pair_iterator_dealloc,
+						  // tp_dealloc
     (printfunc)NULL,				  // tp_print
     (getattrfunc)NULL,				  // tp_getattr
     (setattrfunc)NULL,				  // tp_setattr
@@ -507,7 +516,8 @@ static PyTypeObject khmer_ReadPairIterator_Type =
     (richcmpfunc)NULL,				  // tp_richcompare
     0,						  // tp_weaklistoffset
     (getiterfunc)PyObject_SelfIter,		  // tp_iter
-    (iternextfunc)NULL,				  // tp_iternext
+    (iternextfunc)khmer_read_pair_iterator_iternext,
+						  // tp_iternext
 }; // PyTypeObject khmer_ReadPairIterator_Type
 
 
@@ -550,6 +560,29 @@ new_read_parser( PyObject * self, PyObject * args )
 
 
 static
+PyObject *
+khmer_read_parser_iter_read_pairs( PyObject * self, PyObject * args )
+{
+    uint8_t   pair_mode	=
+    khmer:: read_parsers:: IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+
+    if (!PyArg_ParseTuple( args, "|H", &pair_mode )) return NULL;
+    
+    // Capture existing read parser wrapper and the pairing mode to use.
+    khmer_ReadPairIterator_Object * obj =
+    (khmer_ReadPairIterator_Object *)PyObject_New(
+	khmer_ReadPairIterator_Object, &khmer_ReadPairIterator_Type
+    );
+    obj->parent	    = self;
+    obj->pair_mode  = pair_mode;
+
+    // Increment reference count on existing ReadParser object so that it 
+    // will not go away until all ReadPairIterator instances have gone away.
+    Py_INCREF( self );
+}
+
+
+static
 void
 khmer_read_parser_dealloc( PyObject * self )
 {
@@ -558,6 +591,59 @@ khmer_read_parser_dealloc( PyObject * self )
   delete obj->parser; obj->parser = NULL;
   PyObject_Del( self );
 
+}
+
+
+static
+void
+khmer_read_pair_iterator_dealloc( PyObject * self )
+{
+    khmer_ReadPairIterator_Object * myself = 
+    (khmer_ReadPairIterator_Object *)self;
+
+    Py_DECREF( myself->parent ); myself->parent = NULL;
+    PyObject_Del( self );
+}
+
+
+static
+PyObject *
+khmer_read_pair_iterator_iternext( PyObject * self )
+{
+    khmer_ReadPairIterator_Object *   myself	  =
+    (khmer_ReadPairIterator_Object *)self;
+    khmer_ReadParser_Object *	      parent	  =
+    (khmer_ReadParser_Object *)(myself->parent);
+    khmer:: read_parsers:: IParser *  parser	  = parent->parser;
+    uint8_t			      pair_mode	  = myself->pair_mode;
+
+    bool			    stop_iteration	= false;
+    bool			    invalid_file_format	= false;
+    khmer:: read_parsers:: ReadPair *   the_pair	=
+    new khmer:: read_parsers:: ReadPair( );
+
+    Py_BEGIN_ALLOW_THREADS
+    stop_iteration = parser->is_complete( );
+    if (!stop_iteration)
+	try
+	// TODO: Use a pointer here instead.
+	{ *the_pair = parser->get_next_read_pair( pair_mode ); }
+	catch(khmer:: read_parsers:: InvalidReadFileFormat &exc)
+	{ invalid_file_format = true; }
+    Py_END_ALLOW_THREADS
+
+    // Note: Can simply return NULL instead of setting the StopIteration 
+    //	   exception.
+    if (stop_iteration)
+	return NULL;
+
+    if (invalid_file_format)
+    {
+	PyErr_SetString( PyExc_ValueError, "invalid FAST{A,Q} file" );
+	return NULL;
+    }
+
+    // TODO: Convert ReadPair object to Python tuple and return the tuple.
 }
 
 
