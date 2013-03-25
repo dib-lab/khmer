@@ -1473,9 +1473,9 @@ _parse_read( ParserState &state, Read &the_read )
 }
 
 
-Read
+void
 IParser::
-get_next_read( )
+imprint_next_read( Read &the_read )
 {
     
     ParserState	    &state	    = _get_state( );
@@ -1485,7 +1485,6 @@ get_next_read( )
     TraceLogger	    &trace_logger   = state.trace_logger;
     uint64_t	    split_pos	    = 0;
     bool	    skip_read	    = false;
-    Read	    the_read;
     
     while (!is_complete( ))
     {
@@ -1609,26 +1608,26 @@ get_next_read( )
 
     if (is_complete( ) && (0 == the_read.name.length( )))
 	throw NoMoreReadsAvailable( );
-
-    return the_read;
-} // get_next_read
+} // imprint_next_read
 
 
-// TODO? Pass in by reference to eliminate copy on return.
-ReadPair
+void
 IParser::
-get_next_read_pair( uint8_t mode )
+imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
 {
     switch (mode)
     {
 #if (0)
     case IParser:: PAIR_MODE_ALLOW_UNPAIRED:
-	return _get_next_read_pair_in_allow_mode( );
+	_imprint_next_read_pair_in_allow_mode( the_read_pair );
+	break;
 #endif
     case IParser:: PAIR_MODE_IGNORE_UNPAIRED:
-	return _get_next_read_pair_in_ignore_mode( );
+	_imprint_next_read_pair_in_ignore_mode( the_read_pair );
+	break;
     case IParser:: PAIR_MODE_ERROR_ON_UNPAIRED:
-	return _get_next_read_pair_in_error_mode( );
+	_imprint_next_read_pair_in_error_mode( the_read_pair );
+	break;
     default:
 	throw UnknownPairReadingMode( );
     }
@@ -1636,9 +1635,9 @@ get_next_read_pair( uint8_t mode )
 
 
 #if (0)
-ReadPair
+void
 IParser::
-_get_next_read_pair_in_allow_mode( )
+_imprint_next_read_pair_in_allow_mode( ReadPair &the_read_pair )
 {
     // TODO: Implement.
     //	     Probably need caching of reads between invocations 
@@ -1647,11 +1646,12 @@ _get_next_read_pair_in_allow_mode( )
 #endif
 
 
-ReadPair
+void
 IParser::
-_get_next_read_pair_in_ignore_mode( )
+_imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
 {
-    ReadPair	    the_pair;
+    Read	    &read_1		= the_read_pair.first;
+    Read	    &read_2		= the_read_pair.second;
     regmatch_t	    match_1, match_2;
 
     // Hunt for a read pair until one is found or end of reads is reached.
@@ -1663,9 +1663,9 @@ _get_next_read_pair_in_ignore_mode( )
 	//	 pass through unhandled.
 	while (true)
 	{
-	    the_pair.first = get_next_read( );  
+	    imprint_next_read( read_1 );
 	    if (!regexec(
-		&_re_read_1, the_pair.first.name.c_str( ), 1, &match_1, 0
+		&_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
 	    )) break;
 	}
 
@@ -1673,61 +1673,59 @@ _get_next_read_pair_in_ignore_mode( )
 	// If not found, then restart search for pair.
 	// If found, then validate match.
 	// If invalid pair, then restart search for pair.
-	the_pair.second = get_next_read( );
+	imprint_next_read( read_2 );
 	if (!regexec(
-	    &_re_read_2, the_pair.second.name.c_str( ), 1, &match_2, 0
+	    &_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
 	))
 	{
-	    if (_is_valid_read_pair( the_pair, match_1, match_2 ))
+	    if (_is_valid_read_pair( the_read_pair, match_1, match_2 ))
 		break;
 	}
 
     } // while pair not found
 
-    return the_pair;
-}
+} // _imprint_next_read_pair_in_ignore_mode
 
 
-ReadPair
+void
 IParser::
-_get_next_read_pair_in_error_mode( )
+_imprint_next_read_pair_in_error_mode( ReadPair &the_read_pair )
 {
-    ReadPair	    the_pair;
+    Read	    &read_1		= the_read_pair.first;
+    Read	    &read_2		= the_read_pair.second;
     regmatch_t	    match_1, match_2;
 
     // Note: We let any exception, which flies out of the following,
     //	     pass through unhandled.
-    the_pair.first	= get_next_read( );
-    the_pair.second	= get_next_read( );
+    imprint_next_read( read_1 );
+    imprint_next_read( read_2 );
 
     // Is the first read really the first member of a pair?
     if (REG_NOMATCH == regexec(
-	&_re_read_1, the_pair.first.name.c_str( ), 1, &match_1, 0
+	&_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
     )) throw InvalidReadPair( );
     // Is the second read really the second member of a pair?
     if (REG_NOMATCH == regexec(
-	&_re_read_2, the_pair.second.name.c_str( ), 1, &match_2, 0
+	&_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
     )) throw InvalidReadPair( );
 
     // Is the pair valid?
-    if (!_is_valid_read_pair( the_pair, match_1, match_2 ))
+    if (!_is_valid_read_pair( the_read_pair, match_1, match_2 ))
 	throw InvalidReadPair( );
 
-    return the_pair;
-
-} // get_next_read_pair
+} // _imprint_next_read_pair_in_error_mode
 
 
 bool
 IParser::
 _is_valid_read_pair(
-    ReadPair &the_pair, regmatch_t &match_1, regmatch_t &match_2
+    ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
 )
 {
     return	(match_1.rm_so == match_2.rm_so)
 	    &&	(match_1.rm_eo == match_2.rm_eo)
-	    &&	(	the_pair.first.name.substr( 0, match_1.rm_so )
-		    ==	the_pair.second.name.substr( 0, match_1.rm_so ));
+	    &&	(	the_read_pair.first.name.substr( 0, match_1.rm_so )
+		    ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
 

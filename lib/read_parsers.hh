@@ -372,9 +372,17 @@ struct IParser
     inline bool		is_complete( )
     { return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem; }
 
-    virtual Read	get_next_read( );
+    // Note: 'get_next_read' exists for legacy reasons.
+    //	     In the long term, it should be eliminated in favor of direct use of
+    //	     'imprint_next_read'. A potentially costly copy-by-value happens
+    //	     upon return.
+    // TODO: Eliminate all calls to 'get_next_read'.
+    inline Read		get_next_read( )
+    { Read the_read; imprint_next_read( the_read ); return the_read; }
+    virtual void	imprint_next_read( Read &the_read );
 
-    virtual ReadPair	get_next_read_pair(
+    virtual void	imprint_next_read_pair(
+	ReadPair &the_read_pair,
 	uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
 
@@ -422,15 +430,21 @@ protected:
 
     void		_copy_line( ParserState &state );
 
-    virtual void	_parse_read( ParserState &, Read &)	    = 0;
+    virtual void	_parse_read( ParserState &, Read & )	    = 0;
 
 #if (0)
-    ReadPair		_get_next_read_pair_in_allow_mode( );
+    void		_imprint_next_read_pair_in_allow_mode(
+	ReadPair &the_read_pair
+    );
 #endif
-    ReadPair		_get_next_read_pair_in_ignore_mode( );
-    ReadPair		_get_next_read_pair_in_error_mode( );
+    void		_imprint_next_read_pair_in_ignore_mode(
+	ReadPair &the_read_pair
+    );
+    void		_imprint_next_read_pair_in_error_mode(
+	ReadPair &the_read_pair
+    );
     bool		_is_valid_read_pair(
-	ReadPair &, regmatch_t &, regmatch_t &
+	ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
     );
 
     inline ParserState	&_get_state( )
