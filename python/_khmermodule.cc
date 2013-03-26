@@ -569,16 +569,18 @@ khmer_ReadParser_iter_read_pairs( PyObject * self, PyObject * args )
     if (!PyArg_ParseTuple( args, "|H", &pair_mode )) return NULL;
     
     // Capture existing read parser wrapper and the pairing mode to use.
-    khmer_ReadPairIterator_Object * obj =
+    khmer_ReadPairIterator_Object * rpi_OBJECT =
     (khmer_ReadPairIterator_Object *)PyObject_New(
 	khmer_ReadPairIterator_Object, &khmer_ReadPairIterator_Type
     );
-    obj->parent	    = self;
-    obj->pair_mode  = pair_mode;
+    rpi_OBJECT->parent	    = self;
+    rpi_OBJECT->pair_mode   = pair_mode;
 
     // Increment reference count on existing ReadParser object so that it 
     // will not go away until all ReadPairIterator instances have gone away.
     Py_INCREF( self );
+
+    return (PyObject *)rpi_OBJECT;
 }
 
 
@@ -621,6 +623,7 @@ khmer_ReadPairIterator_iternext( PyObject * self )
 
     bool	stop_iteration	    = false;
     bool	invalid_file_format = false;
+    bool	invalid_read_pair   = false;
     ReadPair	the_read_pair;
 
     Py_BEGIN_ALLOW_THREADS
@@ -630,6 +633,8 @@ khmer_ReadPairIterator_iternext( PyObject * self )
 	{ parser->imprint_next_read_pair( the_read_pair, pair_mode ); }
 	catch (InvalidReadFileFormat &exc)
 	{ invalid_file_format = true; }
+	catch (InvalidReadPair &exc)
+	{ invalid_read_pair = true; }
     Py_END_ALLOW_THREADS
 
     // Note: Can return NULL instead of setting the StopIteration exception.
@@ -638,6 +643,11 @@ khmer_ReadPairIterator_iternext( PyObject * self )
     if (invalid_file_format)
     {
 	PyErr_SetString( PyExc_ValueError, "Invalid input file format." );
+	return NULL;
+    }
+    if (invalid_read_pair)
+    {
+	PyErr_SetString( PyExc_ValueError, "Invalid read pair detected." );
 	return NULL;
     }
 
