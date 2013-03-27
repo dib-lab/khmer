@@ -7,6 +7,7 @@
 #include "Python.h"
 #include "khmer.hh"
 #include "khmer_config.hh"
+#include "trace_logger.hh"
 #include "ktable.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
@@ -20,6 +21,23 @@
 extern "C" {
   void init_khmer();
 }
+
+
+// Configure module logging.
+// TODO: Set variadic null macro for 'trace_logger' if logging is not desired.
+#define WITH_INTERNAL_TRACING
+namespace khmer
+{
+
+static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_DEBUG5;
+// NOTE: Probably not a good idea to perform this kind of object allocation 
+//	 within a library. But, then again, it is not a good idea to create 
+//	 libraries with side effects (e.g., logging to files) either.
+//	 Two wrongs make a right?
+static TraceLogger	_trace_logger( _MODULE_TRACE_LEVEL, "pymod.log" );
+
+} // namespace khmer
+
 
 class _khmer_exception {
 private:
@@ -479,7 +497,44 @@ static PyTypeObject khmer_ReadParser_Type =
     0,				/*tp_weaklistoffset*/
     PyObject_SelfIter,		/*tp_iter*/
     khmer_ReadParser_iternext,	/*tp_iternext*/
+    (PyMethodDef *)NULL,		// tp_methods
+    (PyMemberDef *)NULL,		// tp_members
+    (PyGetSetDef *)NULL,		// tp_getset
+    (_typeobject *)NULL,		// tp_base
+    (PyObject *)NULL,			// tp_dict
 }; // PyTypeObject khmer_ReadParser_Type
+
+static
+void
+khmer_init_ReadParser_Type( )
+{
+    using namespace khmer:: read_parsers;
+
+    khmer_ReadParser_Type.ob_type   = &PyType_Type;
+    
+    PyObject * cls_attrs_DICT = PyDict_New( );
+
+    // Place pair mode constants into class dictionary.
+    assert( !PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_ALLOW_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED )
+    ) );
+    assert( !PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_IGNORE_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED )
+    ) );
+    assert( !PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_ERROR_ON_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED )
+    ) );
+
+    khmer_ReadParser_Type.tp_dict   = cls_attrs_DICT;
+
+    PyType_Ready( &khmer_ReadParser_Type );
+}
 
 
 static void	    khmer_ReadPairIterator_dealloc( PyObject * );
@@ -621,11 +676,12 @@ khmer_ReadPairIterator_iternext( PyObject * self )
     IParser *			    parser	  = parent->parser;
     uint8_t			    pair_mode	  = myself->pair_mode;
 
-    bool	stop_iteration	    = false;
-    bool	invalid_file_format = false;
-    bool	invalid_read_pair   = false;
     ReadPair	the_read_pair;
 
+    bool	stop_iteration		    = false;
+    bool	invalid_file_format	    = false;
+    bool	unknown_pair_reading_mode   = false;
+    bool	invalid_read_pair	    = false;
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
     if (!stop_iteration)
@@ -633,6 +689,8 @@ khmer_ReadPairIterator_iternext( PyObject * self )
 	{ parser->imprint_next_read_pair( the_read_pair, pair_mode ); }
 	catch (InvalidReadFileFormat &exc)
 	{ invalid_file_format = true; }
+	catch (UnknownPairReadingMode &exc)
+	{ unknown_pair_reading_mode = true; }
 	catch (InvalidReadPair &exc)
 	{ invalid_read_pair = true; }
     Py_END_ALLOW_THREADS
@@ -643,6 +701,13 @@ khmer_ReadPairIterator_iternext( PyObject * self )
     if (invalid_file_format)
     {
 	PyErr_SetString( PyExc_ValueError, "Invalid input file format." );
+	return NULL;
+    }
+    if (unknown_pair_reading_mode)
+    {
+	PyErr_SetString(
+	    PyExc_ValueError, "Unknown pair reading mode supplied."
+	);
 	return NULL;
     }
     if (invalid_read_pair)
@@ -4033,20 +4098,38 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 //
 
 static PyMethodDef KhmerMethods[] = {
-  /* { "new_config", new_config, METH_VARARGS, "Create a default internals config" }, */
-  { "get_config", get_config, METH_VARARGS, "Get active khmer configuration object" },
-  /* { "set_config", set_active_config, METH_VARARGS, "Set active khmer configuration object" }, */
-  { "new_read_parser", new_read_parser, METH_VARARGS, "Create a new read parser" },
-  { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
-  { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty single-table counting hash" },
-  { "_new_counting_hash", _new_counting_hash, METH_VARARGS, "Create an empty counting hash" },
-  { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
-  { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
-  { "forward_hash", forward_hash, METH_VARARGS, "", },
-  { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
-  { "reverse_hash", reverse_hash, METH_VARARGS, "", },
-  { "set_reporting_callback", set_reporting_callback, METH_VARARGS, "" },
-  { NULL, NULL, 0, NULL }
+#if (0)
+    { "new_config",		new_config,
+      METH_VARARGS,		"Create a default internals config" }, 
+#endif
+    { "get_config",		get_config,
+      METH_VARARGS,		"Get active khmer configuration object" },
+#if (0)
+    { "set_config",		set_active_config,
+      METH_VARARGS,		"Set active khmer configuration object" },
+#endif
+    { "new_read_parser",	new_read_parser,
+      METH_VARARGS,		"Create a new read parser" },
+    { "new_ktable",		new_ktable,
+      METH_VARARGS,		"Create an empty ktable" },
+    { "new_hashtable",		new_hashtable,
+      METH_VARARGS,		"Create an empty single-table counting hash" },
+    { "_new_counting_hash",	_new_counting_hash,
+      METH_VARARGS,		"Create an empty counting hash" },
+    { "_new_hashbits",		_new_hashbits,
+      METH_VARARGS,		"Create an empty hashbits table" },
+    { "new_minmax",		new_minmax,
+      METH_VARARGS,		"Create a new min/max value table" },
+    { "forward_hash",		forward_hash,
+      METH_VARARGS,		"", },
+    { "forward_hash_no_rc",	forward_hash_no_rc,
+      METH_VARARGS,		"", },
+    { "reverse_hash",		reverse_hash,
+      METH_VARARGS,		"", },
+    { "set_reporting_callback",	set_reporting_callback,
+      METH_VARARGS,		"" },
+
+    { NULL, NULL, 0, NULL } // sentinel
 };
 
 DL_EXPORT(void) init_khmer(void)
@@ -4054,9 +4137,13 @@ DL_EXPORT(void) init_khmer(void)
   khmer_ConfigType.ob_type	      = &PyType_Type;
   khmer_Read_Type.ob_type	      = &PyType_Type;
   khmer_ReadPairIterator_Type.ob_type = &PyType_Type;
-  khmer_ReadParser_Type.ob_type	      = &PyType_Type;
+  khmer_init_ReadParser_Type( );
   khmer_KTableType.ob_type	      = &PyType_Type;
   khmer_KCountingHashType.ob_type     = &PyType_Type;
+
+  PyType_Ready( &khmer_Read_Type );
+  PyType_Ready( &khmer_ReadPairIterator_Type );
+  // TODO: Finalize other types.
 
   PyObject * m;
   m = Py_InitModule("_khmer", KhmerMethods);
