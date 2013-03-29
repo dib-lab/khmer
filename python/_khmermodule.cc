@@ -7,7 +7,6 @@
 #include "Python.h"
 #include "khmer.hh"
 #include "khmer_config.hh"
-#include "trace_logger.hh"
 #include "ktable.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
@@ -24,17 +23,45 @@ extern "C" {
 
 
 // Configure module logging.
-// TODO: Set variadic null macro for 'trace_logger' if logging is not desired.
-#define WITH_INTERNAL_TRACING
+//#define WITH_INTERNAL_TRACING
 namespace khmer
 {
 
-static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_DEBUG5;
-// NOTE: Probably not a good idea to perform this kind of object allocation 
-//	 within a library. But, then again, it is not a good idea to create 
-//	 libraries with side effects (e.g., logging to files) either.
-//	 Two wrongs make a right?
-static TraceLogger	_trace_logger( _MODULE_TRACE_LEVEL, "pymod.log" );
+namespace python
+{
+
+#ifdef WITH_INTERNAL_TRACING
+#warning "Internal tracing of Python extension module is enabled."
+static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_DEBUG9;
+static void		_trace_logger(
+    uint8_t level, char const * format, ...
+)
+{
+    static FILE *	_stream_handle	= NULL;
+
+    if (NULL == _stream_handle)
+	_stream_handle = fopen( "pymod.log", "w" );
+
+    va_list varargs;
+    
+    if (_MODULE_TRACE_LEVEL <= level)
+    {
+	va_start( varargs, format );
+	vfprintf( _stream_handle, format, varargs );
+	va_end( varargs );
+	fflush( _stream_handle );
+    }
+
+}
+#else
+static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_NONE;
+static inline void	_trace_logger(
+    uint8_t level, char const * format, ...
+)
+{ }
+#endif
+
+} // namespace python
 
 } // namespace khmer
 
@@ -476,7 +503,11 @@ static PyTypeObject khmer_ReadParser_Type =
     0,
     khmer_ReadParser_dealloc,	/*tp_dealloc*/
     0,				/*tp_print*/
+#if (0)
     khmer_ReadParser_getattr,	/*tp_getattr*/
+#else
+    0,
+#endif
     0,				/*tp_setattr*/
     0,				/*tp_compare*/
     0,				/*tp_repr*/
@@ -486,7 +517,7 @@ static PyTypeObject khmer_ReadParser_Type =
     0,				/*tp_hash */
     0,				/*tp_call*/
     0,				/*tp_str*/
-    0,				/*tp_getattro*/
+    PyObject_GenericGetAttr,	/*tp_getattro*/
     0,				/*tp_setattro*/
     0,				/*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,		/*tp_flags*/
@@ -503,38 +534,6 @@ static PyTypeObject khmer_ReadParser_Type =
     (_typeobject *)NULL,		// tp_base
     (PyObject *)NULL,			// tp_dict
 }; // PyTypeObject khmer_ReadParser_Type
-
-static
-void
-khmer_init_ReadParser_Type( )
-{
-    using namespace khmer:: read_parsers;
-
-    khmer_ReadParser_Type.ob_type   = &PyType_Type;
-    
-    PyObject * cls_attrs_DICT = PyDict_New( );
-
-    // Place pair mode constants into class dictionary.
-    assert( !PyDict_SetItemString(
-	cls_attrs_DICT,
-	"PAIR_MODE_ALLOW_UNPAIRED",
-	PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED )
-    ) );
-    assert( !PyDict_SetItemString(
-	cls_attrs_DICT,
-	"PAIR_MODE_IGNORE_UNPAIRED",
-	PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED )
-    ) );
-    assert( !PyDict_SetItemString(
-	cls_attrs_DICT,
-	"PAIR_MODE_ERROR_ON_UNPAIRED",
-	PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED )
-    ) );
-
-    khmer_ReadParser_Type.tp_dict   = cls_attrs_DICT;
-
-    PyType_Ready( &khmer_ReadParser_Type );
-}
 
 
 static void	    khmer_ReadPairIterator_dealloc( PyObject * );
@@ -775,6 +774,57 @@ static PyMethodDef khmer_ReadParser_methods[ ] =
     { NULL,	      NULL,
       0,	      NULL }  /* sentinel */
 };
+
+static
+void
+khmer_init_ReadParser_Type( )
+{
+    using namespace khmer;
+    using namespace khmer:: read_parsers;
+    using namespace khmer:: python;
+
+    khmer_ReadParser_Type.ob_type	= &PyType_Type;
+    khmer_ReadParser_Type.tp_methods	= khmer_ReadParser_methods;
+    
+    PyObject * cls_attrs_DICT = PyDict_New( );
+
+    // Place pair mode constants into class dictionary.
+    assert( !PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_ALLOW_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED )
+    ) );
+    assert( !PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_IGNORE_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED )
+    ) );
+    assert( !PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_ERROR_ON_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED )
+    ) );
+
+    khmer_ReadParser_Type.tp_dict = cls_attrs_DICT;
+
+    // Finish initialization of type object.
+    // (Add appropriate attributes to class dictionary, etc...)
+    PyType_Ready( &khmer_ReadParser_Type );
+
+    PyObject *key, *val;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(
+	khmer_ReadParser_Type.tp_dict, &pos, &key, &val
+    ))
+    {
+	_trace_logger(
+	    TraceLogger:: TLVL_DEBUG5,
+	    "ReadParser_Type class dict key = '%s'\n",
+	    PyString_AsString( key )
+	);
+    }
+
+}
 
 
 static
@@ -4134,19 +4184,22 @@ static PyMethodDef KhmerMethods[] = {
 
 DL_EXPORT(void) init_khmer(void)
 {
+    using namespace khmer;
+    using namespace khmer:: python;
+
   khmer_ConfigType.ob_type	      = &PyType_Type;
   khmer_Read_Type.ob_type	      = &PyType_Type;
   khmer_ReadPairIterator_Type.ob_type = &PyType_Type;
-  khmer_init_ReadParser_Type( );
   khmer_KTableType.ob_type	      = &PyType_Type;
   khmer_KCountingHashType.ob_type     = &PyType_Type;
 
+  PyObject * m;
+  m = Py_InitModule("_khmer", KhmerMethods);
+
+  khmer_init_ReadParser_Type( );
   PyType_Ready( &khmer_Read_Type );
   PyType_Ready( &khmer_ReadPairIterator_Type );
   // TODO: Finalize other types.
-
-  PyObject * m;
-  m = Py_InitModule("_khmer", KhmerMethods);
 
   KhmerError = PyErr_NewException((char *)"_khmer.error", NULL, NULL);
   Py_INCREF(KhmerError);
