@@ -37,6 +37,8 @@ def main():
     infile = args.input
     outfile = args.output
 
+    print 'hashtable in:', htfile
+    print 'reading from:', infile
     print 'saving to:', outfile
 
     ht = khmer.new_hashbits(1, 1, 1)
@@ -51,7 +53,7 @@ def main():
     hist = [0.0] * MAX_READ_LENGTH
     histcount = [0] * MAX_READ_LENGTH
 
-    for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
+    for n, record in enumerate(screed.open(infile)):
         seq = record['sequence']
 
         for pos in range(0, len(seq) - K + 1):
