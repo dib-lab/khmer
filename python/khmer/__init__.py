@@ -4,7 +4,7 @@ import _khmer
 from _khmer import get_config
 try:  # CPython API
     # from _khmer import Read
-    from _khmer import new_read_parser as ReadParser
+    from _khmer import ReadParser
 except ImportError:  # Cython
     from _khmer import _Read as Read
     from _khmer import _ReadParser as ReadParser
