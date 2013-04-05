@@ -1,5 +1,5 @@
 //this is the codes for the mini lib function
-#include "minilib.hh"
+#include "indexClassify.hh"
 
 //----------------------------------------
 void convertFastaToBin(std::string readsFileName,std::string readsBinFileName){
