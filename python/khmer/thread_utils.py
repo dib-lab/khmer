@@ -46,6 +46,7 @@ class ThreadedSequenceProcessor(object):
         self.outqueue = Queue.Queue(self.QUEUESIZE)
 
         self.worker_count = 0
+        self.worker_count_lock = threading.Lock()
         self.done = False
         self.verbose = verbose
 
@@ -53,6 +54,7 @@ class ThreadedSequenceProcessor(object):
         self.n_written = 0
         self.bp_processed = 0
         self.bp_written = 0
+        self.tallies_lock = threading.Lock()
 
     def start(self, inputiter, outfp):
         if self.verbose:
@@ -137,25 +139,30 @@ class ThreadedSequenceProcessor(object):
 
             self.outqueue.put(SequenceGroup(0, keep))
 
-            self.n_processed += len(g.seqlist)
-            self.n_written += len(keep)
-            self.bp_processed += bp_processed
-            self.bp_written += bp_written
+            # the tallies are shared among workers, hence we lock
+            with self.tallies_lock:
 
-            if self.verbose and self.n_processed % 500000 == 0:
-                print >>sys.stderr, "processed %d / wrote %d / removed %d" % \
-                    (self.n_processed, self.n_written,
-                     self.n_processed - self.n_written)
-                print >>sys.stderr, \
-                    "processed %d bp / wrote %d bp / removed %d bp" % \
-                    (self.bp_processed, self.bp_written,
-                     self.bp_processed - self.bp_written)
-                discarded = self.bp_processed - self.bp_written
-                f = float(discarded) / float(self.bp_processed) * 100
-                print >>sys.stderr, "discarded %.1f%%" % f
+                self.n_processed += len(g.seqlist)
+                self.n_written += len(keep)
+                self.bp_processed += bp_processed
+                self.bp_written += bp_written
+
+                if self.verbose and self.n_processed % 500000 == 0:
+                    print >>sys.stderr, \
+                        "processed %d / wrote %d / removed %d" % \
+                        (self.n_processed, self.n_written,
+                         self.n_processed - self.n_written)
+                    print >>sys.stderr, \
+                        "processed %d bp / wrote %d bp / removed %d bp" % \
+                        (self.bp_processed, self.bp_written,
+                         self.bp_processed - self.bp_written)
+                    discarded = self.bp_processed - self.bp_written
+                    f = float(discarded) / float(self.bp_processed) * 100
+                    print >>sys.stderr, "discarded %.1f%%" % f
 
         # end of thread; exit, decrement worker count.
-        self.worker_count -= 1
+        with self.worker_count_lock:
+            self.worker_count -= 1
 
     def do_write(self, outfp):
         outq = self.outqueue
