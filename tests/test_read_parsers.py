@@ -154,4 +154,72 @@ def test_casava_1_8_pair_mating( ):
     config.set_reads_input_buffer_size( bufsz )
 
 
+def test_iterator_identities( ):
+    
+    rparser = \
+    ReadParser( utils.get_test_data( "test-abund-read-paired.fa" ) )
+    assert rparser is rparser.__iter__( )
+    assert rparser is rparser.iter_reads( )
+
+
+def test_read_pair_iterator_in_error_mode( ):
+    
+    rparser = \
+    ReadParser( utils.get_test_data( "test-abund-read-paired.fa" ) )
+
+    # If walks like an iterator and quacks like an iterator...
+    rpi = rparser.iter_read_pairs( )
+    assert "__iter__" in dir( rpi )
+    assert "next" in dir( rpi )
+
+    # Are the alleged pairs actually pairs?
+    read_pairs_1 = [ ]
+    for read_1, read_2 in rpi:
+        read_pairs_1.append( [ read_1, read_2 ] )
+        assert read_1.name[ : 19 ] == read_2.name[ : 19 ]
+
+    # Reload parser.
+    # Note: No 'rewind' or 'reset' capability at the time of this writing.
+    rparser = \
+    ReadParser( utils.get_test_data( "test-abund-read-paired.fa" ) )
+
+    # Ensure that error mode is the default mode.
+    read_pairs_2 = [ ]
+    for read_1, read_2 \
+    in rparser.iter_read_pairs( ReadParser.PAIR_MODE_ERROR_ON_UNPAIRED ):
+        read_pairs_2.append( [ read_1, read_2 ] )
+    matches = \
+    map(
+        lambda rp1, rp2: rp1[ 0 ].name == rp2[ 0 ].name, 
+        read_pairs_1, read_pairs_2
+    )
+    assert all( matches )  # Assert ALL the matches. :-]
+
+
+def test_read_pair_iterator_in_error_mode_xfail( ):
+
+    rparser = \
+    ReadParser( utils.get_test_data( "test-abund-read-impaired.fa" ) )
+
+    failed = True
+    try:
+        for rpair in rparser.iter_read_pairs( ): pass
+        failed = False
+    except IOError as exc: pass
+    assert failed
+
+
+def test_read_pair_iterator_in_ignore_mode( ):
+
+    rparser = \
+    ReadParser( utils.get_test_data( "test-abund-read-impaired.fa" ) )
+    
+    read_pairs = [ ]
+    for read_1, read_2 \
+    in rparser.iter_read_pairs( ReadParser.PAIR_MODE_IGNORE_UNPAIRED ):
+        read_pairs.append( [ read_1, read_2 ] )
+        assert read_1.name[ : 19 ] == read_2.name[ : 19 ]
+    assert 2 == len( read_pairs )
+
+
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
