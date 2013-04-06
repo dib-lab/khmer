@@ -790,22 +790,32 @@ _init_ReadParser_Type( )
     ReadParser_Type.tp_methods	    = (PyMethodDef *)_ReadParser_methods;
     
     PyObject * cls_attrs_DICT = PyDict_New( );
+
+
     // Place pair mode constants into class dictionary.
-    assert( !PyDict_SetItemString(
+    int result;
+
+    result = PyDict_SetItemString(
 	cls_attrs_DICT,
 	"PAIR_MODE_ALLOW_UNPAIRED",
 	PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED )
-    ) );
-    assert( !PyDict_SetItemString(
+    );
+    assert(!result);
+
+    result = PyDict_SetItemString(
 	cls_attrs_DICT,
 	"PAIR_MODE_IGNORE_UNPAIRED",
 	PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED )
-    ) );
-    assert( !PyDict_SetItemString(
+    );
+    assert(!result);
+
+    result = PyDict_SetItemString(
 	cls_attrs_DICT,
 	"PAIR_MODE_ERROR_ON_UNPAIRED",
 	PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED )
-    ) );
+    );
+    assert(!result);
+
     ReadParser_Type.tp_dict	    = cls_attrs_DICT;
 
     PyType_Ready( &ReadParser_Type );
