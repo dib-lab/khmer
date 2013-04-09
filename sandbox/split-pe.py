@@ -6,6 +6,12 @@ import os.path
 fp1 = open(os.path.basename(sys.argv[1]) + '.1', 'w')
 fp2 = open(os.path.basename(sys.argv[1]) + '.2', 'w')
 
+is_fastq = False
+record = iter(screed.open(sys.argv[1])).next()
+
+if hasattr(record, 'accuracy'):
+    is_fastq = True
+
 n1 = 0
 n2 = 0
 for n, record in enumerate(screed.open(sys.argv[1])):
@@ -14,10 +20,18 @@ for n, record in enumerate(screed.open(sys.argv[1])):
 
     name = record.name
     if name.endswith('/1'):
-        print >>fp1, '>%s\n%s' % (record.name, record.sequence,)
+        if is_fastq:
+            print >>fp1, '@%s\n%s\n+\n%s' % (record.name, record.sequence,
+                                             record.accuracy)
+        else:
+            print >>fp1, '>%s\n%s' % (record.name, record.sequence,)
         n1 += 1
     elif name.endswith('/2'):
-        print >>fp2, '>%s\n%s' % (record.name, record.sequence,)
+        if is_fastq:
+            print >>fp2, '@%s\n%s\n+\n%s' % (record.name, record.sequence,
+                                             record.accuracy)
+        else:
+            print >>fp2, '>%s\n%s' % (record.name, record.sequence,)
         n2 += 1
 
 print >>sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
