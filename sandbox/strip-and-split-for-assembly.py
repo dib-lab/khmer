@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import screed
 import sys
+import os.path
 
 
 def is_pair(name1, name2):
@@ -14,7 +15,7 @@ def is_pair(name1, name2):
     return False
 
 infile = sys.argv[1]
-outfile = infile
+outfile = os.path.basename(infile)
 if len(sys.argv) > 2:
     outfile = sys.argv[2]
 
