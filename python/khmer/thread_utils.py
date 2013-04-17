@@ -128,8 +128,11 @@ class ThreadedSequenceProcessor(object):
                 name, sequence = self.process_fn(record)
                 bp_processed += len(record['sequence'])
                 if name:
+                    accuracy = getattr(record, 'accuracy', None)
+                    if accuracy:
+                        accuracy = accuracy[:len(sequence)]
                     bp_written += len(sequence)
-                    keep.append((name, sequence))
+                    keep.append((name, sequence, accuracy))
 
             self.outqueue.put(SequenceGroup(0, keep))
 
@@ -161,8 +164,11 @@ class ThreadedSequenceProcessor(object):
             except Queue.Empty:
                 continue
 
-            for name, seq in g.seqlist:
-                outfp.write('>%s\n%s\n' % (name, seq,))
+            for name, seq, accuracy in g.seqlist:
+                if accuracy: # write FASTQ; CTB hack.
+                    outfp.write('@%s\n%s\n+\n%s\n' % (name, seq, accuracy))
+                else:
+                    outfp.write('>%s\n%s\n' % (name, seq,))
 
         if self.verbose:
             print >>sys.stderr, "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
