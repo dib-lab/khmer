@@ -1,13 +1,15 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE = int(8e9)
 N_HT = 4
 ###
 
-RADIUS=10
-MAX_DENSITY=31
+RADIUS = 10
+MAX_DENSITY = 31
 
 infile = sys.argv[1]
 outprefix = sys.argv[2]
@@ -39,17 +41,17 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         print '... saving', n
 
     seq = record['sequence']
-    end = len(seq) - K + 1 - incr/2
+    end = len(seq) - K + 1 - incr / 2
 
     is_high = False
     densities = []
     for pos in range(end, start, -incr):
-        density = ht.count_kmers_within_radius(seq[pos:pos+K], RADIUS,
+        density = ht.count_kmers_within_radius(seq[pos:pos + K], RADIUS,
                                                MAX_DENSITY)
 
         densities.append((density, pos))
         print >>densfp, density
-        
+
         if density >= MAX_DENSITY:
             is_high = True
 
@@ -59,7 +61,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
                 break
 
         chop_end = pos + K
-            
+
         densities.reverse()
         for (density, pos) in densities:
             if density < MAX_DENSITY:
@@ -76,5 +78,5 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         fp = highfp
     else:
         fp = lowfp
-        
+
     print >>fp, '>%s\n%s' % (record['name'], record['sequence'])

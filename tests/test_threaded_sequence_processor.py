@@ -94,7 +94,7 @@ def test_paired_2thread():
                 for record in g.seqlist:
                     name, sequence = self.process_fn(record)
                     if name:
-                        keep.append((name, sequence))
+                        keep.append((name, sequence, None))
 
                 self.outqueue.put(SequenceGroup(0, keep))
 
@@ -141,7 +141,7 @@ def test_paired_2thread_more_seq():
                 for record in g.seqlist:
                     name, sequence = self.process_fn(record)
                     if name:
-                        keep.append((name, sequence))
+                        keep.append((name, sequence, None))
 
                 self.outqueue.put(SequenceGroup(0, keep))
 

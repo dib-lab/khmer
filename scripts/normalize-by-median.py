@@ -8,25 +8,32 @@ DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
 Use '-h' for parameter help.
 """
 
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 from itertools import izip
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 import argparse
 
-DEFAULT_DESIRED_COVERAGE=5
+DEFAULT_DESIRED_COVERAGE = 5
 
 # Iterate a collection in arbitrary batches
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
+
+
 def batchwise(t, size):
     it = iter(t)
-    return izip(*[it]*size)
+    return izip(*[it] * size)
 
 # Returns true if the pair of records are properly pairs
+
+
 def validpair(r0, r1):
     return r0.name[-1] == "1" and \
-           r1.name[-1] == "2" and \
-           r0.name[0:-1] == r1.name[0:-1]
+        r1.name[-1] == "2" and \
+        r0.name[0:-1] == r1.name[0:-1]
+
 
 def main():
     parser = build_construct_args()
@@ -44,21 +51,27 @@ def main():
 
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print>>sys.stderr, "** WARNING: hashsize is default!  You absodefly want to increase this!\n** Please read the docs!"
+            print >>sys.stderr, \
+                "** WARNING: hashsize is default!  " \
+                "You absodefly want to increase this!\n** " \
+                "Please read the docs!"
 
-        print>>sys.stderr, '\nPARAMETERS:'
-        print>>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print>>sys.stderr, ' - paired =	      %s \t\t(-p)' % args.paired
-        print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-'*8
+        print >>sys.stderr, '\nPARAMETERS:'
+        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
+        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
+        print >>sys.stderr, \
+            ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
+        print >>sys.stderr, ' - paired =	      %s \t\t(-p)' % args.paired
+        print >>sys.stderr, ''
+        print >>sys.stderr, \
+            'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' \
+            % (args.n_hashes * args.min_hashsize)
+        print >>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
-    DESIRED_COVERAGE=args.cutoff
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
+    DESIRED_COVERAGE = args.cutoff
     report_fp = args.report_file
     filenames = args.input_filenames
 
@@ -81,8 +94,9 @@ def main():
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
-	n = -1
-        for n, batch in enumerate(batchwise(screed.open(input_filename), batch_size)):
+        n = -1
+        for n, batch in enumerate(batchwise(screed.open(
+                input_filename), batch_size)):
             if n > 0 and n % 100000 == 0:
                 print '... kept', total - discarded, 'of', total, ', or', \
                     int(100. - discarded / float(total) * 100.), '%'
@@ -98,7 +112,9 @@ def main():
             # If in paired mode, check that the reads are properly interleaved
             if args.paired:
                 if not validpair(batch[0], batch[1]):
-                    print >>sys.stderr, 'Error: Improperly interleaved pairs %s %s' % (batch[0].name, batch[1].name)
+                    print >>sys.stderr, \
+                        'Error: Improperly interleaved pairs %s %s' \
+                        % (batch[0].name, batch[1].name)
                     sys.exit(-1)
 
             # Emit the batch of reads if any read passes the filter
@@ -116,24 +132,28 @@ def main():
                 if med < DESIRED_COVERAGE:
                     ht.consume(seq)
                     passed_filter = True
-            
+
             # Emit records if any passed
             if passed_length and passed_filter:
                 for record in batch:
-                    if hasattr(record,'accuracy'):
-                        outfp.write('@%s\n%s\n+\n%s\n' % (record.name, 
-                                                          record.sequence, 
+                    if hasattr(record, 'accuracy'):
+                        outfp.write('@%s\n%s\n+\n%s\n' % (record.name,
+                                                          record.sequence,
                                                           record.accuracy))
                     else:
-                        outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+                        outfp.write(
+                            '>%s\n%s\n' % (record.name, record.sequence))
             else:
                 discarded += batch_size
 
-	if -1 < n:
-	    print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
-		total, 'or', int(100. - discarded / float(total) * 100.), '%'
-	    print 'output in', output_name
-	else: print 'SKIPPED empty file', input_filename
+        if -1 < n:
+            print \
+                'DONE with', input_filename, '; kept', total - discarded, \
+                'of', total, 'or', \
+                int(100. - discarded / float(total) * 100.), '%'
+            print 'output in', output_name
+        else:
+            print 'SKIPPED empty file', input_filename
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
@@ -154,3 +174,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

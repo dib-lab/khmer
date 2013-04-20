@@ -2,6 +2,8 @@
 ktable, simple k-mer counting
 =============================
 
+(This is not why most people want to use khmer -- see :doc:`guide` for that.)
+
 khmer ktables are a simple C++ library for counting k-mers in DNA
 sequences.  There's a complete Python wrapping and it should be pretty
 darned fast; it's intended for genome-scale k-mer counting.

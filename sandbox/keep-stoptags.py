@@ -1,18 +1,21 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
 
-WORKER_THREADS=8
-GROUPSIZE=100
+WORKER_THREADS = 8
+GROUPSIZE = 100
 
 ###
+
 
 def main():
     stoptags = sys.argv[1]
     infile = sys.argv[2]
-        
+
     outfile = os.path.basename(infile) + '.stopkeep'
     if len(sys.argv) >= 4:
         outfile = sys.argv[3]
@@ -42,7 +45,7 @@ def main():
 
         if trim_at < K:
             return name, seq
-        
+
         seq = seq[trim_at:]
         if seq:
             return name, seq

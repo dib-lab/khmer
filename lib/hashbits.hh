@@ -50,6 +50,8 @@ namespace khmer {
       }
     }
 
+    uint32_t _all_tags_spin_lock;
+
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
@@ -60,14 +62,17 @@ namespace khmer {
       if (partition) { partition->_validate_pmap(); }
     }
 
-    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      khmer::Hashtable(ksize), _tablesizes(tablesizes) {
+    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
+    : khmer::Hashtable(ksize),
+      _tablesizes(tablesizes),
+      _all_tags_spin_lock( 0 )
+    {
       _tag_density = DEFAULT_TAG_DENSITY;
       assert(_tag_density % 2 == 0);
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
       _n_unique_kmers = 0;
-	  _n_overlap_kmers = 0;
+      _n_overlap_kmers = 0;
 
       _allocate_counters();
     }
@@ -141,11 +146,25 @@ namespace khmer {
 
     void clear_tags() { all_tags.clear(); }
 
-    void consume_fasta_and_tag(const std::string &filename,
-			       unsigned int &total_reads,
-			       unsigned long long &n_consumed,
-			       CallbackFn callback = 0,
-			       void * callback_data = 0);
+    // Count every k-mer in a FASTA or FASTQ file.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+      std::string const	  &filename,
+      unsigned int	  &total_reads,
+      unsigned long long  &n_consumed,
+      CallbackFn	  callback	  = NULL,
+      void *		  callback_data	  = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads, 
+    // using the supplied parser.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
 
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,
@@ -172,13 +191,11 @@ namespace khmer {
 
     // for overlap k-mer counting
     void consume_fasta_overlap(const std::string &filename,HashIntoType curve[2][100],
-                                      khmer::Hashbits &ht2,
+                              khmer::Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
 			      HashIntoType lower_bound,
 			      HashIntoType upper_bound,
-			      ReadMaskTable ** orig_readmask,
-			      bool update_readmask,
 			      CallbackFn callback,
 			      void * callback_data);
 
@@ -425,6 +442,14 @@ namespace khmer {
 			      std::vector<std::string> &results);
   };
 };
+
+
+#define ACQUIRE_ALL_TAGS_SPIN_LOCK \
+  while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));
+
+#define RELEASE_ALL_TAGS_SPIN_LOCK \
+  __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
+
 
 #include "counting.hh"
 

@@ -1,15 +1,17 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 31
-HASHTABLE_SIZE=int(4e9)
+HASHTABLE_SIZE = int(4e9)
 N_HT = 4
 
 ###
 
-RADIUS=1
-MAX_CIRCUM=4                            # 4 seems to eliminate lump in 1m.fa
-MAX_VOLUME=200
+RADIUS = 1
+MAX_CIRCUM = 4                            # 4 seems to eliminate lump in 1m.fa
+MAX_VOLUME = 200
 
 infile = sys.argv[1]
 outprefix = sys.argv[2]
@@ -29,7 +31,7 @@ highfp = open(highfile, 'w')
 print 'eating', infile
 ht.consume_fasta(infile)
 
-incr = 2*RADIUS
+incr = 2 * RADIUS
 
 for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
                                                    parse_description=False)):
@@ -45,7 +47,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
 
     pos = 0
     for pos in range(0, end, incr):
-        circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
+        circum = ht.count_kmers_on_radius(seq[pos:pos + K], RADIUS, MAX_VOLUME)
 
         if circum >= MAX_CIRCUM:
             is_high = True
@@ -58,7 +60,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         # find last k-mer with a low radius:
         i = 1
         for i in range(1, incr):
-            circum = ht.count_kmers_on_radius(seq[pos+i:pos+i+K],
+            circum = ht.count_kmers_on_radius(seq[pos + i:pos + i + K],
                                               RADIUS, MAX_VOLUME)
             if circum >= MAX_CIRCUM:
                 break
@@ -66,7 +68,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         pos += i - 1
 
         # now trim sequence:
-        seq = seq[:pos+K]
+        seq = seq[:pos + K]
         is_high = False
         name += "\tTRUNC.%d" % pos
 
@@ -75,5 +77,5 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         fp = highfp
     else:
         fp = lowfp
-        
+
     print >>fp, '>%s\n%s' % (name, seq)

@@ -19,13 +19,14 @@ import argparse
 # Debugging Support
 import re
 import platform
-if "Linux" == platform.system( ):
-    def __debug_vm_usage( msg ):
-	print "===> DEBUG: " + msg
-	for vmstat in re.findall( r".*Vm.*", file( "/proc/self/status" ).read( ) ):
-	    print vmstat
+if "Linux" == platform.system():
+    def __debug_vm_usage(msg):
+        print "===> DEBUG: " + msg
+        for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
+            print vmstat
 else:
-    def __debug_vm_usage( msg ): pass
+    def __debug_vm_usage(msg):
+        pass
 
 import khmer
 
@@ -33,6 +34,7 @@ DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
 ###
+
 
 def worker(q, basename, stop_big_traversals):
     while 1:
@@ -46,7 +48,7 @@ def worker(q, basename, stop_big_traversals):
         if os.path.exists(outfile):
             print 'SKIPPING', outfile, ' -- already exists'
             continue
-        
+
         print 'starting:', basename, n
 
         # pay attention to stoptags when partitioning; take command line
@@ -57,6 +59,7 @@ def worker(q, basename, stop_big_traversals):
         ht.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
+
 
 def main():
     parser = argparse.ArgumentParser(description="Partition a graph.")
@@ -120,7 +123,7 @@ def main():
     # break up the subsets into a list of worker tasks
     for i in range(0, n_subsets):
         start = divvy[i]
-        end = divvy[i+1]
+        end = divvy[i + 1]
         worker_q.put((ht, i, start, end))
 
     print 'enqueued %d subset tasks' % n_subsets

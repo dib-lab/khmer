@@ -6,6 +6,12 @@
 #include <cstdarg>
 
 #include <string>
+#include <utility>
+
+extern "C"
+{
+#include <regex.h>
+}
 
 #include "zlib/zlib.h"
 #include "bzip2/bzlib.h"
@@ -48,6 +54,15 @@ struct CacheSegmentBoundaryViolation : public std:: exception
 { };
 
 struct InvalidCacheSizeRequested : public std:: exception
+{ };
+
+struct NoMoreReadsAvailable : public std:: exception
+{ };
+
+struct UnknownPairReadingMode : public std:: exception
+{ };
+
+struct InvalidReadPair : public std:: exception
 { };
 
 
@@ -305,6 +320,8 @@ struct Read
     }
 };
 
+typedef std:: pair< Read, Read >	ReadPair;
+
 
 struct ParserPerformanceMetrics: public IPerformanceMetrics
 {
@@ -323,6 +340,13 @@ struct ParserPerformanceMetrics: public IPerformanceMetrics
 
 struct IParser
 {
+    
+    enum
+    {
+	PAIR_MODE_ALLOW_UNPAIRED = 0,
+	PAIR_MODE_IGNORE_UNPAIRED,
+	PAIR_MODE_ERROR_ON_UNPAIRED
+    };
 
     static IParser * const  get_parser(
 	std:: string const 	&ifile_name,
@@ -348,7 +372,19 @@ struct IParser
     inline bool		is_complete( )
     { return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem; }
 
-    virtual Read	get_next_read( );
+    // Note: 'get_next_read' exists for legacy reasons.
+    //	     In the long term, it should be eliminated in favor of direct use of
+    //	     'imprint_next_read'. A potentially costly copy-by-value happens
+    //	     upon return.
+    // TODO: Eliminate all calls to 'get_next_read'.
+    inline Read		get_next_read( )
+    { Read the_read; imprint_next_read( the_read ); return the_read; }
+    virtual void	imprint_next_read( Read &the_read );
+
+    virtual void	imprint_next_read_pair(
+	ReadPair &the_read_pair,
+	uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
+    );
 
 protected:
     
@@ -382,14 +418,34 @@ protected:
 
     CacheManager	_cache_manager;
 
+    uint32_t		_number_of_threads;
     ThreadIDMap		_thread_id_map;
     bool		_unithreaded;
 
     ParserState **	_states;
 
+    regex_t		_re_read_2_nosub;
+    regex_t		_re_read_1;
+    regex_t		_re_read_2;
+
     void		_copy_line( ParserState &state );
 
-    virtual void	_parse_read( ParserState &, Read &)	    = 0;
+    virtual void	_parse_read( ParserState &, Read & )	    = 0;
+
+#if (0)
+    void		_imprint_next_read_pair_in_allow_mode(
+	ReadPair &the_read_pair
+    );
+#endif
+    void		_imprint_next_read_pair_in_ignore_mode(
+	ReadPair &the_read_pair
+    );
+    void		_imprint_next_read_pair_in_error_mode(
+	ReadPair &the_read_pair
+    );
+    bool		_is_valid_read_pair(
+	ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
+    );
 
     inline ParserState	&_get_state( )
     {

@@ -1,11 +1,14 @@
 def _is_1(name):
     return name.endswith('/1')
 
+
 def _is_2(name):
     return name.endswith('/2')
 
+
 def is_pe(name1, name2):
     return name1[:-1] == name2[:-1]
+
 
 def load_pe(screed_handle):
     last_record = None
@@ -18,7 +21,7 @@ def load_pe(screed_handle):
         except StopIteration:
             if last_record:
                 yield last_record, None
-                    
+
             raise StopIteration
 
         if _is_2(this_record.name):

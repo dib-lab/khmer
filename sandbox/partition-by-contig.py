@@ -1,8 +1,9 @@
-import sys, khmer
+import sys
+import khmer
 import os.path
 import screed
 
-K=32
+K = 32
 
 readsfile = sys.argv[1]
 contigfile = sys.argv[2]
@@ -22,7 +23,7 @@ for n, record in enumerate(screed.open(contigfile)):
         print '... joining', n
     ht.join_partitions_by_path(record.sequence)
 
-#for n, record in enumerate(screed.open(readsfile)):
+# for n, record in enumerate(screed.open(readsfile)):
 #    if n % 10000 == 0:
 #        print '... joining x 2', n
 #    ht.join_partitions_by_path(record.sequence)

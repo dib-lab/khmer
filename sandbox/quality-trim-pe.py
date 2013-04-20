@@ -4,7 +4,9 @@ import sys
 import screed
 
 # python quality-trim.py <input fastq file> <output filtered fastq file>
-# MINLENGTH is the minimum lenth of read desired.  NCALLS is the percentage of a read with 'N' base calls for which if read has greater, it will be removed. 
+# MINLENGTH is the minimum lenth of read desired.  NCALLS is the
+# percentage of a read with 'N' base calls for which if read has greater,
+# it will be removed.
 
 MINLENGTH = 30
 
@@ -13,7 +15,7 @@ fileout = sys.argv[2]
 
 fw = open(fileout, 'w')
 
-count=0
+count = 0
 for n, record in enumerate(screed.open(filein)):
     name = record['name']
     sequence = record['sequence']
@@ -23,7 +25,7 @@ for n, record in enumerate(screed.open(filein)):
     accuracy = accuracy[:len(sequence)]
 
     if 'N' in sequence:
-       continue
+        continue
     else:
         trim = accuracy.find('B')
 
@@ -31,7 +33,8 @@ for n, record in enumerate(screed.open(filein)):
             if trim == -1:
                 fw.write('@%s\n%s\n+\n%s\n' % (name, sequence, accuracy))
             else:
-                fw.write('@%s\n%s\n+\n%s\n' % (name, sequence[:trim], accuracy[:trim]))
+                fw.write('@%s\n%s\n+\n%s\n' % (name,
+                         sequence[:trim], accuracy[:trim]))
             count += 1
 
     if n % 1000 == 0:
@@ -39,4 +42,4 @@ for n, record in enumerate(screed.open(filein)):
 
 print 'Original Number of Reads', n + 1
 print 'Final Number of Reads', count
-print 'Total Filtered', n + 1  - int(count)
+print 'Total Filtered', n + 1 - int(count)

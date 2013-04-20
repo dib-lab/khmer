@@ -303,10 +303,13 @@ namespace khmer {
 	CallbackFn	    callback	    = NULL,
 	void *		    callback_data   = NULL
     );
+			  
+    void get_median_count(const std::string &s,
+			  BoundedCounterType &median,
+			  float &average,
+			  float &stddev);
 
   };
-			  
-
 };
 
 #endif // HASHTABLE_HH

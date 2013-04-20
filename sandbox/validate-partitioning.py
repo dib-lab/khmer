@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import sys
-import screed, khmer
+import screed
+import khmer
 
 K = 32
 

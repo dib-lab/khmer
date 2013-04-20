@@ -7,6 +7,7 @@ import os
 MIN_PARTITION_SIZE = 5          # 3 is the smallest reasonable threshold
 K = 32
 
+
 def main(subset_filenames):
     print 'K', K
     print 'MIN SIZE', MIN_PARTITION_SIZE

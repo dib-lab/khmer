@@ -6,17 +6,20 @@ Streaming error trimming based on digital normalization.
 
 Use -h for parameter help.
 """
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 import argparse
 
-DEFAULT_NORMALIZE_LIMIT=20
-DEFAULT_CUTOFF=2
+DEFAULT_NORMALIZE_LIMIT = 20
+DEFAULT_CUTOFF = 2
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_MIN_HASHSIZE = 1e6
+
 
 def main():
     parser = argparse.ArgumentParser(description='XXX')
@@ -59,12 +62,12 @@ def main():
     parser.add_argument('input_filenames', nargs='+')
     args = parser.parse_args()
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
-    CUTOFF=args.abund_cutoff
-    NORMALIZE_LIMIT=args.normalize_to
+    CUTOFF = args.abund_cutoff
+    NORMALIZE_LIMIT = args.normalize_to
 
     is_variable_abundance = True        # conservative
     if args.is_genome:
@@ -111,7 +114,7 @@ def main():
                 print '... x 2', n, filename
 
             trimfp = open(trimfilename, 'a')
-        
+
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
@@ -126,4 +129,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

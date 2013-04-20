@@ -4,6 +4,7 @@
 import sys
 from screed.fasta import fasta_iter
 
+
 def read_partition_file(fp):
     for n, line in enumerate(fp):
         if n % 2 == 0:
@@ -31,7 +32,7 @@ for name, pid, _, _ in read_partition_file(open(filename1)):
     p1[pid] = x
 
     s1[name] = pid
-    
+
 p2 = {}
 s2 = {}
 for name, pid, _, _ in read_partition_file(open(filename2)):

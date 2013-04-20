@@ -7,7 +7,9 @@ be placed in 'infile.himed'.
 
 Use '-h' for parameter help.
 """
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
@@ -15,7 +17,8 @@ from khmer.counting_args import build_counting_multifile_args
 
 ###
 
-DEFAULT_CUTOFF=2
+DEFAULT_CUTOFF = 2
+
 
 def main():
     parser = build_counting_multifile_args()
@@ -49,14 +52,14 @@ def main():
 
     ### the filtering loop
     for infile in infiles:
-       print 'filtering', infile
-       outfile = os.path.basename(infile) + '.himed'
-       outfp = open(outfile, 'w')
+        print 'filtering', infile
+        outfile = os.path.basename(infile) + '.himed'
+        outfp = open(outfile, 'w')
 
-       tsp = ThreadedSequenceProcessor(process_fn)
-       tsp.start(verbose_loader(infile), outfp)
+        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp.start(verbose_loader(infile), outfp)
 
-       print 'output in', outfile
+        print 'output in', outfile
 
 if __name__ == '__main__':
     main()

@@ -2,37 +2,41 @@ import khmer
 import sys
 import screed
 import os.path
-import threading, Queue
+import threading
+import Queue
 import gc
 
 K = 31
-HASHTABLE_SIZE=int(4e9)
-THRESHOLD=500
-N_HT=4
-WORKER_THREADS=5
+HASHTABLE_SIZE = int(4e9)
+THRESHOLD = 500
+N_HT = 4
+WORKER_THREADS = 5
 
 ###
 
 MAX_DEGREE = 4
 
-GROUPSIZE=100
+GROUPSIZE = 100
 
 ###
+
 
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
 
+
 def is_pair(r1, r2):
     a = r1['name'].split('/')[0]
     b = r2['name'].split('/')[0]
 
-    return (a==b)
+    return (a == b)
+
 
 def process(inq, outq, ht):
     global worker_count
-    
+
     while not done or not inq.empty():
         try:
             g = inq.get(True, 1)
@@ -67,6 +71,7 @@ def process(inq, outq, ht):
 
     worker_count -= 1
 
+
 def write(outq, outfp):
     global worker_count
     groups = {}
@@ -89,11 +94,12 @@ def write(outq, outfp):
 
         gc.collect()
 
+
 def main():
     global done, worker_count
     done = False
     worker_count = 0
-    
+
     infile = sys.argv[1]
     outfile = os.path.basename(infile) + '.graphdeg'
     if len(sys.argv) == 3:

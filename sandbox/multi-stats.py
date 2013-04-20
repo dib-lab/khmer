@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 import os
-import sys, time
+import sys
+import time
 import subprocess
 
 localdir = os.path.dirname(__file__)
 localdir = os.path.abspath(localdir)
 
-COMMAND="%(localdir)s/stats-assemble.sh %(localdir)s %(filename)s"
+COMMAND = "%(localdir)s/stats-assemble.sh %(localdir)s %(filename)s"
 
 
 N_PROCESSES = 8
@@ -41,7 +42,8 @@ while filenames or running:
             report_fp.write('\nOutput:\n%s\n---' % out)
             report_fp.write('\nError:\n%s\n---' % err)
 
-            print 'done! %d of ~%d' % (report_number + 1, report_number + len(running) + len(filenames))
+            print 'done! %d of ~%d' % (report_number + 1, report_number +
+                                       len(running) + len(filenames))
             report_number += 1
             running.remove((cmd, p))
         else:
@@ -50,3 +52,5 @@ while filenames or running:
     time.sleep(1)
 
 print '\n** done **\n'
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

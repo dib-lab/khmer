@@ -1,25 +1,28 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE = int(8e9)
 N_HT = 4
 
-RADIUS=5
-MAX_VOLUME=30
+RADIUS = 5
+MAX_VOLUME = 30
 
-WORKER_THREADS=8
-GROUPSIZE=100
+WORKER_THREADS = 8
+GROUPSIZE = 100
 
 ###
+
 
 def main():
     repfile = sys.argv[1]
     infile = sys.argv[1]
     if len(sys.argv) >= 3:
         infile = sys.argv[2]
-        
+
     outfile = os.path.basename(infile) + '.loess'
     if len(sys.argv) >= 4:
         outfile = sys.argv[3]
@@ -56,7 +59,8 @@ def main():
 #        if trim_at >= K:
 #            return name, trim_seq
 
-        if trim_at == len(seq): return name, seq
+        if trim_at == len(seq):
+            return name, seq
 
         return None, None
 

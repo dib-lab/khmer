@@ -442,7 +442,8 @@ CacheManager(
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _segment_ref_count( 0 ),
     _segment_to_fill( 0 ),
-    _fill_counter( 0 )
+    _fill_counter( 0 ),
+    _ca_spin_lock( 0 )
 {
 
     if (cache_size < number_of_threads)	throw InvalidCacheSizeRequested( );
@@ -692,12 +693,19 @@ split_at( uint64_t const pos )
 	)
     {
 	if (0 == i % 100000000)
+	{
 	    segment.trace_logger(
 		TraceLogger:: TLVL_DEBUG3,
 		"Waited to acquire copyaside buffers spinlock " \
-		"for %llu iterations.\n",
+		"for %llu iterations. [write buffer]\n",
 		(unsigned long long int)i
 	    );
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG4,
+		"\tSpinlock is probably %s.\n",
+		_ca_spin_lock ? "set" : "unset"
+	    );
+	}
     }
     // Create and register copyaside buffer,
     // keyed to segment's current fill ID.
@@ -797,12 +805,19 @@ _perform_segment_maintenance( CacheSegment &segment )
 		    )
 		{
 		    if (0 == i % 100000000)
+		    {
 			segment.trace_logger(
 			    TraceLogger:: TLVL_DEBUG3,
 			    "Waited to acquire copyaside buffers spinlock " \
-			    "for %llu iterations.\n",
+			    "for %llu iterations. [read buffer]\n",
 			    (unsigned long long int)i
 			);
+			segment.trace_logger(
+			    TraceLogger:: TLVL_DEBUG4,
+			    "\tSpinlock is probably %s.\n",
+			    _ca_spin_lock ? "set" : "unset"
+			);
+		    }
 		}
 
 		// Test for existence of copyaside buffer from next fill.
@@ -1173,15 +1188,45 @@ IParser(
 	    stream_reader, number_of_threads, cache_size, trace_level
 	)
     ),
+    _number_of_threads( number_of_threads ),
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _unithreaded( 1 == number_of_threads ),
     _states( new ParserState *[ number_of_threads ] )
-{ for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL; }
+{
+    for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
+
+    assert( !regcomp(
+	&_re_read_2_nosub,
+	// ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
+	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
+	REG_EXTENDED | REG_NOSUB
+    ) );
+    assert( !regcomp(
+	&_re_read_1,
+	"^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
+    ) );
+    assert( !regcomp(
+	&_re_read_2,
+	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
+    ) );
+}
 
 
 IParser::
 ~IParser( )
-{ }
+{
+    for (uint32_t i = 0; i < _number_of_threads; ++i)
+    {
+	if (_states[ i ])
+	{
+	    delete _states[ i ];
+	    _states[ i ] = NULL;
+	}
+    }
+
+    regfree( &_re_read_2_nosub );
+    regfree( &_re_read_1 ); regfree( &_re_read_2 ); 
+}
 
 
 IParser:: ParserState::
@@ -1428,9 +1473,9 @@ _parse_read( ParserState &state, Read &the_read )
 }
 
 
-Read
+void
 IParser::
-get_next_read( )
+imprint_next_read( Read &the_read )
 {
     
     ParserState	    &state	    = _get_state( );
@@ -1440,7 +1485,6 @@ get_next_read( )
     TraceLogger	    &trace_logger   = state.trace_logger;
     uint64_t	    split_pos	    = 0;
     bool	    skip_read	    = false;
-    Read	    the_read;
     
     while (!is_complete( ))
     {
@@ -1486,7 +1530,9 @@ get_next_read( )
 	// when at the beginning of a new fill.
 	skip_read =
 		at_start && (0 != fill_id)
-	    &&	((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
+	    &&	!regexec(
+		    &_re_read_2_nosub, the_read.name.c_str( ), 0, NULL, 0
+		);
 	if (skip_read)
 	{
 	    trace_logger(
@@ -1560,7 +1606,126 @@ get_next_read( )
 	break;
     } // while invalid read
 
-    return the_read;
+    if (is_complete( ) && (0 == the_read.name.length( )))
+	throw NoMoreReadsAvailable( );
+} // imprint_next_read
+
+
+void
+IParser::
+imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
+{
+    switch (mode)
+    {
+#if (0)
+    case IParser:: PAIR_MODE_ALLOW_UNPAIRED:
+	_imprint_next_read_pair_in_allow_mode( the_read_pair );
+	break;
+#endif
+    case IParser:: PAIR_MODE_IGNORE_UNPAIRED:
+	_imprint_next_read_pair_in_ignore_mode( the_read_pair );
+	break;
+    case IParser:: PAIR_MODE_ERROR_ON_UNPAIRED:
+	_imprint_next_read_pair_in_error_mode( the_read_pair );
+	break;
+    default:
+	throw UnknownPairReadingMode( );
+    }
+}
+
+
+#if (0)
+void
+IParser::
+_imprint_next_read_pair_in_allow_mode( ReadPair &the_read_pair )
+{
+    // TODO: Implement.
+    //	     Probably need caching of reads between invocations 
+    //	     and the ability to return pairs which are half empty. 
+}
+#endif
+
+
+void
+IParser::
+_imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
+{
+    Read	    &read_1		= the_read_pair.first;
+    Read	    &read_2		= the_read_pair.second;
+    regmatch_t	    match_1, match_2;
+
+    // Hunt for a read pair until one is found or end of reads is reached.
+    while (true)
+    {
+
+	// Toss out all reads which are not marked as first of a pair.
+	// Note: We let any exception, which flies out of the following,
+	//	 pass through unhandled.
+	while (true)
+	{
+	    imprint_next_read( read_1 );
+	    if (!regexec(
+		&_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
+	    )) break;
+	}
+
+	// If first read of a pair was found, then insist upon second read.
+	// If not found, then restart search for pair.
+	// If found, then validate match.
+	// If invalid pair, then restart search for pair.
+	imprint_next_read( read_2 );
+	if (!regexec(
+	    &_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
+	))
+	{
+	    if (_is_valid_read_pair( the_read_pair, match_1, match_2 ))
+		break;
+	}
+
+    } // while pair not found
+
+} // _imprint_next_read_pair_in_ignore_mode
+
+
+void
+IParser::
+_imprint_next_read_pair_in_error_mode( ReadPair &the_read_pair )
+{
+    Read	    &read_1		= the_read_pair.first;
+    Read	    &read_2		= the_read_pair.second;
+    regmatch_t	    match_1, match_2;
+
+    // Note: We let any exception, which flies out of the following,
+    //	     pass through unhandled.
+    imprint_next_read( read_1 );
+    imprint_next_read( read_2 );
+
+    // Is the first read really the first member of a pair?
+    if (REG_NOMATCH == regexec(
+	&_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
+    )) throw InvalidReadPair( );
+    // Is the second read really the second member of a pair?
+    if (REG_NOMATCH == regexec(
+	&_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
+    )) throw InvalidReadPair( );
+
+    // Is the pair valid?
+    if (!_is_valid_read_pair( the_read_pair, match_1, match_2 ))
+	throw InvalidReadPair( );
+
+} // _imprint_next_read_pair_in_error_mode
+
+
+bool
+IParser::
+_is_valid_read_pair(
+    ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
+)
+{
+    return	(match_1.rm_so == match_2.rm_so)
+	    &&	(match_1.rm_eo == match_2.rm_eo)
+	    &&	(	the_read_pair.first.name.substr( 0, match_1.rm_so )
+		    ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
 

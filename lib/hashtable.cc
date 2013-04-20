@@ -2,8 +2,11 @@
 #include "hashtable.hh"
 #include "read_parsers.hh"
 
-using namespace khmer;
+#include <algorithm>
+
 using namespace std;
+using namespace khmer;
+using namespace khmer:: read_parsers;
 
 
 HashTablePerformanceMetrics::
@@ -139,8 +142,6 @@ consume_fasta(
   CallbackFn	      callback,	    void *		callback_data
 )
 {
-  using namespace khmer:: read_parsers;
-
   khmer:: Config    &the_config	  = khmer:: get_active_config( );
 
   // Note: Always assume only 1 thread if invoked this way.
@@ -156,19 +157,19 @@ consume_fasta(
     lower_bound, upper_bound, 
     callback, callback_data
   );
+
+  delete parser;
 }
 
 void
 Hashtable::
 consume_fasta(
-  read_parsers:: IParser *	      parser,
-  unsigned int	      &total_reads, unsigned long long  &n_consumed,
-  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
-  CallbackFn	      callback,	    void *		callback_data
+  read_parsers:: IParser *  parser,
+  unsigned int		    &total_reads, unsigned long long  &n_consumed,
+  HashIntoType		    lower_bound,  HashIntoType	      upper_bound,
+  CallbackFn		    callback,	  void *	      callback_data
 )
 {
-  using namespace khmer:: read_parsers;
-
   Hasher		  &hasher		= _get_hasher( );
   unsigned int		  total_reads_LOCAL	= 0;
   unsigned long long int  n_consumed_LOCAL	= 0;
@@ -178,13 +179,13 @@ consume_fasta(
     TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
   );
 
-  // Iterate through the reads and consume their kmers.
+  // Iterate through the reads and consume their k-mers.
   while (!parser->is_complete( ))
   {
     unsigned int  this_n_consumed;
     bool	  is_valid;
 
-    read      = parser->get_next_read();
+    read = parser->get_next_read( );
 
     this_n_consumed = 
     check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
@@ -261,6 +262,53 @@ unsigned int Hashtable::consume_string(const std::string &s,
   }
 
   return n_consumed;
+}
+
+// technically, get medioid count... our "median" is always a member of the
+// population.
+
+void Hashtable::get_median_count(const std::string &s,
+				 BoundedCounterType &median,
+				 float &average,
+				 float &stddev)
+{
+  BoundedCounterType count;
+  std::vector<BoundedCounterType> counts;
+  KMerIterator kmers(s.c_str(), _ksize);
+
+  while(!kmers.done()) {
+    HashIntoType kmer = kmers.next();
+    count = this->get_count(kmer);
+    counts.push_back(count);
+  }
+
+  assert(counts.size());
+
+  if (!counts.size()) {
+    median = 0;
+    average = 0;
+    stddev = 0;
+
+    return;
+  }
+
+  average = 0;
+  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
+       i != counts.end(); i++) {
+    average += *i;
+  }
+  average /= float(counts.size());
+
+  stddev = 0;
+  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
+       i != counts.end(); i++) {
+    stddev += (float(*i) - average) * (float(*i) - average);
+  }
+  stddev /= float(counts.size());
+  stddev = sqrt(stddev);
+
+  sort(counts.begin(), counts.end());
+  median = counts[counts.size() / 2]; // rounds down
 }
 
 // vim: set sts=2 sw=2:
