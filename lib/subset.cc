@@ -1,14 +1,15 @@
 #include "hashbits.hh"
 #include "subset.hh"
-#include "parsers.hh"
+#include "read_parsers.hh"
 
-#define IO_BUF_SIZE 1000*1000*1000
+#define IO_BUF_SIZE 250*1000*1000
 
 #define BIG_TRAVERSALS_ARE 200
 
 // #define VALIDATE_PARTITIONS
 
 using namespace khmer;
+using namespace khmer:: read_parsers;
 using namespace std;
 
 #if 0
@@ -89,9 +90,9 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
-    if (_ht->check_read(seq)) {
+    if (_ht->check_and_normalize_read(seq)) {
       const char * kmer_s = seq.c_str();
 
       bool found_tag = false;
@@ -185,9 +186,9 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 
   while(!parser->is_complete()) {
     read = parser->get_next_read();
-    seq = read.seq;
+    seq = read.sequence;
 
-    if (_ht->check_read(seq)) {
+    if (_ht->check_and_normalize_read(seq)) {
       unsigned long long n_consumed = 0;
       SeenSet found_tags;
       _ht->consume_sequence_and_tag(seq, n_consumed, &found_tags);
@@ -814,6 +815,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
     // _merge_from_disk_consolidate(diskp_to_pp);
   }
+
+  delete buf;
 }
 
 // Save a partition map to disk.
@@ -936,7 +939,7 @@ void SubsetPartition::_clear_all_partitions()
 
 bool SubsetPartition::is_single_partition(std::string seq)
 {
-  if (!_ht->check_read(seq)) {
+  if (!_ht->check_and_normalize_read(seq)) {
     return 0;
   }
 

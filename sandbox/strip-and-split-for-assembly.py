@@ -23,6 +23,9 @@ paired_fp = open(outfile + '.pe', 'w')
 last_record = None
 last_name = None
 
+n_pe = 0
+n_se = 0
+
 print 'splitting pe/se sequences from %s to %s.{pe,se}' % (infile, outfile)
 for n, record in enumerate(screed.open(sys.argv[1])):
     if n % 100000 == 0 and n > 0:
@@ -35,8 +38,10 @@ for n, record in enumerate(screed.open(sys.argv[1])):
            print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
            print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
            name, record = None, None
+           n_pe += 1
         else:
            print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+           n_se += 1
 
     last_name = name
     last_record = record
@@ -46,17 +51,21 @@ if last_record:
         print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
         print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
         name, record = None, None
+        n_pe += 1
     else:
         print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
         name, record = None, None
+        n_se += 1
 
 if record:
    print >>single_fp, '>%s\n%s' % (name, record['sequence'])
+   n_se += 1
 
 single_fp.close()
 paired_fp.close()
 
-### check, at the end, to see if it worked!
-paired_fp = open(outfile + '.pe')
-if not paired_fp.read(1):
+if n_pe == 0:
     raise Exception("no paired reads!? check file formats...")
+    
+print 'DONE; read %d sequences, %d pairs and %d singletons' % \
+      (n + 1, n_pe, n_se)

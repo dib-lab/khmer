@@ -51,6 +51,37 @@ def runscript(scriptname, args, in_directory=None):
 
     return status, out, err
 
+def DEBUG_runscript(scriptname, args, in_directory=None):
+    """
+    Run the given Python script, with the given args, in the given directory,
+    using 'execfile'.
+    """
+    sysargs = [scriptname]
+    sysargs.extend(args)
+
+    cwd = os.getcwd()
+
+    try:
+        oldargs = sys.argv
+        sys.argv = sysargs
+
+        if in_directory:
+            os.chdir(in_directory)
+
+        try:
+            print 'running:', scriptname, 'in:', in_directory
+            execfile(scriptname, { '__name__' : '__main__' })
+            status = 0
+        except:
+            traceback.print_exc(file=sys.stderr)
+            status = -1
+    finally:
+        sys.argv = oldargs
+
+        os.chdir(cwd)
+
+    return status, "", ""
+
 ####
 
 def test_load_into_counting():
@@ -207,25 +238,55 @@ def test_normalize_by_median_2():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
     assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
 
-def test_normalize_by_min():
-    CUTOFF='5'
+def test_normalize_by_median_paired():
+    CUTOFF='1'
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fa'), infile)
 
-    script = scriptpath('normalize-by-min.py')
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.sequence for r in screed.open(outfile) ]
+    assert len(seqs) == 2, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
+
+def test_normalize_by_median_impaired():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status != 0
+
+def test_normalize_by_median_empty():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-k', '17', infile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
 
-    outfile = infile + '.minkeep'
+    outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
-
-    seqs = [ r.sequence for r in screed.open(outfile) ]
-    assert len(seqs) == 5, seqs
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')
@@ -338,6 +399,63 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
 
             in_dir = os.path.dirname(outfile)
             (status, out, err) = runscript(script, args, in_dir)
+            assert status == 0
+
+            baseinfile = os.path.basename(infilename)
+            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
+
+    return outfile
+
+def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
+                do_partition=False,
+                annotate_partitions=False,
+                stop_big_traverse=False):
+    script = scriptpath('load-graph.py')
+    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data(infilename)
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = DEBUG_runscript(script, args)
+    assert status == 0
+
+    ht_file = outfile + '.ht'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    if do_partition:
+	print ">>>> DEBUG: Partitioning <<<"
+        script = scriptpath('partition-graph.py')
+        args = [outfile]
+        if stop_big_traverse:
+            args.insert(0, '--no-big-traverse')
+        (status, out, err) = DEBUG_runscript(script, args)
+        print out
+        print err
+        assert status == 0
+
+	print ">>>> DEBUG: Merging Partitions <<<"
+        script = scriptpath('merge-partitions.py')
+        args = [outfile, '-k', str(K)]
+        (status, out, err) = DEBUG_runscript(script, args)
+        print out
+        print err
+        assert status == 0
+
+        final_pmap_file = outfile + '.pmap.merged'
+        assert os.path.exists(final_pmap_file)
+
+        if annotate_partitions:
+	    print ">>>> DEBUG: Annotating Partitions <<<"
+            script = scriptpath('annotate-partitions.py')
+            args = ["-k", str(K), outfile, infilename]
+
+            in_dir = os.path.dirname(outfile)
+            (status, out, err) = DEBUG_runscript(script, args, in_dir)
             assert status == 0
 
             baseinfile = os.path.basename(infilename)
@@ -556,46 +674,3 @@ def test_abundance_dist():
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
 
-
-def test_count_overlap():
-    seqfile1 = utils.get_test_data('test-overlap1.fa')
-    seqfile2 = utils.get_test_data('test-overlap2.fa')
-    in_dir = os.path.dirname(seqfile1)
-    script = scriptpath('count-overlap.py')
-#    --ksize 32 --n_hashes 4 --hashsize 2000000000 --curve curve.out ../tests/test-data/test-graph3.fa ../tests/test-data/test-graph4.fa test.out
-    curvefile = seqfile1+'.curve'
-    outfile = seqfile1+'.out'
-    args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000','--curve', curvefile,seqfile1,seqfile2,outfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    assert os.path.exists(curvefile),curvefile
-    data = [ x.strip() for x in open(outfile) ]
-    data = set(data)
-    assert len(data) == 7, data
-    assert '# of unique kmers:440346' in data
-    assert '# of occupied bin:440299' in data
-    assert '# of unique kmers:581866' in data
-    assert '# of occupied bin:581783' in data
-    assert '# of overlap unique kmers:184849' in data
-    data = [ x.strip() for x in open(curvefile) ]
-    data = set(data)
-    assert len(data) == 100, data
-    assert '6021 0' in data
-    assert '29649 40' in data
-    assert '471277 74260' in data
-    assert '529993 132976' in data
-    assert '581866 184849' in data
-# no curve
-    args = ['--ksize', '32', '--n_hashes', '4', '--hashsize','2000000000',seqfile1,seqfile2,outfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
-    assert os.path.exists(outfile), outfile
-    data = [ x.strip() for x in open(outfile) ]
-    data = set(data)
-    assert len(data) == 7, data
-    assert '# of unique kmers:440346' in data
-    assert '# of occupied bin:440299' in data
-    assert '# of unique kmers:581866' in data
-    assert '# of occupied bin:581783' in data
-    assert '# of overlap unique kmers:184849' in data

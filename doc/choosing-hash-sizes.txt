@@ -29,7 +29,7 @@ tables specifies the total amount of memory used.
 
 This hash table is used to track k-mers.  If it is too small, khmer
 will fail in various ways (and should complain), but there is no harm
-in making too large. So, **the absolute safest thing to do is to
+in making it too large. So, **the absolute safest thing to do is to
 specify as much memory as is available**.  Most scripts will inform
 you of the total memory usage, and (at the end) will complain if it's
 too small.

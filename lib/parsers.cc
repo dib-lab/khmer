@@ -1,5 +1,8 @@
 #include "parsers.hh"
 
+using namespace khmer;
+using namespace khmer:: parsers;
+
 IParser* IParser::get_parser(const std::string &inputfile)
 {
    std::string filename(inputfile);
@@ -54,7 +57,7 @@ FastaParser::FastaParser(const std::string &inputfile) :
          }
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
 
@@ -113,7 +116,7 @@ FastaGzParser::FastaGzParser(const std::string &inputfile)
          }
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
 
@@ -168,10 +171,10 @@ Read FastaParser::get_next_read()
          next_name = line.substr(1);
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
-      }  else if (infile.eof())  {
-         one_read_left = false;
+      }  else if (infile.eof()) {
+	 one_read_left = true;
          break;
       }
 
@@ -182,7 +185,7 @@ Read FastaParser::get_next_read()
          one_read_left = true;
       }
 
-   }
+   } // while read is not validated
 
    return next_read;
 }
@@ -228,9 +231,10 @@ Read FastaGzParser::get_next_read()
          next_name = line.substr(1);
       }
 
-      if ((int)seq.find('N') == -1)  {
+      if ((int)seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }  else if (gzeof(infile))  {
+	 // NOTE: Is this logic correct?
          one_read_left = false;
          break;
       }
@@ -242,7 +246,7 @@ Read FastaGzParser::get_next_read()
          one_read_left = true;
       }
 
-   }
+   } // while read is not validated
 
    return next_read;
 }
@@ -268,7 +272,7 @@ FastqParser::FastqParser(const std::string &inputfile) :
    
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -311,7 +315,7 @@ FastqGzParser::FastqGzParser(const std::string &inputfile)
 
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -342,7 +346,7 @@ Read FastqParser::get_next_read()
 
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
    }
@@ -395,7 +399,7 @@ Read FastqGzParser::get_next_read()
 
       current_read.name = current_read.name.substr(1);
 
-      if ((int)current_read.seq.find('N') == -1)  {
+      if ((int)current_read.seq.find_first_of("Nn") == -1)  {
          valid_read = 1;
       }
 
@@ -406,3 +410,29 @@ Read FastqGzParser::get_next_read()
 
    return next_read;
 }
+
+/*
+int main()
+{
+   IParser* parser = IParser::get_parser("test.fasta.gz");
+   
+   while(!parser->is_complete())  {
+      Read next_read = parser->get_next_read();
+      std::cout << next_read.name << ": " << next_read.seq << std::endl;
+   }
+
+   delete parser;
+
+   IParser* parser2 = IParser::get_parser("test.fq.gz");
+   while (!parser2->is_complete()) {
+      Read next_read = parser2->get_next_read();
+      std::cout << next_read.name << ": " << next_read.seq << std::endl;
+   }
+
+   delete parser2;
+
+   return 0;
+}
+*/
+
+// vim: set sts=3 sw=3:
