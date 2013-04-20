@@ -3829,11 +3829,19 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  CandidateAlignment aln = aligner->alignRead(read);
+  CandidateAlignment aln;
+  std::string rA;
+
+  Py_BEGIN_ALLOW_THREADS
+
+  aln = aligner->alignRead(read);
+  rA = aln.getReadAlignment(read);
+
+  Py_END_ALLOW_THREADS
 
   const char* alignment = aln.alignment.c_str();
-  std::string rA = aln.getReadAlignment(read);
   const char* readAlignment = rA.c_str();
+
  
   return Py_BuildValue("ss", alignment,
                               readAlignment);
