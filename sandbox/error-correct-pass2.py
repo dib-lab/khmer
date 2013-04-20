@@ -18,6 +18,7 @@ from khmer.counting_args import build_counting_multifile_args
 ###
 
 DEFAULT_COVERAGE = 20
+DEFAULT_MAX_ERROR_REGION = 40
 
 
 def main():
@@ -25,6 +26,9 @@ def main():
     parser.add_argument('--cutoff', '-C', dest='coverage',
                         default=DEFAULT_COVERAGE, type=int,
                         help="Diginorm coverage.")
+    parser.add_argument('--max-error-region', '-M', dest='max_error_region',
+                        default=DEFAULT_MAX_ERROR_REGION, type=int,
+                        help="Max length of error region allowed")
     args = parser.parse_args()
 
     counting_ht = args.input_table
@@ -36,7 +40,7 @@ def main():
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
     C = args.coverage
-    max_error_region = 40
+    max_error_region = args.max_error_region
 
     print "K:", K
     print "C:", C
