@@ -1,0 +1,75 @@
+#! /usr/bin/env python
+"""
+Error correct reads based on a counting hash from a diginorm step.
+Output sequences will be put in @@@.
+
+% python scripts/error-correct-pass2 <counting.kh> <data1> [ <data2> <...> ]
+
+Use '-h' for parameter help.
+"""
+import sys
+import screed.fasta
+import os
+import khmer
+from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+
+from khmer.counting_args import build_counting_multifile_args
+
+###
+
+DEFAULT_COVERAGE = 20
+
+
+def main():
+    parser = build_counting_multifile_args()
+    parser.add_argument('--cutoff', '-C', dest='coverage',
+                        default=DEFAULT_COVERAGE, type=int,
+                        help="Diginorm coverage.")
+    args = parser.parse_args()
+
+    counting_ht = args.input_table
+    infiles = args.input_filenames
+
+    print 'file with ht: %s' % counting_ht
+
+    print 'loading hashtable'
+    ht = khmer.load_counting_hash(counting_ht)
+    K = ht.ksize()
+    C = args.coverage
+    max_error_region = 40
+
+    print "K:", K
+    print "C:", C
+    print "max error region:", max_error_region
+
+    ### the filtering function.
+    def process_fn(record):
+        # read_aligner is probably not threadsafe?
+        aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
+    
+        name = record['name']
+        seq = record['sequence']
+
+        seq = seq.replace('N', 'A')
+
+        grXreAlign, reXgrAlign = aligner.align(seq)
+
+        if len(reXgrAlign) > 0:
+            graph_seq = grXreAlign.replace('-', '')
+            seq = graph_seq
+
+        return name, seq
+
+    ### the filtering loop
+    for infile in infiles:
+        print 'filtering', infile
+        outfile = os.path.basename(infile) + '.corr'
+        outfp = open(outfile, 'w')
+
+        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp.start(verbose_loader(infile), outfp)
+
+        print 'output in', outfile
+
+if __name__ == '__main__':
+    main()
