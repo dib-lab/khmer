@@ -71,6 +71,7 @@ def main():
                 if histcount[i]:
                     print >>outfp, i, hist[i], histcount[i], \
                         hist[i] / histcount[i]
+            outfp.close()
 
             if n >= args.num_reads:
                 break
