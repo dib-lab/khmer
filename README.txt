@@ -26,7 +26,7 @@ INSTRUCTIONS:
 
 You'll need 'screed' installed: https://github.com/ged-lab/screed
 
-'cd python && python setup.py test' to test (OR set PYTHONPATH, 'make test').
+'make test' to test (you may need to set your PYTHONPATH to find screed).
 
 'make doc' to build docs.  You'll need Sphinx installed.
 

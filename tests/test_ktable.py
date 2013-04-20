@@ -113,6 +113,15 @@ class Test_KTable:
 
         for i in range(0, kt.n_entries()):
             assert(kt.get(i) == 1)
+    
+    def test_operator_in( self ):
+        kt = self.kt
+
+        s = "ATGAGAGACACAGGGAGAGACCCAATTAGAGAATTGGACC"
+        kt.consume(s)
+
+	assert "CCCAA" in kt
+	assert not "GGGGG" in kt
 
     def test_intersection(self):
         kt = self.kt
@@ -191,13 +200,14 @@ def test_KmerCount():
     assert i == 2
 
     ### test capital letters vs lowercase
+    config = khmer.get_config( )
+    if config.has_extra_sanity_checks( ):
+	km = khmer.KmerCount(4, report_zero=True)
+	km.consume('AAAAAC'.lower())
+	expected = (('AAAA', 2), ('AAAC', 1))
 
-    km = khmer.KmerCount(4, report_zero=True)
-    km.consume('AAAAAC'.lower())
-    expected = (('AAAA', 2), ('AAAC', 1))
-
-    assert km['AAAA'] == 2
-    assert km['AAAC'] == 1
+	assert km['AAAA'] == 2
+	assert km['AAAC'] == 1
 
     ### hooray, done!
 
