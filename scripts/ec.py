@@ -9,8 +9,7 @@ input_filename = sys.argv[2]
 output_filename = sys.argv[3]
 max_error_region = int(sys.argv[4])
 
-K=20 # word size
-C=10 # 20
+C=20 # 20
 
 corrected = 0
 uncorrected = 0
@@ -19,6 +18,8 @@ outfp = open(output_filename, 'w')
 
 ht = khmer.load_counting_hash(hash_filename)
 aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
+
+K = ht.ksize()
 
 for n, record in enumerate(screed.open(input_filename)):
    if n % 1000 == 0:
