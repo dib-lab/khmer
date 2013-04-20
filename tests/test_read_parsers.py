@@ -163,6 +163,7 @@ def test_iterator_identities( ):
 
 
 def test_read_pair_iterator_in_error_mode( ):
+    assert 0
     
     rparser = \
     ReadParser( utils.get_test_data( "test-abund-read-paired.fa" ) )
@@ -210,6 +211,7 @@ def test_read_pair_iterator_in_error_mode_xfail( ):
 
 
 def test_read_pair_iterator_in_ignore_mode( ):
+    assert 0
 
     rparser = \
     ReadParser( utils.get_test_data( "test-abund-read-impaired.fa" ) )
