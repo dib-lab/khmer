@@ -8,7 +8,7 @@ import glob
 import os.path
 import shutil
 
-K=32
+K = 32
 
 ###
 
@@ -16,6 +16,7 @@ lock = threading.Lock()
 output_n = 0
 
 ###
+
 
 def pull_pair(q):
     while q.qsize() >= 2:
@@ -31,9 +32,10 @@ def pull_pair(q):
             print 'pushing, then exiting'
             q.put((ht, filename1))
             return
-        
+
         merge_file = merge(filename1, filename2, ht)
-        #q.put((ht, merge_file))   # @CTB
+        # q.put((ht, merge_file))   # @CTB
+
 
 def merge(filename1, filename2, ht):
     global output_n, lock
@@ -48,8 +50,9 @@ def merge(filename1, filename2, ht):
     subset1 = ht.load_subset_partitionmap(filename1)
     ht.merge2_subset_from_disk(subset1, filename2)
     ht.save_subset_partitionmap(subset1, merge_filename + '.pmap')
-    
+
     return merge_filename + '.pmap'
+
 
 def main(dir1, dir2, n_threads):
     # detect all of the relevant partitionmap files

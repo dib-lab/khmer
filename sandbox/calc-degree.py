@@ -1,8 +1,10 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 31                                  # use K-1 for assembly K
-HASHTABLE_SIZE=int(1e9)
+HASHTABLE_SIZE = int(1e9)
 N_HT = 4
 
 ###
@@ -27,5 +29,5 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
     seq = record['sequence']
 
     for j in range(len(seq) - K):
-        kmer = seq[j:j+K]
+        kmer = seq[j:j + K]
         print >>outfp, ht.kmer_degree(kmer)

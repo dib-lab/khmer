@@ -217,21 +217,6 @@ cdef extern from "../lib/hashtable.hh" namespace "khmer":
 
 
 cdef extern from "../lib/storage.hh" namespace "khmer":
-   cdef cppclass ReadMaskTable:
-      ReadMaskTable(unsigned int)
-      ReadMaskTable()
-
-      unsigned int get_tablesize()
-      unsigned int n_kept()
-      unsigned int get(unsigned int)
-      void set(unsigned int, bool)
-      void merge(ReadMaskTable)
-      void invert()
-      void save(char*)
-      void load(char*)
-      unsigned int filter_fasta_file(char*, char*, 
-                                     CallbackFn,
-                                     void*) except *  
 
    cdef cppclass MinMaxTable:
       MinMaxTable(unsigned int)      
@@ -265,28 +250,8 @@ cdef extern from "../lib/counting.hh" namespace "khmer":
       BoundedCounterType get_count(char*)
       BoundedCounterType get_count(HashIntoType)
       MinMaxTable * fasta_file_to_minmax(char*, unsigned int, 
-                                         ReadMaskTable*,
                                          CallbackFn,
                                          void*) except *
-      ReadMaskTable * filter_fasta_file_any(MinMaxTable&, BoundedCounterType,
-                                            ReadMaskTable*,
-                                            CallbackFn,
-                                            void*) except *
-      ReadMaskTable * filter_fasta_file_all(MinMaxTable&, BoundedCounterType,
-                                            ReadMaskTable* readmask,
-                                            CallbackFn,
-                                            void*) except *
-      ReadMaskTable * filter_fasta_file_limit_n(char*, MinMaxTable&, 
-                                                BoundedCounterType,
-                                                BoundedCounterType,
-                                                ReadMaskTable*,
-                                                CallbackFn,
-                                                void*) except *
-      ReadMaskTable * filter_fasta_file_run(char*, unsigned int, BoundedCounterType, 
-                                            unsigned int, 
-                                            ReadMaskTable* old_readmask,
-                                            CallbackFn,
-                                            void*) except *
       void output_fasta_kmer_pos_freq(char*, char*)
       BoundedCounterType get_min_count(char*, HashIntoType, HashIntoType)
       BoundedCounterType get_max_count(char*, HashIntoType, HashIntoType)
@@ -294,11 +259,10 @@ cdef extern from "../lib/counting.hh" namespace "khmer":
                                             CallbackFn,
                                             void*) except *
       HashIntoType * fasta_count_kmers_by_position(char*, unsigned int,
-                                                   ReadMaskTable*,
                                                    BoundedCounterType,
                                                    CallbackFn,
                                                    void*) except *
-      void fasta_dump_kmers_by_abundance(char*, ReadMaskTable*, BoundedCounterType,
+      void fasta_dump_kmers_by_abundance(char*, BoundedCounterType,
                                          CallbackFn, 
                                          void*) except *
       unsigned int consume_string(char*, HashIntoType, HashIntoType)
@@ -496,41 +460,6 @@ cdef class new_ktable:
    def __contains__( self, char *kmer ):
       return int( pybool( self.thisptr.get_count( kmer ) ) )
 
-cdef class new_readmask:
-   cdef ReadMaskTable *thisptr
-   def __cinit__(self, n=None):
-      if isinstance(n, int) or isinstance(n, long):
-         self.thisptr = new ReadMaskTable(<unsigned int>n)
-   def invert(self):
-      self.thisptr.invert()
-   def tablesize(self):
-      return self.thisptr.get_tablesize()
-   def n_kept(self):
-      return self.thisptr.n_kept()
-   def get(self, unsigned int n):
-      return self.thisptr.get(n)
-   def set(self, unsigned int n, bool b):
-      self.thisptr.set(n, b)
-   def do_and(self, unsigned int index, unsigned int setval):
-      cdef BoundedCounterType val = self.thisptr.get(index)
-      if setval and val:
-         val = 1
-      else:
-         val = 0
-      self.thisptr.set(index, val)
-      return val
-   def save(self, char* s):
-      self.thisptr.save(s)
-   def load(self, char* s):
-      self.thisptr.load(s)
-   def merge(self, new_readmask tbl):
-      self.thisptr.merge(tbl.thisptr[0])
-   def filter_fasta_file(self, char* s1, char* s2, callback_obj=None):
-      global _callback_obj
-      if callback_obj is not None:
-         _callback_obj = callback_obj
-      return self.thisptr.filter_fasta_file(s1, s2, _report_fn, <void*>_callback_obj)
-
 cdef class new_minmax:
    cdef MinMaxTable *thisptr
    def __cinit__(self, unsigned int n=0):
@@ -622,96 +551,28 @@ cdef class _new_counting_hash:
          dist.append(cdist[i])
       return dist
    def fasta_file_to_minmax(self, char* inputfile, unsigned int total_reads, 
-                            new_readmask readmask=None, callback_obj=None):
+                            callback_obj=None):
       global _callback_obj
       if callback_obj is not None:
          _callback_obj = callback_obj
 
-      cdef ReadMaskTable* rm=NULL
-      if readmask is not None:
-         rm = <ReadMaskTable*> readmask.thisptr
-
       cdef MinMaxTable * ret_minmax = self.thisptr.fasta_file_to_minmax(inputfile,
                                                                         total_reads,
-                                                                        rm,
                                                                         _report_fn,
                                                                         <void*>_callback_obj)
       return_minmax = new_minmax()
       return_minmax.thisptr = ret_minmax
       return return_minmax
-   def filter_fasta_file_any(self, new_minmax minmax, BoundedCounterType threshold,
-                             new_readmask in_readmask=None, callback_obj=None):
-      global _callback_obj
-      if callback_obj is not None:
-         _callback_obj = callback_obj
-
-      cdef ReadMaskTable* in_rm=NULL
-      if in_readmask is not None:
-         in_rm = <ReadMaskTable*> in_readmask.thisptr
-      cdef ReadMaskTable * c_readmask = self.thisptr.filter_fasta_file_any(minmax.thisptr[0], threshold, in_rm, _report_fn, <void*>_callback_obj)
-      readmask = new_readmask()
-      readmask.thisptr = c_readmask
-      return readmask
-   def filter_fasta_file_all(self, new_minmax minmax, BoundedCounterType threshold, 
-                             new_readmask in_readmask=None, callback_obj=None):
-      global _callback_obj
-      if callback_obj is not None:
-         _callback_obj = callback_obj
-
-      cdef ReadMaskTable* in_rm=NULL
-      if in_readmask is not None:
-         in_rm = <ReadMaskTable*> in_readmask.thisptr
-      cdef ReadMaskTable * c_readmask = self.thisptr.filter_fasta_file_all(minmax.thisptr[0], threshold,
-                                        in_rm, _report_fn, <void*>_callback_obj)
-      readmask = new_readmask()
-      readmask.thisptr = c_readmask
-      return readmask
-   def filter_fasta_file_limit_n(self, char* filename, new_minmax minmax, 
-                                 BoundedCounterType threshold, BoundedCounterType n,
-                                 new_readmask in_readmask=None, callback_obj=None):
-      global _callback_obj
-      if callback_obj is not None:
-         _callback_obj = callback_obj
-
-      cdef ReadMaskTable* in_rm=NULL
-      if in_readmask is not None:
-         in_rm = <ReadMaskTable*> in_readmask.thisptr
-      cdef ReadMaskTable * c_readmask = self.thisptr.filter_fasta_file_limit_n(filename, minmax.thisptr[0], 
-                                                                               threshold, n,
-                                                          in_rm, _report_fn, <void*>_callback_obj)
-      readmask = new_readmask()
-      readmask.thisptr = c_readmask
-      return readmask
-   def filter_fasta_file_run(self, char* inputfile, unsigned int total_reads,
-                             BoundedCounterType threshold, unsigned int runlength,
-                             new_readmask in_readmask=None, callback_obj=None):
-      global _callback_obj
-      if callback_obj is not None:
-         _callback_obj = callback_obj
-
-      cdef ReadMaskTable* in_rm=NULL
-      if in_readmask is not None:
-         in_rm = <ReadMaskTable*> in_readmask.thisptr
-      cdef ReadMaskTable * c_readmask = self.thisptr.filter_fasta_file_run(inputfile, total_reads,
-                                                                           threshold, runlength, in_rm,
-                                                                           _report_fn, <void*>_callback_obj)
-      readmask = new_readmask()
-      readmask.thisptr = c_readmask
-      return readmask 
    def fasta_count_kmers_by_position(self, char* inputfile, unsigned int max_read_len, 
                                      BoundedCounterType limit_by_count=0, 
-                                     new_readmask in_readmask=None,
                                      callback_obj=None):
       global _callback_obj
       if callback_obj is not None:
          _callback_obj = callback_obj
 
-      cdef ReadMaskTable* in_rm=NULL 
-      if in_readmask is not None:
-         in_rm = <ReadMaskTable*> in_readmask.thisptr  
       positions = []
       cpositions = self.thisptr.fasta_count_kmers_by_position(inputfile, max_read_len,
-                                                              in_rm, limit_by_count,
+                                                              limit_by_count,
                                                               _report_fn, <void*>_callback_obj)
       for i in range(max_read_len):
          positions.append(cpositions[i])
@@ -726,12 +587,12 @@ cdef class _new_counting_hash:
       self.thisptr.consume_fasta(filename, total_reads, n_consumed, lower_bound,
                                  upper_bound, _report_fn, <void*>_callback_obj)
       return total_reads, n_consumed
-   def fasta_dump_kmers_by_abundance(self, char* inputfile, new_readmask rm, 
+   def fasta_dump_kmers_by_abundance(self, char* inputfile, 
                                      BoundedCounterType limit_by_count, callback_obj=None):
       global _callback_obj
       if callback_obj is not None:
          _callback_obj = callback_obj
-      self.thisptr.fasta_dump_kmers_by_abundance(inputfile, rm.thisptr, limit_by_count,
+      self.thisptr.fasta_dump_kmers_by_abundance(inputfile, limit_by_count,
                                                  _report_fn, <void*>_callback_obj)
    def set_use_bigcount(self, bool b):
       self.thisptr.set_use_bigcount(b)

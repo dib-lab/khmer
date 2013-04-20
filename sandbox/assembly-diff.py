@@ -1,11 +1,14 @@
 #! /usr/bin/env python
-import sys, khmer, screed, os
+import sys
+import khmer
+import screed
+import os
 
-K=20
-HASHTABLE_SIZE=int(2.5e8)
-N_HT=4
+K = 20
+HASHTABLE_SIZE = int(2.5e8)
+N_HT = 4
 
-THRESHOLD=0.9
+THRESHOLD = 0.9
 
 filename1 = sys.argv[1]
 filename2 = sys.argv[2]
@@ -25,7 +28,7 @@ for record in screed.open(paths):
     path = record.sequence
     n = len(path) - K + 1
     for i in range(n):
-        if kh1.get(path[i:i+K]):
+        if kh1.get(path[i:i + K]):
             n_present += 1
 
     if n_present / float(n) >= THRESHOLD:
@@ -39,7 +42,7 @@ for record in screed.open(paths):
     path = record.sequence
     n = len(path) - K + 1
     for i in range(n):
-        if kh2.get(path[i:i+K]):
+        if kh2.get(path[i:i + K]):
             n_present += 1
 
     if n_present / float(n) >= THRESHOLD:
@@ -51,7 +54,3 @@ for record in screed.open(paths):
         print >>uniq1, '>%s\n%s' % (record.name, record.sequence)
     elif present2 and not present1:
         print >>uniq2, '>%s\n%s' % (record.name, record.sequence)
-
-
-    
-    

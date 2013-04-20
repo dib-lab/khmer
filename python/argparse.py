@@ -130,6 +130,7 @@ _UNRECOGNIZED_ARGS_ATTR = '_unrecognized_args'
 # Utility functions and classes
 # =============================
 
+
 class _AttributeHolder(object):
     """Abstract base class that provides __repr__.
 
@@ -639,7 +640,7 @@ class HelpFormatter(object):
     def _fill_text(self, text, width, indent):
         text = self._whitespace_matcher.sub(' ', text).strip()
         return _textwrap.fill(text, width, initial_indent=indent,
-                                           subsequent_indent=indent)
+                              subsequent_indent=indent)
 
     def _get_help_string(self, action):
         return action.help
@@ -692,7 +693,7 @@ def _get_action_name(argument):
     if argument is None:
         return None
     elif argument.option_strings:
-        return  '/'.join(argument.option_strings)
+        return '/'.join(argument.option_strings)
     elif argument.metavar not in (None, SUPPRESS):
         return argument.metavar
     elif argument.dest not in (None, SUPPRESS):
@@ -1108,7 +1109,8 @@ class _SubParsersAction(Action):
         # parse all the remaining options into the namespace
         # store any unrecognized options on the object, so that the top
         # level parser can decide what to do with them
-        namespace, arg_strings = parser.parse_known_args(arg_strings, namespace)
+        namespace, arg_strings = parser.parse_known_args(
+            arg_strings, namespace)
         if arg_strings:
             vars(namespace).setdefault(_UNRECOGNIZED_ARGS_ATTR, [])
             getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).extend(arg_strings)
@@ -1160,6 +1162,7 @@ class FileType(object):
 # ===========================
 # Optional and Positional Parsing
 # ===========================
+
 
 class Namespace(_AttributeHolder):
     """Simple object for storing attributes.
@@ -1262,7 +1265,6 @@ class _ActionsContainer(object):
             if action.dest == dest and action.default is not None:
                 return action.default
         return self._defaults.get(dest, None)
-
 
     # =======================
     # Adding argument actions
@@ -1610,12 +1612,12 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             default_prefix = prefix_chars[0]
         if self.add_help:
             self.add_argument(
-                default_prefix+'h', default_prefix*2+'help',
+                default_prefix + 'h', default_prefix * 2 + 'help',
                 action='help', default=SUPPRESS,
                 help=_('show this help message and exit'))
         if self.version:
             self.add_argument(
-                default_prefix+'v', default_prefix*2+'version',
+                default_prefix + 'v', default_prefix * 2 + 'version',
                 action='version', default=SUPPRESS,
                 version=self.version,
                 help=_("show program's version number and exit"))
@@ -2075,7 +2077,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         # if multiple actions match, the option string was ambiguous
         if len(option_tuples) > 1:
             options = ', '.join([option_string
-                for action, option_string, explicit_arg in option_tuples])
+                                 for action, option_string, explicit_arg in option_tuples])
             tup = arg_string, options
             self.error(_('ambiguous option: %s could match %s') % tup)
 

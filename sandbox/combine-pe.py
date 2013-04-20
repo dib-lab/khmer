@@ -7,6 +7,7 @@ K = 32
 
 ###
 
+
 def get_partition(record):
     pid = record['name'].rsplit('\t', 1)[1]
     return int(pid)
@@ -20,10 +21,11 @@ before = ht.count_partitions()
 
 last_name = None
 last_record = None
-for n, record in enumerate(fasta_iter(open(sys.argv[1]), parse_description=False)):
+for n, record in enumerate(
+        fasta_iter(open(sys.argv[1]), parse_description=False)):
     if n % 10000 == 0:
         print '...', n
-        
+
     name = record['name'].split()[0]
     name = name.split('/', 1)[0]
 
@@ -48,3 +50,5 @@ print 'after:', after
 
 n_combined = before[0] - after[0]
 print 'combined:', n_combined
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

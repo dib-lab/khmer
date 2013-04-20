@@ -3,8 +3,10 @@ NO_UNIQUE_RC=0
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
 # comment out whichever is appropriate.  can probably make this automatic ;)
-#SO_EXT=.so
-DYLIB_EXT=.dylib
+SO_EXT=.so
+#DYLIB_EXT=.dylib
+Z_LIB_DIR=zlib-1.2.3
+Z_LIB_FILES=$(Z_LIB_DIR)/*.o
 
 ZLIB_DIR=zlib
 ZLIB_OBJS_BASE=\
@@ -22,8 +24,8 @@ DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser 
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=#ht-diff
 
-CORE_OBJS= khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
-PARSERS_OBJS=parsers.o read_parsers.o
+CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
+PARSERS_OBJS= read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
 
@@ -57,10 +59,6 @@ test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
 ht-diff: $(HT_DIFF_OBJS)
 	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
 
-# TODO: Move 'main' to a driver program.
-#parsetest: parsers.o 
-#	$(CXX) -o $@ parsers.o $(ZLIB_OBJS)
-
 bittest: bittest.o ktable.o
 	$(CXX) -o $@ bittest.o ktable.o
 
@@ -80,6 +78,8 @@ $(ZLIB_OBJS):
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
+
+error.o: error.cc error.hh
 
 khmer_config.o: khmer_config.cc khmer_config.hh
 

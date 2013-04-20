@@ -7,11 +7,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
-#include <error.h>
 #include <getopt.h>
 
 #include <omp.h>
 
+#include "error.hh"
 #include "read_parsers.hh"
 
 

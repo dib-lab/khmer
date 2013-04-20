@@ -22,4 +22,8 @@ a number of scripts.
 Jared T. Simpson (University of Cambridge, Sanger Institute) contributed 
 paired-end support for digital normalization.
 
-EM 8/12
+Eric McDonald thoroughly revised many aspects of the code base, made
+much of the codebase threadsafe, and otherwise improved performance
+dramatically.
+
+CTB 3/13

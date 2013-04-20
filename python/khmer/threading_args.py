@@ -4,10 +4,11 @@
 
 DEFAULT_N_THREADS = 1
 
-def add_threading_args( parser ):
-    
+
+def add_threading_args(parser):
+
     parser.add_argument(
-	'--threads', '-T', dest='n_threads',
+        '--threads', '-T', dest='n_threads',
         default=DEFAULT_N_THREADS,
         help='Number of simultaneous threads to execute'
     )

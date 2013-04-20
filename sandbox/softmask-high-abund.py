@@ -2,7 +2,10 @@
 """
 Lowercase high-copy-number k-mers.
 """
-import sys, khmer, screed, gzip
+import sys
+import khmer
+import screed
+import gzip
 
 THRESHOLD = 5
 
@@ -32,7 +35,7 @@ for n, record in enumerate(screed.open(filename)):
     seq = record.sequence
 
     total += len(seq) - K + 1
-    
+
     pos = 0
     while pos < len(seq) - K + 1:
         kmer = seq[pos:pos + K]
@@ -42,12 +45,12 @@ for n, record in enumerate(screed.open(filename)):
             continue
 
         count = ht.get(kmer)
-        
+
         if count < THRESHOLD:
             x.append(seq[pos].upper())
             pos += 1
         else:
-            x.extend(seq[pos:pos+K].lower())
+            x.extend(seq[pos:pos + K].lower())
             total_masked += K
             pos += K
 
