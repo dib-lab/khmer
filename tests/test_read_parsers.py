@@ -4,7 +4,7 @@
 import khmer
 from khmer import ReadParser
 import khmer_tst_utils as utils
-
+from nose.plugins.attrib import attr
 
 def test_read_properties( ):
     
@@ -162,6 +162,7 @@ def test_iterator_identities( ):
     assert rparser is rparser.iter_reads( )
 
 
+@attr('known_failing')
 def test_read_pair_iterator_in_error_mode( ):
     assert 0
     
@@ -210,6 +211,7 @@ def test_read_pair_iterator_in_error_mode_xfail( ):
     assert failed
 
 
+@attr('known_failing')
 def test_read_pair_iterator_in_ignore_mode( ):
     assert 0
 
