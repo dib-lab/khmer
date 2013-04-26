@@ -118,6 +118,6 @@ python_files: lib_files
 #	python setup.py build_ext -i
 
 test: all
-	nosetests -v -x
+	nosetests -v -x -a \!known_failing
 
 FORCE:
