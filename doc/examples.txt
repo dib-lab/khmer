@@ -1,0 +1,13 @@
+A few examples
+==============
+
+See the 'examples' subdirectory for complete examples.
+
+STAMPS data set
+---------------
+
+The 'stamps' data set is a fake metagenome-like data set containing
+two species, mixed at a 10:1 ratio.  The source genomes are
+in 'data/stamps-genomes.fa'.  The reads file is in 'data/stamps-reads.fa.gz',
+and consists of 100-base reads with a 1% error rate.
+
