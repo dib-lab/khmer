@@ -25,6 +25,7 @@ Contents:
 
    introduction
    install
+   examples
    guide
    scripts
    blog-posts

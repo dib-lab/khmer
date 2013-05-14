@@ -134,7 +134,7 @@ class ThreadedSequenceProcessor(object):
                 name, sequence = self.process_fn(record)
                 bp_processed += len(record['sequence'])
                 if name:
-                    accuracy = getattr(record, 'accuracy', None)
+                    accuracy = record.get('accuracy')
                     if accuracy:
                         accuracy = accuracy[:len(sequence)]
                     bp_written += len(sequence)
