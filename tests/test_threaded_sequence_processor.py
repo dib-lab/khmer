@@ -2,10 +2,15 @@ import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, SequenceGroup
 from cStringIO import StringIO
 from screed.fasta import fasta_iter
+from screed.fastq import fastq_iter
 import Queue
 
 def load_records(stringio_fp):
     records = list(fasta_iter(StringIO(stringio_fp.getvalue())))
+    return records
+
+def load_records_fastq(stringio_fp):
+    records = list(fastq_iter(StringIO(stringio_fp.getvalue())))
     return records
 
 def load_records_d(stringio_fp):
@@ -41,6 +46,19 @@ def test_basic():
     assert len(x) == 2, x
     assert x['a'] == 'AAA'
     assert x['b'] == 'TTT'
+
+def test_basic_fastq_like():
+    tsp = ThreadedSequenceProcessor(idem, 1, 1, verbose=False)
+
+    input = [ dict(name='a', sequence='AAA', accuracy='###'),
+              dict(name='b', sequence='TTT', accuracy='###'), ]
+    outfp = StringIO()
+
+    tsp.start(input, outfp)
+
+    x = load_records_fastq(outfp)
+    for i in x:
+        assert i['accuracy'] == '###'
 
 def test_odd():
     tsp = ThreadedSequenceProcessor(every_other, 1, 1, verbose=False)
