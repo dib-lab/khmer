@@ -1193,22 +1193,31 @@ IParser(
     _unithreaded( 1 == number_of_threads ),
     _states( new ParserState *[ number_of_threads ] )
 {
+    _uuid = rand( );
+
     for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
 
-    assert( !regcomp(
+    int regex_rc = -1;
+    regex_rc = 
+    regcomp(
 	&_re_read_2_nosub,
 	// ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
 	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
 	REG_EXTENDED | REG_NOSUB
-    ) );
-    assert( !regcomp(
+    );
+    assert( !regex_rc );
+    regex_rc =
+    regcomp(
 	&_re_read_1,
 	"^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
-    ) );
-    assert( !regcomp(
+    );
+    assert( !regex_rc );
+    regex_rc = 
+    regcomp(
 	&_re_read_2,
 	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
-    ) );
+    );
+    assert( !regex_rc );
 }
 
 

@@ -369,6 +369,9 @@ struct IParser
     );
     virtual ~IParser( );
 
+    inline int		uuid( )
+    { return _uuid; }
+
     inline bool		is_complete( )
     { return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem; }
 
@@ -413,6 +416,9 @@ protected:
 	~ParserState( );
 
     }; // struct ParserState
+
+    // TODO: Use a 16-octet IETF RFC 4122 UUID or equivalent.
+    int			_uuid;
     
     uint8_t		_trace_level;
 
