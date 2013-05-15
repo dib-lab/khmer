@@ -58,12 +58,18 @@ accumulate_timer_deltas( uint32_t metrics_key )
 
 
 Hashtable:: Hasher::
-Hasher( uint32_t const thread_id, uint8_t const	trace_level )
-: thread_id( thread_id ),
+Hasher(
+  uint32_t const  pool_id,
+  uint32_t const  thread_id,
+  uint8_t const	  trace_level
+)
+: pool_id( pool_id ),
+  thread_id( thread_id ),
   pmetrics( HashTablePerformanceMetrics( ) ),
   trace_logger(
     TraceLogger(
-      trace_level, "hashtable-%lu.log", (unsigned long int)thread_id
+      trace_level, "hashtable-%lu-%lu.log",
+      (unsigned long int)pool_id, (unsigned long int)thread_id
     )
   )
 { }
@@ -170,7 +176,8 @@ consume_fasta(
   CallbackFn		    callback,	  void *	      callback_data
 )
 {
-  Hasher		  &hasher		= _get_hasher( );
+  Hasher		  &hasher		= 
+  _get_hasher( parser->uuid( ) );
   unsigned int		  total_reads_LOCAL	= 0;
   unsigned long long int  n_consumed_LOCAL	= 0;
   Read			  read;

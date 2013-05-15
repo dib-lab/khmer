@@ -331,7 +331,8 @@ consume_fasta_and_tag(
   CallbackFn		    callback,	    void *		callback_data
 )
 {
-  Hasher		  &hasher		= _get_hasher( );
+  Hasher		  &hasher		= 
+  _get_hasher( parser->uuid( ) );
   unsigned int		  total_reads_LOCAL	= 0;
   unsigned long long int  n_consumed_LOCAL	= 0;
   Read			  read;

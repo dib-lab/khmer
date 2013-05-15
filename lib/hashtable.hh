@@ -144,11 +144,13 @@ namespace khmer {
     struct Hasher
     {
 
+	uint32_t			pool_id;
 	uint32_t			thread_id;
 	HashTablePerformanceMetrics	pmetrics;
 	TraceLogger			trace_logger;
 
 	Hasher(
+	    uint32_t const  pool_id,
 	    uint32_t const  thread_id,
 	    uint8_t const   trace_level = TraceLogger:: TLVL_NONE
 	);
@@ -159,8 +161,14 @@ namespace khmer {
     uint8_t	    _trace_level;
 
     uint32_t	    _number_of_threads;
-    ThreadIDMap	    _thread_id_map;
-    Hasher **	    _hashers;
+    uint32_t	    _tpool_map_spin_lock;
+    uint32_t	    _thread_pool_counter;
+    std:: map< int, uint32_t >
+		    _thread_pool_id_map;
+    std:: map< uint32_t, ThreadIDMap * >
+		    _thread_id_maps;
+    std:: map< uint32_t, Hasher ** >
+		    _hashers_map;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -176,33 +184,40 @@ namespace khmer {
     )
     :	_trace_level( trace_level ),
 	_number_of_threads( number_of_threads ), 
-	_thread_id_map( ThreadIDMap( number_of_threads ) ),
+	_tpool_map_spin_lock( 0 ),
+	_thread_pool_counter( 0 ),
 	_max_count( MAX_COUNT - number_of_threads + 1 ),
 	_max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
 	_ksize( ksize )
-    {
-
-	_hashers = new Hasher *[ number_of_threads ];
-	for (uint32_t i = 0; i < number_of_threads; ++i) _hashers[ i ] = NULL;
-
-	_init_bitstuff();
-
-    }
+    { _init_bitstuff( ); }
 
     virtual ~Hashtable( )
     {
-	
-	for (uint32_t i = 0; i < _number_of_threads; ++i)
-	{
-	    if (NULL != _hashers[ i ])
-	    {
-		delete _hashers[ i ];
-		_hashers[ i ]	= NULL;
-	    }
-	}
-	delete [ ] _hashers;
-	_hashers    = NULL;
+	std:: map< int, uint32_t >:: iterator it;
+	uint32_t thread_pool_id;
+	Hasher ** hashers = NULL;
 
+	for (it = _thread_pool_id_map.begin( );
+	     it != _thread_pool_id_map.end( );
+	     ++it)
+	{
+	    thread_pool_id = it->second;
+
+	    delete _thread_id_maps[ thread_pool_id ];
+	    _thread_id_maps[ thread_pool_id ] = NULL;
+
+	    hashers = _hashers_map[ thread_pool_id ];
+	    for (uint32_t i = 0; i < _number_of_threads; ++i)
+	    {
+		if (NULL != hashers[ i ])
+		{
+		    delete hashers[ i ];
+		    hashers[ i ] = NULL;
+		}
+	    }
+	    delete [ ] hashers;
+	    _hashers_map[ thread_pool_id ] = NULL;
+	}
     }
 
     void _init_bitstuff() {
@@ -214,19 +229,50 @@ namespace khmer {
     }
 
 
-    inline Hasher   &_get_hasher( )
+    inline Hasher   &_get_hasher( int uuid = 0 )
     {
-	uint32_t	thread_id	= _thread_id_map.get_thread_id( );
-	Hasher *	hasher_PTR	= NULL;
+	std:: map< int, uint32_t >:: iterator	match;	
+	uint32_t				thread_pool_id;
+	ThreadIDMap *				thread_id_map	= NULL;
+	uint32_t				thread_id;
+	Hasher **				hashers		= NULL;
+	Hasher *				hasher_PTR	= NULL;
+	
+	match = _thread_pool_id_map.find( uuid );
+	if (match == _thread_pool_id_map.end( ))
+	{
+	    
+	    while (!__sync_bool_compare_and_swap(
+		&_tpool_map_spin_lock, 0, 1
+	    ));
 
-	assert( NULL != _hashers );
+	    // TODO: Handle 'std:: bad_alloc' exceptions.
+	    thread_pool_id			= _thread_pool_counter++;
+	    _thread_pool_id_map[ uuid ]		= thread_pool_id;
+	    _thread_id_maps[ thread_pool_id ]	=
+	    new ThreadIDMap( _number_of_threads );
+	    _hashers_map[ thread_pool_id ]	=
+	    new Hasher *[ _number_of_threads ];
+	    hashers				=
+	    _hashers_map[ thread_pool_id ];
+	    for (uint32_t i = 0; i < _number_of_threads; ++i)
+		hashers[ i ] = NULL;
+	    
+	    __sync_bool_compare_and_swap( &_tpool_map_spin_lock, 1, 0 );
 
-	hasher_PTR = _hashers[ thread_id ];
+	    match = _thread_pool_id_map.find( uuid );
+	} // no thread pool for UUID
+
+	thread_pool_id	    = (*match).second;
+	thread_id_map	    = _thread_id_maps[ thread_pool_id ];
+	thread_id	    = thread_id_map->get_thread_id( );
+	hashers		    = _hashers_map[ thread_pool_id ];
+	hasher_PTR	    = hashers[ thread_id ];
 	if (NULL == hasher_PTR)
 	{
-	    _hashers[ thread_id ]   =
-	    new Hasher( thread_id, _trace_level );
-	    hasher_PTR		    = _hashers[ thread_id ];
+	    hashers[ thread_id ]    =
+	    new Hasher( thread_pool_id, thread_id, _trace_level );
+	    hasher_PTR		    = hashers[ thread_id ];
 	}
 
 	return *hasher_PTR;
