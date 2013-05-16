@@ -263,7 +263,7 @@ namespace khmer {
 	    match = _thread_pool_id_map.find( uuid );
 	} // no thread pool for UUID
 
-	thread_pool_id	    = (*match).second;
+	thread_pool_id	    = match->second;
 	thread_id_map	    = _thread_id_maps[ thread_pool_id ];
 	thread_id	    = thread_id_map->get_thread_id( );
 	hashers		    = _hashers_map[ thread_pool_id ];

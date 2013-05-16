@@ -1193,7 +1193,7 @@ IParser(
     _unithreaded( 1 == number_of_threads ),
     _states( new ParserState *[ number_of_threads ] )
 {
-    _uuid = rand( );
+    while (!(_uuid = rand( )));
 
     for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
 
