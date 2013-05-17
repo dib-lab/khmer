@@ -238,13 +238,11 @@ namespace khmer {
 	Hasher **				hashers		= NULL;
 	Hasher *				hasher_PTR	= NULL;
 	
+	while (!__sync_bool_compare_and_swap( &_tpool_map_spin_lock, 0, 1 ));
+	
 	match = _thread_pool_id_map.find( uuid );
 	if (match == _thread_pool_id_map.end( ))
 	{
-	    
-	    while (!__sync_bool_compare_and_swap(
-		&_tpool_map_spin_lock, 0, 1
-	    ));
 
 	    // TODO: Handle 'std:: bad_alloc' exceptions.
 	    thread_pool_id			= _thread_pool_counter++;
@@ -257,11 +255,11 @@ namespace khmer {
 	    _hashers_map[ thread_pool_id ];
 	    for (uint32_t i = 0; i < _number_of_threads; ++i)
 		hashers[ i ] = NULL;
-	    
-	    __sync_bool_compare_and_swap( &_tpool_map_spin_lock, 1, 0 );
 
 	    match = _thread_pool_id_map.find( uuid );
 	} // no thread pool for UUID
+
+	__sync_bool_compare_and_swap( &_tpool_map_spin_lock, 1, 0 );
 
 	thread_pool_id	    = match->second;
 	thread_id_map	    = _thread_id_maps[ thread_pool_id ];

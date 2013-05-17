@@ -109,13 +109,17 @@ unsigned int Hashtable::check_and_process_read(std::string &read,
 bool Hashtable::check_and_normalize_read(std::string &read) const
 {
   bool rc = true;
-  //Hasher		  &hasher		= _get_hasher( );
+#if (0)  // TODO: WITH_INTERNAL_TRACING < some_threshold
+  Hasher		  &hasher		= _get_hasher( );
+#endif
 
   if (read.length() < _ksize) {
     return false;
   }
 
-  //hasher.pmetrics.start_timers( );
+#if (0)   // TODO: WITH_INTERNAL_TRACING < some_threshold
+  hasher.pmetrics.start_timers( );
+#endif
   for (unsigned int i = 0; i < read.length(); i++)  {
     read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
     if (!is_valid_dna( read[ i ] ))
@@ -124,12 +128,12 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
       break;
     }
   }
-  /*
+#if (0)  // TODO: WITH_INTERNAL_TRACING < some_threshold
   hasher.pmetrics.stop_timers( );
   hasher.pmetrics.accumulate_timer_deltas(
     (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_NORM_READ
   );
-  */
+#endif
 
   return rc;
 }
