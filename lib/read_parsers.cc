@@ -560,8 +560,7 @@ has_more_data( )
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
 #endif
-sync_barrier:
-    for (uint64_t i = 0; _segment_ref_count; ++i)
+    for (uint64_t i = 0; true; ++i)
     {
 	// TODO: Determine optimal period. (Probably arch-dependent.)
 	if (0 == i % 100000)
@@ -572,30 +571,23 @@ sync_barrier:
 		    "Waited in synchronization barrier for %llu iterations.\n",
 		    (unsigned long long int)i
 		);
-	    // HACK: Occasionally issue a memory barrier to break things up.
-	    _get_segment_ref_count_ATOMIC( );
+	    if (!_get_segment_ref_count_ATOMIC( ))
+		break;
 	}
     }
 
-    // Return false, if no segment can provide more data.
-    if (!_get_segment_ref_count_ATOMIC( ))
-    {
 #ifdef WITH_INTERNAL_METRICS
-	segment.pmetrics.stop_timers( );
-	segment.pmetrics.accumulate_timer_deltas(
-	    CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
-	);
+    segment.pmetrics.stop_timers( );
+    segment.pmetrics.accumulate_timer_deltas(
+	CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
+    );
 #endif
-	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG1,
-	    "After 'has_more_data' synchronization barrier.\n"
-	);
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG1,
+	"After 'has_more_data' synchronization barrier.\n"
+    );
 
-	return false;
-    }
-    // If we somehow got here and there are still active segments,
-    // then go back to waiting.
-    else goto sync_barrier;
+    return false;
 }
 
 
