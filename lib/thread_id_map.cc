@@ -44,12 +44,12 @@ get_thread_id( )
     std:: map< pthread_t, uint32_t > :: iterator match;
 #endif
 
+    while (!__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ));
+
     match = _thread_id_map.find( native_thread_id );
     if (match == _thread_id_map.end( ))
     {
 	uint32_t thread_id;
-
-	while (!__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ));
 
 	thread_id = _thread_counter++;
 
@@ -67,11 +67,11 @@ get_thread_id( )
 	}
 
 	__sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
-
 	return thread_id;
     }
 
-    return (*match).second;
+    __sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
+    return match->second;
 } // get_thread_id
 
 
