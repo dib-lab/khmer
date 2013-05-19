@@ -39,13 +39,29 @@ namespace read_parsers
 
 
 struct InvalidReadFileFormat: public std:: exception
-{ };
+{
+
+    virtual char const *    what( ) const throw( );
+
+protected:
+    
+    char		    _reason[ CHAR_MAX ];
+
+};
 
 struct InvalidFASTAFileFormat: public InvalidReadFileFormat
-{ };
+{
+    
+    InvalidFASTAFileFormat( char const * reason = NULL );
+
+};
 
 struct InvalidFASTQFileFormat: public InvalidReadFileFormat
-{ };
+{
+    
+    InvalidFASTQFileFormat( char const * reason = NULL );
+
+};
 
 struct CacheSegmentUnavailable : public std:: exception
 { };
