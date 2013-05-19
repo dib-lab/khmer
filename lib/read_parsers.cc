@@ -21,6 +21,36 @@ namespace read_parsers
 {
 
 
+char const *
+InvalidReadFileFormat::
+what( ) const throw( )
+{ return (char const *)_reason; }
+
+
+InvalidFASTAFileFormat::
+InvalidFASTAFileFormat( char const * reason )
+{
+
+    if (reason)
+	snprintf( _reason, CHAR_MAX, "InvalidFASTAFileFormat: %s", reason );
+    else
+	snprintf( _reason, CHAR_MAX, "InvalidFASTAFileFormat" );
+
+}
+
+
+InvalidFASTQFileFormat::
+InvalidFASTQFileFormat( char const * reason )
+{
+
+    if (reason)
+	snprintf( _reason, CHAR_MAX, "InvalidFASTQFileFormat: %s", reason );
+    else
+	snprintf( _reason, CHAR_MAX, "InvalidFASTQFileFormat" );
+
+}
+
+
 StreamReaderPerformanceMetrics::
 StreamReaderPerformanceMetrics( )
 :   IPerformanceMetrics( ),
@@ -1356,7 +1386,8 @@ _parse_read( ParserState &state, Read &the_read )
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('>' != line[ 0 ]) throw InvalidFASTAFileFormat( );    
+    if ('>' != line[ 0 ])
+	throw InvalidFASTAFileFormat( "invalid sequence name indicator" );
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1401,6 +1432,7 @@ _parse_read( ParserState &state, Read &the_read )
  * at parse time.
  * This potential bug cannot occur if only one thread is being used to parse.
  */
+// TODO? Write a simpler FASTQ parser.
 inline
 void
 FastqParser::
@@ -1414,7 +1446,8 @@ _parse_read( ParserState &state, Read &the_read )
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('@' != line[ 0 ]) throw InvalidFASTQFileFormat( );    
+    if ('@' != line[ 0 ])
+	throw InvalidFASTQFileFormat( "invalid sequence name indicator" );
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1434,7 +1467,7 @@ _parse_read( ParserState &state, Read &the_read )
 	// then record is corrupt.
 	if (	!(('A' <= line[ 0 ]) && ('Z' >= line[ 0 ]))
 	    &&	!(('a' <= line[ 0 ]) && ('z' >= line[ 0 ])))
-	    throw InvalidFASTQFileFormat( );
+	    throw InvalidFASTQFileFormat( "illegal sequence letters" );
 
 	the_read.sequence += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
@@ -1461,7 +1494,9 @@ _parse_read( ParserState &state, Read &the_read )
 
     // Validate quality score lines versus sequence lines.
     if (the_read.accuracy.length( ) != the_read.sequence.length( ))
-	throw InvalidFASTQFileFormat( );
+	throw InvalidFASTQFileFormat(
+	    "sequence and quality scores length mismatch"
+	);
 
     state.trace_logger(
 	TraceLogger:: TLVL_DEBUG8,

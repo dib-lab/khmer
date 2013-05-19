@@ -649,7 +649,7 @@ _ReadParser_iternext( PyObject * self )
     Py_END_ALLOW_THREADS
 
     // Note: Can simply return NULL instead of setting the StopIteration 
-    //	   exception.
+    //	     exception.
     if (stop_iteration)
 	return NULL;
 
