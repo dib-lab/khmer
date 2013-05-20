@@ -637,6 +637,7 @@ _ReadParser_iternext( PyObject * self )
 
     bool    stop_iteration	= false;
     bool    invalid_file_format	= false;
+    char    exc_message[ CHAR_MAX ];
     Read *  the_read_PTR	= new Read( );
 
     Py_BEGIN_ALLOW_THREADS
@@ -645,7 +646,10 @@ _ReadParser_iternext( PyObject * self )
 	try
 	{ parser->imprint_next_read( *the_read_PTR ); }
 	catch (InvalidReadFileFormat &exc)
-	{ invalid_file_format = true; }
+	{
+	    invalid_file_format = true;
+	    strncpy( exc_message, exc.what( ), CHAR_MAX );
+	}
     Py_END_ALLOW_THREADS
 
     // Note: Can simply return NULL instead of setting the StopIteration 
@@ -655,7 +659,7 @@ _ReadParser_iternext( PyObject * self )
 
     if (invalid_file_format)
     {
-	PyErr_SetString( PyExc_ValueError, "Invalid input file format." );
+	PyErr_SetString( PyExc_IOError, (char const *)exc_message );
 	return NULL;
     }
 
@@ -681,6 +685,7 @@ _ReadPairIterator_iternext( PyObject * self )
 
     bool    stop_iteration		= false;
     bool    invalid_file_format		= false;
+    char    exc_message[ CHAR_MAX ];
     bool    unknown_pair_reading_mode   = false;
     bool    invalid_read_pair		= false;
     Py_BEGIN_ALLOW_THREADS
@@ -689,7 +694,10 @@ _ReadPairIterator_iternext( PyObject * self )
 	try
 	{ parser->imprint_next_read_pair( the_read_pair, pair_mode ); }
 	catch (InvalidReadFileFormat &exc)
-	{ invalid_file_format = true; }
+	{
+	    invalid_file_format = true;
+	    strncpy( exc_message, exc.what( ), CHAR_MAX );
+	}
 	catch (UnknownPairReadingMode &exc)
 	{ unknown_pair_reading_mode = true; }
 	catch (InvalidReadPair &exc)
@@ -701,7 +709,7 @@ _ReadPairIterator_iternext( PyObject * self )
 
     if (invalid_file_format)
     {
-	PyErr_SetString( PyExc_IOError, "Invalid input file format." );
+	PyErr_SetString( PyExc_IOError, (char const *)exc_message );
 	return NULL;
     }
     if (unknown_pair_reading_mode)

@@ -27,28 +27,35 @@ what( ) const throw( )
 { return (char const *)_reason; }
 
 
-InvalidFASTAFileFormat::
-InvalidFASTAFileFormat( char const * reason )
+InvalidReadFileFormat::
+InvalidReadFileFormat(
+    char const * exc_name, char const * reason, char const * evidence
+)
 {
-
+    
     if (reason)
-	snprintf( _reason, CHAR_MAX, "InvalidFASTAFileFormat: %s", reason );
-    else
-	snprintf( _reason, CHAR_MAX, "InvalidFASTAFileFormat" );
+    {
+	if (evidence)
+	    snprintf(
+		_reason, CHAR_MAX, "%s: %s: %s", exc_name, reason, evidence
+	    );
+	else snprintf( _reason, CHAR_MAX, "%s: %s", exc_name, reason );
+    }
+    else snprintf( _reason, CHAR_MAX, "%s", exc_name );
 
 }
+
+
+InvalidFASTAFileFormat::
+InvalidFASTAFileFormat( char const * reason, char const * evidence )
+: InvalidReadFileFormat( "InvalidFASTAFileFormat", reason, evidence )
+{ }
 
 
 InvalidFASTQFileFormat::
-InvalidFASTQFileFormat( char const * reason )
-{
-
-    if (reason)
-	snprintf( _reason, CHAR_MAX, "InvalidFASTQFileFormat: %s", reason );
-    else
-	snprintf( _reason, CHAR_MAX, "InvalidFASTQFileFormat" );
-
-}
+InvalidFASTQFileFormat( char const * reason, char const * evidence )
+: InvalidReadFileFormat( "InvalidFASTQFileFormat", reason, evidence )
+{ }
 
 
 StreamReaderPerformanceMetrics::
@@ -1387,7 +1394,9 @@ _parse_read( ParserState &state, Read &the_read )
     );
     the_read.bytes_consumed += (line.length( ) + 1);
     if ('>' != line[ 0 ])
-	throw InvalidFASTAFileFormat( "invalid sequence name indicator" );
+	throw InvalidFASTAFileFormat(
+	    "invalid sequence name indicator", line.c_str( )
+	);
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1447,7 +1456,9 @@ _parse_read( ParserState &state, Read &the_read )
     );
     the_read.bytes_consumed += (line.length( ) + 1);
     if ('@' != line[ 0 ])
-	throw InvalidFASTQFileFormat( "invalid sequence name indicator" );
+	throw InvalidFASTQFileFormat(
+	    "invalid sequence name indicator", line.c_str( )
+	);
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1467,7 +1478,9 @@ _parse_read( ParserState &state, Read &the_read )
 	// then record is corrupt.
 	if (	!(('A' <= line[ 0 ]) && ('Z' >= line[ 0 ]))
 	    &&	!(('a' <= line[ 0 ]) && ('z' >= line[ 0 ])))
-	    throw InvalidFASTQFileFormat( "illegal sequence letters" );
+	    throw InvalidFASTQFileFormat(
+		"illegal sequence letters", line.c_str( )
+	    );
 
 	the_read.sequence += line;
 	the_read.bytes_consumed += (line.length( ) + 1);

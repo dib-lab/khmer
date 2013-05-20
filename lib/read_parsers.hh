@@ -40,6 +40,12 @@ namespace read_parsers
 
 struct InvalidReadFileFormat: public std:: exception
 {
+    
+			    InvalidReadFileFormat(
+	char const * exc_name,
+	char const * reason	= NULL,
+	char const * evidence	= NULL
+    );
 
     virtual char const *    what( ) const throw( );
 
@@ -52,14 +58,20 @@ protected:
 struct InvalidFASTAFileFormat: public InvalidReadFileFormat
 {
     
-    InvalidFASTAFileFormat( char const * reason = NULL );
+    InvalidFASTAFileFormat(
+	char const * reason	= NULL,
+	char const * evidence	= NULL
+    );
 
 };
 
 struct InvalidFASTQFileFormat: public InvalidReadFileFormat
 {
     
-    InvalidFASTQFileFormat( char const * reason = NULL );
+    InvalidFASTQFileFormat(
+	char const * reason	= NULL,
+	char const * evidence	= NULL
+    );
 
 };
 
