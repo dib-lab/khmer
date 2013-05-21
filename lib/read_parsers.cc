@@ -588,7 +588,7 @@ has_more_data( )
     if (segment.avail) return true;
 
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG1,
+	TraceLogger:: TLVL_DEBUG6,
 	"Before 'has_more_data' synchronization barrier.\n"
     );
 
@@ -604,7 +604,7 @@ has_more_data( )
 	{
 	    if (0 == i % 100000000)
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG3,
+		    TraceLogger:: TLVL_DEBUG7,
 		    "Waited in synchronization barrier for %llu iterations.\n",
 		    (unsigned long long int)i
 		);
@@ -620,7 +620,7 @@ has_more_data( )
     );
 #endif
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG1,
+	TraceLogger:: TLVL_DEBUG6,
 	"After 'has_more_data' synchronization barrier.\n"
     );
 
@@ -666,7 +666,7 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	segment.cursor += nbcopied;
 
 	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "get_bytes: Copied %llu bytes from %s.\n",
 	    (unsigned long long int)nbcopied,
 	    in_sa_buffer ? "setaside buffer" : "cache segment"
@@ -707,7 +707,7 @@ split_at( uint64_t const pos )
     if (1 == _number_of_threads) return;
 
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG2,
+	TraceLogger:: TLVL_DEBUG7,
 	"Creating copyaside buffer for fill ID %llu up to byte %llu....\n",
 	(unsigned long long int)segment.fill_id, (unsigned long long int)pos
     );
@@ -724,13 +724,13 @@ split_at( uint64_t const pos )
 	if (0 == i % 100000000)
 	{
 	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG3,
+		TraceLogger:: TLVL_DEBUG7,
 		"Waited to acquire copyaside buffers spinlock " \
 		"for %llu iterations. [write buffer]\n",
 		(unsigned long long int)i
 	    );
 	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG4,
+		TraceLogger:: TLVL_DEBUG8,
 		"\tSpinlock is probably %s.\n",
 		_ca_spin_lock ? "set" : "unset"
 	    );
@@ -742,7 +742,7 @@ split_at( uint64_t const pos )
 	(char *)segment.memory, (size_t)pos
     );
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG3,
+	TraceLogger:: TLVL_DEBUG8,
 	"Contents of created copyaside buffer: %s\n",
 	_ca_buffers[ segment.fill_id ].c_str( )
     );
@@ -756,7 +756,7 @@ split_at( uint64_t const pos )
     segment.pmetrics.numbytes_reserved_as_sa_buffer += pos;
 #endif
 
-}
+} // split_at
 
 
 uint64_t const
@@ -773,19 +773,19 @@ _perform_segment_maintenance( CacheSegment &segment )
     assert( segment.avail );
 
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG3,
+	TraceLogger:: TLVL_DEBUG6,
 	"Performing segment maintenance....\n"
     );
     if (segment.cursor_in_ca_buffer)
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG3,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "\tCursor at byte %llu in copyaside buffer for fill %llu.\n",
 	    (unsigned long long int)segment.cursor,
 	    (unsigned long long int)(segment.fill_id + 1)
 	);
     else
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG3,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "\tCursor at byte %llu in fill %llu.\n",
 	    (unsigned long long int)segment.cursor,
 	    (unsigned long long int)segment.fill_id
@@ -836,13 +836,13 @@ _perform_segment_maintenance( CacheSegment &segment )
 		    if (0 == i % 100000000)
 		    {
 			segment.trace_logger(
-			    TraceLogger:: TLVL_DEBUG3,
+			    TraceLogger:: TLVL_DEBUG7,
 			    "Waited to acquire copyaside buffers spinlock " \
 			    "for %llu iterations. [read buffer]\n",
 			    (unsigned long long int)i
 			);
 			segment.trace_logger(
-			    TraceLogger:: TLVL_DEBUG4,
+			    TraceLogger:: TLVL_DEBUG8,
 			    "\tSpinlock is probably %s.\n",
 			    _ca_spin_lock ? "set" : "unset"
 			);
@@ -871,7 +871,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 
 		if (0 == j % 100000000)
 		    segment.trace_logger(
-			TraceLogger:: TLVL_DEBUG3,
+			TraceLogger:: TLVL_DEBUG7,
 			"Waited for copyaside buffer from next fill " \
 			"for %llu iterations.\n",
 			(unsigned long long int)j
@@ -882,10 +882,10 @@ _perform_segment_maintenance( CacheSegment &segment )
 	    if (segment.cursor_in_ca_buffer)
 		segment.cursor = 0;
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG2, "Jumped into copyaside buffer.\n"
+		    TraceLogger:: TLVL_DEBUG7, "Jumped into copyaside buffer.\n"
 		);
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG3,
+		    TraceLogger:: TLVL_DEBUG8,
 		    "Contents of copyaside buffer in use: %s\n",
 		    segment.ca_buffer.c_str( )
 		);
@@ -901,13 +901,13 @@ _perform_segment_maintenance( CacheSegment &segment )
 	segment.cursor_in_ca_buffer	= false;
 	segment.cursor			= 0;
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG2, "Jumped out of copyaside buffer.\n"
+	    TraceLogger:: TLVL_DEBUG7, "Jumped out of copyaside buffer.\n"
 	);
 	
 	_fill_segment_from_stream( segment );
     } // end of copyaside buffer
 
-}
+} // _perform_segment_maintenance
 
 
 inline
@@ -985,7 +985,7 @@ wait_to_fill:
     {
 	if (0 == i % 100000000)
 	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG3,
+		TraceLogger:: TLVL_DEBUG7,
 		"Waited to fill segment for %llu iterations.\n",
 		(unsigned long long int)i
 	    );
@@ -1002,7 +1002,7 @@ wait_to_fill:
     if (_stream_reader.is_at_end_of_stream( ))
     {
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG1, "At end of input stream.\n"
+	    TraceLogger:: TLVL_DEBUG6, "At end of input stream.\n"
 	);
 	segment.size	= 0;
 	segment.avail	= false;
@@ -1035,7 +1035,7 @@ wait_to_fill:
 	);
 #endif
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG2,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "Read %llu bytes into segment.\n",
 	    (unsigned long long int)segment.size
 	);
@@ -1044,7 +1044,7 @@ wait_to_fill:
     // If we somehow get here, then go back and wait some more.
     else goto wait_to_fill;
 
-}
+} // _fill_segment_from_stream
 
 
 inline
@@ -1314,7 +1314,7 @@ _copy_line( ParserState &state )
 	}
 
 	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "_copy_line: Detected line fragment: \"%s\"[%llu]\n",
 	    (char const *)(buffer + pos), (unsigned long long int)i
 	);
@@ -1332,7 +1332,7 @@ _copy_line( ParserState &state )
 	    rem = _cache_manager.get_bytes( buffer, ParserState:: BUFFER_SIZE );
 	    pos = 0;
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG8,
+		TraceLogger:: TLVL_DEBUG6,
 		"_copy_line: Copied %llu bytes into parser buffer.\n",
 		(unsigned long long int)rem
 	    );
@@ -1389,7 +1389,7 @@ _parse_read( ParserState &state, Read &the_read )
 
     // Validate and consume the 'name' field.
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG9,
+	TraceLogger:: TLVL_DEBUG5,
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
     the_read.bytes_consumed += (line.length( ) + 1);
@@ -1405,7 +1405,7 @@ _parse_read( ParserState &state, Read &the_read )
 	_copy_line( state );
 
 	state.trace_logger(
-	    TraceLogger:: TLVL_DEBUG9,
+	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
 	);
 
@@ -1418,7 +1418,7 @@ _parse_read( ParserState &state, Read &the_read )
     }
 
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG8,
+	TraceLogger:: TLVL_DEBUG4,
 	"_parse_read: Successfully parsed FASTA record of %llu bytes.\n",
 	the_read.bytes_consumed
     );
@@ -1451,7 +1451,7 @@ _parse_read( ParserState &state, Read &the_read )
 
     // Validate and consume the 'name' field.
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG9,
+	TraceLogger:: TLVL_DEBUG5,
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
     the_read.bytes_consumed += (line.length( ) + 1);
@@ -1467,7 +1467,7 @@ _parse_read( ParserState &state, Read &the_read )
 	_copy_line( state );
 
 	state.trace_logger(
-	    TraceLogger:: TLVL_DEBUG9,
+	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
 	);
 
@@ -1496,7 +1496,7 @@ _parse_read( ParserState &state, Read &the_read )
 	_copy_line( state );
 
 	state.trace_logger(
-	    TraceLogger:: TLVL_DEBUG9,
+	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Quality Scores (candidate): %s\n",
 	    line.c_str( )
 	);
@@ -1512,7 +1512,7 @@ _parse_read( ParserState &state, Read &the_read )
 	);
 
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG8,
+	TraceLogger:: TLVL_DEBUG4,
 	"_parse_read: Successfully parsed FASTQ record of %llu bytes.\n",
 	the_read.bytes_consumed
     );
@@ -1549,7 +1549,7 @@ imprint_next_read( Read &the_read )
 	    &&  (state.buffer_rem <= _cache_manager.whereis_cursor( ));
 	if (at_start) fill_id = _cache_manager.get_fill_id( );
 	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
+	    TraceLogger:: TLVL_DEBUG4,
 	    "_get_next_read: fill_id = %llu, at_start = %d\n",
 	    (unsigned long long int)fill_id, at_start
 	);
@@ -1561,7 +1561,7 @@ imprint_next_read( Read &the_read )
 	catch (InvalidReadFileFormat &exc)
 	{
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
+		TraceLogger:: TLVL_DEBUG4,
 		"get_next_read: Parse error on line: %s\n" \
 		"\t(fill_id = %llu, at_start = %d)\n",
 		state.line.c_str( ),
@@ -1585,7 +1585,7 @@ imprint_next_read( Read &the_read )
 	if (skip_read)
 	{
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
+		TraceLogger:: TLVL_DEBUG4,
 		"get_next_read: Skipped a split pair, using %llu bytes, " \
 		"looking for next read.\n",
 		(unsigned long long int)the_read.bytes_consumed
@@ -1598,14 +1598,14 @@ imprint_next_read( Read &the_read )
 	{
 
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
+		TraceLogger:: TLVL_DEBUG5,
 		"get_next_read: Memory cursor is at byte %llu " \
 		"in segment (fill %llu).\n",
 		(unsigned long long int)_cache_manager.whereis_cursor( ),
 		(unsigned long long int)_cache_manager.get_fill_id( )
 	    );
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
+		TraceLogger:: TLVL_DEBUG5,
 		"get_next_read: Parser buffer has %llu bytes remaining.\n", 
 		(unsigned long long int)state.buffer_rem
 	    );
@@ -1613,7 +1613,7 @@ imprint_next_read( Read &the_read )
 	    _cache_manager.split_at( split_pos );
 
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG6,
+		TraceLogger:: TLVL_DEBUG4,
 		"get_next_read: Skipped %llu bytes of data total " \
 		"at segment start.\n",
 		(unsigned long long int)split_pos
@@ -1634,7 +1634,7 @@ imprint_next_read( Read &the_read )
 	if (std:: string:: npos != the_read.sequence.find_first_of( "Nn" ))
 	{
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG6,
+		TraceLogger:: TLVL_DEBUG3,
 		"get_next_read: Discarded read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
@@ -1643,7 +1643,7 @@ imprint_next_read( Read &the_read )
 	}
 	else
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG6,
+		TraceLogger:: TLVL_DEBUG3,
 		"get_next_read: Accepted read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
