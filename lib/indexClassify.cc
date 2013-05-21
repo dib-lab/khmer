@@ -5,7 +5,7 @@
 using namespace khmer;
 //----------------------------------------
 void khmer::convertFastaToBin(std::string readsFileName,std::string readsBinFileName){
-	std::cout<<"in convertFastaToBin...\n";
+	//std::cout<<"in convertFastaToBin...\n";
 	std::fstream readBinFile;
 
 	readBinFile.open(readsBinFileName.c_str(),std::ios::out|std::ios::binary); readBinFile.clear();
@@ -58,7 +58,7 @@ void khmer::ReadFromDiskRead(std::fstream& readsBinFile,readNode* read,long page
 //------ tagSet IO operations --------- 
 void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int& save_ksize)
 {
-  std::cout<<"in loading_tagset...\n";
+  //std::cout<<"in loading_tagset...\n";
   std::ifstream infile(infilename.c_str(), std::ios::binary);
   assert(infile.is_open());
   
@@ -71,7 +71,7 @@ void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>&
   infile.read((char *) &save_ksize, sizeof(save_ksize));
   infile.read((char *) &tagset_size, sizeof(tagset_size));
   infile.read((char *) &_tag_density, sizeof(_tag_density));
-  std::cout<<"\nsave_ksize:"<<save_ksize<<" tagset_size:"<<tagset_size<<std::endl;
+  //std::cout<<"\nsave_ksize:"<<save_ksize<<" tagset_size:"<<tagset_size<<std::endl;
 
   khmer::HashIntoType * buf = new khmer::HashIntoType[tagset_size];
   infile.read((char *) buf, sizeof(khmer::HashIntoType) * tagset_size);
@@ -92,15 +92,14 @@ void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>&
 }
 //---- indexing  process ----
 void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashIntoType>& sortedKhmerVector,unsigned int save_ksize){
-	std::cout<<"in building the index...\n";
-
+	//std::cout<<"in building the index...\n";
 	std::fstream readBinFile;
 	readBinFile.open(readsBinFileName.c_str(),std::ios::in|std::ios::binary);
         long numReads=0;        
 	ReadFromDiskHeader(readBinFile,&numReads);
-        std::cout<<"num of reads in the file:"<<numReads<<std::endl;
+        std::cout<<"\tnum of reads in the file:"<<numReads<<std::endl;
 	unsigned int numTkmer=sortedKhmerVector.size();
-	std::cout<<"num of tagged khmers:"<<numTkmer<<std::endl;
+	std::cout<<"\tnum of tagged khmers:"<<numTkmer<<std::endl;
 	//define a data matrix row are t-k-mers and col are read id's
 	bool matrix[numTkmer][numReads];	//the relationship b/w t-k-mer and read id
 	int  classSize[numTkmer];		//the number of reads belong to this id
@@ -120,6 +119,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 
 	for (long i=0; i<numReads; i++){
 		//std::cout<<" read #:"<<i+1<<std::endl;
+
 		//retreive a read number i
 		ReadFromDiskRead(readBinFile,&readBin,i+1);
 		seqLen=readBin.getSeqLength(); 
@@ -145,25 +145,25 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 		readBin.nullfy();
 		_seq="";
         }
-	std::cout<<"\t done indexing Reads...\n";
+	std::cout<<"\tdone indexing Reads...\n";
 	/*std::cout<<"the class size array is:\n";
 	for (int i=0;i< numTkmer ;i++) std::cout<<"{"<<i<<","<<classSize[i]<<"} ";
 	std::cout<<std::endl;
 */
-	std::cout<<"saving the index information...\n";
+	std::cout<<"\tsaving the index information...\n";
 	//save the index informaiton
 	std::string outfilename= readsBinFileName+".index";	
 	std::ofstream outfile(outfilename.c_str(), std::ios::binary);
 	
 	//wertie the size of taged k-mer sorted array
 	outfile.write((const char *) &numTkmer, sizeof(numTkmer));
-	std::cout<<numTkmer<<std::endl;
+	//std::cout<<numTkmer<<std::endl;
 
 	//write the taged k-mer sorted array
 	khmer::HashIntoType * buf = new khmer::HashIntoType[numTkmer];
 	unsigned int i = 0;
 	for (std::vector<khmer::HashIntoType>::iterator it = sortedKhmerVector.begin() ; it != sortedKhmerVector.end(); ++it,++i)
-    		{buf[i]= *it; std::cout<<*it<<" ";}
+    		{buf[i]= *it;/* std::cout<<*it<<" ";*/}
 	std::cout<<std::endl;
  	outfile.write((const char *) buf, sizeof(HashIntoType) * numTkmer);
 
@@ -175,25 +175,24 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 	for (unsigned int i=0; i<numTkmer ;i++){
 		sum+=classSize[i];
 		buff[i]=sum;
-		std::cout<<i<<":"<<sum<<"/";
+		//std::cout<<i<<":"<<sum<<"/";
 		}
 	outfile.write((const char *) buff, sizeof(unsigned int) * numTkmer);
 	delete buff;
 
-	std::cout<<std::endl;
+	//std::cout<<std::endl;
 	
 	//write set of associated arrays that map t-k-mer with a set of read ids
 	for (long i=0; i< numTkmer ; i++){
-		std::cout<<"T "<<i+1<<":";
+		//std::cout<<"T "<<i+1<<":";
                 for (long j=0; j<numReads ; j++)
                        if ( matrix[i][j]!=0){
 				outfile.write((const char *) &j, sizeof(long));
-				std::cout<<j<<" "; 
+				//std::cout<<j<<" "; 
 				}
-			std::cout<<"/";
+		//	std::cout<<"/";
 		}
-	std::cout<<std::endl;
-
+	//std::cout<<std::endl;
 	outfile.close();
 	readBinFile.close();
 }
@@ -234,7 +233,7 @@ void khmer::load_index_header(std::string infilename,unsigned int& num_tagged_kh
 //------ query -------
 //given the index file and set of tagged kmers, retreieve the reads ids contanning this tagged khmers 
 void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer,std::vector<long>& reads_ids ){
-	std::cout<<"in retrieve_read_ids_by_tag...\n";
+	//std::cout<<"in retrieve_read_ids_by_tag...\n";
 	// laod the index header
 	unsigned int num_tagged_khmer=0;
 	std::vector<khmer::HashIntoType> sorted_khmer;
@@ -262,7 +261,7 @@ void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::H
 	std::vector<khmer::HashIntoType>::iterator low;
 	khmer::HashIntoType kmer;
 	// go through all the query tagged khmers
-	std::cout<<"strating query process...\n";
+	//std::cout<<"strating query process...\n";
 	for (int i=0; i<qeuery_tagged_khmer.size();i++){
 		//std::cout<<"query # "<<i+1<<std::endl;
 		kmer=qeuery_tagged_khmer[i];
@@ -288,7 +287,7 @@ void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::H
 
 //given the read binary file and set of read ids, retrieve reads
 void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>& reads_ids, std::vector<std::string>& reads){
-	std::cout<<"in retrieve_read_by_id..\n";
+	//std::cout<<"in retrieve_read_by_id..\n";
 	//open read binary file
 	std::fstream readBinFile;
         readBinFile.open(readsBinFileName.c_str(),std::ios::in|std::ios::binary);

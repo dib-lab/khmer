@@ -75,41 +75,43 @@ int main(int argc,char *argv[])
 	std::cout<<"done...\n";
 
 	//query example
-	/*std::cout<<"\nexact query search ...\n";
-	exactQuery(readsFileNameBin,queryFileName);
-	*/
-
-	std::string infilename;
-	infilename=readsFileNameBin+".index";
-	std::vector<khmer::HashIntoType> qeuery_tagged_khmer;
+	std::cout<<"\nexact query search ...\n";
+	//exactQuery(readsFileNameBin,queryFileName);
 	
-	qeuery_tagged_khmer.push_back(5455492123);
+	//open the query file and save the tagged khmers in a vector
+	std::cout<<"\tin Load_Queries...\n";
+  	std::fstream inQfile(queryFileName.c_str(),std::ios::in| std::ios::binary);
+  	assert(inQfile.is_open());
+	khmer::HashIntoType khmer;
+	std::vector<khmer::HashIntoType> qeuery_tagged_khmer;
+	while (!(inQfile.eof())){
+        inQfile>>khmer;
+	std::cout<<khmer<<" ";
+	qeuery_tagged_khmer.push_back(khmer);
+	}
+	/*qeuery_tagged_khmer.push_back(5455492123);
 	qeuery_tagged_khmer.push_back(5770913351);
 	qeuery_tagged_khmer.push_back(1016590426926);
 	qeuery_tagged_khmer.push_back(1007251177738);
-	
+	*/
+
+	//retrive the read ids that contains at lest one of the query tagged khmer
 	std::vector<long> reads_ids;
-	
-	retrieve_read_ids_by_tag(infilename,qeuery_tagged_khmer,reads_ids );
+	std::string indexfilename;
+        indexfilename=readsFileNameBin+".index";
+	retrieve_read_ids_by_tag(indexfilename,qeuery_tagged_khmer,reads_ids );
+	//output the rertive id result
+	std::cout<<"\toutput the rertive id result\n";
 	for (int i=0; i< reads_ids.size();i++)
 		std::cout<<reads_ids[i]<<" ";
 	std::cout<<std::endl;
-
+	
+	//retrieve reads by read ids
 	std::vector<std::string> reads;
-
 	retrieve_read_by_id(readsFileNameBin,reads_ids,reads);
+	//output the retreieved reads
+	std::cout<<"\toutput the retreieved reads\n";
 	for (int i=0; i< reads.size(); i++)
 		std::cout<<reads[i]<<std::endl;
-	
-	#if 0
-  	int myints[] = {10,20,30,30,20,10,10,20};
-  	std::vector<int> v(myints,myints+8);
-	 std::sort (v.begin(), v.end());                
-	std::vector<int>::iterator low,up;
- 	low=std::lower_bound (v.begin(), v.end(), 20);
-	up= std::upper_bound (v.begin(), v.end(), 20); 
-	std::cout << "lower_bound at position " << (low- v.begin()) << '\n';
- 	 std::cout << "upper_bound at position " << (up - v.begin()) << '\n';
-	#endif
 	return 1;
 }
