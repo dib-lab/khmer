@@ -86,7 +86,7 @@ int main(int argc,char *argv[])
 	std::vector<khmer::HashIntoType> qeuery_tagged_khmer;
 	while (!(inQfile.eof())){
         inQfile>>khmer;
-	std::cout<<khmer<<" ";
+	//std::cout<<khmer<<" ";
 	qeuery_tagged_khmer.push_back(khmer);
 	}
 	/*qeuery_tagged_khmer.push_back(5455492123);
