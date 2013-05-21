@@ -82,8 +82,9 @@ void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>&
 
  std::sort (mykhmervector.begin(),mykhmervector.end());
  //intilize the classes
- /* for (std::vector<khmer::HashIntoType>::iterator it=mykhmervector.begin(); it!=mykhmervector.end(); ++it)
-        openNewClass(*it);
+  /*for (std::vector<khmer::HashIntoType>::iterator it=mykhmervector.begin(); it!=mykhmervector.end(); ++it)
+        std::cout<<*it<<" ";
+	openNewClass(*it);
 */
  delete buf;
 

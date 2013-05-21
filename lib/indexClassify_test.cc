@@ -68,7 +68,7 @@ int main(int argc,char *argv[])
 	unsigned int save_ksize;
 	load_tagset(tagedKhmerFileName,sortedKhmerVector,save_ksize);
 	std::cout<<"done..., the num of tags are:"<<sortedKhmerVector.size()<<std::endl;
-
+	
 	//build the index
 	std::cout<<"\nbuild the index ...\n";
 	build_index(readsFileNameBin,sortedKhmerVector,save_ksize);
@@ -113,5 +113,6 @@ int main(int argc,char *argv[])
 	std::cout<<"\toutput the retreieved reads\n";
 	for (int i=0; i< reads.size(); i++)
 		std::cout<<reads[i]<<std::endl;
+	
 	return 1;
 }
