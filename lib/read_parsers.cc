@@ -362,13 +362,13 @@ CacheSegmentPerformanceMetrics::
 CacheSegmentPerformanceMetrics( )
 :   IPerformanceMetrics( ),
     numbytes_filled_from_stream( 0 ),
-    numbytes_copied_from_sa_buffer( 0 ),
-    numbytes_reserved_as_sa_buffer( 0 ),
+    numbytes_copied_from_ca_buffer( 0 ),
+    numbytes_reserved_as_ca_buffer( 0 ),
     numbytes_copied_to_caller_buffer( 0 ),
-    clock_nsecs_waiting_to_set_sa_buffer( 0 ),
-    cpu_nsecs_waiting_to_set_sa_buffer( 0 ),
-    clock_nsecs_waiting_to_get_sa_buffer( 0 ),
-    cpu_nsecs_waiting_to_get_sa_buffer( 0 ),
+    clock_nsecs_waiting_to_set_ca_buffer( 0 ),
+    cpu_nsecs_waiting_to_set_ca_buffer( 0 ),
+    clock_nsecs_waiting_to_get_ca_buffer( 0 ),
+    cpu_nsecs_waiting_to_get_ca_buffer( 0 ),
     clock_nsecs_waiting_to_fill_from_stream( 0 ),
     cpu_nsecs_waiting_to_fill_from_stream( 0 ),
     clock_nsecs_filling_from_stream( 0 ),
@@ -392,15 +392,15 @@ accumulate_timer_deltas( uint32_t metrics_key )
     switch (metrics_key)
     {
     case MKEY_TIME_WAITING_TO_SET_SA_BUFFER:
-	clock_nsecs_waiting_to_set_sa_buffer +=
+	clock_nsecs_waiting_to_set_ca_buffer +=
 	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-	cpu_nsecs_waiting_to_set_sa_buffer   +=
+	cpu_nsecs_waiting_to_set_ca_buffer   +=
 	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
 	break;
     case MKEY_TIME_WAITING_TO_GET_SA_BUFFER:
-	clock_nsecs_waiting_to_get_sa_buffer +=
+	clock_nsecs_waiting_to_get_ca_buffer +=
 	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-	cpu_nsecs_waiting_to_get_sa_buffer   +=
+	cpu_nsecs_waiting_to_get_ca_buffer   +=
 	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
 	break;
     case MKEY_TIME_WAITING_TO_FILL_FROM_STREAM:
@@ -434,20 +434,20 @@ accumulate_metrics( CacheSegmentPerformanceMetrics &source )
 
     numbytes_filled_from_stream		    +=
     source.numbytes_filled_from_stream;
-    numbytes_copied_from_sa_buffer	    +=
-    source.numbytes_copied_from_sa_buffer;
-    numbytes_reserved_as_sa_buffer	    +=
-    source.numbytes_reserved_as_sa_buffer;
+    numbytes_copied_from_ca_buffer	    +=
+    source.numbytes_copied_from_ca_buffer;
+    numbytes_reserved_as_ca_buffer	    +=
+    source.numbytes_reserved_as_ca_buffer;
     numbytes_copied_to_caller_buffer	    +=
     source.numbytes_copied_to_caller_buffer;
-    clock_nsecs_waiting_to_set_sa_buffer    +=
-    source.clock_nsecs_waiting_to_set_sa_buffer;
-    cpu_nsecs_waiting_to_set_sa_buffer	    +=
-    source.cpu_nsecs_waiting_to_set_sa_buffer;
-    clock_nsecs_waiting_to_get_sa_buffer    +=
-    source.clock_nsecs_waiting_to_get_sa_buffer;
-    cpu_nsecs_waiting_to_get_sa_buffer	    +=
-    source.cpu_nsecs_waiting_to_get_sa_buffer;
+    clock_nsecs_waiting_to_set_ca_buffer    +=
+    source.clock_nsecs_waiting_to_set_ca_buffer;
+    cpu_nsecs_waiting_to_set_ca_buffer	    +=
+    source.cpu_nsecs_waiting_to_set_ca_buffer;
+    clock_nsecs_waiting_to_get_ca_buffer    +=
+    source.clock_nsecs_waiting_to_get_ca_buffer;
+    cpu_nsecs_waiting_to_get_ca_buffer	    +=
+    source.cpu_nsecs_waiting_to_get_ca_buffer;
     clock_nsecs_waiting_to_fill_from_stream +=
     source.clock_nsecs_waiting_to_fill_from_stream;
     cpu_nsecs_waiting_to_fill_from_stream   +=
@@ -585,7 +585,8 @@ has_more_data( )
     CacheSegment &	segment		= _get_segment( );
 
     // Return true immediately, if segment can provide more data.
-    if (segment.avail) return true;
+    if (segment.avail || segment.cursor_in_ca_buffer)
+	return true;
 
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG6,
@@ -609,8 +610,15 @@ has_more_data( )
 		    (unsigned long long int)i
 		);
 	    if (!_get_segment_ref_count_ATOMIC( ))
+	    {
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG6,
+		    "Segment reference count is maybe %llu.\n",
+		    (unsigned long long int)_segment_ref_count
+		);
 		break;
-	}
+	    }
+	} // polling loop
     }
 
 #ifdef WITH_INTERNAL_METRICS
@@ -637,10 +645,12 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
     uint64_t		nbcopied_total	= 0;
     uint8_t *		memory		= NULL;
     uint64_t		size		= 0;
-    bool		in_sa_buffer	= false;
+    bool		in_ca_buffer	= false;
     TraceLogger		&trace_logger	= segment.trace_logger;
 
+#if (0)
     if (!segment.avail) throw CacheSegmentUnavailable( );
+#endif
 
     for (uint64_t nbrem = buffer_len; (0 < nbrem); nbrem -= nbcopied)
     {
@@ -651,14 +661,14 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	{
 	    memory	    = (uint8_t *)segment.ca_buffer.c_str( );
 	    size	    = (uint64_t)segment.ca_buffer.length( );
-	    in_sa_buffer    = true;
+	    in_ca_buffer    = true;
 	}
 	else
 	{
 	    memory	    = segment.memory;
 	    size	    = segment.size;
 	    if (!segment.avail) break;
-	    if (in_sa_buffer) in_sa_buffer = false;
+	    in_ca_buffer    = false;
 	}
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
@@ -669,13 +679,13 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	    TraceLogger:: TLVL_DEBUG7,
 	    "get_bytes: Copied %llu bytes from %s.\n",
 	    (unsigned long long int)nbcopied,
-	    in_sa_buffer ? "setaside buffer" : "cache segment"
+	    in_ca_buffer ? "copyaside buffer" : "cache segment"
 	);
 
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
-	if (in_sa_buffer)
-	    segment.pmetrics.numbytes_copied_from_sa_buffer += nbcopied;
+	if (in_ca_buffer)
+	    segment.pmetrics.numbytes_copied_from_ca_buffer += nbcopied;
 #endif
 	nbcopied_total += nbcopied;
     }
@@ -753,7 +763,7 @@ split_at( uint64_t const pos )
     segment.pmetrics.accumulate_timer_deltas(
 	CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
     );
-    segment.pmetrics.numbytes_reserved_as_sa_buffer += pos;
+    segment.pmetrics.numbytes_reserved_as_ca_buffer += pos;
 #endif
 
 } // split_at
@@ -770,7 +780,9 @@ CacheManager::
 _perform_segment_maintenance( CacheSegment &segment )
 {
 
+#if (0)
     assert( segment.avail );
+#endif
 
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG6,
@@ -808,11 +820,11 @@ _perform_segment_maintenance( CacheSegment &segment )
 	    std:: map< uint64_t, std:: string >:: iterator ca_buffers_ITER;
 
 	    // Loop while copyaside buffer from next fill does not exist.
-	    // (TODO: And there is a next fill and EOS not reached.)
 	    for (uint64_t j = 0; !segment.cursor_in_ca_buffer; ++j)
 	    {
 		
-		// If there are no more fills and EOS has been reached,
+		// If there are no more fills beyond the current one 
+		// and EOS has been reached,
 		// then we know that no copyaside buffer will be found.
 		if (    (_fill_counter == (segment.fill_id + 1))
 		    &&  _stream_reader.is_at_end_of_stream( ))
@@ -855,7 +867,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 		if (ca_buffers_ITER != _ca_buffers.end( ))
 		{
 		    segment.cursor_in_ca_buffer = true;
-		    segment.ca_buffer = _ca_buffers[ segment.fill_id + 1 ];
+		    segment.ca_buffer = ca_buffers_ITER->second;
 		    _ca_buffers.erase( ca_buffers_ITER );
 		}
 
@@ -865,7 +877,8 @@ _perform_segment_maintenance( CacheSegment &segment )
     #ifdef WITH_INTERNAL_METRICS
 		segment.pmetrics.stop_timers( );
 		segment.pmetrics.accumulate_timer_deltas(
-		    CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
+		    CacheSegmentPerformanceMetrics:: 
+		    MKEY_TIME_WAITING_TO_SET_SA_BUFFER
 		);
     #endif
 
@@ -1550,7 +1563,7 @@ imprint_next_read( Read &the_read )
 	if (at_start) fill_id = _cache_manager.get_fill_id( );
 	trace_logger(
 	    TraceLogger:: TLVL_DEBUG4,
-	    "_get_next_read: fill_id = %llu, at_start = %d\n",
+	    "imprint_next_read: fill_id = %llu, at_start = %d\n",
 	    (unsigned long long int)fill_id, at_start
 	);
 
@@ -1562,7 +1575,7 @@ imprint_next_read( Read &the_read )
 	{
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG4,
-		"get_next_read: Parse error on line: %s\n" \
+		"imprint_next_read: Parse error on line: %s\n" \
 		"\t(fill_id = %llu, at_start = %d)\n",
 		state.line.c_str( ),
 		(unsigned long long int)fill_id,
@@ -1586,7 +1599,7 @@ imprint_next_read( Read &the_read )
 	{
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG4,
-		"get_next_read: Skipped a split pair, using %llu bytes, " \
+		"imprint_next_read: Skipped a split pair, using %llu bytes, " \
 		"looking for next read.\n",
 		(unsigned long long int)the_read.bytes_consumed
 	    );
@@ -1599,14 +1612,15 @@ imprint_next_read( Read &the_read )
 
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG5,
-		"get_next_read: Memory cursor is at byte %llu " \
+		"imprint_next_read: Memory cursor is at byte %llu " \
 		"in segment (fill %llu).\n",
 		(unsigned long long int)_cache_manager.whereis_cursor( ),
 		(unsigned long long int)_cache_manager.get_fill_id( )
 	    );
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG5,
-		"get_next_read: Parser buffer has %llu bytes remaining.\n", 
+		"imprint_next_read: Parser buffer has %llu " \
+		"bytes remaining.\n", 
 		(unsigned long long int)state.buffer_rem
 	    );
 
@@ -1614,7 +1628,7 @@ imprint_next_read( Read &the_read )
 
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG4,
-		"get_next_read: Skipped %llu bytes of data total " \
+		"imprint_next_read: Skipped %llu bytes of data total " \
 		"at segment start.\n",
 		(unsigned long long int)split_pos
 	    );
@@ -1635,7 +1649,7 @@ imprint_next_read( Read &the_read )
 	{
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG3,
-		"get_next_read: Discarded read \"%s\" (length %lu).\n",
+		"imprint_next_read: Discarded read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
 	    );
@@ -1644,7 +1658,7 @@ imprint_next_read( Read &the_read )
 	else
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG3,
-		"get_next_read: Accepted read \"%s\" (length %lu).\n",
+		"imprint_next_read: Accepted read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
 	    );
