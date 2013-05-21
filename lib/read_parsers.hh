@@ -205,13 +205,13 @@ struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics
     };
     
     uint64_t	    numbytes_filled_from_stream;
-    uint64_t	    numbytes_copied_from_sa_buffer;
-    uint64_t	    numbytes_reserved_as_sa_buffer;
+    uint64_t	    numbytes_copied_from_ca_buffer;
+    uint64_t	    numbytes_reserved_as_ca_buffer;
     uint64_t	    numbytes_copied_to_caller_buffer;
-    uint64_t	    clock_nsecs_waiting_to_set_sa_buffer;
-    uint64_t	    cpu_nsecs_waiting_to_set_sa_buffer;
-    uint64_t	    clock_nsecs_waiting_to_get_sa_buffer;
-    uint64_t	    cpu_nsecs_waiting_to_get_sa_buffer;
+    uint64_t	    clock_nsecs_waiting_to_set_ca_buffer;
+    uint64_t	    cpu_nsecs_waiting_to_set_ca_buffer;
+    uint64_t	    clock_nsecs_waiting_to_get_ca_buffer;
+    uint64_t	    cpu_nsecs_waiting_to_get_ca_buffer;
     uint64_t	    clock_nsecs_waiting_to_fill_from_stream;
     uint64_t	    cpu_nsecs_waiting_to_fill_from_stream;
     uint64_t	    clock_nsecs_filling_from_stream;
