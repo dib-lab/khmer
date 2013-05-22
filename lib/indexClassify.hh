@@ -15,9 +15,11 @@
 
 namespace khmer {
 
-typedef long ReadID;
-typedef unsigned int khmerID;
+typedef long ReadID;				//we may need long long if we have many reads
+typedef unsigned int khmerID;			//each khmer has a rank
+typedef std::set<HashIntoType> TaggedKhmerSet; //if we decide to change taggedkhmer from vector to set data str
 typedef std::set<ReadID> SetReadId;
+typedef std::map<khmerID, SetReadId*> TagsToReadsMap;
 //typedef std::map<khmerID,SetReadId*>;  //assing for each khmerID a set of reads Iet 
 
 class readNode{

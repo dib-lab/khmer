@@ -102,15 +102,16 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 	unsigned int numTkmer=sortedKhmerVector.size();
 	std::cout<<"\tnum of tagged khmers:"<<numTkmer<<std::endl;
 	//define a data matrix row are t-k-mers and col are read id's
-	bool matrix[numTkmer][numReads];	//the relationship b/w t-k-mer and read id
+	//bool matrix[numTkmer][numReads];	//the relationship b/w t-k-mer and read id
 	int  classSize[numTkmer];		//the number of reads belong to this id
 	long index;
-
-	for (long i=0; i< numTkmer ; i++)
+	std::vector<long>* ptr[numTkmer];		//array of ptrs to set or read ids
+	
+	/*for (long i=0; i< numTkmer ; i++)
 		for (long j=0; j<numReads ; j++)
 			matrix[i][j]=0;
-	
-	for (int i=0; i< numTkmer; i++) classSize[i]=0;
+	*/
+	for (int i=0; i< numTkmer; i++) {classSize[i]=0; ptr[i]=new std::vector<long>;}
 	
 	readNode readBin;
 	
@@ -137,8 +138,9 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 			low=std::lower_bound (sortedKhmerVector.begin(), sortedKhmerVector.end(), kmer);
         		if (low != sortedKhmerVector.end() && *low == kmer){
                 		index= low - sortedKhmerVector.begin();
-				matrix[index][i]=1;
+				//matrix[index][i]=1;
 				classSize[index]++;
+				ptr[index]->push_back(i+1);
 				}
 			} //while
 
@@ -184,13 +186,22 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 	//std::cout<<std::endl;
 	
 	//write set of associated arrays that map t-k-mer with a set of read ids
+	long read_id;
 	for (long i=0; i< numTkmer ; i++){
-		//std::cout<<"T "<<i+1<<":";
-                for (long j=0; j<numReads ; j++)
-                       if ( matrix[i][j]!=0){
+		//std::cout<<"\nT "<<i+1<<":";
+		/*std::cout<<"\tM:";
+                for (long j=1; j<numReads+1 ; j++)
+                       if ( matrix[i][j-1]!=0){
 				outfile.write((const char *) &j, sizeof(long));
-				//std::cout<<j<<" "; 
-				}
+				std::cout<<j<<" "; 
+		*/		
+		//std::cout<<"\tP:";
+		for (std::vector<long>::iterator it = ptr[i]->begin() ; it != ptr[i]->end(); ++it) {
+			//std::cout << ' ' << *it;
+			read_id=*it;
+			outfile.write((const char *) &read_id, sizeof(long));
+			}
+
 		//	std::cout<<"/";
 		}
 	//std::cout<<std::endl;
