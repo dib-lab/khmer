@@ -84,7 +84,6 @@ void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>&
  //intilize the classes
   /*for (std::vector<khmer::HashIntoType>::iterator it=mykhmervector.begin(); it!=mykhmervector.end(); ++it)
         std::cout<<*it<<" ";
-	openNewClass(*it);
 */
  delete buf;
 
@@ -105,7 +104,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 	//bool matrix[numTkmer][numReads];	//the relationship b/w t-k-mer and read id
 	int  classSize[numTkmer];		//the number of reads belong to this id
 	long index;
-	std::vector<long>* ptr[numTkmer];		//array of ptrs to set or read ids
+	std::vector<long>* ptr[numTkmer];		//array of ptrs to set of read ids
 	
 	/*for (long i=0; i< numTkmer ; i++)
 		for (long j=0; j<numReads ; j++)
@@ -209,10 +208,6 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 	readBinFile.close();
 }
 
-/*void khmer::classifyOneRead*/
-
-//------ assinge read id into class -----
-/* */
 //------ load index ------
 //in this function we assume we can load all the index information into the memory
 
@@ -322,7 +317,7 @@ void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>&
 }
 
 //------ exact query ------
-void khmer::exactQuery(std::string readsBinFileName,std::string queryFileName){
+/*void khmer::exactQuery(std::string readsBinFileName,std::string queryFileName){
   std::cout<<"in Load_Queries...\n";
   std::fstream inQfile(queryFileName.c_str(),std::ios::in| std::ios::binary);
   assert(inQfile.is_open());
@@ -356,4 +351,4 @@ void khmer::exactQuery(std::string readsBinFileName,std::string queryFileName){
  inRfile.close();
 
 }
-
+*/

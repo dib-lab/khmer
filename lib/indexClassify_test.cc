@@ -55,33 +55,6 @@ int main(int argc,char *argv[])
         
 	optind++;	
 	}
-	
-/*
-  std::map<char,int> mymap;
-
-  mymap.insert ( std::pair<char,int>('a',100) );
-  mymap.insert ( std::pair<char,int>('z',200) );
-
-  std::pair<std::map<char,int>::iterator,bool> ret;
-  ret = mymap.insert ( std::pair<char,int>('z',500) );
-  if (ret.second==false) {
-    std::cout << "element 'z' already existed";
-    std::cout << " with a value of " << ret.first->second << '\n';
-  }
-
-  std::map<char,int>::iterator it = mymap.begin();
-  mymap.insert (it, std::pair<char,int>('b',300));
-  mymap.insert (it, std::pair<char,int>('c',400));
-  std::map<char,int> anothermap;
-  anothermap.insert(mymap.begin(),mymap.find('c'));
-  std::cout << "mymap contains:\n";
-  for (it=mymap.begin(); it!=mymap.end(); ++it)
-  std::cout << it->first << " => " << it->second << '\n';
-
-  std::cout << "anothermap contains:\n";
-  for (it=anothermap.begin(); it!=anothermap.end(); ++it)
-  std::cout << it->first << " => " << it->second << '\n';
-  */
 
 	
 	//creaate reads binary file
@@ -117,12 +90,7 @@ int main(int argc,char *argv[])
 	//std::cout<<khmer<<" ";
 	qeuery_tagged_khmer.push_back(khmer);
 	}
-	/*qeuery_tagged_khmer.push_back(5455492123);
-	qeuery_tagged_khmer.push_back(5770913351);
-	qeuery_tagged_khmer.push_back(1016590426926);
-	qeuery_tagged_khmer.push_back(1007251177738);
-	*/
-
+	
 	//retrive the read ids that contains at lest one of the query tagged khmer
 	std::vector<long> reads_ids;
 	std::string indexfilename;
