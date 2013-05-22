@@ -28,6 +28,35 @@ WANT_DEBUGGING=false
 # and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_TRACING=false
 
+# Trace busywaits?
+# Set this variable to true if you want to use instrumentation which reports
+# on various busywaits, such as synchronization barriers, spinlock trials, and 
+# polling loops.
+# Spinlock trials will only be reported if 'TRACE_SPINLOCKS' is also true.
+# 'WITH_INTERNAL_TRACING' must be true for this to have effect.
+TRACE_BUSYWAITS=true
+
+# Trace spinlocks?
+# Set this variable to true if you want to use instrumentation which reports 
+# on entries into and exits from spinlocks and spinlock trials.
+# Spinlock trials will only be reported if 'TRACE_BUSYWAITS' is also true.
+# 'WITH_INTERNAL_TRACING' must be true for this to have effect.
+TRACE_SPINLOCKS=true
+
+# Trace memory copies?
+# Set this variable to true if you want to use instrumentation which reports
+# on the sizes of memory copies between various caches and buffers.
+# 'WITH_INTERNAL_TRACING' must be true for this to have effect.
+TRACE_MEMCOPIES=true
+
+# Trace data?
+# Set this variable to true if you want to use instrumentation which reports 
+# on the pieces of data handled by various levels of the processing stack.
+# WARNING! This can generate *very* large trace logs - use with caution or 
+# lots of free storage.
+# 'WITH_INTERNAL_TRACING' must be true for this to have effect.
+TRACE_DATA=false
+
 # Compile with performance metrics turned on?
 # Set this variable to true if you want to use instrumentation provided 
 # in the sources for performance measurement purposes 
@@ -79,6 +108,18 @@ endif
 
 ifeq ($(WITH_INTERNAL_TRACING), true)
 CXXFLAGS+= -DWITH_INTERNAL_TRACING
+ifeq ($(TRACE_BUSYWAITS), true)
+CXXFLAGS+= -DTRACE_BUSYWAITS
+endif
+ifeq ($(TRACE_SPINLOCKS), true)
+CXXFLAGS+= -DTRACE_SPINLOCKS
+endif
+ifeq ($(TRACE_MEMCOPIES), true)
+CXXFLAGS+= -DTRACE_MEMCOPIES
+endif
+ifeq ($(TRACE_DATA), true)
+CXXFLAGS+= -DTRACE_DATA
+endif
 endif
 
 ifeq ($(WITH_INTERNAL_METRICS), true)
