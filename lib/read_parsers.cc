@@ -603,12 +603,14 @@ has_more_data( )
 	// TODO: Determine optimal period. (Probably arch-dependent.)
 	if (0 == i % 100000)
 	{
+#ifdef TRACE_BUSYWAITS
 	    if (0 == i % 100000000)
 		segment.trace_logger(
 		    TraceLogger:: TLVL_DEBUG7,
 		    "Waited in synchronization barrier for %llu iterations.\n",
 		    (unsigned long long int)i
 		);
+#endif
 	    if (!_get_segment_ref_count_ATOMIC( ))
 	    {
 		segment.trace_logger(
@@ -675,12 +677,14 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
 
+#ifdef TRACE_MEMCOPIES
 	trace_logger(
 	    TraceLogger:: TLVL_DEBUG7,
 	    "get_bytes: Copied %llu bytes from %s.\n",
 	    (unsigned long long int)nbcopied,
 	    in_ca_buffer ? "copyaside buffer" : "cache segment"
 	);
+#endif
 
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
@@ -731,6 +735,7 @@ split_at( uint64_t const pos )
 	    ++i
 	)
     {
+#if defined (TRACE_BUSYWAITS) && defined (TRACE_SPINLOCKS)
 	if (0 == i % 100000000)
 	{
 	    segment.trace_logger(
@@ -745,17 +750,20 @@ split_at( uint64_t const pos )
 		_ca_spin_lock ? "set" : "unset"
 	    );
 	}
-    }
+#endif
+    } // wait for ca_spin_lock
     // Create and register copyaside buffer,
     // keyed to segment's current fill ID.
     _ca_buffers[ segment.fill_id ].append(
 	(char *)segment.memory, (size_t)pos
     );
+#ifdef TRACE_DATA
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG8,
 	"Contents of created copyaside buffer: %s\n",
 	_ca_buffers[ segment.fill_id ].c_str( )
     );
+#endif
     // Release copyaside buffers spinlock.
     __sync_bool_compare_and_swap( &_ca_spin_lock, 1, 0 );
 #ifdef WITH_INTERNAL_METRICS
@@ -835,9 +843,9 @@ _perform_segment_maintenance( CacheSegment &segment )
 		    break;
 		}
 
-    #ifdef WITH_INTERNAL_METRICS
+#ifdef WITH_INTERNAL_METRICS
 		segment.pmetrics.start_timers( );
-    #endif
+#endif
 
 		// Acquire copyaside buffers spinlock.
 		for (   uint64_t i = 0;
@@ -845,6 +853,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 			++i
 		    )
 		{
+#if defined (TRACE_BUSYWAITS) && defined (TRACE_SPINLOCKS)
 		    if (0 == i % 100000000)
 		    {
 			segment.trace_logger(
@@ -859,7 +868,8 @@ _perform_segment_maintenance( CacheSegment &segment )
 			    _ca_spin_lock ? "set" : "unset"
 			);
 		    }
-		}
+#endif
+		} // wait for ca_spin_lock
 
 		// Test for existence of copyaside buffer from next fill.
 		// If copyaside buffer exists, then copy it local.
@@ -874,14 +884,15 @@ _perform_segment_maintenance( CacheSegment &segment )
 		// Release copyaside buffers spinlock.
 		__sync_bool_compare_and_swap( &_ca_spin_lock, 1, 0 );
 
-    #ifdef WITH_INTERNAL_METRICS
+#ifdef WITH_INTERNAL_METRICS
 		segment.pmetrics.stop_timers( );
 		segment.pmetrics.accumulate_timer_deltas(
 		    CacheSegmentPerformanceMetrics:: 
 		    MKEY_TIME_WAITING_TO_SET_SA_BUFFER
 		);
-    #endif
+#endif
 
+#ifdef TRACE_BUSYWAITS
 		if (0 == j % 100000000)
 		    segment.trace_logger(
 			TraceLogger:: TLVL_DEBUG7,
@@ -889,6 +900,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 			"for %llu iterations.\n",
 			(unsigned long long int)j
 		    );
+#endif
 
 	    } // loop until copyaside buffer created
 
@@ -897,11 +909,13 @@ _perform_segment_maintenance( CacheSegment &segment )
 		segment.trace_logger(
 		    TraceLogger:: TLVL_DEBUG7, "Jumped into copyaside buffer.\n"
 		);
+#ifdef TRACE_DATA
 		segment.trace_logger(
 		    TraceLogger:: TLVL_DEBUG8,
 		    "Contents of copyaside buffer in use: %s\n",
 		    segment.ca_buffer.c_str( )
 		);
+#endif
 
 	} // if multi-threaded
 
@@ -996,12 +1010,14 @@ wait_to_fill:
 	&&  (_segment_to_fill != segment.thread_id);
 	    ++i)
     {
+#ifdef TRACE_BUSYWAITS
 	if (0 == i % 100000000)
 	    segment.trace_logger(
 		TraceLogger:: TLVL_DEBUG7,
 		"Waited to fill segment for %llu iterations.\n",
 		(unsigned long long int)i
 	    );
+#endif
     }
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.stop_timers( );
@@ -1020,6 +1036,7 @@ wait_to_fill:
 	segment.size	= 0;
 	segment.avail	= false;
 	_decrement_segment_ref_count_ATOMIC( );
+	// TODO: Add trace here.
     }
 
     // Else, refill the segment.
@@ -1047,11 +1064,13 @@ wait_to_fill:
 	    MKEY_TIME_FILLING_FROM_STREAM
 	);
 #endif
+#ifdef TRACE_MEMCOPIES
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG7,
 	    "Read %llu bytes into segment.\n",
 	    (unsigned long long int)segment.size
 	);
+#endif
     }
 
     // If we somehow get here, then go back and wait some more.
@@ -1326,11 +1345,13 @@ _copy_line( ParserState &state )
 	    hit			= true;
 	}
 
+#ifdef TRACE_DATA
 	trace_logger(
 	    TraceLogger:: TLVL_DEBUG7,
 	    "_copy_line: Detected line fragment: \"%s\"[%llu]\n",
 	    (char const *)(buffer + pos), (unsigned long long int)i
 	);
+#endif
 	line.append( (char const *)(buffer + pos), i );
 
 	if (hit)
@@ -1344,11 +1365,13 @@ _copy_line( ParserState &state )
 	{
 	    rem = _cache_manager.get_bytes( buffer, ParserState:: BUFFER_SIZE );
 	    pos = 0;
+#ifdef TRACE_MEMCOPIES
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG6,
 		"_copy_line: Copied %llu bytes into parser buffer.\n",
 		(unsigned long long int)rem
 	    );
+#endif
 	}
 	else break;
 
@@ -1401,10 +1424,12 @@ _parse_read( ParserState &state, Read &the_read )
     std:: string    &line	    = state.line;
 
     // Validate and consume the 'name' field.
+#ifdef TRACE_DATA
     state.trace_logger(
 	TraceLogger:: TLVL_DEBUG5,
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
+#endif
     the_read.bytes_consumed += (line.length( ) + 1);
     if ('>' != line[ 0 ])
 	throw InvalidFASTAFileFormat(
@@ -1417,10 +1442,12 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
+#ifdef TRACE_DATA
 	state.trace_logger(
 	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
 	);
+#endif
 
 	// If a new record is detected, then existing one is complete.
 	if ('>' == line[ 0 ]) break;
@@ -1430,11 +1457,13 @@ _parse_read( ParserState &state, Read &the_read )
 	the_read.bytes_consumed += (line.length( ) + 1);
     }
 
+#ifdef TRACE_MEMCOPIES
     state.trace_logger(
 	TraceLogger:: TLVL_DEBUG4,
 	"_parse_read: Successfully parsed FASTA record of %llu bytes.\n",
 	the_read.bytes_consumed
     );
+#endif
 }
 
 
@@ -1463,10 +1492,12 @@ _parse_read( ParserState &state, Read &the_read )
     std:: string    &line	    = state.line;
 
     // Validate and consume the 'name' field.
+#ifdef TRACE_DATA
     state.trace_logger(
 	TraceLogger:: TLVL_DEBUG5,
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
+#endif
     the_read.bytes_consumed += (line.length( ) + 1);
     if ('@' != line[ 0 ])
 	throw InvalidFASTQFileFormat(
@@ -1479,10 +1510,12 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
+#ifdef TRACE_DATA
 	state.trace_logger(
 	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
 	);
+#endif
 
 	// If separator line is detected, then assume sequence is complete.
 	if (('+' == line[ 0 ]) || ('#' == line[ 0 ])) break;
@@ -1508,11 +1541,13 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
+#ifdef TRACE_DATA
 	state.trace_logger(
 	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Quality Scores (candidate): %s\n",
 	    line.c_str( )
 	);
+#endif
 
 	the_read.accuracy += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
@@ -1524,11 +1559,13 @@ _parse_read( ParserState &state, Read &the_read )
 	    "sequence and quality scores length mismatch"
 	);
 
+#ifdef TRACE_MEMCOPIES
     state.trace_logger(
 	TraceLogger:: TLVL_DEBUG4,
 	"_parse_read: Successfully parsed FASTQ record of %llu bytes.\n",
 	the_read.bytes_consumed
     );
+#endif
 
     // Prefetch next line. (Needed to be consistent with FASTA logic.)
     _copy_line( state );
@@ -1573,6 +1610,7 @@ imprint_next_read( Read &the_read )
 	try { _parse_read( state, the_read ); }
 	catch (InvalidReadFileFormat &exc)
 	{
+#ifdef TRACE_DATA
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG4,
 		"imprint_next_read: Parse error on line: %s\n" \
@@ -1581,6 +1619,15 @@ imprint_next_read( Read &the_read )
 		(unsigned long long int)fill_id,
 		at_start
 	    );
+#else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG4,
+		"imprint_next_read: Parse error" \
+		"(fill_id = %llu, at_start = %d)\n",
+		(unsigned long long int)fill_id,
+		at_start
+	    );
+#endif
 
 	    if (!at_start || (at_start && (0 == fill_id))) throw;
 
@@ -1597,12 +1644,14 @@ imprint_next_read( Read &the_read )
 		);
 	if (skip_read)
 	{
+#ifdef TRACE_MEMCOPIES
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG4,
 		"imprint_next_read: Skipped a split pair, using %llu bytes, " \
 		"looking for next read.\n",
 		(unsigned long long int)the_read.bytes_consumed
 	    );
+#endif
 	    split_pos += the_read.bytes_consumed;
 	}
 
@@ -1626,12 +1675,14 @@ imprint_next_read( Read &the_read )
 
 	    _cache_manager.split_at( split_pos );
 
+#ifdef TRACE_MEMCOPIES
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG4,
 		"imprint_next_read: Skipped %llu bytes of data total " \
 		"at segment start.\n",
 		(unsigned long long int)split_pos
 	    );
+#endif
 
 	}
 
@@ -1647,21 +1698,40 @@ imprint_next_read( Read &the_read )
 	// Discard invalid read.
 	if (std:: string:: npos != the_read.sequence.find_first_of( "Nn" ))
 	{
+#ifdef TRACE_DATA
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG3,
 		"imprint_next_read: Discarded read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
 	    );
+#else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
+		"imprint_next_read: Discarded read of length.\n",
+		(unsigned long int)the_read.sequence.length( )
+	    );
+#endif
 	    continue;
 	}
 	else
+	{
+#ifdef TRACE_DATA
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG3,
 		"imprint_next_read: Accepted read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
 	    );
+#else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
+		"imprint_next_read: Accepted read of length %lu.\n",
+		(unsigned long int)the_read.sequence.length( )
+	    );
+#endif
+	    ;
+	}
 
 #ifdef WITH_INTERNAL_METRICS
 	state.pmetrics.numreads_parsed_valid++;
