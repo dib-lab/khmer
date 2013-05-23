@@ -588,10 +588,12 @@ has_more_data( )
     if (segment.avail || segment.cursor_in_ca_buffer)
 	return true;
 
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG6,
 	"Before 'has_more_data' synchronization barrier.\n"
     );
+#endif
 
     // Block indefinitely, if some other segment can provide more data.
     // (This is a synchronization barrier.)
@@ -613,11 +615,13 @@ has_more_data( )
 #endif
 	    if (!_get_segment_ref_count_ATOMIC( ))
 	    {
+#ifdef TRACE_STATE_CHANGES
 		segment.trace_logger(
 		    TraceLogger:: TLVL_DEBUG6,
 		    "Segment reference count is maybe %llu.\n",
 		    (unsigned long long int)_segment_ref_count
 		);
+#endif
 		break;
 	    }
 	} // polling loop
@@ -629,10 +633,12 @@ has_more_data( )
 	CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
     );
 #endif
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG6,
 	"After 'has_more_data' synchronization barrier.\n"
     );
+#endif
 
     return false;
 }
@@ -720,11 +726,13 @@ split_at( uint64_t const pos )
 
     if (1 == _number_of_threads) return;
 
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG7,
 	"Creating copyaside buffer for fill ID %llu up to byte %llu....\n",
 	(unsigned long long int)segment.fill_id, (unsigned long long int)pos
     );
+#endif
 
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
@@ -792,6 +800,7 @@ _perform_segment_maintenance( CacheSegment &segment )
     assert( segment.avail );
 #endif
 
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
 	TraceLogger:: TLVL_DEBUG6,
 	"Performing segment maintenance....\n"
@@ -810,6 +819,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 	    (unsigned long long int)segment.cursor,
 	    (unsigned long long int)segment.fill_id
 	);
+#endif
 
     // If at end of segment and not already in copyaside buffer, 
     // then jump into copyaside buffer from next fill.
@@ -837,6 +847,12 @@ _perform_segment_maintenance( CacheSegment &segment )
 		if (    (_fill_counter == (segment.fill_id + 1))
 		    &&  _stream_reader.is_at_end_of_stream( ))
 		{
+#ifdef TRACE_STATE_CHANGES
+		    segment.trace_logger(
+			TraceLogger:: TLVL_DEBUG7,
+			"Jumped into dummy copyaside buffer. (No more data.)\n"
+		    );
+#endif
 		    segment.ca_buffer.clear( );
 		    segment.cursor_in_ca_buffer = true;
 		    segment.cursor		= 0;
@@ -876,6 +892,13 @@ _perform_segment_maintenance( CacheSegment &segment )
 		ca_buffers_ITER = _ca_buffers.find( segment.fill_id + 1 );
 		if (ca_buffers_ITER != _ca_buffers.end( ))
 		{
+#ifdef TRACE_STATE_CHANGES
+		    segment.trace_logger(
+			TraceLogger:: TLVL_DEBUG7,
+			"Locally cloning copyaside buffer of fill %llu.\n",
+			(unsigned long long int)(segment.fill_id + 1)
+		    );
+#endif
 		    segment.cursor_in_ca_buffer = true;
 		    segment.ca_buffer = ca_buffers_ITER->second;
 		    _ca_buffers.erase( ca_buffers_ITER );
@@ -906,9 +929,12 @@ _perform_segment_maintenance( CacheSegment &segment )
 
 	    if (segment.cursor_in_ca_buffer)
 		segment.cursor = 0;
+#ifdef TRACE_STATE_CHANGES
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG7, "Jumped into copyaside buffer.\n"
+		    TraceLogger:: TLVL_DEBUG7,
+		    "Jumped into copyaside buffer.\n"
 		);
+#endif
 #ifdef TRACE_DATA
 		segment.trace_logger(
 		    TraceLogger:: TLVL_DEBUG8,
@@ -927,9 +953,11 @@ _perform_segment_maintenance( CacheSegment &segment )
     {
 	segment.cursor_in_ca_buffer	= false;
 	segment.cursor			= 0;
+#ifdef TRACE_STATE_CHANGES
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG7, "Jumped out of copyaside buffer.\n"
 	);
+#endif
 	
 	_fill_segment_from_stream( segment );
     } // end of copyaside buffer
@@ -1030,13 +1058,14 @@ wait_to_fill:
     // If at end of stream, then mark segment unavailable.
     if (_stream_reader.is_at_end_of_stream( ))
     {
+#ifdef TRACE_STATE_CHANGES
 	segment.trace_logger(
 	    TraceLogger:: TLVL_DEBUG6, "At end of input stream.\n"
 	);
+#endif
 	segment.size	= 0;
 	segment.avail	= false;
 	_decrement_segment_ref_count_ATOMIC( );
-	// TODO: Add trace here.
     }
 
     // Else, refill the segment.
@@ -1598,11 +1627,13 @@ imprint_next_read( Read &the_read )
 	    &&  (fill_id != _cache_manager.get_fill_id( ))
 	    &&  (state.buffer_rem <= _cache_manager.whereis_cursor( ));
 	if (at_start) fill_id = _cache_manager.get_fill_id( );
+#ifdef TRACE_STATE_CHANGES
 	trace_logger(
 	    TraceLogger:: TLVL_DEBUG4,
 	    "imprint_next_read: fill_id = %llu, at_start = %d\n",
 	    (unsigned long long int)fill_id, at_start
 	);
+#endif
 
 	// Attempt to parse a read.
 	// If at start of file, then error on garbage.
@@ -1659,6 +1690,7 @@ imprint_next_read( Read &the_read )
 	if (at_start)
 	{
 
+#ifdef TRACE_STATE_CHANGES
 	    trace_logger(
 		TraceLogger:: TLVL_DEBUG5,
 		"imprint_next_read: Memory cursor is at byte %llu " \
@@ -1672,6 +1704,7 @@ imprint_next_read( Read &the_read )
 		"bytes remaining.\n", 
 		(unsigned long long int)state.buffer_rem
 	    );
+#endif
 
 	    _cache_manager.split_at( split_pos );
 
