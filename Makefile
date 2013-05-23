@@ -28,6 +28,13 @@ WANT_DEBUGGING=false
 # and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_TRACING=false
 
+# Trace state transitions?
+# Set this variable to true if you want to use instrumentation which reports
+# on transitions which occur between the states of the various elements of the 
+# processing stack.
+# 'WITH_INTERNAL_TRACING' must be true for this to have effect.
+TRACE_STATE_CHANGES=true
+
 # Trace busywaits?
 # Set this variable to true if you want to use instrumentation which reports
 # on various busywaits, such as synchronization barriers, spinlock trials, and 
@@ -108,6 +115,9 @@ endif
 
 ifeq ($(WITH_INTERNAL_TRACING), true)
 CXXFLAGS+= -DWITH_INTERNAL_TRACING
+ifeq ($(TRACE_STATE_CHANGES), true)
+CXXFLAGS+= -DTRACE_STATE_CHANGES
+endif
 ifeq ($(TRACE_BUSYWAITS), true)
 CXXFLAGS+= -DTRACE_BUSYWAITS
 endif
