@@ -348,7 +348,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
 	    BZ2_bzReadClose( &bz2_error, _block_handle );
 	    _block_handle = NULL;
-	    if (feof( _stream_handle )) _at_eos = true;
+	    if (!bz2_unused_nbread && feof( _stream_handle )) _at_eos = true;
 	    block_complete = false;
 	}
 
