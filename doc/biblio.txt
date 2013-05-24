@@ -1,0 +1,15 @@
+An incomplete bibliography of papers using khmer
+================================================
+
+Digital normalization
+---------------------
+
+Multiple Single-Cell Genomes Provide Insight into Functions of
+Uncultured Deltaproteobacteria in the Human Oral Cavity.  Campbell et
+al., PLoS One, 2013, doi:10.1371/journal.pone.0059361.  [ `paper link <http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0059361>`__ ]
+
+Insights into archaeal evolution and symbiosis from the genomes of a
+nanoarchaeon and its inferred crenarchaeal host from Obsidian Pool,
+Yellowstone National Park.  Podar et al., Biology Direct, 2013
+doi:10.1186/1745-6150-8-9.
+[ `paper link <http://www.biology-direct.com/content/8/1/9/abstract>`__ ]

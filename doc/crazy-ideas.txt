@@ -1,0 +1,8 @@
+Crazy ideas
+===========
+
+1. A JavaScript preprocessor to do things like count k-mers (HLL), and do
+   diginorm on data as uploaded to server.
+
+   Inspired by a paper that Titus reviewed for PLoS One; not yet published.
+
