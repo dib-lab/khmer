@@ -834,28 +834,29 @@ _perform_segment_maintenance( CacheSegment &segment )
 
 	else // multi-threaded
 	{
-
+	    uint64_t	next_fill_id	= segment.fill_id + 1;
 	    std:: map< uint64_t, std:: string >:: iterator ca_buffers_ITER;
 
 	    // Loop while copyaside buffer from next fill does not exist.
 	    for (uint64_t j = 0; !segment.cursor_in_ca_buffer; ++j)
 	    {
+		uint64_t    fill_counter    = _get_fill_counter_ATOMIC( );
 		
 		// If there are no more fills beyond the current one 
 		// and EOS has been reached,
 		// then we know that no copyaside buffer will be found.
-		if (    (_fill_counter == (segment.fill_id + 1))
+		if (    (fill_counter == next_fill_id)
 		    &&  _stream_reader.is_at_end_of_stream( ))
 		{
-#ifdef TRACE_STATE_CHANGES
-		    segment.trace_logger(
-			TraceLogger:: TLVL_DEBUG7,
-			"Jumped into dummy copyaside buffer. (No more data.)\n"
-		    );
-#endif
 		    segment.ca_buffer.clear( );
 		    segment.cursor_in_ca_buffer = true;
 		    segment.cursor		= 0;
+#ifdef TRACE_STATE_CHANGES
+		    segment.trace_logger(
+			TraceLogger:: TLVL_DEBUG7,
+			"Prepared dummy copyaside buffer. (No more data.)\n"
+		    );
+#endif
 		    break;
 		}
 
@@ -1032,12 +1033,13 @@ _fill_segment_from_stream( CacheSegment & segment )
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
 #endif
-wait_to_fill:
-    for (   uint64_t i = 0;
-	    !_stream_reader.is_at_end_of_stream( )
-	&&  (_segment_to_fill != segment.thread_id);
-	    ++i)
+    for (uint64_t i = 0; true; ++i)
     {
+	if (0 == i % 100000)
+	{
+	    if (_stream_reader.is_at_end_of_stream( )) break;
+	    if (_check_segment_to_fill_ATOMIC( segment.thread_id )) break;
+	}
 #ifdef TRACE_BUSYWAITS
 	if (0 == i % 100000000)
 	    segment.trace_logger(
@@ -1046,7 +1048,7 @@ wait_to_fill:
 		(unsigned long long int)i
 	    );
 #endif
-    }
+    } // busy wait for stream availability
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.stop_timers( );
     segment.pmetrics.accumulate_timer_deltas(
@@ -1084,7 +1086,8 @@ wait_to_fill:
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.stop_timers( );
 #endif
-	segment.fill_id	= _fill_counter++;
+	segment.fill_id = _get_fill_counter_ATOMIC( );
+	_increment_fill_counter_ATOMIC( );
 	_select_segment_to_fill_ATOMIC( );
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_filled_from_stream += nbfilled;
@@ -1100,10 +1103,7 @@ wait_to_fill:
 	    (unsigned long long int)segment.size
 	);
 #endif
-    }
-
-    // If we somehow get here, then go back and wait some more.
-    else goto wait_to_fill;
+    } // if stream is available for segment
 
 } // _fill_segment_from_stream
 
@@ -1111,19 +1111,33 @@ wait_to_fill:
 inline
 void
 CacheManager::
-_increment_segment_ref_count_ATOMIC( )
+_increment_fill_counter_ATOMIC( )
+{ __sync_add_and_fetch( &_fill_counter, 1 ); }
+
+
+inline
+uint64_t
+CacheManager::
+_get_fill_counter_ATOMIC( )
 {
-    __sync_add_and_fetch( &_segment_ref_count, 1 );
+    return __sync_and_and_fetch(
+	&_fill_counter, (uint64_t)0xffffffffffffffff
+    );
 }
 
 
 inline
 void
 CacheManager::
+_increment_segment_ref_count_ATOMIC( )
+{ __sync_add_and_fetch( &_segment_ref_count, 1 ); }
+
+
+inline
+void
+CacheManager::
 _decrement_segment_ref_count_ATOMIC( )
-{
-    __sync_sub_and_fetch( &_segment_ref_count, 1 );
-}
+{ __sync_sub_and_fetch( &_segment_ref_count, 1 ); }
 
 inline
 uint32_t const
