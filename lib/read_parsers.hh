@@ -124,7 +124,7 @@ struct IStreamReader
 
     size_t const		    get_memory_alignment( ) const;
 
-    bool const			    is_at_end_of_stream( ) const;
+    bool const			    is_at_EOS_ATOMIC( );
 
     virtual uint64_t const	    read_into_cache(
 	uint8_t * const cache, uint64_t const cache_size
@@ -136,6 +136,8 @@ protected:
     size_t			    _max_aligned;
     
     bool			    _at_eos;
+
+    void			    _set_EOS_ATOMIC( );
 
 };
 

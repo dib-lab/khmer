@@ -186,8 +186,14 @@ Bz2StreamReader::
 
 bool const
 IStreamReader::
-is_at_end_of_stream( ) const
-{ return _at_eos; }
+is_at_EOS_ATOMIC( )
+{ return __sync_and_and_fetch( &_at_eos, true ); }
+
+
+void
+IStreamReader::
+_set_EOS_ATOMIC( )
+{ __sync_bool_compare_and_swap( &_at_eos, 0, 1 ); }
 
 
 size_t const
@@ -212,7 +218,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	cache_size_adjusted = _alignment * ((cache_size / _alignment) + 1);
 #endif
     for (uint64_t nbrem = cache_size_adjusted;
-	 (0 < nbrem) && !_at_eos;
+	 (0 < nbrem) && !is_at_EOS_ATOMIC( );
 	 nbrem -= nbread)
     {
 #ifdef WITH_INTERNAL_METRICS
@@ -231,7 +237,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	);
 #endif
 	if (-1 == nbread) throw StreamReadError( );
-	_at_eos = !nbread;
+	if (!nbread) _set_EOS_ATOMIC( );
 	nbread_total += nbread;
     }
 
@@ -249,7 +255,9 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     assert (NULL != cache);
     if (0 == cache_size) return 0;
 
-    for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
+    for (uint64_t nbrem = cache_size;
+	 (0 < nbrem) && !is_at_EOS_ATOMIC( );
+	 nbrem -= nbread)
     {
 #ifdef WITH_INTERNAL_METRICS
 	pmetrics.start_timers( );
@@ -267,7 +275,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 	);
 #endif
 	if (-1 == nbread) throw StreamReadError( );
-	_at_eos = !nbread;
+	if (!nbread) _set_EOS_ATOMIC( );
 	nbread_total += nbread;
     }
 
@@ -290,7 +298,9 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     assert (NULL != cache);
     if (0 == cache_size) return 0;
 
-    for (uint64_t nbrem = cache_size; (0 < nbrem) && !_at_eos; nbrem -= nbread)
+    for (uint64_t nbrem = cache_size;
+	 (0 < nbrem) && !is_at_EOS_ATOMIC( );
+	 nbrem -= nbread)
     {
 
 	if (NULL == _block_handle)
@@ -348,7 +358,8 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
 	    BZ2_bzReadClose( &bz2_error, _block_handle );
 	    _block_handle = NULL;
-	    if (!bz2_unused_nbread && feof( _stream_handle )) _at_eos = true;
+	    if (!bz2_unused_nbread && feof( _stream_handle ))
+		_set_EOS_ATOMIC( );
 	    block_complete = false;
 	}
 
@@ -846,7 +857,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 		// and EOS has been reached,
 		// then we know that no copyaside buffer will be found.
 		if (    (fill_counter == next_fill_id)
-		    &&  _stream_reader.is_at_end_of_stream( ))
+		    &&  _stream_reader.is_at_EOS_ATOMIC( ))
 		{
 		    segment.ca_buffer.clear( );
 		    segment.cursor_in_ca_buffer = true;
@@ -854,7 +865,9 @@ _perform_segment_maintenance( CacheSegment &segment )
 #ifdef TRACE_STATE_CHANGES
 		    segment.trace_logger(
 			TraceLogger:: TLVL_DEBUG7,
-			"Prepared dummy copyaside buffer. (No more data.)\n"
+			"Prepared dummy copyaside buffer. " \
+			"(next_fill_id = %llu)\n",
+			(unsigned long long int)next_fill_id
 		    );
 #endif
 		    break;
@@ -1037,7 +1050,7 @@ _fill_segment_from_stream( CacheSegment & segment )
     {
 	if (0 == i % 100000)
 	{
-	    if (_stream_reader.is_at_end_of_stream( )) break;
+	    if (_stream_reader.is_at_EOS_ATOMIC( )) break;
 	    if (_check_segment_to_fill_ATOMIC( segment.thread_id )) break;
 	}
 #ifdef TRACE_BUSYWAITS
@@ -1058,7 +1071,7 @@ _fill_segment_from_stream( CacheSegment & segment )
 #endif
 
     // If at end of stream, then mark segment unavailable.
-    if (_stream_reader.is_at_end_of_stream( ))
+    if (_stream_reader.is_at_EOS_ATOMIC( ))
     {
 #ifdef TRACE_STATE_CHANGES
 	segment.trace_logger(
