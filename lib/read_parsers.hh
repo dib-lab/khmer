@@ -314,6 +314,8 @@ private:
 	CacheSegment & segment
     );
 
+    uint64_t		_get_fill_counter_ATOMIC( );
+    void		_increment_fill_counter_ATOMIC( );
     bool const		_check_segment_to_fill_ATOMIC(
 	uint32_t const thread_id
     );

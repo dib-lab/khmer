@@ -18,7 +18,8 @@ WANT_EXTRA_SANITY_CHECKING=false
 # Compile with debugging symbols?
 # Set this variable to true 
 # if you wish the codes to be built with debugging symbols 
-# (increases code size and does not always produce accurate stepping in a debugger 
+# (increases code size 
+# and does not always produce accurate stepping in a debugger 
 # when optimization is turned on).
 WANT_DEBUGGING=false
 
@@ -26,7 +27,7 @@ WANT_DEBUGGING=false
 # Set this variable to true if you want to use instrumentation provided 
 # in the sources for debugging purposes 
 # and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_TRACING=false
+WITH_INTERNAL_TRACING=true
 
 # Trace state transitions?
 # Set this variable to true if you want to use instrumentation which reports
