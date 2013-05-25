@@ -1,2 +1,4 @@
 *.swp
 setup.py
+distribute-*.egg
+distribute-*.tar.gz

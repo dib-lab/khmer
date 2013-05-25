@@ -14,9 +14,9 @@ extern "C"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <cstdlib>
-#include <error.h>
 #include <getopt.h>
 
+#include "error.hh"
 #include "read_parsers.hh"
 
 

@@ -37,7 +37,7 @@ def main():
         print >>sys.stderr, ''
         print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize / 8)' % (
-            args.n_hashes * args.min_hashsize / 8.)
+            args.n_hashes * args.min_hashsize * len(args.input_filenames) / 8.)
         print >>sys.stderr, '-'*8
 
     K = args.ksize
@@ -68,6 +68,9 @@ def main():
     n = 0
     m = 0
     for n, record in enumerate(screed.open(readsfile)):
+        if len(record.sequence) < K:
+            continue
+
         if n % 10000 == 0:
             print '...', n, m
 

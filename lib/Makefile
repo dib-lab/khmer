@@ -2,12 +2,6 @@ NO_UNIQUE_RC=0
 
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
-# comment out whichever is appropriate.  can probably make this automatic ;)
-SO_EXT=.so
-#DYLIB_EXT=.dylib
-Z_LIB_DIR=zlib-1.2.3
-Z_LIB_FILES=$(Z_LIB_DIR)/*.o
-
 ZLIB_DIR=zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
@@ -20,14 +14,14 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=bittest ktable_test test-StreamReader test-CacheManager test-Parser test-HashTables
+DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
-AUX_PROGS=ht-diff
+AUX_PROGS=#ht-diff
 
-CORE_OBJS= khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
+CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
 PARSERS_OBJS= read_parsers.o
 
-all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test
+all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
 
 clean:
 	-(cd $(ZLIB_DIR) && make clean)
@@ -74,10 +68,12 @@ ktable_test: ktable_test.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS)
 #	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
 
 $(ZLIB_OBJS):
-	(cd $(ZLIB_DIR) && ./configure --shared && make libz$(SO_EXT).1.2.3$(DYLIB_EXT))
+	(cd $(ZLIB_DIR) && ./configure --shared && make libz.a)
 
 $(BZIP2_OBJS):
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
+
+error.o: error.cc error.hh
 
 khmer_config.o: khmer_config.cc khmer_config.hh
 
@@ -88,6 +84,22 @@ trace_logger.o: trace_logger.cc trace_logger.hh
 perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
+
+aligntest: aligntest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+
+bugtest: bugtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+
+kmer.o: kmer.cc kmer.hh
+
+node.o: node.cc node.hh
+
+aligner.o: aligner.cc aligner.hh
+
+scoringmatrix.o: scoringmatrix.cc scoringmatrix.hh
+
+parsers.o: parsers.cc parsers.hh
 
 ktable.o: ktable.cc ktable.hh
 

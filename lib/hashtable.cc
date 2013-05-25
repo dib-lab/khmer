@@ -4,8 +4,9 @@
 
 #include <algorithm>
 
-using namespace khmer;
 using namespace std;
+using namespace khmer;
+using namespace khmer:: read_parsers;
 
 
 HashTablePerformanceMetrics::
@@ -57,12 +58,18 @@ accumulate_timer_deltas( uint32_t metrics_key )
 
 
 Hashtable:: Hasher::
-Hasher( uint32_t const thread_id, uint8_t const	trace_level )
-: thread_id( thread_id ),
+Hasher(
+  uint32_t const  pool_id,
+  uint32_t const  thread_id,
+  uint8_t const	  trace_level
+)
+: pool_id( pool_id ),
+  thread_id( thread_id ),
   pmetrics( HashTablePerformanceMetrics( ) ),
   trace_logger(
     TraceLogger(
-      trace_level, "hashtable-%lu.log", (unsigned long int)thread_id
+      trace_level, "hashtable-%lu-%lu.log",
+      (unsigned long int)pool_id, (unsigned long int)thread_id
     )
   )
 { }
@@ -102,13 +109,17 @@ unsigned int Hashtable::check_and_process_read(std::string &read,
 bool Hashtable::check_and_normalize_read(std::string &read) const
 {
   bool rc = true;
-  //Hasher		  &hasher		= _get_hasher( );
+#if (0)  // TODO: WITH_INTERNAL_TRACING < some_threshold
+  Hasher		  &hasher		= _get_hasher( );
+#endif
 
   if (read.length() < _ksize) {
     return false;
   }
 
-  //hasher.pmetrics.start_timers( );
+#if (0)   // TODO: WITH_INTERNAL_TRACING < some_threshold
+  hasher.pmetrics.start_timers( );
+#endif
   for (unsigned int i = 0; i < read.length(); i++)  {
     read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
     if (!is_valid_dna( read[ i ] ))
@@ -117,12 +128,12 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
       break;
     }
   }
-  /*
+#if (0)  // TODO: WITH_INTERNAL_TRACING < some_threshold
   hasher.pmetrics.stop_timers( );
   hasher.pmetrics.accumulate_timer_deltas(
     (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_NORM_READ
   );
-  */
+#endif
 
   return rc;
 }
@@ -141,8 +152,6 @@ consume_fasta(
   CallbackFn	      callback,	    void *		callback_data
 )
 {
-  using namespace khmer:: read_parsers;
-
   khmer:: Config    &the_config	  = khmer:: get_active_config( );
 
   // Note: Always assume only 1 thread if invoked this way.
@@ -165,15 +174,14 @@ consume_fasta(
 void
 Hashtable::
 consume_fasta(
-  read_parsers:: IParser *	      parser,
-  unsigned int	      &total_reads, unsigned long long  &n_consumed,
-  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
-  CallbackFn	      callback,	    void *		callback_data
+  read_parsers:: IParser *  parser,
+  unsigned int		    &total_reads, unsigned long long  &n_consumed,
+  HashIntoType		    lower_bound,  HashIntoType	      upper_bound,
+  CallbackFn		    callback,	  void *	      callback_data
 )
 {
-  using namespace khmer:: read_parsers;
-
-  Hasher		  &hasher		= _get_hasher( );
+  Hasher		  &hasher		= 
+  _get_hasher( parser->uuid( ) );
   unsigned int		  total_reads_LOCAL	= 0;
   unsigned long long int  n_consumed_LOCAL	= 0;
   Read			  read;
@@ -182,13 +190,13 @@ consume_fasta(
     TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
   );
 
-  // Iterate through the reads and consume their kmers.
+  // Iterate through the reads and consume their k-mers.
   while (!parser->is_complete( ))
   {
     unsigned int  this_n_consumed;
     bool	  is_valid;
 
-    read      = parser->get_next_read();
+    read = parser->get_next_read( );
 
     this_n_consumed = 
     check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);

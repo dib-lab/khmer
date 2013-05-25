@@ -1,4 +1,8 @@
 CYTHON_ENABLED = @CYTHON_ENABLED_BOOL@
+
+from distribute_setup import use_setuptools
+use_setuptools()
+
 from distutils.core import setup
 from distutils.extension import Extension
 if CYTHON_ENABLED:
@@ -16,6 +20,7 @@ extra_objs.extend( map(
 	"khmer_config", "thread_id_map", "trace_logger", "perf_metrics", 
 	"read_parsers", 
 	"ktable", "hashtable", "hashbits", "counting", "subset",
+        "aligner", "scoringmatrix", "node", "kmer",
     ]
 ) )
 extra_objs.extend( map(

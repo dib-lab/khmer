@@ -21,6 +21,43 @@ namespace read_parsers
 {
 
 
+char const *
+InvalidReadFileFormat::
+what( ) const throw( )
+{ return (char const *)_reason; }
+
+
+InvalidReadFileFormat::
+InvalidReadFileFormat(
+    char const * exc_name, char const * reason, char const * evidence
+)
+{
+    
+    if (reason)
+    {
+	if (evidence)
+	    snprintf(
+		_reason, CHAR_MAX, "%s: %s: %s", exc_name, reason, evidence
+	    );
+	else snprintf( _reason, CHAR_MAX, "%s: %s", exc_name, reason );
+    }
+    else snprintf( _reason, CHAR_MAX, "%s", exc_name );
+
+}
+
+
+InvalidFASTAFileFormat::
+InvalidFASTAFileFormat( char const * reason, char const * evidence )
+: InvalidReadFileFormat( "InvalidFASTAFileFormat", reason, evidence )
+{ }
+
+
+InvalidFASTQFileFormat::
+InvalidFASTQFileFormat( char const * reason, char const * evidence )
+: InvalidReadFileFormat( "InvalidFASTQFileFormat", reason, evidence )
+{ }
+
+
 StreamReaderPerformanceMetrics::
 StreamReaderPerformanceMetrics( )
 :   IPerformanceMetrics( ),
@@ -325,13 +362,13 @@ CacheSegmentPerformanceMetrics::
 CacheSegmentPerformanceMetrics( )
 :   IPerformanceMetrics( ),
     numbytes_filled_from_stream( 0 ),
-    numbytes_copied_from_sa_buffer( 0 ),
-    numbytes_reserved_as_sa_buffer( 0 ),
+    numbytes_copied_from_ca_buffer( 0 ),
+    numbytes_reserved_as_ca_buffer( 0 ),
     numbytes_copied_to_caller_buffer( 0 ),
-    clock_nsecs_waiting_to_set_sa_buffer( 0 ),
-    cpu_nsecs_waiting_to_set_sa_buffer( 0 ),
-    clock_nsecs_waiting_to_get_sa_buffer( 0 ),
-    cpu_nsecs_waiting_to_get_sa_buffer( 0 ),
+    clock_nsecs_waiting_to_set_ca_buffer( 0 ),
+    cpu_nsecs_waiting_to_set_ca_buffer( 0 ),
+    clock_nsecs_waiting_to_get_ca_buffer( 0 ),
+    cpu_nsecs_waiting_to_get_ca_buffer( 0 ),
     clock_nsecs_waiting_to_fill_from_stream( 0 ),
     cpu_nsecs_waiting_to_fill_from_stream( 0 ),
     clock_nsecs_filling_from_stream( 0 ),
@@ -355,15 +392,15 @@ accumulate_timer_deltas( uint32_t metrics_key )
     switch (metrics_key)
     {
     case MKEY_TIME_WAITING_TO_SET_SA_BUFFER:
-	clock_nsecs_waiting_to_set_sa_buffer +=
+	clock_nsecs_waiting_to_set_ca_buffer +=
 	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-	cpu_nsecs_waiting_to_set_sa_buffer   +=
+	cpu_nsecs_waiting_to_set_ca_buffer   +=
 	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
 	break;
     case MKEY_TIME_WAITING_TO_GET_SA_BUFFER:
-	clock_nsecs_waiting_to_get_sa_buffer +=
+	clock_nsecs_waiting_to_get_ca_buffer +=
 	_timespec_diff_in_nsecs( _temp_clock_start, _temp_clock_stop );
-	cpu_nsecs_waiting_to_get_sa_buffer   +=
+	cpu_nsecs_waiting_to_get_ca_buffer   +=
 	_timespec_diff_in_nsecs( _temp_cpu_start, _temp_cpu_stop );
 	break;
     case MKEY_TIME_WAITING_TO_FILL_FROM_STREAM:
@@ -397,20 +434,20 @@ accumulate_metrics( CacheSegmentPerformanceMetrics &source )
 
     numbytes_filled_from_stream		    +=
     source.numbytes_filled_from_stream;
-    numbytes_copied_from_sa_buffer	    +=
-    source.numbytes_copied_from_sa_buffer;
-    numbytes_reserved_as_sa_buffer	    +=
-    source.numbytes_reserved_as_sa_buffer;
+    numbytes_copied_from_ca_buffer	    +=
+    source.numbytes_copied_from_ca_buffer;
+    numbytes_reserved_as_ca_buffer	    +=
+    source.numbytes_reserved_as_ca_buffer;
     numbytes_copied_to_caller_buffer	    +=
     source.numbytes_copied_to_caller_buffer;
-    clock_nsecs_waiting_to_set_sa_buffer    +=
-    source.clock_nsecs_waiting_to_set_sa_buffer;
-    cpu_nsecs_waiting_to_set_sa_buffer	    +=
-    source.cpu_nsecs_waiting_to_set_sa_buffer;
-    clock_nsecs_waiting_to_get_sa_buffer    +=
-    source.clock_nsecs_waiting_to_get_sa_buffer;
-    cpu_nsecs_waiting_to_get_sa_buffer	    +=
-    source.cpu_nsecs_waiting_to_get_sa_buffer;
+    clock_nsecs_waiting_to_set_ca_buffer    +=
+    source.clock_nsecs_waiting_to_set_ca_buffer;
+    cpu_nsecs_waiting_to_set_ca_buffer	    +=
+    source.cpu_nsecs_waiting_to_set_ca_buffer;
+    clock_nsecs_waiting_to_get_ca_buffer    +=
+    source.clock_nsecs_waiting_to_get_ca_buffer;
+    cpu_nsecs_waiting_to_get_ca_buffer	    +=
+    source.cpu_nsecs_waiting_to_get_ca_buffer;
     clock_nsecs_waiting_to_fill_from_stream +=
     source.clock_nsecs_waiting_to_fill_from_stream;
     cpu_nsecs_waiting_to_fill_from_stream   +=
@@ -442,7 +479,8 @@ CacheManager(
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _segment_ref_count( 0 ),
     _segment_to_fill( 0 ),
-    _fill_counter( 0 )
+    _fill_counter( 0 ),
+    _ca_spin_lock( 0 )
 {
 
     if (cache_size < number_of_threads)	throw InvalidCacheSizeRequested( );
@@ -547,54 +585,62 @@ has_more_data( )
     CacheSegment &	segment		= _get_segment( );
 
     // Return true immediately, if segment can provide more data.
-    if (segment.avail) return true;
+    if (segment.avail || segment.cursor_in_ca_buffer)
+	return true;
 
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG1,
+	TraceLogger:: TLVL_DEBUG6,
 	"Before 'has_more_data' synchronization barrier.\n"
     );
+#endif
 
     // Block indefinitely, if some other segment can provide more data.
     // (This is a synchronization barrier.)
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
 #endif
-sync_barrier:
-    for (uint64_t i = 0; _segment_ref_count; ++i)
+    for (uint64_t i = 0; true; ++i)
     {
 	// TODO: Determine optimal period. (Probably arch-dependent.)
 	if (0 == i % 100000)
 	{
+#ifdef TRACE_BUSYWAITS
 	    if (0 == i % 100000000)
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG3,
+		    TraceLogger:: TLVL_DEBUG7,
 		    "Waited in synchronization barrier for %llu iterations.\n",
 		    (unsigned long long int)i
 		);
-	    // HACK: Occasionally issue a memory barrier to break things up.
-	    _get_segment_ref_count_ATOMIC( );
-	}
-    }
-
-    // Return false, if no segment can provide more data.
-    if (!_get_segment_ref_count_ATOMIC( ))
-    {
-#ifdef WITH_INTERNAL_METRICS
-	segment.pmetrics.stop_timers( );
-	segment.pmetrics.accumulate_timer_deltas(
-	    CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
-	);
 #endif
-	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG1,
-	    "After 'has_more_data' synchronization barrier.\n"
-	);
-
-	return false;
+	    if (!_get_segment_ref_count_ATOMIC( ))
+	    {
+#ifdef TRACE_STATE_CHANGES
+		segment.trace_logger(
+		    TraceLogger:: TLVL_DEBUG6,
+		    "Segment reference count is maybe %llu.\n",
+		    (unsigned long long int)_segment_ref_count
+		);
+#endif
+		break;
+	    }
+	} // polling loop
     }
-    // If we somehow got here and there are still active segments,
-    // then go back to waiting.
-    else goto sync_barrier;
+
+#ifdef WITH_INTERNAL_METRICS
+    segment.pmetrics.stop_timers( );
+    segment.pmetrics.accumulate_timer_deltas(
+	CacheSegmentPerformanceMetrics:: MKEY_TIME_IN_SYNC_BARRIER
+    );
+#endif
+#ifdef TRACE_STATE_CHANGES
+    segment.trace_logger(
+	TraceLogger:: TLVL_DEBUG6,
+	"After 'has_more_data' synchronization barrier.\n"
+    );
+#endif
+
+    return false;
 }
 
 
@@ -607,10 +653,12 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
     uint64_t		nbcopied_total	= 0;
     uint8_t *		memory		= NULL;
     uint64_t		size		= 0;
-    bool		in_sa_buffer	= false;
+    bool		in_ca_buffer	= false;
     TraceLogger		&trace_logger	= segment.trace_logger;
 
+#if (0)
     if (!segment.avail) throw CacheSegmentUnavailable( );
+#endif
 
     for (uint64_t nbrem = buffer_len; (0 < nbrem); nbrem -= nbcopied)
     {
@@ -621,31 +669,33 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	{
 	    memory	    = (uint8_t *)segment.ca_buffer.c_str( );
 	    size	    = (uint64_t)segment.ca_buffer.length( );
-	    in_sa_buffer    = true;
+	    in_ca_buffer    = true;
 	}
 	else
 	{
 	    memory	    = segment.memory;
 	    size	    = segment.size;
 	    if (!segment.avail) break;
-	    if (in_sa_buffer) in_sa_buffer = false;
+	    in_ca_buffer    = false;
 	}
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
 	memcpy( buffer + nbcopied_total, memory + segment.cursor, nbcopied );
 	segment.cursor += nbcopied;
 
+#ifdef TRACE_MEMCOPIES
 	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "get_bytes: Copied %llu bytes from %s.\n",
 	    (unsigned long long int)nbcopied,
-	    in_sa_buffer ? "setaside buffer" : "cache segment"
+	    in_ca_buffer ? "copyaside buffer" : "cache segment"
 	);
+#endif
 
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_copied_to_caller_buffer += nbcopied;
-	if (in_sa_buffer)
-	    segment.pmetrics.numbytes_copied_from_sa_buffer += nbcopied;
+	if (in_ca_buffer)
+	    segment.pmetrics.numbytes_copied_from_ca_buffer += nbcopied;
 #endif
 	nbcopied_total += nbcopied;
     }
@@ -676,11 +726,13 @@ split_at( uint64_t const pos )
 
     if (1 == _number_of_threads) return;
 
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG2,
+	TraceLogger:: TLVL_DEBUG7,
 	"Creating copyaside buffer for fill ID %llu up to byte %llu....\n",
 	(unsigned long long int)segment.fill_id, (unsigned long long int)pos
     );
+#endif
 
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.start_timers( );
@@ -691,24 +743,35 @@ split_at( uint64_t const pos )
 	    ++i
 	)
     {
+#if defined (TRACE_BUSYWAITS) && defined (TRACE_SPINLOCKS)
 	if (0 == i % 100000000)
+	{
 	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG3,
+		TraceLogger:: TLVL_DEBUG7,
 		"Waited to acquire copyaside buffers spinlock " \
-		"for %llu iterations.\n",
+		"for %llu iterations. [write buffer]\n",
 		(unsigned long long int)i
 	    );
-    }
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG8,
+		"\tSpinlock is probably %s.\n",
+		_ca_spin_lock ? "set" : "unset"
+	    );
+	}
+#endif
+    } // wait for ca_spin_lock
     // Create and register copyaside buffer,
     // keyed to segment's current fill ID.
     _ca_buffers[ segment.fill_id ].append(
 	(char *)segment.memory, (size_t)pos
     );
+#ifdef TRACE_DATA
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG3,
+	TraceLogger:: TLVL_DEBUG8,
 	"Contents of created copyaside buffer: %s\n",
 	_ca_buffers[ segment.fill_id ].c_str( )
     );
+#endif
     // Release copyaside buffers spinlock.
     __sync_bool_compare_and_swap( &_ca_spin_lock, 1, 0 );
 #ifdef WITH_INTERNAL_METRICS
@@ -716,10 +779,10 @@ split_at( uint64_t const pos )
     segment.pmetrics.accumulate_timer_deltas(
 	CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
     );
-    segment.pmetrics.numbytes_reserved_as_sa_buffer += pos;
+    segment.pmetrics.numbytes_reserved_as_ca_buffer += pos;
 #endif
 
-}
+} // split_at
 
 
 uint64_t const
@@ -733,26 +796,30 @@ CacheManager::
 _perform_segment_maintenance( CacheSegment &segment )
 {
 
+#if (0)
     assert( segment.avail );
+#endif
 
+#ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
-	TraceLogger:: TLVL_DEBUG3,
+	TraceLogger:: TLVL_DEBUG6,
 	"Performing segment maintenance....\n"
     );
     if (segment.cursor_in_ca_buffer)
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG3,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "\tCursor at byte %llu in copyaside buffer for fill %llu.\n",
 	    (unsigned long long int)segment.cursor,
 	    (unsigned long long int)(segment.fill_id + 1)
 	);
     else
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG3,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "\tCursor at byte %llu in fill %llu.\n",
 	    (unsigned long long int)segment.cursor,
 	    (unsigned long long int)segment.fill_id
 	);
+#endif
 
     // If at end of segment and not already in copyaside buffer, 
     // then jump into copyaside buffer from next fill.
@@ -771,24 +838,30 @@ _perform_segment_maintenance( CacheSegment &segment )
 	    std:: map< uint64_t, std:: string >:: iterator ca_buffers_ITER;
 
 	    // Loop while copyaside buffer from next fill does not exist.
-	    // (TODO: And there is a next fill and EOS not reached.)
 	    for (uint64_t j = 0; !segment.cursor_in_ca_buffer; ++j)
 	    {
 		
-		// If there are no more fills and EOS has been reached,
+		// If there are no more fills beyond the current one 
+		// and EOS has been reached,
 		// then we know that no copyaside buffer will be found.
 		if (    (_fill_counter == (segment.fill_id + 1))
 		    &&  _stream_reader.is_at_end_of_stream( ))
 		{
+#ifdef TRACE_STATE_CHANGES
+		    segment.trace_logger(
+			TraceLogger:: TLVL_DEBUG7,
+			"Jumped into dummy copyaside buffer. (No more data.)\n"
+		    );
+#endif
 		    segment.ca_buffer.clear( );
 		    segment.cursor_in_ca_buffer = true;
 		    segment.cursor		= 0;
 		    break;
 		}
 
-    #ifdef WITH_INTERNAL_METRICS
+#ifdef WITH_INTERNAL_METRICS
 		segment.pmetrics.start_timers( );
-    #endif
+#endif
 
 		// Acquire copyaside buffers spinlock.
 		for (   uint64_t i = 0;
@@ -796,55 +869,79 @@ _perform_segment_maintenance( CacheSegment &segment )
 			++i
 		    )
 		{
+#if defined (TRACE_BUSYWAITS) && defined (TRACE_SPINLOCKS)
 		    if (0 == i % 100000000)
+		    {
 			segment.trace_logger(
-			    TraceLogger:: TLVL_DEBUG3,
+			    TraceLogger:: TLVL_DEBUG7,
 			    "Waited to acquire copyaside buffers spinlock " \
-			    "for %llu iterations.\n",
+			    "for %llu iterations. [read buffer]\n",
 			    (unsigned long long int)i
 			);
-		}
+			segment.trace_logger(
+			    TraceLogger:: TLVL_DEBUG8,
+			    "\tSpinlock is probably %s.\n",
+			    _ca_spin_lock ? "set" : "unset"
+			);
+		    }
+#endif
+		} // wait for ca_spin_lock
 
 		// Test for existence of copyaside buffer from next fill.
 		// If copyaside buffer exists, then copy it local.
 		ca_buffers_ITER = _ca_buffers.find( segment.fill_id + 1 );
 		if (ca_buffers_ITER != _ca_buffers.end( ))
 		{
+#ifdef TRACE_STATE_CHANGES
+		    segment.trace_logger(
+			TraceLogger:: TLVL_DEBUG7,
+			"Locally cloning copyaside buffer of fill %llu.\n",
+			(unsigned long long int)(segment.fill_id + 1)
+		    );
+#endif
 		    segment.cursor_in_ca_buffer = true;
-		    segment.ca_buffer = _ca_buffers[ segment.fill_id + 1 ];
+		    segment.ca_buffer = ca_buffers_ITER->second;
 		    _ca_buffers.erase( ca_buffers_ITER );
 		}
 
 		// Release copyaside buffers spinlock.
 		__sync_bool_compare_and_swap( &_ca_spin_lock, 1, 0 );
 
-    #ifdef WITH_INTERNAL_METRICS
+#ifdef WITH_INTERNAL_METRICS
 		segment.pmetrics.stop_timers( );
 		segment.pmetrics.accumulate_timer_deltas(
-		    CacheSegmentPerformanceMetrics:: MKEY_TIME_WAITING_TO_SET_SA_BUFFER
+		    CacheSegmentPerformanceMetrics:: 
+		    MKEY_TIME_WAITING_TO_SET_SA_BUFFER
 		);
-    #endif
+#endif
 
+#ifdef TRACE_BUSYWAITS
 		if (0 == j % 100000000)
 		    segment.trace_logger(
-			TraceLogger:: TLVL_DEBUG3,
+			TraceLogger:: TLVL_DEBUG7,
 			"Waited for copyaside buffer from next fill " \
 			"for %llu iterations.\n",
 			(unsigned long long int)j
 		    );
+#endif
 
 	    } // loop until copyaside buffer created
 
 	    if (segment.cursor_in_ca_buffer)
 		segment.cursor = 0;
+#ifdef TRACE_STATE_CHANGES
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG2, "Jumped into copyaside buffer.\n"
+		    TraceLogger:: TLVL_DEBUG7,
+		    "Jumped into copyaside buffer.\n"
 		);
+#endif
+#ifdef TRACE_DATA
 		segment.trace_logger(
-		    TraceLogger:: TLVL_DEBUG3,
+		    TraceLogger:: TLVL_DEBUG8,
 		    "Contents of copyaside buffer in use: %s\n",
 		    segment.ca_buffer.c_str( )
 		);
+#endif
 
 	} // if multi-threaded
 
@@ -856,14 +953,16 @@ _perform_segment_maintenance( CacheSegment &segment )
     {
 	segment.cursor_in_ca_buffer	= false;
 	segment.cursor			= 0;
+#ifdef TRACE_STATE_CHANGES
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG2, "Jumped out of copyaside buffer.\n"
+	    TraceLogger:: TLVL_DEBUG7, "Jumped out of copyaside buffer.\n"
 	);
+#endif
 	
 	_fill_segment_from_stream( segment );
     } // end of copyaside buffer
 
-}
+} // _perform_segment_maintenance
 
 
 inline
@@ -939,12 +1038,14 @@ wait_to_fill:
 	&&  (_segment_to_fill != segment.thread_id);
 	    ++i)
     {
+#ifdef TRACE_BUSYWAITS
 	if (0 == i % 100000000)
 	    segment.trace_logger(
-		TraceLogger:: TLVL_DEBUG3,
+		TraceLogger:: TLVL_DEBUG7,
 		"Waited to fill segment for %llu iterations.\n",
 		(unsigned long long int)i
 	    );
+#endif
     }
 #ifdef WITH_INTERNAL_METRICS
     segment.pmetrics.stop_timers( );
@@ -957,9 +1058,11 @@ wait_to_fill:
     // If at end of stream, then mark segment unavailable.
     if (_stream_reader.is_at_end_of_stream( ))
     {
+#ifdef TRACE_STATE_CHANGES
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG1, "At end of input stream.\n"
+	    TraceLogger:: TLVL_DEBUG6, "At end of input stream.\n"
 	);
+#endif
 	segment.size	= 0;
 	segment.avail	= false;
 	_decrement_segment_ref_count_ATOMIC( );
@@ -990,17 +1093,19 @@ wait_to_fill:
 	    MKEY_TIME_FILLING_FROM_STREAM
 	);
 #endif
+#ifdef TRACE_MEMCOPIES
 	segment.trace_logger(
-	    TraceLogger:: TLVL_DEBUG2,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "Read %llu bytes into segment.\n",
 	    (unsigned long long int)segment.size
 	);
+#endif
     }
 
     // If we somehow get here, then go back and wait some more.
     else goto wait_to_fill;
 
-}
+} // _fill_segment_from_stream
 
 
 inline
@@ -1177,7 +1282,33 @@ IParser(
     _thread_id_map( ThreadIDMap( number_of_threads ) ),
     _unithreaded( 1 == number_of_threads ),
     _states( new ParserState *[ number_of_threads ] )
-{ for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL; }
+{
+    while (!(_uuid = rand( )));
+
+    for (uint32_t i = 0; i < number_of_threads; ++i) _states[ i ] = NULL;
+
+    int regex_rc = -1;
+    regex_rc = 
+    regcomp(
+	&_re_read_2_nosub,
+	// ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",
+	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
+	REG_EXTENDED | REG_NOSUB
+    );
+    assert( !regex_rc );
+    regex_rc =
+    regcomp(
+	&_re_read_1,
+	"^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
+    );
+    assert( !regex_rc );
+    regex_rc = 
+    regcomp(
+	&_re_read_2,
+	"^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
+    );
+    assert( !regex_rc );
+}
 
 
 IParser::
@@ -1191,6 +1322,9 @@ IParser::
 	    _states[ i ] = NULL;
 	}
     }
+
+    regfree( &_re_read_2_nosub );
+    regfree( &_re_read_1 ); regfree( &_re_read_2 ); 
 }
 
 
@@ -1240,11 +1374,13 @@ _copy_line( ParserState &state )
 	    hit			= true;
 	}
 
+#ifdef TRACE_DATA
 	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
+	    TraceLogger:: TLVL_DEBUG7,
 	    "_copy_line: Detected line fragment: \"%s\"[%llu]\n",
 	    (char const *)(buffer + pos), (unsigned long long int)i
 	);
+#endif
 	line.append( (char const *)(buffer + pos), i );
 
 	if (hit)
@@ -1258,11 +1394,13 @@ _copy_line( ParserState &state )
 	{
 	    rem = _cache_manager.get_bytes( buffer, ParserState:: BUFFER_SIZE );
 	    pos = 0;
+#ifdef TRACE_MEMCOPIES
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG8,
+		TraceLogger:: TLVL_DEBUG6,
 		"_copy_line: Copied %llu bytes into parser buffer.\n",
 		(unsigned long long int)rem
 	    );
+#endif
 	}
 	else break;
 
@@ -1315,12 +1453,17 @@ _parse_read( ParserState &state, Read &the_read )
     std:: string    &line	    = state.line;
 
     // Validate and consume the 'name' field.
+#ifdef TRACE_DATA
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG9,
+	TraceLogger:: TLVL_DEBUG5,
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
+#endif
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('>' != line[ 0 ]) throw InvalidFASTAFileFormat( );    
+    if ('>' != line[ 0 ])
+	throw InvalidFASTAFileFormat(
+	    "invalid sequence name indicator", line.c_str( )
+	);
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1328,10 +1471,12 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
+#ifdef TRACE_DATA
 	state.trace_logger(
-	    TraceLogger:: TLVL_DEBUG9,
+	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
 	);
+#endif
 
 	// If a new record is detected, then existing one is complete.
 	if ('>' == line[ 0 ]) break;
@@ -1341,11 +1486,13 @@ _parse_read( ParserState &state, Read &the_read )
 	the_read.bytes_consumed += (line.length( ) + 1);
     }
 
+#ifdef TRACE_MEMCOPIES
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG8,
+	TraceLogger:: TLVL_DEBUG4,
 	"_parse_read: Successfully parsed FASTA record of %llu bytes.\n",
 	the_read.bytes_consumed
     );
+#endif
 }
 
 
@@ -1365,6 +1512,7 @@ _parse_read( ParserState &state, Read &the_read )
  * at parse time.
  * This potential bug cannot occur if only one thread is being used to parse.
  */
+// TODO? Write a simpler FASTQ parser.
 inline
 void
 FastqParser::
@@ -1373,12 +1521,17 @@ _parse_read( ParserState &state, Read &the_read )
     std:: string    &line	    = state.line;
 
     // Validate and consume the 'name' field.
+#ifdef TRACE_DATA
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG9,
+	TraceLogger:: TLVL_DEBUG5,
 	"_parse_read: Read Name: %s\n", line.c_str( )
     );
+#endif
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('@' != line[ 0 ]) throw InvalidFASTQFileFormat( );    
+    if ('@' != line[ 0 ])
+	throw InvalidFASTQFileFormat(
+	    "invalid sequence name indicator", line.c_str( )
+	);
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1386,10 +1539,12 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
+#ifdef TRACE_DATA
 	state.trace_logger(
-	    TraceLogger:: TLVL_DEBUG9,
+	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Sequence (candidate): %s\n", line.c_str( )
 	);
+#endif
 
 	// If separator line is detected, then assume sequence is complete.
 	if (('+' == line[ 0 ]) || ('#' == line[ 0 ])) break;
@@ -1398,7 +1553,9 @@ _parse_read( ParserState &state, Read &the_read )
 	// then record is corrupt.
 	if (	!(('A' <= line[ 0 ]) && ('Z' >= line[ 0 ]))
 	    &&	!(('a' <= line[ 0 ]) && ('z' >= line[ 0 ])))
-	    throw InvalidFASTQFileFormat( );
+	    throw InvalidFASTQFileFormat(
+		"illegal sequence letters", line.c_str( )
+	    );
 
 	the_read.sequence += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
@@ -1413,11 +1570,13 @@ _parse_read( ParserState &state, Read &the_read )
     {
 	_copy_line( state );
 
+#ifdef TRACE_DATA
 	state.trace_logger(
-	    TraceLogger:: TLVL_DEBUG9,
+	    TraceLogger:: TLVL_DEBUG6,
 	    "_parse_read: Read Quality Scores (candidate): %s\n",
 	    line.c_str( )
 	);
+#endif
 
 	the_read.accuracy += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
@@ -1425,22 +1584,26 @@ _parse_read( ParserState &state, Read &the_read )
 
     // Validate quality score lines versus sequence lines.
     if (the_read.accuracy.length( ) != the_read.sequence.length( ))
-	throw InvalidFASTQFileFormat( );
+	throw InvalidFASTQFileFormat(
+	    "sequence and quality scores length mismatch"
+	);
 
+#ifdef TRACE_MEMCOPIES
     state.trace_logger(
-	TraceLogger:: TLVL_DEBUG8,
+	TraceLogger:: TLVL_DEBUG4,
 	"_parse_read: Successfully parsed FASTQ record of %llu bytes.\n",
 	the_read.bytes_consumed
     );
+#endif
 
     // Prefetch next line. (Needed to be consistent with FASTA logic.)
     _copy_line( state );
 }
 
 
-Read
+void
 IParser::
-get_next_read( )
+imprint_next_read( Read &the_read )
 {
     
     ParserState	    &state	    = _get_state( );
@@ -1450,7 +1613,6 @@ get_next_read( )
     TraceLogger	    &trace_logger   = state.trace_logger;
     uint64_t	    split_pos	    = 0;
     bool	    skip_read	    = false;
-    Read	    the_read;
     
     while (!is_complete( ))
     {
@@ -1465,11 +1627,13 @@ get_next_read( )
 	    &&  (fill_id != _cache_manager.get_fill_id( ))
 	    &&  (state.buffer_rem <= _cache_manager.whereis_cursor( ));
 	if (at_start) fill_id = _cache_manager.get_fill_id( );
+#ifdef TRACE_STATE_CHANGES
 	trace_logger(
-	    TraceLogger:: TLVL_DEBUG8,
-	    "_get_next_read: fill_id = %llu, at_start = %d\n",
+	    TraceLogger:: TLVL_DEBUG4,
+	    "imprint_next_read: fill_id = %llu, at_start = %d\n",
 	    (unsigned long long int)fill_id, at_start
 	);
+#endif
 
 	// Attempt to parse a read.
 	// If at start of file, then error on garbage.
@@ -1477,14 +1641,24 @@ get_next_read( )
 	try { _parse_read( state, the_read ); }
 	catch (InvalidReadFileFormat &exc)
 	{
+#ifdef TRACE_DATA
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
-		"get_next_read: Parse error on line: %s\n" \
+		TraceLogger:: TLVL_DEBUG4,
+		"imprint_next_read: Parse error on line: %s\n" \
 		"\t(fill_id = %llu, at_start = %d)\n",
 		state.line.c_str( ),
 		(unsigned long long int)fill_id,
 		at_start
 	    );
+#else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG4,
+		"imprint_next_read: Parse error" \
+		"(fill_id = %llu, at_start = %d)\n",
+		(unsigned long long int)fill_id,
+		at_start
+	    );
+#endif
 
 	    if (!at_start || (at_start && (0 == fill_id))) throw;
 
@@ -1496,15 +1670,19 @@ get_next_read( )
 	// when at the beginning of a new fill.
 	skip_read =
 		at_start && (0 != fill_id)
-	    &&	((the_read.name.length( ) - 2) == the_read.name.rfind( "/2" ));
+	    &&	!regexec(
+		    &_re_read_2_nosub, the_read.name.c_str( ), 0, NULL, 0
+		);
 	if (skip_read)
 	{
+#ifdef TRACE_MEMCOPIES
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
-		"get_next_read: Skipped a split pair, using %llu bytes, " \
+		TraceLogger:: TLVL_DEBUG4,
+		"imprint_next_read: Skipped a split pair, using %llu bytes, " \
 		"looking for next read.\n",
 		(unsigned long long int)the_read.bytes_consumed
 	    );
+#endif
 	    split_pos += the_read.bytes_consumed;
 	}
 
@@ -1512,27 +1690,32 @@ get_next_read( )
 	if (at_start)
 	{
 
+#ifdef TRACE_STATE_CHANGES
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
-		"get_next_read: Memory cursor is at byte %llu " \
+		TraceLogger:: TLVL_DEBUG5,
+		"imprint_next_read: Memory cursor is at byte %llu " \
 		"in segment (fill %llu).\n",
 		(unsigned long long int)_cache_manager.whereis_cursor( ),
 		(unsigned long long int)_cache_manager.get_fill_id( )
 	    );
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG7,
-		"get_next_read: Parser buffer has %llu bytes remaining.\n", 
+		TraceLogger:: TLVL_DEBUG5,
+		"imprint_next_read: Parser buffer has %llu " \
+		"bytes remaining.\n", 
 		(unsigned long long int)state.buffer_rem
 	    );
+#endif
 
 	    _cache_manager.split_at( split_pos );
 
+#ifdef TRACE_MEMCOPIES
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG6,
-		"get_next_read: Skipped %llu bytes of data total " \
+		TraceLogger:: TLVL_DEBUG4,
+		"imprint_next_read: Skipped %llu bytes of data total " \
 		"at segment start.\n",
 		(unsigned long long int)split_pos
 	    );
+#endif
 
 	}
 
@@ -1548,21 +1731,40 @@ get_next_read( )
 	// Discard invalid read.
 	if (std:: string:: npos != the_read.sequence.find_first_of( "Nn" ))
 	{
+#ifdef TRACE_DATA
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG6,
-		"get_next_read: Discarded read \"%s\" (length %lu).\n",
+		TraceLogger:: TLVL_DEBUG3,
+		"imprint_next_read: Discarded read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
 	    );
+#else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
+		"imprint_next_read: Discarded read of length.\n",
+		(unsigned long int)the_read.sequence.length( )
+	    );
+#endif
 	    continue;
 	}
 	else
+	{
+#ifdef TRACE_DATA
 	    trace_logger(
-		TraceLogger:: TLVL_DEBUG6,
-		"get_next_read: Accepted read \"%s\" (length %lu).\n",
+		TraceLogger:: TLVL_DEBUG3,
+		"imprint_next_read: Accepted read \"%s\" (length %lu).\n",
 		the_read.name.c_str( ),
 		(unsigned long int)the_read.sequence.length( )
 	    );
+#else
+	    trace_logger(
+		TraceLogger:: TLVL_DEBUG3,
+		"imprint_next_read: Accepted read of length %lu.\n",
+		(unsigned long int)the_read.sequence.length( )
+	    );
+#endif
+	    ;
+	}
 
 #ifdef WITH_INTERNAL_METRICS
 	state.pmetrics.numreads_parsed_valid++;
@@ -1570,7 +1772,126 @@ get_next_read( )
 	break;
     } // while invalid read
 
-    return the_read;
+    if (is_complete( ) && (0 == the_read.name.length( )))
+	throw NoMoreReadsAvailable( );
+} // imprint_next_read
+
+
+void
+IParser::
+imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
+{
+    switch (mode)
+    {
+#if (0)
+    case IParser:: PAIR_MODE_ALLOW_UNPAIRED:
+	_imprint_next_read_pair_in_allow_mode( the_read_pair );
+	break;
+#endif
+    case IParser:: PAIR_MODE_IGNORE_UNPAIRED:
+	_imprint_next_read_pair_in_ignore_mode( the_read_pair );
+	break;
+    case IParser:: PAIR_MODE_ERROR_ON_UNPAIRED:
+	_imprint_next_read_pair_in_error_mode( the_read_pair );
+	break;
+    default:
+	throw UnknownPairReadingMode( );
+    }
+}
+
+
+#if (0)
+void
+IParser::
+_imprint_next_read_pair_in_allow_mode( ReadPair &the_read_pair )
+{
+    // TODO: Implement.
+    //	     Probably need caching of reads between invocations 
+    //	     and the ability to return pairs which are half empty. 
+}
+#endif
+
+
+void
+IParser::
+_imprint_next_read_pair_in_ignore_mode( ReadPair &the_read_pair )
+{
+    Read	    &read_1		= the_read_pair.first;
+    Read	    &read_2		= the_read_pair.second;
+    regmatch_t	    match_1, match_2;
+
+    // Hunt for a read pair until one is found or end of reads is reached.
+    while (true)
+    {
+
+	// Toss out all reads which are not marked as first of a pair.
+	// Note: We let any exception, which flies out of the following,
+	//	 pass through unhandled.
+	while (true)
+	{
+	    imprint_next_read( read_1 );
+	    if (!regexec(
+		&_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
+	    )) break;
+	}
+
+	// If first read of a pair was found, then insist upon second read.
+	// If not found, then restart search for pair.
+	// If found, then validate match.
+	// If invalid pair, then restart search for pair.
+	imprint_next_read( read_2 );
+	if (!regexec(
+	    &_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
+	))
+	{
+	    if (_is_valid_read_pair( the_read_pair, match_1, match_2 ))
+		break;
+	}
+
+    } // while pair not found
+
+} // _imprint_next_read_pair_in_ignore_mode
+
+
+void
+IParser::
+_imprint_next_read_pair_in_error_mode( ReadPair &the_read_pair )
+{
+    Read	    &read_1		= the_read_pair.first;
+    Read	    &read_2		= the_read_pair.second;
+    regmatch_t	    match_1, match_2;
+
+    // Note: We let any exception, which flies out of the following,
+    //	     pass through unhandled.
+    imprint_next_read( read_1 );
+    imprint_next_read( read_2 );
+
+    // Is the first read really the first member of a pair?
+    if (REG_NOMATCH == regexec(
+	&_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
+    )) throw InvalidReadPair( );
+    // Is the second read really the second member of a pair?
+    if (REG_NOMATCH == regexec(
+	&_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
+    )) throw InvalidReadPair( );
+
+    // Is the pair valid?
+    if (!_is_valid_read_pair( the_read_pair, match_1, match_2 ))
+	throw InvalidReadPair( );
+
+} // _imprint_next_read_pair_in_error_mode
+
+
+bool
+IParser::
+_is_valid_read_pair(
+    ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
+)
+{
+    return	(match_1.rm_so == match_2.rm_so)
+	    &&	(match_1.rm_eo == match_2.rm_eo)
+	    &&	(	the_read_pair.first.name.substr( 0, match_1.rm_so )
+		    ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
 
