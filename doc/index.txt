@@ -36,7 +36,9 @@ Contents:
    ktable
    details
    development
+   crazy-ideas
    contributors
+   biblio
 
    LICENSE
 
