@@ -10,13 +10,14 @@ def test_simple_retrieval():
     # this tag is the first 32 bases of the only sequence in
     # 'test-outline-simple.fa'
     tag = 'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCT'
-    tags = [tag] 
+    tags = [tag]
 
-    # @CTB the tag API is not very accessible to Python ATM -- for now, instead
-    # of:
-    # sorted_tags = khmer.load_and_sort_tags(tag_filename)
-    # do:
-    sorted_tags = khmer.sort_tags(sorted_tags)
+    ht = khmer.new_hashbits(32, 1, 1)
+    ht.add_tag(tags)
+
+    # return the sorted/numerical tags (well, tag, in this case).
+    # @CTB could we do this with 'sort' if they weere
+    sorted_tags = ht.get_sorted_tags(sorted_tags)
 
     # build the index connect tags <=> reads
     index_filename = khmer.build_outline_index(data_filename, sorted_tags)
@@ -28,7 +29,7 @@ def test_simple_retrieval():
                                                           tags)
 
     # should only be one sequence!
-    assert len(read_id_list) == 0
+    assert len(read_id_list) == 1
 
     # retrieve read
     read = khmer.outline_retrieve_read_by_id(bin_filename, read_id_list[0])
