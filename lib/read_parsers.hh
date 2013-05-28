@@ -279,6 +279,7 @@ private:
 	bool				cursor_in_ca_buffer;
 	std:: string			ca_buffer;
 	uint64_t			fill_id;
+	bool				found_EOS;
 	CacheSegmentPerformanceMetrics	pmetrics;
 	TraceLogger			trace_logger;
 	
