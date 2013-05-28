@@ -187,7 +187,7 @@ Bz2StreamReader::
 bool const
 IStreamReader::
 is_at_EOS_ATOMIC( )
-{ return __sync_and_and_fetch( &_at_eos, true ); }
+{ return __sync_and_and_fetch( &_at_eos, 1 ); }
 
 
 void
@@ -1084,7 +1084,7 @@ _fill_segment_from_stream( CacheSegment & segment )
     }
 
     // Else, refill the segment.
-    else if (_check_segment_to_fill_ATOMIC( segment.thread_id ))
+    else
     {
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.start_timers( );
