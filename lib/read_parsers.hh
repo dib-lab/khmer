@@ -124,7 +124,7 @@ struct IStreamReader
 
     size_t const		    get_memory_alignment( ) const;
 
-    bool const			    is_at_end_of_stream( ) const;
+    bool const			    is_at_EOS_ATOMIC( );
 
     virtual uint64_t const	    read_into_cache(
 	uint8_t * const cache, uint64_t const cache_size
@@ -136,6 +136,8 @@ protected:
     size_t			    _max_aligned;
     
     bool			    _at_eos;
+
+    void			    _set_EOS_ATOMIC( );
 
 };
 
@@ -277,6 +279,7 @@ private:
 	bool				cursor_in_ca_buffer;
 	std:: string			ca_buffer;
 	uint64_t			fill_id;
+	bool				found_EOS;
 	CacheSegmentPerformanceMetrics	pmetrics;
 	TraceLogger			trace_logger;
 	
@@ -314,6 +317,8 @@ private:
 	CacheSegment & segment
     );
 
+    uint64_t		_get_fill_counter_ATOMIC( );
+    void		_increment_fill_counter_ATOMIC( );
     bool const		_check_segment_to_fill_ATOMIC(
 	uint32_t const thread_id
     );
