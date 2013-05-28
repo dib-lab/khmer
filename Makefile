@@ -27,7 +27,7 @@ WANT_DEBUGGING=false
 # Set this variable to true if you want to use instrumentation provided 
 # in the sources for debugging purposes 
 # and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_TRACING=true
+WITH_INTERNAL_TRACING=false
 
 # Trace state transitions?
 # Set this variable to true if you want to use instrumentation which reports

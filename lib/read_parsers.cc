@@ -541,6 +541,7 @@ CacheSegment(
     cursor( 0 ),
     cursor_in_ca_buffer( false ),
     fill_id( 0 ),
+    found_EOS( false ),
     pmetrics( CacheSegmentPerformanceMetrics( ) ),
     trace_logger(
 	TraceLogger(
@@ -806,10 +807,11 @@ void
 CacheManager::
 _perform_segment_maintenance( CacheSegment &segment )
 {
-
 #if (0)
     assert( segment.avail );
 #endif
+
+    uint64_t	next_fill_id	= segment.fill_id + 1;
 
 #ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
@@ -821,7 +823,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 	    TraceLogger:: TLVL_DEBUG7,
 	    "\tCursor at byte %llu in copyaside buffer for fill %llu.\n",
 	    (unsigned long long int)segment.cursor,
-	    (unsigned long long int)(segment.fill_id + 1)
+	    (unsigned long long int)next_fill_id
 	);
     else
 	segment.trace_logger(
@@ -836,42 +838,32 @@ _perform_segment_maintenance( CacheSegment &segment )
     // then jump into copyaside buffer from next fill.
     if (!segment.cursor_in_ca_buffer && (segment.cursor == segment.size))
     {
-	if (1 == _number_of_threads)
+
+	// If only one thread is being used
+	// or if this is thread which found end-of-stream,
+	// then we know that there will be no copyaside buffer 
+	// upon which to wait and can therefore skip past this step.
+	if ((1 == _number_of_threads) || segment.found_EOS)
 	{
 	    segment.ca_buffer.clear( );
 	    segment.cursor_in_ca_buffer = true;
 	    segment.cursor		= 0;
+#ifdef TRACE_STATE_CHANGES
+	    segment.trace_logger(
+		TraceLogger:: TLVL_DEBUG7,
+		"Prepared dummy copyaside buffer. (next_fill_id = %llu)\n",
+		(unsigned long long int)next_fill_id
+	    );
+#endif
 	}
 
-	else // multi-threaded
+	else // one out of multiple threads and did not find EOS
 	{
-	    uint64_t	next_fill_id	= segment.fill_id + 1;
 	    std:: map< uint64_t, std:: string >:: iterator ca_buffers_ITER;
 
 	    // Loop while copyaside buffer from next fill does not exist.
 	    for (uint64_t j = 0; !segment.cursor_in_ca_buffer; ++j)
 	    {
-		uint64_t    fill_counter    = _get_fill_counter_ATOMIC( );
-		
-		// If there are no more fills beyond the current one 
-		// and EOS has been reached,
-		// then we know that no copyaside buffer will be found.
-		if (    (fill_counter == next_fill_id)
-		    &&  _stream_reader.is_at_EOS_ATOMIC( ))
-		{
-		    segment.ca_buffer.clear( );
-		    segment.cursor_in_ca_buffer = true;
-		    segment.cursor		= 0;
-#ifdef TRACE_STATE_CHANGES
-		    segment.trace_logger(
-			TraceLogger:: TLVL_DEBUG7,
-			"Prepared dummy copyaside buffer. " \
-			"(next_fill_id = %llu)\n",
-			(unsigned long long int)next_fill_id
-		    );
-#endif
-		    break;
-		}
 
 #ifdef WITH_INTERNAL_METRICS
 		segment.pmetrics.start_timers( );
@@ -1093,8 +1085,7 @@ _fill_segment_from_stream( CacheSegment & segment )
 	    segment.cursor
 	+   (	nbfilled =
 		_stream_reader.read_into_cache(
-		    segment.memory + segment.cursor,
-		    _segment_size - segment.cursor
+		    segment.memory, _segment_size
 		));
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.stop_timers( );
@@ -1102,6 +1093,8 @@ _fill_segment_from_stream( CacheSegment & segment )
 	segment.fill_id = _get_fill_counter_ATOMIC( );
 	_increment_fill_counter_ATOMIC( );
 	_select_segment_to_fill_ATOMIC( );
+	if (segment.size < _segment_size)
+	    segment.found_EOS = true;
 #ifdef WITH_INTERNAL_METRICS
 	segment.pmetrics.numbytes_filled_from_stream += nbfilled;
 	segment.pmetrics.accumulate_timer_deltas(
@@ -1114,6 +1107,13 @@ _fill_segment_from_stream( CacheSegment & segment )
 	    TraceLogger:: TLVL_DEBUG7,
 	    "Read %llu bytes into segment.\n",
 	    (unsigned long long int)segment.size
+	);
+#endif
+#ifdef TRACE_STATE_CHANGES
+	segment.trace_logger(
+	    TraceLogger:: TLVL_DEBUG7,
+	    "Incremented fill counter to %llu.\n",
+	    (unsigned long long int)_get_fill_counter_ATOMIC( )
 	);
 #endif
     } // if stream is available for segment
