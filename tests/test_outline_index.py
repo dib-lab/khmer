@@ -1,5 +1,22 @@
 import khmer
 import khmer_tst_utils as utils
+import os.path
+
+def test_bin_index_and_retrieve():
+    data_filename = utils.get_test_data('test-outline-simple.fa')
+
+    # index the reads
+    bin_filename = khmer.convert_fasta_to_indexed_bin(data_filename)
+    print 'bin_filename is', bin_filename
+    assert os.path.exists(bin_filename)
+
+    # retrieve read
+    read = khmer.outline_retrieve_read_by_id(bin_filename, 1)
+    print 'READ IS', read
+    assert read == \
+           'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCTATAAGATATTGCATACGTTGAGCCAGC', \
+           read
+
 
 def test_simple_retrieval():
     data_filename = utils.get_test_data('test-outline-simple.fa')
@@ -34,5 +51,5 @@ def test_simple_retrieval():
     # retrieve read
     read = khmer.outline_retrieve_read_by_id(bin_filename, read_id_list[0])
     assert read == \
-           'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCTATAAGATATTGCATACGTTGAGCCAGC',
+           'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCTATAAGATATTGCATACGTTGAGCCAGC', \
            read

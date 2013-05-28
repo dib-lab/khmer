@@ -13,6 +13,7 @@
 #include "counting.hh"
 #include "storage.hh"
 #include "aligner.hh"
+#include "indexClassify.hh"
 
 //
 // Function necessary for Python loading:
@@ -3991,6 +3992,52 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
   return (PyObject *) khashbits_obj;
 }
 
+//
+// convert_fasta_to_indexed_bin
+//
+
+static PyObject* convert_fasta_to_indexed_bin(PyObject * self, PyObject * args)
+{
+  char * fasta_filename_ptr;
+
+  if (!PyArg_ParseTuple(args, "s", &fasta_filename_ptr)) {
+    return NULL;
+  }
+
+  std::string fasta_filename = std::string(fasta_filename_ptr);
+
+  std::string bin_filename = fasta_filename;
+  bin_filename += ".bin";
+
+  khmer::convertFastaToBin(fasta_filename, bin_filename);
+
+  return PyString_FromString(bin_filename.c_str());
+}
+
+//
+// outline_retrieve_read_by_id
+//
+
+static PyObject* outline_retrieve_read_by_id(PyObject * self, PyObject * args)
+{
+  char * bin_filename = NULL;
+  long read_id = 0;
+
+  if (!PyArg_ParseTuple(args, "sl", &bin_filename, &read_id)) {
+    return NULL;
+  }
+
+  std::vector<long> read_ids;
+  std::vector<std::string> reads;
+
+  read_ids.push_back(read_id);
+  khmer::retrieve_read_by_id(bin_filename, read_ids, reads);
+
+  std::string read = reads[0];
+
+  return PyString_FromString(read.c_str());
+}
+
 static PyObject * hash_collect_high_abundance_kmers(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -4363,6 +4410,10 @@ static PyMethodDef KhmerMethods[] = {
       METH_VARARGS,		"", },
     { "set_reporting_callback",	set_reporting_callback,
       METH_VARARGS,		"" },
+    { "convert_fasta_to_indexed_bin",	convert_fasta_to_indexed_bin,
+      METH_VARARGS,		"Index a FASTA file for easy retrieval" },
+    { "outline_retrieve_read_by_id",	outline_retrieve_read_by_id,
+      METH_VARARGS,		"Retrieve a specific sequence ID from a bin file"},
 
     { NULL, NULL, 0, NULL } // sentinel
 };
