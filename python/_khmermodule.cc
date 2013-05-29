@@ -2922,6 +2922,45 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
   return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
 }
 
+static PyObject * hashbits_find_all_tags_to_taglist(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer_s = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    return NULL;
+  }
+
+  if (strlen(kmer_s) < hashbits->ksize()) { // @@
+    return NULL;
+  }
+
+  SeenSet tagged_kmers;
+
+  Py_BEGIN_ALLOW_THREADS
+
+    khmer::HashIntoType kmer, kmer_f, kmer_r;
+    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
+
+    hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
+				       hashbits->all_tags);
+    hashbits->add_kmer_to_tags(kmer);
+
+  Py_END_ALLOW_THREADS
+
+  PyObject * x = PyList_New(tagged_kmers.size());
+
+  Py_ssize_t i = 0;
+  for (khmer::SeenSet::const_iterator si = tagged_kmers.begin();
+       si != tagged_kmers.end(); si++, i++) {
+    PyObject * ko = PyLong_FromUnsignedLongLong(*si);
+    PyList_SET_ITEM(x, i, ko);
+  }
+  return x;
+}
+
 static PyObject * hashbits_assign_partition_id(PyObject * self, PyObject *args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3790,6 +3829,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
+  { "find_all_tags_to_taglist", hashbits_find_all_tags_to_taglist, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
   { "find_unpart", hashbits_find_unpart, METH_VARARGS, "" },
