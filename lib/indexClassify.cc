@@ -284,7 +284,7 @@ void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::H
 		else num_reads=accumulated_sizes[index]-accumulated_sizes[index-1];
 		//seeek the file
 		infile.seekg(start+offset*sizeof(long));
-		unsigned int * buf = new unsigned int [num_reads];
+		unsigned long * buf = new unsigned long [num_reads];
   		infile.read((char *) buf, sizeof(long) * num_reads);
   		for (unsigned int i = 0; i < num_reads; i++)
     			reads_ids.push_back(buf[i]);
