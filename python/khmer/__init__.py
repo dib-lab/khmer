@@ -21,6 +21,7 @@ from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback
 from _khmer import convert_fasta_to_indexed_bin
 from _khmer import outline_retrieve_read_by_id
+from _khmer import outline_retrieve_read_ids_by_taglist
 
 ###
 

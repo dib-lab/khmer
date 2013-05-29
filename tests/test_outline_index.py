@@ -27,29 +27,69 @@ def test_simple_retrieval():
     # this tag is the first 32 bases of the only sequence in
     # 'test-outline-simple.fa'
     tag = 'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCT'
-    tags = [tag]
+    tags = [khmer.forward_hash(tag, 32)]
 
     ht = khmer.new_hashbits(32, 1, 1)
-    ht.add_tag(tags)
-
-    # return the sorted/numerical tags (well, tag, in this case).
-    # @CTB could we do this with 'sort' if they weere
-    sorted_tags = ht.get_sorted_tags(sorted_tags)
+    ht.add_tag(tag)
 
     # build the index connect tags <=> reads
-    index_filename = khmer.build_outline_index(data_filename, sorted_tags)
+    index_filename = ht.build_outline_index(bin_filename)
 
     # OK, done building indices, etc.
 
     # retrieve list of IDs
-    read_id_list = khmer.outline_retrieve_read_ids_by_tag(index_filename,
-                                                          tags)
+    read_id_list = khmer.outline_retrieve_read_ids_by_taglist(index_filename,
+                                                              tags)
 
     # should only be one sequence!
     assert len(read_id_list) == 1
 
     # retrieve read
     read = khmer.outline_retrieve_read_by_id(bin_filename, read_id_list[0])
+    print 'READ IS', (read,), read_id_list
     assert read == \
            'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCTATAAGATATTGCATACGTTGAGCCAGC', \
+           read
+
+def test_2seq_retrieval():
+    data_filename = utils.get_test_data('test-outline-simple2.fa')
+
+    # index the reads
+    bin_filename = khmer.convert_fasta_to_indexed_bin(data_filename)
+
+    # this tag is the first 32 bases of the first sequence in
+    # 'test-outline-simple2.fa', and the last 32 bases of the second
+    # sequence.
+    tag = 'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCT'
+    tags = [khmer.forward_hash(tag, 32)]
+
+    ht = khmer.new_hashbits(32, 1, 1)
+    ht.add_tag(tag)
+
+    # build the index connect tags <=> reads
+    index_filename = ht.build_outline_index(bin_filename)
+
+    print data_filename, bin_filename, index_filename
+
+    # OK, done building indices, etc.
+
+    # retrieve list of IDs
+    read_id_list = khmer.outline_retrieve_read_ids_by_taglist(index_filename,
+                                                              tags)
+
+    # should be two sequences
+    assert len(read_id_list) == 2
+
+    # retrieve read 1
+    read = khmer.outline_retrieve_read_by_id(bin_filename, read_id_list[0])
+    print 'READ IS', (read,), read_id_list
+    assert read == \
+           'CGCAGGCTGGATTCTAGAGGCAGAGGTGAGCTATAAGATATTGCATACGTTGAGCCAGC', \
+           read
+
+    # retrieve read 2
+    read = khmer.outline_retrieve_read_by_id(bin_filename, read_id_list[1])
+    print 'READ IS', (read,), read_id_list
+    assert read == \
+           'TAGAGCCGATGAGATGCAGAGTAGAGACGCAGGCTGGATTCTAGAGGCAGAGGTGAGCT', \
            read
