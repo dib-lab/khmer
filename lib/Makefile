@@ -28,7 +28,7 @@ clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS) $(AUX_PROGS)
 
-test: $(DRV_PROGS) $(AUX_PROGS) indexClassify_test
+test: $(DRV_PROGS) $(AUX_PROGS) outline_index_test
 
 DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
@@ -111,7 +111,7 @@ subset.o: subset.cc subset.hh hashbits.hh ktable.hh khmer.hh
 
 counting.o: counting.cc counting.hh hashtable.hh ktable.hh khmer.hh
 
-indexClassify.o: indexClassify.cc indexClassify.hh  hashtable.hh ktable.hh khmer.hh
+outline_index.o: outline_index.cc outline_index.hh  hashtable.hh ktable.hh khmer.hh
 
 test-StreamReader.o: test-StreamReader.cc read_parsers.hh
 
@@ -126,5 +126,5 @@ test-HashTables.o: test-HashTables.cc read_parsers.hh primes.hh
 
 ht-diff.o: counting.hh hashtable.hh ktable.hh khmer.hh
 
-indexClassify_test: indexClassify_test.o indexClassify.o  hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	 $(CXX) -o $@ indexClassify_test.o indexClassify.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+outline_index_test: outline_index_test.o outline_index.o  hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	 $(CXX) -o $@ outline_index_test.o outline_index.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)

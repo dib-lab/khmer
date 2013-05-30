@@ -13,7 +13,7 @@
 #include "counting.hh"
 #include "storage.hh"
 #include "aligner.hh"
-#include "indexClassify.hh"
+#include "outline_index.hh"
 
 //
 // Function necessary for Python loading:

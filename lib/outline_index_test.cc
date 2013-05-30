@@ -8,7 +8,7 @@
 #include <set>
 #include <vector>
 */
-#include "indexClassify.hh"
+#include "outline_index.hh"
 
 using namespace khmer;
 

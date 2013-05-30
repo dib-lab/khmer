@@ -1,7 +1,7 @@
 //this is the codes for the mini lib function
 #include "khmer.hh"
 
-#include "indexClassify.hh"
+#include "outline_index.hh"
 using namespace khmer;
 //----------------------------------------
 void khmer::convertFastaToBin(std::string readsFileName,std::string readsBinFileName)
