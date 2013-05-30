@@ -2927,22 +2927,39 @@ static PyObject * hashbits_find_all_tags_to_taglist(PyObject * self, PyObject *a
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
-  char * kmer_s = NULL;
+  PyObject * kmer_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+  if (!PyArg_ParseTuple(args, "O", &kmer_o)) {
     return NULL;
   }
 
-  if (strlen(kmer_s) < hashbits->ksize()) { // @@
+  khmer::HashIntoType kmer, kmer_f, kmer_r;
+  if (PyLong_Check(kmer_o)) {
+    kmer = PyLong_AsUnsignedLongLong(kmer_o);
+    std::cout << "CONVERTING foo\n";
+
+    std::string kmer_s = khmer::_revhash(kmer, hashbits->ksize());
+    kmer = khmer::_hash(kmer_s.c_str(), hashbits->ksize(), kmer_f, kmer_r);
+  } else if (PyString_Check(kmer_o)) {
+    char * kmer_s = PyString_AsString(kmer_o);
+
+    if (strlen(kmer_s) < hashbits->ksize()) { // @@
+      // std::cout << "ERROR 1" << std::endl;
+      return NULL;
+    }
+    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
+  } else {
+    // std::cout << "ERROR 2" << std::endl;
+    return NULL;
+  }
+
+  if (PyErr_Occurred()) {
     return NULL;
   }
 
   SeenSet tagged_kmers;
 
   Py_BEGIN_ALLOW_THREADS
-
-    khmer::HashIntoType kmer, kmer_f, kmer_r;
-    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
 
     hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
 				       hashbits->all_tags);
@@ -4133,7 +4150,7 @@ static PyObject* outline_retrieve_read_ids_by_taglist(PyObject * self, PyObject 
 
   for (Py_ssize_t i = 0; i < PyList_Size(taglist); i++) {
     PyObject * ko = PyList_GetItem(taglist, i);
-    khmer::HashIntoType k = PyInt_AsLong(ko);
+    khmer::HashIntoType k = PyLong_AsUnsignedLongLong(ko);
     tag_ids.push_back(k);
   }
 
@@ -4141,8 +4158,7 @@ static PyObject* outline_retrieve_read_ids_by_taglist(PyObject * self, PyObject 
 
   PyObject * x = PyList_New(read_ids.size());
   for (unsigned int i = 0; i < read_ids.size(); i++) {
-    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(read_ids[i]));
-    // @CTB check unsigned long long!
+    PyList_SET_ITEM(x, i, PyLong_FromLong(read_ids[i]));
   }
 
   return x;
