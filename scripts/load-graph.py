@@ -17,13 +17,20 @@ from khmer.hashbits_args import build_construct_args
 from khmer.counting_args import report_on_config
 from khmer.threading_args import add_threading_args
 
+DEFAULT_TAG_DENSITY=None                # this is compiled in...
 
 def main():
     parser = build_construct_args()
     add_threading_args(parser)
+    
     parser.add_argument('--no-build-tagset', '-n', default=False,
                         action='store_true', dest='no_build_tagset',
                         help='Do NOT construct tagset while loading sequences')
+    
+    parser.add_argument('--tag-density', '-d', default=DEFAULT_TAG_DENSITY,
+                        dest='tag_density',
+                        help='Alter the spacing of the sparse tags.')
+    
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
 
@@ -37,6 +44,7 @@ def main():
     base = args.output_filename
     filenames = args.input_filenames
     n_threads = int(args.n_threads)
+    tag_density = args.tag_density
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
@@ -54,6 +62,14 @@ def main():
         target_method = ht.consume_fasta_with_reads_parser
     else:
         target_method = ht.consume_fasta_and_tag_with_reads_parser
+
+    if args.tag_density is None:
+        print 'tag density is DEFAULT:', ht._get_tag_density()
+    else:
+        tag_density = int(args.tag_density)
+        assert tag_density % 2 == 0, "tagging density must be even."
+        print 'setting tag density to:', tag_density
+        ht._set_tag_density(tag_density)
 
     for n, filename in enumerate(filenames):
         
