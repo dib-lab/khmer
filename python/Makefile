@@ -5,7 +5,6 @@ setup.py: setup.py.in
 	sed \
 		-e 's/@DEFINE_KHMER_EXTRA_SANITY_CHECKS@/$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)/g' \
 		-e 's/@CXX_DEBUG_FLAGS@/$(CXX_DEBUG_FLAGS)/g' \
-		-e 's/@CYTHON_ENABLED_BOOL@/$(CYTHON_ENABLED_BOOL)/g' \
 		setup.py.in > setup.py
 
 test:	all
