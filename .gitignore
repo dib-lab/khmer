@@ -5,5 +5,11 @@
 python/build
 python/_khmermodule.cpp
 lib/test
+lib/outline_index_test
 doc/_build
 *.log
+tests/test-data/test-overlap1.fa.curve
+tests/test-data/test-overlap1.fa.out
+*.bin
+*.bin.index
+*.tagset
