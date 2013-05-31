@@ -78,10 +78,10 @@ match.o: match.S
 	rm -f _match.s
 
 $(SHAREDLIBV): $(OBJS)
-	#$(LDSHARED) -o $@ $(OBJS)
-	#rm -f $(SHAREDLIB) $(SHAREDLIBM)
-	#ln -s $@ $(SHAREDLIB)
-	#ln -s $@ $(SHAREDLIBM)
+	$(LDSHARED) -o $@ $(OBJS)
+	rm -f $(SHAREDLIB) $(SHAREDLIBM)
+	ln -s $@ $(SHAREDLIB)
+	ln -s $@ $(SHAREDLIBM)
 
 example$(EXE): example.o $(LIBS)
 	$(CC) $(CFLAGS) -o $@ example.o $(LDFLAGS)

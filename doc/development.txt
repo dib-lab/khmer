@@ -1,6 +1,33 @@
 Development miscellany
 ======================
 
+Build framework
+---------------
+
+'make' should build everything, including tests and "development" code.
+
+Coding standards
+----------------
+
+For C++, let's use `Todd Hoff's coding standard
+<http://www.possibility.com/Cpp/CppCodingStandard.html>`__, and
+`astyle -A10 / "One True Brace Style"
+<http://astyle.sourceforge.net/astyle.html>`__ indentation and
+bracing.
+
+For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ seems
+like a good standard to default to, and there are tools to check it,
+too.
+
+Testing
+-------
+
+'nosetests' is the canonical way to run the tests.  This is what 'make test'
+does.
+
+Command line scripts
+--------------------
+
 Python command-line scripts should use '-' instead of '_' in the name.
 (Only filenames containing code for import imported should use _.)
 
@@ -48,3 +75,4 @@ CLI reading:
    http://catb.org/esr/writings/taoup/html/ch11s06.html
 
    http://figshare.com/articles/tutorial_pdf/643388
+

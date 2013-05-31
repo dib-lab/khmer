@@ -23,7 +23,6 @@ TraceLogger( uint8_t const level, char const * const file_name_format, ... )
     char	tfile_name[ FILENAME_MAX + 1 ];
     va_list	varargs;
 
-    tfile_name[ FILENAME_MAX ] = '\0';
     va_start( varargs, file_name_format );
     vsnprintf( tfile_name, FILENAME_MAX, file_name_format, varargs );
     va_end( varargs );

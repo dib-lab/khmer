@@ -18,6 +18,8 @@ the following URLs:
 
     * Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
+The archives for the khmer list are available at: http://lists.idyll.org/pipermail/khmer/
+
 Contents:
 
 .. toctree::
@@ -25,6 +27,7 @@ Contents:
 
    introduction
    install
+   examples
    guide
    scripts
    blog-posts
@@ -33,7 +36,9 @@ Contents:
    ktable
    details
    development
+   crazy-ideas
    contributors
+   biblio
 
    LICENSE
 
