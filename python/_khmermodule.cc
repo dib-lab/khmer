@@ -2712,6 +2712,44 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hashbits_consume_fasta_with_reads_parser(
+  PyObject * self, PyObject * args
+)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * rparser_obj = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(
+    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
+  )) {
+      return NULL;
+  }
+
+  khmer:: read_parsers:: IParser * rparser = 
+  _PyObject_to_khmer_ReadParser( rparser_obj );
+
+  // call the C++ function, and trap signals => Python
+  unsigned long long  n_consumed  = 0;
+  unsigned int	      total_reads = 0;
+  bool		      exc_raised  = false;
+  Py_BEGIN_ALLOW_THREADS
+  try {
+    hashbits->consume_fasta(rparser, total_reads, n_consumed,
+			    lower_bound, upper_bound, 
+			    _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
 static PyObject * hashbits_traverse_from_reads(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3777,6 +3815,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_get_tag_density", hashbits__get_tag_density, METH_VARARGS, "" },
   { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_with_reads_parser", hashbits_consume_fasta_with_reads_parser, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag_with_reads_parser", hashbits_consume_fasta_and_tag_with_reads_parser, 
     METH_VARARGS, "Count all k-mers using a given reads parser" },
