@@ -71,12 +71,6 @@ TRACE_DATA=false
 # and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_METRICS=false
 
-# Use Cython?
-# Set this variable to true if you wish to build the Python wrapper 
-# with Cython rather than the directly using the Python C API.
-# (Do not set this to true if you do not have Cython installed.)
-USE_CYTHON=false
-
 
 ### NOTE: No user-servicable parts below this line! ###
 
@@ -137,12 +131,6 @@ ifeq ($(WITH_INTERNAL_METRICS), true)
 CXXFLAGS+= -DWITH_INTERNAL_METRICS
 endif
 
-ifeq ($(USE_CYTHON), true)
-CYTHON_ENABLED_BOOL=True
-else
-CYTHON_ENABLED_BOOL=False
-endif
-
 # Place POSIX threads last in linking order, if needed.
 ifneq ($(shell uname), Linux)
 LIBS+= -pthread
@@ -165,9 +153,7 @@ lib_files:
 python_files: lib_files
 	cd python && \
 	make 	DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
-		CXX_DEBUG_FLAGS="$(CXX_DEBUG_FLAGS)" \
-		CYTHON_ENABLED_BOOL="$(CYTHON_ENABLED_BOOL)"
-#	python setup.py build_ext -i
+		CXX_DEBUG_FLAGS="$(CXX_DEBUG_FLAGS)" 
 
 test: all
 	nosetests -v -x -a \!known_failing
