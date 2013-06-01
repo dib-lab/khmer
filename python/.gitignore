@@ -1,4 +1,4 @@
 *.swp
-setup.py
+setup-dynamic.py
 distribute-*.egg
 distribute-*.tar.gz

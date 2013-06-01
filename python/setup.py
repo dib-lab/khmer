@@ -9,6 +9,11 @@ from os.path import (
     join	    as path_join,
 )
 
+# Execute dynamically-generated portion of setup script in current namespace.
+# Please see the dynamically-generated file to learn which variables are added
+# to the current namespace.
+execfile( "setup-dynamic.py" )
+
 extra_objs = [ ]
 extra_objs.extend( map(
     lambda bn: path_join( path_pardir, "lib", bn + ".o" ),
@@ -46,10 +51,7 @@ build_depends.extend( map(
 extension_mod_DICT = \
     {
 	"sources": [ "_khmermodule.cc" ],
-	"extra_compile_args": filter( None, [
-	    '@DEFINE_KHMER_EXTRA_SANITY_CHECKS@',
-	    '@CXX_DEBUG_FLAGS@',
-	] ),
+	"extra_compile_args": extra_compile_args,
 	"extra_link_args": filter( None, [ ] ),
 	"include_dirs": [ path_join( path_pardir, "lib" ), ],
 	"library_dirs": [ path_join( path_pardir, "lib" ), ],
@@ -76,4 +78,4 @@ setup_metadata = \
 
 setup( **setup_metadata )
 
-# vim: set sts=4 sw=4:
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
