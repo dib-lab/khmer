@@ -365,6 +365,29 @@ def test_load_graph():
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
+def test_load_graph_no_tags():
+    script = scriptpath('load-graph.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0
+
+    ht_file = outfile + '.ht'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert not os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+
+    # can't think of a good way to make sure this worked, beyond just
+    # loading the ht file...
+
 def test_load_graph_fail():
     script = scriptpath('load-graph.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20'] # use small HT
