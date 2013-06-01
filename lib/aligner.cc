@@ -269,7 +269,11 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
    }
 
    // exceeded max error region parameter
+#if (0) // Jason's original code
    if (longestErrorRegion > maxErrorRegion && maxErrorRegion >= 0) {
+#else
+   if (longestErrorRegion > maxErrorRegion && maxErrorRegion < UINT_MAX) {
+#endif
       return best;
    }
 
