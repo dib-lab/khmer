@@ -1,17 +1,18 @@
-CYTHON_ENABLED = @CYTHON_ENABLED_BOOL@
-
 from distribute_setup import use_setuptools
 use_setuptools()
 
 from distutils.core import setup
 from distutils.extension import Extension
-if CYTHON_ENABLED:
-    from Cython.Distutils import build_ext
 
 from os.path import (
     pardir	    as path_pardir,
     join	    as path_join,
 )
+
+# Execute dynamically-generated portion of setup script in current namespace.
+# Please see the dynamically-generated file to learn which variables are added
+# to the current namespace.
+execfile( "setup-dynamic.py" )
 
 extra_objs = [ ]
 extra_objs.extend( map(
@@ -49,30 +50,18 @@ build_depends.extend( map(
 
 extension_mod_DICT = \
     {
-	"sources": [ "_khmermodule.pyx" if CYTHON_ENABLED else "_khmermodule.cc" ],
-	"extra_compile_args": filter( None, [
-	    '@DEFINE_KHMER_EXTRA_SANITY_CHECKS@',
-	    '@CXX_DEBUG_FLAGS@',
-	] ),
+	"sources": [ "_khmermodule.cc" ],
+	"extra_compile_args": extra_compile_args,
 	"extra_link_args": filter( None, [ ] ),
 	"include_dirs": [ path_join( path_pardir, "lib" ), ],
 	"library_dirs": [ path_join( path_pardir, "lib" ), ],
 	"extra_objects": extra_objs,
 	"depends": build_depends,
+	"language": "c++",
+	"libraries": [ "stdc++" ],
     }
-if CYTHON_ENABLED:
-    extension_mod_DICT.update(
-	{
-	    "language": "c++",
-	    "libraries": [ "stdc++" ],
-	}
-    )
 
-extension_mod = \
-    Extension(
-	"khmer._khmer" if CYTHON_ENABLED else "khmer._khmermodule",
-	**extension_mod_DICT
-    )
+extension_mod = Extension( "khmer._khmermodule", **extension_mod_DICT )
 # python modules: only 'khmer'
 py_mod = 'khmer'
 setup_metadata = \
@@ -86,13 +75,7 @@ setup_metadata = \
 	"packages": [ py_mod, ],
 	"ext_modules": [ extension_mod, ],
     }
-if CYTHON_ENABLED:
-    setup_metadata.update(
-	{
-	    "cmdclass": {'build_ext': build_ext},
-	}
-    )
 
 setup( **setup_metadata )
 
-# vim: set sts=4 sw=4:
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
