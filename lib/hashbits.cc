@@ -334,7 +334,9 @@ consume_fasta_and_tag(
   Hasher		  &hasher		= 
   _get_hasher( parser->uuid( ) );
   unsigned int		  total_reads_LOCAL	= 0;
+#if (0) // Note: Used with callback - currently disabled.
   unsigned long long int  n_consumed_LOCAL	= 0;
+#endif
   Read			  read;
 
   // TODO? Delete the following assignments.
@@ -360,7 +362,11 @@ consume_fasta_and_tag(
 #ifdef WITH_INTERNAL_METRICS
       hasher.pmetrics.start_timers( );
 #endif
+#if (0) // Note: Used with callback - currently disabled.
       n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#else
+      __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#endif
       total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
 #ifdef WITH_INTERNAL_METRICS
       hasher.pmetrics.stop_timers( );
@@ -1357,7 +1363,7 @@ const
 {
   std::string kmer_s = _revhash(start, _ksize);
   HashIntoType kmer, kmer_f, kmer_r;
-  kmer = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
+  _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
   HashIntoType f, r;
   NodeQueue node_q;
@@ -1391,7 +1397,7 @@ const
       break;
     }
 
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+    kmer = uniqify_rc(kmer_f, kmer_r);
     if (set_contains(keeper, kmer)) {
       continue;
     }
@@ -1404,6 +1410,7 @@ const
     keeper.insert(kmer);
     total++;
 
+    // QUESITON: Huh? What's up with the following?
     if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
       continue;
     }

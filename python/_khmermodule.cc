@@ -4066,9 +4066,9 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   PyObject * py_obj;
   double lambdaOne = 0.0;
   double lambdaTwo = 0.0;
-  signed int maxErrorRegion = -1;
+  unsigned int maxErrorRegion = UINT_MAX;
 
-  if(!PyArg_ParseTuple(args, "O|ddi", &py_obj, 
+  if(!PyArg_ParseTuple(args, "O|ddI", &py_obj, 
                        &lambdaOne, &lambdaTwo, &maxErrorRegion)) {
     return NULL;
   }
@@ -4078,9 +4078,10 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == -1) { 
+  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == UINT_MAX) { 
     readaligner_obj->aligner = new Aligner(ch->counting);
-  } else if (maxErrorRegion == -1 && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
+  } else if
+    (maxErrorRegion == UINT_MAX && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
     readaligner_obj->aligner = new Aligner(ch->counting, 
                                            lambdaOne, lambdaTwo);
   } else {
