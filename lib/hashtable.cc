@@ -183,7 +183,9 @@ consume_fasta(
   Hasher		  &hasher		= 
   _get_hasher( parser->uuid( ) );
   unsigned int		  total_reads_LOCAL	= 0;
+#if (0) // Note: Used with callback - currently disabled.
   unsigned long long int  n_consumed_LOCAL	= 0;
+#endif
   Read			  read;
   
   hasher.trace_logger(
@@ -204,7 +206,11 @@ consume_fasta(
 #ifdef WITH_INTERNAL_METRICS
     hasher.pmetrics.start_timers( );
 #endif
+#if (0) // Note: Used with callback - currently disabled.
     n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#else
+    __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#endif
     total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
 #ifdef WITH_INTERNAL_METRICS
     hasher.pmetrics.stop_timers( );

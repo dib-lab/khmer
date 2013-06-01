@@ -37,7 +37,7 @@ int main()
 
   d.clear();
 
-  char * s = "ATCGATATGAGGATCCAGGATCAAGATAGACCAGATATGACCAGAG";
+  char const * s = "ATCGATATGAGGATCCAGGATCAAGATAGACCAGATATGACCAGAG";
   d.consume_string(s);
 
   for (unsigned int i = 0; i < strlen(s) - k + 1; i++) {

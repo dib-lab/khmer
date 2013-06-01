@@ -665,8 +665,12 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
     uint64_t		nbcopied_total	= 0;
     uint8_t *		memory		= NULL;
     uint64_t		size		= 0;
+#ifdef TRACE_MEMCOPIES
     bool		in_ca_buffer	= false;
+#endif
+#if defined( TRACE_MEMCOPIES )
     TraceLogger		&trace_logger	= segment.trace_logger;
+#endif
 
 #if (0)
     if (!segment.avail) throw CacheSegmentUnavailable( );
@@ -681,14 +685,18 @@ get_bytes( uint8_t * const buffer, uint64_t buffer_len )
 	{
 	    memory	    = (uint8_t *)segment.ca_buffer.c_str( );
 	    size	    = (uint64_t)segment.ca_buffer.length( );
+#ifdef TRACE_MEMCOPIES
 	    in_ca_buffer    = true;
+#endif
 	}
 	else
 	{
 	    memory	    = segment.memory;
 	    size	    = segment.size;
 	    if (!segment.avail) break;
+#ifdef TRACE_MEMCOPIES
 	    in_ca_buffer    = false;
+#endif
 	}
 
 	nbcopied = MIN( nbrem, size - segment.cursor );
@@ -811,7 +819,9 @@ _perform_segment_maintenance( CacheSegment &segment )
     assert( segment.avail );
 #endif
 
+#ifdef TRACE_STATE_CHANGES
     uint64_t	next_fill_id	= segment.fill_id + 1;
+#endif
 
 #ifdef TRACE_STATE_CHANGES
     segment.trace_logger(
@@ -1380,7 +1390,9 @@ void
 IParser::
 _copy_line( ParserState &state )
 {
+#if defined( TRACE_DATA )
     TraceLogger	    &trace_logger   = state.trace_logger;
+#endif
     uint8_t	    (&buffer)[ ParserState:: BUFFER_SIZE + 1 ]
 				    = state.buffer;
     uint64_t	    &pos	    = state.buffer_pos;
