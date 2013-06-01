@@ -2,17 +2,9 @@ __version__ = "0.4"
 
 import _khmer
 from _khmer import get_config
-try:  # CPython API
-    # from _khmer import Read
-    from _khmer import ReadParser
-except ImportError:  # Cython
-    from _khmer import _Read as Read
-    from _khmer import _ReadParser as ReadParser
+from _khmer import ReadParser
 from _khmer import new_ktable
-try:  # CPython API
-    from _khmer import new_hashtable
-except ImportError:  # Cython
-    from _khmer import _new_counting_hash as new_hashtable
+from _khmer import new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
 from _khmer import new_minmax
