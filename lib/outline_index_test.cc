@@ -4,10 +4,11 @@
 #include <stdlib.h>             //used for c_str() function
 #include <ctime>
 #include <stdlib.h>
-//#include <time.h>   //both used to make sure we do have differnt random numbers
+#include <time.h>   //both used to make sure we do have differnt random numbers
 #include <set>
 #include <vector>
 */
+#include <time.h>
 #include "outline_index.hh"
 
 using namespace khmer;
@@ -69,9 +70,17 @@ int main(int argc,char *argv[])
 
     //build the index
     std::cout<<"\nbuild the index ...\n";
+    //start the timer
+    time_t start,end;
+    double diff;
+    time (&start);
     build_index(readsFileNameBin,sortedKhmerVector,save_ksize);
+    time (&end);
+    diff = difftime (end,start);
+    printf ("It took you %.2lf seconds to build the tree.\n", diff );
     std::cout<<"done...\n";
-
+   
+    /*
     //query example
     std::cout<<"\nexact query search ...\n";
     //exactQuery(readsFileNameBin,queryFileName);
@@ -108,6 +117,6 @@ int main(int argc,char *argv[])
     for (int i=0; i< reads.size(); i++) {
         std::cout<<reads[i]<<std::endl;
     }
-
+    */
     return 1;
 }
