@@ -1,0 +1,73 @@
+Architecture and Design
+=======================
+
+What follows is an attempt to describe the overall architecture and design of
+the *khmer* software under the hood. Where appropriate, implementation details
+will be mentioned. Also, possible future directions and design considerations
+will be mentioned as appropriate.
+
+Overview
+--------
+
+* Configuration Objects
+
+* Trace Loggers
+
+* Performance Metrics
+
+* Data Pumps
+
+   * Raw
+
+   * Gzip
+
+   * Bzip2
+
+   * NOTE: Limits on multithreaded decompression.
+
+* Cache Manager
+
+   * Threads and Cache Mananger Segments
+
+   * Fills segments.
+
+   * Provides interface to copy data from segments.
+
+   * TODO: Synch vs asynch reads.
+
+   * TODO: Reduce polling frequency of spinlocks to reduce membars.
+
+* Parsers
+   
+   * Threads and Parser States
+   
+   * FASTA
+
+   * FASTQ
+
+   * Parser Interface: IParser
+
+   * TODO: Sniff file type rather than rely on extension.
+
+* Reads
+
+   * TODO: Inherit from thin Read Interface.
+
+   * TODO: One class per format type.
+   
+   * TODO? Promote to reader/writer objects. Reduce parsers to facilitator
+     roles.
+
+* k-mer Counters
+   
+   * k-mer Counter Storage
+
+   * Hash Functions
+
+   * Threads
+
+   * Thread Pools
+
+* Python Interface
+
+.. vim: set ft=rst ts=3 sts=3 sw=3 et tw=79:
