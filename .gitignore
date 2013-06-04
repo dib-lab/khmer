@@ -13,3 +13,5 @@ tests/test-data/test-overlap1.fa.out
 *.bin
 *.bin.index
 *.tagset
+*env
+*ENV
