@@ -34,6 +34,7 @@ Contents:
    choosing-hash-sizes
    partitioning-big-data
    ktable
+   design
    details
    development
    crazy-ideas
