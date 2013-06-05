@@ -9,13 +9,103 @@ will be mentioned as appropriate.
 Overview
 --------
 
-* Configuration Objects
+Data pumps stage data from disk storage into an in-memory cache. The in-memory
+cache is divided into segments, one segment per thread. A cache manager exposes
+an interface for staging the data via the data pumps and for accessing the data
+in the cache segments. Read parsers convert the staged data into read
+objects. A separate state object is maintained for each thread using a parser.
+Existing-tracking or counting Bloom filters can use the read parsers as a
+source of reads from which to extract k-mers.
 
-* Trace Loggers
+The read parsers and the layers under them can be controlled via global
+configuration objects, which provide default values during their instantiation.
+In many cases, these default values can also be overriden by supplying
+pertinent arguments to the constructors. Only one global configuration object
+is considered active at a given time; but, a singleton pattern is not enforced
+and more than one may be available to supply alternative configurations.
 
-* Performance Metrics
+The top-level makefile for the project contains a user-configurable section,
+wherein preprocessor, compiler, and linker options may be selected via
+convenient, prefabricated bundles. The ability to generate profiling
+instrumentation, compile with debugging symbols, and to generate tracing
+instrumentation are all controlled via these option bundles. The lower levels
+of the code, such as the data pumps, cache manager, and read parsers all have
+significant built-in profiling and tracing instrumentation. This
+instrumentation is conditionally-compiled according to the option bundles
+selected in the top-level makefile.
 
-* Data Pumps
+Namespace
+---------
+
+Unless otherwise noted, all C++ classes, functions, and static variables noted
+in this document are members of the ``khmer`` namespace. Likewise, unless
+otherwise noted, all Python classes, functions, and module variables noted in
+this document are members of the ``khmer`` module.
+
+.. cpp:namespace:: khmer
+
+.. py:module:: khmer
+
+
+Configuration Objects
+---------------------
+
+C++ API
+~~~~~~~
+
+The defintion of the configuration objects is contained in
+:file:`lib/khmer_config.hh`.
+
+.. cpp:class:: Config
+
+.. cpp:function:: Config &get_active_config( )
+
+.. cpp:function:: void set_active_config( Config &c )
+   
+An *active* configuration object is always present. A reference to this object
+is supplied via the :cpp:func:`get_active_config` function. The initial
+settings of the active configuration object are quite conservative. New
+configuration objects are created with the empty constructor; all settings
+modifications occur upon already-created instances via their setter methods.
+The active configuration object can be set via the
+:cpp:func:`set_active_config` function, which takes a reference to a
+:cpp:class:`Config` object as its only argument.
+
+Except for read-only configuration options, such as extra sanity checking,
+which are determined at the time of compilation, the configuration options are
+manipulated via getter/setter methods. The most prominent or useful 
+getter/setter methods are the following: 
+
+.. cpp:function:: uint32_t Config::get_number_of_threads( ) const
+
+.. cpp:function:: void Config::set_number_of_threads( uint32_t const n )
+
+.. cpp:function:: uint64_t const Config::get_reads_input_buffer_size( ) const
+
+.. cpp:function:: void Config::set_reads_input_buffer_size( uint64_t const sz )
+
+Python API
+~~~~~~~~~~
+
+The :cpp:class:`Config` objects are exposed in the Python wrapper.
+
+.. py:function:: get_config( )
+
+.. py:function:: set_config( c )
+
+The C++ getter/setter methods are exposed via the same names in Python.
+
+.. todo::
+   The getter/setter methods should be exposed as properties in Python.
+
+Trace Loggers
+-------------
+
+Performance Metrics
+-------------------
+
+Data Pumps
+----------
 
    * Raw
 
@@ -25,7 +115,8 @@ Overview
 
    * NOTE: Limits on multithreaded decompression.
 
-* Cache Manager
+Cache Manager
+-------------
 
    * Threads and Cache Mananger Segments
 
@@ -37,7 +128,8 @@ Overview
 
    * TODO: Reduce polling frequency of spinlocks to reduce membars.
 
-* Parsers
+Read Parsers
+------------
    
    * Threads and Parser States
    
@@ -49,7 +141,8 @@ Overview
 
    * TODO: Sniff file type rather than rely on extension.
 
-* Reads
+Reads
+-----
 
    * TODO: Inherit from thin Read Interface.
 
@@ -58,7 +151,8 @@ Overview
    * TODO? Promote to reader/writer objects. Reduce parsers to facilitator
      roles.
 
-* k-mer Counters
+k-mer Counters
+--------------
    
    * k-mer Counter Storage
 
@@ -68,6 +162,7 @@ Overview
 
    * Thread Pools
 
-* Python Interface
+Python Interface
+----------------
 
 .. vim: set ft=rst ts=3 sts=3 sw=3 et tw=79:
