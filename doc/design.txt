@@ -46,6 +46,8 @@ this document are members of the ``khmer`` module.
 
 .. py:module:: khmer
 
+.. todo::
+   Use ``breathe`` to interface with ``Doxygen`` for better documentation.
 
 Configuration Objects
 ---------------------
@@ -101,8 +103,116 @@ The C++ getter/setter methods are exposed via the same names in Python.
 Trace Loggers
 -------------
 
+Trace loggers can log execution traces and other useful debugging information
+to files on a per-thread basis. This makes them very useful for debugging
+multi-threaded code, especially in the absence of advanced commerical
+debuggers, such as DDT or TotalView. Trace loggers are contolled via several
+user-configurable variables in the top-level makefile. As of this writing,
+these variables are ``WITH_INTERNAL_TRACING``, ``TRACE_STATE_CHANGES``,
+``TRACE_BUSYWAITS``, ``TRACE_SPINLOCKS``, ``TRACE_MEMCOPIES``, and
+``TRACE_DATA``. The ``TRACE_`` options are ineffective unless
+``WITH_INTERNAL_TRACING`` is set to ``true``.
+
+.. todo::
+   Replace the editing of makefiles with a configure script or else move to an
+   all-Pythonic regime where the user would edit :file:`setup.cfg`. See 
+   `issue #9 <https://github.com/ged-lab/khmer/issues/9>`_ in the Github issue
+   tracker for the project.
+
+The data pump and read parser code, as well as some of the Bloom filter code,
+is impregnated with trace loggers. Other parts of the source code could use
+them as well.
+
+Trace logger objects are not exposed directly via the Python wrapper; they are
+only available in the C++ API. The trace logger class is defined in the
+:file:`lib/trace_logger.hh` file.
+
+.. cpp:class:: TraceLogger
+
+Tracing be performed at coarser or finer levels of detail, as desired. An
+enumeration of named integral constants provides the available levels. The use
+of ``TLVL_ALL`` will trace everything which is instrumented for tracing. After
+that, ``TLVL_DEBUG9`` is the next finest level of detail. The enumeration
+ascends to higher and higher numerical values which indicate more coarseness;
+specifically the ordering is trace levels ``TLVL_DEBUG8`` through
+``TLVL_DEBUG0``, followed by ``TLVL_INFO9`` through ``TLVL_INFO0``, and then
+``TLVL_WARNING``, ``TLVL_ERROR``, and ``TLVL_CRITICAL``. The special level
+``TLVL_NONE`` means that nothing will be traced even though tracing may be
+activated at compile time. Note that ``TLVL_ALL`` corresponds to 0 and
+``TLVL_NONE`` corresponds to 255; this is useful for setting trace levels in
+method arguments via the Python interface.
+
+.. todo::
+   Expose trace level names via the Python interface.
+
+.. todo::
+   Allow C++ :cpp:class:`TraceLogger` objects to be targets of Python
+   :py:mod:`logging` module?
+
+Two constructors are available for instantiating objects of type
+:cpp:class:`TraceLogger`. One takes the trace level and a ``FILE *`` stream
+handle. The other takes the trace level, a file name format string, and a
+variable number of arguments to ``sprintf`` into that format string. This form
+exists so that trace files, named according to logical thread ID, can be
+created, for example. The trace level argument is the finest requested level of
+detail which will be traced by the object.
+
+The objects instantiated by these constructors are *function objects* (also
+sometimes known as *functors* to the chagrin of some mathematicians). This is
+to say that the objects may be called.
+
+.. cpp:function:: void TraceLogger::operator( )( uint8_t const level, char const * const format, ...) const
+
+The ``level`` argument is the desired level of detail. If the object was
+instantiated for a coarser level than the requested level, then nothing will be
+logged. The ``format`` argument is the format string for the underlying
+``fprintf`` call and a variable number of arguments may be supplied for use
+with this format string.
+
 Performance Metrics
 -------------------
+
+Performance metrics can be gathered on a per-thread basis and can measure
+things which are not covered by traditional profiling tools. Such metrics may
+include the input or output rate in bytes per second, for example. Not all
+platforms support the high resolution, per-thread timers needed to effectively
+use these metrics.
+
+The Python wrapper does not presently support reporting on performance metrics.
+
+.. todo::
+   Support reporting on performance metrics from within the Python wrapper.
+
+The performance metrics abstract base class is defined in the
+:file:`lib/perf_metrics.hh` file. This class is subclassed for various specific
+domains.
+
+.. cpp:class:: IPerformanceMetrics
+
+The class provides a hassle-free stopwatch.
+
+.. cpp:function:: void IPerformanceMetrics::start_timers( )
+
+.. cpp:function:: void IPerformanceMetrics::stop_timers( )
+
+These functions record the amount of physical time elapsed since the thread was
+created and the amount of time that the thread has spent using CPU cores. Two
+sets of internal scratch variables are used for this purpose: one set of start
+times and one set of stop times.
+
+.. warning::
+   Because of the use of internal scratch variables, these methods are not
+   reentrant. Timer deltas must be collected before new calls can be issued to
+   the stopwatch. This is the trade-off for convenience....
+
+Once start and stop times have been accumulated, then a timer delta can be
+calculated and stowed in the appropriate category. Categories are determined by
+keys which are defined in subclasses of the abstract class. The delta
+accumulator takes a category key as an argument and is declared pure virtual in
+the abstract base class so that it must be implemented in subclasses where they
+category keys are enumerated.
+
+.. cpp:function:: void IPerformanceMetrics::accumulate_timer_deltas( uint32_t metrics_key )
 
 Data Pumps
 ----------
