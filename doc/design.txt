@@ -55,7 +55,7 @@ Configuration Objects
 C++ API
 ~~~~~~~
 
-The defintion of the configuration objects is contained in
+The declaration of the configuration objects is contained in
 :file:`lib/khmer_config.hh`.
 
 .. cpp:class:: Config
@@ -124,7 +124,7 @@ is impregnated with trace loggers. Other parts of the source code could use
 them as well.
 
 Trace logger objects are not exposed directly via the Python wrapper; they are
-only available in the C++ API. The trace logger class is defined in the
+only available in the C++ API. The trace logger class is declared in the
 :file:`lib/trace_logger.hh` file.
 
 .. cpp:class:: TraceLogger
@@ -183,7 +183,7 @@ The Python wrapper does not presently support reporting on performance metrics.
 .. todo::
    Support reporting on performance metrics from within the Python wrapper.
 
-The performance metrics abstract base class is defined in the
+The performance metrics abstract base class is declared in the
 :file:`lib/perf_metrics.hh` file. This class is subclassed for various specific
 domains.
 
@@ -214,29 +214,241 @@ category keys are enumerated.
 
 .. cpp:function:: void IPerformanceMetrics::accumulate_timer_deltas( uint32_t metrics_key )
 
-Data Pumps
-----------
+Input Data Pumps
+----------------
 
-   * Raw
+An input data pump object copies data from a file into a cache in memory. Since
+accesses to memory are typically three orders of magnitude faster than to an
+individual hard disk drive and since many operations to process the data are
+slower than reading it from a file, it makes sense to stage some of it into
+memory. Having the data in memory can reduce the latency from accessing it upon
+demand. And, the cache in memory can be filled more rapidly than it is
+processed.
 
-   * Gzip
+The input data pumps are declared in :file:`lib/read_parsers.hh`. All of them
+derive from an abstract base class.
 
-   * Bzip2
+.. todo::
+   Refactor the data pumps into a separate header and implementation file.
 
-   * NOTE: Limits on multithreaded decompression.
+.. cpp:class:: IStreamReader
 
-Cache Manager
--------------
+Presently, three types of data pumps are implemented.
 
-   * Threads and Cache Mananger Segments
+.. cpp:class:: RawStreamReader
 
-   * Fills segments.
+.. cpp:class:: GzStreamReader
 
-   * Provides interface to copy data from segments.
+.. cpp:class:: Bz2StreamReader
 
-   * TODO: Synch vs asynch reads.
+These input data pumps are not exposed via the Python wrapper.
 
-   * TODO: Reduce polling frequency of spinlocks to reduce membars.
+The :cpp:class:`IStreamReader` interface defines one method of interest.
+
+.. cpp:function:: uint64_t const read_into_cache( uint8_t * const cache, uint64_t const cache_size )
+
+This is a pure virtual method which must be overridden in subclasses. The
+``cache`` parameter receives an argument which is an arbitrary piece of memory
+which it treats as an array of bytes. The ``cache_size`` parameter receives an
+argument which is the size, in bytes, of the cache. The return value is the
+number of bytes read into the cache from file.
+
+Raw Stream Reader
+~~~~~~~~~~~~~~~~~
+
+The raw stream reader is constructed from a file descriptor, such as returned
+by the ``open`` system call. An optional read alignment may be supplied to this
+constructor. Depending on the operating system and file system, this may be
+used as a chunk size and alignment for *direct I/O*. Otherwise, it is ignored.
+Direct I/O allows for blocks to copied directly from a block device into
+user-space memory rather than passing through a kernel-space block cache first.
+This reduces the number of memory copies involved in processing the data.
+
+.. warning::
+   Direct I/O has received some testing within the software, but has not been
+   tested enough to be considered production-ready.
+
+.. note::
+   In principle, the file descriptor could number 0 (stdin) and one could
+   create pipelines, but this is not supported at the higher level interfaces.
+
+Reading is currently performed in a synchronous manner, which is fine for most
+typical use cases of the software since input is not the bottleneck.
+
+.. todo::
+   Support asynchronous reading.
+
+
+Gzip Stream Reader and Decompressor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The stream reader and decompressor for the ``gzip`` format is based on
+``zlib``. No direct I/O is supported by this stream reader and its constructor
+therefore only accepts a file descriptor. Furthermore, data must be copied and
+decompressed sequentially and cannot be read asynchronously. In the regime that
+higher level processing is fast, this stream reader is likely to be a
+bottleneck, especially as there is overhead from decompression. However, as
+pipelining support does not yet exist in the software, providing native support
+for a popular compression format makes sense. Also, some users of the software
+may not be familiar with standard Unix compression tools, such as ``gzip``;
+built-in support of popular compression formats removes a barrier to entry for
+these users.
+
+.. todo::
+   Implement higher level support for pipelining so that parallelized
+   decompressors can feed a raw stream reader, assuming that they can output
+   decompressed data to stdout and do so in order. Alternatively, if a
+   parallelized variant of ``zlib`` can be found, then that should be used in
+   place of ``zlib`` for native support.
+
+Bzip2 Stream Reader and Decompressor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The stream reader and decompressor for the ``bzip2`` format is based on the
+``bzip2`` library. The same notes and considerations for the ``gzip`` stream
+reader also apply to this one as well.
+
+As a historical note, it is worth mentioning that the logic for reading from a
+``bzip2``-compressed file stream is significantly more complicated than for raw
+or ``gzip``-compressed streams because of the way the library API is structured
+and the nature of the compression format. Prior to the architecture being
+described, data pumps and reads parsers were tightly coupled and implementing a
+``bzip2`` data pump in that architecture would have been very painful. As it
+turns out, the current architecture preemptively fixed a bug in the old
+``gzip`` data pump before it was reported against that architecture. So, this
+decoupled design has already paid for itself several times over.
+
+Thread Identity Maps
+--------------------
+
+Higher level processing requires that threads be able to persistently work with
+the same set of data. A thread does not inherently "know" what its index into a
+particular lookup table is. However, this index can be mapped to an OS-native 
+identifier for a thread. Using an appropriate system call, a thread can query
+its own native identifier from the operating system and then use this as a map
+key to find its logical identifier within the software. This logical identifier
+serves as the thread's index into any lookup tables which it may need to use.
+
+The self-identification is also important on the grounds of a software
+engineering principle: don't break existing interfaces. Prior to the current
+architecture, the code was not thread-safe. In order to add thread-safety in a
+reliable manner and not break existing interfaces, self-identification of
+threads was necessary.
+
+The thread identity map class is declared in the :file:`lib/thread_id_map.hh`
+file.
+
+.. cpp:class:: ThreadIDMap
+
+This class is not exposed via the Python wrapper as it is an internal
+mechanism. And, the implementation of the class varies according to operating 
+system. The only important method for those who wish to avail themselves to
+this bookkeeping method is the one which returns the logical identifier (lookup
+table index) of the current thread.
+
+.. cpp:function:: uint32_t const ThreadIDMap::get_thread_id( )
+
+New entries are added to the map as new threads call this method for the first
+time. Thus, the bookkeeping is automatic and does not get in the way of the
+developer.
+
+Cache Managers
+--------------
+
+A cache manager provides memory into which an input data pump may copy. The
+provided memory is segmented on a per-thread basis. On machines with multiple
+NUMA nodes, this can help performance by decreasing the likelihood of
+cross-node fetches and stores. More importantly, it provides an association
+between a particular thread and a particular cache segment, so that higher
+level processing, such as parsing, can always be guaranteed to operate on the
+same contiguous portion of memory.
+
+.. todo::
+   Implement pinning of threads to specific cores on operating systems which
+   support this. Preventing the migration of threads between cores should
+   mostly eliminate cross-node fetches and stores.
+
+The :file:`lib/read_parsers.hh` file declares the cache manager and cache
+manager segment classes.
+
+.. cpp:class:: CacheManager
+
+.. cpp:class:: CacheManagerSegment
+
+As multiple threads share access to the same data pump, the cache manager
+orchestrates access to this resource. Internally, a spinlock is used to limit
+access to one thread at a time.
+
+.. todo::
+   Increase period of spinlock trials from once per iteration to something
+   greater, similar to what the other busywaiters which perform atomic tests
+   use.
+
+Internally, a :cpp:class:`ThreadIDMap` is used to match a current thread with
+its corresponding entry in the table of cache segments. A convenience method is
+provided for the current thread to find its corresponding cache segment,
+creating it if it doesn't already exist.
+
+.. cpp:function:: CacheSegment &CacheManger::_get_segment( bool const higher = false )
+
+This is a private method used only within cache mangers. The ``higher``
+parameter is vestigial remnant from an earlier implementation and can likely be
+removed.
+
+.. todo::
+   Remove the ``higher`` parameter from :cpp:func:`_get_segment`.
+
+Developers wishing to use a cache manager rather than muck around in its
+implementation will probably find the following methods most useful.
+
+.. cpp:function:: bool const CacheManager::has_more_data( )
+
+.. cpp:function:: uint64_t const CacheManager::get_bytes( uint8_t * const buffer, uint64_t buffer_len )
+
+.. cpp:function:: void CacheManager::split_at( uint64_t const pos )
+
+The :cpp:func:`has_more_data` method queries both the underlying stream and the
+current cache segment to see if more data is available. If both the underlying
+stream is exhausted and the memory cursor, which tracks how much of a cache
+segment has been accessed since its last refill, is at the end of the segment,
+then no more data is considered to be available and the current thread hits a
+synchronization barrier to wait for the other threads to finish.
+
+The :cpp:func:`get_bytes` method copies up to ``buffer_len`` bytes of memory
+from the current cache segment into the supplied buffer ``buffer``. All
+bookkeeping, such as replenishing the cache segment from the underlying stream,
+is handled behind the scenes. The method also copies memory from the
+appropriate *copyaside buffer* as necessary. Copyaside buffers are created by
+the :cpp:func:`split_at` method and represent extensions to the current cache
+segment.
+
+.. todo::
+   Expose the underlying memory segments directly to higher level processing,
+   such as parsing, to eliminate the memory copy overhead that
+   :cpp:func:`get_bytes` carries. Note that this comes at the cost of some
+   horrid bookkeeping on the part of the higher level functions. The
+   :cpp:func:`get_bytes` method exists to handle this bookkeeping.
+
+The :cpp:func:`split_at` method copies up to ``pos`` bytes from the beginning
+of the current cache segment into a copyaside buffer. The copyaside buffer will
+then be available for the previous (in terms of lookup table index modulo the
+number of threads) cache segment. This method helps with multi-threaded parsing
+of files when parser offsets into a file do not correspond with record
+boundaries. A parser can scan forward to the next record boundary and then set
+the scanned over bytes aside to be appended to the cache segment which contains
+the beginning of the partial record.
+
+The initial implementation of the cache manager used *setaside buffers*, which
+were just reserved portions of cache segments and no memory copies were
+performed. However, the recordkeeping was quite complicated and after several
+bugs slipped through the cracks, the setaside buffer logic was converted to
+copyaside buffers. The cost of the memory copies is essentially nothing in the
+typical use cases encountered by the software. Copyaside buffers are also much
+more amenable to asychronous refilling of cache segments, should that be
+supported at a later point.
+
+.. todo::
+   Implement asynchronous refills of cache segments.
 
 Read Parsers
 ------------
