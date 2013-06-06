@@ -492,7 +492,11 @@ C++ API
    
 Read parsers create the aforementioned :cpp:class:`Read` objects. The
 :file:`lib/read_parsers.hh` file declares an abstract base class as well as
-FASTA and FASTQ parsers derived from that.
+FASTA and FASTQ parsers derived from that. These are made available from
+within a namespace which encapsulates most classes in the
+:file:`lib/read_parsers.hh` file.
+
+.. cpp:namespace:: khmer::read_parsers
 
 .. cpp:class:: IParser
 
@@ -571,18 +575,91 @@ constants for controlling its behavior as the underlying C++ class does.
 
 .. py:method:: ReadParser.iter_read_pairs( pair_mode )
 
-k-mer Counters
+k-mer Counters and Bloom Filters
+--------------------------------
+
+C++ API
+~~~~~~~
+
+The Bloom filter counting is described elsewhere and so we won't go into
+details of it here. Some of the methods of the hash tables has been granted
+thread safety and can use the thread-safe :cpp:class:`IParser` objects.
+
+.. cpp:class:: Hashtable
+
+.. cpp:class:: Hashbits
+
+.. cpp:function:: void Hashtable::consume_fasta( IParser * parser, unsigned int &total_reads, unsigned long long &n_consumed, HashIntoType lower_bound, HashIntoType upper_bound, CallbackFn callback, void * callback_data ) 
+
+.. cpp:function:: void Hashbits::consume_fasta_and_tag( IParser * parser, unsigned int &total_reads, unsigned long long &n_consumed, CallbackFn callback, void * callback_data )
+
+For legacy support, methods with signatures that have a file name parameter
+rather than a :cpp:class:`IParser` parameter are still provided as well. (They
+wrap the ones with the parser parameter.)
+
+As with the cache managers and read parsers, the hashtables track per-thread
+state.
+
+.. cpp:class:: Hasher
+
+Since more than one pool of threads (e.g., one set of threads per reads parser
+and one reads parser per file stream) may be used with a particular hash table
+object, the hash table objects internally maintain the notion of thread pools.
+The universally unique identifier (UUID) of an object (e.g., a reads parser) is
+used to map to the correct thread pool. This is behind-the-scenes accounting
+and a developer should generally not have to worry about this. But, if you are
+converting another method to be thread-safe and it can take different reads
+parsers on different invocations, then be sure to consider this.
+
+.. todo::
+   Drop more logic currently implemented in Python to C++ to gain
+   multi-threading efficiencies. Not everything can really scale well using the
+   existing interfaces working in Python.
+
+.. todo::
+   Cache k-mers to hash in small buckets which correspond to regions of the
+   hash tables. This will allow for multiple updates per memory page and reduce
+   the number of CPU cache misses.
+
+.. todo::
+   Abstact the counter storage from the hash functions. A number of open issues
+   can be addressed by doing this. The counter storage might be better
+   implemented with partial template specialization than with subclassing. For
+   small hash tables sizes, not hashing makes more sense because every possible
+   k-mer in the k-mer space can be addressed directly in memory. Counter
+   storage will be most efficient for powers-of-two numbers of bits per
+   counter. Blah, blah... these and other thoughts are discussed more
+   thoroughly in the various GitHub issues involving them.
+
+Python Wrapper
+~~~~~~~~~~~~~~
+
+The hash table objects have methods which take :py:class:`ReadParser` objects
+and invoke the appropriate C++ methods underneath the hood.
+
+.. py:method:: new_hashtable.consume_fasta_with_reads_parser( rparser )
+
+.. py:method:: new_counting_hash.consume_fasta_and_tag_with_reads_parser( rparser )
+
+.. todo::
+   Convert factory functions into callable classes and properly attribute
+   those classes.
+
+Python Wrapper
 --------------
-   
-   * k-mer Counter Storage
 
-   * Hash Functions
+The Python wrapper resides in :file:`python/_khmermodule.cc`. C++ code is used
+to call the CPython API to bind some of the C++ classes and methods to Python
+classes and methods. Some of the newer additions to the wrapper, such as the
+:py:class:`Read` and :py:class:`ReadParser` classes should be considered models
+for future additions as they expose callable classes with properties and
+iterators and which look just like Python classes for the most part. Much of
+the older code relies on factory functions to create objects and those objects
+are not very Pythonic. The newer additions are also much less cluttered and
+more readable (though the author of this sentence may be biased in this
+regard).
 
-   * Threads
-
-   * Thread Pools
-
-Python Interface
-----------------
+.. todo::
+   Use SWIG to generate the interface. Maybe?
 
 .. vim: set ft=rst ts=3 sts=3 sw=3 et tw=79:
