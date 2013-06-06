@@ -440,7 +440,7 @@ the beginning of the partial record.
 
 The initial implementation of the cache manager used *setaside buffers*, which
 were just reserved portions of cache segments and no memory copies were
-performed. However, the recordkeeping was quite complicated and after several
+performed. However, the bookkeeping was quite complicated and after several
 bugs slipped through the cracks, the setaside buffer logic was converted to
 copyaside buffers. The cost of the memory copies is essentially nothing in the
 typical use cases encountered by the software. Copyaside buffers are also much
@@ -450,28 +450,126 @@ supported at a later point.
 .. todo::
    Implement asynchronous refills of cache segments.
 
+Reads and Read Pairs
+--------------------
+
+Reads are simple data structures which contain genomic sequences, as well
+identifiers and quality scores for those sequences. The class is declared in
+:file:`lib/read_parsers.hh`.
+
+.. cpp:class:: Read
+
+The Python wrapper exposes an interface to reads.
+
+.. py:class:: Read
+
+The data members are accessed as properties. These mimick the access keys for
+``screed`` records.
+
+.. py:attribute:: Read.name
+
+.. py:attribute:: Read.sequence
+
+.. py:attribute:: Read.accuracy
+
+.. py:attribute:: Read.annotations
+
+No distinction is currently made between FASTA and FASTQ reads.
+
+.. todo::
+   Create an IRead abstract base class and subclass for FASTA and FASTQ record
+   types. This would remove wasted fields for FASTA records and allow the type
+   of records being used at any level of processing.
+
+Read pairs are two reads bound together in a STL ``pair``. This is intended to
+track sequences with paired ends.
+
 Read Parsers
 ------------
+
+C++ API
+~~~~~~~
    
-   * Threads and Parser States
-   
-   * FASTA
+Read parsers create the aforementioned :cpp:class:`Read` objects. The
+:file:`lib/read_parsers.hh` file declares an abstract base class as well as
+FASTA and FASTQ parsers derived from that.
 
-   * FASTQ
+.. cpp:class:: IParser
 
-   * Parser Interface: IParser
+.. cpp:class:: FastaParser
 
-   * TODO: Sniff file type rather than rely on extension.
+.. cpp:class:: FastqParser
 
-Reads
------
+An instance of the appropriate sublcass is created via a factory method
+provided by the abstract class. This method infers the correct subclass
+instance to create based on file name extension. The file name is required but
+the other arguments are optional. If the other arguments are supplied, then
+they override the defaults from the active :cpp:class:`Config` object.
 
-   * TODO: Inherit from thin Read Interface.
+.. cpp:function:: IParser * const IParser::get_parser( std::string const &ifile_name, uint32_t const number_of_threads, uint64_t const cache_size, uint8_t const trace_level )
 
-   * TODO: One class per format type.
-   
-   * TODO? Promote to reader/writer objects. Reduce parsers to facilitator
-     roles.
+.. todo::
+   Sniff file type rather than rely on extension.
+
+Just as the :cpp:class:`CacheManager` maintains per-thread state in
+:cpp:class:`CacheSegment` objects, the parser classes maintain per-thread state
+in special objects as well.
+
+.. cpp:class:: ParserState
+
+The parser state maintains a line buffer, among other things, and tracks how
+much of it has been parsed by each call to the parser.
+
+The :cpp:class:`IParser` interface provides some useful methods.
+
+.. cpp:function:: bool IParser::is_complete( )
+
+.. cpp:function:: void IParser::imprint_next_read( Read &the_read )
+
+.. cpp:function:: void IParser::imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED )
+
+The :cpp:func:`is_complete` method checks if parsing of the current stream is
+complete and blocks in a synchronization barrier if it is but some threads are
+still working.
+
+The :cpp:func:`imprint_next_read` method attempts to parse another read from
+the file stream and create a :cpp:class:`Read` object from it. Note that a
+legacy method ``get_next_read`` is still available but its use in new code is
+discouraged.  The legacy method involves an additional memory copy.
+
+The :cpp:func:`imprint_next_read_pair` method attempts to parse a pair of reads
+from the file stream a create a `ReadPair` object from them. Currently, this
+has two implemented modes of operation with a third one planned. The modes are
+``PAIR_MODE_ALLOW_UNPAIRED``, ``PAIR_MODE_IGNORE_UNPAIRED``, and
+``PAIR_MODE_ERROR_ON_UNPAIRED``. The first one is not yet implemented; it may
+be useful for filtering or diverting paired or unpaired reads out of a stream.
+The ``PAIR_MODE_IGNORE_UNPAIRED`` mode simply ignores unpaired reads and only
+returns paired reads. The ``PAIR_MODE_ERROR_ON_UNPAIRED`` mode raises an
+exception if an unpaired read is encountered. As a note, both the old-style
+("/1" and "/2") and new-style ("1..." and "2:...") Illumina read pairs are
+detected from sequence identifiers.
+
+.. todo::
+   Implement ``PAIR_MODE_ALLOW_UNPAIRED`` mode.
+
+.. todo::
+   Place burden of input parsing and output formatting on :cpp:class:`Read`
+   obects rather than on parser methods. Demote parsers to role of facilitator.
+   Maybe?
+
+Python Wrapper
+~~~~~~~~~~~~~~
+
+The Python wrapper exposes a read parser class.
+
+.. py:class:: ReadParser
+
+This class has no subclasses, but handles various formats appropriately. An
+instance of the class is an iterator, which produces one read at a time. There
+is also a method for iterating over read pairs and the class exposes the same
+constants for controlling its behavior as the underlying C++ class does.
+
+.. py:method:: ReadParser.iter_read_pairs( pair_mode )
 
 k-mer Counters
 --------------
