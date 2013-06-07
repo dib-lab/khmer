@@ -30,6 +30,7 @@ void khmer::convertFastaToBin(std::string readsFileName,std::string readsBinFile
         readBin.setSeq(read.sequence.size(),read.sequence);
         WriteToDiskRead(readBinFile,&readBin,total_reads);
     }
+    std::cout<<"the num of reads consumed is :"<<total_reads<<std::endl;
     //write header of the bin file
     WriteToDiskHeader(readBinFile,&total_reads);
     readBinFile.close();
@@ -65,6 +66,7 @@ void khmer::ReadFromDiskRead(std::fstream& readsBinFile,readNode* read,long page
 void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int& save_ksize)
 {
     //std::cout<<"in loading_tagset...\n";
+    //std::cout<<"the file name sents is:"<<infilename<<std::endl;
     std::ifstream infile(infilename.c_str(), std::ios::binary);
     assert(infile.is_open());
 
@@ -108,16 +110,11 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     std::cout<<"\tnum of reads in the file:"<<numReads<<std::endl;
     unsigned int numTkmer=sortedKhmerVector.size();
     std::cout<<"\tnum of tagged khmers:"<<numTkmer<<std::endl;
-    //define a data matrix row are t-k-mers and col are read id's
-    //bool matrix[numTkmer][numReads];	//the relationship b/w t-k-mer and read id
+    
     int  classSize[numTkmer];		//the number of reads belong to this id
     long index;
     std::vector<long>* ptr[numTkmer];		//array of ptrs to set of read ids
 
-    /*for (long i=0; i< numTkmer ; i++)
-    	for (long j=0; j<numReads ; j++)
-    		matrix[i][j]=0;
-    */
     for (int i=0; i< numTkmer; i++) {
         classSize[i]=0;
         ptr[i]=new std::vector<long>;
@@ -155,7 +152,10 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
                 index= low - sortedKhmerVector.begin();
                 //matrix[index][i]=1;
                 classSize[index]++;
+		//std::cout<<"index:"<<index<<" i+1:"<<i+1<<std:endl;
+		//if (*(ptr[index]->end())!=(i+1)){
                 ptr[index]->push_back(i+1);
+		//}
             }
         } //while
 
@@ -164,16 +164,21 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
         _seq="";
     }
     std::cout<<"\tdone indexing Reads...\n";
-    /*std::cout<<"the class size array is:\n";
-    for (int i=0;i< numTkmer ;i++) std::cout<<"{"<<i<<","<<classSize[i]<<"} ";
+    std::string outfilename2= readsBinFileName+".readDist";
+    std::ofstream outfile2(outfilename2.c_str());
+    std::cout<<"wrting the class size array into xxx.readDist file:\n";
+    for (int i=0;i< numTkmer ;i++){ 
+	outfile2<<i+1<<"\t"<<classSize[i]<<"\n";
+	}
+    outfile2.close();
     std::cout<<std::endl;
-    */
+    
     std::cout<<"\tsaving the index information...\n";
     //save the index informaiton
     std::string outfilename= readsBinFileName+".index";
     std::ofstream outfile(outfilename.c_str(), std::ios::binary);
 
-    //wertie the size of taged k-mer sorted array
+    //wrtie the size of taged k-mer sorted array
     outfile.write((const char *) &numTkmer, sizeof(numTkmer));
     //std::cout<<numTkmer<<std::endl;
 
@@ -205,13 +210,6 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     long read_id;
     for (long i=0; i< numTkmer ; i++) {
         //std::cout<<"\nT "<<i+1<<":";
-        /*std::cout<<"\tM:";
-                for (long j=1; j<numReads+1 ; j++)
-                       if ( matrix[i][j-1]!=0){
-        		outfile.write((const char *) &j, sizeof(long));
-        		std::cout<<j<<" ";
-        */
-        //std::cout<<"\tP:";
         for (std::vector<long>::iterator it = ptr[i]->begin() ; it != ptr[i]->end(); ++it) {
             //std::cout << ' ' << *it;
             read_id=*it;

@@ -54,13 +54,13 @@ int main(int argc,char *argv[])
         optind++;
     }
 
-
+    
     //creaate reads binary file
     std::cout<<"\ncreating reads binary file ....\n";
     std::string readsFileNameBin=readsFileName+".bin";
     convertFastaToBin(readsFileName,readsFileNameBin);
     std::cout<<"done...\n";
-
+    
     //intilize the classes
     std::cout<<"\nload tagged khmers and sort them ...\n";
     std::vector<khmer::HashIntoType> sortedKhmerVector;
@@ -79,7 +79,7 @@ int main(int argc,char *argv[])
     diff = difftime (end,start);
     printf ("It took you %.2lf seconds to build the tree.\n", diff );
     std::cout<<"done...\n";
-   
+    
     /*
     //query example
     std::cout<<"\nexact query search ...\n";
