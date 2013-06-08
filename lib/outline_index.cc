@@ -26,7 +26,10 @@ void khmer::convertFastaToBin(std::string readsFileName,std::string readsBinFile
         read = parser->get_next_read();
         total_reads++;
         readBin.setPageNum(total_reads);
-        readBin.setName(read.name.size(),read.name);
+        //temp change the data the reads to upper cass
+        //KHMER_EXTRA_SANITY_CHECKS flag in kmer iterators  must be set 
+        std::transform(read.sequence.begin(), read.sequence.end(), read.sequence.begin(), ::toupper);
+	 readBin.setName(read.name.size(),read.name);
         readBin.setSeq(read.sequence.size(),read.sequence);
         WriteToDiskRead(readBinFile,&readBin,total_reads);
     }
@@ -128,7 +131,8 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     for(int i=0; i<seqLen; i++) {
         _seq+=seq[i];
     }
-
+    bool read_is_tagged;		//test if a read is successfully tagged
+    //unsigned long error_cnt=0;	//keep track of the number of reads not tagged
     for (long i=0; i<numReads; i++) {
         //std::cout<<" read #:"<<i+1<<std::endl;
 
@@ -144,20 +148,22 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
         khmer::KMerIterator kmers(_seq.c_str(), save_ksize);
         khmer::HashIntoType kmer;
         std::vector<khmer::HashIntoType>::iterator low;
-
+	//read_is_tagged=false;
         while(!kmers.done()) {
             kmer = kmers.next();
             low=std::lower_bound (sortedKhmerVector.begin(), sortedKhmerVector.end(), kmer);
             if (low != sortedKhmerVector.end() && *low == kmer) {
                 index= low - sortedKhmerVector.begin();
-                //matrix[index][i]=1;
                 classSize[index]++;
-		//std::cout<<"index:"<<index<<" i+1:"<<i+1<<std:endl;
-		//if (*(ptr[index]->end())!=(i+1)){
+		//std::cout<<"index:"<<index<<" i+1:"<<i+1<<std::endl;
                 ptr[index]->push_back(i+1);
-		//}
+		read_is_tagged=true;// std::cout<<"read ID:"<<i+1<<"is tagged now\n";
             }
         } //while
+	if (read_is_tagged==false){ 
+		std::cout<<"ERROR read is not tagged\n";
+		//error_cnt++;
+	}
 
         // clean for the next read processing
         readBin.nullfy();
