@@ -1020,7 +1020,10 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
 
   unsigned long count = 0;
 
-  if (PyInt_Check(arg)) {
+  if(PyLong_Check(arg)) {
+    HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
+    count = ktable->get_count(pos);
+  } else if (PyInt_Check(arg)) {
     long pos = PyInt_AsLong(arg);
     count = ktable->get_count((unsigned int) pos);
   } else if (PyString_Check(arg)) {
