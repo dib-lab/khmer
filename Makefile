@@ -136,6 +136,10 @@ ifneq ($(shell uname), Linux)
 LIBS+= -pthread
 endif
 
+export CXX
+export CXXFLAGS
+export LIBS
+
 all: lib_files python_files
 
 clean:
@@ -148,7 +152,7 @@ doc: FORCE
 
 lib_files:
 	cd lib && \
-	make CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LIBS="$(LIBS)"
+	make
 
 python_files: lib_files
 	cd python && \
