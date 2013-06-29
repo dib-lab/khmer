@@ -16,9 +16,11 @@ k-mer counting
    Build a counting hash table using the sequences in <file1-N>, and save it
    to <output.kh>.
 
-   Note that with the '-b' option <output.kh> will be the exact size of
-   your hashtables, and load-into-counting.py will be constant memory;
-   in exchange, k-mer counts will stop at 255.
+   Note that with the '-b' option <output.kh> will be the exact size
+   of your hashtables, and load-into-counting.py will be constant
+   memory; in exchange, k-mer counts will stop at 255.  The memory
+   usage of this script with '-b' will be about 1.15x the product of
+   the -x and -N numbers.
 
    Example::
 
@@ -61,7 +63,12 @@ k-mer counting
    created unless --savehash is specified.)
 
    Note that with the '-b' option this script is constant memory; in
-   exchange, k-mer counts will stop at 255.
+   exchange, k-mer counts will stop at 255. The memory usage of this
+   script with '-b' will be about 1.15x the product of the -x and -N
+   numbers.
+
+   To count k-mers in multiple files, use load-into-counting.py and
+   abundance-dist.py.
 
    Example::
 
