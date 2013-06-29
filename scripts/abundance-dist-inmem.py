@@ -74,9 +74,34 @@ def main():
     for t in threads:
         t.join()
 
+    z_list = []
+    def do_abundance_dist(r):
+        z = ht.abundance_distribution_with_reads_parser(r, tracking)
+        z_list.append(z)
+
     print 'preparing hist from %s...' % datafile
-    z = ht.abundance_distribution(datafile, tracking)
-    total = sum(z)
+    rparser = khmer.ReadParser(datafile, n_threads)
+    threads = []
+    print 'consuming input', datafile
+    for tnum in xrange(n_threads):
+        t = \
+            threading.Thread(
+                target=do_abundance_dist,
+                args=(rparser,)
+            )
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
+
+    assert len(z_list) == n_threads, len(z_list)
+    z = {}
+    for zz in z_list:
+        for i, count in enumerate(zz):
+            z[i] = z.get(i, 0) + count
+
+    total = sum(z.values())
 
     if 0 == total:
         print >>sys.stderr, \
@@ -88,7 +113,7 @@ def main():
     fp = open(histout, 'w')
 
     sofar = 0
-    for n, i in enumerate(z):
+    for n, i in sorted(z.items()):
         if i == 0 and not args.output_zero:
             continue
 
