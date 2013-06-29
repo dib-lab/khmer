@@ -58,6 +58,10 @@ def main():
     print 'HT sizes:', sizes
     print 'outputting to', histout
 
+    config = khmer.get_config()
+    bufsz = config.get_reads_input_buffer_size()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
+
     # start loading
     rparser = khmer.ReadParser(datafile, n_threads)
     threads = []
