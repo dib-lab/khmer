@@ -23,6 +23,9 @@ def main():
     add_threading_args(parser)
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
+                        action='store_false',
+                        help='Do not count k-mers past 255')
 
     args = parser.parse_args()
     report_on_config(args)
@@ -42,7 +45,7 @@ def main():
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
-    ht.set_use_bigcount(True)
+    ht.set_use_bigcount(args.bigcount)
 
     for n, filename in enumerate(filenames):
 

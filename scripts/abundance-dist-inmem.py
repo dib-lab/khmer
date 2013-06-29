@@ -26,9 +26,13 @@ def main():
     parser.add_argument('-z', '--no-zero', dest='output_zero', default=True,
                         action='store_false',
                         help='Do not output 0-count bins')
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
+                        action='store_false',
+                        help='Do not count k-mers past 255')
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('--savehash', dest='savehash', default='')
 
     args = parser.parse_args()
     report_on_config(args)
@@ -43,7 +47,7 @@ def main():
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
-    ht.set_use_bigcount(False)
+    ht.set_use_bigcount(args.bigcount)
 
     print 'building tracking ht'
     K = ht.ksize()
@@ -95,6 +99,11 @@ def main():
 
         if sofar == total:
             break
+
+    if args.savehash:
+        print 'Saving hashfile', args.savehash
+        print '...saving to', args.savehash
+        ht.save(args.savehash)
 
 if __name__ == '__main__':
     main()
