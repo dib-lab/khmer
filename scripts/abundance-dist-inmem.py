@@ -65,7 +65,7 @@ def main():
     # start loading
     rparser = khmer.ReadParser(datafile, n_threads)
     threads = []
-    print 'consuming input', datafile
+    print 'consuming input, round 1 --', datafile
     for tnum in xrange(n_threads):
         t = \
             threading.Thread(
@@ -86,7 +86,7 @@ def main():
     print 'preparing hist from %s...' % datafile
     rparser = khmer.ReadParser(datafile, n_threads)
     threads = []
-    print 'consuming input', datafile
+    print 'consuming input, round 2 --', datafile
     for tnum in xrange(n_threads):
         t = \
             threading.Thread(
