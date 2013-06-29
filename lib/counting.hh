@@ -191,10 +191,10 @@ namespace khmer {
 			  BoundedCounterType &kadian,
 			  unsigned int nk = 1);
 
+    HashIntoType * abundance_distribution(read_parsers::IParser * parser,
+					  Hashbits * tracking);
     HashIntoType * abundance_distribution(std::string filename,
-					  Hashbits * tracking,
-					  CallbackFn callback = NULL,
-					  void * callback_data = NULL) const;
+					  Hashbits * tracking);
 
     HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
 					 const unsigned int max_read_len,
