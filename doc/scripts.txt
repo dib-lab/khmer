@@ -1,6 +1,6 @@
-========================
-Ready-made khmer scripts
-========================
+==============================
+khmer's command-line interface
+==============================
 
 For -x and -N parameters, see :doc:`choosing-hash-sizes`.
 
@@ -51,11 +51,11 @@ k-mer counting
    are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
    of total distinct k-mers.
 
-**abundance-dist-inmem.py**: calculate the abundance distribution.
+**abundance-dist-single.py**: calculate the k-mer abundance distribution for a single file
 
    Usage::
 	
-	scripts/abundance-dist-inmem.py [ options ] <datafile> <histout>
+	scripts/abundance-dist-single.py [ options ] <datafile> <histout>
 
    Count the k-mer abundance distribution in <datafile>; output
    distribution to <histout>.  (This is a single-step/in-memory
@@ -72,7 +72,7 @@ k-mer counting
 
    Example::
 
-	scripts/abundance-dist-inmem.py -k 20 -x 5e7 data/100k-filtered.fa out.hist
+	scripts/abundance-dist-single.py -k 20 -x 5e7 data/100k-filtered.fa out.hist
 
    The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
    are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
@@ -92,6 +92,26 @@ k-mer counting
 
 	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
 	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
+
+**filter-abund-single.py**: trim sequences at a min k-mer abundance.
+
+   Usage::
+	
+	filter-abund-single.py [ -C <cutoff> ... ] <file>
+
+   Trim sequences at k-mer abundance < C.  (This is an in-memory
+   version of filter-abund.py that works for single files.)
+
+   Trimmed sequences will be placed in <file>.abundfilt.
+
+   This script is constant memory.
+
+   To trim reads based on k-mer abundance across multiple files, use
+   load-into-counting and filter-abund.
+
+   Example::
+
+	scripts/filter-abund-single.py -k 20 -x 5e7 -C 2 data/100k-filtered.fa
 
 **count-median.py**: count median, average, and stddev of k-mer abundance in sequences.
 
