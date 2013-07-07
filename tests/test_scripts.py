@@ -194,6 +194,24 @@ def test_filter_abund_3():
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
 
+def test_filter_abund_1_singlefile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
 def test_filter_stoptags():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
@@ -751,14 +769,14 @@ def test_abundance_dist_nobigcount():
     line = fp.next().strip()
     assert line == '255 2 98 1.0', line
 
-def test_abundance_dist_inmem():
+def test_abundance_dist_single():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
-    script = scriptpath('abundance-dist-inmem.py')
+    script = scriptpath('abundance-dist-single.py')
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
@@ -772,14 +790,14 @@ def test_abundance_dist_inmem():
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
 
-def test_abundance_dist_inmem_nobigcount():
+def test_abundance_dist_single_nobigcount():
     infile = utils.get_temp_filename('test.fa')
     outfile = utils.get_temp_filename('test.dist')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
-    script = scriptpath('abundance-dist-inmem.py')
+    script = scriptpath('abundance-dist-single.py')
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
