@@ -14,7 +14,7 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser test-HashTables
+DRV_PROGS=bittest ktable_test outline_index_test   #test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=#ht-diff
 
