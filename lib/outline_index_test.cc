@@ -118,5 +118,5 @@ int main(int argc,char *argv[])
         std::cout<<reads[i]<<std::endl;
     }
     */
-    return 1;
+    return 0;
 }
