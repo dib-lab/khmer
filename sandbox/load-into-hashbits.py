@@ -12,6 +12,7 @@ import screed
 import os
 import khmer
 from khmer.counting_args import build_construct_args, report_on_config
+from khmer.threading_args import add_threading_args
 
 def main():
     parser = build_construct_args()
