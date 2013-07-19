@@ -24,8 +24,8 @@ PARSERS_OBJS= read_parsers.o
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
 
 clean:
-	-(cd $(ZLIB_DIR) && make clean)
-	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
+	-(cd $(ZLIB_DIR) && $(MAKE) clean)
+	(cd $(BZIP2_DIR) && $(MAKE) -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS) $(AUX_PROGS)
 
 test: $(DRV_PROGS) $(AUX_PROGS)
@@ -71,7 +71,7 @@ $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure --shared && make libz.a)
 
 $(BZIP2_OBJS):
-	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
+	(cd $(BZIP2_DIR) && $(MAKE) -f Makefile-libbz2_so all)
 
 error.o: error.cc error.hh
 
