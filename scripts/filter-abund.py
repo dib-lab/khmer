@@ -8,7 +8,6 @@ hash table.  Output sequences will be placed in 'infile.abundfilt'.
 Use '-h' for parameter help.
 """
 import sys
-import screed.fasta
 import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
