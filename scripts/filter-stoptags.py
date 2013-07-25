@@ -9,7 +9,6 @@ Use '-h' for parameter help.
 """
 
 import sys
-import screed.fasta
 import os
 import khmer
 import argparse
