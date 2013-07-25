@@ -143,20 +143,21 @@ export LIBS
 all: lib_files python_files
 
 clean:
-	cd lib && make clean
-	cd python && make clean
+	cd lib && $(MAKE) clean
+	cd python && $(MAKE) clean
 	cd tests && rm -rf khmertest_*
 
 doc: FORCE
-	cd doc && make html
+	doxygen Doxyfile
+	cd doc && $(MAKE) html
 
 lib_files:
 	cd lib && \
-	make
+	$(MAKE)
 
 python_files: lib_files
 	cd python && \
-	make 	DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
+	$(MAKE) 	DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
 		CXX_DEBUG_FLAGS="$(CXX_DEBUG_FLAGS)" 
 
 test: all
