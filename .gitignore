@@ -15,3 +15,5 @@ tests/test-data/test-overlap1.fa.out
 *.tagset
 *env
 *ENV
+tests/test-data/
+
