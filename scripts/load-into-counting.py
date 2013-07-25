@@ -5,8 +5,6 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 % python scripts/load-into-counting.py <htname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
-
-@CTB enable/disable bigcount via command-line parameters.
 """
 
 import sys
