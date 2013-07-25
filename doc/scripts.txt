@@ -82,11 +82,16 @@ k-mer counting
 
    Usage::
 	
-	filter-abund.py [ -C <cutoff> ] <input.kh> <file1> <file2> ...
+	filter-abund.py [ -C <cutoff> -V [ -Z num ] ] <input.kh> <file1> <file2> ...
 
    Load a counting hash table from <input.kh> and use it to trim the
    sequences in <file1-N>.  Trimmed sequences will be placed in
    <fileN>.abundfilt.
+
+   The '-V' option sets variable coverage, which means that only
+   low-abundance k-mers in high-coverage reads are trimmed; this
+   should be used for RNAseq and metagenome data.  The '-Z num' option
+   sets the meaning of "high coverage"; by default it's 20.
 
    Example::
 

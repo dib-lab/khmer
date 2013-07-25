@@ -14,6 +14,20 @@ def is_pair(name1, name2):
 
     return False
 
+def output_pair(r1, r2):
+    if hasattr(r1, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
+            (r1.name, r1.sequence, r1.accuracy,
+             r2.name, r2.sequence, r2.accuracy)
+    else:
+        return ">%s\n%s\n%s\n%s\n" % (r1.name, r1.sequence, r2.name, r2.sequence)
+
+def output_single(r):
+    if hasattr(r, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+    else:
+        return ">%s\n%s\n" % (r.name, r.sequence)
+
 infile = sys.argv[1]
 outfile = os.path.basename(infile)
 if len(sys.argv) > 2:
@@ -37,12 +51,11 @@ for n, record in enumerate(screed.open(sys.argv[1])):
 
     if last_record:
         if is_pair(last_name, name):
-            print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
-            print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
+            paired_fp.write(output_pair(last_record, record))
             name, record = None, None
             n_pe += 1
         else:
-            print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+            single_fp.write(output_single(last_record))
             n_se += 1
 
     last_name = name
@@ -50,17 +63,16 @@ for n, record in enumerate(screed.open(sys.argv[1])):
 
 if last_record:
     if is_pair(last_name, name):
-        print >>paired_fp, '>%s\n%s' % (last_name, last_record['sequence'])
-        print >>paired_fp, '>%s\n%s' % (name, record['sequence'])
+        paired_fp.write(output_pair(last_record, record))
         name, record = None, None
         n_pe += 1
     else:
-        print >>single_fp, '>%s\n%s' % (last_name, last_record['sequence'])
+        single_fp.write(output_single(last_record))
         name, record = None, None
         n_se += 1
 
 if record:
-    print >>single_fp, '>%s\n%s' % (name, record['sequence'])
+    single_fp.write(output_single(record))
     n_se += 1
 
 single_fp.close()
