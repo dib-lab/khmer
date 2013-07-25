@@ -180,6 +180,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     std::cout<<std::endl;
     
     std::cout<<"\tsaving the index information...\n";
+    int indexSize=0;
     //save the index informaiton
     std::string outfilename= readsBinFileName+".index";
     std::ofstream outfile(outfilename.c_str(), std::ios::binary);
@@ -187,6 +188,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     //wrtie the size of taged k-mer sorted array
     outfile.write((const char *) &numTkmer, sizeof(numTkmer));
     //std::cout<<numTkmer<<std::endl;
+    indexSize+=sizeof(numTkmer);
 
     //write the taged k-mer sorted array
     khmer::HashIntoType * buf = new khmer::HashIntoType[numTkmer];
@@ -196,7 +198,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     }
     std::cout<<std::endl;
     outfile.write((const char *) buf, sizeof(HashIntoType) * numTkmer);
-
+    indexSize+=sizeof(HashIntoType) * numTkmer;
     delete buf;
 
     //create the array of acummulated sizes
@@ -209,21 +211,24 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     }
     outfile.write((const char *) buff, sizeof(unsigned int) * numTkmer);
     delete buff;
-
+    indexSize+=sizeof(unsigned int) * numTkmer;
     //std::cout<<std::endl;
 
     //write set of associated arrays that map t-k-mer with a set of read ids
     long read_id;
+    int cnt=0;
     for (long i=0; i< numTkmer ; i++) {
         //std::cout<<"\nT "<<i+1<<":";
         for (std::vector<long>::iterator it = ptr[i]->begin() ; it != ptr[i]->end(); ++it) {
             //std::cout << ' ' << *it;
             read_id=*it;
             outfile.write((const char *) &read_id, sizeof(long));
+	    cnt++;
         }
-
         //	std::cout<<"/";
     }
+    indexSize+=sizeof(long)*cnt;
+    std::cout<<"the size of the index is:"<<indexSize<<std::endl;
     //std::cout<<std::endl;
     outfile.close();
     readBinFile.close();
@@ -393,3 +398,81 @@ void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>&
 
 }
 */
+//------- searching procedures -------------
+void khmer::exhaustive_search(std::string readsBinFileName,std::string queryFileName){
+	std::cout<<"exhaustive_search\n";
+}
+void khmer::approximate_search(std::string readsBinFileName,std::string queryFileName){
+	std::cout<<"approximate_search\n";;
+}
+
+//------- Sampling Procedures ---------------
+void khmer::samplefrombinary(){
+    std::cout<<"in sampling from binary sequnce file\n";
+    /*
+    this function  create set of qureirs randomly from a given input file
+ input: 1- binary file where each entry contins DNA sequnace
+        2- size of the smaple, the number of the reads to be sampled
+        3- fixed length of the sample, it is optinal in case we want to extract an equal leng
+th substrings
+        4- if length is not providede then random length will be chosen
+        5- full flag is used to smaple the whole read not a substring from a read
+    */
+    std::string   readsBinFileName="", queryFileName="";
+    int num_q=0;
+    //mandatory inputs for all cases
+    std::cout<<"enter the reads Binary file name:";	std::cin>>readsBinFileName;	std::cout<<std::endl;
+    std::cout<<"enter the output query file name:";	std::cin>>queryFileName;	std::cout<<std::endl;
+    std::cout<<"enter the number of qureies:",		std::cin>>num_q;		std::cout<<std::endl;
+    
+    std::fstream readBinFile;
+    readBinFile.open(readsBinFileName.c_str(),std::ios::in|std::ios::binary);
+    long numReads=0;
+    ReadFromDiskHeader(readBinFile,&numReads);
+    std::cout<<"\tnum of reads in the file:"<<numReads<<std::endl;
+    std::fstream queryFile;
+    queryFile.open(queryFileName.c_str(),std::ios::out);
+    
+    //some cases
+    bool full_length=true;
+    int n;
+    std::cout<<"default sampling is the whole read,\n";
+    std::cout<<" if you want sub-sting enter 0 otherwise enter 1:"; std::cin>>n;	std::cout<<std::endl;
+    if (n==0) full_length=false;
+   //we need to do the follwoing
+   //randomly select k , the skips over the reads, to slect a read 
+   //if we are in case one we are don
+   //if we are in case two , then either fixed length of variable length
+   //in fixed length case we have L, then select reandomly a pos in (s,e-L+1) then str=seq[pos,pos+l] 
+   //if substring is vaialbe, then selct the pos in(s,e-1) and then select l in (1,e-pos+1) then str=seq[pos,pos+l)
+   long location=0; readNode readBin; 
+  if (full_length){
+	std::cout<<"in smapling the entire reads mode\n";
+	unsigned int k; k=rand()%100; std::cout<<"k:"<<k<<std::endl; //skipping paramater
+	for (unsigned int i=0; i<num_q; i++){
+		location+=(long)((i+k)%numReads)+1;
+		std::cout<<location<<std::endl;
+		readBin.nullfy();
+                ReadFromDiskRead(readBinFile,&readBin,location);
+                readBin.printSeq(queryFile); queryFile<<std::endl;
+	
+	}
+
+
+	}
+  if (!full_length){
+	std::cout<<" in smapling sub strings mode\n";
+	std::cout<<" the defualt is to sample variable length sub strings\n";
+	std::cout<<" if you want to smaple with fixed length please enter the length othewise enter 0:";
+	std::cin>>n; std::cout<<std::endl;
+	if (n==0){
+		std::cout<<"We are in smapling substring with variable length\n";
+	}
+	else	{
+		std::cout<<" we are in sampling substring with fixed length equal to "<<n<<std::endl;
+	}
+	}
+
+   readBinFile.close();
+   queryFile.close();
+}//end sampling procedure

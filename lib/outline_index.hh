@@ -143,6 +143,12 @@ void retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::HashInto
 void retrieve_read_by_id(std::string infilename, std::vector<long>& reads_ids, std::vector<std::string>& reads);
 
 void exactQuery(std::string readsBinFileName,std::string queryFileName);
+//------ searching Procedures ------
+void exhaustive_search(std::string readsBinFileName,std::string queryFileName);
+void approximate_search(std::string readsBinFileName,std::string queryFileName);
+//------ sampling procedure --------
+void samplefrombinary();
+
 
 };
 

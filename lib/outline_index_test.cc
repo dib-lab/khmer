@@ -56,10 +56,10 @@ int main(int argc,char *argv[])
 
     
     //creaate reads binary file
-    std::cout<<"\ncreating reads binary file ....\n";
+    //std::cout<<"\ncreating reads binary file ....\n";
     std::string readsFileNameBin=readsFileName+".bin";
-    convertFastaToBin(readsFileName,readsFileNameBin);
-    std::cout<<"done...\n";
+    //convertFastaToBin(readsFileName,readsFileNameBin);
+    //std::cout<<"done...\n";
     
     //intilize the classes
     std::cout<<"\nload tagged khmers and sort them ...\n";
@@ -80,6 +80,7 @@ int main(int argc,char *argv[])
     printf ("It took you %.2lf seconds to build the tree.\n", diff );
     std::cout<<"done...\n";
     
+
     /*
     //query example
     std::cout<<"\nexact query search ...\n";
@@ -118,5 +119,8 @@ int main(int argc,char *argv[])
         std::cout<<reads[i]<<std::endl;
     }
     */
+    
+    // the sampling process
+    //samplefrombinary();
     return 0;
 }
