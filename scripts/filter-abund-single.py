@@ -66,6 +66,9 @@ def main():
     for t in threads:
         t.join()
 
+    fp_rate = khmer.calc_expected_collisions(ht)
+    print 'fp rate estimated to be %1.3f' % fp_rate
+
     ### now, trim.
 
     ### the filtering function.
