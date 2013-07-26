@@ -32,8 +32,129 @@ def is_pair(r1, r2):
 
     return (a == b)
 
+def start_threads(n_threads, target, args):
+    "Start up n_threads, running the given target with the given args."
+    threads = []
+    for tnum in xrange(n_threads):
+        t = threading.Thread(target=target, args=args)
+        threads.append(t)
+        t.start()
+
+    return threads
+
+class ThreadedWriter(object):
+    """A queue-based threadsafe FASTA/FASTQ output writer.
+
+    Public API:
+       x = ThreadedWriter(outfp) - write records to outfp, sniffing format
+
+       x.start()             - start self up in thread.
+       x.join(other_threads) - wait on other threads, then flush & exit
+
+    Typical usage:
+       x = ThreadedWriter(outfp).start()
+       ...
+       x.join(other_threads)
+    """
+    QUEUESIZE = 1000                    # what should this be? @CTB
+
+    def __init__(self, outfp, fastq=None):
+        self.fp = outfp
+        self.outq = Queue.Queue(self.QUEUESIZE)
+        self.fastq = fastq              # None => sniff; else T(fastq) / F(fa)
+        self._exit = False
+        self._thread = None
+
+    def save_record(self, record):
+        if self.fastq is None:
+            if record.accuracy:
+                self.fastq = True
+            else:
+                self.fastq = False
+                
+        if self.fastq:
+            self.save(record.name, record.sequence, record.accuracy)
+        else:
+            self.save(record.name, record.sequence)
+
+    def save(self, name, sequence, quality=None):
+        if self.fastq is None:
+            if quality:
+                self.fastq = True
+            else:
+                self.fastq = False
+
+        if self.fastq and quality is None:
+            raise Exception("Error: empty quality given for read %s" % name)
+
+        self.outq.put((name, sequence, quality))
+
+    ###
+
+    def start(self):
+        "Start self in a thread."
+        self._thread = threading.Thread(target=self.run)
+        self._thread.start()
+        return self
+
+    def join(self, other_threads):
+        "Wait until reader threads are finished, then flush & exit."
+        for t in other_threads:
+            t.join()
+            
+        self.exit()
+        self._thread.join()
+
+    def run(self):
+        "run until _exit flag is set & queue is empty."
+        while (not self._exit) or (not self.outq.empty()):
+            self._looper()
+
+    def exit(self):
+        "set the exit flag - no more 'save's will be called."
+        self._exit = True
+
+    ## internal functions
+
+    def _looper(self):
+        "loop until the queue is empty and a timeout is received."
+        try:
+            while 1:
+                # wait for the queue to stay empty and then raise Empty
+                item = self.outq.get(True, 0.01)
+                self._write(item)
+        except Queue.Empty:
+            return
+
+    def _write(self, item):
+        "write out a single record in appropriate FASTA/FASTQ format."
+        if self.fastq:
+            self.fp.write('@%s\n%s\n+\n%s\n' % (item[0], item[1], item[2]))
+        else:
+            self.fp.write('>%s\n%s\n' % (item[0], item[1]))
+
+    def single_process_fn(self, rparser, filter_fn):
+        """\
+        Handle single reads one at a time.
+
+        If 'filter_fn' returns anything, it's assumed to be sequence to be
+        saved; if quality score is present, it's trimmed appropriately and
+        then sent to the queue.
+        """
+        for read in rparser:
+            seq = filter_fn(read.name, read.sequence)
+            if seq:                     # save?
+                if read.accuracy:
+                    accuracy = read.accuracy[:len(seq)]
+                    self.save(read.name, seq, accuracy)
+                else:
+                    self.save(read.name, seq)
 
 class ThreadedSequenceProcessor(object):
+    """
+    DEPRECATED
+    """
+    
     QUEUESIZE = 50
 
     def __init__(self, process_fn, n_workers=DEFAULT_WORKER_THREADS,
