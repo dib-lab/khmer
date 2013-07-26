@@ -133,7 +133,7 @@ class ThreadedWriter(object):
         else:
             self.fp.write('>%s\n%s\n' % (item[0], item[1]))
 
-    def single_process_fn(self, rparser, filter_fn):
+    def process_fn(self, rparser, filter_fn):
         """\
         Handle single reads one at a time.
 
@@ -149,6 +149,62 @@ class ThreadedWriter(object):
                     self.save(read.name, seq, accuracy)
                 else:
                     self.save(read.name, seq)
+
+class PairThreadedWriter(ThreadedWriter):
+    """A queue-based threadsafe FASTA/FASTQ output writer.
+
+    Public API:
+       x = PairThreadedWriter(outfp) - write records to outfp, sniffing format
+
+       x.start()             - start self up in thread.
+       x.join(other_threads) - wait on other threads, then flush & exit
+
+    Typical usage:
+       x = PairThreadedWriter(outfp).start()
+       ...
+       x.join(other_threads)
+    """
+    QUEUESIZE = 1000                    # what should this be? @CTB
+
+    def save(self, a, b):
+        if self.fastq is None:
+            if len(a) == 3:
+                self.fastq = True
+            else:
+                self.fastq = False
+
+        if self.fastq and (not a[2] or not b[2]):
+            raise Exception("Error: empty quality given for pair %s" % a[0])
+
+        self.outq.put((a, b))
+
+    ###
+
+
+    def _write(self, item):
+        "write out a pair of records in appropriate FASTA/FASTQ format."
+
+        a, b = item
+        if self.fastq:
+            self.fp.write('@%s\n%s\n+\n%s\n' % (a[0], a[1], a[2]))
+            self.fp.write('@%s\n%s\n+\n%s\n' % (b[0], b[1], b[2]))
+        else:
+            self.fp.write('>%s\n%s\n' % (a[0], a[1]))
+            self.fp.write('>%s\n%s\n' % (b[0], b[1]))
+
+    def process_fn(self, rparser, filter_fn):
+        for r1, r2 in rparser.iter_read_pairs():
+            seq1, seq2 = filter_fn(r1.name, r1.sequence,
+                                   r2.name, r2.sequence)
+            if seq1 and seq2:
+                if r1.accuracy:
+                    accuracy1 = r1.accuracy[:len(seq1)]
+                    accuracy2 = r2.accuracy[:len(seq2)]
+                    self.save((r1.name, seq1, accuracy1),
+                              (r2.name, seq2, accuracy2))
+                else:
+                    self.save((r1.name, seq1),
+                              (r2.name, seq2))
 
 class ThreadedSequenceProcessor(object):
     """

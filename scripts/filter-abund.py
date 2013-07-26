@@ -91,7 +91,7 @@ def main():
         # create multithreaded readparser
         rparser = khmer.ReadParser(filename, n_threads - 1)
         threads = thread_utils.start_threads(n_threads - 1,
-                                             target=tw.single_process_fn,
+                                             target=tw.process_fn,
                                              args=(rparser, filter_fn))
 
         # wait for threads to finish & flush out any remaining records.
