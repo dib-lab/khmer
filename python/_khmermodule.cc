@@ -1854,7 +1854,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
   }
 
-  delete dist;
+  delete[] dist;
 
   return x;
 }
