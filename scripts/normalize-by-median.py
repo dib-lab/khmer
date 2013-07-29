@@ -155,6 +155,14 @@ def main():
         else:
             print 'SKIPPED empty file', input_filename
 
+    except IOError as e:
+        print '** ERROR:', e
+        print 'Failed on {}: '.format(input_filename)
+        hashname = input_filename + '.ht.failed'
+        print '...dumping hashtable to {}'.format(hashname)
+        ht.save(hashname)
+        sys.exit(1)
+
     if args.savehash:
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash
