@@ -3,7 +3,7 @@
 Produce the k-mer abundance distribution for the given file, without
 loading a prebuilt counting hash.
 
-% python scripts/abundance-dist-inmem.py <data> <histout>
+% python scripts/abundance-dist-single.py <data> <histout>
 
 Use '-h' for parameter help.
 """
@@ -17,7 +17,7 @@ from khmer.threading_args import add_threading_args
 
 def main():
     parser = build_construct_args(
-        "Output k-mer abundance distribution (inmem version).")
+        "Output k-mer abundance distribution (single file version).")
     add_threading_args(parser)
 
     parser.add_argument('datafile')
@@ -59,7 +59,6 @@ def main():
     print 'outputting to', histout
 
     config = khmer.get_config()
-    bufsz = config.get_reads_input_buffer_size()
     config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     # start loading
