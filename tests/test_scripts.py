@@ -37,6 +37,7 @@ def runscript(scriptname, args, in_directory=None):
 
         try:
             print 'running:', scriptname, 'in:', in_directory
+            print 'arguments', sysargs
             execfile(scriptname, { '__name__' : '__main__' })
             status = 0
         except:
@@ -112,9 +113,12 @@ def test_load_into_counting_fail():
     assert status == -1
     assert "ERROR:" in err
 
-def _make_counting(infilename, SIZE=1e7, N=2, K=20):
+def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = scriptpath('load-into-counting.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+
+    if not BIGCOUNT:
+        args.append('-b')
     
     outfile = utils.get_temp_filename('out.kh')
 
@@ -188,6 +192,24 @@ def test_filter_abund_3_fq_retained():
     seqs = set([ r.accuracy for r in screed.open(outfile) ])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
+
+def test_filter_abund_1_singlefile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 # test that the -V option does not trim sequences that are low abundance
 def test_filter_abund_4_retain_low_abund():
@@ -781,11 +803,79 @@ def test_abundance_dist():
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
 
+    print (status, out, err)
+
     fp = iter(open(outfile))
     line = fp.next().strip()
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
+
+def test_abundance_dist_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
+
+    script = scriptpath('abundance-dist.py')
+    args = ['-z', htfile, infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    print (status, out, err)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line
+
+def test_abundance_dist_single():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    print status
+    print out
+    print err
+    assert status == 0
+
+    print open(outfile).read()
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+def test_abundance_dist_single_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    print (status, out, err)
+    print open(outfile).read()
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line
 
 def test_do_partition():
     seqfile = utils.get_test_data('random-20-a.fa')
