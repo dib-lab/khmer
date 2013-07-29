@@ -99,7 +99,7 @@ strip-and-split-for-assembly, and normalize-by-median the pe and se
 files to C=5 (in that order).
 
 For low-coverage libraries (< 50x) do single-pass digital normalization:
-run normalize-by-median to C=5.
+run normalize-by-median to C=10.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
 reads into singletons using strip-and-split-for-assembly
