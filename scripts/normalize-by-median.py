@@ -90,61 +90,62 @@ def main():
     total = 0
     discarded = 0
 
-    for input_filename in filenames:
-        output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w')
+    try:
+        for input_filename in filenames:
+            output_name = os.path.basename(input_filename) + '.keep'
+            outfp = open(output_name, 'w')
 
-        n = -1
-        for n, batch in enumerate(batchwise(screed.open(
-                input_filename), batch_size)):
-            if n > 0 and n % 100000 == 0:
-                print '... kept', total - discarded, 'of', total, ', or', \
-                    int(100. - discarded / float(total) * 100.), '%'
-                print '... in file', input_filename
+            n = -1
+            for n, batch in enumerate(batchwise(screed.open(
+                    input_filename), batch_size)):
+                if n > 0 and n % 100000 == 0:
+                    print '... kept', total - discarded, 'of', total, ', or', \
+                        int(100. - discarded / float(total) * 100.), '%'
+                    print '... in file', input_filename
 
-                if report_fp:
-                    print>>report_fp, total, total - discarded, \
-                        1. - (discarded / float(total))
-                    report_fp.flush()
+                    if report_fp:
+                        print>>report_fp, total, total - discarded, \
+                            1. - (discarded / float(total))
+                        report_fp.flush()
 
-            total += batch_size
+                total += batch_size
 
-            # If in paired mode, check that the reads are properly interleaved
-            if args.paired:
-                if not validpair(batch[0], batch[1]):
-                    print >>sys.stderr, \
-                        'Error: Improperly interleaved pairs %s %s' \
-                        % (batch[0].name, batch[1].name)
-                    sys.exit(-1)
+                # If in paired mode, check that the reads are properly interleaved
+                if args.paired:
+                    if not validpair(batch[0], batch[1]):
+                        print >>sys.stderr, \
+                            'Error: Improperly interleaved pairs %s %s' \
+                            % (batch[0].name, batch[1].name)
+                        sys.exit(-1)
 
-            # Emit the batch of reads if any read passes the filter
-            # and all reads are longer than K
-            passed_filter = False
-            passed_length = True
-            for record in batch:
-                if len(record.sequence) < K:
-                    passed_length = False
-                    continue
-
-                seq = record.sequence.replace('N', 'A')
-                med, _, _ = ht.get_median_count(seq)
-
-                if med < DESIRED_COVERAGE:
-                    ht.consume(seq)
-                    passed_filter = True
-
-            # Emit records if any passed
-            if passed_length and passed_filter:
+                # Emit the batch of reads if any read passes the filter
+                # and all reads are longer than K
+                passed_filter = False
+                passed_length = True
                 for record in batch:
-                    if hasattr(record, 'accuracy'):
-                        outfp.write('@%s\n%s\n+\n%s\n' % (record.name,
-                                                          record.sequence,
-                                                          record.accuracy))
-                    else:
-                        outfp.write(
-                            '>%s\n%s\n' % (record.name, record.sequence))
-            else:
-                discarded += batch_size
+                    if len(record.sequence) < K:
+                        passed_length = False
+                        continue
+
+                    seq = record.sequence.replace('N', 'A')
+                    med, _, _ = ht.get_median_count(seq)
+
+                    if med < DESIRED_COVERAGE:
+                        ht.consume(seq)
+                        passed_filter = True
+
+                # Emit records if any passed
+                if passed_length and passed_filter:
+                    for record in batch:
+                        if hasattr(record, 'accuracy'):
+                            outfp.write('@%s\n%s\n+\n%s\n' % (record.name,
+                                                              record.sequence,
+                                                              record.accuracy))
+                        else:
+                            outfp.write(
+                                '>%s\n%s\n' % (record.name, record.sequence))
+                else:
+                    discarded += batch_size
 
         if -1 < n:
             print \
