@@ -843,9 +843,11 @@ def test_abundance_dist_single():
     script = scriptpath('abundance-dist-single.py')
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
     (status, out, err) = runscript(script, args, in_dir)
+    print status
+    print out
+    print err
     assert status == 0
 
-    print (status, out, err)
     print open(outfile).read()
 
     fp = iter(open(outfile))
