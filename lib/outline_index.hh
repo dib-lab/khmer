@@ -5,10 +5,11 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <algorithm>		//used for binary search
-#include <sstream>		//used for file name string stream
-#include <string>               //used for files names
-#include <stdlib.h>             //used for c_str() function
+#include <algorithm>		// used for binary search
+#include <sstream>		// used for file name string stream
+#include <string>               // used for files names
+#include <stdlib.h>             // used for c_str() function
+#include <iterator>     	// std::distance
 #include "hashtable.hh"
 #define maxNameLength 80
 #define maxSeqLength 200
@@ -133,22 +134,21 @@ void ReadFromDiskHeader(std::fstream& readBinFile,long* numReads);
 void WriteToDiskRead(std::fstream& readBinFile,readNode* read,long pageNum);
 void ReadFromDiskRead(std::fstream& readBinFile,readNode* read,long pageNum);
 //----------- tagSet IO operation ------------
-void load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector, unsigned int& k);
+void load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector, unsigned int& k,unsigned int& _tag_density );
 //---------- index ----------
 void build_index(std::string readsBinFileName,std::vector<khmer::HashIntoType>& sortedKhmerVector,unsigned int  save_ksize );
 void load_index_header(std::string infilename,unsigned int& num_tagged_khmer,std::vector<khmer::HashIntoType>& sorted_khmer,std::vector<unsigned int>& accumulated_sizes);
 //--------- exact query -----------
+void extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer);
 void retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer,std::vector<long>& reads_ids );
-
 void retrieve_read_by_id(std::string infilename, std::vector<long>& reads_ids, std::vector<std::string>& reads);
-
+unsigned int sim_measure(std::string seq1, std::string seq2, unsigned int save_ksize);
 void exactQuery(std::string readsBinFileName,std::string queryFileName);
 //------ searching Procedures ------
 void exhaustive_search(std::string readsBinFileName,std::string queryFileName);
 void approximate_search(std::string readsBinFileName,std::string queryFileName);
 //------ sampling procedure --------
 void samplefrombinary();
-
 
 };
 

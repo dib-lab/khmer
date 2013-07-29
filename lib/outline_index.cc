@@ -66,24 +66,25 @@ void khmer::ReadFromDiskRead(std::fstream& readsBinFile,readNode* read,long page
 }
 
 //------ tagSet IO operations ---------
-void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int& save_ksize)
+void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int& save_ksize, unsigned int& _tag_density)
 {
     //std::cout<<"in loading_tagset...\n";
-    //std::cout<<"the file name sents is:"<<infilename<<std::endl;
+    //std::cout<<"the file name sent is:"<<infilename<<std::endl;
     std::ifstream infile(infilename.c_str(), std::ios::binary);
     assert(infile.is_open());
 
     unsigned char version, ht_type;
     //unsigned int save_ksize = 0;
     unsigned int tagset_size = 0;
-    unsigned int _tag_density = 0;
+    //unsigned int _tag_density = 0;
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     infile.read((char *) &tagset_size, sizeof(tagset_size));
     infile.read((char *) &_tag_density, sizeof(_tag_density));
-    //std::cout<<"\nsave_ksize:"<<save_ksize<<" tagset_size:"<<tagset_size<<std::endl;
-
+    //std::cout<<"\nsave_ksize:"<<save_ksize<<" tagset_size:"<<tagset_size<<" _tag_density:"<<_tag_density<<std::endl;
+    //save_ksize2=save_ksize; _tag_density2=_tag_density;
+    //std::cout<<"save_ksize2:"<<save_ksize2<<" _tag_density2:"<<_tag_density2<<std::endl;
     khmer::HashIntoType * buf = new khmer::HashIntoType[tagset_size];
     infile.read((char *) buf, sizeof(khmer::HashIntoType) * tagset_size);
 
@@ -125,12 +126,12 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 
     readNode readBin;
 
-    int seqLen;
-    std::string  seq;
+    int seqLen=0;
+    std::string  seq="";
     std::string _seq="";
-    for(int i=0; i<seqLen; i++) {
+    /*for(int i=0; i<seqLen; i++) {
         _seq+=seq[i];
-    }
+    }*/
     bool read_is_tagged;		//test if a read is successfully tagged
     //unsigned long error_cnt=0;	//keep track of the number of reads not tagged
     for (long i=0; i<numReads; i++) {
@@ -148,7 +149,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
         khmer::KMerIterator kmers(_seq.c_str(), save_ksize);
         khmer::HashIntoType kmer;
         std::vector<khmer::HashIntoType>::iterator low;
-	//read_is_tagged=false;
+	read_is_tagged=false;
         while(!kmers.done()) {
             kmer = kmers.next();
             low=std::lower_bound (sortedKhmerVector.begin(), sortedKhmerVector.end(), kmer);
@@ -158,10 +159,12 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
 		//std::cout<<"index:"<<index<<" i+1:"<<i+1<<std::endl;
                 ptr[index]->push_back(i+1);
 		read_is_tagged=true;// std::cout<<"read ID:"<<i+1<<"is tagged now\n";
+		//std::cout<<_seq<<std::endl;
             }
         } //while
 	if (read_is_tagged==false){ 
-		std::cout<<"ERROR read is not tagged\n";
+		std::cout<<"ERROR read is not tagged with id:"<<i+1<<"\n";
+		//std::cout<<_seq<<std::endl;
 		//error_cnt++;
 	}
 
@@ -267,6 +270,38 @@ void khmer::load_index_header(std::string infilename,unsigned int& num_tagged_kh
 }
 
 //------ query -------
+//given a query sequnce, find all its tagged k-mers
+void khmer::extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer)
+{
+    std::cout<<"in extract_tags_from_seq...\n";
+    // laod the index header
+    unsigned int num_tagged_khmer=0;
+    std::vector<khmer::HashIntoType> sorted_khmer;
+    
+    // open the index file to load the sorted tags
+    std::ifstream infile(infilename.c_str(), std::ios::binary);
+    assert(infile.is_open());
+    infile.read((char*) &num_tagged_khmer,sizeof(unsigned int));
+    HashIntoType * buf1 = new HashIntoType[num_tagged_khmer];
+    infile.read((char *) buf1, sizeof(HashIntoType) * num_tagged_khmer);
+    for (unsigned int i = 0; i < num_tagged_khmer; i++) {
+        sorted_khmer.push_back(buf1[i]);
+    }
+    //extract the k-mers from read or seq  and check if any is tagged one
+    khmer::KMerIterator kmers(seq.c_str(), save_ksize);
+    khmer::HashIntoType kmer;
+    std::vector<khmer::HashIntoType>::iterator low;
+    while(!kmers.done()) {
+            kmer = kmers.next();
+            low=std::lower_bound (sorted_khmer.begin(), sorted_khmer.end(), kmer);
+            if (low != sorted_khmer.end() && *low == kmer) {
+                std::cout<<"a tag is found \n";
+		qeuery_tagged_khmer.push_back(kmer);
+            }
+        } //while
+
+    infile.close();
+}
 //given the index file and set of tagged kmers, retreieve the reads ids contanning this tagged khmers
 void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer,std::vector<long>& reads_ids )
 {
@@ -361,7 +396,42 @@ void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>&
     }
     readBinFile.close();
 }
+unsigned int khmer::sim_measure(std::string seq1, std::string seq2, unsigned int save_ksize){
+    std::cout<<"in sim_measure\n";
+    unsigned int score=0;
+	
+    //first extract all unique k-mers from seq1 and sort them
+    std::set<khmer::HashIntoType> sorted_khmer;
+    khmer::KMerIterator kmers(seq1.c_str(), save_ksize);
+    khmer::HashIntoType kmer;
+    while(!kmers.done()) {
+            kmer = kmers.next();
+	    sorted_khmer.insert(kmer);
+   }
+   std::cout<<"the num of u-k-mer in seq1 is:"<<sorted_khmer.size()<<std::endl;
+    //allocate a bool ary to check the shared u-k-mers
+    bool ary[sorted_khmer.size()];
+    for (unsigned int i=0; i<sorted_khmer.size(); i++) ary[i]=false;
+    //second extract all the kmers from seq2 and see if any is shared 
+    khmer::KMerIterator kmers2(seq2.c_str(), save_ksize);
+    khmer::HashIntoType kmer2;
+    std::set<khmer::HashIntoType>::iterator it;
+    std::set<khmer::HashIntoType>::iterator low;
+   
+    while(!kmers2.done()) {
+            kmer2 = kmers2.next();
+ 	    it=sorted_khmer.find(kmer2);
+	    if (it!=sorted_khmer.end()){
+		//std::cout<<"shared h-mer is found\n";
+		//std::cout << "The distance is: " << distance(sorted_khmer.begin(),it) << '\n';
+		ary[ distance(sorted_khmer.begin(),it) ]=true;
+		}
+        } //while
+    for (unsigned int i=0; i<sorted_khmer.size();i++)
+	if (ary[i]==true)	score++;
 
+    return score;
+}
 //------ exact query ------
 /*void khmer::exactQuery(std::string readsBinFileName,std::string queryFileName){
   std::cout<<"in Load_Queries...\n";
@@ -448,16 +518,15 @@ th substrings
    long location=0; readNode readBin; 
   if (full_length){
 	std::cout<<"in smapling the entire reads mode\n";
-	unsigned int k; k=rand()%100; std::cout<<"k:"<<k<<std::endl; //skipping paramater
+	unsigned int k; k=rand()%100;
+	std::cout<<"enter the skipping paramter k value:"; std::cin>>k; std::cout<<std::endl;//skipping paramater
 	for (unsigned int i=0; i<num_q; i++){
 		location+=(long)((i+k)%numReads)+1;
 		std::cout<<location<<std::endl;
 		readBin.nullfy();
                 ReadFromDiskRead(readBinFile,&readBin,location);
                 readBin.printSeq(queryFile); queryFile<<std::endl;
-	
 	}
-
 
 	}
   if (!full_length){
