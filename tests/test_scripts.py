@@ -323,10 +323,11 @@ def test_normalize_by_median_2():
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
 
-    seqs = [ r.sequence for r in screed.open(outfile) ]
+    seqs = sorted([ r.sequence for r in screed.open(outfile) ])
     assert len(seqs) == 2, seqs
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-    assert seqs[1] == 'GGTTGACGGGGCTCAGGG', seqs
+    
+    assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
+    assert seqs[1].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 def test_normalize_by_median_paired():
     CUTOFF='1'
@@ -339,6 +340,8 @@ def test_normalize_by_median_paired():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     (status, out, err) = runscript(script, args, in_dir)
+    print out
+    print err
     assert status == 0
 
     outfile = infile + '.keep'
@@ -366,6 +369,22 @@ def test_normalize_by_median_empty():
     CUTOFF='1'
 
     infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+def test_normalize_by_median_empty_fq():
+    CUTOFF='1'
+
+    infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-empty.fa'), infile)
