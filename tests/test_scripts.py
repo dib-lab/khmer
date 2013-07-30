@@ -354,13 +354,32 @@ def test_normalize_by_median_impaired():
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-
+    
     shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status != 0
+
+def test_normalize_by_median_force():
+    CUTOFF='1'
+    
+    corrupt_infile = utils.get_temp_filename('test-corrupt.fq')
+    good_infile = utils.get_temp_filename('test-good.fq')
+    
+    in_dir = os.path.dirname(good_infile)
+    
+    shutil.copyfile(utils.get_test_data('test-error-reads.fq'), corrupt_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), corrupt_infile)
+    
+    script = scriptpath('normalize-by-median.py')
+    args = ['-f', '-C', CUTOFF, '-k', '17', corrupt_infile, good_infile]
+    
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+    assert os.path.exists(corrupt_infile + '.ht.failed')
+    assert '*** Skipping' in err
 
 def test_normalize_by_median_empty():
     CUTOFF='1'
