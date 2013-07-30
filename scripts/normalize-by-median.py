@@ -174,7 +174,7 @@ def main():
             ht.save(hashname)
             if not force:
                 print >>sys.stderr, '** Exiting!'
-                sys.exit(1)
+                sys.exit(-1)
             else:
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
