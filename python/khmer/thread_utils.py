@@ -185,9 +185,13 @@ class ThreadedWriter(object):
     """
     def __init__(self, outfp, fastq=None):
         self.writer = SingleWriter(outfp, fastq)
-        self._exit = False
+        
         self._thread = None
         self.reporter = BasicReporter()
+        
+        self._exit = False
+        self._abort = False
+        self.abort_lock = threading.Lock()
 
     def start(self):
         """Start the writer thread, run self.run()."""
@@ -227,7 +231,32 @@ class ThreadedWriter(object):
         """
         self._exit = True
 
+    def abort(self):
+        """Set the abort flag."""
+
+        self._abort = True
+
     def process_fn(self, rparser, filter_fn):
+        """\
+        Call _process_fn (which does the real work) and trap any errors.
+        """
+        import traceback
+        try:
+            return self._process_fn(rparser, filter_fn)
+        except:
+            # lock so that we only get one traceback message
+            with self.abort_lock:
+                if self._abort:
+                    return
+
+                self.abort()
+                
+            print >>sys.stderr, "** traceback caught in process_fn - exiting"
+            traceback.print_exc()
+
+            # now, exit thread safely.
+
+    def _process_fn(self, rparser, filter_fn):
         """\
         Handle single reads one at a time.
 
@@ -260,6 +289,9 @@ class ThreadedWriter(object):
                 else:
                     self.writer.save(read.name, seq)
 
+            if self._abort:
+                break
+
             # report every so often
             if n_read % reporter.report_every == 0:
                 reporter.report(n_read, bp_read, n_saved, bp_saved)
@@ -288,7 +320,7 @@ class PairThreadedWriter(ThreadedWriter):
         super(PairThreadedWriter, self).__init__(outfp, fastq)
         self.writer = PairWriter(outfp, fastq)
 
-    def process_fn(self, rparser, filter_fn):
+    def _process_fn(self, rparser, filter_fn):
         """Apply filter function; write out sequences appropriately.
 
         Note: run in non-writer threads.
@@ -319,6 +351,9 @@ class PairThreadedWriter(ThreadedWriter):
                 else:
                     self.writer.save((r1.name, seq1),
                                      (r2.name, seq2))
+
+            if self._abort:
+                break
 
             # report on read consumption
             if n_read % reporter.report_every == 0:
