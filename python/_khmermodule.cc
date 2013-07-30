@@ -642,7 +642,7 @@ _ReadParser_iternext( PyObject * self )
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
-    if (!stop_iteration)
+    if (!stop_iteration) {
 	try
 	{ parser->imprint_next_read( *the_read_PTR ); }
 	catch (InvalidReadFileFormat &exc)
@@ -650,6 +650,11 @@ _ReadParser_iternext( PyObject * self )
 	    invalid_file_format = true;
 	    strncpy( exc_message, exc.what( ), CHAR_MAX );
 	}
+	catch (NoMoreReadsAvailable &exc)
+	  {
+	    ;
+	  }
+    }
     Py_END_ALLOW_THREADS
 
     // Note: Can simply return NULL instead of setting the StopIteration 

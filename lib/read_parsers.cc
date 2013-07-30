@@ -1499,15 +1499,18 @@ _parse_read( ParserState &state, Read &the_read )
     );
 #endif
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('>' != line[ 0 ])
+
+    if (line.length()) {
+      if ('>' != line[ 0 ]) {
 	throw InvalidFASTAFileFormat(
 	    "invalid sequence name indicator", line.c_str( )
-	);
-    the_read.name = line.substr( 1 );
+				     );
+      }
+      the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
-    while (!is_complete( ))
-    {
+      while (!is_complete( ))
+	{
 	_copy_line( state );
 
 #ifdef TRACE_DATA
@@ -1523,6 +1526,7 @@ _parse_read( ParserState &state, Read &the_read )
 	// TODO? Uppercase and validate entire sequence here.
 	the_read.sequence += line;
 	the_read.bytes_consumed += (line.length( ) + 1);
+      }
     }
 
 #ifdef TRACE_MEMCOPIES
