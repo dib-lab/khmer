@@ -106,6 +106,12 @@ def main():
                         default='')
     parser.add_argument('-R', '--report-to-file', dest='report_file',
                         type=argparse.FileType('w'))
+    parser.add_argument('-f', '--force-processing', dest='force',
+                        help='continue on next file if read errors are \
+                         encountered', action='store_true')
+    parser.add_argument('-F', '--save-frequency', dest='save_frequency',
+                        type=int, help='save hashtable every F files',
+                        default=-1)
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
@@ -135,7 +141,13 @@ def main():
     DESIRED_COVERAGE = args.cutoff
     report_fp = args.report_file
     filenames = args.input_filenames
-
+    force=args.force
+    save_frequency = args.save_frequency
+    
+    # list to save error files along with throwing exceptions
+    if force == True:
+        corrupt_files = []
+    
     # In paired mode we read two records at a time
     batch_size = 1
     if args.paired:
@@ -151,7 +163,7 @@ def main():
     total = 0
     discarded = 0
 
-    for input_filename in filenames:
+    for n, input_filename in enumerate(filenames):
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
 
@@ -159,12 +171,29 @@ def main():
             normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE)
 
         except IOError as e:
-            print '** ERROR:', e
-            print 'Failed on {}: '.format(input_filename)
+            print >>sys.stderr, '** ERROR:', e
+            print >>sys.stderr, '** Failed on {}: '.format(input_filename)
             hashname = input_filename + '.ht.failed'
-            print '...dumping hashtable to {}'.format(hashname)
+            print >>sys.stderr, '** ...dumping hashtable to {}'.format(hashname)
             ht.save(hashname)
-            sys.exit(1)
+            if not force:
+                print >>sys.stderr, '** Exiting!'
+                sys.exit(1)
+            else:
+                print >>sys.stderr, '*** Skipping error file, moving on...'
+                corrupt_files.append(input_filename)
+                pass
+        
+        if save_frequency > 0 and n > 0 and n % save_frequency == 0:
+            print 'Backup: Saving hashfile through', input_filename
+            if args.savehash:
+                hashname = args.savehash
+                print '...saving to', hashname
+            else:
+                hashname = 'backup.ht'
+                print 'Nothing given for savehash, saving to', hashname
+            ht.save(hashname)
+            
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
