@@ -16,7 +16,7 @@ import khmer
 from khmer.counting_args import build_counting_multifile_args
 from khmer.threading_args import add_threading_args
 from khmer import thread_utils
-from khmer.thread_utils import ThreadedWriter
+from khmer.thread_utils import ThreadedProcessor
 
 ###
 
@@ -40,9 +40,7 @@ def main():
 
     counting_ht = args.input_table
     infiles = args.input_filenames
-    n_threads = int(args.n_threads)
-    if n_threads == 1:
-        n_threads = 2
+    n_threads = max(int(args.n_threads), 2) # one reader, one writer
 
     print 'file with ht: %s' % counting_ht
     print 'n_threads:', n_threads
@@ -86,7 +84,7 @@ def main():
         outfp = open(outfile, 'w')
 
         # create and start a threaded writer
-        tw = ThreadedWriter(outfp).start()
+        tw = ThreadedProcessor(outfp).start()
 
         # create multithreaded readparser
         rparser = khmer.ReadParser(filename, n_threads - 1)

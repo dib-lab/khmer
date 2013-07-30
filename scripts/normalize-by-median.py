@@ -17,7 +17,8 @@ import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 from khmer.threading_args import add_threading_args
 from khmer import thread_utils
-from khmer.thread_utils import ThreadedWriter, PairThreadedWriter
+from khmer.thread_utils import ThreadedProcessor, PairThreadedProcessor, \
+                               FilterReporter
 
 DEFAULT_DESIRED_COVERAGE = 10
 
@@ -61,9 +62,10 @@ def main():
     DESIRED_COVERAGE = args.cutoff
     report_fp = args.report_file
     filenames = args.input_filenames
-    n_threads = int(args.n_threads)
-    if n_threads == 1:
-        n_threads = 2
+    n_threads = max(int(args.n_threads), 2) # min one reader, one writer.
+
+    config = khmer.get_config()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     if args.loadhash:
         print 'loading hashtable from', args.loadhash
@@ -71,9 +73,6 @@ def main():
     else:
         print 'making hashtable'
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
-
-    total = 0
-    discarded = 0
 
     def single_filter_fn(name, seq):
         if len(seq) < K:
@@ -87,8 +86,7 @@ def main():
             return seq
 
     def pair_filter_fn(n1, s1, n2, s2):
-        if single_filter_fn(n1, s1) or \
-           single_filter_fn(n2, s2):
+        if single_filter_fn(n1, s1) or single_filter_fn(n2, s2):
             return s1, s2
         else:
             return None, None
@@ -98,13 +96,15 @@ def main():
         outfp = open(output_name, 'w')
 
         if args.paired:
-            writer_class = PairThreadedWriter
+            processor_class = PairThreadedProcessor
             filter_fn = pair_filter_fn
         else:
-            writer_class = ThreadedWriter
+            processor_class = ThreadedProcessor
             filter_fn = single_filter_fn
 
-        tw = writer_class(outfp).start()
+        reporter = FilterReporter()
+
+        tw = processor_class(outfp, reporter=reporter).start()
         rparser = khmer.ReadParser(input_filename, n_threads - 1)
         threads = thread_utils.start_threads(n_threads - 1,
                                              target=tw.process_fn,

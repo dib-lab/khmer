@@ -40,6 +40,7 @@ and pretty much everything else is allowed.
 CTB 05/2012.
 
 TODO for threadwrite --
+ - add -R reporting
  - benchmarking
  - testing
  - CTRL-C/interrupt

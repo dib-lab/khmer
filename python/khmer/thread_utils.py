@@ -33,28 +33,6 @@ def is_pair(r1, r2):
 
     return (a == b)
 
-class FakeQueue(object):
-    def __init__(self, size):
-        self.q = []
-
-    def put(self, item):
-        self.q.append(item)
-
-    def empty(self):
-        return not len(self.q)
-
-    def get(self, raise_on_empty, wait):
-        if self.q:
-            return self.q.pop()
-        time.sleep(wait)
-        if self.q:
-            return self.q.pop()
-            
-        raise Queue.Empty
-
-    def pop(self):
-        return self.q.pop()
-
 def start_threads(n_threads, target, args):
     "Start up n_threads, running the given target with the given args."
     threads = []
@@ -167,11 +145,31 @@ class BasicReporter(object):
               (self.n_read, round(self.bp_read/1000.),
                self.n_saved, round(self.bp_saved/1000.))
 
-class ThreadedWriter(object):
+class FilterReporter(BasicReporter):
+    def output(self):
+        diff_seq = self.n_read - self.n_saved
+        diff_bp = self.bp_read - self.bp_saved
+
+        if self.n_read == 0 or self.bp_read == 0:
+            return
+        
+        print "... read %d sequences (%d kb); wrote %d sequences (%d kb)" %\
+              (self.n_read, round(self.bp_read/1000.),
+               self.n_saved, round(self.bp_saved/1000.))
+
+        percent_seq = diff_seq / float(self.n_read) * 100.
+        kb = round(diff_bp / 1000, 1)
+        percent_bp = diff_bp / float(self.bp_read) * 100.
+        
+        print "... DISCARDED %d sequences (%%%.1f)" % (diff_seq, percent_seq),
+        print "/ %d kb (%%%.1f)" % (kb, percent_bp)
+        print '----'
+
+class ThreadedProcessor(object):
     """A queue-based threadsafe FASTA/FASTQ output writer.
 
     Public API:
-       x = ThreadedWriter(outfp) - write records to outfp, sniffing format
+       x = ThreadedWriter(outfp) - write records to fp, sniffing format
 
        x.start()             - start self up in thread.
        x.join(other_threads) - wait on other threads, then flush & exit
@@ -183,11 +181,16 @@ class ThreadedWriter(object):
        ...
        x.join(other_threads)
     """
-    def __init__(self, outfp, fastq=None):
+    QUEUEWAIT = 0.0
+    
+    def __init__(self, outfp, fastq=None, reporter=None):
         self.writer = SingleWriter(outfp, fastq)
         
         self._thread = None
-        self.reporter = BasicReporter()
+
+        self.reporter = reporter
+        if reporter is None:
+            self.reporter = BasicReporter()
         
         self._exit = False
         self._abort = False
@@ -206,12 +209,21 @@ class ThreadedWriter(object):
 
         Note: run by controlling process.
         """
-        for t in other_threads:
-            t.join()
-            
-        self.exit()
-        self._thread.join()
+        try:
+            for t in other_threads:
+                print '** GOT ONE; waiting on', t
+                t.join()
+                
+            self.exit()
+            self._thread.join()
+        except KeyboardInterrupt:       # this does not seem to work. CTB
+            self.abort()
+        finally:
+            self.reporter.report(0, 0, 0, 0, force=True)
 
+        if self._abort:
+            raise Exception("ThreadedProcessor aborted")
+            
     def run(self):
         """Run until _exit flag is set & queue is empty.
 
@@ -220,8 +232,8 @@ class ThreadedWriter(object):
         while (not self._exit) or (not self.writer.empty()):
             try:
                 self.writer.flush()
-            except (IndexError, Queue.Empty):
-                time.sleep(0.001)       # @CTB configurable?
+            except IndexError:
+                time.sleep(self.QUEUEWAIT)
                 continue
 
     def exit(self):
@@ -298,26 +310,29 @@ class ThreadedWriter(object):
                 n_read = n_saved = bp_read = bp_saved = 0
 
         # flush reporting
-        reporter.report(n_read, bp_read, n_saved, bp_saved, force=True)
+        reporter.report(n_read, bp_read, n_saved, bp_saved)
 
-class PairThreadedWriter(ThreadedWriter):
+class PairThreadedProcessor(ThreadedProcessor):
     """A queue-based threadsafe FASTA/FASTQ output writer.
 
     Public API:
-       x = PairThreadedWriter(outfp) - write records to outfp, sniffing format
+       x = PairThreadedProcessor(outfp) - write records to fp, sniffing format
 
        x.start()             - start self up in thread.
        x.join(other_threads) - wait on other threads, then flush & exit
 
     Typical usage:
-       x = PairThreadedWriter(outfp).start()
+       x = PairThreadedProcessor(outfp).start()
+       ...
+       (call to process_fn)
        ...
        x.join(other_threads)
     """
     ###
 
-    def __init__(self, outfp, fastq=None):
-        super(PairThreadedWriter, self).__init__(outfp, fastq)
+    def __init__(self, outfp, fastq=None, reporter=None):
+        super(PairThreadedProcessor, self).__init__(outfp, fastq,
+                                                    reporter=reporter)
         self.writer = PairWriter(outfp, fastq)
 
     def _process_fn(self, rparser, filter_fn):
@@ -328,8 +343,10 @@ class PairThreadedWriter(ThreadedWriter):
         # note, all local variables => threadsafe
         n_read = n_saved = bp_read = bp_saved = 0
         reporter = self.reporter
-        
+
+        print 'entering'
         for r1, r2 in rparser.iter_read_pairs():
+            print 'XXX', n_read
             # track sequences & bp read in
             n_read += 2
             bp_read += len(r1.sequence) + len(r2.sequence)
@@ -361,7 +378,7 @@ class PairThreadedWriter(ThreadedWriter):
                 n_read = n_saved = bp_read = bp_saved = 0
 
         # flush report
-        reporter.report(n_read, bp_read, n_saved, bp_saved, force=True)
+        reporter.report(n_read, bp_read, n_saved, bp_saved)
 
 class ThreadedSequenceProcessor(object):
     """

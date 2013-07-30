@@ -18,12 +18,9 @@ import khmer
 
 from khmer.threading_args import add_threading_args
 from khmer import thread_utils
-from khmer.thread_utils import ThreadedWriter, PairThreadedWriter
+from khmer.thread_utils import ThreadedProcessor, PairThreadedProcessor
 
 ###
-
-DEFAULT_NORMALIZE_LIMIT = 20
-DEFAULT_CUTOFF = 2
 
 def main():
     parser = argparse.ArgumentParser()
@@ -35,9 +32,7 @@ def main():
     args = parser.parse_args()
 
     infiles = args.input_filenames
-    n_threads = int(args.n_threads)
-    if n_threads == 1:
-        n_threads = 2
+    n_threads = max(int(args.n_threads), 2)
 
     if args.do_threading:
         print 'n_threads:', n_threads
@@ -66,10 +61,10 @@ def main():
 
         # create and start a threaded writer
         if args.paired:
-            tw = PairThreadedWriter(outfp).start()
+            tw = PairThreadedProcessor(outfp).start()
             ffn = pair_filter_fn
         else:
-            tw = ThreadedWriter(outfp).start()
+            tw = ThreadedProcessor(outfp).start()
             ffn = filter_fn
 
         threads = []
@@ -87,7 +82,6 @@ def main():
                         
         # wait for threads to finish & flush out any remaining records.
         tw.join(threads)
-                    
 
 if __name__ == '__main__':
     main()
