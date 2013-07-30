@@ -53,10 +53,6 @@ def normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE):
             if not validpair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs %s %s' \
                                % (batch[0].name, batch[1].name))
-                #print >>sys.stderr, \
-                #    'Error: Improperly interleaved pairs %s %s' \
-                #    % (batch[0].name, batch[1].name)
-                #sys.exit(-1)
 
         # Emit the batch of reads if any read passes the filter
         # and all reads are longer than K
@@ -203,7 +199,12 @@ def main():
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
     print 'fp rate estimated to be %1.3f' % fp_rate
-
+    
+    if force and len(corrupt_files) > 0:
+        print >>sys.stderr, "** WARNING: Finished with errors!"
+        print >>sys.stderr, "** IOErrors occurred in the following files:"
+        print >>sys.stderr, "\t", " ".join(corrupt_files)
+    
     if fp_rate > 0.20:
         print >>sys.stderr, "**"
         print >>sys.stderr, "** ERROR: the counting hash is too small for"
