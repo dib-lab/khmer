@@ -40,8 +40,6 @@ and pretty much everything else is allowed.
 CTB 05/2012.
 
 TODO for threadwrite --
- - reporting on reading in
- - reporting on writing out
  - error handling
  - benchmarking
  - testing
