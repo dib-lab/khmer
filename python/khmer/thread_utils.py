@@ -5,6 +5,7 @@ import threading
 import Queue
 import sys
 import screed
+import time
 
 DEFAULT_WORKER_THREADS = 8
 DEFAULT_GROUPSIZE = 100
@@ -31,6 +32,25 @@ def is_pair(r1, r2):
     b = r2['name'].split('/')[0]
 
     return (a == b)
+
+class FakeQueue(object):
+    def __init__(self, size):
+        self.q = []
+
+    def put(self, item):
+        self.q.append(item)
+
+    def empty(self):
+        return not len(self.q)
+
+    def get(self, raise_on_empty, wait):
+        if self.q:
+            return self.q.pop()
+        time.sleep(wait)
+        if self.q:
+            return self.q.pop()
+            
+        raise Queue.Empty
 
 def start_threads(n_threads, target, args):
     "Start up n_threads, running the given target with the given args."
@@ -60,12 +80,21 @@ class ThreadedWriter(object):
 
     def __init__(self, outfp, fastq=None):
         self.fp = outfp
-        self.outq = Queue.Queue(self.QUEUESIZE)
+        #self.outq = Queue.Queue(self.QUEUESIZE)
+        self.outq = FakeQueue(self.QUEUESIZE)
         self.fastq = fastq              # None => sniff; else T(fastq) / F(fa)
         self._exit = False
         self._thread = None
+        self.report_every = 10000
+        self.report_lock = threading.Lock()
+        self.n_read = self.n_saved = self.bp_read = self.bp_saved = 0
+        self.last_report_n_read = 0
 
     def save_record(self, record):
+        """Queue up the given record for output.
+
+        Note: run in non-writer threads.
+        """
         if self.fastq is None:
             if record.accuracy:
                 self.fastq = True
@@ -78,6 +107,10 @@ class ThreadedWriter(object):
             self.save(record.name, record.sequence)
 
     def save(self, name, sequence, quality=None):
+        """Queue up the given sequence for output.
+
+        Note: run in non-writer threads.
+        """
         if self.fastq is None:
             if quality:
                 self.fastq = True
@@ -92,13 +125,18 @@ class ThreadedWriter(object):
     ###
 
     def start(self):
-        "Start self in a thread."
+        """Start the writer thread, run self.run()."""
+        if self._thread:
+            raise Exception("writer thread already running!")
         self._thread = threading.Thread(target=self.run)
         self._thread.start()
         return self
 
     def join(self, other_threads):
-        "Wait until reader threads are finished, then flush & exit."
+        """Wait until reader threads are finished, then flush & exit.
+
+        Note: run in writer thread.
+        """
         for t in other_threads:
             t.join()
             
@@ -106,28 +144,41 @@ class ThreadedWriter(object):
         self._thread.join()
 
     def run(self):
-        "run until _exit flag is set & queue is empty."
+        """Run until _exit flag is set & queue is empty.
+
+        Note: run in writer thread.
+        """
         while (not self._exit) or (not self.outq.empty()):
             self._looper()
 
     def exit(self):
-        "set the exit flag - no more 'save's will be called."
+        """Set the exit flag - no more 'save's will be called.
+
+        Can be called from any thread.
+        """
         self._exit = True
 
     ## internal functions
 
     def _looper(self):
-        "loop until the queue is empty and a timeout is received."
+        """Loop until the queue is empty and a timeout is received.
+
+        Note: run in writer thread.
+        """
         try:
             while 1:
                 # wait for the queue to stay empty and then raise Empty
-                item = self.outq.get(True, 0.01)
+                item = self.outq.get(True, 0.0001)
                 self._write(item)
         except Queue.Empty:
             return
 
     def _write(self, item):
-        "write out a single record in appropriate FASTA/FASTQ format."
+        """Write out a single record in appropriate FASTA/FASTQ format.
+
+        Note: run in writer thread.
+        """
+        
         if self.fastq:
             self.fp.write('@%s\n%s\n+\n%s\n' % (item[0], item[1], item[2]))
         else:
@@ -140,15 +191,54 @@ class ThreadedWriter(object):
         If 'filter_fn' returns anything, it's assumed to be sequence to be
         saved; if quality score is present, it's trimmed appropriately and
         then sent to the queue.
+
+        Note: run in non-writer threads.
         """
+        # note, all local variables => threadsafe
+        n_read = 0
+        n_saved = 0
+        bp_read = 0
+        bp_saved = 0
+        
         for read in rparser:
+            n_read += 1
+            bp_read += len(read.sequence)
+            
             seq = filter_fn(read.name, read.sequence)
             if seq:                     # save?
+                n_saved += 1
+                bp_saved += len(seq)
+                
                 if read.accuracy:
                     accuracy = read.accuracy[:len(seq)]
                     self.save(read.name, seq, accuracy)
                 else:
                     self.save(read.name, seq)
+
+            if n_read % self.report_every == 0:
+                self.report(n_read, bp_read, n_saved, bp_saved)
+                n_read = n_saved = bp_read = bp_saved = 0
+                
+        self.report(n_read, bp_read, n_saved, bp_saved, force=True)
+
+    def report(self, n_read, bp_read, n_saved, bp_saved, force=False):
+        with self.report_lock:
+            since = self.n_read - self.last_report_n_read
+            
+            self.n_read += n_read
+            self.bp_read += bp_read
+            self.n_saved += n_saved
+            self.bp_saved += bp_saved
+
+            if since + n_read >= self.report_every or force: # report!
+                n = self.n_read
+                self.last_report_n_read = n
+
+                print \
+                 "... read %d sequences (%d kb); wrote %d sequences (%d kb)" %\
+                     (self.n_read, round(self.bp_read/1000.),
+                      self.n_saved, round(self.bp_saved/1000.))
+            
 
 class PairThreadedWriter(ThreadedWriter):
     """A queue-based threadsafe FASTA/FASTQ output writer.
@@ -167,6 +257,10 @@ class PairThreadedWriter(ThreadedWriter):
     QUEUESIZE = 1000                    # what should this be? @CTB
 
     def save(self, a, b):
+        """Add a pair of sequences to be output.
+
+        Note: run in non-writer threads.
+        """
         if self.fastq is None:
             if len(a) == 3:
                 self.fastq = True
@@ -182,7 +276,10 @@ class PairThreadedWriter(ThreadedWriter):
 
 
     def _write(self, item):
-        "write out a pair of records in appropriate FASTA/FASTQ format."
+        """Write out a pair of records in appropriate FASTA/FASTQ format.
+
+        Note: run in non-writer threads.
+        """
 
         a, b = item
         if self.fastq:
@@ -193,10 +290,26 @@ class PairThreadedWriter(ThreadedWriter):
             self.fp.write('>%s\n%s\n' % (b[0], b[1]))
 
     def process_fn(self, rparser, filter_fn):
+        """Apply filter function; write out sequences appropriately.
+
+        Note: run in non-writer threads.
+        """
+        # note, all local variables => threadsafe
+        n_read = 0
+        n_saved = 0
+        bp_read = 0
+        bp_saved = 0
+        
         for r1, r2 in rparser.iter_read_pairs():
+            n_read += 2
+            bp_read += len(r1.sequence) + len(r2.sequence)
+            
             seq1, seq2 = filter_fn(r1.name, r1.sequence,
                                    r2.name, r2.sequence)
             if seq1 and seq2:
+                n_saved += 2
+                bp_saved += len(seq1) + len(seq2)
+                
                 if r1.accuracy:
                     accuracy1 = r1.accuracy[:len(seq1)]
                     accuracy2 = r2.accuracy[:len(seq2)]
@@ -205,6 +318,12 @@ class PairThreadedWriter(ThreadedWriter):
                 else:
                     self.save((r1.name, seq1),
                               (r2.name, seq2))
+
+            if n_read % self.report_every == 0:
+                self.report(n_read, bp_read, n_saved, bp_saved)
+                n_read = n_saved = bp_read = bp_saved = 0
+                
+        self.report(n_read, bp_read, n_saved, bp_saved, force=True)
 
 class ThreadedSequenceProcessor(object):
     """
