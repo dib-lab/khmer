@@ -192,7 +192,7 @@ class ThreadedProcessor(object):
         if reporter is None:
             self.reporter = BasicReporter()
         
-        self._exit = False
+        self._done = False
         self._abort = False
         self.abort_lock = threading.Lock()
 
@@ -214,7 +214,7 @@ class ThreadedProcessor(object):
                 print '** GOT ONE; waiting on', t
                 t.join()
                 
-            self.exit()
+            self.done()
             self._thread.join()
         except KeyboardInterrupt:       # this does not seem to work. CTB
             self.abort()
@@ -225,23 +225,23 @@ class ThreadedProcessor(object):
             raise Exception("ThreadedProcessor aborted")
             
     def run(self):
-        """Run until _exit flag is set & queue is empty.
+        """Run until _done flag is set & queue is empty.
 
         Note: run in writer thread.
         """
-        while (not self._exit) or (not self.writer.empty()):
+        while (not self._done) or (not self.writer.empty()):
             try:
                 self.writer.flush()
             except IndexError:
                 time.sleep(self.QUEUEWAIT)
                 continue
 
-    def exit(self):
-        """Set the exit flag - no more 'save's will be called.
+    def done(self):
+        """Set the done flag - no more 'save's will be called.
 
         Can be called from any thread.
         """
-        self._exit = True
+        self._done = True
 
     def abort(self):
         """Set the abort flag."""

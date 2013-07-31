@@ -6,7 +6,7 @@ def fasta_test():
     tw = ThreadedProcessor(fp, fastq=False)
 
     tw.writer.save('a', 'ATCG')
-    tw.exit()
+    tw.done()
     tw.run()
 
     x = fp.getvalue()
@@ -17,7 +17,7 @@ def fastq_test():
     tw = ThreadedProcessor(fp, fastq=True)
 
     tw.writer.save('a', 'ATCG', '####')
-    tw.exit()
+    tw.done()
     tw.run()
 
     x = fp.getvalue()
@@ -28,7 +28,7 @@ def fastq_sniff_test():
     tw = ThreadedProcessor(fp)
 
     tw.writer.save('a', 'ATCG', '####')
-    tw.exit()
+    tw.done()
     tw.run()
 
     x = fp.getvalue()
@@ -39,7 +39,7 @@ def fasta_sniff_test():
     tw = ThreadedProcessor(fp)
 
     tw.writer.save('a', 'ATCG')
-    tw.exit()
+    tw.done()
     tw.run()
 
     x = fp.getvalue()
@@ -53,7 +53,7 @@ def test_several():
     tw.writer.save('a', 'ATCG')
     tw.writer.save('a', 'ATCG')
 
-    tw.exit()
+    tw.done()
     tw.run()
 
     assert len(fp.getvalue().splitlines()) == 6, fp.getvalue()
@@ -63,7 +63,7 @@ def pair_fasta_test():
     tw = PairThreadedProcessor(fp, fastq=False)
 
     tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
-    tw.exit()
+    tw.done()
     tw.run()
         
     x = fp.getvalue()
@@ -74,7 +74,7 @@ def pair_fastq_test():
     tw = PairThreadedProcessor(fp, fastq=True)
 
     tw.writer.save(('a', 'ATCG', '####'), ('b', 'TAGC', 'BBBB'))
-    tw.exit()
+    tw.done()
     tw.run()
 
     x = fp.getvalue()
@@ -85,7 +85,7 @@ def pair_fastq_sniff_test():
     tw = PairThreadedProcessor(fp)
 
     tw.writer.save(('a', 'ATCG', '####'), ('b', 'TAGC', 'BBBB'))
-    tw.exit()
+    tw.done()
     tw.run()
     
     x = fp.getvalue()
@@ -96,7 +96,7 @@ def pair_fasta_sniff_test():
     tw = PairThreadedProcessor(fp)
 
     tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
-    tw.exit()
+    tw.done()
     tw.run()
 
     x = fp.getvalue()
@@ -111,7 +111,7 @@ def pair_test_several():
     tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
     tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
 
-    tw.exit()
+    tw.done()
     tw.run()
 
     assert len(fp.getvalue().splitlines()) == 12, fp.getvalue()
