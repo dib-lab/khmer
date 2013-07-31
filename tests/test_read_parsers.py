@@ -56,10 +56,9 @@ def test_bzip2_decompression( ):
     assert 100 == reads_count
 
 
-@attr('known_failing')
+# CTB note: one reason this test can fail is if you've completely broken
+# multithreaded parsing ;).
 def test_with_multiple_threads( ):
-    assert 0
-    
     import operator
     import threading
 
@@ -97,10 +96,7 @@ def test_with_multiple_threads( ):
            reads_counts_per_thread
 
 
-@attr('known_failing')
 def test_old_illumina_pair_mating( ):
-    assert 0
-    
     import threading
 
     config = khmer.get_config( )
@@ -131,10 +127,7 @@ def test_old_illumina_pair_mating( ):
     config.set_reads_input_buffer_size( bufsz )
 
 
-@attr('known_failing')
 def test_casava_1_8_pair_mating( ):
-    assert 0
-    
     import threading
 
     config = khmer.get_config( )

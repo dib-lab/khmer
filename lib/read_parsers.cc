@@ -1557,7 +1557,6 @@ _parse_read( ParserState &state, Read &the_read )
 
     if (line.length()) {
       if ('>' != line[ 0 ]) {
-   	    _cache_manager._set_abort();
             throw InvalidFASTAFileFormat(
                 "invalid sequence name indicator", line.c_str( )
             );
@@ -1630,7 +1629,6 @@ _parse_read( ParserState &state, Read &the_read )
     the_read.bytes_consumed += (line.length( ) + 1);
     if (line.length() || !is_complete()) {
       if ('@' != line[ 0 ]) {
-	_cache_manager._set_abort();
         throw InvalidFASTQFileFormat(
 		     "invalid sequence name indicator", line.c_str( )
 				     );
@@ -1689,7 +1687,6 @@ _parse_read( ParserState &state, Read &the_read )
 
       // Validate quality score lines versus sequence lines.
       if (the_read.accuracy.length( ) != the_read.sequence.length( )) {
-	_cache_manager._set_abort();
         throw InvalidFASTQFileFormat(
 		     "sequence and quality scores length mismatch"
 				     );
@@ -1772,6 +1769,7 @@ imprint_next_read( Read &the_read )
 #endif
 
             if (!at_start || (at_start && (0 == fill_id))) {
+	      _cache_manager._set_abort();
                 throw;
             }
 
