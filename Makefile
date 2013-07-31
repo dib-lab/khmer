@@ -13,7 +13,7 @@ PROFILER_OF_CHOICE=gprof
 # Set this variable to true 
 # if you wish the codes to perform extra sanity checking 
 # (to the possible detriment of performance).
-WANT_EXTRA_SANITY_CHECKING=false
+WANT_EXTRA_SANITY_CHECKING=true
 
 # Compile with debugging symbols?
 # Set this variable to true 
@@ -21,13 +21,13 @@ WANT_EXTRA_SANITY_CHECKING=false
 # (increases code size 
 # and does not always produce accurate stepping in a debugger 
 # when optimization is turned on).
-WANT_DEBUGGING=false
+WANT_DEBUGGING=true
 
 # Compile with tracing logic turned on?
 # Set this variable to true if you want to use instrumentation provided 
 # in the sources for debugging purposes 
 # and are willing to accept the overhead such instrumentation introduces.
-WITH_INTERNAL_TRACING=false
+WITH_INTERNAL_TRACING=true
 
 # Trace state transitions?
 # Set this variable to true if you want to use instrumentation which reports
@@ -63,7 +63,7 @@ TRACE_MEMCOPIES=true
 # WARNING! This can generate *very* large trace logs - use with caution or 
 # lots of free storage.
 # 'WITH_INTERNAL_TRACING' must be true for this to have effect.
-TRACE_DATA=false
+TRACE_DATA=true
 
 # Compile with performance metrics turned on?
 # Set this variable to true if you want to use instrumentation provided 
@@ -77,7 +77,7 @@ WITH_INTERNAL_METRICS=false
 
 CXXFLAGS=
 CXX_WARNING_FLAGS=-Wall
-CXX_OPTIMIZATION_FLAGS=-O3
+CXX_OPTIMIZATION_FLAGS=
 CXX_SHARED_LIB_FLAGS=-fPIC
 CXXFLAGS+= $(CXX_WARNING_FLAGS) $(CXX_OPTIMIZATION_FLAGS) $(CXX_SHARED_LIB_FLAGS)
 

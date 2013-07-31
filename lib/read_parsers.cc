@@ -98,6 +98,7 @@ accumulate_timer_deltas( uint32_t metrics_key )
 IStreamReader::
 IStreamReader( )
     :   pmetrics( StreamReaderPerformanceMetrics( ) ),
+	_abort( false ),
         _alignment( 0 ),
         _max_aligned( SSIZE_MAX ),
         _at_eos( false )
@@ -681,6 +682,7 @@ has_more_data( )
                 break;
             }
         } // polling loop
+	if (_stream_reader._abort) { break; }
     }
 
 #ifdef WITH_INTERNAL_METRICS
@@ -1554,7 +1556,8 @@ _parse_read( ParserState &state, Read &the_read )
     the_read.bytes_consumed += (line.length( ) + 1);
 
     if (line.length()) {
-        if ('>' != line[ 0 ]) {
+      if ('>' != line[ 0 ]) {
+   	    _cache_manager._set_abort();
             throw InvalidFASTAFileFormat(
                 "invalid sequence name indicator", line.c_str( )
             );
@@ -1627,6 +1630,7 @@ _parse_read( ParserState &state, Read &the_read )
     the_read.bytes_consumed += (line.length( ) + 1);
     if (line.length() || !is_complete()) {
       if ('@' != line[ 0 ]) {
+	_cache_manager._set_abort();
         throw InvalidFASTQFileFormat(
 		     "invalid sequence name indicator", line.c_str( )
 				     );
@@ -1652,10 +1656,12 @@ _parse_read( ParserState &state, Read &the_read )
         // If line starts with non-alphabetic character,
         // then record is corrupt.
         if (	!(('A' <= line[ 0 ]) && ('Z' >= line[ 0 ]))
-                &&	!(('a' <= line[ 0 ]) && ('z' >= line[ 0 ])))
+                &&	!(('a' <= line[ 0 ]) && ('z' >= line[ 0 ]))) {
+   	    _cache_manager._set_abort();
             throw InvalidFASTQFileFormat(
                 "illegal sequence letters", line.c_str( )
             );
+	}
 
         the_read.sequence += line;
         the_read.bytes_consumed += (line.length( ) + 1);
@@ -1682,10 +1688,12 @@ _parse_read( ParserState &state, Read &the_read )
       }
 
       // Validate quality score lines versus sequence lines.
-      if (the_read.accuracy.length( ) != the_read.sequence.length( ))
+      if (the_read.accuracy.length( ) != the_read.sequence.length( )) {
+	_cache_manager._set_abort();
         throw InvalidFASTQFileFormat(
 		     "sequence and quality scores length mismatch"
 				     );
+      }
 
 #ifdef TRACE_MEMCOPIES
       state.trace_logger(
@@ -1897,6 +1905,7 @@ imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode )
         _imprint_next_read_pair_in_error_mode( the_read_pair );
         break;
     default:
+        _cache_manager._set_abort();
         throw UnknownPairReadingMode( );
     }
 }
@@ -1972,17 +1981,20 @@ _imprint_next_read_pair_in_error_mode( ReadPair &the_read_pair )
     if (REG_NOMATCH == regexec(
                 &_re_read_1, read_1.name.c_str( ), 1, &match_1, 0
             )) {
+        _cache_manager._set_abort();
         throw InvalidReadPair( );
     }
     // Is the second read really the second member of a pair?
     if (REG_NOMATCH == regexec(
                 &_re_read_2, read_2.name.c_str( ), 1, &match_2, 0
             )) {
+        _cache_manager._set_abort();
         throw InvalidReadPair( );
     }
 
     // Is the pair valid?
     if (!_is_valid_read_pair( the_read_pair, match_1, match_2 )) {
+        _cache_manager._set_abort();
         throw InvalidReadPair( );
     }
 

@@ -124,6 +124,8 @@ struct IStreamReader {
         uint8_t * const cache, uint64_t const cache_size
     ) = 0;
 
+   bool _abort;
+
 protected:
 
     size_t			    _alignment;
@@ -252,6 +254,9 @@ struct CacheManager {
     void		split_at( uint64_t const pos );
 
     uint64_t const	get_fill_id( );
+
+    void _set_abort() { _stream_reader._abort = true; };
+    const bool _get_abort() { return _stream_reader._abort; };
 
 private:
 
@@ -389,7 +394,7 @@ struct IParser {
     }
 
     inline bool		is_complete( ) {
-        return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem;
+      return (!_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem) || _cache_manager._get_abort();
     }
 
     // Note: 'get_next_read' exists for legacy reasons.
