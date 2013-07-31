@@ -211,19 +211,16 @@ class ThreadedProcessor(object):
         """
         try:
             for t in other_threads:
-                print '** GOT ONE; waiting on', t
                 t.join()
                 
             self.done()
             self._thread.join()
         except KeyboardInterrupt:       # this does not seem to work. CTB
             self.abort()
+            raise
         finally:
             self.reporter.report(0, 0, 0, 0, force=True)
 
-        if self._abort:
-            raise Exception("ThreadedProcessor aborted")
-            
     def run(self):
         """Run until _done flag is set & queue is empty.
 
@@ -344,9 +341,7 @@ class PairThreadedProcessor(ThreadedProcessor):
         n_read = n_saved = bp_read = bp_saved = 0
         reporter = self.reporter
 
-        print 'entering'
         for r1, r2 in rparser.iter_read_pairs():
-            print 'XXX', n_read
             # track sequences & bp read in
             n_read += 2
             bp_read += len(r1.sequence) + len(r2.sequence)
