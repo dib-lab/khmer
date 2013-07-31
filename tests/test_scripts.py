@@ -366,12 +366,12 @@ def test_normalize_by_median_force():
     CUTOFF='1'
     
     corrupt_infile = utils.get_temp_filename('test-corrupt.fq')
-    good_infile = utils.get_temp_filename('test-good.fq')
+    good_infile = utils.get_temp_filename('test-good.fq',tempdir=os.path.dirname(corrupt_infile))
     
     in_dir = os.path.dirname(good_infile)
     
     shutil.copyfile(utils.get_test_data('test-error-reads.fq'), corrupt_infile)
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), corrupt_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), good_infile)
     
     script = scriptpath('normalize-by-median.py')
     args = ['-f', '-C', CUTOFF, '-k', '17', corrupt_infile, good_infile]
@@ -380,6 +380,28 @@ def test_normalize_by_median_force():
     assert status == 0
     assert os.path.exists(corrupt_infile + '.ht.failed')
     assert '*** Skipping' in err
+    assert '** IOErrors' in err
+
+def test_normalize_by_median_dumpfrequency():
+    CUTOFF='1'
+    
+    infiles = [utils.get_temp_filename('test-0.fq')]
+    in_dir = os.path.dirname(infiles[0])
+    for x in range(1,5):
+        infiles.append(utils.get_temp_filename('test-{}.fq'.format(x), tempdir=in_dir))
+    
+    for infile in infiles:
+        shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+    
+    script = scriptpath('normalize-by-median.py')
+    args = ['-d', '2', '-C', CUTOFF, '-k', '17']
+    args.extend(infiles)
+    
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+    assert os.path.exists(os.path.join(in_dir, 'backup.ht'))
+    assert out.count('Backup: Saving') == 2
+    assert 'Nothing' in out
 
 def test_normalize_by_median_empty():
     CUTOFF='1'
