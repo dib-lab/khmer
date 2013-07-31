@@ -110,7 +110,7 @@ def main():
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
-                        type=int, help='dump hashtable every F files',
+                        type=int, help='dump hashtable every d files',
                         default=-1)
     parser.add_argument('input_filenames', nargs='+')
 
