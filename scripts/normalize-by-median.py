@@ -163,7 +163,7 @@ def main():
         outfp = open(output_name, 'w')
 
         try:
-            t, d = normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE, args)
+            t, d = normalize_by_median(input_filename, outfp, ht, args)
             total += t
             discarded += d
 
