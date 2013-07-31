@@ -45,8 +45,3 @@ TODO for threadwrite --
  - benchmarking
  - testing
  - CTRL-C/interrupt
-
-Note that we have exposed at least one bug? in the read_parsers code:
-when the read_pair_iterator fails for pairing reasons, there seems
-to be a race condition in the other threads that doesn't permit them
-to exit.

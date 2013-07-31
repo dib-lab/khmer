@@ -207,6 +207,8 @@ class ThreadedProcessor(object):
     def join(self, other_threads):
         """Wait until reader threads are finished, then flush & exit.
 
+        Returns 'true' on success, 'false' on failure.
+
         Note: run by controlling process.
         """
         try:
@@ -220,6 +222,11 @@ class ThreadedProcessor(object):
             raise
         finally:
             self.reporter.report(0, 0, 0, 0, force=True)
+
+        if self._abort:
+            return False
+
+        return True
 
     def run(self):
         """Run until _done flag is set & queue is empty.

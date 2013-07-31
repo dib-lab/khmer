@@ -92,7 +92,9 @@ def main():
                                              args=(rparser, filter_fn))
 
         # wait for threads to finish & flush out any remaining records.
-        tw.join(threads)
+        if not tw.join(threads):
+            print >>sys.stderr, "** failure.  See message above."
+            sys.exit(-1)
 
 if __name__ == '__main__':
     main()

@@ -110,7 +110,9 @@ def main():
                                              target=tw.process_fn,
                                              args=(rparser, filter_fn))
 
-        tw.join(threads)
+        if not tw.join(threads):
+            print >>sys.stderr, "** failure.  See message above."
+            sys.exit(-1)
 
         print 'DONE with', input_filename
         # end loop
