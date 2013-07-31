@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 """
-Trim sequences at k-mers of the given abundance, based on the given counting
-hash table.  Output sequences will be placed in 'infile.abundfilt'.
+Test script for threaded reading/writing.  Should output files identical
+in content (but potentially shuffled) to those given to it.  -x turns
+off threading, -p turns on paired-end required.
 
-% python scripts/filter-abund.py <counting.kh> <data1> [ <data2> <...> ]
+% python sandbox/thread-rw.py [ -p ] [ -x ] [ --threads N ] <input files>
 
 Use '-h' for parameter help.
 """
