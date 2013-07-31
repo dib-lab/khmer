@@ -1625,14 +1625,16 @@ _parse_read( ParserState &state, Read &the_read )
     );
 #endif
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('@' != line[ 0 ])
+    if (line.length() || !is_complete()) {
+      if ('@' != line[ 0 ]) {
         throw InvalidFASTQFileFormat(
-            "invalid sequence name indicator", line.c_str( )
-        );
-    the_read.name = line.substr( 1 );
+		     "invalid sequence name indicator", line.c_str( )
+				     );
+      }
+      the_read.name = line.substr( 1 );
 
-    // Grab sequence lines until exit conditions are met.
-    while (!is_complete( )) {
+      // Grab sequence lines until exit conditions are met.
+      while (!is_complete( )) {
         _copy_line( state );
 
 #ifdef TRACE_DATA
@@ -1657,13 +1659,13 @@ _parse_read( ParserState &state, Read &the_read )
 
         the_read.sequence += line;
         the_read.bytes_consumed += (line.length( ) + 1);
-    }
+      }
 
-    // Ignore repeated name field.
-    the_read.bytes_consumed += (line.length( ) + 1);
+      // Ignore repeated name field.
+      the_read.bytes_consumed += (line.length( ) + 1);
 
-    // Grab quality score lines until exit conditions are met.
-    while (	!is_complete( )
+      // Grab quality score lines until exit conditions are met.
+      while (!is_complete( )
             &&	(the_read.accuracy.length( ) < the_read.sequence.length( ))) {
         _copy_line( state );
 
@@ -1677,24 +1679,25 @@ _parse_read( ParserState &state, Read &the_read )
 
         the_read.accuracy += line;
         the_read.bytes_consumed += (line.length( ) + 1);
-    }
+      }
 
-    // Validate quality score lines versus sequence lines.
-    if (the_read.accuracy.length( ) != the_read.sequence.length( ))
+      // Validate quality score lines versus sequence lines.
+      if (the_read.accuracy.length( ) != the_read.sequence.length( ))
         throw InvalidFASTQFileFormat(
-            "sequence and quality scores length mismatch"
-        );
+		     "sequence and quality scores length mismatch"
+				     );
 
 #ifdef TRACE_MEMCOPIES
-    state.trace_logger(
+      state.trace_logger(
         TraceLogger:: TLVL_DEBUG4,
         "_parse_read: Successfully parsed FASTQ record of %llu bytes.\n",
         the_read.bytes_consumed
     );
 #endif
 
-    // Prefetch next line. (Needed to be consistent with FASTA logic.)
-    _copy_line( state );
+      // Prefetch next line. (Needed to be consistent with FASTA logic.)
+      _copy_line( state );
+    }
 }
 
 
