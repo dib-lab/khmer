@@ -32,8 +32,16 @@ def validpair(r0, r1):
         r1.name[-1] == "2" and \
         r0.name[0:-1] == r1.name[0:-1]
 
-def normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE):
+def normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE, args):
+
+    # In paired mode we read two records at a time
+    batch_size = 1
+    if args.paired:
+        batch_size = 2
+
     n = -1
+    total = 0
+    discarded = 0
     for n, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if n > 0 and n % 100000 == 0:
@@ -82,15 +90,8 @@ def normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE):
                         '>%s\n%s\n' % (record.name, record.sequence))
         else:
             discarded += batch_size
-
-    if -1 < n:
-        print \
-            'DONE with', input_filename, '; kept', total - discarded, \
-            'of', total, 'or', \
-            int(100. - discarded / float(total) * 100.), '%'
-        print 'output in', output_name
-    else:
-        print 'SKIPPED empty file', input_filename
+    
+    return total, discarded
 
 def main():
     parser = build_construct_args()
@@ -105,8 +106,8 @@ def main():
     parser.add_argument('-f', '--force-processing', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
-    parser.add_argument('-F', '--save-frequency', dest='save_frequency',
-                        type=int, help='save hashtable every F files',
+    parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
+                        type=int, help='dump hashtable every F files',
                         default=-1)
     parser.add_argument('input_filenames', nargs='+')
 
@@ -138,17 +139,12 @@ def main():
     report_fp = args.report_file
     filenames = args.input_filenames
     force=args.force
-    save_frequency = args.save_frequency
+    dump_frequency = args.dump_frequency
     
     # list to save error files along with throwing exceptions
     if force == True:
         corrupt_files = []
     
-    # In paired mode we read two records at a time
-    batch_size = 1
-    if args.paired:
-        batch_size = 2
-
     if args.loadhash:
         print 'loading hashtable from', args.loadhash
         ht = khmer.load_counting_hash(args.loadhash)
@@ -164,14 +160,28 @@ def main():
         outfp = open(output_name, 'w')
 
         try:
-            normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE)
+            t, d = normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE, args)
+            total += t
+            discarded += d
+
+            if t == 0 and d == 0:
+                print 'SKIPPED empty file', input_filename
+            else:
+                print \
+                    'DONE with', input_filename, '; kept', total - discarded, \
+                    'of', total, 'or', \
+                    int(100. - discarded / float(total) * 100.), '%'
+                print 'output in', output_name
 
         except IOError as e:
             print >>sys.stderr, '** ERROR:', e
             print >>sys.stderr, '** Failed on {}: '.format(input_filename)
-            hashname = input_filename + '.ht.failed'
+            hashname = os.path.basename(input_filename) + '.ht.failed'
             print >>sys.stderr, '** ...dumping hashtable to {}'.format(hashname)
+            
             ht.save(hashname)
+            os.remove(output_name)
+            
             if not force:
                 print >>sys.stderr, '** Exiting!'
                 sys.exit(-1)
@@ -179,8 +189,8 @@ def main():
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
                 pass
-        
-        if save_frequency > 0 and n > 0 and n % save_frequency == 0:
+
+        if dump_frequency > 0 and n > 0 and n % dump_frequency == 0:
             print 'Backup: Saving hashfile through', input_filename
             if args.savehash:
                 hashname = args.savehash
