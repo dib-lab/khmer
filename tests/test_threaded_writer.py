@@ -1,53 +1,57 @@
-from khmer.thread_utils import ThreadedWriter, PairThreadedWriter
+from khmer.thread_utils import ThreadedProcessor, PairThreadedProcessor
 from cStringIO import StringIO
 
 def fasta_test():
     fp = StringIO()
-    tw = ThreadedWriter(fp, fastq=False)
+    tw = ThreadedProcessor(fp, fastq=False)
 
-    tw.save('a', 'ATCG')
-    tw._looper()
+    tw.writer.save('a', 'ATCG')
+    tw.exit()
+    tw.run()
 
     x = fp.getvalue()
     assert x == '>a\nATCG\n'
 
 def fastq_test():
     fp = StringIO()
-    tw = ThreadedWriter(fp, fastq=True)
+    tw = ThreadedProcessor(fp, fastq=True)
 
-    tw.save('a', 'ATCG', '####')
-    tw._looper()
+    tw.writer.save('a', 'ATCG', '####')
+    tw.exit()
+    tw.run()
 
     x = fp.getvalue()
     assert x == '@a\nATCG\n+\n####\n', x
 
 def fastq_sniff_test():
     fp = StringIO()
-    tw = ThreadedWriter(fp)
+    tw = ThreadedProcessor(fp)
 
-    tw.save('a', 'ATCG', '####')
-    tw._looper()
+    tw.writer.save('a', 'ATCG', '####')
+    tw.exit()
+    tw.run()
 
     x = fp.getvalue()
     assert x == '@a\nATCG\n+\n####\n', x
 
 def fasta_sniff_test():
     fp = StringIO()
-    tw = ThreadedWriter(fp)
+    tw = ThreadedProcessor(fp)
 
-    tw.save('a', 'ATCG')
-    tw._looper()
+    tw.writer.save('a', 'ATCG')
+    tw.exit()
+    tw.run()
 
     x = fp.getvalue()
     assert x == '>a\nATCG\n'
 
 def test_several():
     fp = StringIO()
-    tw = ThreadedWriter(fp)
+    tw = ThreadedProcessor(fp)
 
-    tw.save('a', 'ATCG')
-    tw.save('a', 'ATCG')
-    tw.save('a', 'ATCG')
+    tw.writer.save('a', 'ATCG')
+    tw.writer.save('a', 'ATCG')
+    tw.writer.save('a', 'ATCG')
 
     tw.exit()
     tw.run()
@@ -56,40 +60,44 @@ def test_several():
 
 def pair_fasta_test():
     fp = StringIO()
-    tw = PairThreadedWriter(fp, fastq=False)
+    tw = PairThreadedProcessor(fp, fastq=False)
 
-    tw.save(('a', 'ATCG'), ('b', 'TAGC'))
-    tw._looper()
-
+    tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
+    tw.exit()
+    tw.run()
+        
     x = fp.getvalue()
     assert x == '>a\nATCG\n>b\nTAGC\n'
 
 def pair_fastq_test():
     fp = StringIO()
-    tw = PairThreadedWriter(fp, fastq=True)
+    tw = PairThreadedProcessor(fp, fastq=True)
 
-    tw.save(('a', 'ATCG', '####'), ('b', 'TAGC', 'BBBB'))
-    tw._looper()
+    tw.writer.save(('a', 'ATCG', '####'), ('b', 'TAGC', 'BBBB'))
+    tw.exit()
+    tw.run()
 
     x = fp.getvalue()
     assert x == '@a\nATCG\n+\n####\n@b\nTAGC\n+\nBBBB\n', x
 
 def pair_fastq_sniff_test():
     fp = StringIO()
-    tw = PairThreadedWriter(fp)
+    tw = PairThreadedProcessor(fp)
 
-    tw.save(('a', 'ATCG', '####'), ('b', 'TAGC', 'BBBB'))
-    tw._looper()
-
+    tw.writer.save(('a', 'ATCG', '####'), ('b', 'TAGC', 'BBBB'))
+    tw.exit()
+    tw.run()
+    
     x = fp.getvalue()
     assert x == '@a\nATCG\n+\n####\n@b\nTAGC\n+\nBBBB\n', x
 
 def pair_fasta_sniff_test():
     fp = StringIO()
-    tw = PairThreadedWriter(fp)
+    tw = PairThreadedProcessor(fp)
 
-    tw.save(('a', 'ATCG'), ('b', 'TAGC'))
-    tw._looper()
+    tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
+    tw.exit()
+    tw.run()
 
     x = fp.getvalue()
     assert x == '>a\nATCG\n>b\nTAGC\n', x
@@ -97,11 +105,11 @@ def pair_fasta_sniff_test():
 
 def pair_test_several():
     fp = StringIO()
-    tw = PairThreadedWriter(fp)
+    tw = PairThreadedProcessor(fp)
 
-    tw.save(('a', 'ATCG'), ('b', 'TAGC'))
-    tw.save(('a', 'ATCG'), ('b', 'TAGC'))
-    tw.save(('a', 'ATCG'), ('b', 'TAGC'))
+    tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
+    tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
+    tw.writer.save(('a', 'ATCG'), ('b', 'TAGC'))
 
     tw.exit()
     tw.run()
