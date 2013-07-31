@@ -9,3 +9,6 @@ doc/_build
 *.log
 *env
 *ENV
+*.keep
+*.abundfilt
+*.foo
