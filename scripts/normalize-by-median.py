@@ -32,8 +32,11 @@ def validpair(r0, r1):
         r1.name[-1] == "2" and \
         r0.name[0:-1] == r1.name[0:-1]
 
-def normalize_by_median(input_filename, outfp, ht, K, DESIRED_COVERAGE, args):
+def normalize_by_median(input_filename, outfp, ht, args):
 
+    DESIRED_COVERAGE = args.cutoff
+    K = ht.ksize()
+    
     # In paired mode we read two records at a time
     batch_size = 1
     if args.paired:
@@ -135,7 +138,7 @@ def main():
     K = args.ksize
     HT_SIZE = args.min_hashsize
     N_HT = args.n_hashes
-    DESIRED_COVERAGE = args.cutoff
+
     report_fp = args.report_file
     filenames = args.input_filenames
     force=args.force
