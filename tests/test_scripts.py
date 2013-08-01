@@ -406,6 +406,13 @@ def test_normalize_by_median_dumpfrequency():
     args.extend(infiles)
     
     (status, out, err) = runscript(script, args, in_dir)
+
+    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ht'))
+    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
+    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
+    assert test_ht.count(test_good_read[:17]) > 0
+    assert test_ht.count(test_good_read2[:17]) > 0
+    
     assert status == 0
     assert os.path.exists(os.path.join(in_dir, 'backup.ht'))
     assert out.count('Backup: Saving') == 2
