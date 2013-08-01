@@ -16,7 +16,7 @@ from itertools import izip
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 import argparse
 
-DEFAULT_DESIRED_COVERAGE = 5
+DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
@@ -106,7 +106,7 @@ def handle_error(error, output_name, input_name, ht):
     try:
         os.remove(output_name)
     except:
-        print >>sys.stderr, '** ERROR: problem removing erroenous .keep file'
+        print >>sys.stderr, '** ERROR: problem removing erroneous .keep file'
 
 def main():
     parser = build_construct_args()
