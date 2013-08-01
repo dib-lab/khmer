@@ -366,7 +366,8 @@ def test_normalize_by_median_force():
     CUTOFF='1'
     
     corrupt_infile = utils.get_temp_filename('test-corrupt.fq')
-    good_infile = utils.get_temp_filename('test-good.fq',tempdir=os.path.dirname(corrupt_infile))
+    good_infile = utils.get_temp_filename('test-good.fq',
+                                        tempdir=os.path.dirname(corrupt_infile))
     
     in_dir = os.path.dirname(good_infile)
     
@@ -377,6 +378,12 @@ def test_normalize_by_median_force():
     args = ['-f', '-C', CUTOFF, '-k', '17', corrupt_infile, good_infile]
     
     (status, out, err) = runscript(script, args, in_dir)
+    
+    test_ht = khmer.load_counting_hash(corrupt_infile + '.ht.failed')
+    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
+    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
+    assert test_ht.count(test_good_read[:17]) > 0
+    assert test_ht.count(test_good_read2[:17]) > 0
     assert status == 0
     assert os.path.exists(corrupt_infile + '.ht.failed')
     assert '*** Skipping' in err
@@ -388,7 +395,8 @@ def test_normalize_by_median_dumpfrequency():
     infiles = [utils.get_temp_filename('test-0.fq')]
     in_dir = os.path.dirname(infiles[0])
     for x in range(1,5):
-        infiles.append(utils.get_temp_filename('test-{}.fq'.format(x), tempdir=in_dir))
+        infiles.append(utils.get_temp_filename('test-{}.fq'.format(x),
+                                                tempdir=in_dir))
     
     for infile in infiles:
         shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
