@@ -1,8 +1,16 @@
-========================
-Ready-made khmer scripts
-========================
+====================
+Command line scripts
+====================
 
-For -x and -N parameters, see :doc:`choosing-hash-sizes`.
+The simplest way to use khmer's functionality is through the command
+line scripts, located in the scripts/ directory of the khmer
+distribution.  Below is our documentation for these scripts.  Note
+that all scripts can be given '-h' as an option, which will print out
+a list of arguments taken by that script.
+
+Many scripts take '-x' and '-N' parameters, which drive khmer's memory usage.
+These parameters depend on details of your data set; for more information
+on how to choose them, see :doc:`choosing-hash-sizes`.
 
 k-mer counting
 ==============
