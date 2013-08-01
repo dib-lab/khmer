@@ -316,3 +316,11 @@ redundant sequences)
    Example::
 
 	scripts/normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
+
+   Example::
+        
+        scripts/normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq
+
+   Example::
+
+        scripts/normalize-by-median.py -k 17 -d 2 -s test.ht tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads.fq
