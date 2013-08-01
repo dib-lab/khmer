@@ -246,6 +246,16 @@ redundant sequences)
 
    Paired end reads can be considered together if the ``-p`` flag is set.
 
+   With the ``-s`` option, the counting hash will be saved to the
+   specified file after all sequences have been processed. With ``-d``,
+   the counting hash will be saved every d files for multifile runs;
+   if ``-s`` is set, the specified name will be used, and if not,
+   the name backup.ht will be used.
+
+   The ``-f`` flag will force the program to continue upon encountering
+   a formatting error in a sequence file; the counting hash up to that
+   point will be dumped, and processing will continue on the next file.
+
    Example::
 
 	scripts/normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
