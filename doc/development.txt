@@ -28,8 +28,8 @@ does.
 Pipelines
 ---------
 
-All Khmer scripts used by a published pipeline must be included in scripts/ and meet
-the standards therein implied.
+All khmer scripts used by a published recommended analysis pipeline must be
+included in scripts/ and meet the standards therein implied.
 
 Command line scripts
 --------------------
