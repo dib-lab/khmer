@@ -48,7 +48,7 @@ def normalize_by_median(input_filename, outfp, ht, args):
     for n, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if n > 0 and n % 100000 == 0:
-            print '... kept {kept} of {total} or {perc:.2%}'.format(
+            print '... kept {kept} of {total} or {perc:2}%'.format(
                 kept=total-discarded, total=total,
                 perc=int(100. - discarded / float(total) * 100.))
             print '... in file', input_filename
@@ -175,21 +175,13 @@ def main():
     for n, input_filename in enumerate(filenames):
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
-
+        
+        total_acc = 0
+        discarded_acc = 0
+        
         try:
-            t, d = normalize_by_median(input_filename, outfp, ht, args)
-            total += t
-            discarded += d
-
-            if t == 0 and d == 0:
-                print 'SKIPPED empty file', input_filename
-            else:
-                print 'DONE with {inp}; kept {kept} of {total} or \
-                      {perc:.2%}'.format(inp=input_filename,
-                      kept=total-discarded, total=total,
-                      perc=int(100. - discarded / float(total) * 100.))
-                print 'output in', output_name
-
+            total_acc, discarded_acc = normalize_by_median(input_filename, 
+                                                           outfp, ht, args)
         except IOError as e:
             handle_error(e, output_name, input_filename, ht)
             if not force:
@@ -199,6 +191,17 @@ def main():
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
                 pass
+        else:
+            if total_acc == 0 and discarded_acc == 0:
+                print 'SKIPPED empty file', input_filename
+            else:
+                total += total_acc
+                discarded += discarded_acc
+                print 'DONE with {inp}; kept {kept} of {total} or \
+                      {perc:2}%'.format(inp=input_filename,
+                      kept=total-discarded, total=total,
+                      perc=int(100. - discarded / float(total) * 100.))
+                print 'output in', output_name
 
         if dump_frequency > 0 and n > 0 and n % dump_frequency == 0:
             print 'Backup: Saving hashfile through', input_filename
