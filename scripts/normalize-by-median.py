@@ -48,8 +48,9 @@ def normalize_by_median(input_filename, outfp, ht, args):
     for n, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if n > 0 and n % 100000 == 0:
-            print '... kept', total - discarded, 'of', total, ', or', \
-                int(100. - discarded / float(total) * 100.), '%'
+            print '... kept {kept} of {total} or {perc:.2%}'.format(
+                kept=total-discarded, total=total,
+                perc=int(100. - discarded / float(total) * 100.))
             print '... in file', input_filename
 
             if report_fp:
@@ -62,8 +63,8 @@ def normalize_by_median(input_filename, outfp, ht, args):
         # If in paired mode, check that the reads are properly interleaved
         if args.paired:
             if not validpair(batch[0], batch[1]):
-                raise IOError('Error: Improperly interleaved pairs %s %s' \
-                               % (batch[0].name, batch[1].name))
+                raise IOError('Error: Improperly interleaved pairs \
+                    {} {}'.format(batch[0].name, batch[1].name))
 
         # Emit the batch of reads if any read passes the filter
         # and all reads are longer than K
@@ -85,16 +86,27 @@ def normalize_by_median(input_filename, outfp, ht, args):
         if passed_length and passed_filter:
             for record in batch:
                 if hasattr(record, 'accuracy'):
-                    outfp.write('@%s\n%s\n+\n%s\n' % (record.name,
-                                                      record.sequence,
-                                                      record.accuracy))
+                    outfp.write('@{}\n{}\n+\n{}\n'.format(record.name,
+                                                          record.sequence,
+                                                          record.accuracy))
                 else:
                     outfp.write(
-                        '>%s\n%s\n' % (record.name, record.sequence))
+                        '>{}\n{}\n'.format(record.name, record.sequence))
         else:
             discarded += batch_size
     
     return total, discarded
+
+def handle_error(error, output_name, input_name, ht):
+    print >>sys.stderr, '** ERROR:', error
+    print >>sys.stderr, '** Failed on {}: '.format(input_name)
+    hashname = os.path.basename(input_name) + '.ht.failed'
+    print >>sys.stderr, '** ...dumping hashtable to {}'.format(hashname)
+    ht.save(hashname)
+    try:
+        os.remove(output_name)
+    except:
+        print >>sys.stderr, '** ERROR: problem removing erroenous .keep file'
 
 def main():
     parser = build_construct_args()
@@ -124,15 +136,17 @@ def main():
                 "Please read the docs!"
 
         print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
         print >>sys.stderr, \
-            ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print >>sys.stderr, ' - paired =	      %s \t\t(-p)' % args.paired
+            ' - kmer size =    {:d} \t\t(-k)'.format(args.ksize)
+        print >>sys.stderr, \
+            ' - n hashes =     {:d} \t\t(-N)'.format(args.n_hashes)
+        print >>sys.stderr, \
+            ' - min hashsize = {:-5.2g} \t(-x)'.format(args.min_hashsize)
+        print >>sys.stderr, ' - paired = {} \t\t(-p)'.format(args.paired)
         print >>sys.stderr, ''
         print >>sys.stderr, \
-            'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' \
-            % (args.n_hashes * args.min_hashsize)
+            'Estimated memory usage is {:.2g} bytes \
+            (n_hashes x min_hashsize)'.format(args.n_hashes*args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
@@ -170,21 +184,14 @@ def main():
             if t == 0 and d == 0:
                 print 'SKIPPED empty file', input_filename
             else:
-                print \
-                    'DONE with', input_filename, '; kept', total - discarded, \
-                    'of', total, 'or', \
-                    int(100. - discarded / float(total) * 100.), '%'
+                print 'DONE with {inp}; kept {kept} of {total} or \
+                      {perc:.2%}'.format(inp=input_filename,
+                      kept=total-discarded, total=total,
+                      perc=int(100. - discarded / float(total) * 100.))
                 print 'output in', output_name
 
         except IOError as e:
-            print >>sys.stderr, '** ERROR:', e
-            print >>sys.stderr, '** Failed on {}: '.format(input_filename)
-            hashname = os.path.basename(input_filename) + '.ht.failed'
-            print >>sys.stderr, '** ...dumping hashtable to {}'.format(hashname)
-            
-            ht.save(hashname)
-            os.remove(output_name)
-            
+            handle_error(e, output_name, input_filename, ht)
             if not force:
                 print >>sys.stderr, '** Exiting!'
                 sys.exit(-1)
@@ -211,7 +218,7 @@ def main():
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print 'fp rate estimated to be {:1.3f}'.format(fp_rate)
     
     if force and len(corrupt_files) > 0:
         print >>sys.stderr, "** WARNING: Finished with errors!"
