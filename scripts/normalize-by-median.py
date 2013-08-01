@@ -197,10 +197,10 @@ def main():
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print 'DONE with {inp}; kept {kept} of {total} or \
-                      {perc:2}%'.format(inp=input_filename,
-                      kept=total-discarded, total=total,
-                      perc=int(100. - discarded / float(total) * 100.))
+                print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
+                    .format(inp=input_filename,
+                    kept=total-discarded, total=total,
+                    perc=int(100. - discarded / float(total) * 100.))
                 print 'output in', output_name
 
         if dump_frequency > 0 and n > 0 and n % dump_frequency == 0:
