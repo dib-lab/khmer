@@ -32,7 +32,7 @@ def validpair(r0, r1):
         r1.name[-1] == "2" and \
         r0.name[0:-1] == r1.name[0:-1]
 
-def normalize_by_median(input_filename, outfp, ht, args):
+def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
 
     DESIRED_COVERAGE = args.cutoff
     K = ht.ksize()
@@ -181,7 +181,8 @@ def main():
         
         try:
             total_acc, discarded_acc = normalize_by_median(input_filename, 
-                                                           outfp, ht, args)
+                                                           outfp, ht, args,
+                                                           report_fp)
         except IOError as e:
             handle_error(e, output_name, input_filename, ht)
             if not force:
