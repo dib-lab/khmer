@@ -1,6 +1,6 @@
-========================
-Ready-made khmer scripts
-========================
+==============================
+khmer's command-line interface
+==============================
 
 For -x and -N parameters, see :doc:`choosing-hash-sizes`.
 
@@ -15,6 +15,12 @@ k-mer counting
 
    Build a counting hash table using the sequences in <file1-N>, and save it
    to <output.kh>.
+
+   Note that with the '-b' option <output.kh> will be the exact size
+   of your hashtables, and load-into-counting.py will be constant
+   memory; in exchange, k-mer counts will stop at 255.  The memory
+   usage of this script with '-b' will be about 1.15x the product of
+   the -x and -N numbers.
 
    Example::
 
@@ -45,6 +51,33 @@ k-mer counting
    are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
    of total distinct k-mers.
 
+**abundance-dist-single.py**: calculate the k-mer abundance distribution for a single file
+
+   Usage::
+	
+	scripts/abundance-dist-single.py [ options ] <datafile> <histout>
+
+   Count the k-mer abundance distribution in <datafile>; output
+   distribution to <histout>.  (This is a single-step/in-memory
+   version of abundance-dist.py; no counting hash file will be
+   created unless --savehash is specified.)
+
+   Note that with the '-b' option this script is constant memory; in
+   exchange, k-mer counts will stop at 255. The memory usage of this
+   script with '-b' will be about 1.15x the product of the -x and -N
+   numbers.
+
+   To count k-mers in multiple files, use load-into-counting.py and
+   abundance-dist.py.
+
+   Example::
+
+	scripts/abundance-dist-single.py -k 20 -x 5e7 data/100k-filtered.fa out.hist
+
+   The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
+   are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
+   of total distinct k-mers.
+
 **filter-abund.py**: trim sequences at a min k-mer abundance.
 
    Usage::
@@ -64,6 +97,26 @@ k-mer counting
 
 	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
 	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
+
+**filter-abund-single.py**: trim sequences at a min k-mer abundance.
+
+   Usage::
+	
+	filter-abund-single.py [ -C <cutoff> ... ] <file>
+
+   Trim sequences at k-mer abundance < C.  (This is an in-memory
+   version of filter-abund.py that works for single files.)
+
+   Trimmed sequences will be placed in <file>.abundfilt.
+
+   This script is constant memory.
+
+   To trim reads based on k-mer abundance across multiple files, use
+   load-into-counting and filter-abund.
+
+   Example::
+
+	scripts/filter-abund-single.py -k 20 -x 5e7 -C 2 data/100k-filtered.fa
 
 **count-median.py**: count median, average, and stddev of k-mer abundance in sequences.
 
@@ -246,6 +299,16 @@ redundant sequences)
 
    Paired end reads can be considered together if the ``-p`` flag is set.
 
+   With the ``-s`` option, the counting hash will be saved to the
+   specified file after all sequences have been processed. With ``-d``,
+   the counting hash will be saved every d files for multifile runs;
+   if ``-s`` is set, the specified name will be used, and if not,
+   the name backup.ht will be used.
+
+   The ``-f`` flag will force the program to continue upon encountering
+   a formatting error in a sequence file; the counting hash up to that
+   point will be dumped, and processing will continue on the next file.
+
    Example::
 
 	scripts/normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
@@ -253,3 +316,11 @@ redundant sequences)
    Example::
 
 	scripts/normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
+
+   Example::
+        
+        scripts/normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq
+
+   Example::
+
+        scripts/normalize-by-median.py -k 17 -d 2 -s test.ht tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads.fq

@@ -5,8 +5,6 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 % python scripts/load-into-counting.py <htname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
-
-@CTB enable/disable bigcount via command-line parameters.
 """
 
 import sys
@@ -23,6 +21,9 @@ def main():
     add_threading_args(parser)
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
+                        action='store_false',
+                        help='Do not count k-mers past 255')
 
     args = parser.parse_args()
     report_on_config(args)
@@ -42,7 +43,11 @@ def main():
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
-    ht.set_use_bigcount(True)
+    ht.set_use_bigcount(args.bigcount)
+
+    config = khmer.get_config()
+    bufsz = config.get_reads_input_buffer_size()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     for n, filename in enumerate(filenames):
 
