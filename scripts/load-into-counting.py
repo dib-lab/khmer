@@ -37,6 +37,7 @@ def main():
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
+    print 'Using %d threads' % n_threads
 
     ###
 
