@@ -37,6 +37,7 @@ def runscript(scriptname, args, in_directory=None):
 
         try:
             print 'running:', scriptname, 'in:', in_directory
+            print 'arguments', sysargs
             execfile(scriptname, { '__name__' : '__main__' })
             status = 0
         except:
@@ -112,9 +113,12 @@ def test_load_into_counting_fail():
     assert status == -1
     assert "ERROR:" in err
 
-def _make_counting(infilename, SIZE=1e7, N=2, K=20):
+def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = scriptpath('load-into-counting.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+
+    if not BIGCOUNT:
+        args.append('-b')
     
     outfile = utils.get_temp_filename('out.kh')
 
@@ -188,6 +192,24 @@ def test_filter_abund_3_fq_retained():
     seqs = set([ r.accuracy for r in screed.open(outfile) ])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
+
+def test_filter_abund_1_singlefile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 # test that the -V option does not trim sequences that are low abundance
 def test_filter_abund_4_retain_low_abund():
@@ -354,13 +376,69 @@ def test_normalize_by_median_impaired():
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-
+    
     shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status != 0
+
+def test_normalize_by_median_force():
+    CUTOFF='1'
+    
+    corrupt_infile = utils.get_temp_filename('test-corrupt.fq')
+    good_infile = utils.get_temp_filename('test-good.fq',
+                                        tempdir=os.path.dirname(corrupt_infile))
+    
+    in_dir = os.path.dirname(good_infile)
+    
+    shutil.copyfile(utils.get_test_data('test-error-reads.fq'), corrupt_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), good_infile)
+    
+    script = scriptpath('normalize-by-median.py')
+    args = ['-f', '-C', CUTOFF, '-k', '17', corrupt_infile, good_infile]
+    
+    (status, out, err) = runscript(script, args, in_dir)
+    
+    test_ht = khmer.load_counting_hash(corrupt_infile + '.ht.failed')
+    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
+    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
+    assert test_ht.count(test_good_read[:17]) > 0
+    assert test_ht.count(test_good_read2[:17]) > 0
+    assert status == 0
+    assert os.path.exists(corrupt_infile + '.ht.failed')
+    assert '*** Skipping' in err
+    assert '** IOErrors' in err
+
+def test_normalize_by_median_dumpfrequency():
+    CUTOFF='1'
+    
+    infiles = [utils.get_temp_filename('test-0.fq')]
+    in_dir = os.path.dirname(infiles[0])
+    for x in range(1,5):
+        infiles.append(utils.get_temp_filename('test-{}.fq'.format(x),
+                                                tempdir=in_dir))
+    
+    for infile in infiles:
+        shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+    
+    script = scriptpath('normalize-by-median.py')
+    args = ['-d', '2', '-C', CUTOFF, '-k', '17']
+    args.extend(infiles)
+    
+    (status, out, err) = runscript(script, args, in_dir)
+
+    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ht'))
+    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
+    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
+    assert test_ht.count(test_good_read[:17]) > 0
+    assert test_ht.count(test_good_read2[:17]) > 0
+    
+    assert status == 0
+    assert os.path.exists(os.path.join(in_dir, 'backup.ht'))
+    assert out.count('Backup: Saving') == 2
+    assert 'Nothing' in out
 
 def test_normalize_by_median_empty():
     CUTOFF='1'
@@ -781,11 +859,79 @@ def test_abundance_dist():
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
 
+    print (status, out, err)
+
     fp = iter(open(outfile))
     line = fp.next().strip()
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
+
+def test_abundance_dist_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
+
+    script = scriptpath('abundance-dist.py')
+    args = ['-z', htfile, infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    print (status, out, err)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line
+
+def test_abundance_dist_single():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    print status
+    print out
+    print err
+    assert status == 0
+
+    print open(outfile).read()
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+def test_abundance_dist_single_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+
+    print (status, out, err)
+    print open(outfile).read()
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line
 
 def test_do_partition():
     seqfile = utils.get_test_data('random-20-a.fa')
