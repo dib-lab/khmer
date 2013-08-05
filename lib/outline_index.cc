@@ -103,17 +103,143 @@ void khmer::load_tagset(std::string infilename,std::vector<khmer::HashIntoType>&
     infile.close();
     return ;
 }
+
+void khmer::print_tagset(std::string infilename, std::vector<khmer::HashIntoType>& mykhmervector, unsigned int save_ksize)
+{
+  std::ofstream printfile(infilename.c_str());
+
+  for (std::vector<khmer::HashIntoType>::iterator it=mykhmervector.begin(); it!=mykhmervector.end(); ++it) {
+    	std::string kmer = _revhash(*it, save_ksize);
+    	printfile << kmer << "\n";
+	}
+
+  printfile.close();
+}
+
+//------- seedSet IO ---------------------
+void khmer:: consume_fasta_and_tag(std::string readsFileName,unsigned int save_ksize, unsigned int tag_density){
+ 
+  std::cout<<"in consume_fasta_and_tag\n";
+  unsigned long long total_reads = 0;
+  using namespace khmer:: read_parsers;
+  IParser * parser  = IParser::get_parser(readsFileName.c_str());
+  Read read;
+  std::set<khmer::HashIntoType> all_seeds;
+  std::set<khmer::HashIntoType> new_seeds;
+  while(!parser->is_complete())  {
+        read = parser->get_next_read();
+        total_reads++;
+	//KHMER_EXTRA_SANITY_CHECKS flag in kmer iterators  must be set
+        new_seeds.clear();
+ 	new_seeds = consume_sequence_and_tag(read.sequence, save_ksize, tag_density);
+	}
+  
+  std::cout<<"the num of reads consumed is :"<<total_reads<<std::endl;
+
+  
+}
+std::set<khmer::HashIntoType> khmer:: consume_sequence_and_tag(std::string seq , unsigned int save_ksize, unsigned int tag_density ){
+  std::cout<<"consume_sequence_and_tag\n";
+ 
+  std::set<khmer::HashIntoType> new_seeds;
+  khmer::KMerIterator kmers(seq.c_str(), save_ksize);
+  khmer::HashIntoType kmer;
+  unsigned int since=0;
+  
+  while(!kmers.done()) {
+ 	kmer = kmers.next();
+	if (since<=tag_density) {
+		new_seeds.insert(kmer);
+		}
+	}
+  std::cout<<"the # seeds:"<<new_seeds.size()<<std::endl;
+
+  return new_seeds;
+}
+
+void khmer::save_seedset(std::string outfilename,std::set<khmer::HashIntoType>& all_seeds,unsigned int& _ksize, unsigned int& _tag_density)
+{
+  std::ofstream outfile(outfilename.c_str(), std::ios::binary);
+  const unsigned int seed_set_size = all_seeds.size();
+  unsigned int save_ksize = _ksize;
+  unsigned int tag_density=_tag_density;
+
+  HashIntoType * buf = new HashIntoType[seed_set_size];
+
+  unsigned char version = 'v';	//SAVED_FORMAT_VERSION;	//dumpy var
+  outfile.write((const char *) &version, 1);
+
+  unsigned char ht_type = 'h' ;	// SAVED_TAGS;		//dumpy var
+  outfile.write((const char *) &ht_type, 1);
+
+  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+  outfile.write((const char *) &seed_set_size, sizeof(seed_set_size));
+  outfile.write((const char *) &tag_density, sizeof(tag_density));
+
+  unsigned int i = 0;
+  for (std::set<khmer::HashIntoType>::iterator pi = all_seeds.begin(); pi != all_seeds.end();
+         pi++, i++) {
+    buf[i] = *pi;
+  }
+
+  outfile.write((const char *) buf, sizeof(HashIntoType) * seed_set_size);
+  outfile.close();
+
+  delete buf;
+  return ;
+}
+
+void khmer::load_seedset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int& save_ksize, unsigned int& _tag_density)
+{
+  //std::cout<<"in loading_tagset...\n";
+  std::ifstream infile(infilename.c_str(), std::ios::binary);
+  assert(infile.is_open());
+  unsigned char version, ht_type;
+  unsigned int tagset_size = 0;
+  infile.read((char *) &version, 1);
+  infile.read((char *) &ht_type, 1);
+  infile.read((char *) &save_ksize, sizeof(save_ksize));
+  infile.read((char *) &tagset_size, sizeof(tagset_size));
+  infile.read((char *) &_tag_density, sizeof(_tag_density));
+  khmer::HashIntoType * buf = new khmer::HashIntoType[tagset_size];
+  infile.read((char *) buf, sizeof(khmer::HashIntoType) * tagset_size);
+  
+  for (int i=0; i<tagset_size; i++) {
+        mykhmervector.push_back(buf[i]);
+    }
+
+  std::sort (mykhmervector.begin(),mykhmervector.end());
+
+  delete buf;
+
+  infile.close();
+  return ;
+}
+
+void khmer::print_seedset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int save_ksize)
+{
+  std::ofstream printfile(infilename.c_str());
+
+  unsigned int i = 0;
+  for (std::vector<khmer::HashIntoType>::iterator it=mykhmervector.begin(); it!=mykhmervector.end(); ++it) {
+        std::string kmer = _revhash(*it, save_ksize);
+        printfile << kmer << "\n";
+        }
+
+  printfile.close();
+}
+
 //---- indexing  process ----
-void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashIntoType>& sortedKhmerVector,unsigned int save_ksize)
+void khmer::build_index(std::string readsBinFileName, unsigned int density,  std::vector<khmer::HashIntoType>& sortedKhmerVector,unsigned int save_ksize)
 {
     //std::cout<<"in building the index...\n";
     std::fstream readBinFile;
     readBinFile.open(readsBinFileName.c_str(),std::ios::in|std::ios::binary);
     long numReads=0;
     ReadFromDiskHeader(readBinFile,&numReads);
-    std::cout<<"\tnum of reads in the file:"<<numReads<<std::endl;
+    //std::cout<<"\tnum of reads in the file:"<<numReads<<std::endl;
     unsigned int numTkmer=sortedKhmerVector.size();
-    std::cout<<"\tnum of tagged khmers:"<<numTkmer<<std::endl;
+    //std::cout<<"\tnum of tagged khmers:"<<numTkmer<<std::endl;
     
     int  classSize[numTkmer];		//the number of reads belong to this id
     long index;
@@ -163,7 +289,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
             }
         } //while
 	if (read_is_tagged==false){ 
-		std::cout<<"ERROR read is not tagged with id:"<<i+1<<"\n";
+		std::cout<<"ERROR read is not tagged with id:"<<i+1<<"and length:"<<seqLen<<"\n";
 		//std::cout<<_seq<<std::endl;
 		//error_cnt++;
 	}
@@ -173,9 +299,11 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
         _seq="";
     }
     std::cout<<"\tdone indexing Reads...\n";
-    std::string outfilename2= readsBinFileName+".readDist";
+    //save the info to the disk
+    std::string density_str=""; std::ostringstream convert;     convert << density;     density_str = convert.str();
+    std::string outfilename2= readsBinFileName+".readDist.d"+density_str;
     std::ofstream outfile2(outfilename2.c_str());
-    std::cout<<"wrting the class size array into xxx.readDist file:\n";
+    std::cout<<"wrting the class size array into xxx.readDist.dx file:\n";
     for (int i=0;i< numTkmer ;i++){ 
 	outfile2<<i+1<<"\t"<<classSize[i]<<"\n";
 	}
@@ -185,7 +313,7 @@ void khmer::build_index(std::string readsBinFileName, std::vector<khmer::HashInt
     std::cout<<"\tsaving the index information...\n";
     int indexSize=0;
     //save the index informaiton
-    std::string outfilename= readsBinFileName+".index";
+    std::string outfilename= readsBinFileName+".index.d"+density_str;
     std::ofstream outfile(outfilename.c_str(), std::ios::binary);
 
     //wrtie the size of taged k-mer sorted array
@@ -273,7 +401,7 @@ void khmer::load_index_header(std::string infilename,unsigned int& num_tagged_kh
 //given a query sequnce, find all its tagged k-mers
 void khmer::extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer)
 {
-    std::cout<<"in extract_tags_from_seq...\n";
+    //std::cout<<"in extract_tags_from_seq...\n";
     // laod the index header
     unsigned int num_tagged_khmer=0;
     std::vector<khmer::HashIntoType> sorted_khmer;
@@ -295,7 +423,7 @@ void khmer::extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::s
             kmer = kmers.next();
             low=std::lower_bound (sorted_khmer.begin(), sorted_khmer.end(), kmer);
             if (low != sorted_khmer.end() && *low == kmer) {
-                std::cout<<"a tag is found \n";
+                //std::cout<<"a tag is found \n";
 		qeuery_tagged_khmer.push_back(kmer);
             }
         } //while
@@ -397,7 +525,7 @@ void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>&
     readBinFile.close();
 }
 unsigned int khmer::sim_measure(std::string seq1, std::string seq2, unsigned int save_ksize){
-    std::cout<<"in sim_measure\n";
+    //std::cout<<"in sim_measure\n";
     unsigned int score=0;
 	
     //first extract all unique k-mers from seq1 and sort them
@@ -408,7 +536,7 @@ unsigned int khmer::sim_measure(std::string seq1, std::string seq2, unsigned int
             kmer = kmers.next();
 	    sorted_khmer.insert(kmer);
    }
-   std::cout<<"the num of u-k-mer in seq1 is:"<<sorted_khmer.size()<<std::endl;
+   //std::cout<<"the num of u-k-mer in seq1 is:"<<sorted_khmer.size()<<std::endl;
     //allocate a bool ary to check the shared u-k-mers
     bool ary[sorted_khmer.size()];
     for (unsigned int i=0; i<sorted_khmer.size(); i++) ary[i]=false;
@@ -522,7 +650,7 @@ th substrings
 	std::cout<<"enter the skipping paramter k value:"; std::cin>>k; std::cout<<std::endl;//skipping paramater
 	for (unsigned int i=0; i<num_q; i++){
 		location+=(long)((i+k)%numReads)+1;
-		std::cout<<location<<std::endl;
+		//std::cout<<location<<std::endl;
 		readBin.nullfy();
                 ReadFromDiskRead(readBinFile,&readBin,location);
                 readBin.printSeq(queryFile); queryFile<<std::endl;
@@ -545,3 +673,49 @@ th substrings
    readBinFile.close();
    queryFile.close();
 }//end sampling procedure
+
+//----- stat --------
+//mean=E(X), std= sgr( E(x^2)- (E(x)^2) )
+void khmer::create_stat(std::string statfilename){
+   std::cout<<"in create_stat\n";
+   std::ifstream infile(statfilename.c_str(), std::ios::in);
+   assert(infile.is_open());
+   
+   int seq_id = 0, read_id;
+   float  score=0, first_mom_socre=0,second_mom_socre=0, local_std_score=0;
+   int read_sum=0, read_ssum=0;
+   float score_sum=0, score_ssum=0;
+   int id=1;  //keep track of each q-seq stat
+   
+   while (!infile.eof()) {
+	infile>>seq_id>>read_id>>score;
+	while (id == seq_id) {
+		read_sum++ ;
+		score_sum += score ;
+		score_ssum = score * score ;
+		} // innner while
+	// copmute locat stat
+	first_mom_socre  = (float) score_sum / (float) read_sum;
+ 	second_mom_socre = (float) score_ssum / (float) read_sum;
+	local_std_score  = sqrt (second_mom_socre - first_mom_socre * first_mom_socre);
+	
+	//print local info
+	std::cout<< "local stat for q-seq:" << seq_id
+                 << ":# ret_reads:" << read_sum
+		 << " avg_score:" << first_mom_socre
+		 << " std_score:" << local_std_score <<std::endl;
+	
+	//update global info
+	
+	//prepare for the next local stat
+	id=seq_id;read_sum=1;
+	score_sum=score;
+	score_ssum = score * score ;
+        } // outert while
+   
+   //print stat for lst group
+   
+   //print global stat
+
+   infile.close();
+}

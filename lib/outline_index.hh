@@ -10,6 +10,7 @@
 #include <string>               // used for files names
 #include <stdlib.h>             // used for c_str() function
 #include <iterator>     	// std::distance
+//#include <cmath>		// for stat
 #include "hashtable.hh"
 #define maxNameLength 80
 #define maxSeqLength 200
@@ -135,9 +136,19 @@ void WriteToDiskRead(std::fstream& readBinFile,readNode* read,long pageNum);
 void ReadFromDiskRead(std::fstream& readBinFile,readNode* read,long pageNum);
 //----------- tagSet IO operation ------------
 void load_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector, unsigned int& k,unsigned int& _tag_density );
+void print_tagset(std::string infilename,std::vector<khmer::HashIntoType>& mykhmervector,unsigned int save_ksize);
+//----------- seedSet ----------------------
+void consume_fasta_and_tag(std::string readsFileName,unsigned int save_ksize,unsigned int tag_density);
+
+std::set<khmer::HashIntoType> consume_sequence_and_tag(std::string seq , unsigned int save_ksize, unsigned int _tag_density);
+
+void save_seedset(std::string infilename, std::set<khmer::HashIntoType>& all_seeds, unsigned int& k,unsigned int& _tag_density );
+void load_seedset(std::string infilename, std::vector<khmer::HashIntoType>& mykhmervector, unsigned int& k,unsigned int& _tag_density );
+
+void print_seedset(std::string infilename, std::vector<khmer::HashIntoType>& mykhmervector, unsigned int save_ksize);
 //---------- index ----------
-void build_index(std::string readsBinFileName,std::vector<khmer::HashIntoType>& sortedKhmerVector,unsigned int  save_ksize );
-void load_index_header(std::string infilename,unsigned int& num_tagged_khmer,std::vector<khmer::HashIntoType>& sorted_khmer,std::vector<unsigned int>& accumulated_sizes);
+void build_index(std::string readsBinFileName, unsigned int density,std::vector<khmer::HashIntoType>& sortedKhmerVector,unsigned int  save_ksize );
+void load_index_header(std::string infilename ,unsigned int& num_tagged_khmer,std::vector<khmer::HashIntoType>& sorted_khmer,std::vector<unsigned int>& accumulated_sizes);
 //--------- exact query -----------
 void extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer);
 void retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer,std::vector<long>& reads_ids );
@@ -149,6 +160,8 @@ void exhaustive_search(std::string readsBinFileName,std::string queryFileName);
 void approximate_search(std::string readsBinFileName,std::string queryFileName);
 //------ sampling procedure --------
 void samplefrombinary();
+//------- stat ----------
+void create_stat(std::string statfilename);
 
 };
 
