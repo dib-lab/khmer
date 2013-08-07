@@ -20,7 +20,7 @@
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
-#include "aligner.hh"
+#include "read_aligner.hh"
 #include "labelhash.hh"
 
 using namespace khmer;
@@ -1234,6 +1234,99 @@ static PyObject * hash_consume_high_abund_kmers(PyObject * self,
     unsigned int n_consumed;
     n_consumed = counting->consume_high_abund_kmers(long_str,
                  (BoundedCounterType) min_count);
+
+    /***********************************************************************/
+
+//
+// KCountingHash object
+//
+
+void free_pre_partition_info(void * p)
+{
+  _pre_partition_info * ppi = (_pre_partition_info *) p;
+  delete ppi;
+}
+
+void free_subset_partition_info(void * p)
+{
+  khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
+  delete subset_p;
+}
+
+typedef struct {
+  PyObject_HEAD
+  khmer::CountingHash * counting;
+} khmer_KCountingHashObject;
+
+typedef struct {
+  PyObject_HEAD
+  khmer::SubsetPartition * subset;
+} khmer_KSubsetPartitionObject;
+
+typedef struct {
+  PyObject_HEAD
+  khmer::Hashbits * hashbits;
+} khmer_KHashbitsObject;
+
+static void khmer_subset_dealloc(PyObject *);
+static PyObject * khmer_subset_getattr(PyObject * obj, char * name);
+
+static PyTypeObject khmer_KSubsetPartitionType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "KSubset", sizeof(khmer_KSubsetPartitionObject),
+    0,
+    khmer_subset_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_subset_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "subset object",           /* tp_doc */
+};
+
+#define is_subset_obj(v)  ((v)->ob_type == &khmer_KSubsetPartitionType)
+
+// MOVED HASHBITS TYPE TO BELOW METHODS
+
+/* GRAPHALIGN addition */
+typedef struct {
+  PyObject_HEAD
+  khmer::ReadAligner * aligner;
+} khmer_ReadAlignerObject;
+
+static void khmer_counting_dealloc(PyObject *);
+
+static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args);
+
+static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args);
+
+static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  PyObject * x;
+  if (!PyArg_ParseTuple(args, "O", &x)) {
+    return NULL;
+  }
+
+  bool setme = PyObject_IsTrue(x);
+  counting->set_use_bigcount(setme);
+
+  Py_RETURN_NONE;
+}
+>>>>>>> Working (if threadbare) implementation of aligning reads to the DBG based on Jason Pell's work
 
     return PyInt_FromLong(n_consumed);
 }
@@ -4274,6 +4367,11 @@ static PyTypeObject khmer_KLabelHashType = {
     (initproc)khmer_labelhash_init,   /* tp_init */
     0,                       /* tp_alloc */
 };
+
+//
+// GRAPHALIGN addition
+//
+
 
 //
 // GRAPHALIGN addition
