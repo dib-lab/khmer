@@ -141,10 +141,9 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
   return max_count;
 }
 
-HashIntoType * CountingHash::abundance_distribution(std::string filename,
-						    Hashbits * tracking,
-			    CallbackFn callback,
-			    void * callback_data) const
+HashIntoType * 
+CountingHash::abundance_distribution(read_parsers::IParser * parser,
+				     Hashbits * tracking)
 {
   HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
   HashIntoType i;
@@ -154,7 +153,7 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
   }
 
   Read read;
-  IParser* parser = IParser::get_parser(filename.c_str());
+  
   string name;
   string seq;
   unsigned long long read_num = 0;
@@ -186,18 +185,17 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     }
 
     read_num += 1;
-
-    // run callback, if specified
-    if (read_num % CALLBACK_PERIOD == 0 && callback) {
-      try {
-        callback("abundance_distribution", callback_data, read_num, 0);
-      } catch (...) {
-        throw;
-      }
-    }
   }
-
   return dist;
+}
+
+
+HashIntoType * CountingHash::abundance_distribution(std::string filename,
+						    Hashbits * tracking)
+{
+  IParser* parser = IParser::get_parser(filename.c_str());
+
+  return abundance_distribution(parser, tracking);
 }
 
 HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &inputfile,

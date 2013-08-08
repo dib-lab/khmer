@@ -55,6 +55,10 @@ def main():
     else:
         target_method = ht.consume_fasta_and_tag_with_reads_parser
 
+    config = khmer.get_config()
+    bufsz = config.get_reads_input_buffer_size()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
+
     for n, filename in enumerate(filenames):
         
         rparser = khmer.ReadParser(filename, n_threads)
