@@ -1,0 +1,35 @@
+#! /usr/bin/env python
+import screed
+
+import sys
+
+dbfile = sys.argv[1]
+mapfile = sys.argv[2]
+
+lengths = {}
+for n, record in enumerate(screed.open(dbfile)):
+    if n % 10000 == 0:
+        print '...', n
+    lengths[record.name] = len(record.sequence)
+
+sums = {}
+for n, line in enumerate(open(mapfile)):
+    if n % 10000 == 0:
+        print '... 2x', n
+    x = line.split()
+    name = x[2]
+    readlen = len(x[4])
+    sums[name] = sums.get(name, 0) + 1
+
+mapped_reads = n
+
+rpkms = {}
+for k in sums:
+    rpkms[k] = sums[k] * (1000. / float(lengths[k])) * float(mapped_reads)/1e6
+
+outfp = open(dbfile + '.cov', 'w')
+for n, record in enumerate(screed.open(dbfile)):
+    if n % 10000 == 0:
+        print '...', n
+
+    print >>outfp, ">%s[cov=%d]\n%s" % (record.name, rpkms.get(record.name, 0), record.sequence)
