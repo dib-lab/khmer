@@ -16,7 +16,7 @@ sums = {}
 for n, line in enumerate(open(mapfile)):
     if n % 10000 == 0:
         print '... 2x', n
-    x = line.split()
+    x = line.split('\t')
     name = x[2]
     readlen = len(x[4])
     sums[name] = sums.get(name, 0) + 1
