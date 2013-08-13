@@ -117,43 +117,57 @@ void khmer::print_tagset(std::string infilename, std::vector<khmer::HashIntoType
 }
 
 //------- seedSet IO ---------------------
-void khmer:: consume_fasta_and_tag(std::string readsFileName,unsigned int save_ksize, unsigned int tag_density){
+std::set<khmer::HashIntoType>  khmer:: consume_fasta_and_tag(std::string readsFileName,unsigned int save_ksize, unsigned int tag_density){
  
-  std::cout<<"in consume_fasta_and_tag\n";
+  //std::cout<<"in consume_fasta_and_tag\n";
   unsigned long long total_reads = 0;
   using namespace khmer:: read_parsers;
+
   IParser * parser  = IParser::get_parser(readsFileName.c_str());
   Read read;
   std::set<khmer::HashIntoType> all_seeds;
   std::set<khmer::HashIntoType> new_seeds;
-  while(!parser->is_complete())  {
+
+  while(!parser->is_complete()/*&& (total_reads<3)*/)  {
         read = parser->get_next_read();
         total_reads++;
 	//KHMER_EXTRA_SANITY_CHECKS flag in kmer iterators  must be set
         new_seeds.clear();
  	new_seeds = consume_sequence_and_tag(read.sequence, save_ksize, tag_density);
+	all_seeds.insert(new_seeds.begin(), new_seeds.end());
 	}
-  
-  std::cout<<"the num of reads consumed is :"<<total_reads<<std::endl;
 
-  
+  //std::cout<<"the num of reads consumed is :"<<total_reads<<std::endl;
+  return all_seeds;
 }
 std::set<khmer::HashIntoType> khmer:: consume_sequence_and_tag(std::string seq , unsigned int save_ksize, unsigned int tag_density ){
-  std::cout<<"consume_sequence_and_tag\n";
+  //std::cout<<"consume_sequence_and_tag\n";
  
   std::set<khmer::HashIntoType> new_seeds;
   khmer::KMerIterator kmers(seq.c_str(), save_ksize);
   khmer::HashIntoType kmer;
-  unsigned int since=0;
-  
+  unsigned int since = 1 ; //UINT_MAX;
+  int cnt=0;
+  /*std::cout<<"save_ksize:"<<save_ksize<<" tag_density:"<<tag_density<<std::endl;
+  std::cout<<"the sent seq is:";
+  std::cout<<seq<<std::endl;
+  std::cout<<"the length of the seq is:"<<seq.length()<<std::endl;
+  */
   while(!kmers.done()) {
+	cnt++;
  	kmer = kmers.next();
-	if (since<=tag_density) {
+	if (since ==  tag_density) {
+		/*std::cout<<"this k-mer is chosen at location :"<<cnt<<std::endl;
+		std::cout<<"h-k-mer:"<<kmer<<std::endl;
+		std::cout<<_revhash(kmer, save_ksize)<<std::endl;
+		*/
 		new_seeds.insert(kmer);
+		since = 1 ;
 		}
+	else {	since++;}
 	}
-  std::cout<<"the # seeds:"<<new_seeds.size()<<std::endl;
-
+  //std::cout<<"local # seeds:"<<new_seeds.size()<<std::endl;
+  //std::cout<<"# all possible k-mers:"<<cnt<<std::endl;
   return new_seeds;
 }
 
@@ -399,7 +413,7 @@ void khmer::load_index_header(std::string infilename,unsigned int& num_tagged_kh
 
 //------ query -------
 //given a query sequnce, find all its tagged k-mers
-void khmer::extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer)
+void khmer::extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::string infilename,std::set<khmer::HashIntoType>& qeuery_tagged_khmer)
 {
     //std::cout<<"in extract_tags_from_seq...\n";
     // laod the index header
@@ -424,14 +438,15 @@ void khmer::extract_tags_from_seq(std::string seq,unsigned int save_ksize,std::s
             low=std::lower_bound (sorted_khmer.begin(), sorted_khmer.end(), kmer);
             if (low != sorted_khmer.end() && *low == kmer) {
                 //std::cout<<"a tag is found \n";
-		qeuery_tagged_khmer.push_back(kmer);
+		//qeuery_tagged_khmer.push_back(kmer);
+		qeuery_tagged_khmer.insert(kmer);
             }
         } //while
 
     infile.close();
 }
 //given the index file and set of tagged kmers, retreieve the reads ids contanning this tagged khmers
-void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::HashIntoType>& qeuery_tagged_khmer,std::vector<long>& reads_ids )
+void khmer::retrieve_read_ids_by_tag(std::string infilename,std::set<khmer::HashIntoType>& qeuery_tagged_khmer,std::set<long>& reads_ids )
 {
     //std::cout<<"in retrieve_read_ids_by_tag...\n";
     // laod the index header
@@ -463,10 +478,12 @@ void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::H
     std::vector<khmer::HashIntoType>::iterator low;
     khmer::HashIntoType kmer;
     // go through all the query tagged khmers
-    //std::cout<<"strating query process...\n";
-    for (int i=0; i<qeuery_tagged_khmer.size(); i++) {
+    for (std::set<khmer::HashIntoType>::iterator pi = qeuery_tagged_khmer.begin(); pi != qeuery_tagged_khmer.end();
+         pi++) {
+    //for (int i=0; i<qeuery_tagged_khmer.size(); i++) {
         //std::cout<<"query # "<<i+1<<std::endl;
-        kmer=qeuery_tagged_khmer[i];
+        //kmer=qeuery_tagged_khmer[i];
+        kmer=*pi;
         index=-1;
         //locate khmer of interest
         low=std::lower_bound (sorted_khmer.begin(), sorted_khmer.end(), kmer);
@@ -491,14 +508,15 @@ void khmer::retrieve_read_ids_by_tag(std::string infilename,std::vector<khmer::H
         unsigned long * buf = new unsigned long [num_reads];
         infile.read((char *) buf, sizeof(long) * num_reads);
         for (unsigned int i = 0; i < num_reads; i++) {
-            reads_ids.push_back(buf[i]);
+            //reads_ids.push_back(buf[i]);
+	    reads_ids.insert(buf[i]);
         }
     }
     infile.close();
 }
 
 //given the read binary file and set of read ids, retrieve reads
-void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>& reads_ids, std::vector<std::string>& reads)
+void khmer::retrieve_read_by_id(std::string readsBinFileName, std::set<long>& reads_ids, std::vector<std::string>& reads)
 {
     //std::cout<<"in retrieve_read_by_id..\n";
     //open read binary file
@@ -510,9 +528,10 @@ void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>&
     unsigned int seqLen;
     std::string  seq;
     std::string _seq="";
-    for (unsigned int i=0; i<reads_ids.size(); i++) {
-        ReadFromDiskRead(readBinFile,&readBin,reads_ids[i]);
-        seqLen=readBin.getSeqLength();
+    for (std::set<long>::iterator pi = reads_ids.begin(); pi != reads_ids.end();
+	pi++) {
+       	ReadFromDiskRead(readBinFile,&readBin,*pi);
+	seqLen=readBin.getSeqLength();
         seq=readBin.getSeq();
         for(int j=0; j<seqLen; j++) {
             _seq+=seq[j];
@@ -522,6 +541,33 @@ void khmer::retrieve_read_by_id(std::string readsBinFileName, std::vector<long>&
         readBin.nullfy();
         _seq="";
     }
+    readBinFile.close();
+}
+void khmer::retrieve_read_by_id(std::string readsBinFileName, std::set<long>& reads_ids, std::map<long,std::string>& mymap)
+{
+    //std::cout<<"in retrieve_read_by_id\n";
+    std::fstream readBinFile;
+    readBinFile.open(readsBinFileName.c_str(),std::ios::in|std::ios::binary);
+    //clear your map
+    readNode readBin;
+    unsigned int seqLen;
+    std::string  seq;
+    std::string _seq="";
+    for (std::set<long>::iterator pi = reads_ids.begin(); pi != reads_ids.end();
+        pi++) {
+	ReadFromDiskRead(readBinFile,&readBin,*pi);
+        seqLen=readBin.getSeqLength();
+        seq=readBin.getSeq();
+        for(int j=0; j<seqLen; j++) {
+            _seq+=seq[j];
+		}
+	//std::cout<<"before inserting to the map the values are:"<<*pi<<"\t"<<_seq<<std::endl;
+	mymap.insert ( std::pair<long,std::string>(*pi,_seq) );
+        // clean for the next read processing
+	readBin.nullfy();
+        _seq="";
+
+	}	
     readBinFile.close();
 }
 unsigned int khmer::sim_measure(std::string seq1, std::string seq2, unsigned int save_ksize){
@@ -560,50 +606,6 @@ unsigned int khmer::sim_measure(std::string seq1, std::string seq2, unsigned int
 
     return score;
 }
-//------ exact query ------
-/*void khmer::exactQuery(std::string readsBinFileName,std::string queryFileName){
-  std::cout<<"in Load_Queries...\n";
-  std::fstream inQfile(queryFileName.c_str(),std::ios::in| std::ios::binary);
-  assert(inQfile.is_open());
-  std::fstream inRfile(readsBinFileName.c_str(),std::ios::in|std::ios::binary);
-  assert(inRfile.is_open());
-
- khmer::HashIntoType khmer;
- std::stringstream ss;
- std::ifstream inputClassFile; std::string inputClassFileName;
- long location;	readNode readBin;char ch;
- //while not end of query file
- while (!(inQfile.eof())){
- 	inQfile>>khmer;		ss.str("");	ss<<khmer;
-	std::cout<<"qKhmer:"<<khmer<<std::endl;
- 	inputClassFileName="classes/class";  inputClassFileName+=ss.str();
- 	inputClassFile.open(inputClassFileName.c_str(),std::ios::in);
- 	if (!inputClassFile.is_open()) std::cout<<"this tagged khmer is new!!!!\n";
- 	else { location=-1;
-		while (!(inputClassFile.eof())){
-			//location=-1;
-			inputClassFile>>location; std::cout<<"\tlocation:"<<location;
- 			readBin.nullfy();
-			ReadFromDiskRead(inRfile,&readBin,location);
- 			std::cout<<"\tread:";	readBin.printSeq(); std::cout<<std::endl;
-			inputClassFile>>ch;
-		}
- 	inputClassFile.close();
-	}
- }
- inQfile.close();
- inRfile.close();
-
-}
-*/
-//------- searching procedures -------------
-void khmer::exhaustive_search(std::string readsBinFileName,std::string queryFileName){
-	std::cout<<"exhaustive_search\n";
-}
-void khmer::approximate_search(std::string readsBinFileName,std::string queryFileName){
-	std::cout<<"approximate_search\n";;
-}
-
 //------- Sampling Procedures ---------------
 void khmer::samplefrombinary(){
     std::cout<<"in sampling from binary sequnce file\n";
@@ -680,42 +682,67 @@ void khmer::create_stat(std::string statfilename){
    std::cout<<"in create_stat\n";
    std::ifstream infile(statfilename.c_str(), std::ios::in);
    assert(infile.is_open());
+   //std::cout<<"the fiel name sent is : "<<statfilename<<std::endl;
+   unsigned int seq_id=-1 , read_id;
+   float  score=0, first_mom=0,second_mom=0, std_dev=0;
+   unsigned int read_sum=0, global_read_sum = 0 , global_read_ssum=0;
+   float score_sum=0, score_ssum=0 , global_score_sum=0, global_score_ssum=0;;
+   unsigned int cnt=0 , id=1;  //keep track of each q-seq stat
    
-   int seq_id = 0, read_id;
-   float  score=0, first_mom_socre=0,second_mom_socre=0, local_std_score=0;
-   int read_sum=0, read_ssum=0;
-   float score_sum=0, score_ssum=0;
-   int id=1;  //keep track of each q-seq stat
+   std::string header_str="";
+   std::getline(infile,header_str);
+   //std::cout<<"the header file is:"<<header_str<<std::endl;
+   
    
    while (!infile.eof()) {
-	infile>>seq_id>>read_id>>score;
-	while (id == seq_id) {
+	infile>>seq_id>>read_id>>score;		cnt++;
+	//std::cout<<"prcess q-seq:"<<seq_id<<" read_id:"<<read_id<<" score:"<<score<<std::endl;
+	while ((!infile.eof()) && (id == seq_id)) {
 		read_sum++ ;
 		score_sum += score ;
-		score_ssum = score * score ;
+		score_ssum += score * score ;
+		infile>>seq_id>>read_id>>score;
 		} // innner while
+	//std::cout<<"done...";
+
 	// copmute locat stat
-	first_mom_socre  = (float) score_sum / (float) read_sum;
- 	second_mom_socre = (float) score_ssum / (float) read_sum;
-	local_std_score  = sqrt (second_mom_socre - first_mom_socre * first_mom_socre);
+	first_mom  = (float) score_sum / (float) read_sum;
+ 	second_mom = (float) score_ssum / (float) read_sum;
+	std_dev    = sqrt (second_mom - first_mom * first_mom);
 	
 	//print local info
-	std::cout<< "local stat for q-seq:" << seq_id
-                 << ":# ret_reads:" << read_sum
-		 << " avg_score:" << first_mom_socre
-		 << " std_score:" << local_std_score <<std::endl;
+	std::cout<< "local stat for q-seq:" << seq_id << std::endl
+                 << " # ret_reads:" << read_sum
+		 << " avg_score:" << first_mom
+		 << " std_score:" << std_dev <<std::endl;
 	
 	//update global info
-	
+	global_score_sum  += score_sum; //first_mom;
+	global_score_ssum += score_ssum;//first_mom * first_mom;
+	global_read_sum   += read_sum;
+	global_read_ssum  += read_sum * read_sum;
 	//prepare for the next local stat
-	id=seq_id;read_sum=1;
-	score_sum=score;
-	score_ssum = score * score ;
-        } // outert while
-   
-   //print stat for lst group
-   
-   //print global stat
+	if (id!=seq_id) {
+		id=seq_id;		read_sum=1;	
+		score_sum=score;	score_ssum = score * score ;
+		}	
+	} // outert while
 
+   	//print global info
+   	std::cout<< "global  stat" << std::endl;
+	first_mom  =( float) global_read_sum / (float) cnt; 
+	second_mom = (float) global_read_ssum / (float) cnt;
+	std_dev    = sqrt (second_mom - first_mom * first_mom);
+	std::cout<< " avg_ret_reads:" << first_mom
+		 << " std_ret_reads:" << std_dev << std::endl;
+	
+	first_mom  =(float) global_score_sum  / (float) global_read_sum ;//(float) cnt;
+	second_mom =(float) global_score_ssum / (float) global_read_sum;// (float) cnt;
+	std_dev    = sqrt (second_mom - first_mom * first_mom);
+	//std::cout<<" cnt:"<<cnt<<"global_score_sum:"<<global_score_sum<<" global_score_ssum:"<<global_score_ssum<<std::endl;
+	std::cout<< " avg_score:" << first_mom
+                 << " std_score:" << std_dev <<std::endl;
+
+	
    infile.close();
 }
