@@ -813,7 +813,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     // _merge_from_disk_consolidate(diskp_to_pp);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 // Save a partition map to disk.
@@ -873,7 +873,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
   }
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 // Load a partition map from disk.
