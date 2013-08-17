@@ -204,7 +204,7 @@ void Hashbits::save_tagset(std::string outfilename)
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::load_tagset(std::string infilename, bool clear_tags)
@@ -240,7 +240,7 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
     all_tags.insert(buf[i]);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 unsigned int Hashbits::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
@@ -1521,6 +1521,8 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
     read_num += 1;
   }
 
+  delete parser;
+
 #if VERBOSE_REPARTITION
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
 #endif // 0
@@ -1557,7 +1559,7 @@ void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
     stop_tags.insert(buf[i]);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::save_stop_tags(std::string outfilename)
@@ -1965,6 +1967,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     }
 
   } // while
+  
+  delete parser;
 }
 
 //
