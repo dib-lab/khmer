@@ -970,3 +970,95 @@ def test_do_partition_2():
 
     assert len(parts) == 99, len(parts)
 
+####
+
+def test_interleave_reads_1():
+    # test input files
+    infile1 = utils.get_test_data('paired.fq.1')
+    infile2 = utils.get_test_data('paired.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    (status, out, err) = runscript(script, args)
+
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+
+def test_extract_paired_reads_1_fa():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fa')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fa.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fa.se')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired-mixed.fa.pe')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired-mixed.fa.se', in_dir)
+
+    script = scriptpath('extract-paired-reads.py')
+    args = [infile]
+
+    (status, out, err) = runscript(script, args, in_dir)
+    print (status, out, err)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+def test_split_paired_reads_1():
+    # test input file
+    infile = utils.get_test_data('paired.fa')
+
+    ex_outfile1 = utils.get_test_data('paired.fa.1')
+    ex_outfile2 = utils.get_test_data('paired.fa.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fa.1')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fa.2', in_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = [infile]
+
+    (status, out, err) = runscript(script, args, in_dir)
+    print (status, out, err)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0

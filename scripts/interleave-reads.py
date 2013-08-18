@@ -1,4 +1,16 @@
 #! /usr/bin/env python
+"""
+Take two files containing left & right reads from a paired-end sequencing run,
+and interleave them.
+
+% scripts/interleave-reads.py <R1> <R2> [ -o <outputfile> ]
+
+By default, output is sent to stdout; or use -o. Use '-h' for parameter help.
+"""
+
+#TODO: take fa as well?
+#      support gzip option?
+
 import screed
 import sys
 import itertools
