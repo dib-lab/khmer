@@ -44,13 +44,16 @@ def main():
     single_fp = open(outfile + '.se', 'w')
     paired_fp = open(outfile + '.pe', 'w')
 
+    print 'reading file "%s"' % infile
+    print 'outputting interleaved pairs to "%s.pe"' % outfile
+    print 'outputting orphans to "%s.se"' % outfile
+
     last_record = None
     last_name = None
 
     n_pe = 0
     n_se = 0
 
-    print 'splitting pe/se sequences from %s to %s.{pe,se}' % (infile, outfile)
     for n, record in enumerate(screed.open(sys.argv[1])):
         if n % 100000 == 0 and n > 0:
             print '...', n
