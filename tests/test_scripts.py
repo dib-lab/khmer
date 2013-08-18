@@ -1028,6 +1028,43 @@ def test_extract_paired_reads_1_fa():
         assert r.sequence == q.sequence
     assert n > 0
 
+def test_extract_paired_reads_2_fq():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fq')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fq.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fq.se')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired-mixed.fq.pe')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired-mixed.fq.se', in_dir)
+
+    script = scriptpath('extract-paired-reads.py')
+    args = [infile]
+
+    (status, out, err) = runscript(script, args, in_dir)
+    print (status, out, err)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
 def test_split_paired_reads_1():
     # test input file
     infile = utils.get_test_data('paired.fa')
