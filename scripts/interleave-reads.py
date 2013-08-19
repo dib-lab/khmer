@@ -17,6 +17,14 @@ import itertools
 import os
 import argparse
 
+def output_pair(r1, r2):
+    if hasattr(r1, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
+            (r1.name, r1.sequence, r1.accuracy,
+             r2.name, r2.sequence, r2.accuracy)
+    else:
+        return ">%s\n%s\n>%s\n%s\n" % (r1.name, r1.sequence, r2.name, r2.sequence)
+
 def main():
     parser = argparse.ArgumentParser(\
         description='Produce interleaved files from R1/R2 paired files')
@@ -63,12 +71,9 @@ def main():
 
         assert name1[:-2] == name2[:-2], "This doesn't look like paired data! %s %s" % (name1, name2)
 
-        print >>args.output, '@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s' % (name1,
-                                                                 r1.sequence,
-                                                                 r1.accuracy,
-                                                                 name2,
-                                                                 r2.sequence,
-                                                                 r2.accuracy)
+        r1.name = name1
+        r2.name = name2
+        print >>args.output, output_pair(r1, r2)
 
 if __name__ == '__main__':
     main()
