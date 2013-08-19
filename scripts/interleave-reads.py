@@ -75,5 +75,7 @@ def main():
         r2.name = name2
         print >>args.output, output_pair(r1, r2)
 
+    print >>sys.stderr, 'final: interleaved %d pairs' % n
+
 if __name__ == '__main__':
     main()
