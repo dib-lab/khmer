@@ -10,9 +10,16 @@ Reads FASTQ and FASTA input, retains format for output.
 import screed
 import sys
 import os.path
+import argparse
 
 def main():
-    infile = sys.argv[1]
+    parser = argparse.ArgumentParser(\
+        description='Split interleaved reads into two files, left and right.')
+
+    parser.add_argument('infile')
+    args = parser.parse_args()
+    
+    infile = args.infile
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'
     fp1 = open(out1, 'w')
