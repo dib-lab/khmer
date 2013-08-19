@@ -14,7 +14,7 @@ def scriptpath(scriptfile):
 def teardown():
     utils.cleanup()
 
-def runscript(scriptname, args, in_directory=None):
+def runscript(scriptname, args, in_directory=None, fail_ok=False):
     """
     Run the given Python script, with the given args, in the given directory,
     using 'execfile'.
@@ -49,6 +49,9 @@ def runscript(scriptname, args, in_directory=None):
         sys.stdout, sys.stderr = oldout, olderr
 
         os.chdir(cwd)
+
+    if status != 0 and not fail_ok:
+        raise Exception(status, out, err)
 
     return status, out, err
 
@@ -107,7 +110,7 @@ def test_load_into_counting_fail():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = runscript(script, args, fail_ok=True)
     print out
     print err
     assert status == -1
@@ -381,7 +384,7 @@ def test_normalize_by_median_impaired():
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
-    (status, out, err) = runscript(script, args, in_dir)
+    (status, out, err) = runscript(script, args, in_dir, fail_ok=True)
     assert status != 0
 
 def test_normalize_by_median_force():
@@ -539,7 +542,7 @@ def test_load_graph_fail():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = runscript(script, args, fail_ok=True)
     assert status == -1
     assert "ERROR:" in err
 
@@ -972,7 +975,7 @@ def test_do_partition_2():
 
 ####
 
-def test_interleave_reads_1():
+def test_interleave_reads_1_fq():
     # test input files
     infile1 = utils.get_test_data('paired.fq.1')
     infile2 = utils.get_test_data('paired.fq.2')
@@ -987,11 +990,39 @@ def test_interleave_reads_1():
     args = [infile1, infile2, '-o', outfile]
 
     (status, out, err) = runscript(script, args)
+    assert status == 0, (status, out, err)
 
+    n = 0
     for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
         assert r.accuracy == q.accuracy
+    assert n > 0, (status, out, err)
+
+def test_interleave_reads_2_fa():
+    # test input files
+    infile1 = utils.get_test_data('paired.fa.1')
+    infile2 = utils.get_test_data('paired.fa.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired.fa')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fa')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0, (status, out, err)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
 
 def test_extract_paired_reads_1_fa():
     # test input file
@@ -1009,6 +1040,8 @@ def test_extract_paired_reads_1_fa():
     args = [infile]
 
     (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0, (status, out, err)
+    
     print (status, out, err)
 
     assert os.path.exists(outfile1), outfile1
@@ -1044,6 +1077,7 @@ def test_extract_paired_reads_2_fq():
     args = [infile]
 
     (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0, (status, out, err)
     print (status, out, err)
 
     assert os.path.exists(outfile1), outfile1
@@ -1081,6 +1115,7 @@ def test_split_paired_reads_1():
     args = [infile]
 
     (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0, (status, out, err)
     print (status, out, err)
 
     assert os.path.exists(outfile1), outfile1
