@@ -10,6 +10,7 @@ Reads FASTQ and FASTA input, retains format for output.
 import screed
 import sys
 import os.path
+import argparse
 
 def is_pair(name1, name2):
     if name1.endswith('/1') and name2.endswith('/2'):
@@ -36,7 +37,13 @@ def output_single(r):
         return ">%s\n%s\n" % (r.name, r.sequence)
 
 def main():
-    infile = sys.argv[1]
+    parser = argparse.ArgumentParser(\
+       description='Take a mixture of reads and split into pairs and orphans.')
+
+    parser.add_argument('infile')
+    args = parser.parse_args()
+
+    infile = args.infile
     outfile = os.path.basename(infile)
     if len(sys.argv) > 2:
         outfile = sys.argv[2]
