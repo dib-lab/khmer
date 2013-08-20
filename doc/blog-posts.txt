@@ -45,7 +45,7 @@ The hashtable method 'dump_kmers_by_abundance' can be used to dump
 high abundance k-mers, but we don't have a script handy to do that yet.
 
 You can assess high/low abundance k-mer distributions with the
-`hi-lo-abundance-by-position script <http://github.com/ctb/khmer/blob/master/scripts/hi-lo-abundance-by-position.py>`__::
+`hi-lo-abundance-by-position script <http://github.com/ctb/khmer/blob/master/sandbox/hi-lo-abundance-by-position.py>`__::
 
    scripts/load-into-counting.py -k 20 25k.kh data/25k.fq.gz
    python sandbox/hi-lo-abundance-by-position.py 25k.kh data/25k.fq.gz
