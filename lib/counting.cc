@@ -53,6 +53,8 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(
         }
     }
 
+    delete parser;
+
     return mmt;
 }
 
@@ -81,6 +83,8 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
       }
       outfile << endl;
    }
+
+   delete parser;
 
    outfile.close();
 }
@@ -141,10 +145,9 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s,
   return max_count;
 }
 
-HashIntoType * CountingHash::abundance_distribution(std::string filename,
-						    Hashbits * tracking,
-			    CallbackFn callback,
-			    void * callback_data) const
+HashIntoType * 
+CountingHash::abundance_distribution(read_parsers::IParser * parser,
+				     Hashbits * tracking)
 {
   HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
   HashIntoType i;
@@ -154,7 +157,7 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
   }
 
   Read read;
-  IParser* parser = IParser::get_parser(filename.c_str());
+  
   string name;
   string seq;
   unsigned long long read_num = 0;
@@ -186,18 +189,17 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     }
 
     read_num += 1;
-
-    // run callback, if specified
-    if (read_num % CALLBACK_PERIOD == 0 && callback) {
-      try {
-        callback("abundance_distribution", callback_data, read_num, 0);
-      } catch (...) {
-        throw;
-      }
-    }
   }
-
   return dist;
+}
+
+
+HashIntoType * CountingHash::abundance_distribution(std::string filename,
+						    Hashbits * tracking)
+{
+  IParser* parser = IParser::get_parser(filename.c_str());
+
+  return abundance_distribution(parser, tracking);
 }
 
 HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &inputfile,
@@ -254,6 +256,8 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
           }
    } // while reads
 
+   delete parser;
+
    return counts;
 }
 
@@ -303,6 +307,8 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
             }
         }
     } // while reads
+
+    delete parser;
 }
 
 void CountingHash::save(std::string outfilename)
@@ -397,6 +403,8 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
 #endif // 0
   }
 
+  delete parser;
+
   mean = float(total) / float(count);
 }
 
@@ -445,6 +453,8 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
     }
 #endif // 0
   }
+
+  delete parser;
 
   abs_deviation = total / float(count);
 }

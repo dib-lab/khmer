@@ -1886,13 +1886,11 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     khmer::CountingHash * counting = me->counting;
 
-    char * filename = NULL;
-    PyObject * tracking_obj = NULL;
-    PyObject * callback_obj = NULL;
-    if (!PyArg_ParseTuple(args, "sO|O", &filename, &tracking_obj,
-                          &callback_obj)) {
-        return NULL;
-    }
+  char * filename = NULL;
+  PyObject * tracking_obj = NULL;
+  if (!PyArg_ParseTuple(args, "sO", &filename, &tracking_obj)) {
+    return NULL;
+  }
 
     assert(is_hashbits_obj(tracking_obj));
 
@@ -1900,14 +1898,52 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     khmer::Hashbits * hashbits = tracking_o->hashbits;
 
 
-    khmer::HashIntoType * dist;
-    dist = counting->abundance_distribution(filename, hashbits,
-                                            _report_fn, callback_obj);
+  khmer::HashIntoType * dist;
 
-    PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-    for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-        PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
-    }
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(filename, hashbits);
+  Py_END_ALLOW_THREADS
+  
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+  }
+
+  delete[] dist;
+
+  return x;
+}
+
+static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  PyObject * rparser_obj = NULL;
+  PyObject * tracking_obj = NULL;
+  if (!PyArg_ParseTuple(args, "OO", &rparser_obj, &tracking_obj)) {
+    return NULL;
+  }
+
+  khmer:: read_parsers:: IParser * rparser = 
+    _PyObject_to_khmer_ReadParser(rparser_obj);
+
+  assert(is_hashbits_obj(tracking_obj));
+
+  khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
+  khmer::Hashbits * hashbits = tracking_o->hashbits;
+
+
+  khmer::HashIntoType * dist;
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(rparser, hashbits);
+  Py_END_ALLOW_THREADS
+  
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+  }
 
     delete dist;
 
@@ -2070,42 +2106,39 @@ static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
         PyObject * args);
 
 static PyMethodDef khmer_counting_methods[] = {
-    { "ksize", hash_get_ksize, METH_VARARGS, "" },
-    { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
-    { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
-    { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
-    { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
-    { "n_entries", hash_n_entries, METH_VARARGS, "" },
-    { "count", hash_count, METH_VARARGS, "Count the given kmer" },
-    { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
-    { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
-    {
-        "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser,
-        METH_VARARGS, "Count all k-mers using a given reads parser"
-    },
-    { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
-    { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
-    { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
-    { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
-    { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
-    { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
-    { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
-    { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
-    { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
-    { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
-    { "load", hash_load, METH_VARARGS, "" },
-    { "save", hash_save, METH_VARARGS, "" },
-    { "get_kmer_abund_abs_deviation", hash_get_kmer_abund_abs_deviation, METH_VARARGS, "" },
-    { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
-    {
-        "collect_high_abundance_kmers", hash_collect_high_abundance_kmers,
-        METH_VARARGS, ""
-    },
+  { "ksize", hash_get_ksize, METH_VARARGS, "" },
+  { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
+  { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
+  { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
+  { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
+  { "n_entries", hash_n_entries, METH_VARARGS, "" },
+  { "count", hash_count, METH_VARARGS, "Count the given kmer" },
+  { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
+    METH_VARARGS, "Count all k-mers using a given reads parser" },
+  { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
+  { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
+  { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
+  { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
+  { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
+  { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
+  { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
+  { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
+  { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
+  { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
+  { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
+  { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
+  { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
+  { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
+  { "load", hash_load, METH_VARARGS, "" },
+  { "save", hash_save, METH_VARARGS, "" },
+  { "get_kmer_abund_abs_deviation", hash_get_kmer_abund_abs_deviation, METH_VARARGS, "" },
+  { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
+  { "collect_high_abundance_kmers", hash_collect_high_abundance_kmers,
+    METH_VARARGS, "" },
 
-    {NULL, NULL, 0, NULL}           /* sentinel */
+  {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
 static PyObject *

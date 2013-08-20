@@ -20,7 +20,7 @@ def output_pair(r1, r2):
             (r1.name, r1.sequence, r1.accuracy,
              r2.name, r2.sequence, r2.accuracy)
     else:
-        return ">%s\n%s\n%s\n%s\n" % (r1.name, r1.sequence, r2.name, r2.sequence)
+        return ">%s\n%s\n>%s\n%s\n" % (r1.name, r1.sequence, r2.name, r2.sequence)
 
 def output_single(r):
     if hasattr(r, 'accuracy'):
