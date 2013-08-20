@@ -78,7 +78,7 @@ def main():
 
         r1.name = name1
         r2.name = name2
-        print >>args.output, output_pair(r1, r2)
+        args.output.write(output_pair(r1, r2))
 
     print >>sys.stderr, 'final: interleaved %d pairs' % n
 
