@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013.  See doc/LICENSE.txt
+# for license, or contact C. Titus Brown <ctb@msu.edu> with questions.
+# 
 """
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
