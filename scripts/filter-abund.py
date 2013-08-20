@@ -9,10 +9,14 @@ Use '-h' for parameter help.
 """
 import sys
 import os
+import threading
+
 import khmer
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
 from khmer.counting_args import build_counting_multifile_args
+from khmer.threading_args import add_threading_args
+from khmer import thread_utils
+from khmer.thread_utils import ThreadedProcessor
 
 ###
 
@@ -21,6 +25,7 @@ DEFAULT_CUTOFF = 2
 
 def main():
     parser = build_counting_multifile_args()
+    add_threading_args(parser)
     parser.add_argument('--cutoff', '-C', dest='cutoff',
                         default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
@@ -35,44 +40,61 @@ def main():
 
     counting_ht = args.input_table
     infiles = args.input_filenames
+    n_threads = max(int(args.n_threads), 2) # one reader, one writer
 
     print 'file with ht: %s' % counting_ht
+    print 'n_threads:', n_threads
 
     print 'loading hashtable'
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
     print "K:", K
+    config = khmer.get_config()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
-    ### the filtering function.
-    def process_fn(record):
-        name = record['name']
-        seq = record['sequence']
-        if 'N' in seq:
-            return None, None
+    ### the filtering function - return sequence, rest is taken care of.
+    def filter_fn(name, seq):
+        if 'N' in seq or len(seq) < K:
+            return None
 
-        if args.variable_coverage: # only trim when sequence has high enough C
+        # if var cov, only trim when sequence has high enough coverage
+        if args.variable_coverage:
             med, _, _ = ht.get_median_count(seq)
             if med < args.normalize_to:
-                return name, seq
+                return seq
 
+        # high-coverage sequence or no var cov flag -- trim!
         trim_seq, trim_at = ht.trim_on_abundance(seq, args.cutoff)
 
+        # is trimmed sequence long enough to keep?
         if trim_at >= K:
-            return name, trim_seq
+            return trim_seq
 
-        return None, None
-
+        # else, eliminate sequence
+        return None
+        
     ### the filtering loop
-    for infile in infiles:
-        print 'filtering', infile
-        outfile = os.path.basename(infile) + '.abundfilt'
+    for n, filename in enumerate(infiles):
+        print 'filtering', filename
+        outfile = os.path.basename(filename) + '.abundfilt'
+        
+        print 'output in', outfile
         outfp = open(outfile, 'w')
 
-        tsp = ThreadedSequenceProcessor(process_fn)
-        tsp.start(verbose_loader(infile), outfp)
+        # create and start a threaded writer
+        tw = ThreadedProcessor(outfp).start()
 
-        print 'output in', outfile
+        # create multithreaded readparser
+        rparser = khmer.ReadParser(filename, n_threads - 1)
+        threads = thread_utils.start_threads(n_threads - 1,
+                                             target=tw.process_fn,
+                                             args=(rparser, filter_fn))
+
+        # wait for threads to finish & flush out any remaining records.
+        if not tw.join(threads):
+            print >>sys.stderr, "** failure.  See message above."
+            sys.exit(-1)
 
 if __name__ == '__main__':
     main()

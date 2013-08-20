@@ -11,91 +11,59 @@ Use '-h' for parameter help.
 import sys
 import screed
 import os
-import khmer
-from itertools import izip
-from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 import argparse
+
+import khmer
+from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.threading_args import add_threading_args
+from khmer import thread_utils
+from khmer.thread_utils import ThreadedProcessor, PairThreadedProcessor, \
+                               FilterReporter
 
 DEFAULT_DESIRED_COVERAGE = 10
 
-# Iterate a collection in arbitrary batches
-# from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
+def normalize_by_median(input_filename, outfp, ht, args, n_threads,
+                        report_fp=None):
+    def single_filter_fn(name, seq):
+        if len(seq) < K:
+            return None
 
+        seq = seq.replace('N', 'A')
+        med, _, _ = ht.get_median_count(seq)
 
-def batchwise(t, size):
-    it = iter(t)
-    return izip(*[it] * size)
+        if med < DESIRED_COVERAGE:
+            ht.consume(seq)
+            return seq
 
-# Returns true if the pair of records are properly pairs
-def validpair(r0, r1):
-    return r0.name[-1] == "1" and \
-        r1.name[-1] == "2" and \
-        r0.name[0:-1] == r1.name[0:-1]
-
-def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
+    def pair_filter_fn(n1, s1, n2, s2):
+        if single_filter_fn(n1, s1) or single_filter_fn(n2, s2):
+            return s1, s2
+        else:
+            return None, None
 
     DESIRED_COVERAGE = args.cutoff
     K = ht.ksize()
-    
-    # In paired mode we read two records at a time
-    batch_size = 1
+
     if args.paired:
-        batch_size = 2
+        processor_class = PairThreadedProcessor
+        filter_fn = pair_filter_fn
+    else:
+        processor_class = ThreadedProcessor
+        filter_fn = single_filter_fn
 
-    n = -1
-    total = 0
-    discarded = 0
-    for n, batch in enumerate(batchwise(screed.open(
-            input_filename), batch_size)):
-        if n > 0 and n % 100000 == 0:
-            print '... kept {kept} of {total} or {perc:2}%'.format(
-                kept=total-discarded, total=total,
-                perc=int(100. - discarded / float(total) * 100.))
-            print '... in file', input_filename
+    reporter = FilterReporter()
 
-            if report_fp:
-                print>>report_fp, total, total - discarded, \
-                    1. - (discarded / float(total))
-                report_fp.flush()
+    tw = processor_class(outfp, reporter=reporter).start()
+    rparser = khmer.ReadParser(input_filename, n_threads - 1)
+    threads = thread_utils.start_threads(n_threads - 1,
+                                         target=tw.process_fn,
+                                         args=(rparser, filter_fn))
 
-        total += batch_size
+    if not tw.join(threads):
+        print >>sys.stderr, "** failure.  See message above."
+        raise IOError
 
-        # If in paired mode, check that the reads are properly interleaved
-        if args.paired:
-            if not validpair(batch[0], batch[1]):
-                raise IOError('Error: Improperly interleaved pairs \
-                    {} {}'.format(batch[0].name, batch[1].name))
-
-        # Emit the batch of reads if any read passes the filter
-        # and all reads are longer than K
-        passed_filter = False
-        passed_length = True
-        for record in batch:
-            if len(record.sequence) < K:
-                passed_length = False
-                continue
-
-            seq = record.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
-
-            if med < DESIRED_COVERAGE:
-                ht.consume(seq)
-                passed_filter = True
-
-        # Emit records if any passed
-        if passed_length and passed_filter:
-            for record in batch:
-                if hasattr(record, 'accuracy'):
-                    outfp.write('@{}\n{}\n+\n{}\n'.format(record.name,
-                                                          record.sequence,
-                                                          record.accuracy))
-                else:
-                    outfp.write(
-                        '>{}\n{}\n'.format(record.name, record.sequence))
-        else:
-            discarded += batch_size
-    
-    return total, discarded
+    return reporter.n_read, reporter.n_read - reporter.n_saved
 
 def handle_error(error, output_name, input_name, ht):
     print >>sys.stderr, '** ERROR:', error
@@ -110,6 +78,7 @@ def handle_error(error, output_name, input_name, ht):
 
 def main():
     parser = build_construct_args()
+    add_threading_args(parser)
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
@@ -155,6 +124,11 @@ def main():
 
     report_fp = args.report_file
     filenames = args.input_filenames
+    n_threads = max(int(args.n_threads), 2) # min one reader, one writer.
+
+    config = khmer.get_config()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
+
     force=args.force
     dump_frequency = args.dump_frequency
     
@@ -171,7 +145,6 @@ def main():
 
     total = 0
     discarded = 0
-
     for n, input_filename in enumerate(filenames):
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
@@ -182,6 +155,7 @@ def main():
         try:
             total_acc, discarded_acc = normalize_by_median(input_filename, 
                                                            outfp, ht, args,
+                                                           n_threads,
                                                            report_fp)
         except IOError as e:
             handle_error(e, output_name, input_filename, ht)
@@ -191,7 +165,6 @@ def main():
             else:
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
-                pass
         else:
             if total_acc == 0 and discarded_acc == 0:
                 print 'SKIPPED empty file', input_filename
@@ -214,7 +187,6 @@ def main():
                 print 'Nothing given for savehash, saving to', hashname
             ht.save(hashname)
             
-
     if args.savehash:
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash
