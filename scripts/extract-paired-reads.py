@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013.  See doc/LICENSE.txt
+# for license, or contact C. Titus Brown <ctb@msu.edu> with questions.
+# 
 """
 Take a file containing a mixture of interleaved and orphaned reads, and
 extract them into separate files (.pe and .se).
