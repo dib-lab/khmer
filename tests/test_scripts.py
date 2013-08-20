@@ -923,13 +923,10 @@ def test_interleave_reads_1_fq():
 
     runscript(script, args)
 
-    n = 0
-    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
-        n += 1
-        assert r.name == q.name
-        assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
-    assert n > 0, (status, out, err)
+    r = open(ex_outfile).read()
+    q = open(outfile).read()
+
+    assert r == q, (r, q)
 
 def test_interleave_reads_2_fa():
     # test input files
