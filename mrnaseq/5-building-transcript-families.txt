@@ -1,0 +1,135 @@
+============================================================
+5. Building transcript families and annotating the sequences
+============================================================
+
+Install khmer, screed, and BLAST.  (See :doc:`1-quality` and
+:doc:`installing-blastkit`).  I would suggest using an m1.large or
+m1.xlarge machine.
+
+You'll also need to install some eel-pond scripts::
+
+   git clone https://github.com/ctb/eel-pond.git /usr/local/share/eel-pond
+
+Copy in your data
+=================
+
+You need to get ahold of your assembled transcriptome (from
+e.g. :doc:`3-big-assembly`).  Put it in /mnt.
+
+For the purposes of your first run through, I suggest just grabbing my copy
+of the Nematostella assembly::
+
+   cd /mnt
+   curl -O https://s3.amazonaws.com/public.ged.msu.edu/trinity-nematostella-raw.fa.gz
+
+Run khmer partitioning
+======================
+
+Partitioning runs a de Bruijn graph-based clustering algorithm that will
+cluster your transcripts by transitive sequence overlap.  That is, it will
+build transcript families :). ::
+
+   /usr/local/share/khmer/scripts/do-partition.py -x 1e9 -N 4 --threads 4 nema trinity-nematostella-raw.fa.gz
+
+This should take about 15 minutes, and outputs a file ending in '.part'
+that contains the partition assignments.  Now, group and rename the
+sequences::
+
+   python /usr/local/share/eel-pond/rename-with-partitions.py nema trinity-nematostella-raw.fa.gz.part
+   mv trinity-nematostella-raw.fa.gz.part.renamed.fasta.gz trinity-nematostella.renamed.fa.gz
+
+.. tail n.dist
+.. (warning)
+
+.. 
+
+.. (explain sequence names)
+
+Looking at the renamed sequences
+================================
+
+Let's look at the renamed sequences::
+
+   gunzip -c trinity-nematostella.renamed.fa.gz | head
+
+You'll see that each sequence name looks like this::
+
+   >nema.id1.tr16001 1_of_1_in_tr16001 len=261 id=1 tr=16001
+
+Some explanation:
+
+* 'nema' is the prefix that you gave the rename script, above; modify
+  accordingly for your own organism.  It's best to change it each time
+  you do an assembly, just to keep things straight.
+
+* 'idN' is the unique ID for this sequence; it will never be repeated in this
+   file.
+
+* 'trN' is the transcript family, which may contain one or more transcripts.
+
+* '1_of_1_in_tr16001' tells you that this transcript family has only
+  one transcript in it (this one!) Other transcript families may
+  (will) have more.
+
+* 'len' is the sequence length.
+
+Doing a preliminary annotation against mouse
+============================================
+
+Now let's assign putative homology & orthology to these transcripts, by
+doing BLASTs & reciprocal best hit analysis.  First, uncompress your
+transcripts file::
+
+   gunzip trinity-nematostella.renamed.fa.gz 
+
+Now, grab the latest mouse RefSeq::
+
+   curl -O ftp://ftp.ncbi.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.protein.faa.gz
+   gunzip mouse.protein.faa.gz
+
+Format both as BLAST databases::
+
+   formatdb -i mouse.protein.faa -o T -p T
+   formatdb -i trinity-nematostella.renamed.fa -o T -p F
+
+And, now, run BLAST in both directions.  Note, this may take ~24 hours or
+longer; you probably want to run it in screen::
+
+   blastall -i trinity-nematostella.renamed.fa -d mouse.protein.faa -e 1e-3 -p blastx -o nema.x.mouse -a 8 -v 4 -b 4
+   blastall -i mouse.protein.faa -d trinity-nematostella.renamed.fa -e 1e-3 -p tblastn -o mouse.x.nema -a 8 -v 4 -b 4
+
+.. note::
+
+   These BLASTs will take a *long* time, like 24-36 hours.  If you want to
+   work with canned BLASTs, do::
+
+      curl -O http://athyra.idyll.org/~t/nema.x.mouse.gz
+      curl -O http://athyra.idyll.org/~t/mouse.x.nema.gz
+      gunzip nema.x.mouse.gz
+      gunzip mouse.x.nema.gz
+
+Assigning names to sequences
+============================
+
+Now, calculate putative homology (best BLAST hit) and orthology
+(reciprocal best hits)::
+
+   python /usr/local/share/eel-pond/make-uni-best-hits.py nema.x.mouse nema.x.mouse.homol
+   python /usr/local/share/eel-pond/make-reciprocal-best-hits.py nema.x.mouse mouse.x.nema nema.x.mouse.ortho
+
+Prepare some of the mouse info::
+
+   python /usr/local/share/eel-pond/make-namedb.py mouse.protein.faa mouse.namedb
+   python -m screed.fadbm mouse.protein.faa
+
+And, finally, annotate the sequences::
+
+   python /usr/local/share/eel-pond/annotate-seqs.py trinity-nematostella.renamed.fa nema.x.mouse.ortho nema.x.mouse.homol
+
+This will produce a file 'trinity-nematostella.renamed.fa.annot', which
+will have sequences that look like this::
+
+   >nematostella.id1.tr115222 h=43% => suppressor of tumorigenicity 7 protein isoform 2 [Mus musculus] 1_of_7_in_tr115222 len=1635 id=1 tr=115222 1_of_7_in_tr115222 len=1635 id=1 tr=115222
+
+I suggest renaming this file to 'nematostella.fa' and using it for
+BLASTs (see :doc:`installing-blastkit`).

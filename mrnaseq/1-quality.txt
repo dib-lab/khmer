@@ -1,0 +1,376 @@
+================================================
+1. Quality Trimming and Filtering Your Sequences
+================================================
+
+Boot up an m1.xlarge machine from Amazon Web Services; this has about
+15 GB of RAM, and 2 CPUs, and will be enough to complete the assembly
+of the Nematostella data set.
+
+.. note::
+
+   This follows the NGS 2013 tutorial,
+   `Short-read quality evaluation <http://ged.msu.edu/angus/tutorials-2013/short-read-quality-evaluation.html>`__,
+   but for multiple files.
+
+.. note::
+
+   The end results of this tutorial are available as public snapshot
+   snap-8b155fd9 on EC2/EBS.
+
+Install software
+----------------
+
+Install screed::
+
+   cd /usr/local/share
+   git clone https://github.com/ged-lab/screed.git
+   cd screed
+   python setup.py install
+
+Install the bleeding-edge version of khmer::
+
+   cd /usr/local/share
+   git clone https://github.com/ged-lab/khmer.git -b bleeding-edge
+   cd khmer
+   make
+
+   echo 'export PYTHONPATH=/usr/local/share/khmer/python' >> ~/.bashrc
+   source ~/.bashrc
+
+Install Trimmomatic::
+
+   cd /root
+   curl -O http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.27.zip
+   unzip Trimmomatic-0.27.zip 
+   cp Trimmomatic-0.27/trimmomatic-0.27.jar /usr/local/bin
+
+Install libgtextutils and fastx::
+
+   cd /root
+   curl -O http://hannonlab.cshl.edu/fastx_toolkit/libgtextutils-0.6.1.tar.bz2
+   tar xjf libgtextutils-0.6.1.tar.bz2 
+   cd libgtextutils-0.6.1/
+   ./configure && make && make install
+
+   cd /root
+   curl -O http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit-0.0.13.2.tar.bz2
+   tar xjf fastx_toolkit-0.0.13.2.tar.bz2
+   cd fastx_toolkit-0.0.13.2/
+   ./configure && make && make install
+
+In each of these cases, we're downloading the software -- you can use
+google to figure out what each package is and does if we don't discuss
+it below.  We're then unpacking it, sometimes compiling it (which we
+can discuss later), and then installing it for general use.
+
+Find your data
+--------------
+
+Either load in your own data (as in :doc:`0-download-and-save`) or
+create a volume from snapshot snap-f5a9dea7 and mount it as ``/data``
+(again, this is the data from `Tulin et al., 2013
+<http://www.evodevojournal.com/content/4/1/16>`__).
+
+Check::
+
+   ls /data
+
+If you see all the files you think you should, good!  Otherwise, debug.
+
+If you're using the Tulin et al. data provided in the snapshot above,
+you should see a bunch of files like::
+
+   /data/0Hour_ATCACG_L002_R1_001.fastq.gz
+
+Link your data into a working directory
+---------------------------------------
+
+Rather than *copying* the files into the working directory, let's just
+*link* them in -- this creates a reference so that UNIX knows where to
+find them but doesn't need to actually move them around. ::
+
+   cd /mnt
+   mkdir work
+   cd work
+
+   ln -fs /data/*.fastq.gz .
+
+(The 'ln' command is what does the linking.)
+
+Now, do an 'ls' to list the files.  If you see only one entry, ``*.fastq.gz``,
+then the ln command above didn't work properly.  One possibility is that
+your files aren't in /data; another is that they're not named *.fastq.gz.
+
+Download the Illumina adapters
+------------------------------
+
+In the working directory, ::
+
+   curl -O https://s3.amazonaws.com/public.ged.msu.edu/illuminaClipping.fa
+
+.. note::
+
+   You'll need to make sure these are the right adapters for your data.
+   If they are, you should see that some of them are trimmed off, below;
+   if they're not, you shouldn't see anything get trimmed.
+
+Adapter trim each pair of files
+-------------------------------
+
+(From this point on, you may want to be running things inside of
+screen, so that you detach and log out while it's running; see
+:doc:`using-screen` for more information.)
+
+If you're following along using the Nematostella data, you should have a
+bunch of files that look like this (use 'ls' to show them)::
+
+   24HourB_GCCAAT_L002_R1_001.fastq.gz
+                       ^^
+
+Each file with an R1 in its name should have a matching file with an R2 --
+these are the paired ends.
+
+.. note::
+
+   You'll need to replace <R1 FILE> and <R2 FILE>, below, with the
+   names of your actual R1 and R2 files.  You'll also need to replace
+   <SAMPLE NAME> with something that's unique to each pair of files.
+   It doesn't really matter what, but you need to make sure it's different
+   for each pair of files.
+
+For *each* of these pairs, run the following::
+
+   # make a temp directory
+   mkdir trim
+   cd trim
+
+   # run trimmomatic
+   java -jar /usr/local/bin/trimmomatic-0.27.jar PE <R1 FILE> <R2 FILE> s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+
+   # interleave the remaining paired-end files
+   /usr/local/share/khmer/scripts/interleave-reads.py s1_pe s2_pe | gzip -9c > ../<SAMPLE NAME>.pe.fq.gz
+
+   # combine the single-ended files
+   cat s1_se s2_se | gzip -9c > ../<SAMPLE NAME>.se.fq.gz
+
+   # go back up to the working directory and remove the temp directory
+   cd ..
+   rm -r trim
+
+   # make it hard to delete the files you just created
+   chmod u-w *.pe.fq.gz *.se.fq.gz
+
+To get a basic idea of what's going on, please read the '#' comments
+above, but, briefly, this set of commands:
+
+* creates a temporary directory, 'trim/'
+
+* runs 'Trimmomatic' in that directory to trim off the adapters, and then
+  puts remaining pairs (most of them!) in s1_pe and s2_pe, and any orphaned
+  singletons in s1_se and s2_se.
+
+* interleaves the paired ends and puts them back in the working directory
+
+* combines the orphaned reads and puts them back in the working directory
+
+At the end of this you will have new files ending in '.pe.fq.gz' and
+'.se.fq.gz', representing the paired and orphaned quality trimmed
+reads, respectively.
+
+Automating things a bit
+~~~~~~~~~~~~~~~~~~~~~~~
+
+OK, once you've done this once or twice, it gets kind of tedious, doesn't it?
+I've written a script to write these commands out automatically.  Run it
+like so::
+
+   cd /mnt/work
+   python /usr/local/share/khmer/sandbox/write-trimmomatic.py > trim.sh
+
+Run this, and then look at 'trim.sh' using the 'more' command -- ::
+
+   more trim.sh
+
+If it looks like it contains the right commands, you can run it by doing::
+
+   bash trim.sh
+
+.. note::
+
+   This is a prime example of scripting to make your life much easier
+   and less error prone.  Take a look at this file sometime --
+   'more /usr/local/share/khmer/sandbox/write-trimmomatic.py' -- to get
+   some idea of how this works.
+
+Quality trim each pair of files
+-------------------------------
+
+After you run this, you should have a bunch of '.pe.fq.gz' files and
+a bunch of '.se.fq.gz' files.  The former are files that contain paired,
+interleaved sequences; the latter contain single-ended, non-interleaved
+sequences.
+
+Next, for each of these files, run::
+
+   gunzip -c <filename> | fastq_quality_filter -Q33 -q 30 -p 50 | gzip -9c > <filename>.qc.fq.gz
+
+This uncompresses each file, removes poor-quality sequences, and then
+recompresses it.  Note that (following `Short-read quality evaluation
+<http://kbroman.wordpress.com/2013/08/20/electronic-lab-notebook/>`__)
+you can also trim to a specific length by putting in a 'fastx_trimmer
+-Q33 -l 70 |' into the mix.
+
+If fastq_quality_filter complains about invalid quality scores, try
+removing the -Q33 in the command; Illumina has blessed us with multiple
+quality score encodings.
+
+Automating this step
+~~~~~~~~~~~~~~~~~~~~
+
+This step can be automated with a 'for' loop at the shell prompt.  Try::
+
+   for i in *.pe.fq.gz *.se.fq.gz
+   do
+        echo working with $i
+	newfile="$(basename $i .fq.gz)"
+	gunzip -c $i | fastq_quality_filter -Q33 -q 30 -p 50 | gzip -9c > "${newfile}.qc.fq.gz"
+   done
+
+What this loop does is:
+
+* for every file ending in pe.fq.gz and se.fq.gz,
+
+* print out a message with the filename,
+
+* construct a name 'newfile' that omits the trailing .fq.gz
+
+* uncompresses the original file, passes it through fastq, recompresses it,
+  and saves it as 'newfile'.qc.fq.gz
+
+Extracting paired ends from the interleaved files
+-------------------------------------------------
+
+The fastx utilities that we're using to do quality trimming aren't
+paired-end aware; they're removing individual sequences.  Because the
+pe files are interleaved, this means that there may now be some orphaned
+sequences in there.  Downstream, we will want to pay special attention
+to the remaining paired sequences, so we want to separate out the pe
+and se files.  How do we go about that?  Another script, of course!
+
+The khmer script 'strip-and-split-for-assembly.py' does exactly that.
+You run it on an interleaved file that may have some orphans, and it
+produces .pe and .se files afterwards, containing pairs and orphans
+respectively.
+
+To run it on all of the pe qc files, do::
+
+   for i in *.pe.qc.fq.gz
+   do
+      /usr/local/share/khmer/scripts/extract-paired-reads.py $i
+   done
+
+Finishing up
+------------
+
+You should now have a whole mess of files. For example, in the Nematostella
+data, for *each* of the original input files, you'll have::
+
+   24HourB_GCCAAT_L002_R1_001.fastq.gz 	      	     - the original data
+   24HourB_GCCAAT_L002_R2_001.fastq.gz
+   24HourB_GCCAAT_L002_R1_001.pe.fq.gz		     - adapter trimmed pe
+   24HourB_GCCAAT_L002_R1_001.pe.qc.fq.gz	     - FASTX filtered
+   24HourB_GCCAAT_L002_R1_001.pe.qc.fq.gz.pe	     - FASTX filtered PE
+   24HourB_GCCAAT_L002_R1_001.pe.qc.fq.gz.se	     - FASTX filtered SE
+   24HourB_GCCAAT_L002_R1_001.se.fq.gz		     - adapter trimmed orphans
+   24HourB_GCCAAT_L002_R1_001.se.qc.fq.gz	     - FASTX filtered orphans
+
+Yikes!  What to do?
+
+Well, first, you can get rid of the original data.  You already have it on a
+disk somewhere, right? ::
+
+   rm *.fastq.gz
+
+Next, you can get rid of the 'pe.fq.gz' and 'se.fq.gz' files, since you
+only want the QC files.  So::
+
+   rm *.pe.fq.gz *.se.fq.gz
+
+And, finally, you can toss the pe.fq.gz files, because you've turned *those*
+into .pe and .se files. ::
+
+   rm *.pe.qc.fq.gz
+
+So now you should be left with only three files for each sample::
+
+   24HourB_GCCAAT_L002_R1_001.pe.qc.fq.gz.pe   - FASTX filtered PE
+   24HourB_GCCAAT_L002_R1_001.pe.qc.fq.gz.se   - FASTX filtered SE
+   24HourB_GCCAAT_L002_R1_001.se.qc.fq.gz      - FASTX filtered orphans
+
+Things to think about
+~~~~~~~~~~~~~~~~~~~~~
+
+Note that the filenames, while ugly, are conveniently structured with the
+history of what you've done.  This is a good idea.
+
+Also note that we've conveniently named the files so that we can remove
+the unwanted ones en masse.  This is a good idea, too.
+
+Renaming files
+--------------
+
+I'm a fan of keeping the files named somewhat sensibly, and keeping them
+compressed.  Let's do some mass renaming::
+
+   for i in *.pe.qc.fq.gz.pe
+   do
+      newfile="$(basename $i .pe.qc.fq.gz.pe).pe.qc.fq"
+      mv $i $newfile
+      gzip $newfile
+   done
+
+and also some mass combining::
+
+   for i in *.pe.qc.fq.gz.se
+   do
+     otherfile="$(basename $i .pe.qc.fq.gz.se).se.qc.fq.gz"
+     gunzip -c $otherfile > combine
+     cat $i >> combine
+     gzip -c combine > $otherfile
+     rm $i
+   done
+
+and finally, make the end product files read-only::
+
+   chmod u-w *.qc.fq.gz
+
+to make sure you don't accidentally delete something.
+
+Saving the files
+----------------
+
+At this point, you should save these files, which will be used in two
+ways: first, for assembly; and second, for mapping, to do quantitation
+and ultimately comparative expression analysis.  You can save them by
+doing this::
+
+   mkdir save
+   mv *.qc.fq.gz save
+   du -sk save
+
+This puts the data you want to save into a subdirectory named 'save', and
+calculates the size.
+
+Now, create a volume of the given size -- divide by a thousand to get
+gigabytes, multiply by 1.1 to make sure you have enough room, and then
+follow the instructions in :doc:`saving-data-persistently`.  Once
+you've mounted it properly (I would suggest mounting it on /save
+instead of /data!), then do ::
+
+   rsync -av save /save
+
+which will copy all of the files over from the ./save directory onto the
+'/save' disk.  Then 'umount /save' and voila, you've got a copy of the files!
+
+Next stop: :doc:`2-diginorm`.
+

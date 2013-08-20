@@ -1,0 +1,7 @@
+
+java -jar /usr/local/bin/trimmomatic-0.27.jar PE P_astreoides_larva_GCCAAT_L005_R?_001.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+
+
+mkdir larva
+root@ip-10-40-10-213:/mnt/two# mv s?_?e larva/
+root@ip-10-40-10-213:/mnt/two# java -jar /usr/local/bin/trimmomatic-0.27.jar PE P_astreoides_settled*_L005_R?_001.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10

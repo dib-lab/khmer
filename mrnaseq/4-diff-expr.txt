@@ -1,0 +1,4 @@
+curl -O http://athyra.idyll.org/~t/petMar_lamp3.longest.fasta.gz
+gunzip petMar_lamp3.longest.fasta.gz
+
+rsem-prepare-reference petMar_lamp3.longest.fasta lamp3

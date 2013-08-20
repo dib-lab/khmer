@@ -35,7 +35,7 @@ extensions = ['sphinx.ext.mathjax']
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = '.txt'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -44,8 +44,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'labibi'
-copyright = u'2012, C. Titus Brown'
+project = u'khmer-protocols'
+copyright = u'2013, C. Titus Brown et al.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

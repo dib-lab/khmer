@@ -1,0 +1,107 @@
+============================
+BLASTing your assembled data
+============================
+
+One thing everyone wants to do is BLAST sequence data, right?  Here's a
+simple way to set up a stylish little BLAST server that lets you search
+your newly assembled sequences.
+
+Installing blastkit
+-------------------
+
+Installing some prerequisites::
+
+   pip install pygr
+   pip install whoosh
+   pip install git+https://github.com/ctb/pygr-draw.git
+   pip install git+https://github.com/ged-lab/screed.git
+   apt-get -y install lighttpd
+
+and configure them::
+
+   cd /etc/lighttpd/conf-enabled
+   ln -fs ../conf-available/10-cgi.conf ./
+   echo 'cgi.assign = ( ".cgi" => "" )' >> 10-cgi.conf
+   echo 'index-file.names += ( "index.cgi" ) ' >> 10-cgi.conf
+
+   /etc/init.d/lighttpd restart
+
+Next, install BLAST::
+
+   cd /root
+
+   curl -O ftp://ftp.ncbi.nih.gov/blast/executables/release/2.2.24/blast-2.2.24-x64-linux.tar.gz
+   tar xzf blast-2.2.24-x64-linux.tar.gz
+   cp blast-2.2.24/bin/* /usr/local/bin
+   cp -r blast-2.2.24/data /usr/local/blast-data
+
+And put in blastkit::
+
+   cd /root
+   git clone https://github.com/ctb/blastkit.git -b ec2
+   cd blastkit/www
+   ln -fs $PWD /var/www/blastkit
+
+   mkdir files
+   chmod a+rxwt files
+   chmod +x /root
+
+and run check.py::
+
+   cd /root/blastkit
+   python ./check.py
+
+It should say everything is OK.
+
+Adding the data
+---------------
+
+If you've just finished a transcriptome assembly (:doc:`3-big-assembly`) then
+you can do this to copy your newly generated assembly into the right place::
+
+   cp trinity_out_dir/Trinity.fasta /root/blastkit/db/db.fa
+
+Alternatively, you can grab my version of the assembly (from running this
+tutorial)::
+
+   cd /root/blastkit
+   curl -O https://s3.amazonaws.com/public.ged.msu.edu/trinity-nematostella-raw.fa.gz
+   gunzip trinity-nematostella-raw.fa.gz 
+   mv trinity-nematostella-raw.fa db/db.fa
+
+Formatting the database
+~~~~~~~~~~~~~~~~~~~~~~~
+
+After you've done either of the above, format and install the database
+for blastkit::
+
+   cd /root/blastkit
+   formatdb -i db/db.fa -o T -p F
+   python index-db.py db/db.fa
+
+Done!
+
+.. note::
+
+   You can install any file of DNA sequences you want this way; just copy
+   it into /root/blastkit/db/db.fa and run the indexing commands, above.
+
+Running blastkit
+----------------
+
+Figure out what your machine name is
+(ec2-???-???-???-???.compute-1.amazonaws.com) and go to::
+
+    http://machine-name/blastkit/
+
+Make sure you have enabled port 80 in your security settings on Amazon.
+
+(If you're using the Nematostella data set, try this sequence::
+
+   CAGCCTTTAGAAGGAAACAGTGGCAATATATAATTCTAGATGAAGCTCAGAATATCAAAA
+   ATTTTAAAAGTCAAAGGTGGCAGTTGCTGTTGAATTTTTCAAGTCAGAGGAGACTTTTGT
+   TGACTGGAACACCTTTGCAGAACAATTTGATGGAGCTGTGGTCGCTTATGCATTTCCTCA
+   TGCCATCAATGTTTGCTTCTCATAAAGATTTTAGGGAGTGGTTTTCTAACCCTGTTACAG
+   GGATGATTGAAGGGAATTCAG
+
+It should match something in your assembly.)

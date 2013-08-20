@@ -1,0 +1,144 @@
+===================================================
+Doing a small de novo mRNAseq assembly with Trinity
+===================================================
+
+Installing Trinity
+------------------
+
+To install Trinity::
+
+   cd /root
+
+   curl -L http://sourceforge.net/projects/trinityrnaseq/files/latest/download?source=files > trinity.tar.gz
+
+   tar xzf trinity.tar.gz
+   cd trinityrnaseq_r2013-02-25/
+   export FORCE_UNSAFE_CONFIGURE=1
+   make
+
+Install ctb Python packages
+---------------------------
+
+Install screed and khmer::
+
+   cd /usr/local/share
+   git clone https://github.com/ged-lab/screed.git
+   cd screed
+   python setup.py install
+
+   cd /usr/local/share
+   git clone https://github.com/ged-lab/khmer.git
+   cd khmer
+   make
+   
+   echo export PYTHONPATH=/usr/local/share/khmer/python >> ~/.bashrc
+   source ~/.bashrc
+
+Installing blastkit
+-------------------
+
+Installing some prerequisites::
+
+   pip install pygr
+   apt-get -y install lighttpd
+
+and configure them::
+
+   cd /etc/lighttpd/conf-enabled
+   ln -fs ../conf-available/10-cgi.conf ./
+   echo 'cgi.assign = ( ".cgi" => "" )' >> 10-cgi.conf
+   echo 'index-file.names += ( "index.cgi" ) ' >> 10-cgi.conf
+
+   /etc/init.d/lighttpd restart
+
+Next, install BLAST::
+
+   cd /root
+
+   curl -O ftp://ftp.ncbi.nih.gov/blast/executables/release/2.2.24/blast-2.2.24-x64-linux.tar.gz
+   tar xzf blast-2.2.24-x64-linux.tar.gz
+   cp blast-2.2.24/bin/* /usr/local/bin
+   cp -r blast-2.2.24/data /usr/local/blast-data
+
+And put in blastkit::
+
+   cd /root
+   git clone https://github.com/ctb/blastkit.git -b ec2
+   cd blastkit/www
+   ln -fs $PWD /var/www/blastkit
+
+   mkdir files
+   chmod a+rxwt files
+   chmod +x /root
+
+Install bowtie
+--------------
+
+Download and install bowtie::
+
+   cd /root
+   curl -O -L http://sourceforge.net/projects/bowtie-bio/files/bowtie/0.12.7/bowtie-0.12.7-linux-x86_64.zip
+   unzip bowtie-0.12.7-linux-x86_64.zip
+   cd bowtie-0.12.7
+   cp bowtie bowtie-build bowtie-inspect /usr/local/bin
+
+Download and preparing the test data
+------------------------------------
+
+Grab the coral data::
+
+   cd /mnt
+   curl -O https://s3.amazonaws.com/public.ged.msu.edu/coral-settled-400k-pe.fq.gz
+
+Break the interleaved FASTQ data into left and right files for Trinity::
+
+   python /usr/local/share/khmer/sandbox/split-pe.py coral-settled-400k-pe.fq.gz 
+
+Assemble! ::
+
+   /root/trinityrnaseq_r2013-02-25/Trinity.pl --left coral-settled-400k-pe.fq.gz.1 --right coral-settled-400k-pe.fq.gz.2 --seqType fq -JM 5G
+
+Note that this last bit (5G) is the maximum amount of memory to use.  You
+can increase (or decrease) it based on what machine you rented.
+
+Are you impatient??
+~~~~~~~~~~~~~~~~~~~
+
+Note: I have a little test database that you can install below INSTEAD of
+doing the assembly::
+
+  mkdir /root/blastkit/db
+  curl https://s3.amazonaws.com/public.ged.msu.edu/coral-mini-assembly.fa.gz | gunzip > /root/blastkit/db/db.fa
+
+Set up a BLAST database
+-----------------------
+
+Assuming everything is successful, let's make this BLASTable.
+
+Copy the assembly::
+
+  mkdir /root/blastkit/db
+  cp trinity_out_dir/Trinity.fasta /root/blastkit/db/db.fa
+
+Format the database for BLASTing::
+
+  cd /root/blastkit/db
+  formatdb -i db.fa -o T -p F
+
+Format the database for sequence retrieval::
+
+  python ../index-db.py db.fa
+
+Now, go to 'http://<your EC2 hostname>/blastkit/' and you should have a simple
+BLAST interface.  If you're using the coral dataset, above, try the following
+query::
+
+   MSRADPGKNSEPSESKMSLELRPTAPSDLGRSNEAFQDEDLERQNTPGNSTVRNRVVQSGEQGHAKQDDRQITIEQEPLG
+   NKEDPEDDSEDEHQKGFLERKYDTICEFCRKHRVVLRSTIWAVLLTGFLALVIAACAINFHRALPLFVITLVTIFFVIWD
+   HLMAKYEQRIDDFLSPGRRLLDRHWFWLKWVVWSSLILAIILWLSLDTAKLGQQNLVSFGGLIMYLILLFLFSKHPTRVY
+   WRPVFWGIGLQFLLGLLILRTRPGFVAFDWMGRQVQTFLGYTDTGARFVFGEKYTDHFFAFKILPIVVFFSTVMSMLYYL
+   GLMQWIIRKVGWLMLVTMGSSPIESVVAAGNIFIGQTESPLLVQPYLPHVTKSELHTIMTAGFATIAGSVLGAYISFGVS
+   STHLLTASVMSAPAALAVAKLFWPETEKPKITLKSAMKMENGDSRNLLEAASQGASSSIPLVANIAANLIAFLALLSFVN
+   SALSWFGSMFNYPELSFELICSYIFMPFSFMMGVDWQDSFMVAKLIGYKTFFNEFVAYDHLSKLINLRKAAGPKFVNGVQ
+   QYMSIRSETIATYALCGFANFGSLGIVIGGLTSIAPSRKRDIASGAMRALIAGTIACFMTACIAGILSDTPVDINCHHVL
+   ENGRVLSNTTEVVSCCQNLFNSTVAKGPNDVVPGGNFSLYALKSCCNLLKPPTLNCNWIPNKL

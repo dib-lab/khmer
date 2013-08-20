@@ -1,0 +1,12 @@
+===============
+khmer protocols
+===============
+
+funding.
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   mrnaseq/index
+   metagenomics/index

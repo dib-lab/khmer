@@ -1,0 +1,126 @@
+=================================
+2. Applying Digital Normalization
+=================================
+
+.. note::
+
+   You can start this tutorial with the contents of EC2/EBS snapshot
+   snap-126cc847.
+
+.. note::
+
+   You'll need ~15 GB of RAM for this, or more if you have a LOT of data.
+
+Link in your data
+-----------------
+
+Make sure your data is in /mnt/work/.  If you've loaded it onto /data,
+you can do::
+
+   cd /mnt
+   mkdir work
+   cd /mnt/work
+   ln -fs /data/*.qc.fq.gz .
+
+Run digital normalization
+-------------------------
+
+Apply digital normalization to the paired-end reads::
+
+   /usr/local/share/khmer/scripts/normalize-by-median.py -p -k 20 -C 20 -N 4 -x 3e9 --savehash normC20k20.kh *.pe.qc.fq.gz
+
+and then to the single-end reads::
+
+   /usr/local/share/khmer/scripts/normalize-by-median.py -C 20 --loadhash normC20k20.kh --savehash normC20k20.kh *.se.qc.fq.gz
+
+Note the '-p' in the first normalize-by-median command -- when run on
+PE data, that ensures that no paired ends are orphaned.  However, it
+will complain on single-ended data, so you have to give the data to it
+separately.
+
+Also note the '-N' and '-x' parameters.  These specify how much memory
+diginorm should use.  The product of these should be less than the
+memory size of the machine you selected.  The maximum needed for *any*
+transcriptome should be in the ~60 GB range, e.g. -N 4 -x 15e9; for
+only a few hundred million reads, 16 GB should be plenty.  (See
+`choosing hash sizes for khmer
+<http://khmer.readthedocs.org/en/latest/choosing-hash-sizes.html>`__
+for more information.)
+
+Trim off likely erroneous k-mers
+-------------------------------
+
+Now, run through all the reads and trim off low-abundance parts of
+high-coverage reads::
+
+   /usr/local/share/khmer/scripts/filter-abund.py -V normC20k20.kh *.keep
+
+This will turn some reads into orphans, but that's ok -- their partner
+read was bad.
+
+Rename files
+~~~~~~~~~~~~
+
+You'll have a bunch of 'keep.abundfilt' files -- let's make things prettier.
+
+First, let's break out the orphaned and still-paired reads::
+
+   for i in *.pe.*.abundfilt;
+   do 
+      /usr/local/share/khmer/scripts/extract-paired-reads.py $i
+   done
+
+We can combine the orphaned reads into a single file::
+
+   for i in *.se.qc.fq.gz.keep.abundfilt
+   do
+      pe_orphans=$(basename $i .se.qc.fq.gz.keep.abundfilt).pe.qc.fq.gz.keep.abundfilt.se
+      newfile=$(basename $i .se.qc.fq.gz.keep.abundfilt).se.qc.keep.abundfilt.fq.gz
+      cat $i $pe_orphans | gzip -c > $newfile
+   done
+
+We can also rename the remaining PE reads & compress those files::
+
+   for i in *.abundfilt.pe
+   do
+      newfile=$(basename $i .fq.gz.keep.abundfilt.pe).keep.abundfilt.fq
+      mv $i $newfile
+      gzip $newfile
+   done
+
+This leaves you with a whole passel o' files, most of which you want to go
+away! ::
+
+   6Hour_CGATGT_L002_R1_005.pe.qc.fq.gz
+   6Hour_CGATGT_L002_R1_005.pe.qc.fq.gz.keep
+   6Hour_CGATGT_L002_R1_005.pe.qc.fq.gz.keep.abundfilt
+   6Hour_CGATGT_L002_R1_005.pe.qc.fq.gz.keep.abundfilt.se
+   6Hour_CGATGT_L002_R1_005.se.qc.fq.gz
+   6Hour_CGATGT_L002_R1_005.se.qc.fq.gz.keep
+   6Hour_CGATGT_L002_R1_005.se.qc.fq.gz.keep.abundfilt
+
+So, finally, let's get rid of a lot of the old files ::
+
+   rm *.se.qc.fq.gz.keep.abundfilt
+   rm *.pe.qc.fq.gz.keep.abundfilt.se
+   rm *.keep
+   rm *.abundfilt
+   rm *.qc.fq.gz
+
+Gut check
+~~~~~~~~~
+
+You should now have::
+
+   6Hour_CGATGT_L002_R1_005.pe.qc.keep.abundfilt.fq.gz
+   6Hour_CGATGT_L002_R1_005.se.qc.keep.abundfilt.fq.gz
+
+These files are, respectively, the paired (pe) quality-filtered (qc)
+digitally normalized (keep) abundance-trimmed (abundfilt) FASTQ (fq)
+gzipped (gz) sequences, and the orphaned (se) quality-filtered (qc)
+digitally normalized (keep) abundance-trimmed (abundfilt) FASTQ (fq)
+gzipped (gz) sequences.
+
+Save all these files to a new volume, and get ready to assemble!
+
+Next: :doc:`3-big-assembly`.
