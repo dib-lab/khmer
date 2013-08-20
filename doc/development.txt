@@ -31,6 +31,12 @@ Testing
 'nosetests' is the canonical way to run the tests.  This is what 'make test'
 does.
 
+Pipelines
+---------
+
+All khmer scripts used by a published recommended analysis pipeline must be
+included in scripts/ and meet the standards therein implied.
+
 Command line scripts
 --------------------
 
