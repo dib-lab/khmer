@@ -405,6 +405,8 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
 
   delete parser;
 
+  if (count == 0) { throw InvalidReadFileFormat(NULL, "no counts"); } 
+
   mean = float(total) / float(count);
 }
 
@@ -455,6 +457,8 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
   }
 
   delete parser;
+
+  if (count == 0) { throw InvalidReadFileFormat(NULL, "no counts"); }
 
   abs_deviation = total / float(count);
 }
