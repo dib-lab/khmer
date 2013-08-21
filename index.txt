@@ -2,7 +2,10 @@
 khmer protocols
 ===============
 
-funding.
+To be added:
+
+* funding acks.
+* citation instructions
 
 .. toctree::
    :maxdepth: 1
