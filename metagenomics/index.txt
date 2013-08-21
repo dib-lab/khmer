@@ -1,6 +1,9 @@
 The Kalamazoo Metagenome Assembly Tutorial
 ==========================================
 
+:author: Adina Howe and Titus Brown
+:version: 0.7 alpha
+
 .. toctree::
    :maxdepth: 1
 
