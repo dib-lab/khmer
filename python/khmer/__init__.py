@@ -1,4 +1,4 @@
-__version__ = "0.4"
+__version__ = "0.5"
 
 import _khmer
 from _khmer import new_ktable

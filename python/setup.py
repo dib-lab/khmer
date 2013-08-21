@@ -55,7 +55,7 @@ py_mod = 'khmer'
 # update version here, and in doc/conf.py, python/khmer/__init__.py,
 #      and lib/khmer.hh.
 
-setup(name = "khmer", version = "0.4",
+setup(name = "khmer", version = "0.5",
       description = 'khmer k-mer counting library',
       author = 'C. Titus Brown, Jason Pell, and Adina Howe',
       author_email = 'ctb@msu.edu',
