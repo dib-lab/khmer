@@ -2,7 +2,6 @@ The Eel Pond mRNAseq Tutorial
 =============================
 
 :author: Titus Brown, Chris Welcher, and Leigh Sheneman.
-:version: 0.8 beta
 
 The tutorial:
 

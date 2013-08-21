@@ -2,10 +2,16 @@
 khmer protocols
 ===============
 
+:version: 0.8 (beta, unreleased)
+
 To be added:
 
 * funding acks.
 * citation instructions
+* mailing list
+* disqus commenting
+* google analytics
+* editme
 
 .. toctree::
    :maxdepth: 1

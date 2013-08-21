@@ -1,0 +1,7 @@
+For a new release,
+
+ - update versions in docs to vX.Y
+ - tag new release (vX.Y)
+ - push tag to ged-lab/khmer-protocols
+ - update readthedocs to point appropriately.
+
