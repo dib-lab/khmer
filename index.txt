@@ -4,6 +4,11 @@ khmer protocols
 
 :version: 0.8 (beta, unreleased)
 
+The latest released version of these protocols is v0.8; please use
+the following URL in citations and discussions::
+
+   http://https://khmer-protocols.readthedocs.org/en/v0.8/
+
 To be added:
 
 * funding acks.
