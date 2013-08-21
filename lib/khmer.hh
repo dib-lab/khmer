@@ -1,4 +1,4 @@
-#define VERSION "0.4"
+#define VERSION "0.5"
 
 #define MAX_COUNT 255
 #define MAX_BIGCOUNT 65535
