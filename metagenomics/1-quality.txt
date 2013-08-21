@@ -1,0 +1,135 @@
+================================================
+1. Quality Trimming and Filtering Your Sequences
+================================================
+
+Boot up an m1.xlarge machine from Amazon Web Services; this has about
+15 GB of RAM, and 2 CPUs, and will be enough to complete the assembly
+of the example data set.
+
+.. note::
+
+   This follows the NGS 2013 tutorial,
+   `Short-read quality evaluation <http://ged.msu.edu/angus/tutorials-2013/short-read-quality-evaluation.html>`__,
+   but for multiple files.
+
+.. note::
+
+   The end results of this tutorial are available as public snapshot
+   XXX on EC2/EBS.
+
+Also see:  :doc:`../mrnaseq/using-screen`.
+
+Install software
+================
+
+Install screed::
+
+   pip install git+https://github.com/ged-lab/screed.git
+
+Install the bleeding-edge version of khmer::
+
+   cd /usr/local/share
+   git clone https://github.com/ged-lab/khmer.git -b bleeding-edge
+   cd khmer
+   make
+
+   echo 'export PYTHONPATH=/usr/local/share/khmer/python' >> ~/.bashrc
+   source ~/.bashrc
+
+Install Trimmomatic::
+
+   cd /root
+   curl -O http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.27.zip
+   unzip Trimmomatic-0.27.zip 
+   cp Trimmomatic-0.27/trimmomatic-0.27.jar /usr/local/bin
+
+Install libgtextutils and fastx::
+
+   cd /root
+   curl -O http://hannonlab.cshl.edu/fastx_toolkit/libgtextutils-0.6.1.tar.bz2
+   tar xjf libgtextutils-0.6.1.tar.bz2 
+   cd libgtextutils-0.6.1/
+   ./configure && make && make install
+
+   cd /root
+   curl -O http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit-0.0.13.2.tar.bz2
+   tar xjf fastx_toolkit-0.0.13.2.tar.bz2
+   cd fastx_toolkit-0.0.13.2/
+   ./configure && make && make install
+
+In each of these cases, we're downloading the software -- you can use
+google to figure out what each package is and does if we don't discuss
+it below.  We're then unpacking it, sometimes compiling it (which we
+can discuss later), and then installing it for general use.
+
+Create a working directory
+==========================
+
+Let's create a place to work::
+
+   cd /mnt
+   mkdir assembly
+   cd assembly
+
+Link in the data
+================
+
+Trim and quality filter
+=======================
+
+Grab some Illumina adapters::
+
+   curl -O https://s3.amazonaws.com/public.ged.msu.edu/illuminaClipping.fa
+
+Trim the first data set (~20 minutes)::
+
+   mkdir trim
+   cd trim
+
+   java -jar /usr/local/bin/trimmomatic-0.27.jar PE ../SRR492065_?.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+
+   /usr/local/share/khmer/scripts/interleave-reads.py s?_pe > combined.fq
+
+   fastq_quality_filter -Q33 -q 30 -p 50 -i combined.fq > combined-trim.fq
+   fastq_quality_filter -Q33 -q 30 -p 50 -i s1_se > s1_se.trim
+   /usr/local/share/khmer/scripts/extract-paired-reads.py combined-trim.fq
+
+   gzip -9c combined-trim.fq.pe > ../SRR492065.pe.qc.fq.gz
+   gzip -9c combined-trim.fq.se s1_se > ../SRR492065.se.qc.fq.gz
+
+   cd ../
+   rm -fr trim
+
+Trim the second data set (~20 minutes)::
+
+   mkdir trim
+   cd trim
+
+   java -jar /usr/local/bin/trimmomatic-0.27.jar PE ../SRR492066_?.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+
+   /usr/local/share/khmer/scripts/interleave-reads.py s?_pe > combined.fq
+
+   fastq_quality_filter -Q33 -q 30 -p 50 -i combined.fq > combined-trim.fq
+   fastq_quality_filter -Q33 -q 30 -p 50 -i s1_se > s1_se.trim
+   /usr/local/share/khmer/scripts/extract-paired-reads.py combined-trim.fq
+
+   gzip -9c combined-trim.fq.pe > ../SRR492066.pe.qc.fq.gz
+   gzip -9c combined-trim.fq.se s1_se > ../SRR492066.se.qc.fq.gz
+
+   cd ../
+   rm -fr trim
+
+Done!  Now you have four files: SRR492065.pe.qc.fq.gz, SRR492065.se.qc.fq.gz, SRR492066.pe.qc.fq.gz, and SRR492066.se.qc.fq.gz.
+
+The '.pe' files are interleaved paired-end; you can take a look at them like so::
+
+   gunzip -c SRR492065.pe.qc.fq.gz | head
+
+The other two are single-ended files, where the reads have been
+orphaned because we discarded stuff.
+
+All four files are in FASTQ format.
+
+----
+
+Next: :doc:`2-diginorm`

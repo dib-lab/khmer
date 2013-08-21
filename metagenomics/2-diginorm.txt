@@ -1,0 +1,121 @@
+================================
+2. Running digital normalization
+================================
+
+.. note::
+
+   Make sure you're running in screen!
+
+Start with the QC'ed files from :doc:`1-quality` or copy them into a
+working directory.
+
+Run a first round of digital normalization
+==========================================
+
+Normalize everything to a coverage of 20, starting with the (more valuable)
+PE reads; keep pairs using '-p'::
+
+   /usr/local/share/khmer/scripts/normalize-by-median.py -k 20 -C 20 -N 4 -x 5e8 -p --savehash normC20k20.kh *.pe.qc.fq.gz
+
+...and continuing into the (less valuable but maybe still useful) SE reads::
+
+   /usr/local/share/khmer/scripts/normalize-by-median.py -C 20 --savehash normC20k20.kh --loadhash normC20k20.kh *.se.qc.fq.gz
+
+This produces a set of '.keep' files, as well as a normC20k20.kh
+database file.
+
+Error-trim your data
+====================
+
+Use 'filter-abund' to trim off any k-mers that are abundance-1 in
+high-coverage reads (-V option, for variable coverage)::
+
+   /usr/local/share/khmer/scripts/filter-abund.py -V normC20k20.kh *.keep
+
+This produces .abundfilt files.
+
+The process of error trimming could have orphaned reads, so split the
+PE file into still-interleaved and non-interleaved reads::
+
+   for i in *.pe.qc.fq.gz.keep.abundfilt
+   do
+      /usr/local/share/khmer/scripts/extract-paired-reads.py $i
+   done
+
+This leaves you with PE files (.pe.qc.fq.gz.keep.abundfilt.pe :) and
+two sets of SE files (.se.qc.fq.gz.keep.abundfilt and
+.pe.qc.fq.gz.keep.abundfilt.se).  (Yes, I did indeed devise this naming
+scheme.  It makes sense. Trust me.)
+
+Normalize down to C=5
+=====================
+
+Now that we've eliminated many more erroneous k-mers, let's ditch some more
+high-coverage data.  First, normalize the paired-end reads::
+
+   /usr/local/share/khmer/scripts/normalize-by-median.py -C 5 -k 20 -N 4 -x 5e8 --savehash normC5k20.kh -p *.pe.qc.fq.gz.keep.abundfilt.pe
+
+and then do the remaining single-ended reads::
+
+   /usr/local/share/khmer/scripts/normalize-by-median.py -C 5 --savehash normC5k20.kh --loadhash normC5k20.kh *.pe.qc.fq.gz.keep.abundfilt.se *.se.qc.fq.gz.keep.abundfilt
+
+Compress and combine the files
+==============================
+
+Now let's tidy things up.  Here are the paired files (kak =
+keep/abundfilt/keep)::
+
+   gzip -9c SRR492065.pe.qc.fq.gz.keep.abundfilt.pe.keep > SRR492065.pe.kak.qc.fq.gz
+   gzip -9c SRR492066.pe.qc.fq.gz.keep.abundfilt.pe.keep > SRR492066.pe.kak.qc.fq.gz
+
+and the single-ended files::
+
+   gzip -9c SRR492066.pe.qc.fq.gz.keep.abundfilt.se.keep SRR492066.se.qc.fq.gz.keep.abundfilt.keep > SRR492066.se.kak.qc.fq.gz
+   gzip -9c SRR492065.pe.qc.fq.gz.keep.abundfilt.se.keep SRR492065.se.qc.fq.gz.keep.abundfilt.keep > SRR492065.se.kak.qc.fq.gz
+
+You can now remove all of these various files::
+
+   SRR492066.pe.qc.fq.gz.keep
+   SRR492066.pe.qc.fq.gz.keep.abundfilt
+   SRR492066.pe.qc.fq.gz.keep.abundfilt.pe
+   SRR492066.pe.qc.fq.gz.keep.abundfilt.pe.keep
+   SRR492066.pe.qc.fq.gz.keep.abundfilt.se
+   SRR492066.pe.qc.fq.gz.keep.abundfilt.se.keep
+
+by typing::
+
+   rm *.keep *.abundfilt *.pe *.se
+
+You may also want to remove the k-mer hash tables::
+
+   rm *.kh
+
+Read stats
+==========
+
+Try running::
+
+   /usr/local/share/khmer/sandbox/readstats.py *.kak.qc.fq.gz *.?e.qc.fq.gz
+
+after a long wait, you'll see ::
+
+   ---------------
+   861769600 bp / 8617696 seqs; 100.0 average length -- SRR492065.pe.qc.fq.gz
+   79586148 bp / 802158 seqs; 99.2 average length -- SRR492065.se.qc.fq.gz
+   531691400 bp / 5316914 seqs; 100.0 average length -- SRR492066.pe.qc.fq.gz
+   89903689 bp / 904157 seqs; 99.4 average length -- SRR492066.se.qc.fq.gz
+
+   173748898 bp / 1830478 seqs; 94.9 average length -- SRR492065.pe.kak.qc.fq.gz
+   8825611 bp / 92997 seqs; 94.9 average length -- SRR492065.se.kak.qc.fq.gz
+   52345833 bp / 550900 seqs; 95.0 average length -- SRR492066.pe.kak.qc.fq.gz
+   10280721 bp / 105478 seqs; 97.5 average length -- SRR492066.se.kak.qc.fq.gz
+   
+   ---------------
+
+This shows you how many sequences were in the original QC files, and
+how many are left in the 'kak' files.  Not bad -- considerably more
+than 80% of the reads were eliminated in the kak!
+
+----
+
+Next: :doc:`3-partition`

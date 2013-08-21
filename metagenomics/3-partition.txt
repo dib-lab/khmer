@@ -1,0 +1,78 @@
+===============
+3. Partitioning
+===============
+
+.. note::
+
+   Make sure you're running in screen!
+
+Start with the QC'ed files from :doc:`2-diginorm` or copy them into a
+working directory.
+
+Simple partitioning
+===================
+
+Partitioning is a rather complex process -- nowhere near as nice and
+simple as digital normalization.  However, we do have a simple script
+to run the basic stuff; if this script is too slow, or doesn't work
+well for big chunks of data, we might have remedies.  But for the
+meantime, try the simple script::
+
+   /usr/local/share/khmer/scripts/do-partition.py -k 32 -x 1e9 --threads 4 kak *.kak.qc.fq.gz
+   
+This should take about 15 minutes, and will produce '.part' files.  These
+are now FASTA files that contain partition annotations.  For example, check
+out::
+
+   head SRR492065.pe.kak.qc.fq.gz.part
+
+Extracting the partitions into groups
+=====================================
+
+Generally there are *lots* of partitions, and for convenience sake we
+group them into group files that can be assembled in small chunks.
+To do this, ::
+
+   /usr/local/share/khmer/scripts/extract-partitions.py -X 100000 kak *.part
+
+This will leave you with a bunch of 'kak.group*.fa', as well as a '.dist'
+file containing the distribution of partition sizes (how many sequences are
+in a given partition).
+
+Here, the '-X' sets the number of sequences stuck into a group file.
+By default the -X parameter is 1 million, which would put all of the
+sequences into a single file for this data set.
+
+Occasionally (OK, rather frequently) you'll find that almost all of
+your sequences coalesce into one partition, which we unaffectionately
+call the 'lump'.  There are many possible reasons for this, and we
+have a series of increasingly large hammers that can be used on the
+lump.
+
+For now, simply observe that::
+
+   tail kak.dist
+
+reports that about 2/3 of the sequences are in a single partition::
+
+   1674746 1 112164 2539252
+
+Reinflating partitions (optional)
+=================================
+
+At this point it's worth noting that the partitions are *normalized*,
+that is, diginormed.  That makes it hard to use them for abundance
+calculations, and some assemblers prefer to have the original
+abundances in there.
+
+So, ran you recover the abundances?  Of course you can!  However, you
+do have to combine all of the raw (unpartitioned) reads into a single
+file, because the script to reinflate the partitions takes only single
+file.  Sorry :(. ::
+
+   gunzip -c /class/cbrown/data/SRR49206?.?e.qc.fq.gz > all.fq
+   python /usr/local/share/khmer/sandbox/sweep-reads3.py -x 1e8 kak.group*.fa all.fq
+
+----
+
+Next: :doc:`4-assemble`

@@ -1,0 +1,101 @@
+=============
+4. Assembling
+=============
+
+At last!  All that filtering and diginorming is done, and we can get
+down to the serious business of assembling.  Huzzah!
+
+Splitting out PE and SE reads
+=============================
+
+Let's assemble just one group, for now -- group 5 should be nice and
+small.  Generally assemblers will want interleaved reads to be
+distinguished from orphaned reads, so let's split 'em out::
+
+  mkdir group5
+  cd group5    
+  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa.gz
+  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa.gz.sweep3
+  mv kak.group0005.fa.gz.sweep3.pe kak.group5.nodn.pe
+  mv kak.group0005.fa.gz.sweep3.se kak.group5.nodn.se
+
+Using Velvet
+============
+
+I personally really like the Velvet assembler, since it yields pretty
+good results in a wide variety of situations.  It's also rather fast.
+The downside is that you have to specify a 'k' parameter, which gets
+annoying because it gives you different results (see presentation).
+
+So, let's just assemble across a lot of k's. ::
+
+   for k in {21..43..2}
+   do
+      velveth dn.$k $k -fasta -shortPaired kak.group0005.fa.gz.pe -short kak.group0005.fa.gz.se
+      velvetg dn.$k -exp_cov auto
+   done
+
+   for k in {21..43..2}
+   do
+      velveth nodn.$k $k -fasta -shortPaired kak.group5.nodn.pe -short kak.group5.nodn.se
+      velvetg nodn.$k -exp_cov auto
+   done
+
+
+Using IDBA
+==========
+
+I've heard good things about IDBA.  Let's give it a try::
+
+   idba_ud --pre_correction -r kak.group0005.fa.gz.pe -o idba.dn.d
+
+   idba_ud --pre_correction -r kak.group5.nodn.pe -o idba.nodn.d/
+
+Getting stats for the assemblies
+================================
+
+To get some basic stats for the assemblies, run::
+
+   python /usr/local/share/khmer/sandbox/assemstats3.py 500 *.??/contigs.fa idba.*.d/scaffold.fa
+
+This will yield something like::
+
+   N       sum     max     filename
+   38      671957  83467   dn.21/contigs.fa
+   32      668918  83568   dn.23/contigs.fa
+   35      668509  83401   dn.25/contigs.fa
+   31      671843  83817   dn.27/contigs.fa
+   32      669104  83721   dn.29/contigs.fa
+   32      672735  84066   dn.31/contigs.fa
+   32      673102  83774   dn.33/contigs.fa
+   31      674629  83912   dn.35/contigs.fa
+   31      677446  84200   dn.37/contigs.fa
+   33      681099  84554   dn.39/contigs.fa
+   35      685245  84852   dn.41/contigs.fa
+   40      686733  85276   dn.43/contigs.fa
+   41      649574  62719   nodn.21/contigs.fa
+   39      639388  62155   nodn.23/contigs.fa
+   49      646132  62145   nodn.25/contigs.fa
+   39      647100  83798   nodn.27/contigs.fa
+   38      650487  83750   nodn.29/contigs.fa
+   33      649863  83770   nodn.31/contigs.fa
+   31      636979  83822   nodn.33/contigs.fa
+   35      645536  83856   nodn.35/contigs.fa
+   36      647848  83800   nodn.37/contigs.fa
+   33      654660  83934   nodn.39/contigs.fa
+   36      645126  83897   nodn.41/contigs.fa
+   34      660289  83231   idba.dn.d/scaffold.fa
+   45      666147  41120   idba.nodn.d/scaffold.fa
+
+Extracting sequences over a certain length
+==========================================
+
+Let's say that we want to work with the sequences in dn.43/contigs.fa, but we want to get rid of all the small sequences.  How?
+
+Easy::
+
+   /usr/local/share/khmer/sandbox/extract-long-sequences.py 500 dn.43/contigs.fa > group5-assembly.fa
+
+----
+
+Next: :doc:`5-mapping-and-quantitation`.

@@ -1,0 +1,11 @@
+The Kalamazoo Metagenome Assembly Tutorial
+==========================================
+
+.. toctree::
+   :maxdepth: 1
+
+   1-quality
+   2-diginorm
+   3-partition
+..   4-assemble
+..   5-mapping-and-quantitation
