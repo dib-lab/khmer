@@ -5,6 +5,26 @@
 At last!  All that filtering and diginorming is done, and we can get
 down to the serious business of assembling.  Huzzah!
 
+Install some assemblers
+=======================
+
+First, let's install Velvet::
+
+   cd /root
+   curl -O http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.10.tgz
+   tar xzf velvet_1.2.10.tgz
+   cd velvet_1.2.10
+   make MAXKMERLENGTH=51
+   cp velvet? /usr/local/bin
+
+And also IDBA::
+
+   cd /root
+   curl -O http://hku-idba.googlecode.com/files/idba-1.1.1.tar.gz
+   tar xzf idba-1.1.1.tar.gz
+   cd idba-1.1.1
+   ./configure && make
+
 Splitting out PE and SE reads
 =============================
 

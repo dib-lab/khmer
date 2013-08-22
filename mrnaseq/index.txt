@@ -3,6 +3,8 @@ The Eel Pond mRNAseq Tutorial
 
 :author: Titus Brown, Chris Welcher, and Leigh Sheneman.
 
+Special thanks to Dr. Joshua Rosenthal for his help in testing this!
+
 The tutorial:
 
 .. toctree::
