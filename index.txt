@@ -2,15 +2,15 @@
 khmer protocols
 ===============
 
-:version: 0.8 (beta, unreleased)
+:version: 0.8.1 (beta, unreleased)
 
 This is a set of protocols for doing genomic data analysis -- specifically,
 de novo mRNAseq assembly and de novo metagenome assembly -- in the cloud.
 
-The latest released version of these protocols is v0.8; please use
+The latest released version of these protocols is v0.8.1; please use
 the following URL in citations and discussions:
 
-   http://https://khmer-protocols.readthedocs.org/en/v0.8/
+   http://https://khmer-protocols.readthedocs.org/en/v0.8.1/
 
 Protocols:
 ----------
