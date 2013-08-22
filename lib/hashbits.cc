@@ -1588,7 +1588,7 @@ void Hashbits::save_stop_tags(std::string outfilename)
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::print_stop_tags(std::string infilename)
@@ -1923,6 +1923,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
   
   total_reads = 0;
   khmer::HashIntoType start = 0, stop = 0;
+  
+  delete parser;
   parser = IParser::get_parser(filename.c_str());
 
 
