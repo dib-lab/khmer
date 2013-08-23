@@ -133,3 +133,5 @@ will have sequences that look like this::
 
 I suggest renaming this file to 'nematostella.fa' and using it for
 BLASTs (see :doc:`installing-blastkit`).
+
+.. -z to annotate-seqs and make-reciprocal best
