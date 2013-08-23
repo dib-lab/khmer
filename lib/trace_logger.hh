@@ -57,8 +57,9 @@ private:
     
     uint8_t	    _level;
     bool	    _shared_stream;
+#ifdef WITH_INTERNAL_TRACING
     FILE *	    _stream_handle;
-
+#endif
 };
 
 
