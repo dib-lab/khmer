@@ -12,7 +12,7 @@
 #include "hashbits.hh"
 #include "counting.hh"
 #include "storage.hh"
-#include "aligner.hh"
+#include "read_aligner.hh"
 
 //
 // Function necessary for Python loading:
@@ -1021,7 +1021,7 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
   unsigned long count = 0;
 
   if(PyLong_Check(arg)) {
-    HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
+    khmer::HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
     count = ktable->get_count(pos);
   } else if (PyInt_Check(arg)) {
     long pos = PyInt_AsLong(arg);
@@ -1301,24 +1301,6 @@ typedef struct {
 
 static void khmer_hashbits_dealloc(PyObject *);
 static PyObject * khmer_hashbits_getattr(PyObject * obj, char * name);
-<<<<<<< HEAD
-typedef struct {
-  PyObject_HEAD
-  khmer::ReadMaskTable * mask;
-} khmer_ReadMaskObject;
-
-/* GRAPHALIGN addition */
-typedef struct {
-  PyObject_HEAD
-  Aligner * aligner;
-} khmer_ReadAlignerObject;
-
-#define is_readmask_obj(v)  ((v)->ob_type == &khmer_ReadMaskType)
-
-static void khmer_readmask_dealloc(PyObject *);
-static PyObject * khmer_readmask_getattr(PyObject *, char *);
-=======
->>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 
 static PyTypeObject khmer_KHashbitsType = {
     PyObject_HEAD_INIT(NULL)
@@ -1349,7 +1331,7 @@ static PyTypeObject khmer_KHashbitsType = {
 /* GRAPHALIGN addition */
 typedef struct {
   PyObject_HEAD
-  Aligner * aligner;
+  khmer::ReadAligner * aligner;
 } khmer_ReadAlignerObject;
 
 typedef struct {
@@ -3913,11 +3895,6 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_hashbits_methods, obj, name);
 }
 
-<<<<<<< HEAD
-#define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
-
-=======
->>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 //
 // GRAPHALIGN addition
 //
@@ -3925,66 +3902,34 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 static PyObject * readaligner_align(PyObject * self, PyObject * args)
 {
   khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-  Aligner * aligner = me->aligner;
+  khmer::ReadAligner* aligner = me->aligner;
 
-  char * read;
+  char* read;
 
   if (!PyArg_ParseTuple(args, "s", &read)) {
     return NULL;
   }
 
-  if (strlen(read) < (unsigned int)aligner->ksize()) {
+  /*if (strlen(read) < (unsigned int)aligner->ksize()) {
     PyErr_SetString(PyExc_ValueError,
                     "string length must >= the hashtable k-mer size");
     return NULL;
+    }*/
+
+  khmer::Alignment* aln;
+  aln = aligner->align_test(read);
+  if(aln == NULL) {
+    return NULL;
   }
 
-  CandidateAlignment aln;
-  std::string rA;
-
-  Py_BEGIN_ALLOW_THREADS
-
-  aln = aligner->alignRead(read);
-  rA = aln.getReadAlignment(read);
-
-  Py_END_ALLOW_THREADS
-
-  const char* alignment = aln.alignment.c_str();
-  const char* readAlignment = rA.c_str();
-
+  const char* alignment = aln->graph_alignment.c_str();
+  const char* readAlignment = aln->read_alignment.c_str();
  
-  return Py_BuildValue("ss", alignment,
-                              readAlignment);
-}
-
-static PyObject * readaligner_printErrorFootprint(PyObject * self, 
-                                                PyObject * args)
-
-{
-  khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-  Aligner * aligner = me->aligner;
-
-  char * read;
-
-  if (!PyArg_ParseTuple(args, "s", &read)) {
-    return NULL;
-  }
-
-  if (strlen(read) < (unsigned int)aligner->ksize()) {
-    PyErr_SetString(PyExc_ValueError,
-                    "string length must >= the hashtable k-mer size");
-    return NULL;
-  }
-
-  aligner->printErrorFootprint(read);
-  
-  Py_INCREF(Py_None);
-  return Py_None;
+  return Py_BuildValue("dss", aln->score, alignment, readAlignment);
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {
   {"align", readaligner_align, METH_VARARGS, ""},
-  {"printErrorFootprint", readaligner_printErrorFootprint, METH_VARARGS, ""},
   {NULL, NULL, 0, NULL}
 };
 
@@ -3994,33 +3939,6 @@ khmer_readaligner_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_ReadAligner_methods, obj, name);
 }
 
-<<<<<<< HEAD
-static PyTypeObject khmer_KHashbitsType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "KHashbits", sizeof(khmer_KHashbitsObject),
-    0,
-    khmer_hashbits_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_hashbits_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "hashbits object",           /* tp_doc */
-};
-
-=======
->>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 //
 // khmer_readaligner_dealloc -- clean up readaligner object
 // GRAPHALIGN addition
@@ -4065,12 +3983,8 @@ static PyTypeObject khmer_ReadAlignerType = {
 static PyObject* new_readaligner(PyObject * self, PyObject * args)
 {
   PyObject * py_obj;
-  double lambdaOne = 0.0;
-  double lambdaTwo = 0.0;
-  unsigned int maxErrorRegion = UINT_MAX;
 
-  if(!PyArg_ParseTuple(args, "O|ddI", &py_obj, 
-                       &lambdaOne, &lambdaTwo, &maxErrorRegion)) {
+  if(!PyArg_ParseTuple(args, "O", &py_obj)) {
     return NULL;
   }
 
@@ -4079,18 +3993,7 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == UINT_MAX) { 
-    readaligner_obj->aligner = new Aligner(ch->counting);
-  } else if
-    (maxErrorRegion == UINT_MAX && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
-    readaligner_obj->aligner = new Aligner(ch->counting, 
-                                           lambdaOne, lambdaTwo);
-  } else {
-    readaligner_obj->aligner = new Aligner(ch->counting, 
-                                           lambdaOne, lambdaTwo, 
-                                           maxErrorRegion);
-
-  }
+  readaligner_obj->aligner = new khmer::ReadAligner(ch->counting);
 
   return (PyObject *) readaligner_obj; 
 }
@@ -4464,24 +4367,6 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 //
 
 static PyMethodDef KhmerMethods[] = {
-<<<<<<< HEAD
-  /* { "new_config", new_config, METH_VARARGS, "Create a default internals config" }, */
-  { "get_config", get_config, METH_VARARGS, "Get active khmer configuration object" },
-  /* { "set_config", set_active_config, METH_VARARGS, "Set active khmer configuration object" }, */
-  { "new_read_parser", new_read_parser, METH_VARARGS, "Create a new read parser" },
-  { "new_ktable", new_ktable, METH_VARARGS, "Create an empty ktable" },
-  { "new_hashtable", new_hashtable, METH_VARARGS, "Create an empty single-table counting hash" },
-  { "_new_counting_hash", _new_counting_hash, METH_VARARGS, "Create an empty counting hash" },
-  { "_new_hashbits", _new_hashbits, METH_VARARGS, "Create an empty hashbits table" },
-  { "new_readaligner", new_readaligner, METH_VARARGS, "create a read aligner" },
-  { "new_readmask", new_readmask, METH_VARARGS, "Create a new read mask table" },
-  { "new_minmax", new_minmax, METH_VARARGS, "Create a new min/max value table" },
-  { "forward_hash", forward_hash, METH_VARARGS, "", },
-  { "forward_hash_no_rc", forward_hash_no_rc, METH_VARARGS, "", },
-  { "reverse_hash", reverse_hash, METH_VARARGS, "", },
-  { "set_reporting_callback", set_reporting_callback, METH_VARARGS, "" },
-  { NULL, NULL, 0, NULL }
-=======
 #if (0)
     { "new_config",		new_config,
       METH_VARARGS,		"Create a default internals config" }, 
@@ -4514,7 +4399,6 @@ static PyMethodDef KhmerMethods[] = {
       METH_VARARGS,		"" },
 
     { NULL, NULL, 0, NULL } // sentinel
->>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 };
 
 DL_EXPORT(void) init_khmer(void)

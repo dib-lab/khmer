@@ -15,7 +15,7 @@ extra_objs.extend( map(
     [ 
 	"khmer_config", "thread_id_map", "trace_logger", "perf_metrics", 
 	"read_parsers", 
-	"ktable", "hashtable", "hashbits", "counting", "subset",
+	"ktable", "hashtable", "hashbits", "counting", "subset", "read_aligner",
     ]
 ) )
 extra_objs.extend( map(
