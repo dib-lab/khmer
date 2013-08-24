@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace khmer;
+using namespace khmer:: read_parsers;
 
 void Hashbits::save(std::string outfilename)
 {
@@ -203,7 +204,7 @@ void Hashbits::save_tagset(std::string outfilename)
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::load_tagset(std::string infilename, bool clear_tags)
@@ -239,7 +240,7 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
     all_tags.insert(buf[i]);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 unsigned int Hashbits::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
@@ -294,42 +295,97 @@ const
 //     so often.
 //
 
-void Hashbits::consume_fasta_and_tag(const std::string &filename,
-				      unsigned int &total_reads,
-				      unsigned long long &n_consumed,
-				      CallbackFn callback,
-				      void * callback_data)
+// TODO? Inline in header.
+void
+Hashbits::
+consume_fasta_and_tag(
+  std:: string const  &filename,
+  unsigned int	      &total_reads, unsigned long long	&n_consumed,
+  CallbackFn	      callback,	    void *		callback_data
+)
 {
-  using namespace khmer:: read_parsers;
+  khmer:: Config    &the_config	  = khmer:: get_active_config( );
 
+  // Note: Always assume only 1 thread if invoked this way.
+  IParser *	  parser = 
+  IParser::get_parser(
+    filename, 1, the_config.get_reads_input_buffer_size( ),
+    the_config.get_reads_parser_trace_level( )
+  );
+
+
+  consume_fasta_and_tag(
+    parser,
+    total_reads, n_consumed,
+    callback, callback_data
+  );
+
+  delete parser;
+}
+
+void
+Hashbits::
+consume_fasta_and_tag(
+  read_parsers:: IParser *  parser,
+  unsigned int		    &total_reads,   unsigned long long	&n_consumed,
+  CallbackFn		    callback,	    void *		callback_data
+)
+{
+  Hasher		  &hasher		= 
+  _get_hasher( parser->uuid( ) );
+  unsigned int		  total_reads_LOCAL	= 0;
+#if (0) // Note: Used with callback - currently disabled.
+  unsigned long long int  n_consumed_LOCAL	= 0;
+#endif
+  Read			  read;
+
+  // TODO? Delete the following assignments.
   total_reads = 0;
   n_consumed = 0;
+  
+  hasher.trace_logger(
+    TraceLogger:: TLVL_DEBUG2,
+    "Starting trace of 'consume_fasta_and_tag'....\n"
+  );
 
-  unsigned int total_reads_TL = 0;
+  // Iterate through the reads and consume their k-mers.
+  while (!parser->is_complete( ))
+  {
+    unsigned long long this_n_consumed   = 0;
 
-  IParser *		    parser  = IParser::get_parser(filename.c_str());
-  Read read;
+    read = parser->get_next_read( );
 
-  string seq = "";
+    if (check_and_normalize_read( read.sequence ))
+    {
+      consume_sequence_and_tag( read.sequence, this_n_consumed );
 
-  //
-  // iterate through the FASTA file & consume the reads.
-  //
+#ifdef WITH_INTERNAL_METRICS
+      hasher.pmetrics.start_timers( );
+#endif
+#if (0) // Note: Used with callback - currently disabled.
+      n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#else
+      __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#endif
+      total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+#ifdef WITH_INTERNAL_METRICS
+      hasher.pmetrics.stop_timers( );
+      hasher.pmetrics.accumulate_timer_deltas(
+	(uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
+      );
+#endif
+    }
 
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    seq = read.sequence;
+    if (0 == (total_reads_LOCAL % 10000))
+      hasher.trace_logger(
+	TraceLogger:: TLVL_DEBUG3,
+	"Total number of reads processed: %llu\n",
+	(unsigned long long int)total_reads_LOCAL
+      );
 
-    // n_consumed += this_n_consumed;
-
-      if (check_and_normalize_read(seq)) {	// process?
-	// TODO? Place spinlock here.
-	consume_sequence_and_tag(seq, n_consumed);
-      }
-
-      // reset the sequence info, increment read number
-      total_reads_TL = __sync_add_and_fetch( &total_reads, 1 );
-
+    // TODO: Figure out alternative to callback into Python VM
+    //       Cannot use in multi-threaded operation.
+#if (0)
       // run callback, if specified
       if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
 	std::cout << "n tags: " << all_tags.size() << "\n";
@@ -341,10 +397,9 @@ void Hashbits::consume_fasta_and_tag(const std::string &filename,
 	  throw;
 	}
       }
+#endif // 0
 
   } // while reads left for parser
-
-  delete parser;
 
 }
 
@@ -353,6 +408,7 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
 					SeenSet * found_tags)
 {
   bool is_new_kmer;
+  bool kmer_tagged;
 
   KMerIterator kmers(seq.c_str(), _ksize);
   HashIntoType kmer;
@@ -366,38 +422,47 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     // and report on whether or not they had already been set.
     // This is probably better than first testing and then setting the bits, 
     // as a failed test essentially results in doing the same amount of work 
-    // twice. This way is also easier to add thread safety at an atomic level.
-#if (1)
+    // twice.
     if ((is_new_kmer = test_and_set_bits( kmer )))
-      __sync_add_and_fetch( &n_consumed, 1 );
+      ++n_consumed;
+
+#if (1)
+    if (is_new_kmer) ++since;
+    else
+    {
+      ACQUIRE_ALL_TAGS_SPIN_LOCK
+      kmer_tagged = set_contains(all_tags, kmer);
+      RELEASE_ALL_TAGS_SPIN_LOCK
+      if (kmer_tagged)
+      {
+	since = 1;
+	if (found_tags) { found_tags->insert(kmer); }
+      }
+      else ++since;
+    }
 #else
-    is_new_kmer = (bool) !get_count(kmer);
-    if (is_new_kmer) {
-      count(kmer);
-      n_consumed++;
+    if (!is_new_kmer && set_contains(all_tags, kmer)) {
+      since = 1;
+      if (found_tags) { found_tags->insert(kmer); }
+    } else {
+      since++;
     }
 #endif
 
-    // TODO? Place spinlock here.
-    {
-      if (!is_new_kmer && set_contains(all_tags, kmer)) {
-	since = 1;
-	if (found_tags) { found_tags->insert(kmer); }
-      } else {
-	since++;
-      }
+    if (since >= _tag_density) {
+      ACQUIRE_ALL_TAGS_SPIN_LOCK
+      all_tags.insert(kmer);
+      RELEASE_ALL_TAGS_SPIN_LOCK
+      if (found_tags) { found_tags->insert(kmer); }
+      since = 1;
+    }
 
-      if (since >= _tag_density) {
-	all_tags.insert(kmer);
-	if (found_tags) { found_tags->insert(kmer); }
-	since = 1;
-      }
-    } // critical section
   } // iteration over kmers
 
-  // TODO? Place spinlock here.
   if (since >= _tag_density/2 - 1) {
+    ACQUIRE_ALL_TAGS_SPIN_LOCK
     all_tags.insert(kmer);	// insert the last k-mer, too.
+    RELEASE_ALL_TAGS_SPIN_LOCK
     if (found_tags) { found_tags->insert(kmer); }
   }
 }
@@ -414,8 +479,6 @@ void Hashbits::consume_fasta_and_tag_with_stoptags(const std::string &filename,
 						   CallbackFn callback,
 						   void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
 
@@ -568,8 +631,6 @@ void Hashbits::consume_partitioned_fasta(const std::string &filename,
 					  CallbackFn callback,
 					  void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
 
@@ -628,8 +689,6 @@ void Hashbits::filter_if_present(const std::string infilename,
 				 CallbackFn callback,
 				 void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   IParser* parser = IParser::get_parser(infilename);
   ofstream outfile(outputfile.c_str());
 
@@ -1304,7 +1363,7 @@ const
 {
   std::string kmer_s = _revhash(start, _ksize);
   HashIntoType kmer, kmer_f, kmer_r;
-  kmer = _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
+  _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
   HashIntoType f, r;
   NodeQueue node_q;
@@ -1338,7 +1397,7 @@ const
       break;
     }
 
-    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+    kmer = uniqify_rc(kmer_f, kmer_r);
     if (set_contains(keeper, kmer)) {
       continue;
     }
@@ -1351,6 +1410,7 @@ const
     keeper.insert(kmer);
     total++;
 
+    // QUESITON: Huh? What's up with the following?
     if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
       continue;
     }
@@ -1433,8 +1493,6 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 				      CountingHash &counting,
 				      unsigned int cutoff)
 {
-  using namespace khmer:: read_parsers;
-
   Read read;
   IParser* parser = IParser::get_parser(filename);
   string name;
@@ -1462,6 +1520,8 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
 
     read_num += 1;
   }
+
+  delete parser;
 
 #if VERBOSE_REPARTITION
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
@@ -1499,7 +1559,7 @@ void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
     stop_tags.insert(buf[i]);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::save_stop_tags(std::string outfilename)
@@ -1528,7 +1588,7 @@ void Hashbits::save_stop_tags(std::string outfilename)
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::print_stop_tags(std::string infilename)
@@ -1584,8 +1644,6 @@ void Hashbits::traverse_from_reads(std::string filename,
 				   unsigned int transfer_threshold,
 				   CountingHash &counting)
 {
-  using namespace khmer:: read_parsers;
-
   unsigned long long total_reads = 0;
   unsigned long long total_stop = 0;
 
@@ -1642,8 +1700,6 @@ void Hashbits::consume_fasta_and_traverse(const std::string &filename,
 					  unsigned int transfer_threshold,
 					  CountingHash &counting)
 {
-  using namespace khmer:: read_parsers;
-
   unsigned long long total_reads = 0;
 
   IParser* parser = IParser::get_parser(filename.c_str());
@@ -1851,8 +1907,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 			      CallbackFn callback,
 			      void * callback_data)
 {
-  using namespace khmer:: read_parsers;
-
   total_reads = 0;
   n_consumed = 0;
   Read read;
@@ -1869,6 +1923,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
   
   total_reads = 0;
   khmer::HashIntoType start = 0, stop = 0;
+  
+  delete parser;
   parser = IParser::get_parser(filename.c_str());
 
 
@@ -1913,6 +1969,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     }
 
   } // while
+  
+  delete parser;
 }
 
 //

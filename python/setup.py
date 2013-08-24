@@ -1,4 +1,4 @@
-CYTHON_ENABLED = @CYTHON_ENABLED_BOOL@
+CYTHON_ENABLED = False
 from distutils.core import setup
 from distutils.extension import Extension
 if CYTHON_ENABLED:
@@ -46,8 +46,8 @@ extension_mod_DICT = \
     {
 	"sources": [ "_khmermodule.pyx" if CYTHON_ENABLED else "_khmermodule.cc" ],
 	"extra_compile_args": filter( None, [
-	    '@DEFINE_KHMER_EXTRA_SANITY_CHECKS@',
-	    '@CXX_DEBUG_FLAGS@',
+	    '',
+	    '',
 	] ),
 	"extra_link_args": filter( None, [ ] ),
 	"include_dirs": [ path_join( path_pardir, "lib" ), ],

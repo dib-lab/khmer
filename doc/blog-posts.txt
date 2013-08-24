@@ -2,8 +2,6 @@
 Blog posts and additional documentation
 =======================================
 
-There is a handbook for khmer available here: http://ivory.idyll.org/blog/an-assembly-handbook-for-khmer.html
-
 Hashtable and filtering
 =======================
 
@@ -16,6 +14,7 @@ A test data set (soil metagenomics, 88m reads, 10gb) is here:
 
    http://angus.ged.msu.edu.s3.amazonaws.com/88m-reads.fa.gz
 
+
 The `filter-exact <http://github.com/ctb/khmer/blob/master/scripts/filter-exact.py>`__ script can be used as a starting point.
 
 Illumina read abundance profiles
@@ -27,30 +26,29 @@ across Illumina reads; see, for example, this blog post:
    http://ivory.idyll.org/blog/jul-10/illumina-read-phenomenology
 
 The `fasta-to-abundance-hist
-<http://github.com/ctb/khmer/blob/master/scripts/fasta-to-abundance-hist.py>`__
+<http://github.com/ctb/khmer/blob/master/sandbox/fasta-to-abundance-hist.py>`__
 and `abundance-hist-by-position
-<http://github.com/ctb/khmer/blob/master/scripts/abundance-hist-by-position.py>`__
-scripts can be used to generate the k-mer abundance profile data::
+<http://github.com/ctb/khmer/blob/master/sandbox/abundance-hist-by-position.py>`__
+scripts can be used to generate the k-mer abundance profile data, after
+loading all the k-mer counts into a .kh file::
 
-  %% python scripts/fasta-to-abundance-hist.py <filename> <K>
-  %% python scripts/abundance-hist-by-position.py <filename>.<K>.hist > out
+   # first, load all the k-mer counts:
+   scripts/load-into-counting.py -k 20 -x 1e7 25k.kh data/25k.fq.gz
 
-e.g.::
+   # then, build the '.freq' file that contains all of the counts by position
+   python sandbox/fasta-to-abundance-hist.py 25k.kh data/25k.fq.gz
 
-  %% python scripts/fasta-to-abundance-hist.py 88m-reads.fa 17
-  %% python scripts/abundance-hist-by-position.py 88m-reads.fa.17.hist > 17.txt
+   # sum across positions.
+   python sandbox/abundance-hist-by-position.py data/25k.fq.gz.freq > out.dist
 
 The hashtable method 'dump_kmers_by_abundance' can be used to dump
 high abundance k-mers, but we don't have a script handy to do that yet.
 
-The quality trimming script is in `scripts/quality-trim.py <http://github.com/ctb/khmer/blob/master/scripts/quality-filter.py>`__::
-
-  %% python scripts/quality-trim.py <fastq file> <trimmed file>
-
 You can assess high/low abundance k-mer distributions with the
-`hi-lo-abundance-by-position script <http://github.com/ctb/khmer/blob/master/scripts/hi-lo-abundance-by-position.py>`__::
+`hi-lo-abundance-by-position script <http://github.com/ctb/khmer/blob/master/sandbox/hi-lo-abundance-by-position.py>`__::
 
-  %% python scripts/hi-lo-abundance-by-position.py <fasta file>
+   scripts/load-into-counting.py -k 20 25k.kh data/25k.fq.gz
+   python sandbox/hi-lo-abundance-by-position.py 25k.kh data/25k.fq.gz
 
 This will produce two output files, <filename>.pos.abund=1 and
 <filename>.pos.abund=255.

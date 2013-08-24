@@ -2,22 +2,18 @@ __version__ = "0.4"
 
 import _khmer
 from _khmer import get_config
-try:  # CPython API
-    # from _khmer import Read
-    from _khmer import new_read_parser as ReadParser
-except ImportError:  # Cython
-    from _khmer import _Read as Read
-    from _khmer import _ReadParser as ReadParser
+from _khmer import ReadParser
 from _khmer import new_ktable
-try:  # CPython API
-    from _khmer import new_hashtable
-except ImportError:  # Cython
-    from _khmer import _new_counting_hash as new_hashtable
+from _khmer import new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
+<<<<<<< HEAD
 from _khmer import new_readaligner
 from _khmer import new_readmask
+=======
+>>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 from _khmer import new_minmax
+from _khmer import new_readaligner
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback
 

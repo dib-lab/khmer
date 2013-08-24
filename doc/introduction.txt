@@ -43,9 +43,11 @@ Using khmer
 khmer comes "out of the box" with a number of scripts that make it
 immediately useful for a few different operations, including:
 
- - eliminating reads that will not be used by a de Bruijn graph assembler;
+ - normalizing read coverage ("digital normalization")
 
- - dividing reads into disjoint sets that do not connect;
+ - dividing reads into disjoint sets that do not connect ("partitioning")
+
+ - eliminating reads that will not be used by a de Bruijn graph assembler;
 
  - removing reads with low- or high-abundance k-mers;
 
@@ -66,21 +68,17 @@ Practical considerations
 
 The most important thing to think about when using khmer is whether or
 not the transformation or filter you're applying is appropriate for
-the data you're trying to assemble.  The most powerful operations
-available in khmer, graphsize filtering and graph partitioning, only
-make sense for assembly datasets with many theoretically unconnected
-components.  This is typical of metagenomic and mRNAseq data sets.
-khmer will probably never be all that useful for single-genome
-assembly, although abundance filtering and error trimming may be
-helpful for those data sets.
+the data you're trying to assemble.  Two of the most powerful
+operations available in khmer, graphsize filtering and graph
+partitioning, only make sense for assembly datasets with many
+theoretically unconnected components.  This is typical of metagenomic
+data sets.
 
 The second most important consideration is memory usage.  The
 effectiveness of all of the Bloom filter-based functions (which is
-everything interesting in khmer!)  depends critically on having enough
-memory to do a good job.  We've found that about 2 bytes per unique
-k-mer is a good amount.  So if you have really, really large sequence
-data set from an extremely high-diversity sample, you may need 100 GB
-or more.
+everything interesting in khmer!) depends critically on having enough
+memory to do a good job.  See :doc:`choosing-hash-sizes` for more
+information.
 
 Copyright and license
 =====================

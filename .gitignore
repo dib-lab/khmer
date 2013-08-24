@@ -7,3 +7,5 @@ python/_khmermodule.cpp
 lib/test
 doc/_build
 *.log
+*env
+*ENV
