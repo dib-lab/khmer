@@ -72,7 +72,7 @@ namespace khmer {
 	next_rc = prev_r(rc, next_nucl);
       }
       
-      hash = next_fwd;//uniqify_rc(next_fwd, next_rc);
+      hash = uniqify_rc(next_fwd, next_rc);
       kmerCov = ch->get_count(hash);
 
       if (kmerCov == 0) {

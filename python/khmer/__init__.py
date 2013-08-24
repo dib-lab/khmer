@@ -7,11 +7,6 @@ from _khmer import new_ktable
 from _khmer import new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
-<<<<<<< HEAD
-from _khmer import new_readaligner
-from _khmer import new_readmask
-=======
->>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 from _khmer import new_minmax
 from _khmer import new_readaligner
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
