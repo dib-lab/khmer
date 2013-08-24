@@ -1,6 +1,45 @@
 Development miscellany
 ======================
 
+Build framework
+---------------
+
+'make' should build everything, including tests and "development" code.
+
+Coding standards
+----------------
+
+For C++, let's use `Todd Hoff's coding standard
+<http://www.possibility.com/Cpp/CppCodingStandard.html>`__, and
+`astyle -A10 / "One True Brace Style"
+<http://astyle.sourceforge.net/astyle.html>`__ indentation and
+bracing.  Note: we need to find vi and emacs settings that work for this!
+
+For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ seems
+like a good standard to default to, and there are tools to check it,
+too.
+
+git and github strategies
+-------------------------
+
+Still in the works, but read `this
+<http://scottchacon.com/2011/08/31/github-flow.html>`__.
+
+Testing
+-------
+
+'nosetests' is the canonical way to run the tests.  This is what 'make test'
+does.
+
+Pipelines
+---------
+
+All khmer scripts used by a published recommended analysis pipeline must be
+included in scripts/ and meet the standards therein implied.
+
+Command line scripts
+--------------------
+
 Python command-line scripts should use '-' instead of '_' in the name.
 (Only filenames containing code for import imported should use _.)
 
@@ -9,6 +48,22 @@ includes most especially standardization of '-x' to be hash table size,
 '-N' to be number of hash tables, and '-k' to always refer to the
 k-mer size.
 
+Command line thoughts:
+
+   If a filename is required, typically UNIX commands don't use a flag to
+   specify it.
+
+   Also, positional arguments typically aren't used with multiple files.
+
+   CTB's overall philosophy is that new files, with new names, should
+   be created as the result of filtering etc.; this allows easy
+   chaining of commands.  We're thinking about how best to allow
+   override of this, e.g. ::
+
+      filter-abund.py <kh file> <filename> [ -o <filename.keep> ]
+
+----
+
 All code in scripts/ must have automated tests; see tests/test_scripts.py.
 Otherwise it belongs in sandbox/.
 
@@ -16,4 +71,20 @@ When files are overwritten, they should only be opened to be overwritten
 after the input files have been shown to exist.  That prevents stupid
 command like mistakes from trashing important files.
 
-@@CTB: to squash output, or not to squash, by default?
+It would be nice to allow piping from one command to another where possible.
+But this seems complicated.
+
+CTB: should we squash output files (overwrite them if they exist), or not?
+So far, leaning towards 'not', as that way no one is surprised and loses
+their data.
+
+----
+
+CLI reading:
+
+   http://stackoverflow.com/questions/1183876/what-are-the-best-practices-for-implementing-a-cli-tool-in-perl
+
+   http://catb.org/esr/writings/taoup/html/ch11s06.html
+
+   http://figshare.com/articles/tutorial_pdf/643388
+

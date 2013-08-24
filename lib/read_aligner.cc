@@ -3,15 +3,45 @@
 namespace khmer {
 // http://www.wesleysteiner.com/professional/del_fun.html
 
+  Transition get_trans(State s1, State s2) {
+    if(s1 == match) {
+      if(s2 == match) {
+	return MM;
+      } else if(s2 == deletion) {
+	return MD;
+      } else if(s2 == insertion) {
+	return MI;
+      }
+    } else if(s1 == deletion) {
+      if(s2 == match) {
+	return DM;
+      } else if(s2 == deletion) {
+	return DD;
+      }
+    } else if(s1 == insertion) {
+      if(s2 == match) {
+	return IM;
+      } else if(s2 == insertion) {
+	return II;
+      }
+    }
+
+    return disallowed;
+  }
+
   void ReadAligner::enumerate(
-		       const NodeHeap& open,
+		       NodeHeap& open,
 		       AlignmentNode* curr,
-		       unsigned char forward,
+		       bool forward,
 		       const std::string& seq
 		       ) {
     int next_seq_idx;
     int remaining;
     int kmerCov;
+    double hcost;
+    double tsc;
+    double sc;
+    Transition trans;
     HashIntoType fwd = curr->fwd_hash;
     HashIntoType rc = curr->rc_hash;
     HashIntoType next_fwd, next_rc, hash;
@@ -27,6 +57,8 @@ namespace khmer {
       next_seq_idx = curr->seq_idx - 1;
       remaining = next_seq_idx;
     }
+
+    //std::cerr << "Enumerating: " << _revhash(fwd, ch->ksize()) << " " << _revhash(rc, ch->ksize()) << std::endl;
     
     // loop for matches and insertions
     for (int i = A; i <= T; i++) {
@@ -36,32 +68,61 @@ namespace khmer {
 	next_fwd = next_f(fwd, next_nucl);
 	next_rc = next_r(rc, next_nucl);
       } else {
-	next_fwd = next_f(fwd, next_nucl);
-	next_rc = next_r(rc, next_nucl);
+	next_fwd = prev_f(fwd, next_nucl);
+	next_rc = prev_r(rc, next_nucl);
       }
       
-      hash = uniqify_rc(next_fwd, next_rc);
+      hash = next_fwd;//uniqify_rc(next_fwd, next_rc);
       kmerCov = ch->get_count(hash);
-    
+
       if (kmerCov == 0) {
 	continue;
       }
-    
-      // match
-      next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, match,
-			       next_fwd, next_rc);
-      next->score = curr->score + sm->score(next_nucl, seq[next_seq_idx]);
-      isCorrect = kmerCov >= 2; //isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo);
-      if (!isCorrect) {
-	next->score += errorOffset;
-      }
-      next->h_score = sm->trans[MM] * remaining;
-      next->f_score = next->score + next->h_score;
-      
-      if (isCorrect) {
-	open.push(next);
-      } else {
-	delete next;
+
+      for(int next_state_iter = match;next_state_iter <= deletion;next_state_iter++) {
+	State next_state = static_cast<State>(next_state_iter);
+	trans = get_trans(curr->state, next_state);
+	hcost = sm->tsc[get_trans(next_state, match)] + sm->tsc[MM] * (remaining - 1);// + sm->match * remaining;
+	if(trans == disallowed) {
+	  continue;
+	}
+
+	if(next_state == match) {
+	  if(next_nucl == seq[next_seq_idx]) {
+	    sc = sm->match;
+	  } else {
+	    sc = sm->mismatch;
+	  }
+	} else {
+	  sc = 0;
+	}
+
+	if(next_state == match) {
+	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state,
+				   next_fwd, next_rc);	  
+	} else if(next_state == deletion) {
+	  next = new AlignmentNode(curr, (Nucl)i, curr->seq_idx, (State)next_state,
+				   next_fwd, next_rc);
+	} else if(next_state == insertion) {
+	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state,
+				   curr->fwd_hash, curr->rc_hash);
+
+	}
+
+	next->score = curr->score + sc + sm->tsc[trans];
+	isCorrect = true; //kmerCov >= 1; //isCorrectKmer(nextKmerCov, lambdaOne, lambdaTwo);
+	if (!isCorrect) {
+	  next->score += errorOffset;
+	}
+	next->h_score = hcost;
+	next->f_score = next->score + next->h_score;
+	//std::cerr << "\t" << i << " " << next_nucl << " " << next->score << " " << next->h_score << " " << next->f_score << " " << state_labels[next->state] << " " << trans_labels[trans] << " " << hash << " " << _revhash(hash, ch->ksize()) << " " << _revhash(next_fwd, ch->ksize()) << " " << _revhash(next_rc, ch->ksize()) << " " << kmerCov << std::endl;
+	
+	if (isCorrect) {
+	  open.push(next);
+	} else {
+	  delete next;
+	}
       }
     }
   }
@@ -71,29 +132,112 @@ namespace khmer {
 				   bool forward,
 				   const std::string& seq) {
     
-    NodeHeap open();
+    NodeHeap open;
+    std::set<AlignmentNode> closed;
     open.push(startVert);
     AlignmentNode* curr;
 
     while (!open.empty()) {
       curr = open.top();
+      //std::cerr << "curr: " << curr->prev << " " << _revhash(curr->fwd_hash, ch->ksize()) << " " << _revhash(curr->rc_hash, ch->ksize()) << " " << curr->base << " " << curr->seq_idx << " " << state_labels[curr->state] << " " << curr->score << " " << curr->f_score << std::endl;
       open.pop();
       
-      if (curr->stateNo == seqLen-1 ||
-	  curr->stateNo == 0) {
+      if (curr->seq_idx == seqLen-1 ||
+	  curr->seq_idx == 0) {
 	return curr;
       }
+
+      if(set_contains(closed, *curr)) {
+	continue;
+      }
+
+      closed.insert(*curr);
       
-      enumerate(open, forward, seq);
+      enumerate(open, curr, forward, seq);
     }
     
     return NULL;
   }
 
-  Alignment ReadAligner::align(const std::string& seq,
+  Alignment* ReadAligner::extract_alignment(AlignmentNode* node, const std::string& read, const std::string& kmer) {
+    if(node == NULL) {
+      return NULL;
+    }
+
+    assert(node->seq_idx < read.length());
+    assert(node->seq_idx > 0);
+    std::string read_alignment = "";
+    std::string graph_alignment = "";
+    Alignment* ret = new Alignment;
+    ret->score = node->score;
+    //std::cerr << "Alignment end: " << node->prev << " " << node->base << " " << node->seq_idx << " " << node->state << " " << node->score << std::endl;
+
+    char read_base;
+    char graph_base;
+
+    while(node != NULL && node->prev != NULL) {
+      if(node->state == match) {
+	graph_base = toupper(nucl_lookup[node->base]);
+	read_base = read[node->seq_idx];
+      } else if(node->state == insertion) {
+	graph_base = '-';
+	read_base = tolower(read[node->seq_idx]);
+      } else if(node->state == deletion) {
+	graph_base = tolower(nucl_lookup[node->base]);
+	read_base = '-';
+      } else {
+	graph_base = '?';
+	read_base = '?';
+      }
+      graph_alignment = graph_base + graph_alignment;
+      read_alignment = read_base + read_alignment;
+      node = node->prev;
+    }
+    ret->graph_alignment = kmer + graph_alignment;
+    ret->read_alignment = kmer + read_alignment;
+    
+    return ret;
+  }
+  
+  Alignment* ReadAligner::align_test(const std::string& read) {
+    int k = ch->ksize();
+    for (unsigned int i = 0; i < read.length() - k + 1; i++) {
+      std::string kmer = read.substr(i, k);
+      
+      int kCov = ch->get_count(kmer.c_str());
+      if(kCov > 0) {
+	HashIntoType fhash, rhash;
+	_hash(kmer.c_str(), k, fhash, rhash);
+	//std::cerr << "Starting kmer: " << kmer << " " << _revhash(fhash, ch->ksize()) << " " << _revhash(rhash, ch->ksize()) << " idx: " << i << ", " << i + k - 1 << " emission: " << kmer[k - 1] << std::endl;
+	char base = toupper(kmer[k - 1]);
+	Nucl e;
+	switch(base) {
+	case 'A':
+	  e = A;
+	  break;
+	case 'C':
+	  e = C;
+	  break;
+	case 'G':
+	  e = G;
+	  break;
+	case 'T': case 'U':
+	  e = T;
+	  break;
+	}
+	AlignmentNode start(NULL, e, i + k - 1, match, fhash, rhash);
+	AlignmentNode* end = subalign(&start, read.length(), true, read);
+	return extract_alignment(end, read, kmer);
+      }
+    }
+    return NULL;
+  }
+
+  Alignment* ReadAligner::align(const std::string& seq,
 			   const std::string& kmer,
 			   int index) {
-    AlignmentNode* leftStart = new AlignemntNode(NULL,
+
+    /*AlignmentNode* leftStart = new AlignemntNode(NULL,
 						 kmer[0],
 						 index,
 						 'm',
@@ -120,10 +264,11 @@ namespace khmer {
       kmer +
       extractString(rightGoal, 1, &readDels);
     
-    return Alignment(readDels, align);
+      return Alignment(readDels, align);*/
+    return NULL;
   }
 
-  Alignment ReadAligner::alignRead(const std::string& read) {
+  /*Alignment ReadAligner::alignRead(const std::string& read) {
     std::vector<unsigned int> markers;
     bool toggleError = 1;
     
@@ -239,5 +384,5 @@ namespace khmer {
     }
    
     return NULL;
-  }
+    }*/
 }

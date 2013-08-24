@@ -22,6 +22,93 @@ extern "C" {
   void init_khmer();
 }
 
+
+// Configure module logging.
+//#define WITH_INTERNAL_TRACING
+namespace khmer
+{
+
+namespace python
+{
+
+#ifdef WITH_INTERNAL_TRACING
+#warning "Internal tracing of Python extension module is enabled."
+static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_DEBUG9;
+static void		_trace_logger(
+    uint8_t level, char const * format, ...
+)
+{
+    static FILE *	_stream_handle	= NULL;
+
+    if (NULL == _stream_handle)
+	_stream_handle = fopen( "pymod.log", "w" );
+
+    va_list varargs;
+    
+    if (_MODULE_TRACE_LEVEL <= level)
+    {
+	va_start( varargs, format );
+	vfprintf( _stream_handle, format, varargs );
+	va_end( varargs );
+	fflush( _stream_handle );
+    }
+
+}
+#else
+static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_NONE;
+static inline void	_trace_logger(
+    uint8_t level, char const * format, ...
+)
+{ }
+#endif
+
+
+template < typename OBJECT >
+void
+_common_init_Type(
+    PyTypeObject &tobj, char const * name, char const * doc
+)
+{
+    assert( name );
+    assert( doc );
+    
+    tobj.ob_size		= 0;
+    tobj.ob_type		= &PyType_Type;
+    tobj.tp_name		= name;
+    tobj.tp_basicsize		= sizeof( OBJECT );
+    tobj.tp_alloc		= PyType_GenericAlloc;
+    tobj.tp_free		= PyObject_Free;
+    tobj.tp_getattro		= PyObject_GenericGetAttr;
+    tobj.tp_flags		= Py_TPFLAGS_DEFAULT;
+    tobj.tp_doc			= doc;
+}
+
+
+static inline
+void
+_debug_class_attrs( PyTypeObject &tobj )
+{
+#ifdef WITH_INTERNAL_TRACING
+    PyObject *key, *val;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next( tobj.tp_dict, &pos, &key, &val ))
+    {
+	_trace_logger(
+	    TraceLogger:: TLVL_DEBUG5,
+	    "\ttype '%s' dictionary key %d: '%s'\n",
+	    tobj.tp_name, pos, PyString_AsString( key )
+	);
+    }
+#endif // WITH_INTERNAL_TRACING
+}
+
+
+} // namespace python
+
+} // namespace khmer
+
+
 class _khmer_exception {
 private:
   std::string _message;
@@ -347,246 +434,444 @@ khmer_config_getattr( PyObject * obj, char * name )
 // Read object -- name, sequence, and FASTQ stuff
 //
 
+namespace khmer
+{
+
+namespace python
+{
+
+
+static PyTypeObject Read_Type = { PyObject_HEAD_INIT( NULL ) };
+
+
 typedef struct
 {
-  PyObject_HEAD
-  khmer:: read_parsers:: Read *  read;
-} khmer_ReadObject;
+    PyObject_HEAD
+    //! Pointer to the low-level genomic read object.
+    khmer:: read_parsers:: Read *   read;
+} Read_Object;
 
 
-static void	    khmer_read_dealloc( PyObject * obj );
-static PyObject *   khmer_read_getattr( PyObject * obj, char * name );
-
-static PyTypeObject khmer_ReadType =
+static
+void
+_Read_dealloc( PyObject * self )
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "Read",
-    sizeof( khmer_ReadObject ),
-    0,
-    khmer_read_dealloc,		/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_read_getattr,		/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "FASTA/FASTQ read object",	/* tp_doc */
+    Read_Object * myself = (Read_Object *)self;
+    delete myself->read; myself->read = NULL;
+    Read_Type.tp_free( self );
+}
+
+
+#define KHMER_READ_STRING_GETTER( SELF, ATTR_NAME ) \
+    PyString_FromString( \
+	((((Read_Object *)(SELF))->read)->ATTR_NAME).c_str( ) \
+    )
+
+
+static
+PyObject *
+Read_get_name( PyObject * self, void * closure )
+{ return KHMER_READ_STRING_GETTER( self, name ); }
+
+
+static
+PyObject *
+Read_get_sequence( PyObject * self, void * closure )
+{ return KHMER_READ_STRING_GETTER( self, sequence ); }
+
+
+static
+PyObject *
+Read_get_accuracy( PyObject * self, void * closure )
+{ return KHMER_READ_STRING_GETTER( self, accuracy ); }
+
+
+static
+PyObject *
+Read_get_annotations( PyObject * self, void * closure )
+{ return KHMER_READ_STRING_GETTER( self, annotations ); }
+
+
+// TODO? Implement setters.
+
+
+static PyGetSetDef _Read_accessors [ ] =
+{
+    { (char *)"name",
+      (getter)Read_get_name, (setter)NULL,
+      (char *)"Read identifier.", NULL },
+    { (char *)"sequence",
+      (getter)Read_get_sequence, (setter)NULL,
+      (char *)"Genomic sequence.", NULL },
+    { (char *)"accuracy",
+      (getter)Read_get_accuracy, (setter)NULL,
+      (char *)"Quality scores.", NULL },
+    { (char *)"annotations",
+      (getter)Read_get_annotations, (setter)NULL,
+      (char *)"Annotations.", NULL },
+    
+    { NULL, NULL, NULL, NULL, NULL } // sentinel
 };
 
 
 static
 void
-khmer_read_dealloc( PyObject * self )
+_init_Read_Type( )
 {
+    using namespace khmer:: read_parsers;
 
-  khmer_ReadObject *  obj = (khmer_ReadObject *)self;
-  delete obj->read; obj->read = NULL;
-  PyObject_Del( self );
+    _common_init_Type<Read_Object>(
+	Read_Type, "Read", "A FASTQ record plus some metadata."
+    );
+    Read_Type.tp_dealloc	= (destructor)_Read_dealloc;
 
+    Read_Type.tp_getset		= (PyGetSetDef *)_Read_accessors;
+    
+    PyType_Ready( &Read_Type );
+
+    _debug_class_attrs( Read_Type );
 }
 
-static
-PyObject *
-khmer_read_getattr( PyObject * self, char * attr_name )
-{
-  khmer_ReadObject *		me	      = (khmer_ReadObject *)self;
-  khmer:: read_parsers:: Read *	read	      = me->read;
-  PyObject *			value_OBJECT  = NULL;
-
-  assert( read );
-
-  if	  (!strcmp( attr_name, "name" ))
-    value_OBJECT = PyString_FromString( (read->name).c_str( ) );
-  else if (!strcmp( attr_name, "sequence" ))
-    value_OBJECT = PyString_FromString( (read->sequence).c_str( ) );
-  else if (!strcmp( attr_name, "annotations" ))
-    value_OBJECT = PyString_FromString( (read->annotations).c_str( ) );
-  else if (!strcmp( attr_name, "accuracy" ))
-    value_OBJECT = PyString_FromString( (read->accuracy).c_str( ) );
-  // TODO? Handle other fields.
-  else
-  {
-    PyErr_SetString( PyExc_KeyError, "invalid member attribute name" );
-    return NULL;
-  }
-
-  return value_OBJECT;
-}
 
 /***********************************************************************/
 
 //
 // ReadParser object -- parse reads directly from streams
+// ReadPairIterator -- return pairs of Read objects
 //
+
+
+static PyTypeObject ReadParser_Type = { PyObject_HEAD_INIT( NULL ) };
+static PyTypeObject ReadPairIterator_Type = { PyObject_HEAD_INIT( NULL ) };
+
 
 typedef struct
 {
-  PyObject_HEAD
-  khmer:: read_parsers:: IParser *  parser;
-} khmer_ReadParserObject;
+    PyObject_HEAD
+    //! Pointer to the low-level parser object.
+    khmer:: read_parsers:: IParser *  parser;
+} ReadParser_Object;
 
 
-static void	    khmer_read_parser_dealloc( PyObject * );
-static PyObject *   khmer_read_parser_getattr( PyObject * obj, char * name );
-
-static PyTypeObject khmer_ReadParserType =
+typedef struct
 {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "ReadParser",
-    sizeof( khmer_ReadParserObject ),
-    0,
-    khmer_read_parser_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_read_parser_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "read parser object",	/* tp_doc */
-};
+    PyObject_HEAD
+    //! Pointer to Python parser object for reference counting purposes.
+    PyObject *	parent;
+    //! Persistent value of pair mode across invocations.
+    uint8_t	pair_mode;
+} ReadPairIterator_Object;
 
 
 static
-PyObject *
-new_read_parser( PyObject * self, PyObject * args )
+void
+_ReadParser_dealloc( PyObject * self )
 {
-  char *      ifile_name_CSTR;
-  khmer:: Config  &the_config	  = khmer:: get_active_config( );
-  uint32_t    number_of_threads	  = the_config.get_number_of_threads( );
-  uint64_t    cache_size	  = the_config.get_reads_input_buffer_size( );
-  uint8_t     trace_level	  = the_config.get_reads_parser_trace_level( );
 
-  if (!PyArg_ParseTuple(
-	args, "s|IKH",
-	&ifile_name_CSTR, &number_of_threads, &cache_size, &trace_level
-      )) return NULL;
-  std:: string	ifile_name( ifile_name_CSTR );
+    ReadParser_Object * myself = (ReadParser_Object *)self;
+    delete myself->parser; myself->parser = NULL;
+    ReadParser_Type.tp_free( self );
 
-  khmer_ReadParserObject * obj = 
-  (khmer_ReadParserObject *)PyObject_New(
-    khmer_ReadParserObject, &khmer_ReadParserType
-  );
-
-  try
-  {
-    obj->parser = 
-    khmer:: read_parsers:: IParser:: get_parser(
-      ifile_name, number_of_threads, cache_size, trace_level
-    );
-  }
-  catch (khmer:: InvalidStreamHandle &exc)
-  {
-    PyErr_SetString( PyExc_ValueError, "invalid input file name" );
-    return NULL;
-  }
-
-  return (PyObject *)obj;
 }
 
 
 static
 void
-khmer_read_parser_dealloc( PyObject * self )
+_ReadPairIterator_dealloc( PyObject * self )
 {
+    ReadPairIterator_Object * myself = (ReadPairIterator_Object *)self;
 
-  khmer_ReadParserObject *  obj = (khmer_ReadParserObject *)self;
-  delete obj->parser; obj->parser = NULL;
-  PyObject_Del( self );
-
+    Py_DECREF( myself->parent ); myself->parent = NULL;
+    ReadPairIterator_Type.tp_free( self );
 }
 
 
 static
 PyObject *
-khmer_read_parser_is_complete( PyObject * self, PyObject * dummy )
+_ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 {
-  khmer_ReadParserObject *	    me	    = (khmer_ReadParserObject *) self;
-  khmer:: read_parsers:: IParser *  parser  = me->parser;
+    using namespace khmer:: read_parsers;
 
-  // Note: 'is_complete' can block if no more data from stream
-  //	   but other parser threads are still working.
-  bool complete = false;
-  Py_BEGIN_ALLOW_THREADS
-  complete = parser->is_complete( );  
-  Py_END_ALLOW_THREADS
+    char *      ifile_name_CSTR;
+    Config	&the_config	  = get_active_config( );
+    uint32_t    number_of_threads = the_config.get_number_of_threads( );
+    uint64_t    cache_size	  = the_config.get_reads_input_buffer_size( );
+    uint8_t     trace_level	  = the_config.get_reads_parser_trace_level( );
 
-  if (complete) Py_RETURN_TRUE;
-  Py_RETURN_FALSE;
+    if (!PyArg_ParseTuple(
+	args, "s|IKH",
+	&ifile_name_CSTR, &number_of_threads, &cache_size, &trace_level
+    )) return NULL;
+    // TODO: Handle keyword arguments.
+    std:: string	ifile_name( ifile_name_CSTR );
+
+    PyObject * self		= subtype->tp_alloc( subtype, 1 );
+    ReadParser_Object * myself	= (ReadParser_Object *)self;
+
+    // Wrap the low-level parser object.
+    try
+    {
+	myself->parser = 
+	IParser:: get_parser(
+	    ifile_name, number_of_threads, cache_size, trace_level
+	);
+    }
+    catch (InvalidStreamHandle &exc)
+    {
+	PyErr_SetString( PyExc_ValueError, "invalid input file name" );
+	return NULL;
+    }
+
+    return self;
 }
 
 
 static
 PyObject *
-khmer_read_parser_get_next_read( PyObject * self, PyObject * dummy )
+_ReadParser_iternext( PyObject * self )
 {
-  bool	  invalid_fasta_file	= false;
+    using namespace khmer:: read_parsers;
 
-  khmer_ReadParserObject *	    me	      = (khmer_ReadParserObject *) self;
-  khmer:: read_parsers:: IParser *  parser    = me->parser;
-  khmer:: read_parsers:: Read *	    read      =
-  new khmer:: read_parsers:: Read( );
+    ReadParser_Object *	myself  = (ReadParser_Object *)self;
+    IParser *		parser  = myself->parser;
 
-  Py_BEGIN_ALLOW_THREADS
-  try
-  {
-    *read = parser->get_next_read( );
-  }
-  catch (khmer:: read_parsers:: InvalidFASTAFileFormat &exc)
-  {
-    invalid_fasta_file = true;
-  }
-  // TODO: Handle case when this is called with no more reads left on stream.
-  Py_END_ALLOW_THREADS
+    bool    stop_iteration	= false;
+    bool    invalid_file_format	= false;
+    char    exc_message[ CHAR_MAX ];
+    Read *  the_read_PTR	= new Read( );
 
-  if (invalid_fasta_file)
-  {
-    PyErr_SetString( PyExc_ValueError, "invalid FASTA file" );
-    return NULL;
-  }
+    Py_BEGIN_ALLOW_THREADS
+    stop_iteration = parser->is_complete( );
+    if (!stop_iteration)
+	try
+	{ parser->imprint_next_read( *the_read_PTR ); }
+	catch (InvalidReadFileFormat &exc)
+	{
+	    invalid_file_format = true;
+	    strncpy( exc_message, exc.what( ), CHAR_MAX );
+	}
+    Py_END_ALLOW_THREADS
 
-  khmer_ReadObject *		    read_OBJECT = 
-  (khmer_ReadObject *)PyObject_New( khmer_ReadObject, &khmer_ReadType );
-  read_OBJECT->read = read;
+    // Note: Can simply return NULL instead of setting the StopIteration 
+    //	     exception.
+    if (stop_iteration)
+	return NULL;
 
-  return (PyObject *)read_OBJECT;
+    if (invalid_file_format)
+    {
+	PyErr_SetString( PyExc_IOError, (char const *)exc_message );
+	return NULL;
+    }
+
+    PyObject * the_read_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
+    ((Read_Object *)the_read_OBJECT)->read = the_read_PTR;
+    return the_read_OBJECT;
 }
 
 
-static PyMethodDef khmer_read_parser_methods[ ] =
+static
+PyObject *
+_ReadPairIterator_iternext( PyObject * self )
 {
-  { "is_complete",    khmer_read_parser_is_complete,
-      METH_NOARGS, "No more reads to parse?" },
-  { "get_next_read",  khmer_read_parser_get_next_read,
-      METH_NOARGS, "Fetch next read from stream." },
-  { NULL,	      NULL,
-      0,	      NULL }  /* sentinel */
+    using namespace khmer:: read_parsers;
+
+    ReadPairIterator_Object *	myself	  = (ReadPairIterator_Object *)self;
+    ReadParser_Object *		parent	  =
+    (ReadParser_Object *)(myself->parent);
+    IParser *			parser	  = parent->parser;
+    uint8_t			pair_mode = myself->pair_mode;
+
+    ReadPair	the_read_pair;
+
+    bool    stop_iteration		= false;
+    bool    invalid_file_format		= false;
+    char    exc_message[ CHAR_MAX ];
+    bool    unknown_pair_reading_mode   = false;
+    bool    invalid_read_pair		= false;
+    Py_BEGIN_ALLOW_THREADS
+    stop_iteration = parser->is_complete( );
+    if (!stop_iteration)
+	try
+	{ parser->imprint_next_read_pair( the_read_pair, pair_mode ); }
+	catch (InvalidReadFileFormat &exc)
+	{
+	    invalid_file_format = true;
+	    strncpy( exc_message, exc.what( ), CHAR_MAX );
+	}
+	catch (UnknownPairReadingMode &exc)
+	{ unknown_pair_reading_mode = true; }
+	catch (InvalidReadPair &exc)
+	{ invalid_read_pair = true; }
+    Py_END_ALLOW_THREADS
+
+    // Note: Can return NULL instead of setting the StopIteration exception.
+    if (stop_iteration) return NULL;
+
+    if (invalid_file_format)
+    {
+	PyErr_SetString( PyExc_IOError, (char const *)exc_message );
+	return NULL;
+    }
+    if (unknown_pair_reading_mode)
+    {
+	PyErr_SetString(
+	    PyExc_ValueError, "Unknown pair reading mode supplied."
+	);
+	return NULL;
+    }
+    if (invalid_read_pair)
+    {
+	PyErr_SetString( PyExc_IOError, "Invalid read pair detected." );
+	return NULL;
+    }
+
+    // Copy elements of 'ReadPair' object into Python tuple.
+    // TODO? Replace dummy reads with 'None' object.
+    PyObject * read_1_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
+    ((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
+    PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
+    ((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
+    return PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+}
+
+
+static
+PyObject *
+ReadParser_iter_reads( PyObject * self, PyObject * args )
+{ return PyObject_SelfIter( self ); }
+
+
+static
+PyObject *
+ReadParser_iter_read_pairs( PyObject * self, PyObject * args )
+{
+    using namespace khmer:: read_parsers;
+
+    uint8_t   pair_mode	= IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
+
+    if (!PyArg_ParseTuple( args, "|H", &pair_mode )) return NULL;
+    
+    // Capture existing read parser.
+    PyObject * obj = ReadPairIterator_Type.tp_alloc(
+	&ReadPairIterator_Type, 1
+    );
+    ReadPairIterator_Object * rpi   = (ReadPairIterator_Object *)obj;
+    rpi->parent			    = self;
+    rpi->pair_mode		    = pair_mode;
+
+    // Increment reference count on existing ReadParser object so that it 
+    // will not go away until all ReadPairIterator instances have gone away.
+    Py_INCREF( self );
+
+    return obj;
+}
+
+
+static PyMethodDef _ReadParser_methods [ ] =
+{
+    { "iter_reads",		(PyCFunction)ReadParser_iter_reads,
+      METH_NOARGS,		"Iterates over reads." },
+    { "iter_read_pairs",	(PyCFunction)ReadParser_iter_read_pairs,
+      METH_VARARGS,		"Iterates over paired reads as pairs." },
+    
+    { NULL, NULL, 0, NULL } // sentinel
 };
 
 
 static
-PyObject *
-khmer_read_parser_getattr( PyObject * obj, char * name )
-{ return Py_FindMethod(khmer_read_parser_methods, obj, name); }
+void
+_init_ReadParser_Type( )
+{
+    using namespace khmer:: read_parsers;
+
+    _common_init_Type<ReadParser_Object>(
+	ReadParser_Type,
+	"ReadParser",
+	"Parses streams from various file formats, " \
+	"such as FASTA and FASTQ."
+    );
+    ReadParser_Type.tp_new	    = (newfunc)_ReadParser_new;
+    ReadParser_Type.tp_dealloc	    = (destructor)_ReadParser_dealloc;
+
+    ReadParser_Type.tp_iter	    = PyObject_SelfIter;
+    ReadParser_Type.tp_iternext	    = (iternextfunc)_ReadParser_iternext;
+
+    ReadParser_Type.tp_methods	    = (PyMethodDef *)_ReadParser_methods;
+    
+    PyObject * cls_attrs_DICT = PyDict_New( );
+
+
+    // Place pair mode constants into class dictionary.
+    int result;
+
+    result = PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_ALLOW_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED )
+    );
+    assert(!result);
+
+    result = PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_IGNORE_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED )
+    );
+    assert(!result);
+
+    result = PyDict_SetItemString(
+	cls_attrs_DICT,
+	"PAIR_MODE_ERROR_ON_UNPAIRED",
+	PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED )
+    );
+    assert(!result);
+
+    ReadParser_Type.tp_dict	    = cls_attrs_DICT;
+
+    PyType_Ready( &ReadParser_Type );
+
+    _debug_class_attrs( ReadParser_Type );
+
+} // _init_ReadParser_Type
+
+
+static
+void
+_init_ReadPairIterator_Type( )
+{
+
+    _common_init_Type<ReadPairIterator_Object>(
+	ReadPairIterator_Type,
+	"ReadParser-pair-iterator",
+	"Iterates over 'ReadParser' objects and returns read pairs." 
+    );
+    //ReadPairIterator_Type.tp_new	= (newfunc)_ReadPairIterator_new;
+    ReadPairIterator_Type.tp_dealloc    =
+    (destructor)_ReadPairIterator_dealloc;
+
+    ReadPairIterator_Type.tp_iter	= PyObject_SelfIter;
+    ReadPairIterator_Type.tp_iternext	= 
+    (iternextfunc)_ReadPairIterator_iternext;
+
+    PyType_Ready( &ReadPairIterator_Type );
+
+    _debug_class_attrs( ReadPairIterator_Type );
+
+} // _init_ReadPairIterator_Type
+
+
+} // namespace python
+
+} // namespace khmer
+
+
+static
+khmer:: read_parsers:: IParser *
+_PyObject_to_khmer_ReadParser( PyObject * py_object )
+{
+  // TODO: Add type-checking.
+
+  return ((khmer:: python:: ReadParser_Object *)py_object)->parser;
+}
 
 
 /***********************************************************************/
@@ -735,7 +1020,10 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
 
   unsigned long count = 0;
 
-  if (PyInt_Check(arg)) {
+  if(PyLong_Check(arg)) {
+    HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
+    count = ktable->get_count(pos);
+  } else if (PyInt_Check(arg)) {
     long pos = PyInt_AsLong(arg);
     count = ktable->get_count((unsigned int) pos);
   } else if (PyString_Check(arg)) {
@@ -1013,6 +1301,7 @@ typedef struct {
 
 static void khmer_hashbits_dealloc(PyObject *);
 static PyObject * khmer_hashbits_getattr(PyObject * obj, char * name);
+<<<<<<< HEAD
 typedef struct {
   PyObject_HEAD
   khmer::ReadMaskTable * mask;
@@ -1028,6 +1317,8 @@ typedef struct {
 
 static void khmer_readmask_dealloc(PyObject *);
 static PyObject * khmer_readmask_getattr(PyObject *, char *);
+=======
+>>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 
 static PyTypeObject khmer_KHashbitsType = {
     PyObject_HEAD_INIT(NULL)
@@ -1054,6 +1345,12 @@ static PyTypeObject khmer_KHashbitsType = {
 };
 
 #define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
+
+/* GRAPHALIGN addition */
+typedef struct {
+  PyObject_HEAD
+  Aligner * aligner;
+} khmer_ReadAlignerObject;
 
 typedef struct {
   PyObject_HEAD
@@ -1268,24 +1565,23 @@ static PyObject * hash_consume_fasta_with_reads_parser(
       return NULL;
   }
 
-  // TODO: Add type-checking.
-  khmer_ReadParserObject * my_rparser	  = 
-  (khmer_ReadParserObject *)rparser_obj;
-  khmer:: read_parsers::IParser * rparser = my_rparser->parser;
+  khmer:: read_parsers:: IParser * rparser = 
+  _PyObject_to_khmer_ReadParser( rparser_obj );
 
   // call the C++ function, and trap signals => Python
-  unsigned long long  n_consumed    = 0;
-  unsigned int	      total_reads   = 0;
+  unsigned long long  n_consumed  = 0;
+  unsigned int	      total_reads = 0;
+  bool		      exc_raised  = false;
+  Py_BEGIN_ALLOW_THREADS
   try {
-    // TODO: Extend thread toggle into exception handler.
-    Py_BEGIN_ALLOW_THREADS
     counting->consume_fasta(rparser, total_reads, n_consumed,
 			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
-    Py_END_ALLOW_THREADS
   } catch (_khmer_signal &e) {
-    return NULL;
+    exc_raised = true;
   }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
 
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
@@ -1555,9 +1851,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 
   char * filename = NULL;
   PyObject * tracking_obj = NULL;
-  PyObject * callback_obj = NULL;
-  if (!PyArg_ParseTuple(args, "sO|O", &filename, &tracking_obj,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sO", &filename, &tracking_obj)) {
     return NULL;
   }
 
@@ -1568,8 +1862,46 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 
 
   khmer::HashIntoType * dist;
-  dist = counting->abundance_distribution(filename, hashbits,
-					  _report_fn, callback_obj);
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(filename, hashbits);
+  Py_END_ALLOW_THREADS
+  
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+  }
+
+  delete[] dist;
+
+  return x;
+}
+
+static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  PyObject * rparser_obj = NULL;
+  PyObject * tracking_obj = NULL;
+  if (!PyArg_ParseTuple(args, "OO", &rparser_obj, &tracking_obj)) {
+    return NULL;
+  }
+
+  khmer:: read_parsers:: IParser * rparser = 
+    _PyObject_to_khmer_ReadParser(rparser_obj);
+
+  assert(is_hashbits_obj(tracking_obj));
+
+  khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
+  khmer::Hashbits * hashbits = tracking_o->hashbits;
+
+
+  khmer::HashIntoType * dist;
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(rparser, hashbits);
+  Py_END_ALLOW_THREADS
   
   PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
@@ -1747,7 +2079,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
-    METH_VARARGS, "Count all k-mers in a given file" },
+    METH_VARARGS, "Count all k-mers using a given reads parser" },
   { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
@@ -1759,6 +2091,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
+  { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
   { "load", hash_load, METH_VARARGS, "" },
@@ -2437,6 +2770,44 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hashbits_consume_fasta_with_reads_parser(
+  PyObject * self, PyObject * args
+)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * rparser_obj = NULL;
+  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(
+    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
+  )) {
+      return NULL;
+  }
+
+  khmer:: read_parsers:: IParser * rparser = 
+  _PyObject_to_khmer_ReadParser( rparser_obj );
+
+  // call the C++ function, and trap signals => Python
+  unsigned long long  n_consumed  = 0;
+  unsigned int	      total_reads = 0;
+  bool		      exc_raised  = false;
+  Py_BEGIN_ALLOW_THREADS
+  try {
+    hashbits->consume_fasta(rparser, total_reads, n_consumed,
+			    lower_bound, upper_bound, 
+			    _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
 static PyObject * hashbits_traverse_from_reads(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2515,6 +2886,40 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * arg
   } catch (_khmer_signal &e) {
     return NULL;
   }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
+static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
+  PyObject * self, PyObject * args
+)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * rparser_obj = NULL;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple( args, "O|O", &rparser_obj, &callback_obj ))
+    return NULL;
+
+  khmer:: read_parsers:: IParser * rparser =
+  _PyObject_to_khmer_ReadParser( rparser_obj );
+
+  // call the C++ function, and trap signals => Python
+  unsigned long long  n_consumed  = 0;
+  unsigned int	      total_reads = 0;
+  bool		      exc_raised  = false;
+  Py_BEGIN_ALLOW_THREADS
+  try {
+    hashbits->consume_fasta_and_tag(
+      rparser, total_reads, n_consumed, _report_fn, callback_obj
+    );
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
 
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
@@ -3468,7 +3873,10 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "_get_tag_density", hashbits__get_tag_density, METH_VARARGS, "" },
   { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
   { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_with_reads_parser", hashbits_consume_fasta_with_reads_parser, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_and_tag_with_reads_parser", hashbits_consume_fasta_and_tag_with_reads_parser, 
+    METH_VARARGS, "Count all k-mers using a given reads parser" },
   { "traverse_from_reads", hashbits_traverse_from_reads, METH_VARARGS, "" },
   { "consume_fasta_and_traverse", hashbits_consume_fasta_and_traverse, METH_VARARGS, "" },
   { "consume_fasta_and_tag_with_stoptags", hashbits_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
@@ -3505,8 +3913,11 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_hashbits_methods, obj, name);
 }
 
+<<<<<<< HEAD
 #define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
 
+=======
+>>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 //
 // GRAPHALIGN addition
 //
@@ -3528,11 +3939,19 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  CandidateAlignment aln = aligner->alignRead(read);
+  CandidateAlignment aln;
+  std::string rA;
+
+  Py_BEGIN_ALLOW_THREADS
+
+  aln = aligner->alignRead(read);
+  rA = aln.getReadAlignment(read);
+
+  Py_END_ALLOW_THREADS
 
   const char* alignment = aln.alignment.c_str();
-  std::string rA = aln.getReadAlignment(read);
   const char* readAlignment = rA.c_str();
+
  
   return Py_BuildValue("ss", alignment,
                               readAlignment);
@@ -3575,6 +3994,7 @@ khmer_readaligner_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_ReadAligner_methods, obj, name);
 }
 
+<<<<<<< HEAD
 static PyTypeObject khmer_KHashbitsType = {
     PyObject_HEAD_INIT(NULL)
     0,
@@ -3599,6 +4019,8 @@ static PyTypeObject khmer_KHashbitsType = {
     "hashbits object",           /* tp_doc */
 };
 
+=======
+>>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 //
 // khmer_readaligner_dealloc -- clean up readaligner object
 // GRAPHALIGN addition
@@ -3645,9 +4067,9 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   PyObject * py_obj;
   double lambdaOne = 0.0;
   double lambdaTwo = 0.0;
-  signed int maxErrorRegion = -1;
+  unsigned int maxErrorRegion = UINT_MAX;
 
-  if(!PyArg_ParseTuple(args, "O|ddi", &py_obj, 
+  if(!PyArg_ParseTuple(args, "O|ddI", &py_obj, 
                        &lambdaOne, &lambdaTwo, &maxErrorRegion)) {
     return NULL;
   }
@@ -3657,9 +4079,10 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == -1) { 
+  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == UINT_MAX) { 
     readaligner_obj->aligner = new Aligner(ch->counting);
-  } else if (maxErrorRegion == -1 && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
+  } else if
+    (maxErrorRegion == UINT_MAX && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
     readaligner_obj->aligner = new Aligner(ch->counting, 
                                            lambdaOne, lambdaTwo);
   } else {
@@ -4041,6 +4464,7 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 //
 
 static PyMethodDef KhmerMethods[] = {
+<<<<<<< HEAD
   /* { "new_config", new_config, METH_VARARGS, "Create a default internals config" }, */
   { "get_config", get_config, METH_VARARGS, "Get active khmer configuration object" },
   /* { "set_config", set_active_config, METH_VARARGS, "Set active khmer configuration object" }, */
@@ -4057,23 +4481,66 @@ static PyMethodDef KhmerMethods[] = {
   { "reverse_hash", reverse_hash, METH_VARARGS, "", },
   { "set_reporting_callback", set_reporting_callback, METH_VARARGS, "" },
   { NULL, NULL, 0, NULL }
+=======
+#if (0)
+    { "new_config",		new_config,
+      METH_VARARGS,		"Create a default internals config" }, 
+#endif
+    { "get_config",		get_config,
+      METH_VARARGS,		"Get active khmer configuration object" },
+#if (0)
+    { "set_config",		set_active_config,
+      METH_VARARGS,		"Set active khmer configuration object" },
+#endif
+    { "new_ktable",		new_ktable,
+      METH_VARARGS,		"Create an empty ktable" },
+    { "new_hashtable",		new_hashtable,
+      METH_VARARGS,		"Create an empty single-table counting hash" },
+    { "_new_counting_hash",	_new_counting_hash,
+      METH_VARARGS,		"Create an empty counting hash" },
+    { "_new_hashbits",		_new_hashbits,
+      METH_VARARGS,		"Create an empty hashbits table" },
+    { "new_minmax",		new_minmax,
+      METH_VARARGS,		"Create a new min/max value table" },
+    { "new_readaligner",        new_readaligner,
+      METH_VARARGS,             "Create a read aligner object" },
+    { "forward_hash",		forward_hash,
+      METH_VARARGS,		"", },
+    { "forward_hash_no_rc",	forward_hash_no_rc,
+      METH_VARARGS,		"", },
+    { "reverse_hash",		reverse_hash,
+      METH_VARARGS,		"", },
+    { "set_reporting_callback",	set_reporting_callback,
+      METH_VARARGS,		"" },
+
+    { NULL, NULL, 0, NULL } // sentinel
+>>>>>>> f30aa5920ff8d1c967efd7db4b8acb351cd3e43e
 };
 
 DL_EXPORT(void) init_khmer(void)
 {
-  khmer_ConfigType.ob_type	  = &PyType_Type;
-  khmer_ReadType.ob_type	  = &PyType_Type;
-  khmer_ReadParserType.ob_type	  = &PyType_Type;
-  khmer_KTableType.ob_type	  = &PyType_Type;
-  khmer_KCountingHashType.ob_type = &PyType_Type;
+    using namespace khmer;
+    using namespace khmer:: python;
 
-  PyObject * m;
-  m = Py_InitModule("_khmer", KhmerMethods);
+    khmer_ConfigType.ob_type	      = &PyType_Type;
+    khmer_KTableType.ob_type	      = &PyType_Type;
+    khmer_KCountingHashType.ob_type   = &PyType_Type;
 
-  KhmerError = PyErr_NewException((char *)"_khmer.error", NULL, NULL);
-  Py_INCREF(KhmerError);
+    PyObject * m;
+    m = Py_InitModule( "_khmer", KhmerMethods );
 
-  PyModule_AddObject(m, "error", KhmerError);
+    _init_Read_Type( );
+    _init_ReadParser_Type( );
+    _init_ReadPairIterator_Type( );
+    // TODO: Finish initialization of other types.
+
+    KhmerError = PyErr_NewException((char *)"_khmer.error", NULL, NULL);
+    Py_INCREF(KhmerError);
+
+    PyModule_AddObject( m, "error", KhmerError );
+    PyModule_AddObject( m, "ReadParser", (PyObject *)&ReadParser_Type );
+    // TODO: Add other types here as their 'new' methods are implemented.
+    //	     Then, remove the corresponding factory functions.
 }
 
-// vim: set sts=2 sw=2:
+// vim: set ft=cpp sts=4 sw=4 tw=79:

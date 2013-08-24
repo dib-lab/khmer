@@ -11,8 +11,14 @@ namespace khmer
 
 TraceLogger::
 TraceLogger( uint8_t const level, FILE * stream_handle )
+#ifdef WITH_INTERNAL_TRACING
 : _level( level ), _shared_stream( true ), _stream_handle( stream_handle )
-{ assert( NULL != stream_handle ); }
+{
+    assert( NULL != stream_handle );
+}
+#else
+{ }
+#endif
 
 
 TraceLogger::
@@ -23,7 +29,6 @@ TraceLogger( uint8_t const level, char const * const file_name_format, ... )
     char	tfile_name[ FILENAME_MAX + 1 ];
     va_list	varargs;
 
-    tfile_name[ FILENAME_MAX ] = '\0';
     va_start( varargs, file_name_format );
     vsnprintf( tfile_name, FILENAME_MAX, file_name_format, varargs );
     va_end( varargs );
