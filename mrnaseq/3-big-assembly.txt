@@ -21,9 +21,9 @@ To install Trinity::
    cd /root
 
    curl -L http://sourceforge.net/projects/trinityrnaseq/files/latest/download?source=files > trinity.tar.gz
-
    tar xzf trinity.tar.gz
-   cd trinityrnaseq*
+   mv trinityrnaseq* trinityrnaseq-latest
+   cd trinityrnaseq-latest/
    export FORCE_UNSAFE_CONFIGURE=1
    make
 
@@ -37,6 +37,19 @@ Download and install bowtie::
    unzip bowtie-0.12.7-linux-x86_64.zip
    cd bowtie-0.12.7
    cp bowtie bowtie-build bowtie-inspect /usr/local/bin
+
+Install samtools
+----------------
+
+Download and install samtools::
+
+   cd /root
+   curl -L http://sourceforge.net/projects/samtools/files/latest/download?source=files >samtools.tar.bz2
+   tar xjf samtools.tar.bz2
+   mv samtools-* samtools-latest
+   cd samtools-latest/
+   make
+   cp samtools bcftools/bcftools misc/* /usr/local/bin
 
 Build the files to assemble
 ---------------------------
