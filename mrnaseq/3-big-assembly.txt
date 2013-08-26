@@ -22,7 +22,7 @@ To install Trinity::
 
    curl -L http://sourceforge.net/projects/trinityrnaseq/files/latest/download?source=files > trinity.tar.gz
    tar xzf trinity.tar.gz
-   cd trinityrnaseq-*/
+   cd trinityrnaseq*/
    export FORCE_UNSAFE_CONFIGURE=1
    make
 
@@ -74,7 +74,7 @@ Assembling with Trinity
 
 Run the assembler! ::
 
-   /root/trinityrnaseq-*/Trinity.pl --left left.fq --right right.fq --seqType fq -JM 15G
+   /root/trinityrnaseq*/Trinity.pl --left left.fq --right right.fq --seqType fq -JM 15G
 
 Note that this last bit (15G) is the maximum amount of memory to use.  You
 can increase (or decrease) it based on what machine you rented.  This size
