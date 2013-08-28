@@ -85,11 +85,12 @@ perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
 
+#Disabled while the updated read aligner api is finalized
 #aligntest: aligntest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
 #	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
-#bugtest: bugtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
-#	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+bugtest: bugtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o read_aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o bugtest bugtest.o read_aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
 
 read_aligner.o: read_aligner.cc read_aligner.hh
 
