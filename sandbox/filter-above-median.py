@@ -1,4 +1,9 @@
-# /usr/bin/env python
+#! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Keep sequences with median >= the given cutoff.  Output sequences will
 be placed in 'infile.himed'.

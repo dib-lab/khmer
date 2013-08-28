@@ -1,3 +1,9 @@
+#! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import sys
 import screed.fasta
 import os
@@ -73,7 +79,7 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile),
         is_high = False
         name += "\tTRUNC.%d" % pos
 
-    # sort "high circumference" and "low" circumerence sequences separately.
+    # sort "high circumference" and "low" circumference sequences separately.
     if is_high:
         fp = highfp
     else:

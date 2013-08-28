@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Find highly-connected k-mers and output them in a .stoptags file, for use
 in partitioning.

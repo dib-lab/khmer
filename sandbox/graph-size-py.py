@@ -1,3 +1,9 @@
+#! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 # assert 0, "don't use this script -- use graph-size.py instead"
 
 import khmer
