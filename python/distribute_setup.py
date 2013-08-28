@@ -1,4 +1,9 @@
-#!python
+#! /usr/bin/env python
+#
+# This script is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """Bootstrap distribute installation
 
 If you want to use setuptools in your package's setup.py, just include this
@@ -274,7 +279,7 @@ def _rename_path(path):
 
 def _remove_flat_installation(placeholder):
     if not os.path.isdir(placeholder):
-        log.warn('Unkown installation at %s', placeholder)
+        log.warn('Unknown installation at %s', placeholder)
         return False
     found = False
     for file in os.listdir(placeholder):
@@ -420,7 +425,7 @@ def _fake_setuptools():
     setuptools_location = setuptools_dist.location
     log.warn('Setuptools installation detected at %s', setuptools_location)
 
-    # if --root or --preix was provided, and if
+    # if --root or --prefix was provided, and if
     # setuptools is not located in them, we don't patch it
     if not _under_prefix(setuptools_location):
         log.warn('Not patching, --root or --prefix is installing Distribute'

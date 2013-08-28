@@ -141,7 +141,7 @@ k-mer counting
    generate a report of the increase of overlap k-mers as the number of
    sequences in the second dataset increases. The report can be used to generate
    a curve to show that trend easily.The report file contains the numbers of
-   unique k-mers in the two datasets seperately and the number of overlap k-mers
+   unique k-mers in the two datasets separately and the number of overlap k-mers
    appearing in both datasets..
 
 
