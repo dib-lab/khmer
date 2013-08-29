@@ -2,39 +2,43 @@ import khmer
 import sys
 import screed
 import os.path
-import threading, Queue
+import threading
+import Queue
 import gc
 
 K = 32
-HASHTABLE_SIZE=int(1e9)
-THRESHOLD=500
-N_HT=4
-WORKER_THREADS=5
+HASHTABLE_SIZE = int(1e9)
+THRESHOLD = 500
+N_HT = 4
+WORKER_THREADS = 5
 
 ###
 
-RADIUS=2
-MAX_CIRCUM=4                            # 4 seems to eliminate lump in 1m.fa
-MAX_VOLUME=200
+RADIUS = 2
+MAX_CIRCUM = 4                            # 4 seems to eliminate lump in 1m.fa
+MAX_VOLUME = 200
 
-incr = 2*RADIUS
+incr = 2 * RADIUS
+
+###
+
+GROUPSIZE = 100
 
 ###
 
-GROUPSIZE=100
-
-###
 
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
 
+
 def is_pair(r1, r2):
     a = r1['name'].split('/')[0]
     b = r2['name'].split('/')[0]
 
-    return (a==b)
+    return (a == b)
+
 
 def trim_by_circumference(ht, name, seq):
     # calculate circumference for every point.
@@ -43,7 +47,7 @@ def trim_by_circumference(ht, name, seq):
 
     pos = 0
     for pos in range(0, end, incr):
-        circum = ht.count_kmers_on_radius(seq[pos:pos+K], RADIUS, MAX_VOLUME)
+        circum = ht.count_kmers_on_radius(seq[pos:pos + K], RADIUS, MAX_VOLUME)
 
         if circum >= MAX_CIRCUM:
             is_high = True
@@ -56,7 +60,7 @@ def trim_by_circumference(ht, name, seq):
         # find last k-mer with a low radius:
         i = 1
         for i in range(1, incr):
-            circum = ht.count_kmers_on_radius(seq[pos+i:pos+i+K],
+            circum = ht.count_kmers_on_radius(seq[pos + i:pos + i + K],
                                               RADIUS, MAX_VOLUME)
             if circum >= MAX_CIRCUM:
                 break
@@ -64,7 +68,7 @@ def trim_by_circumference(ht, name, seq):
         pos += i - 1
 
         # now trim sequence:
-        seq = seq[:pos+K]
+        seq = seq[:pos + K]
         is_high = False
         name += "\tTRUNC.%d" % pos
 
@@ -73,9 +77,10 @@ def trim_by_circumference(ht, name, seq):
     else:
         return name, seq
 
+
 def process(inq, outq, ht):
     global worker_count
-    
+
     while not done or not inq.empty():
         try:
             g = inq.get(True, 1)
@@ -99,7 +104,7 @@ def process(inq, outq, ht):
         y = []
         for record in x:
             name, seq = trim_by_circumference(ht, record['name'],
-                                                  record['sequence'])
+                                              record['sequence'])
             if name:
                 y.append((name, seq))
 
@@ -107,6 +112,7 @@ def process(inq, outq, ht):
         outq.put(gg)
 
     worker_count -= 1
+
 
 def write(outq, outfp):
     global worker_count
@@ -130,11 +136,12 @@ def write(outq, outfp):
 
         gc.collect()
 
+
 def main():
     global done, worker_count
     done = False
     worker_count = 0
-    
+
     infile = sys.argv[1]
     outfile = os.path.basename(infile) + '.graphcirc'
     if len(sys.argv) == 3:

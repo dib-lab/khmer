@@ -1,20 +1,23 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fastq_iter
 
 K = 32
-HT_SIZE=4e9
-N_HT=4
+HT_SIZE = 4e9
+N_HT = 4
 
-WORKER_THREADS=8
-GROUPSIZE=100
+WORKER_THREADS = 8
+GROUPSIZE = 100
 
 ###
+
 
 def main():
     repfile = sys.argv[1]
     infile = sys.argv[2]
-        
+
     outfile = os.path.basename(infile) + '.fno255'
     if len(sys.argv) >= 4:
         outfile = sys.argv[3]

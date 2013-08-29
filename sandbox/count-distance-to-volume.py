@@ -1,20 +1,22 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE = int(8e9)
 N_HT = 4
 
-MAX_RADIUS=500
-VOLUME=500
+MAX_RADIUS = 500
+VOLUME = 500
 
 ###
 
 infile = sys.argv[1]
 outfile = sys.argv[2]
 if len(sys.argv) > 3:
-    RADIUS=int(sys.argv[3])
-    
+    RADIUS = int(sys.argv[3])
+
 print 'saving to:', outfile
 
 print 'making hashtable'
@@ -31,6 +33,6 @@ for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
 
     middle = (len(seq) - K + 1) / 2
 
-    r = ht.find_radius_for_volume(seq[middle:middle+K], VOLUME, MAX_RADIUS)
-    
+    r = ht.find_radius_for_volume(seq[middle:middle + K], VOLUME, MAX_RADIUS)
+
     print >>outfp, '>%s r=%d\n%s' % (record['name'], r, record['sequence'])

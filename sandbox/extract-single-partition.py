@@ -1,6 +1,7 @@
 import sys
 from screed.fasta import fasta_iter
 
+
 def read_partition_file(fp):
     for n, record in enumerate(fasta_iter(fp, parse_description=False)):
         name = record['name']

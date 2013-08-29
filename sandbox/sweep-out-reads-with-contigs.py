@@ -1,8 +1,9 @@
-import sys, khmer
+import sys
+import khmer
 import os.path
 import screed
 
-K=20
+K = 20
 
 readsfile = sys.argv[1]
 contigfile = sys.argv[2]

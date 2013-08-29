@@ -1,12 +1,15 @@
 #! /usr/bin/env python
-import sys, khmer, screed, os
+import sys
+import khmer
+import screed
+import os
 
-K=20
-HASHTABLE_SIZE=int(4e9)
-N_HT=4
+K = 20
+HASHTABLE_SIZE = int(4e9)
+N_HT = 4
 
-UNIQUE_LEN=100
-UNIQUE_F=0.9
+UNIQUE_LEN = 100
+UNIQUE_F = 0.9
 
 filename1 = sys.argv[1]
 filename2 = sys.argv[2]

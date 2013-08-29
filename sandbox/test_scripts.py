@@ -1,9 +1,10 @@
-DATA_DIR='../data'
-SCRIPTS_DIR='../scripts'
+DATA_DIR = '../data'
+SCRIPTS_DIR = '../scripts'
 
 ###
 
-import os, glob
+import os
+import glob
 thisdir = os.path.dirname(__file__)
 thisdir = os.path.abspath(thisdir)
 
@@ -17,6 +18,7 @@ import sys
 import khmer
 import subprocess
 
+
 def test_quick_do_partition_calc():
     script = os.path.join(scriptsdir, 'do-partition-calc.py')
     datafile = os.path.join(datadir, '25k.fa')
@@ -26,10 +28,11 @@ def test_quick_do_partition_calc():
     p = subprocess.Popen([sys.executable, script, datafile],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (out, err) = p.communicate()
-    
+
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
+
 
 def test_quick_do_th_subset_calc():
     script = os.path.join(scriptsdir, 'do-th-subset-calc.py')
@@ -40,10 +43,11 @@ def test_quick_do_th_subset_calc():
     p = subprocess.Popen([sys.executable, script, datafile],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (out, err) = p.communicate()
-    
+
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
+
 
 def test_quick_do_th_subset_calc():
     script = os.path.join(scriptsdir, 'do-th-subset-calc.py')
@@ -54,10 +58,11 @@ def test_quick_do_th_subset_calc():
     p = subprocess.Popen([sys.executable, script, datafile],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (out, err) = p.communicate()
-    
+
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
+
 
 def test_quick_do_th_subset_save():
     script = os.path.join(scriptsdir, 'do-th-subset-save.py')
@@ -68,10 +73,11 @@ def test_quick_do_th_subset_save():
     p = subprocess.Popen([sys.executable, script, datafile],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (out, err) = p.communicate()
-    
+
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
+
 
 def test_quick_do_th_subset_load():
     script = os.path.join(scriptsdir, 'do-th-subset-load.py')
@@ -86,15 +92,16 @@ def test_quick_do_th_subset_load():
 
     p = subprocess.Popen(x, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (out, err) = p.communicate()
-    
+
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
 
+
 def test_quick_graph_size_py():
     script = os.path.join(scriptsdir, 'graph-size-py.py')
     datafile = os.path.join(datadir, "*.gz")
-    
+
     x = [sys.executable, script, 'occ.out', datafile]
     print 'running', x
 
@@ -104,4 +111,3 @@ def test_quick_graph_size_py():
     print '---\n', out
     print '---\n', err
     assert p.returncode == 0
-

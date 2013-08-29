@@ -2,13 +2,14 @@
 import sys
 from screed.fasta import fasta_iter
 
-MAX_SIZE=5000
+MAX_SIZE = 5000
 
 distfp = open(sys.argv[2], 'w')
 count = {}
 filename = sys.argv[1]
 
-for n, record in enumerate(fasta_iter(open(sys.argv[1]), parse_description=False)):
+for n, record in enumerate(
+        fasta_iter(open(sys.argv[1]), parse_description=False)):
     if n % 10000 == 0:
         print '...', n
 
@@ -17,14 +18,15 @@ for n, record in enumerate(fasta_iter(open(sys.argv[1]), parse_description=False
 
 # develop histogram of partition sizes
 dist = {}
-for n, record in enumerate(fasta_iter(open(sys.argv[1]), parse_description=False)):
+for n, record in enumerate(
+        fasta_iter(open(sys.argv[1]), parse_description=False)):
     if n % 10000 == 0:
         print '...x2', n
 
     partition = int(record['name'].rsplit('\t', 1)[1])
     if partition not in count:
         continue
-    
+
     c = count[partition]
     if partition == 0:
         c = 0
@@ -41,3 +43,5 @@ for c, n in sorted(dist.items()):
         n /= c
     total += n
     distfp.write('%d %d %d\n' % (c, n, total))
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

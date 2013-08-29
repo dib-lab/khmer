@@ -2,6 +2,7 @@
 import sys
 from screed.fasta import fasta_iter
 
+
 def read_partition_file(fp):
     for n, line in enumerate(fp):
         if n % 2 == 0:
@@ -18,6 +19,7 @@ def read_partition_file(fp):
 
             yield name, partition_id, surrendered, sequence
 
+
 def main(filename):
     outfp = open(filename + '.surrender', 'w')
     for n, x in enumerate(read_partition_file(open(filename))):
@@ -31,4 +33,3 @@ def main(filename):
 if __name__ == '__main__':
     filename = sys.argv[1]
     main(filename)
-    

@@ -1,0 +1,9 @@
+test-StreamReader
+test-CacheManager
+test-Parser
+test-HashTables
+smpFiltering
+bittest
+ktable_test
+ht-diff
+*.swp

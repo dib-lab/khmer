@@ -18,6 +18,8 @@ cython integrate!
 
 pull reads into partitions?
 
+look more assiduously for memory leaks
+
 ----
 
 counting hash generalization to n < 8 bits => memory efficiency

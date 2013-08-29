@@ -1,8 +1,9 @@
-import sys, khmer
+import sys
+import khmer
 import os.path
 import screed
 
-K=21
+K = 21
 output_unassigned = True        # output sequences in no partition (p0)
 
 readsfile = sys.argv[1]

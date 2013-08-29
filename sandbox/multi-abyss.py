@@ -1,9 +1,10 @@
 #! /usr/bin/env python
-import sys, time
+import sys
+import time
 import subprocess
 
-#COMMAND="ABYSS -k45 %(filename)s -o %(filename)s.k45"
-COMMAND="abyss-pe k=45 n=5 in=\\'%(filename)s\\' name=%(filename)s.zzz"
+# COMMAND="ABYSS -k45 %(filename)s -o %(filename)s.k45"
+COMMAND = "abyss-pe k=45 n=5 in=\\'%(filename)s\\' name=%(filename)s.zzz"
 
 N_PROCESSES = 4
 
@@ -19,7 +20,7 @@ while 1:
         print 'running:', cmd
         running.append(p)
 
-    i = 0;
+    i = 0
     while i < len(running):
         p = running[i]
         returncode = p.poll()

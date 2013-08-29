@@ -1,19 +1,22 @@
-import khmer, sys
+import khmer
+import sys
 import threading
 
 K = 32
-HASHTABLE_SIZE=int(32e9)
-N_THREADS=4                             # @CTB
+HASHTABLE_SIZE = int(32e9)
+N_THREADS = 4                             # @CTB
 
 ht = khmer.new_hashbits(K, HASHTABLE_SIZE, 4)
 
 ###
+
 
 def threaded_calc(ht, start, stop, results):
     print 'starting', start, stop
     x = ht.do_subset_partition(start, stop)
     print 'done!', start, stop
     results.append(x)
+
 
 def main(filename):
     print 'K', K
@@ -28,10 +31,10 @@ def main(filename):
 
     results = []
 
-    #ht.save(filename + '.ht')                # @CTB
-    #ht.save_tagset(filename + '.tagset')     # @CTB
-    #ht.load(filename + '.ht')
-    #ht.load_tagset(filename + '.tagset')
+    # ht.save(filename + '.ht')                # @CTB
+    # ht.save_tagset(filename + '.tagset')     # @CTB
+    # ht.load(filename + '.ht')
+    # ht.load_tagset(filename + '.tagset')
 
     # calculate the hashtable occupancy
     print '---'
@@ -41,13 +44,13 @@ def main(filename):
     divvy = ht.divide_tags_into_subsets(subset_size)
     n_subsets = len(divvy)
     divvy.append(0)
-        
+
     threads = []
 
     # start things.
     for i in range(n_subsets):
         start = divvy[i]
-        end = divvy[i+1]
+        end = divvy[i + 1]
         t = threading.Thread(target=threaded_calc,
                              args=(ht, start, end, results))
         threads.append(t)
@@ -64,7 +67,7 @@ def main(filename):
     for i, x in enumerate(results):
         print 'merging %d' % (i,)
         ht.merge_subset(x)
-    
+
     n_partitions = ht.output_partitions(filename, filename + '.part')
     print n_partitions, 'partitions kept'
     print ht.count_partitions()

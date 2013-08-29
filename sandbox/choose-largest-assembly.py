@@ -2,6 +2,7 @@
 import sys
 from screed.fasta import fasta_iter
 
+
 def count_sum_contigs(cutoff, filename):
     total = 0
     for record in fasta_iter(open(filename)):
