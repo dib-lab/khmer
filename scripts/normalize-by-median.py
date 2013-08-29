@@ -137,16 +137,16 @@ def main():
 
         print >>sys.stderr, '\nPARAMETERS:'
         print >>sys.stderr, \
-            ' - kmer size =    {:d} \t\t(-k)'.format(args.ksize)
+            ' - kmer size =    {ksize:d} \t\t(-k)'.format(ksize=args.ksize)
         print >>sys.stderr, \
-            ' - n hashes =     {:d} \t\t(-N)'.format(args.n_hashes)
+            ' - n hashes =     {nhash:d} \t\t(-N)'.format(nhash=args.n_hashes)
         print >>sys.stderr, \
-            ' - min hashsize = {:-5.2g} \t(-x)'.format(args.min_hashsize)
+            ' - min hashsize = {mh:-5.2g} \t(-x)'.format(mh=args.min_hashsize)
         print >>sys.stderr, ' - paired = {} \t\t(-p)'.format(args.paired)
         print >>sys.stderr, ''
         print >>sys.stderr, \
-            'Estimated memory usage is {:.2g} bytes \
-            (n_hashes x min_hashsize)'.format(args.n_hashes*args.min_hashsize)
+            'Estimated memory usage is {prod:.2g} bytes \
+            (n_hashes x min_hashsize)'.format(prod=args.n_hashes*args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
@@ -222,7 +222,7 @@ def main():
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
-    print 'fp rate estimated to be {:1.3f}'.format(fp_rate)
+    print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
     
     if force and len(corrupt_files) > 0:
         print >>sys.stderr, "** WARNING: Finished with errors!"
