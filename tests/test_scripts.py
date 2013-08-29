@@ -408,7 +408,7 @@ def test_normalize_by_median_dumpfrequency():
     infiles = [utils.get_temp_filename('test-0.fq')]
     in_dir = os.path.dirname(infiles[0])
     for x in range(1,5):
-        infiles.append(utils.get_temp_filename('test-{}.fq'.format(x),
+        infiles.append(utils.get_temp_filename('test-{x}.fq'.format(x=x),
                                                 tempdir=in_dir))
     
     for infile in infiles:
