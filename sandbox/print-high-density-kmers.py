@@ -1,21 +1,23 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(2e9)
+HASHTABLE_SIZE = int(2e9)
 N_HT = 4
-RADIUS=4
+RADIUS = 4
 
 ###
 
-MAX_DENSITY=2000
-THRESHOLD=10
+MAX_DENSITY = 2000
+THRESHOLD = 10
 
 infile = sys.argv[1]
 outfile = sys.argv[2]
 if len(sys.argv) > 3:
-    RADIUS=int(sys.argv[3])
-    
+    RADIUS = int(sys.argv[3])
+
 print 'saving to:', outfile
 
 print 'making hashtable'
@@ -32,11 +34,11 @@ for n, record in enumerate(screed.open(infile)):
         print '... saving', n
         if n > 100000:
             break
-            
+
     seq = record['sequence']
 
     for pos in range(0, len(seq) - K + 1):
-        kmer = seq[pos:pos+K]
+        kmer = seq[pos:pos + K]
         if kmer in seen:
             continue
 

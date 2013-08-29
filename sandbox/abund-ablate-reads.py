@@ -5,7 +5,7 @@ from screed.fasta import fasta_iter
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(1e9)
+HASHTABLE_SIZE = int(1e9)
 N_HT = 4
 
 ABUND_THRESHOLD = 65
@@ -24,7 +24,7 @@ print 'counting'
 for n, record in enumerate(fasta_iter(open(infile))):
     if n % 10000 == 0:
         print>>sys.stderr, '...', n
-        
+
     seq = record['sequence']
     if len(seq) < K:
         continue
@@ -32,7 +32,7 @@ for n, record in enumerate(fasta_iter(open(infile))):
     # ablate end
     pos = len(seq) - K + 1
     while pos >= 0:
-        if ht.get(seq[pos:pos+K]) < ABUND_THRESHOLD:
+        if ht.get(seq[pos:pos + K]) < ABUND_THRESHOLD:
             break
         pos -= 1
 
@@ -44,7 +44,7 @@ for n, record in enumerate(fasta_iter(open(infile))):
     # ablate beginning
     pos = 0
     while pos < len(seq) - K + 1:
-        if ht.get(seq[pos:pos+K]) < ABUND_THRESHOLD:
+        if ht.get(seq[pos:pos + K]) < ABUND_THRESHOLD:
             break
         pos += 1
 

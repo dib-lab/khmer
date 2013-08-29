@@ -2,8 +2,8 @@
 # purposes.
 import random
 
-K=31
-SIZE=100000
+K = 31
+SIZE = 100000
 
 dna = ["A"] * SIZE + ["C"] * SIZE + ["T"] * SIZE + ["G"] * SIZE
 random.shuffle(dna)
@@ -13,7 +13,7 @@ dna = "".join(dna)
 
 x = []
 for i in range(40, len(dna), 40):
-    subseq = dna[i-(K-1):i+40]
+    subseq = dna[i - (K - 1):i + 40]
     x.append((n, subseq))
     n += 1
 

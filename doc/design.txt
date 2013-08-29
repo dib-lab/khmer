@@ -1,0 +1,665 @@
+Architecture and Design
+=======================
+
+What follows is an attempt to describe the overall architecture and design of
+the *khmer* software under the hood. Where appropriate, implementation details
+will be mentioned. Also, possible future directions and design considerations
+will be mentioned as appropriate.
+
+Overview
+--------
+
+Data pumps stage data from disk storage into an in-memory cache. The in-memory
+cache is divided into segments, one segment per thread. A cache manager exposes
+an interface for staging the data via the data pumps and for accessing the data
+in the cache segments. Read parsers convert the staged data into read
+objects. A separate state object is maintained for each thread using a parser.
+Existing-tracking or counting Bloom filters can use the read parsers as a
+source of reads from which to extract k-mers.
+
+The read parsers and the layers under them can be controlled via global
+configuration objects, which provide default values during their instantiation.
+In many cases, these default values can also be overriden by supplying
+pertinent arguments to the constructors. Only one global configuration object
+is considered active at a given time; but, a singleton pattern is not enforced
+and more than one may be available to supply alternative configurations.
+
+The top-level makefile for the project contains a user-configurable section,
+wherein preprocessor, compiler, and linker options may be selected via
+convenient, prefabricated bundles. The ability to generate profiling
+instrumentation, compile with debugging symbols, and to generate tracing
+instrumentation are all controlled via these option bundles. The lower levels
+of the code, such as the data pumps, cache manager, and read parsers all have
+significant built-in profiling and tracing instrumentation. This
+instrumentation is conditionally-compiled according to the option bundles
+selected in the top-level makefile.
+
+Namespace
+---------
+
+Unless otherwise noted, all C++ classes, functions, and static variables noted
+in this document are members of the ``khmer`` namespace. Likewise, unless
+otherwise noted, all Python classes, functions, and module variables noted in
+this document are members of the ``khmer`` module.
+
+.. cpp:namespace:: khmer
+
+.. py:module:: khmer
+
+.. todo::
+   Use ``breathe`` to interface with ``Doxygen`` for better documentation.
+
+Configuration Objects
+---------------------
+
+C++ API
+~~~~~~~
+
+The declaration of the configuration objects is contained in
+:file:`lib/khmer_config.hh`.
+
+.. cpp:class:: Config
+
+.. cpp:function:: Config &get_active_config( )
+
+.. cpp:function:: void set_active_config( Config &c )
+   
+An *active* configuration object is always present. A reference to this object
+is supplied via the :cpp:func:`get_active_config` function. The initial
+settings of the active configuration object are quite conservative. New
+configuration objects are created with the empty constructor; all settings
+modifications occur upon already-created instances via their setter methods.
+The active configuration object can be set via the
+:cpp:func:`set_active_config` function, which takes a reference to a
+:cpp:class:`Config` object as its only argument.
+
+Except for read-only configuration options, such as extra sanity checking,
+which are determined at the time of compilation, the configuration options are
+manipulated via getter/setter methods. The most prominent or useful 
+getter/setter methods are the following: 
+
+.. cpp:function:: uint32_t Config::get_number_of_threads( ) const
+
+.. cpp:function:: void Config::set_number_of_threads( uint32_t const n )
+
+.. cpp:function:: uint64_t const Config::get_reads_input_buffer_size( ) const
+
+.. cpp:function:: void Config::set_reads_input_buffer_size( uint64_t const sz )
+
+Python API
+~~~~~~~~~~
+
+The :cpp:class:`Config` objects are exposed in the Python wrapper.
+
+.. py:function:: get_config( )
+
+.. py:function:: set_config( c )
+
+The C++ getter/setter methods are exposed via the same names in Python.
+
+.. todo::
+   The getter/setter methods should be exposed as properties in Python.
+
+Trace Loggers
+-------------
+
+Trace loggers can log execution traces and other useful debugging information
+to files on a per-thread basis. This makes them very useful for debugging
+multi-threaded code, especially in the absence of advanced commerical
+debuggers, such as DDT or TotalView. Trace loggers are contolled via several
+user-configurable variables in the top-level makefile. As of this writing,
+these variables are ``WITH_INTERNAL_TRACING``, ``TRACE_STATE_CHANGES``,
+``TRACE_BUSYWAITS``, ``TRACE_SPINLOCKS``, ``TRACE_MEMCOPIES``, and
+``TRACE_DATA``. The ``TRACE_`` options are ineffective unless
+``WITH_INTERNAL_TRACING`` is set to ``true``.
+
+.. todo::
+   Replace the editing of makefiles with a configure script or else move to an
+   all-Pythonic regime where the user would edit :file:`setup.cfg`. See 
+   `issue #9 <https://github.com/ged-lab/khmer/issues/9>`_ in the Github issue
+   tracker for the project.
+
+The data pump and read parser code, as well as some of the Bloom filter code,
+is impregnated with trace loggers. Other parts of the source code could use
+them as well.
+
+Trace logger objects are not exposed directly via the Python wrapper; they are
+only available in the C++ API. The trace logger class is declared in the
+:file:`lib/trace_logger.hh` file.
+
+.. cpp:class:: TraceLogger
+
+Tracing be performed at coarser or finer levels of detail, as desired. An
+enumeration of named integral constants provides the available levels. The use
+of ``TLVL_ALL`` will trace everything which is instrumented for tracing. After
+that, ``TLVL_DEBUG9`` is the next finest level of detail. The enumeration
+ascends to higher and higher numerical values which indicate more coarseness;
+specifically the ordering is trace levels ``TLVL_DEBUG8`` through
+``TLVL_DEBUG0``, followed by ``TLVL_INFO9`` through ``TLVL_INFO0``, and then
+``TLVL_WARNING``, ``TLVL_ERROR``, and ``TLVL_CRITICAL``. The special level
+``TLVL_NONE`` means that nothing will be traced even though tracing may be
+activated at compile time. Note that ``TLVL_ALL`` corresponds to 0 and
+``TLVL_NONE`` corresponds to 255; this is useful for setting trace levels in
+method arguments via the Python interface.
+
+.. todo::
+   Expose trace level names via the Python interface.
+
+.. todo::
+   Allow C++ :cpp:class:`TraceLogger` objects to be targets of Python
+   :py:mod:`logging` module?
+
+Two constructors are available for instantiating objects of type
+:cpp:class:`TraceLogger`. One takes the trace level and a ``FILE *`` stream
+handle. The other takes the trace level, a file name format string, and a
+variable number of arguments to ``sprintf`` into that format string. This form
+exists so that trace files, named according to logical thread ID, can be
+created, for example. The trace level argument is the finest requested level of
+detail which will be traced by the object.
+
+The objects instantiated by these constructors are *function objects* (also
+sometimes known as *functors* to the chagrin of some mathematicians). This is
+to say that the objects may be called.
+
+.. cpp:function:: void TraceLogger::operator( )( uint8_t const level, char const * const format, ...) const
+
+The ``level`` argument is the desired level of detail. If the object was
+instantiated for a coarser level than the requested level, then nothing will be
+logged. The ``format`` argument is the format string for the underlying
+``fprintf`` call and a variable number of arguments may be supplied for use
+with this format string.
+
+Performance Metrics
+-------------------
+
+Performance metrics can be gathered on a per-thread basis and can measure
+things which are not covered by traditional profiling tools. Such metrics may
+include the input or output rate in bytes per second, for example. Not all
+platforms support the high resolution, per-thread timers needed to effectively
+use these metrics.
+
+The Python wrapper does not presently support reporting on performance metrics.
+
+.. todo::
+   Support reporting on performance metrics from within the Python wrapper.
+
+The performance metrics abstract base class is declared in the
+:file:`lib/perf_metrics.hh` file. This class is subclassed for various specific
+domains.
+
+.. cpp:class:: IPerformanceMetrics
+
+The class provides a hassle-free stopwatch.
+
+.. cpp:function:: void IPerformanceMetrics::start_timers( )
+
+.. cpp:function:: void IPerformanceMetrics::stop_timers( )
+
+These functions record the amount of physical time elapsed since the thread was
+created and the amount of time that the thread has spent using CPU cores. Two
+sets of internal scratch variables are used for this purpose: one set of start
+times and one set of stop times.
+
+.. warning::
+   Because of the use of internal scratch variables, these methods are not
+   reentrant. Timer deltas must be collected before new calls can be issued to
+   the stopwatch. This is the trade-off for convenience....
+
+Once start and stop times have been accumulated, then a timer delta can be
+calculated and stowed in the appropriate category. Categories are determined by
+keys which are defined in subclasses of the abstract class. The delta
+accumulator takes a category key as an argument and is declared pure virtual in
+the abstract base class so that it must be implemented in subclasses where they
+category keys are enumerated.
+
+.. cpp:function:: void IPerformanceMetrics::accumulate_timer_deltas( uint32_t metrics_key )
+
+Input Data Pumps
+----------------
+
+An input data pump object copies data from a file into a cache in memory. Since
+accesses to memory are typically three orders of magnitude faster than to an
+individual hard disk drive and since many operations to process the data are
+slower than reading it from a file, it makes sense to stage some of it into
+memory. Having the data in memory can reduce the latency from accessing it upon
+demand. And, the cache in memory can be filled more rapidly than it is
+processed.
+
+The input data pumps are declared in :file:`lib/read_parsers.hh`. All of them
+derive from an abstract base class.
+
+.. todo::
+   Refactor the data pumps into a separate header and implementation file.
+
+.. cpp:class:: IStreamReader
+
+Presently, three types of data pumps are implemented.
+
+.. cpp:class:: RawStreamReader
+
+.. cpp:class:: GzStreamReader
+
+.. cpp:class:: Bz2StreamReader
+
+These input data pumps are not exposed via the Python wrapper.
+
+The :cpp:class:`IStreamReader` interface defines one method of interest.
+
+.. cpp:function:: uint64_t const read_into_cache( uint8_t * const cache, uint64_t const cache_size )
+
+This is a pure virtual method which must be overridden in subclasses. The
+``cache`` parameter receives an argument which is an arbitrary piece of memory
+which it treats as an array of bytes. The ``cache_size`` parameter receives an
+argument which is the size, in bytes, of the cache. The return value is the
+number of bytes read into the cache from file.
+
+Raw Stream Reader
+~~~~~~~~~~~~~~~~~
+
+The raw stream reader is constructed from a file descriptor, such as returned
+by the ``open`` system call. An optional read alignment may be supplied to this
+constructor. Depending on the operating system and file system, this may be
+used as a chunk size and alignment for *direct I/O*. Otherwise, it is ignored.
+Direct I/O allows for blocks to copied directly from a block device into
+user-space memory rather than passing through a kernel-space block cache first.
+This reduces the number of memory copies involved in processing the data.
+
+.. warning::
+   Direct I/O has received some testing within the software, but has not been
+   tested enough to be considered production-ready.
+
+.. note::
+   In principle, the file descriptor could number 0 (stdin) and one could
+   create pipelines, but this is not supported at the higher level interfaces.
+
+Reading is currently performed in a synchronous manner, which is fine for most
+typical use cases of the software since input is not the bottleneck.
+
+.. todo::
+   Support asynchronous reading.
+
+
+Gzip Stream Reader and Decompressor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The stream reader and decompressor for the ``gzip`` format is based on
+``zlib``. No direct I/O is supported by this stream reader and its constructor
+therefore only accepts a file descriptor. Furthermore, data must be copied and
+decompressed sequentially and cannot be read asynchronously. In the regime that
+higher level processing is fast, this stream reader is likely to be a
+bottleneck, especially as there is overhead from decompression. However, as
+pipelining support does not yet exist in the software, providing native support
+for a popular compression format makes sense. Also, some users of the software
+may not be familiar with standard Unix compression tools, such as ``gzip``;
+built-in support of popular compression formats removes a barrier to entry for
+these users.
+
+.. todo::
+   Implement higher level support for pipelining so that parallelized
+   decompressors can feed a raw stream reader, assuming that they can output
+   decompressed data to stdout and do so in order. Alternatively, if a
+   parallelized variant of ``zlib`` can be found, then that should be used in
+   place of ``zlib`` for native support.
+
+Bzip2 Stream Reader and Decompressor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The stream reader and decompressor for the ``bzip2`` format is based on the
+``bzip2`` library. The same notes and considerations for the ``gzip`` stream
+reader also apply to this one as well.
+
+As a historical note, it is worth mentioning that the logic for reading from a
+``bzip2``-compressed file stream is significantly more complicated than for raw
+or ``gzip``-compressed streams because of the way the library API is structured
+and the nature of the compression format. Prior to the architecture being
+described, data pumps and reads parsers were tightly coupled and implementing a
+``bzip2`` data pump in that architecture would have been very painful. As it
+turns out, the current architecture preemptively fixed a bug in the old
+``gzip`` data pump before it was reported against that architecture. So, this
+decoupled design has already paid for itself several times over.
+
+Thread Identity Maps
+--------------------
+
+Higher level processing requires that threads be able to persistently work with
+the same set of data. A thread does not inherently "know" what its index into a
+particular lookup table is. However, this index can be mapped to an OS-native 
+identifier for a thread. Using an appropriate system call, a thread can query
+its own native identifier from the operating system and then use this as a map
+key to find its logical identifier within the software. This logical identifier
+serves as the thread's index into any lookup tables which it may need to use.
+
+The self-identification is also important on the grounds of a software
+engineering principle: don't break existing interfaces. Prior to the current
+architecture, the code was not thread-safe. In order to add thread-safety in a
+reliable manner and not break existing interfaces, self-identification of
+threads was necessary.
+
+The thread identity map class is declared in the :file:`lib/thread_id_map.hh`
+file.
+
+.. cpp:class:: ThreadIDMap
+
+This class is not exposed via the Python wrapper as it is an internal
+mechanism. And, the implementation of the class varies according to operating 
+system. The only important method for those who wish to avail themselves to
+this bookkeeping method is the one which returns the logical identifier (lookup
+table index) of the current thread.
+
+.. cpp:function:: uint32_t const ThreadIDMap::get_thread_id( )
+
+New entries are added to the map as new threads call this method for the first
+time. Thus, the bookkeeping is automatic and does not get in the way of the
+developer.
+
+Cache Managers
+--------------
+
+A cache manager provides memory into which an input data pump may copy. The
+provided memory is segmented on a per-thread basis. On machines with multiple
+NUMA nodes, this can help performance by decreasing the likelihood of
+cross-node fetches and stores. More importantly, it provides an association
+between a particular thread and a particular cache segment, so that higher
+level processing, such as parsing, can always be guaranteed to operate on the
+same contiguous portion of memory.
+
+.. todo::
+   Implement pinning of threads to specific cores on operating systems which
+   support this. Preventing the migration of threads between cores should
+   mostly eliminate cross-node fetches and stores.
+
+The :file:`lib/read_parsers.hh` file declares the cache manager and cache
+manager segment classes.
+
+.. cpp:class:: CacheManager
+
+.. cpp:class:: CacheManagerSegment
+
+As multiple threads share access to the same data pump, the cache manager
+orchestrates access to this resource. Internally, a spinlock is used to limit
+access to one thread at a time.
+
+.. todo::
+   Increase period of spinlock trials from once per iteration to something
+   greater, similar to what the other busywaiters which perform atomic tests
+   use.
+
+Internally, a :cpp:class:`ThreadIDMap` is used to match a current thread with
+its corresponding entry in the table of cache segments. A convenience method is
+provided for the current thread to find its corresponding cache segment,
+creating it if it doesn't already exist.
+
+.. cpp:function:: CacheSegment &CacheManger::_get_segment( bool const higher = false )
+
+This is a private method used only within cache mangers. The ``higher``
+parameter is vestigial remnant from an earlier implementation and can likely be
+removed.
+
+.. todo::
+   Remove the ``higher`` parameter from :cpp:func:`_get_segment`.
+
+Developers wishing to use a cache manager rather than muck around in its
+implementation will probably find the following methods most useful.
+
+.. cpp:function:: bool const CacheManager::has_more_data( )
+
+.. cpp:function:: uint64_t const CacheManager::get_bytes( uint8_t * const buffer, uint64_t buffer_len )
+
+.. cpp:function:: void CacheManager::split_at( uint64_t const pos )
+
+The :cpp:func:`has_more_data` method queries both the underlying stream and the
+current cache segment to see if more data is available. If both the underlying
+stream is exhausted and the memory cursor, which tracks how much of a cache
+segment has been accessed since its last refill, is at the end of the segment,
+then no more data is considered to be available and the current thread hits a
+synchronization barrier to wait for the other threads to finish.
+
+The :cpp:func:`get_bytes` method copies up to ``buffer_len`` bytes of memory
+from the current cache segment into the supplied buffer ``buffer``. All
+bookkeeping, such as replenishing the cache segment from the underlying stream,
+is handled behind the scenes. The method also copies memory from the
+appropriate *copyaside buffer* as necessary. Copyaside buffers are created by
+the :cpp:func:`split_at` method and represent extensions to the current cache
+segment.
+
+.. todo::
+   Expose the underlying memory segments directly to higher level processing,
+   such as parsing, to eliminate the memory copy overhead that
+   :cpp:func:`get_bytes` carries. Note that this comes at the cost of some
+   horrid bookkeeping on the part of the higher level functions. The
+   :cpp:func:`get_bytes` method exists to handle this bookkeeping.
+
+The :cpp:func:`split_at` method copies up to ``pos`` bytes from the beginning
+of the current cache segment into a copyaside buffer. The copyaside buffer will
+then be available for the previous (in terms of lookup table index modulo the
+number of threads) cache segment. This method helps with multi-threaded parsing
+of files when parser offsets into a file do not correspond with record
+boundaries. A parser can scan forward to the next record boundary and then set
+the scanned over bytes aside to be appended to the cache segment which contains
+the beginning of the partial record.
+
+The initial implementation of the cache manager used *setaside buffers*, which
+were just reserved portions of cache segments and no memory copies were
+performed. However, the bookkeeping was quite complicated and after several
+bugs slipped through the cracks, the setaside buffer logic was converted to
+copyaside buffers. The cost of the memory copies is essentially nothing in the
+typical use cases encountered by the software. Copyaside buffers are also much
+more amenable to asychronous refilling of cache segments, should that be
+supported at a later point.
+
+.. todo::
+   Implement asynchronous refills of cache segments.
+
+Reads and Read Pairs
+--------------------
+
+Reads are simple data structures which contain genomic sequences, as well
+identifiers and quality scores for those sequences. The class is declared in
+:file:`lib/read_parsers.hh`.
+
+.. cpp:class:: Read
+
+The Python wrapper exposes an interface to reads.
+
+.. py:class:: Read
+
+The data members are accessed as properties. These mimick the access keys for
+``screed`` records.
+
+.. py:attribute:: Read.name
+
+.. py:attribute:: Read.sequence
+
+.. py:attribute:: Read.accuracy
+
+.. py:attribute:: Read.annotations
+
+No distinction is currently made between FASTA and FASTQ reads.
+
+.. todo::
+   Create an IRead abstract base class and subclass for FASTA and FASTQ record
+   types. This would remove wasted fields for FASTA records and allow the type
+   of records being used at any level of processing.
+
+Read pairs are two reads bound together in a STL ``pair``. This is intended to
+track sequences with paired ends.
+
+Read Parsers
+------------
+
+C++ API
+~~~~~~~
+   
+Read parsers create the aforementioned :cpp:class:`Read` objects. The
+:file:`lib/read_parsers.hh` file declares an abstract base class as well as
+FASTA and FASTQ parsers derived from that. These are made available from
+within a namespace which encapsulates most classes in the
+:file:`lib/read_parsers.hh` file.
+
+.. cpp:namespace:: khmer::read_parsers
+
+.. cpp:class:: IParser
+
+.. cpp:class:: FastaParser
+
+.. cpp:class:: FastqParser
+
+An instance of the appropriate sublcass is created via a factory method
+provided by the abstract class. This method infers the correct subclass
+instance to create based on file name extension. The file name is required but
+the other arguments are optional. If the other arguments are supplied, then
+they override the defaults from the active :cpp:class:`Config` object.
+
+.. cpp:function:: IParser * const IParser::get_parser( std::string const &ifile_name, uint32_t const number_of_threads, uint64_t const cache_size, uint8_t const trace_level )
+
+.. todo::
+   Sniff file type rather than rely on extension.
+
+Just as the :cpp:class:`CacheManager` maintains per-thread state in
+:cpp:class:`CacheSegment` objects, the parser classes maintain per-thread state
+in special objects as well.
+
+.. cpp:class:: ParserState
+
+The parser state maintains a line buffer, among other things, and tracks how
+much of it has been parsed by each call to the parser.
+
+The :cpp:class:`IParser` interface provides some useful methods.
+
+.. cpp:function:: bool IParser::is_complete( )
+
+.. cpp:function:: void IParser::imprint_next_read( Read &the_read )
+
+.. cpp:function:: void IParser::imprint_next_read_pair( ReadPair &the_read_pair, uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED )
+
+The :cpp:func:`is_complete` method checks if parsing of the current stream is
+complete and blocks in a synchronization barrier if it is but some threads are
+still working.
+
+The :cpp:func:`imprint_next_read` method attempts to parse another read from
+the file stream and create a :cpp:class:`Read` object from it. Note that a
+legacy method ``get_next_read`` is still available but its use in new code is
+discouraged.  The legacy method involves an additional memory copy.
+
+The :cpp:func:`imprint_next_read_pair` method attempts to parse a pair of reads
+from the file stream a create a `ReadPair` object from them. Currently, this
+has two implemented modes of operation with a third one planned. The modes are
+``PAIR_MODE_ALLOW_UNPAIRED``, ``PAIR_MODE_IGNORE_UNPAIRED``, and
+``PAIR_MODE_ERROR_ON_UNPAIRED``. The first one is not yet implemented; it may
+be useful for filtering or diverting paired or unpaired reads out of a stream.
+The ``PAIR_MODE_IGNORE_UNPAIRED`` mode simply ignores unpaired reads and only
+returns paired reads. The ``PAIR_MODE_ERROR_ON_UNPAIRED`` mode raises an
+exception if an unpaired read is encountered. As a note, both the old-style
+("/1" and "/2") and new-style ("1..." and "2:...") Illumina read pairs are
+detected from sequence identifiers.
+
+.. todo::
+   Implement ``PAIR_MODE_ALLOW_UNPAIRED`` mode.
+
+.. todo::
+   Place burden of input parsing and output formatting on :cpp:class:`Read`
+   obects rather than on parser methods. Demote parsers to role of facilitator.
+   Maybe?
+
+Python Wrapper
+~~~~~~~~~~~~~~
+
+The Python wrapper exposes a read parser class.
+
+.. py:class:: ReadParser
+
+This class has no subclasses, but handles various formats appropriately. An
+instance of the class is an iterator, which produces one read at a time. There
+is also a method for iterating over read pairs and the class exposes the same
+constants for controlling its behavior as the underlying C++ class does.
+
+.. py:method:: ReadParser.iter_read_pairs( pair_mode )
+
+k-mer Counters and Bloom Filters
+--------------------------------
+
+C++ API
+~~~~~~~
+
+The Bloom filter counting is described elsewhere and so we won't go into
+details of it here. Some of the methods of the hash tables has been granted
+thread safety and can use the thread-safe :cpp:class:`IParser` objects.
+
+.. cpp:class:: Hashtable
+
+.. cpp:class:: Hashbits
+
+.. cpp:function:: void Hashtable::consume_fasta( IParser * parser, unsigned int &total_reads, unsigned long long &n_consumed, HashIntoType lower_bound, HashIntoType upper_bound, CallbackFn callback, void * callback_data ) 
+
+.. cpp:function:: void Hashbits::consume_fasta_and_tag( IParser * parser, unsigned int &total_reads, unsigned long long &n_consumed, CallbackFn callback, void * callback_data )
+
+For legacy support, methods with signatures that have a file name parameter
+rather than a :cpp:class:`IParser` parameter are still provided as well. (They
+wrap the ones with the parser parameter.)
+
+As with the cache managers and read parsers, the hashtables track per-thread
+state.
+
+.. cpp:class:: Hasher
+
+Since more than one pool of threads (e.g., one set of threads per reads parser
+and one reads parser per file stream) may be used with a particular hash table
+object, the hash table objects internally maintain the notion of thread pools.
+The universally unique identifier (UUID) of an object (e.g., a reads parser) is
+used to map to the correct thread pool. This is behind-the-scenes accounting
+and a developer should generally not have to worry about this. But, if you are
+converting another method to be thread-safe and it can take different reads
+parsers on different invocations, then be sure to consider this.
+
+.. todo::
+   Drop more logic currently implemented in Python to C++ to gain
+   multi-threading efficiencies. Not everything can really scale well using the
+   existing interfaces working in Python.
+
+.. todo::
+   Cache k-mers to hash in small buckets which correspond to regions of the
+   hash tables. This will allow for multiple updates per memory page and reduce
+   the number of CPU cache misses.
+
+.. todo::
+   Abstact the counter storage from the hash functions. A number of open issues
+   can be addressed by doing this. The counter storage might be better
+   implemented with partial template specialization than with subclassing. For
+   small hash tables sizes, not hashing makes more sense because every possible
+   k-mer in the k-mer space can be addressed directly in memory. Counter
+   storage will be most efficient for powers-of-two numbers of bits per
+   counter. Blah, blah... these and other thoughts are discussed more
+   thoroughly in the various GitHub issues involving them.
+
+Python Wrapper
+~~~~~~~~~~~~~~
+
+The hash table objects have methods which take :py:class:`ReadParser` objects
+and invoke the appropriate C++ methods underneath the hood.
+
+.. py:method:: new_hashtable.consume_fasta_with_reads_parser( rparser )
+
+.. py:method:: new_counting_hash.consume_fasta_and_tag_with_reads_parser( rparser )
+
+.. todo::
+   Convert factory functions into callable classes and properly attribute
+   those classes.
+
+Python Wrapper
+--------------
+
+The Python wrapper resides in :file:`python/_khmermodule.cc`. C++ code is used
+to call the CPython API to bind some of the C++ classes and methods to Python
+classes and methods. Some of the newer additions to the wrapper, such as the
+:py:class:`Read` and :py:class:`ReadParser` classes should be considered models
+for future additions as they expose callable classes with properties and
+iterators and which look just like Python classes for the most part. Much of
+the older code relies on factory functions to create objects and those objects
+are not very Pythonic. The newer additions are also much less cluttered and
+more readable (though the author of this sentence may be biased in this
+regard).
+
+.. todo::
+   Use SWIG to generate the interface. Maybe?
+
+.. vim: set ft=rst ts=3 sts=3 sw=3 et tw=79:

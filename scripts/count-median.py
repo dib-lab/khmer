@@ -12,14 +12,18 @@ The output file contains sequence id, median, average, stddev, and seq length.
 
 NOTE: All 'N's in the input sequences are converted to 'G's.
 """
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 import argparse
 
 ###
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Count k-mers summary stats for sequences')
+    parser = argparse.ArgumentParser(
+        description='Count k-mers summary stats for sequences')
 
     parser.add_argument('htfile')
     parser.add_argument('input')
@@ -30,22 +34,22 @@ def main():
     htfile = args.htfile
     input_filename = args.input
     output_filename = args.output
-    
+
     print 'loading counting hash from', htfile
     ht = khmer.load_counting_hash(htfile)
     K = ht.ksize()
 
     print 'writing to', output_filename
     output = open(output_filename, 'w')
-    
-    for record in screed.open(input_filename):
-       seq = record.sequence.upper()
-       if 'N' in seq:
-           seq = seq.replace('N', 'G')
 
-       if K <= len(seq):
-           a, b, c = ht.get_median_count(seq)
-           print >>output, record.name, a, b, c, len(seq)
+    for record in screed.open(input_filename):
+        seq = record.sequence.upper()
+        if 'N' in seq:
+            seq = seq.replace('N', 'G')
+
+        if K <= len(seq):
+            a, b, c = ht.get_median_count(seq)
+            print >>output, record.name, a, b, c, len(seq)
 
 if __name__ == '__main__':
     main()

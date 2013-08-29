@@ -6,17 +6,20 @@ Streaming error trimming based on digital normalization.
 
 Use -h for parameter help.
 """
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 import argparse
 
-DEFAULT_NORMALIZE_LIMIT=20
-DEFAULT_CUTOFF=2
+DEFAULT_NORMALIZE_LIMIT = 20
+DEFAULT_CUTOFF = 2
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_MIN_HASHSIZE = 1e6
+
 
 def main():
     parser = argparse.ArgumentParser(description='XXX')
@@ -59,18 +62,18 @@ def main():
     parser.add_argument('input_filenames', nargs='+')
     args = parser.parse_args()
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
 
-    CUTOFF=args.abund_cutoff
-    NORMALIZE_LIMIT=args.normalize_to
+    CUTOFF = args.abund_cutoff
+    NORMALIZE_LIMIT = args.normalize_to
 
     is_variable_abundance = True        # conservative
     if args.is_genome:
         is_variable_abundance = False
 
-    errors = [0]*1000
+    errors = [0] * 1000
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
@@ -100,7 +103,7 @@ def main():
             else:
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at < len(seq):
-                   errors[trim_at] += 1
+                    errors[trim_at] += 1
                 if trim_at >= K:
                     trimfp.write('>%s\n%s\n' % (read.name, trim_seq))
 
@@ -115,14 +118,14 @@ def main():
                 print '... x 2', n, filename
 
             trimfp = open(trimfilename, 'a')
-        
+
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
             if med >= NORMALIZE_LIMIT or not is_variable_abundance:
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at < len(seq):
-                   errors[trim_at] += 1
+                    errors[trim_at] += 1
                 if trim_at >= K:
                     trimfp.write('>%s\n%s\n' % (read.name, trim_seq))
             else:
@@ -132,8 +135,7 @@ def main():
 
     fp = open('err-profile.out', 'w')
     for pos, count in enumerate(errors):
-       print >>fp, pos, count
+        print >>fp, pos, count
 
 if __name__ == '__main__':
     main()
-

@@ -15,11 +15,12 @@ import os
 
 import khmer
 
-DEFAULT_K=32
+DEFAULT_K = 32
+
 
 def main():
     parser = argparse.ArgumentParser(description="Merge pmap files.")
-    
+
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('--keep-subsets', dest='remove_subsets',

@@ -1,12 +1,14 @@
 """
 Utilities for dealing with multithreaded processing of short reads.
 """
-import threading, Queue
+import threading
+import Queue
 import sys
 import screed
 
-DEFAULT_WORKER_THREADS=8
-DEFAULT_GROUPSIZE=100
+DEFAULT_WORKER_THREADS = 8
+DEFAULT_GROUPSIZE = 100
+
 
 def verbose_loader(filename):
     it = screed.open(filename)
@@ -17,26 +19,29 @@ def verbose_loader(filename):
 
 verbose_fasta_iter = verbose_loader
 
+
 class SequenceGroup(object):
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
 
+
 def is_pair(r1, r2):
     a = r1['name'].split('/')[0]
     b = r2['name'].split('/')[0]
 
-    return (a==b)
+    return (a == b)
+
 
 class ThreadedSequenceProcessor(object):
     QUEUESIZE = 50
-    
+
     def __init__(self, process_fn, n_workers=DEFAULT_WORKER_THREADS,
                  group_size=DEFAULT_GROUPSIZE, verbose=True):
         self.process_fn = process_fn
         self.n_workers = n_workers
         self.group_size = group_size
-        
+
         self.inqueue = Queue.Queue(self.QUEUESIZE)
         self.outqueue = Queue.Queue(self.QUEUESIZE)
 
@@ -44,11 +49,12 @@ class ThreadedSequenceProcessor(object):
         self.worker_count_lock = threading.Lock()
         self.done = False
         self.verbose = verbose
-        
+
         self.n_processed = 0
         self.n_written = 0
         self.bp_processed = 0
         self.bp_written = 0
+        self.tallies_lock = threading.Lock()
 
     def start(self, inputiter, outfp):
         if self.verbose:
@@ -113,7 +119,7 @@ class ThreadedSequenceProcessor(object):
     def do_process(self):
         inq = self.inqueue
         outq = self.outqueue
-        
+
         while not self.done or not inq.empty():
             try:
                 g = inq.get(True, 1)
@@ -136,21 +142,26 @@ class ThreadedSequenceProcessor(object):
 
             self.outqueue.put(SequenceGroup(0, keep))
 
-            self.n_processed += len(g.seqlist)
-            self.n_written += len(keep)
-            self.bp_processed += bp_processed
-            self.bp_written += bp_written
-            
-            if self.verbose and self.n_processed % 500000 == 0:
-                print >>sys.stderr, "processed %d / wrote %d / removed %d" % \
-                      (self.n_processed, self.n_written,
-                       self.n_processed - self.n_written)
-                print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
-                      (self.bp_processed, self.bp_written,
-                       self.bp_processed - self.bp_written)
-                discarded = self.bp_processed - self.bp_written
-                f = float(discarded) / float(self.bp_processed) * 100
-                print >>sys.stderr, "discarded %.1f%%" % f
+            # the tallies are shared among workers, hence we lock
+            with self.tallies_lock:
+
+                self.n_processed += len(g.seqlist)
+                self.n_written += len(keep)
+                self.bp_processed += bp_processed
+                self.bp_written += bp_written
+
+                if self.verbose and self.n_processed % 500000 == 0:
+                    print >>sys.stderr, \
+                        "processed %d / wrote %d / removed %d" % \
+                        (self.n_processed, self.n_written,
+                         self.n_processed - self.n_written)
+                    print >>sys.stderr, \
+                        "processed %d bp / wrote %d bp / removed %d bp" % \
+                        (self.bp_processed, self.bp_written,
+                         self.bp_processed - self.bp_written)
+                    discarded = self.bp_processed - self.bp_written
+                    f = float(discarded) / float(self.bp_processed) * 100
+                    print >>sys.stderr, "discarded %.1f%%" % f
 
         # end of thread; exit, decrement worker count.
         with self.worker_count_lock:
@@ -171,15 +182,16 @@ class ThreadedSequenceProcessor(object):
                     outfp.write('>%s\n%s\n' % (name, seq,))
 
         if self.verbose:
-            print >>sys.stderr, "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
-                  (self.n_processed, self.n_written,
-                   self.n_processed - self.n_written)
-            print >>sys.stderr, "processed %d bp / wrote %d bp / removed %d bp" % \
-                  (self.bp_processed, self.bp_written,
-                   self.bp_processed - self.bp_written)
+            print >>sys.stderr, \
+                "DONE writing.\nprocessed %d / wrote %d / removed %d" % \
+                (self.n_processed, self.n_written,
+                 self.n_processed - self.n_written)
+            print >>sys.stderr, \
+                "processed %d bp / wrote %d bp / removed %d bp" % \
+                (self.bp_processed, self.bp_written,
+                 self.bp_processed - self.bp_written)
             discarded = self.bp_processed - self.bp_written
             f = float(discarded) / float(self.bp_processed) * 100
             print >>sys.stderr, "discarded %.1f%%" % f
-        
 
-                
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

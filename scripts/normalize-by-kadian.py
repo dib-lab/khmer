@@ -8,11 +8,14 @@ DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keepkad'.
 Use '-h' for parameter help.
 """
 
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
-DEFAULT_DESIRED_COVERAGE=5
+DEFAULT_DESIRED_COVERAGE = 5
+
 
 def main():
     parser = build_construct_args()
@@ -27,20 +30,26 @@ def main():
 
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print>>sys.stderr, "** WARNING: hashsize is default!  You absodefly want to increase this!\n** Please read the docs!"
+            print >>sys.stderr, \
+                "** WARNING: hashsize is default!  " \
+                "You absodefly want to increase this!\n** " \
+                "Please read the docs!"
 
-        print>>sys.stderr, '\nPARAMETERS:'
-        print>>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print>>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print>>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print>>sys.stderr, ''
-        print>>sys.stderr, 'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' % (args.n_hashes * args.min_hashsize)
-        print>>sys.stderr, '-'*8
+        print >>sys.stderr, '\nPARAMETERS:'
+        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
+        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
+        print >>sys.stderr, \
+            ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
+        print >>sys.stderr, ''
+        print >>sys.stderr, \
+            'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' \
+            % (args.n_hashes * args.min_hashsize)
+        print >>sys.stderr, '-' * 8
 
-    K=args.ksize
-    HT_SIZE=args.min_hashsize
-    N_HT=args.n_hashes
-    DESIRED_COVERAGE=args.cutoff
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
+    DESIRED_COVERAGE = args.cutoff
 
     filenames = args.input_filenames
 
@@ -100,3 +109,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

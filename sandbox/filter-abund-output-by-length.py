@@ -7,7 +7,9 @@ hash table.  Output sequences will be placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
@@ -15,7 +17,8 @@ from khmer.counting_args import build_counting_multifile_args
 
 ###
 
-DEFAULT_CUTOFF=2
+DEFAULT_CUTOFF = 2
+
 
 class OutputByLength(object):
     def __init__(self, base):
@@ -35,8 +38,9 @@ class OutputByLength(object):
         fp_dict = self.fp_dict
         if length not in fp_dict:
             fp_dict[length] = open('%s.%03d' % (self.base, 1000 - length), 'w')
-    
+
         fp_dict[length].write(s)
+
 
 def main():
     parser = build_counting_multifile_args()
@@ -70,16 +74,15 @@ def main():
 
         return None, None
 
-
     ### the filtering loop
     for infile in infiles:
-       print 'filtering', infile
-       outfile = os.path.basename(infile) + '.abundfilt'
+        print 'filtering', infile
+        outfile = os.path.basename(infile) + '.abundfilt'
 
-       tsp = ThreadedSequenceProcessor(process_fn)
-       tsp.start(verbose_loader(infile), OutputByLength(outfile))
+        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp.start(verbose_loader(infile), OutputByLength(outfile))
 
-       print 'output in', outfile
+        print 'output in', outfile
 
 if __name__ == '__main__':
     main()

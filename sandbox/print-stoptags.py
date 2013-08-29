@@ -1,5 +1,7 @@
 #! /usr/bin/env python
-import khmer, sys, os
+import khmer
+import sys
+import os
 
 K = 32
 

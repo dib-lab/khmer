@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 import sys
 
-MAX_SIZE=50000
+MAX_SIZE = 50000
+
 
 def read_partition_file(fp):
     for n, line in enumerate(fp):
@@ -19,7 +20,7 @@ def read_partition_file(fp):
             sequence = line.strip()
 
             yield name, partition_id, partition_readcount, surrendered, \
-                  sequence
+                sequence
 
 if __name__ == '__main__':
     filename = sys.argv[1]
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     partition_sizes = {}
 
     ### first, read in all the cluster sizes
-    
+
     fp = open(filename)
     for n, x in enumerate(read_partition_file(fp)):
         if n % 100000 == 0:
@@ -39,7 +40,7 @@ if __name__ == '__main__':
             partition_sizes[partition_id] = readcount
 
     ### sort by # of reads in each cluster
-    divvy = sorted(partition_sizes.items(), key=lambda y:y[1])
+    divvy = sorted(partition_sizes.items(), key=lambda y: y[1])
 
     ## divvy up into different groups, based on having MAX_SIZE sequences
     ## in each group.
