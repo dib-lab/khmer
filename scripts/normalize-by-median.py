@@ -64,7 +64,7 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
         if args.paired:
             if not validpair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs \
-                    {} {}'.format(batch[0].name, batch[1].name))
+                    {b0} {b1}'.format(b0=batch[0].name, b1=batch[1].name))
 
         # Emit the batch of reads if any read passes the filter
         # and all reads are longer than K
@@ -86,12 +86,12 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
         if passed_length and passed_filter:
             for record in batch:
                 if hasattr(record, 'accuracy'):
-                    outfp.write('@{}\n{}\n+\n{}\n'.format(record.name,
-                                                          record.sequence,
-                                                          record.accuracy))
+                    outfp.write('@{name}\n{seq}\n+\n{acc}\n'.format(name=record.name,
+                                                          seq=record.sequence,
+                                                          acc=record.accuracy))
                 else:
                     outfp.write(
-                        '>{}\n{}\n'.format(record.name, record.sequence))
+                        '>{name}\n{seq}\n'.format(name=record.name, seq=record.sequence))
         else:
             discarded += batch_size
     
@@ -99,9 +99,9 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
 
 def handle_error(error, output_name, input_name, ht):
     print >>sys.stderr, '** ERROR:', error
-    print >>sys.stderr, '** Failed on {}: '.format(input_name)
+    print >>sys.stderr, '** Failed on {name}: '.format(name=input_name)
     hashname = os.path.basename(input_name) + '.ht.failed'
-    print >>sys.stderr, '** ...dumping hashtable to {}'.format(hashname)
+    print >>sys.stderr, '** ...dumping hashtable to {ht}'.format(ht=hashname)
     ht.save(hashname)
     try:
         os.remove(output_name)
@@ -137,16 +137,16 @@ def main():
 
         print >>sys.stderr, '\nPARAMETERS:'
         print >>sys.stderr, \
-            ' - kmer size =    {:d} \t\t(-k)'.format(args.ksize)
+            ' - kmer size =    {ksize:d} \t\t(-k)'.format(ksize=args.ksize)
         print >>sys.stderr, \
-            ' - n hashes =     {:d} \t\t(-N)'.format(args.n_hashes)
+            ' - n hashes =     {nhash:d} \t\t(-N)'.format(nhash=args.n_hashes)
         print >>sys.stderr, \
-            ' - min hashsize = {:-5.2g} \t(-x)'.format(args.min_hashsize)
-        print >>sys.stderr, ' - paired = {} \t\t(-p)'.format(args.paired)
+            ' - min hashsize = {mh:-5.2g} \t(-x)'.format(mh=args.min_hashsize)
+        print >>sys.stderr, ' - paired = {pr} \t\t(-p)'.format(pr=args.paired)
         print >>sys.stderr, ''
         print >>sys.stderr, \
-            'Estimated memory usage is {:.2g} bytes \
-            (n_hashes x min_hashsize)'.format(args.n_hashes*args.min_hashsize)
+            'Estimated memory usage is {prod:.2g} bytes \
+            (n_hashes x min_hashsize)'.format(prod=args.n_hashes*args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
@@ -222,7 +222,7 @@ def main():
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
-    print 'fp rate estimated to be {:1.3f}'.format(fp_rate)
+    print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
     
     if force and len(corrupt_files) > 0:
         print >>sys.stderr, "** WARNING: Finished with errors!"
