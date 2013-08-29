@@ -1,9 +1,10 @@
 import os
 import argparse
 
-DEFAULT_K=32
-DEFAULT_N_HT=4
-DEFAULT_MIN_HASHSIZE=1e6
+DEFAULT_K = 32
+DEFAULT_N_HT = 4
+DEFAULT_MIN_HASHSIZE = 1e6
+
 
 def build_construct_args():
 

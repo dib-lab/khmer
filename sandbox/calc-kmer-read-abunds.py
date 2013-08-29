@@ -5,7 +5,7 @@ from screed.fasta import fasta_iter
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(1e9)
+HASHTABLE_SIZE = int(1e9)
 N_HT = 4
 
 infile = sys.argv[1]
@@ -22,18 +22,18 @@ print 'counting'
 for n, record in enumerate(fasta_iter(open(infile))):
     if n % 10000 == 0:
         print>>sys.stderr, '...', n
-        
+
     seq = record['sequence']
     if len(seq) < K:
         continue
 
     x = []
     for pos in range(0, len(seq) - K + 1):
-        x.append(ht.get(seq[pos:pos+K]))
+        x.append(ht.get(seq[pos:pos + K]))
 
     print >>outfp, '>%s\n%s' % (record['name'], record['sequence'])
     print >>outfp, " ".join(map(str, x))
-    
+
     median, average, stddev = ht.get_median_count(seq)
     max_count = ht.get_max_count(seq)
     min_count = ht.get_min_count(seq)

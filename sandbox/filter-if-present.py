@@ -1,8 +1,8 @@
 import sys
 import khmer
 
-K=32
-HASHTABLE_SIZE=int(116e9)
+K = 32
+HASHTABLE_SIZE = int(116e9)
 N_HT = 2
 
 ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)

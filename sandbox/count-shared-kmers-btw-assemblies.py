@@ -4,15 +4,17 @@ import screed
 import os
 from screed.fasta import fasta_iter
 
-K=32
+K = 32
 HASHTABLE_SIZE = 5e7
 N_HT = 4
 
 LENGTH_THRESHOLD = int(sys.argv[3])
 
+
 def iterseq(x):
     for record in x:
         yield record.sequence
+
 
 def slidingWindow(sequence, K_size):
     total_windows = (len(sequence) - K_size) + 1
@@ -21,7 +23,8 @@ def slidingWindow(sequence, K_size):
         kmer = sequence[i:i + K_size]
         if 'N' in kmer:
             continue
-        yield sequence[i:i+K_size]
+        yield sequence[i:i + K_size]
+
 
 def count(contigs1, contigs2):
     ht = khmer.new_counting_hash(K, HASHTABLE_SIZE, N_HT)
@@ -50,9 +53,11 @@ def count(contigs1, contigs2):
     # 'count3' is the total number of kmers shared between the two files.
     print count, count2, count3, "%.1f%%" % (count3 / float(count) * 100.)
 
+
 def main(contig1, contig2):
-    ht = count(iterseq(screed.open(contig1)), 
+    ht = count(iterseq(screed.open(contig1)),
                iterseq(screed.open(contig2)))
+
 
 def output(ht, contigs, fp):
     for n, sequence in enumerate(contigs):
@@ -64,13 +69,13 @@ def output(ht, contigs, fp):
 
     for item in count_list:
         print >>fp, '%s' % item
-    
-    print 'Hashtable occupancy =', ht.n_occupied()/float(HASHTABLE_SIZE)
+
+    print 'Hashtable occupancy =', ht.n_occupied() / float(HASHTABLE_SIZE)
     return count_list
 
-if __name__=='__main__':
+if __name__ == '__main__':
 
     contig_file1 = sys.argv[1]
     contig_file2 = sys.argv[2]
-    
+
     main(contig_file1, contig_file2)

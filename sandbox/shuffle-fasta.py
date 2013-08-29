@@ -4,7 +4,7 @@ import sys
 from screed.fasta import fasta_iter
 import random
 
-d = dict([ (r['name'], r['sequence']) for r in fasta_iter(open(sys.argv[1])) ])
+d = dict([(r['name'], r['sequence']) for r in fasta_iter(open(sys.argv[1]))])
 
 ks = d.keys()
 random.shuffle(ks)

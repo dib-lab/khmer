@@ -1,20 +1,22 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 
 K = 32
-HASHTABLE_SIZE=int(8e9)
+HASHTABLE_SIZE = int(8e9)
 N_HT = 4
-RADIUS=100
+RADIUS = 100
 
 ###
 
-MAX_DENSITY=2000
+MAX_DENSITY = 2000
 
 infile = sys.argv[1]
 outfile = sys.argv[2]
 if len(sys.argv) > 3:
-    RADIUS=int(sys.argv[3])
-    
+    RADIUS = int(sys.argv[3])
+
 print 'saving to:', outfile
 
 print 'making hashtable'
@@ -33,12 +35,13 @@ for n, record in enumerate(screed.open(infile)):
     seq = record['sequence']
 
     for pos in range(0, len(seq), 200):
-       subseq = seq[pos:pos+200]
+        subseq = seq[pos:pos + 200]
 
-       middle = (len(subseq) - K + 1) / 2
-    
-       density = ht.count_kmers_within_radius(subseq[middle:middle+K], RADIUS,
-                                              MAX_DENSITY)
-       density /= float(RADIUS)
-    
-       print >>outfp, '>%s d=%.3f\n%s' % (record['name'], density, subseq) 
+        middle = (len(subseq) - K + 1) / 2
+
+        density = ht.count_kmers_within_radius(
+            subseq[middle:middle + K], RADIUS,
+            MAX_DENSITY)
+        density /= float(RADIUS)
+
+        print >>outfp, '>%s d=%.3f\n%s' % (record['name'], density, subseq)

@@ -10,6 +10,11 @@ khmer -- k-mer counting & filtering FTW
 :Contact: ctb@msu.edu
 :License: BSD
 
+khmer is a library and suite of command line tools for working with
+DNA sequence.  It is primarily aimed at short-read sequencing data
+such as that produced by the Illumina platform.  khmer takes a k-mer-centric
+approach to sequence analysis, hence the name.
+
 There are two mailing lists dedicated to khmer, an announcements-only list and
 a discussion list. To search their archives and sign-up for them, please visit
 the following URLs:
@@ -19,6 +24,14 @@ the following URLs:
     * Announcements: http://lists.idyll.org/listinfo/khmer-announce
 
 The archives for the khmer list are available at: http://lists.idyll.org/pipermail/khmer/
+
+khmer development has largely been supported by AFRI Competitive Grant
+no.  `2010-65205-20361
+<http://ged.msu.edu/downloads/2009-usda-vertex.pdf>`__ from the USDA
+NIFA, and is now funded by the National Human Genome Research
+Institute of the National Institutes of Health under Award Number
+`R01HG007513 <http://ged.msu.edu/downloads/2012-bigdata-nsf.pdf>`__,
+both to C. Titus Brown.
 
 Contents:
 
@@ -34,6 +47,7 @@ Contents:
    choosing-hash-sizes
    partitioning-big-data
    ktable
+   design
    details
    development
    crazy-ideas

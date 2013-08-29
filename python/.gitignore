@@ -1,0 +1,4 @@
+*.swp
+setup-dynamic.py
+distribute-*.egg
+distribute-*.tar.gz

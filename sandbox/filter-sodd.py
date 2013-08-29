@@ -1,18 +1,21 @@
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
-MAX_SODD=3
+MAX_SODD = 3
 
-WORKER_THREADS=8
-GROUPSIZE=100
+WORKER_THREADS = 8
+GROUPSIZE = 100
 
 ###
+
 
 def main():
     htfile = sys.argv[1]
     outfiles = sys.argv[2:]
-        
+
     print 'loading hashbits'
     ht = khmer.load_hashbits(htfile)
 
@@ -30,11 +33,11 @@ def main():
         return None, None
 
     for filename in outfiles:
-       outpath = os.path.basename(filename) + '.sodd'
-       outfp = open(outpath, 'w')
+        outpath = os.path.basename(filename) + '.sodd'
+        outfp = open(outpath, 'w')
 
-       tsp = ThreadedSequenceProcessor(process_fn, WORKER_THREADS, GROUPSIZE)
-       tsp.start(verbose_fasta_iter(filename), outfp)
+        tsp = ThreadedSequenceProcessor(process_fn, WORKER_THREADS, GROUPSIZE)
+        tsp.start(verbose_fasta_iter(filename), outfp)
 
 if __name__ == '__main__':
     main()

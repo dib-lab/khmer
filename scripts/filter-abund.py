@@ -7,7 +7,8 @@ hash table.  Output sequences will be placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-import sys, screed.fasta, os
+import sys
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
@@ -15,13 +16,21 @@ from khmer.counting_args import build_counting_multifile_args
 
 ###
 
-DEFAULT_CUTOFF=2
+DEFAULT_NORMALIZE_LIMIT = 20
+DEFAULT_CUTOFF = 2
 
 def main():
     parser = build_counting_multifile_args()
     parser.add_argument('--cutoff', '-C', dest='cutoff',
                         default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
+
+    parser.add_argument('-V', '--variable-coverage', action='store_true',
+                        dest='variable_coverage', default=False)
+    parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
+                        help='base variable-coverage cutoff on this median k-mer abundance',
+                        default=DEFAULT_NORMALIZE_LIMIT)
+
     args = parser.parse_args()
 
     counting_ht = args.input_table
@@ -42,6 +51,11 @@ def main():
         if 'N' in seq:
             return None, None
 
+        if args.variable_coverage: # only trim when sequence has high enough C
+            med, _, _ = ht.get_median_count(seq)
+            if med < args.normalize_to:
+                return name, seq
+
         trim_seq, trim_at = ht.trim_on_abundance(seq, args.cutoff)
 
         if trim_at >= K:
@@ -49,17 +63,16 @@ def main():
 
         return None, None
 
-
     ### the filtering loop
     for infile in infiles:
-       print 'filtering', infile
-       outfile = os.path.basename(infile) + '.abundfilt'
-       outfp = open(outfile, 'w')
+        print 'filtering', infile
+        outfile = os.path.basename(infile) + '.abundfilt'
+        outfp = open(outfile, 'w')
 
-       tsp = ThreadedSequenceProcessor(process_fn)
-       tsp.start(verbose_loader(infile), outfp)
+        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp.start(verbose_loader(infile), outfp)
 
-       print 'output in', outfile
+        print 'output in', outfile
 
 if __name__ == '__main__':
     main()

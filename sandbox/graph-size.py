@@ -5,16 +5,17 @@ import os.path
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
-HASHTABLE_SIZE=int(4e9)
-THRESHOLD=500
-N_HT=4
-WORKER_THREADS=5
+HASHTABLE_SIZE = int(4e9)
+THRESHOLD = 500
+N_HT = 4
+WORKER_THREADS = 5
 
 ###
 
-GROUPSIZE=100
+GROUPSIZE = 100
 
 ###
+
 
 def main():
     infile = sys.argv[1]
@@ -39,7 +40,7 @@ def main():
     outfp = open(outfile, 'w')
 
     ###
-    
+
     def process_fn(record, ht=ht):
         kmer = record['sequence'][:K]
         size = ht.calc_connected_graph_size(kmer, THRESHOLD)

@@ -50,6 +50,8 @@ namespace khmer {
       }
     }
 
+    uint32_t _all_tags_spin_lock;
+
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
@@ -60,14 +62,17 @@ namespace khmer {
       if (partition) { partition->_validate_pmap(); }
     }
 
-    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes) :
-      khmer::Hashtable(ksize), _tablesizes(tablesizes) {
+    Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
+    : khmer::Hashtable(ksize),
+      _tablesizes(tablesizes),
+      _all_tags_spin_lock( 0 )
+    {
       _tag_density = DEFAULT_TAG_DENSITY;
       assert(_tag_density % 2 == 0);
       partition = new SubsetPartition(this);
       _occupied_bins = 0;
       _n_unique_kmers = 0;
-	  _n_overlap_kmers = 0;
+      _n_overlap_kmers = 0;
 
       _allocate_counters();
     }
@@ -141,11 +146,25 @@ namespace khmer {
 
     void clear_tags() { all_tags.clear(); }
 
-    void consume_fasta_and_tag(const std::string &filename,
-			       unsigned int &total_reads,
-			       unsigned long long &n_consumed,
-			       CallbackFn callback = 0,
-			       void * callback_data = 0);
+    // Count every k-mer in a FASTA or FASTQ file.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+      std::string const	  &filename,
+      unsigned int	  &total_reads,
+      unsigned long long  &n_consumed,
+      CallbackFn	  callback	  = NULL,
+      void *		  callback_data	  = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads, 
+    // using the supplied parser.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
 
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,
@@ -172,20 +191,18 @@ namespace khmer {
 
     // for overlap k-mer counting
     void consume_fasta_overlap(const std::string &filename,HashIntoType curve[2][100],
-                                      khmer::Hashbits &ht2,
+                              khmer::Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
 			      HashIntoType lower_bound,
 			      HashIntoType upper_bound,
-			      ReadMaskTable ** orig_readmask,
-			      bool update_readmask,
 			      CallbackFn callback,
 			      void * callback_data);
 
 
 
     // just for overlap k-mer counting!
-    unsigned int check_and_process_read_overlap(const std::string &read,
+    unsigned int check_and_process_read_overlap(std::string &read,
 					    bool &is_valid,HashIntoType lower_bound,
                                             HashIntoType upper_bound,
                                             khmer::Hashbits &ht2);
@@ -216,6 +233,53 @@ namespace khmer {
                   HashIntoType stop=0) const {
       return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
     }
+
+    // Get and set the hashbits for the given kmer.
+    inline
+    virtual
+    const
+    BoundedCounterType
+    test_and_set_bits(const char * kmer)
+    {
+      HashIntoType hash = _hash(kmer, _ksize);
+      return test_and_set_bits(hash);
+    }
+
+    // Get and set the hashbits for the given kmer hash.
+    // Generally, it is better to keep tests and mutations separate, 
+    // but, in the interests of efficiency and thread safety, 
+    // tests and mutations are being blended here against conventional 
+    // software engineering wisdom.
+    inline
+    virtual
+    const
+    bool
+    test_and_set_bits( HashIntoType khash ) 
+    {
+      bool is_new_kmer = false;
+
+      for (unsigned int i = 0; i < _n_tables; i++)
+      {
+        HashIntoType bin = khash % _tablesizes[i];
+	HashIntoType byte = bin / 8;
+	unsigned char bit = (unsigned char)(1 << (bin % 8));
+
+	unsigned char bits_orig = __sync_fetch_and_or( *(_counts + i) + byte, bit );
+	if (!(bits_orig & bit))
+	{
+	  __sync_add_and_fetch( &_occupied_bins, 1 );
+	  is_new_kmer = true;
+	}
+      } // iteration over hashtables
+
+      if (is_new_kmer)
+      {
+	__sync_add_and_fetch( &_n_unique_kmers, 1 );
+	return true; // kmer not seen before
+      }
+
+      return false; // kmer already seen
+    } // test_and_set_bits
 
     virtual const HashIntoType n_overlap_kmers(HashIntoType start=0,
                   HashIntoType stop=0) const {
@@ -379,6 +443,16 @@ namespace khmer {
   };
 };
 
+
+#define ACQUIRE_ALL_TAGS_SPIN_LOCK \
+  while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));
+
+#define RELEASE_ALL_TAGS_SPIN_LOCK \
+  __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
+
+
 #include "counting.hh"
 
 #endif // HASHBITS_HH
+
+// vim: set sts=2 sw=2:
