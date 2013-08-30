@@ -3917,15 +3917,12 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
     }*/
 
   khmer::Alignment* aln;
-  aln = aligner->align_test(read);
-  if(aln == NULL) {
-    return NULL;
-  }
+  aln = aligner->Align(read);
 
   const char* alignment = aln->graph_alignment.c_str();
   const char* readAlignment = aln->read_alignment.c_str();
  
-  return Py_BuildValue("dss", aln->score, alignment, readAlignment);
+  return Py_BuildValue("dssi", aln->score, alignment, readAlignment, aln->truncated);
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {

@@ -1,3 +1,7 @@
+/*
+  This line intentionally left blank to bother mr-c
+ */
+
 #ifndef READ_ALIGNER_HH
 #define READ_ALIGNER_HH
 
@@ -11,7 +15,7 @@
 
 namespace khmer {
 
-  enum State { match, insertion, deletion };
+  enum State { MATCH, INSERT_READ, INSERT_GRAPH };
   enum Nucl {A, C, G, T};
   static const char nucl_lookup[4] = {'A', 'C', 'G', 'T'};
   
@@ -27,8 +31,10 @@ namespace khmer {
     double f_score;
     double h_score;
 
-    AlignmentNode(AlignmentNode* _prev, Nucl _emission, int _seq_idx, State _state, HashIntoType _fwd_hash, HashIntoType _rc_hash)
-      :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), fwd_hash(_fwd_hash), rc_hash(_rc_hash) {}
+    unsigned int length;
+    
+    AlignmentNode(AlignmentNode* _prev, Nucl _emission, int _seq_idx, State _state, HashIntoType _fwd_hash, HashIntoType _rc_hash, unsigned int _length)
+      :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), fwd_hash(_fwd_hash), rc_hash(_rc_hash), length(_length) {}
     
     bool operator== (const AlignmentNode& rhs) const {
       return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
@@ -67,26 +73,27 @@ namespace khmer {
     std::string graph_alignment;
     std::string read_alignment;
     double score;
+    bool truncated;
   };
 
-  static const char* trans_labels[] = {"mm", "mi", "md", "im", "ii", "dm", "dd", "disallowed"};
-  static const char* state_labels[] = {"match", "insert", "delete"};
-  //pam 1 = 1.99 2 = 1.97
+  // Constants for state transitions
   enum Transition { MM, MI, MD, IM, II, DM, DD, disallowed };
-  static double trans_default[] = { log2(.96), log2(.01), log2(.03), log2(.95), log2(.05), log2(.95), log2(.05)};
-  static const ScoringMatrix default_sm(log2(.99), log2(.01), trans_default);
+  // log probabilities for state transitions
+  static double trans_default[] = { log2(.98), log2(.01), log2(.01), log2(.95), log2(.05), log2(.95), log2(.05)};
+  
   
   class ReadAligner {
   private:
-    static const float errorOffset = 20.0f;
 
-    Alignment* extract_alignment(khmer::AlignmentNode*, const std::string&, const std::string&);
-    void enumerate(NodeHeap&, khmer::AlignmentNode*, bool, const std::string&);
+    Alignment* ExtractAlignment(khmer::AlignmentNode*, const std::string&, const std::string&);
+    void Enumerate(NodeHeap&, khmer::AlignmentNode*, bool, const std::string&);
+    AlignmentNode* Subalign(AlignmentNode*, unsigned int, bool, const std::string&);
     
-    khmer::CountingHash * ch;
-    const ScoringMatrix* sm;
-    int maxErrorRegion;
+    khmer::CountingHash* m_ch;
+    ScoringMatrix m_sm;
 
+    // These variables are required to use the _revhash and hash macros
+    // might as well just compute them once
     const HashIntoType bitmask;
     const unsigned int rc_left_shift;
 
@@ -99,14 +106,10 @@ namespace khmer {
     }
     
   public:
-    AlignmentNode* subalign(AlignmentNode*, unsigned int, bool, const std::string&);
-    Alignment* align(const std::string&, const std::string&, int);
-    Alignment* align_test(const std::string&);
+    Alignment* Align(const std::string&);
 
-    ReadAligner(khmer::CountingHash* _ch,  int maxErrorReg=-1)
-      : ch(_ch), bitmask(comp_bitmask(_ch->ksize())), rc_left_shift(_ch->ksize() * 2 - 2), sm(&default_sm) {
-      maxErrorRegion = maxErrorReg;
-    }
+    ReadAligner(khmer::CountingHash* ch)
+      : m_ch(ch), bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_sm(log2(.99), log2(.01), trans_default) {}
   };
 }
 
