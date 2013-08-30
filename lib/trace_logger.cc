@@ -17,8 +17,14 @@ namespace khmer
 
 TraceLogger::
 TraceLogger( uint8_t const level, FILE * stream_handle )
+#ifdef WITH_INTERNAL_TRACING
 : _level( level ), _shared_stream( true ), _stream_handle( stream_handle )
-{ assert( NULL != stream_handle ); }
+{
+    assert( NULL != stream_handle );
+}
+#else
+{ }
+#endif
 
 
 TraceLogger::

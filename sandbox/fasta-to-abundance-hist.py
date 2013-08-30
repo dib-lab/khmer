@@ -19,4 +19,5 @@ ht = khmer.new_counting_hash(1, 1, 1)
 ht.load(sys.argv[1])
 
 for i, infile in enumerate(files):
-    ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")
+   print 'outputting', infile + '.freq'
+   ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")

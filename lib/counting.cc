@@ -59,6 +59,8 @@ MinMaxTable * CountingHash::fasta_file_to_minmax(
         }
     }
 
+    delete parser;
+
     return mmt;
 }
 
@@ -87,6 +89,8 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
       }
       outfile << endl;
    }
+
+   delete parser;
 
    outfile.close();
 }
@@ -258,6 +262,8 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
           }
    } // while reads
 
+   delete parser;
+
    return counts;
 }
 
@@ -307,6 +313,8 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
             }
         }
     } // while reads
+
+    delete parser;
 }
 
 void CountingHash::save(std::string outfilename)
@@ -401,6 +409,10 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
 #endif // 0
   }
 
+  delete parser;
+
+  if (count == 0) { throw InvalidReadFileFormat(NULL, "no counts"); } 
+
   mean = float(total) / float(count);
 }
 
@@ -449,6 +461,10 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
     }
 #endif // 0
   }
+
+  delete parser;
+
+  if (count == 0) { throw InvalidReadFileFormat(NULL, "no counts"); }
 
   abs_deviation = total / float(count);
 }

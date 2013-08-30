@@ -88,6 +88,9 @@ namespace khmer {
 
       index = _ksize - 1;
       length = strlen(seq);
+      _kmer_f = 0;
+      _kmer_r = 0;
+
       initialized = false;
     }
 
