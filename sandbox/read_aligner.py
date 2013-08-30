@@ -45,10 +45,11 @@ def main():
             seq = record['sequence'].upper()
             print seq
 
-            score, graph_alignment, read_alignment = aligner.align(seq)
+            score, graph_alignment, read_alignment, truncated = aligner.align(seq)
             print score
             print graph_alignment
             print read_alignment
+            print truncated
 
 if __name__ == '__main__':
     main()
