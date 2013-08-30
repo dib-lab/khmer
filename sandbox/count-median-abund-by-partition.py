@@ -1,11 +1,14 @@
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 
 K = 32
-N_HT=4
-PARTITION_SIZE_LIMIT=5
+N_HT = 4
+PARTITION_SIZE_LIMIT = 5
 
 ###
+
 
 def main():
     ht_filename = sys.argv[1]
@@ -33,7 +36,7 @@ def main():
     for k, x in partition_counts.iteritems():
         if len(x) < PARTITION_SIZE_LIMIT:
             continue
-        
+
         fp = open('partition%s.counts' % k, 'w')
         for i in x:
             fp.write("%s\n" % i)

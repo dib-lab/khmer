@@ -1,22 +1,24 @@
-import khmer, sys
+import khmer
+import sys
 import threading
 import Queue
 import gc
 import os.path
 
-K=20
-HASHTABLE_SIZE=int(1e9)
-N_HT=4
+K = 20
+HASHTABLE_SIZE = int(1e9)
+N_HT = 4
 
-COUNTING_SIZE=int(1e8)
+COUNTING_SIZE = int(1e8)
 
 ht = None
 
 ###
 
+
 def main(filename):
     global ht
-    
+
     basename = os.path.basename(filename)
 
     print 'input file to partition: %s' % filename

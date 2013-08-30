@@ -1,18 +1,20 @@
 import khmer
 import sys
 import screed
-import threading, Queue
+import threading
+import Queue
 
 K = 14
-HASHTABLE_SIZE=int(1e9)
-THRESHOLD=100
+HASHTABLE_SIZE = int(1e9)
+THRESHOLD = 100
 
-GROUPSIZE=100
-WORKER_THREADS=4
+GROUPSIZE = 100
+WORKER_THREADS = 4
+
 
 def process(inq, outq, ht):
     global worker_count
-    
+
     while not done or not inq.empty():
         try:
             recordlist = inq.get(True, 1)
@@ -30,6 +32,7 @@ def process(inq, outq, ht):
 
     worker_count -= 1
 
+
 def write(outq, outfp):
     global worker_count
     while worker_count > 0 or not outq.empty():
@@ -41,11 +44,12 @@ def write(outq, outfp):
         for record in recordlist:
             outfp.write('>%s\n%s\n' % (record['name'], record['sequence']))
 
+
 def main():
     global done, worker_count
     done = False
     worker_count = 0
-    
+
     infile = sys.argv[1]
     outfile = infile + '.graphsize2'
 

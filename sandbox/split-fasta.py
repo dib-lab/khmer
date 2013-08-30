@@ -10,7 +10,7 @@ division = -1
 for n, record in enumerate(screed.open(filename)):
     if n % 100000 == 0:
         print '...', n
-        
+
     if n % size == 0:
         division += 1
         new_name = '%s.%04d.fa' % (prefix, division)

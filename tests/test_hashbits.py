@@ -479,3 +479,19 @@ def test_find_unpart_fail():
    ht.find_unpart(filename2, True, False)
    n, _ = ht.count_partitions()
    assert n == 49, n                    # only 49 sequences worth of tags
+
+def test_simple_median():
+    hi = khmer.new_hashbits(6, 1e6, 2)
+
+    (median, average, stddev) = hi.get_median_count("AAAAAA")
+    print median, average, stddev
+    assert median == 0
+    assert average == 0.0
+    assert stddev == 0.0
+
+    hi.consume("AAAAAA")
+    (median, average, stddev) = hi.get_median_count("AAAAAA")
+    print median, average, stddev
+    assert median == 1
+    assert average == 1.0
+    assert stddev == 0.0

@@ -1,17 +1,19 @@
 #! /usr/bin/env python
 import os
-import sys, time
+import sys
+import time
 import subprocess
 
-K=33
+K = 33
 
 localdir = os.path.dirname(__file__)
 localdir = os.path.abspath(localdir)
 
 # velveth %(filename)s.ass $K -short -paired %(filename)s
 
-#COMMAND="velvetg %(filename)s.ass -read_trkg yes -exp_cov 3 -cov_cutoff 0 -min_contig_lgth 1000"
-COMMAND="%%(localdir)s/velvet-assemble.sh %%(filename)s %d" % K
+# COMMAND="velvetg %(filename)s.ass -read_trkg yes -exp_cov 3 -cov_cutoff
+# 0 -min_contig_lgth 1000"
+COMMAND = "%%(localdir)s/velvet-assemble.sh %%(filename)s %d" % K
 
 
 N_PROCESSES = 8
@@ -46,7 +48,8 @@ while filenames or running:
             report_fp.write('\nOutput:\n%s\n---' % out)
             report_fp.write('\nError:\n%s\n---' % err)
 
-            print 'done! %d of ~%d' % (report_number + 1, report_number + len(running) + len(filenames))
+            print 'done! %d of ~%d' % (report_number + 1, report_number +
+                                       len(running) + len(filenames))
             report_number += 1
             running.remove((cmd, p))
         else:
@@ -55,3 +58,5 @@ while filenames or running:
     time.sleep(1)
 
 print '\n** done **\n'
+
+# vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

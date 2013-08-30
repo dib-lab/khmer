@@ -1,10 +1,11 @@
-import khmer, sys
+import khmer
+import sys
 import gc
 import glob
 
 K = 32
 
-subset_filenames=sys.argv[1:]
+subset_filenames = sys.argv[1:]
 
 ht = khmer.new_hashbits(K, 1, 1)
 for filename in subset_filenames:
@@ -19,5 +20,5 @@ for filename in subset_filenames:
     for (size, count) in dist:
         print size, count
     print '%d unassigned tags' % n_unassigned
-    
+
     print '--'

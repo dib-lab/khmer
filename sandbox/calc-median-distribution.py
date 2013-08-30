@@ -1,12 +1,15 @@
 #! /usr/bin/env python
-import sys, khmer
+import sys
+import khmer
 import argparse
 import os
 import screed
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Output k-mer abundance distribution.")
-    
+    parser = argparse.ArgumentParser(
+        description="Output k-mer abundance distribution.")
+
     parser.add_argument('hashname')
     parser.add_argument('seqfile')
     parser.add_argument('histout')

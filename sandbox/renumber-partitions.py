@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import sys
-import screed, gzip
+import screed
+import gzip
 import os.path
 
 next_partition = 2
@@ -12,7 +13,7 @@ for filename in sys.argv[1:]:
     old_to_new = {}
     for n, record in enumerate(screed.open(filename)):
         if n > 0 and n % 10000 == 0:
-           print '...', os.path.basename(filename), n
+            print '...', os.path.basename(filename), n
         partition = record.name.split()[-1]
         name = record.name.split()[0]
 

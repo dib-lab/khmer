@@ -13,11 +13,17 @@ For C++, let's use `Todd Hoff's coding standard
 <http://www.possibility.com/Cpp/CppCodingStandard.html>`__, and
 `astyle -A10 / "One True Brace Style"
 <http://astyle.sourceforge.net/astyle.html>`__ indentation and
-bracing.
+bracing.  Note: we need to find vi and emacs settings that work for this!
 
 For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ seems
 like a good standard to default to, and there are tools to check it,
 too.
+
+git and github strategies
+-------------------------
+
+Still in the works, but read `this
+<http://scottchacon.com/2011/08/31/github-flow.html>`__.
 
 Testing
 -------

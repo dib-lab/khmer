@@ -12,11 +12,14 @@ Example usage:
 Parameters to adjust: DESIRED_COVERAGE
 """
 
-import sys, screed, os
+import sys
+import screed
+import os
 import khmer
 import random
 
-DESIRED_COVERAGE=5
+DESIRED_COVERAGE = 5
+
 
 def main():
     ht_filename = sys.argv[1]
@@ -27,20 +30,20 @@ def main():
     ht.load(ht_filename)
 
     for record in screed.open(contig_filename):
-       seq = record.sequence.upper()
-       if 'N' in seq:
-          seq = seq.replace('N', 'G')
+        seq = record.sequence.upper()
+        if 'N' in seq:
+            seq = seq.replace('N', 'G')
 
-       med, _, _ = ht.get_median_count(seq)
+        med, _, _ = ht.get_median_count(seq)
 
-       if med > DESIRED_COVERAGE:
-           ratio = float(med) / float(DESIRED_COVERAGE)
-           ratio = ratio * 100.
-           if random.randrange(int(ratio)) > 100:
-               sys.stderr.write('SKIPPING %s\n' % record.name)
-               continue                 # ELIMINATE sequence
+        if med > DESIRED_COVERAGE:
+            ratio = float(med) / float(DESIRED_COVERAGE)
+            ratio = ratio * 100.
+            if random.randrange(int(ratio)) > 100:
+                sys.stderr.write('SKIPPING %s\n' % record.name)
+                continue                 # ELIMINATE sequence
 
-       print '>%s\n%s' % (record.name, record.sequence)
+        print '>%s\n%s' % (record.name, record.sequence)
 
 if __name__ == '__main__':
     main()

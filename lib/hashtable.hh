@@ -14,10 +14,12 @@
 
 #include "khmer.hh"
 #include "storage.hh"
+#include "read_parsers.hh"
 
 #define CALLBACK_PERIOD 100000
 
 namespace khmer {
+
   typedef unsigned int PartitionID;
   typedef std::set<HashIntoType> SeenSet;
   typedef std::set<PartitionID> PartitionSet;
@@ -31,6 +33,30 @@ namespace khmer {
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+
+  struct HashTablePerformanceMetrics : public IPerformanceMetrics
+  {
+	
+	enum
+	{
+	    MKEY_TIME_NORM_READ,
+	    MKEY_TIME_HASH_KMER,
+	    MKEY_TIME_UPDATE_TALLIES
+	};
+
+	uint64_t	clock_nsecs_norm_read;
+	uint64_t	cpu_nsecs_norm_read;
+	uint64_t	clock_nsecs_hash_kmer;
+	uint64_t	cpu_nsecs_hash_kmer;
+	uint64_t	clock_nsecs_update_tallies;
+	uint64_t	cpu_nsecs_update_tallies;
+
+		HashTablePerformanceMetrics( );
+	virtual ~HashTablePerformanceMetrics( );
+
+	virtual void	accumulate_timer_deltas( uint32_t metrics_key );
+
+  };
 
   //
   // Sequence iterator class, test.  Not really a C++ iterator yet.
@@ -56,6 +82,9 @@ namespace khmer {
 
       index = _ksize - 1;
       length = strlen(seq);
+      _kmer_f = 0;
+      _kmer_r = 0;
+
       initialized = false;
     }
 
@@ -108,19 +137,91 @@ namespace khmer {
     HashIntoType next() { return next(_kmer_f, _kmer_r); }
 
     bool done() { return index >= length; }
-  };
+  }; // class KMerIterator
+
 
   class Hashtable {		// Base class implementation of a Bloom ht.
+
   protected:
-    WordLength _ksize;
-    HashIntoType bitmask;
-    unsigned int _nbits_sub_1;
 
-    Hashtable(WordLength ksize) : _ksize(ksize) {
-      _init_bitstuff();
+    struct Hasher
+    {
+
+	uint32_t			pool_id;
+	uint32_t			thread_id;
+	HashTablePerformanceMetrics	pmetrics;
+	TraceLogger			trace_logger;
+
+	Hasher(
+	    uint32_t const  pool_id,
+	    uint32_t const  thread_id,
+	    uint8_t const   trace_level = TraceLogger:: TLVL_NONE
+	);
+	~Hasher( );
+
+    }; // struct Hasher
+    
+    uint8_t	    _trace_level;
+
+    uint32_t	    _number_of_threads;
+    uint32_t	    _tpool_map_spin_lock;
+    uint32_t	    _thread_pool_counter;
+    std:: map< int, uint32_t >
+		    _thread_pool_id_map;
+    std:: map< uint32_t, ThreadIDMap * >
+		    _thread_id_maps;
+    std:: map< uint32_t, Hasher ** >
+		    _hashers_map;
+    unsigned int    _max_count;
+    unsigned int    _max_bigcount;
+
+    WordLength	    _ksize;
+    HashIntoType    bitmask;
+    unsigned int    _nbits_sub_1;
+
+    Hashtable(
+	WordLength	ksize,
+	uint32_t const	number_of_threads   = 
+	get_active_config( ).get_number_of_threads( ),
+	uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
+    )
+    :	_trace_level( trace_level ),
+	_number_of_threads( number_of_threads ), 
+	_tpool_map_spin_lock( 0 ),
+	_thread_pool_counter( 0 ),
+	_max_count( MAX_COUNT - number_of_threads + 1 ),
+	_max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
+	_ksize( ksize )
+    { _init_bitstuff( ); }
+
+    virtual ~Hashtable( )
+    {
+	std:: map< int, uint32_t >:: iterator it;
+	uint32_t thread_pool_id;
+	Hasher ** hashers = NULL;
+
+	for (it = _thread_pool_id_map.begin( );
+	     it != _thread_pool_id_map.end( );
+	     ++it)
+	{
+	    thread_pool_id = it->second;
+
+	    delete _thread_id_maps[ thread_pool_id ];
+	    _thread_id_maps[ thread_pool_id ] = NULL;
+
+	    hashers = _hashers_map[ thread_pool_id ];
+	    for (uint32_t i = 0; i < _number_of_threads; ++i)
+	    {
+		if (NULL != hashers[ i ])
+		{
+		    delete hashers[ i ];
+		    hashers[ i ] = NULL;
+		}
+	    }
+	    delete [ ] hashers;
+	    _hashers_map[ thread_pool_id ] = NULL;
+	}
     }
-
-    virtual ~Hashtable() {}
 
     void _init_bitstuff() {
       bitmask = 0;
@@ -129,6 +230,55 @@ namespace khmer {
       }
       _nbits_sub_1 = (_ksize*2 - 2);
     }
+
+
+    inline Hasher   &_get_hasher( int uuid = 0 )
+    {
+	std:: map< int, uint32_t >:: iterator	match;	
+	uint32_t				thread_pool_id;
+	ThreadIDMap *				thread_id_map	= NULL;
+	uint32_t				thread_id;
+	Hasher **				hashers		= NULL;
+	Hasher *				hasher_PTR	= NULL;
+	
+	while (!__sync_bool_compare_and_swap( &_tpool_map_spin_lock, 0, 1 ));
+	
+	match = _thread_pool_id_map.find( uuid );
+	if (match == _thread_pool_id_map.end( ))
+	{
+
+	    // TODO: Handle 'std:: bad_alloc' exceptions.
+	    thread_pool_id			= _thread_pool_counter++;
+	    _thread_pool_id_map[ uuid ]		= thread_pool_id;
+	    _thread_id_maps[ thread_pool_id ]	=
+	    new ThreadIDMap( _number_of_threads );
+	    _hashers_map[ thread_pool_id ]	=
+	    new Hasher *[ _number_of_threads ];
+	    hashers				=
+	    _hashers_map[ thread_pool_id ];
+	    for (uint32_t i = 0; i < _number_of_threads; ++i)
+		hashers[ i ] = NULL;
+
+	    match = _thread_pool_id_map.find( uuid );
+	} // no thread pool for UUID
+
+	__sync_bool_compare_and_swap( &_tpool_map_spin_lock, 1, 0 );
+
+	thread_pool_id	    = match->second;
+	thread_id_map	    = _thread_id_maps[ thread_pool_id ];
+	thread_id	    = thread_id_map->get_thread_id( );
+	hashers		    = _hashers_map[ thread_pool_id ];
+	hasher_PTR	    = hashers[ thread_id ];
+	if (NULL == hasher_PTR)
+	{
+	    hashers[ thread_id ]    =
+	    new Hasher( thread_pool_id, thread_id, _trace_level );
+	    hasher_PTR		    = hashers[ thread_id ];
+	}
+
+	return *hasher_PTR;
+    }
+
 
     HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const {
       // left-shift the previous hash over
@@ -168,28 +318,45 @@ namespace khmer {
 				HashIntoType upper_bound = 0);
     
     // checks each read for non-ACGT characters
-    bool check_read(const std::string &read) const;
+    bool check_and_normalize_read(std::string &read) const;
 
     // check each read for non-ACGT characters, and then consume it.
-    unsigned int check_and_process_read(const std::string &read,
+    unsigned int check_and_process_read(std::string &read,
 					bool &is_valid,
 					HashIntoType lower_bound = 0,
 					HashIntoType upper_bound = 0);
     
-    // count every k-mer in the FASTA file.
-    void consume_fasta(const std::string &filename,
-		       unsigned int &total_reads,
-		       unsigned long long &n_consumed,
-		       HashIntoType lower_bound = 0,
-		       HashIntoType upper_bound = 0,
-		       ReadMaskTable ** readmask = NULL,
-		       bool update_readmask = true,
-		       CallbackFn callback = NULL,
-		       void * callback_data = NULL);
-  };
-
+    // Count every k-mer in a FASTA or FASTQ file.
+    // Note: Yes, the name 'comsume_fasta' is a bit misleading, 
+    //	     but the FASTA format is effectively a subset of the FASTQ format
+    //	     and the FASTA portion is what we care about in this case.
+    void consume_fasta(
+	std::string const   &filename,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	HashIntoType	    lower_bound	    = 0,
+	HashIntoType	    upper_bound	    = 0,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads, 
+    // using the supplied parser.
+    void consume_fasta(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	HashIntoType	    lower_bound	    = 0,
+	HashIntoType	    upper_bound	    = 0,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
 			  
+    void get_median_count(const std::string &s,
+			  BoundedCounterType &median,
+			  float &average,
+			  float &stddev);
 
+  };
 };
 
 #endif // HASHTABLE_HH
