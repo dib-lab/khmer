@@ -3,12 +3,32 @@
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-#
+# 
+"""
+Take two files containing left & right reads from a paired-end sequencing run,
+and interleave them.
+
+% scripts/interleave-reads.py <R1> <R2> [ -o <outputfile> ]
+
+By default, output is sent to stdout; or use -o. Use '-h' for parameter help.
+"""
+
+#TODO: take fa as well?
+#      support gzip option?
+
 import screed
 import sys
 import itertools
 import os
 import argparse
+
+def output_pair(r1, r2):
+    if hasattr(r1, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
+            (r1.name, r1.sequence, r1.accuracy,
+             r2.name, r2.sequence, r2.accuracy)
+    else:
+        return ">%s\n%s\n>%s\n%s\n" % (r1.name, r1.sequence, r2.name, r2.sequence)
 
 def main():
     parser = argparse.ArgumentParser(\
@@ -56,12 +76,11 @@ def main():
 
         assert name1[:-2] == name2[:-2], "This doesn't look like paired data! %s %s" % (name1, name2)
 
-        print >>args.output, '@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s' % (name1,
-                                                                 r1.sequence,
-                                                                 r1.accuracy,
-                                                                 name2,
-                                                                 r2.sequence,
-                                                                 r2.accuracy)
+        r1.name = name1
+        r2.name = name2
+        args.output.write(output_pair(r1, r2))
+
+    print >>sys.stderr, 'final: interleaved %d pairs' % n
 
 if __name__ == '__main__':
     main()

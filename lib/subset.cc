@@ -819,7 +819,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     // _merge_from_disk_consolidate(diskp_to_pp);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 // Save a partition map to disk.
@@ -879,7 +879,7 @@ void SubsetPartition::save_partitionmap(string pmap_filename)
   }
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 // Load a partition map from disk.
@@ -1167,10 +1167,12 @@ void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
     find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags, true, false);
 
     // only join things already in bigtags.
-    for (SeenSet::iterator ssi = tagged_kmers.begin();
-	 ssi != tagged_kmers.end(); ssi++) {
+    SeenSet::iterator ssi = tagged_kmers.begin();
+    while (ssi != tagged_kmers.end()) {
       if (!set_contains(partition_tags, *ssi)) {
-	tagged_kmers.erase(ssi);
+	tagged_kmers.erase(ssi++);
+      } else {
+        ++ssi;
       }
     }
     // std::cout << "joining: " << tagged_kmers.size() << "\n";

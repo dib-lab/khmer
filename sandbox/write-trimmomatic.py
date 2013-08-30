@@ -16,7 +16,7 @@ for r1 in filelist:
 mkdir trim
 cd trim
 java -jar /usr/local/bin/trimmomatic-0.27.jar PE ../%s ../%s s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
-python /usr/local/share/khmer/sandbox/interleave.py s1_pe s2_pe | gzip -9c > ../%s
+/usr/local/share/khmer/scripts/interleave-reads.py s1_pe s2_pe | gzip -9c > ../%s
 
 cat s1_se s2_se | gzip -9c > ../%s
 cd ..
