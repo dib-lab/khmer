@@ -1,8 +1,4 @@
-#
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-#
+#!python
 """Bootstrap distribute installation
 
 If you want to use setuptools in your package's setup.py, just include this
