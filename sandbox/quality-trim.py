@@ -1,11 +1,16 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 
 import sys
 import screed
 import gzip
 
 # python quality-trim.py <input fastq file> <output filtered fastq file>
-# MINLENGTH is the minimum lenth of read desired.  NCALLS is the
+# MINLENGTH is the minimum length of read desired.  NCALLS is the
 # percentage of a read with 'N' base calls for which if read has greater,
 # it will be removed.
 

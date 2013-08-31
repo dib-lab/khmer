@@ -19,7 +19,7 @@ source of reads from which to extract k-mers.
 
 The read parsers and the layers under them can be controlled via global
 configuration objects, which provide default values during their instantiation.
-In many cases, these default values can also be overriden by supplying
+In many cases, these default values can also be overridden by supplying
 pertinent arguments to the constructors. Only one global configuration object
 is considered active at a given time; but, a singleton pattern is not enforced
 and more than one may be available to supply alternative configurations.
@@ -105,8 +105,8 @@ Trace Loggers
 
 Trace loggers can log execution traces and other useful debugging information
 to files on a per-thread basis. This makes them very useful for debugging
-multi-threaded code, especially in the absence of advanced commerical
-debuggers, such as DDT or TotalView. Trace loggers are contolled via several
+multi-threaded code, especially in the absence of advanced commercial
+debuggers, such as DDT or TotalView. Trace loggers are controlled via several
 user-configurable variables in the top-level makefile. As of this writing,
 these variables are ``WITH_INTERNAL_TRACING``, ``TRACE_STATE_CHANGES``,
 ``TRACE_BUSYWAITS``, ``TRACE_SPINLOCKS``, ``TRACE_MEMCOPIES``, and
@@ -444,7 +444,7 @@ performed. However, the bookkeeping was quite complicated and after several
 bugs slipped through the cracks, the setaside buffer logic was converted to
 copyaside buffers. The cost of the memory copies is essentially nothing in the
 typical use cases encountered by the software. Copyaside buffers are also much
-more amenable to asychronous refilling of cache segments, should that be
+more amenable to asynchronous refilling of cache segments, should that be
 supported at a later point.
 
 .. todo::
@@ -463,7 +463,7 @@ The Python wrapper exposes an interface to reads.
 
 .. py:class:: Read
 
-The data members are accessed as properties. These mimick the access keys for
+The data members are accessed as properties. These mimic the access keys for
 ``screed`` records.
 
 .. py:attribute:: Read.name
@@ -504,7 +504,7 @@ within a namespace which encapsulates most classes in the
 
 .. cpp:class:: FastqParser
 
-An instance of the appropriate sublcass is created via a factory method
+An instance of the appropriate subclass is created via a factory method
 provided by the abstract class. This method infers the correct subclass
 instance to create based on file name extension. The file name is required but
 the other arguments are optional. If the other arguments are supplied, then
