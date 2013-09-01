@@ -171,11 +171,6 @@ namespace khmer {
       return min_count;
     }
 
-    MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
-				      unsigned long long total_reads,
-				      CallbackFn callback = NULL,
-				      void * callback_data = NULL);
-
     void output_fasta_kmer_pos_freq(const std::string &inputfile,
                                     const std::string &outputfile);
 

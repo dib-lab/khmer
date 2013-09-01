@@ -1334,43 +1334,6 @@ typedef struct {
   Aligner * aligner;
 } khmer_ReadAlignerObject;
 
-typedef struct {
-  PyObject_HEAD
-  khmer::MinMaxTable * mmt;
-} khmer_MinMaxObject;
-
-
-#define is_minmax_obj(v)  ((v)->ob_type == &khmer_MinMaxType)
-
-static void khmer_minmax_dealloc(PyObject* self);
-static PyObject * khmer_minmax_getattr(PyObject *, char *);
-
-static PyTypeObject khmer_MinMaxType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "MinMax", sizeof(khmer_MinMaxObject),
-    0,
-    khmer_minmax_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_minmax_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "minmax object",           /* tp_doc */
-};
-
-
-
 static void khmer_counting_dealloc(PyObject *);
 
 static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
@@ -1469,36 +1432,6 @@ static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *arg
   counting->output_fasta_kmer_pos_freq(infile, outfile);
 
   return PyInt_FromLong(0);
-}
-
-static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  char * filename;
-  unsigned int total_reads;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "si|O", &filename, &total_reads,
-			&callback_obj)) {
-    return NULL;
-  }
-
-  khmer::MinMaxTable * mmt;
-  try {
-    mmt = counting->fasta_file_to_minmax(filename, total_reads, 
-					  _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-  
-  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
-    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
-
-  minmax_obj->mmt = mmt;
-
-  return (PyObject *) minmax_obj;
 }
 
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
@@ -2084,7 +2017,6 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
     METH_VARARGS, "Count all k-mers using a given reads parser" },
-  { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
@@ -4141,211 +4073,6 @@ static void khmer_hashbits_dealloc(PyObject* self)
   PyObject_Del((PyObject *) obj);
 }
 
-//
-// MinMaxTable object
-//
-
-static PyObject * minmax_clear(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  mmt->clear(index);
-  
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_get_min(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  unsigned int val = mmt->get_min(index);
-
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_get_max(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  unsigned int val = mmt->get_max(index);
-
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_add_min(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-  unsigned int val;
-
-  if (!PyArg_ParseTuple(args, "II", &index, &val)) {
-    return NULL;
-  }
-
-  val = mmt->add_min(index, val);
-  
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_add_max(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-  unsigned int val;
-
-  if (!PyArg_ParseTuple(args, "II", &index, &val)) {
-    return NULL;
-  }
-
-  val = mmt->add_max(index, val);
-  
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_merge(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  PyObject * other_py_obj;
-
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  if (!PyArg_ParseTuple(args, "O", &other_py_obj)) {
-    return NULL;
-  }
-
-  khmer_MinMaxObject * other = (khmer_MinMaxObject *) other_py_obj;
-
-  mmt->merge(*(other->mmt));
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_save(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-
-  khmer::MinMaxTable * mmt = me->mmt;
-  char * filename;
-
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-  }
-
-  mmt->save(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_load(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-
-  khmer::MinMaxTable * mmt = me->mmt;
-  char * filename;
-
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-  }
-
-  mmt->load(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_tablesize(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(mmt->get_tablesize());
-}
-
-static PyMethodDef khmer_minmax_methods[] = {
-  { "tablesize", minmax_tablesize, METH_VARARGS, "" },
-  { "get_min", minmax_get_min, METH_VARARGS, "" },
-  { "get_max", minmax_get_max, METH_VARARGS, "" },
-  { "add_min", minmax_add_min, METH_VARARGS, "" },
-  { "add_max", minmax_add_max, METH_VARARGS, "" },
-  { "clear", minmax_clear, METH_VARARGS, "" },
-  { "merge", minmax_merge, METH_VARARGS, "" },
-  { "load", minmax_load, METH_VARARGS, "" },
-  { "save", minmax_save, METH_VARARGS, "" },
-  {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static PyObject *
-khmer_minmax_getattr(PyObject * obj, char * name)
-{
-  return Py_FindMethod(khmer_minmax_methods, obj, name);
-}
-
-//
-// new_minmax
-//
-
-static PyObject* new_minmax(PyObject * self, PyObject * args)
-{
-  unsigned int size = 0;
-
-  if (!PyArg_ParseTuple(args, "I", &size)) {
-    return NULL;
-  }
-
-  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
-    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
-
-  minmax_obj->mmt = new khmer::MinMaxTable(size);
-
-  return (PyObject *) minmax_obj;
-}
-
-//
-// khmer_minmax_dealloc -- clean up a minmax object.
-//
-
-static void khmer_minmax_dealloc(PyObject* self)
-{
-  khmer_MinMaxObject * obj = (khmer_MinMaxObject *) self;
-  delete obj->mmt;
-  obj->mmt = NULL;
-  
-  PyObject_Del((PyObject *) obj);
-}
-
-
 //////////////////////////////
 // standalone functions
 
@@ -4445,8 +4172,6 @@ static PyMethodDef KhmerMethods[] = {
       METH_VARARGS,		"Create an empty counting hash" },
     { "_new_hashbits",		_new_hashbits,
       METH_VARARGS,		"Create an empty hashbits table" },
-    { "new_minmax",		new_minmax,
-      METH_VARARGS,		"Create a new min/max value table" },
     { "new_readaligner",        new_readaligner,
       METH_VARARGS,             "Create a read aligner object" },
     { "forward_hash",		forward_hash,
