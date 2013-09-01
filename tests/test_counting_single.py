@@ -322,18 +322,6 @@ class Test_ConsumeString(object):
         count = self.kh.get_min_count('AAAA')
         assert count == 1
         
-    def test_min_count_in_bound(self):
-        self.kh.consume('AAAA')
-
-        count = self.kh.get_min_count('AAAAA', 0, 1)
-        assert count == 1
-        
-    def test_min_count_out_bound(self):
-        self.kh.consume('AAAA')
-
-        count = self.kh.get_min_count('AAAAA', 1, 4**4)
-        assert count == MAX_COUNT
-
     def test_max_count(self):
         self.kh.consume('AAAA')
 

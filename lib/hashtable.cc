@@ -85,9 +85,7 @@ Hashtable:: Hasher::
 //
 
 unsigned int Hashtable::check_and_process_read(std::string &read,
-					    bool &is_valid,
-                                            HashIntoType lower_bound,
-                                            HashIntoType upper_bound)
+					       bool &is_valid)
 {
    is_valid = check_and_normalize_read(read);
 
@@ -148,7 +146,6 @@ Hashtable::
 consume_fasta(
   std:: string const  &filename,
   unsigned int	      &total_reads, unsigned long long	&n_consumed,
-  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
   CallbackFn	      callback,	    void *		callback_data
 )
 {
@@ -164,7 +161,6 @@ consume_fasta(
   consume_fasta(
     parser, 
     total_reads, n_consumed, 
-    lower_bound, upper_bound, 
     callback, callback_data
   );
 
@@ -176,7 +172,6 @@ Hashtable::
 consume_fasta(
   read_parsers:: IParser *  parser,
   unsigned int		    &total_reads, unsigned long long  &n_consumed,
-  HashIntoType		    lower_bound,  HashIntoType	      upper_bound,
   CallbackFn		    callback,	  void *	      callback_data
 )
 {

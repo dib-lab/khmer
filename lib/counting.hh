@@ -179,13 +179,9 @@ namespace khmer {
     void output_fasta_kmer_pos_freq(const std::string &inputfile,
                                     const std::string &outputfile);
 
-    BoundedCounterType get_min_count(const std::string &s,
-				     HashIntoType lower_bound = 0,
-				     HashIntoType upper_bound = 0);
+    BoundedCounterType get_min_count(const std::string &s);
 				     
-    BoundedCounterType get_max_count(const std::string &s,
-				     HashIntoType lower_bound = 0,
-				     HashIntoType upper_bound = 0);
+    BoundedCounterType get_max_count(const std::string &s);
 
     void get_kadian_count(const std::string &s,
 			  BoundedCounterType &kadian,
