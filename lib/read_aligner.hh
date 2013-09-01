@@ -1,5 +1,14 @@
 /*
   This line intentionally left blank to bother mr-c
+
+  TODO:
+  - Free allocated memory
+    - subalign will have to return an alignment object
+    - or take an alignment object to fill out (*)
+  - Document python return tuple (named tuple?)
+  - Decide whether probabilities should be modifible without recompiling
+  - Implement trusted kmer detection (cutoff vs probability)
+  - Model error vs trusted kmers
  */
 
 #ifndef READ_ALIGNER_HH
