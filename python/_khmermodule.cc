@@ -1507,11 +1507,10 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   khmer::CountingHash * counting  = me->counting;
 
   char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(
-    args, "s|iiO", &filename, &lower_bound, &upper_bound, &callback_obj
+    args, "s|O", &filename, &callback_obj
   )) {
       return NULL;
   }
@@ -1521,7 +1520,6 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   unsigned int	      total_reads   = 0;
   try {
     counting->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -1538,11 +1536,10 @@ static PyObject * hash_consume_fasta_with_reads_parser(
   khmer::CountingHash * counting  = me->counting;
 
   PyObject * rparser_obj = NULL;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(
-    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
+    args, "O|O", &rparser_obj, &callback_obj
   )) {
       return NULL;
   }
@@ -1557,7 +1554,6 @@ static PyObject * hash_consume_fasta_with_reads_parser(
   Py_BEGIN_ALLOW_THREADS
   try {
     counting->consume_fasta(rparser, total_reads, n_consumed,
-			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     exc_raised = true;
@@ -1627,11 +1623,10 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting = me->counting;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
 
@@ -1641,9 +1636,7 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::BoundedCounterType c = counting->get_min_count(long_str,
-							 lower_bound,
-							 upper_bound);
+  khmer::BoundedCounterType c = counting->get_min_count(long_str);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
@@ -1653,11 +1646,10 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting = me->counting;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
 
@@ -1667,9 +1659,7 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::BoundedCounterType c = counting->get_max_count(long_str,
-							 lower_bound,
-							 upper_bound);
+  khmer::BoundedCounterType c = counting->get_max_count(long_str);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
@@ -2226,11 +2216,10 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
   khmer_KHashbitsObject * ht2_argu;
   char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
   khmer::Hashbits * ht2;
 
-  if (!PyArg_ParseTuple(args, "sO|iiO", &filename, &ht2_argu,&lower_bound, &upper_bound,
+  if (!PyArg_ParseTuple(args, "sO|O", &filename, &ht2_argu,
 			&callback_obj)) {
     return NULL;
   }
@@ -2245,7 +2234,7 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
 
   try {
     hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed,
-			     lower_bound, upper_bound, _report_fn, callback_obj);
+				    _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -2322,9 +2311,8 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * long_str;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
   
@@ -2760,11 +2748,9 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
     return NULL;
   }
 
@@ -2775,7 +2761,6 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
   try {
     hashbits->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -2792,12 +2777,10 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
   khmer::Hashbits * hashbits = me->hashbits;
 
   PyObject * rparser_obj = NULL;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(
-    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
-  )) {
+    args, "O|O", &rparser_obj, &callback_obj)) {
       return NULL;
   }
 
@@ -2811,7 +2794,6 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
   Py_BEGIN_ALLOW_THREADS
   try {
     hashbits->consume_fasta(rparser, total_reads, n_consumed,
-			    lower_bound, upper_bound, 
 			    _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     exc_raised = true;
