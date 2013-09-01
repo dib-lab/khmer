@@ -313,9 +313,11 @@ namespace khmer {
     virtual void load(std::string) = 0;
 
     // count every k-mer in the string.
-    unsigned int consume_string(const std::string &s,
-				HashIntoType lower_bound = 0,
-				HashIntoType upper_bound = 0);
+    unsigned int consume_string(const std::string &s);
+    
+    // count every k-mer in the string.
+    unsigned int consume_high_abund_kmers(const std::string &s,
+					  BoundedCounterType min_count);
     
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
