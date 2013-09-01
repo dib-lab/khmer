@@ -72,7 +72,7 @@ There are also some counting functions:
    string or hashval.
 
 In all of the cases above, 'kmer' is an L-length string, 'hashval' is
-a non-negative integer, and 'sequence' is a DNA sequence containg ONLY
+a non-negative integer, and 'sequence' is a DNA sequence containing ONLY
 A/C/G/T.
 
 **Note:** 'N' is not a legal DNA character as far as khmer is concerned!

@@ -274,7 +274,7 @@ def _rename_path(path):
 
 def _remove_flat_installation(placeholder):
     if not os.path.isdir(placeholder):
-        log.warn('Unkown installation at %s', placeholder)
+        log.warn('Unknown installation at %s', placeholder)
         return False
     found = False
     for file in os.listdir(placeholder):
@@ -420,7 +420,7 @@ def _fake_setuptools():
     setuptools_location = setuptools_dist.location
     log.warn('Setuptools installation detected at %s', setuptools_location)
 
-    # if --root or --preix was provided, and if
+    # if --root or --prefix was provided, and if
     # setuptools is not located in them, we don't patch it
     if not _under_prefix(setuptools_location):
         log.warn('Not patching, --root or --prefix is installing Distribute'
