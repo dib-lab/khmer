@@ -1574,9 +1574,8 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * long_str;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
   
@@ -1587,7 +1586,39 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   }
 
   unsigned int n_consumed;
-  n_consumed = counting->consume_string(long_str, lower_bound, upper_bound);
+  n_consumed = counting->consume_string(long_str);
+
+  return PyInt_FromLong(n_consumed);
+}
+
+static PyObject * hash_consume_high_abund_kmers(PyObject * self,
+						PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * long_str;
+  unsigned int min_count;
+
+  if (!PyArg_ParseTuple(args, "sI", &long_str, &min_count)) {
+    return NULL;
+  }
+  
+  if (strlen(long_str) < counting->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  if (min_count > MAX_COUNT) {
+    PyErr_SetString(PyExc_ValueError,
+		    "min count specified is > maximum possible count");
+    return NULL;
+  }
+
+  unsigned int n_consumed;
+  n_consumed = counting->consume_high_abund_kmers(long_str,
+					     (BoundedCounterType) min_count);
 
   return PyInt_FromLong(n_consumed);
 }
@@ -2059,6 +2090,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "consume_high_abund_kmers", hash_consume_high_abund_kmers, METH_VARARGS, "Count all k-mers in the given string with abund >= min specified" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
     METH_VARARGS, "Count all k-mers using a given reads parser" },
@@ -2303,7 +2335,7 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
   }
 
   unsigned int n_consumed;
-  n_consumed = hashbits->consume_string(long_str, lower_bound, upper_bound);
+  n_consumed = hashbits->consume_string(long_str);
 
   return PyInt_FromLong(n_consumed);
 }
