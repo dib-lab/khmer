@@ -2,10 +2,34 @@
 khmer's command-line interface
 ==============================
 
-For -x and -N parameters, see :doc:`choosing-hash-sizes`.
+The simplest way to use khmer's functionality is through the command
+line scripts, located in the scripts/ directory of the khmer
+distribution.  Below is our documentation for these scripts.  Note
+that all scripts can be given '-h' as an option, which will print out
+a list of arguments taken by that script.
 
-k-mer counting
-==============
+Many scripts take '-x' and '-N' parameters, which drive khmer's memory usage.
+These parameters depend on details of your data set; for more information
+on how to choose them, see :doc:`choosing-hash-sizes`.
+
+1. :ref:`scripts-counting`
+2. :ref:`scripts-partitioning`
+3. :ref:`scripts-diginorm`
+4. :ref:`scripts-read-handling`
+
+.. note::
+ 
+   Almost all scripts take in either FASTA and FASTQ format, and
+   output the same.  Some scripts may only recognize FASTQ if the file
+   ending is '.fq' or '.fastq', at least for now.
+
+   Files ending with '.gz' will be treated as gzipped files, and
+   files ending with '.bz2' will be treated as bzip2'd files.
+
+.. _scripts-counting:
+
+k-mer counting and abundance filtering
+======================================
 
 **load-into-counting.py**: build a counting hash.
 
@@ -144,8 +168,7 @@ k-mer counting
    unique k-mers in the two datasets seperately and the number of overlap k-mers
    appearing in both datasets..
 
-
-"""
+.. _scripts-partitioning:
 
 Partitioning
 ============
@@ -283,6 +306,8 @@ highly-connected k-mers (HCKs).  See :doc:`partitioning-big-data`.
    or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
    <fileN>.stopfilt.
 
+.. _scripts-diginorm:
+
 Digital normalization
 =====================
 
@@ -297,13 +322,17 @@ redundant sequences)
    abundance lies above a specified cutoff.  Kept sequences will be
    placed in <fileN>.keep.
 
-   Paired end reads can be considered together if the ``-p`` flag is set.
+   Paired end reads will be considered together if the ``-p`` flag is
+   set.  If either read will be kept, then both will be kept.  This
+   should result in keeping (or discarding) each sequencing
+   fragment. This helps with retention of repeats, especially.
 
-   With the ``-s`` option, the counting hash will be saved to the
+   With the ``-s/--savehash`` option, the counting hash will be saved to the
    specified file after all sequences have been processed. With ``-d``,
    the counting hash will be saved every d files for multifile runs;
    if ``-s`` is set, the specified name will be used, and if not,
-   the name backup.ht will be used.
+   the name backup.ht will be used. ``-l/--loadhash`` will load the specified
+   hash.
 
    The ``-f`` flag will force the program to continue upon encountering
    a formatting error in a sequence file; the counting hash up to that
@@ -324,3 +353,66 @@ redundant sequences)
    Example::
 
         scripts/normalize-by-median.py -k 17 -d 2 -s test.ht tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads.fq
+
+.. _scripts-read-handling:
+
+Read handling: interleaving, splitting, etc.
+============================================
+
+**extract-paired-reads.py:** take an interleaved file with some orphan reads,
+and separate paired from orphans.
+
+   Usage::
+
+      extract-paired-reads.py <input file>
+
+   The output is two files, <input file>.pe and <input file>.se,
+   placed in the current directory.  The .pe file contains interleaved
+   and properly paired sequences, while the .se file contains orphan
+   sequences.
+
+   Many assemblers (e.g. Velvet) require that you give them either
+   perfectly interleaved files, or files containing only single reads.
+   This script takes files that were originally interleaved but where
+   reads may have been orphaned via error filtering, application of
+   abundance filtering, digital normalization in non-paired mode, or
+   partitioning.  
+
+   Example::
+
+      scripts/extract-paired-reads.py tests/test-data/paired.fq
+
+**interleave-reads.py:** take left (/1) and right (/2) reads, and interleave them.
+
+   Usage::
+
+      interleave-reads.py <R1> <R2> [ -o output ]
+
+   The output is an interleaved set of reads, with each read in <R1> paired
+   with a read in <R2>. By default, the output goes to stdout unless
+   '-o' is specified.
+
+   As a "bonus", this file ensures that read names are formatted in a
+   consistent way, such that they look like the latest Casava format
+   (@name/1, @name/2).
+
+   Example::
+
+      scripts/interleave-reads.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq
+
+**split-paired-reads.py:** split interleaved read files into two files, one left and one right.
+
+   Usage::
+
+      split-paired-reads.py <file>
+
+   The output is placed in <file>.1 and <file>.2.
+
+   Some programs want paired-end read input in the One True Format,
+   which is interleaved; other programs want input in Insanely Bad
+   Format, with left- and right- reads separated.  This reformats the
+   former to the latter.
+
+   Example::
+
+      scripts/split-paired-reads.py tests/test-data/paired.fq
