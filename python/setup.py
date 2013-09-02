@@ -40,7 +40,7 @@ extra_objs.extend( map(
     ]
 ) )
 
-build_depends = extra_objs
+build_depends = list(extra_objs)
 build_depends.extend( map(
     lambda bn: path_join( path_pardir, "lib", bn + ".hh" ),
     [
