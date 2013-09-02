@@ -371,3 +371,45 @@ def test_small_real_partitions():
     assert set(parts) != set(['0'])
 
 test_small_real_partitions.runme = True
+
+a = """\
+CAGACTTGGAAGCTGAGAGTCCGACGTCACTGCCTCAACTCGCGCAAATGTTCCCGCCAA\
+ATTGTATCCTAGGGATCTTCCATAAGCTTATATACGGGGGTTTCCAAGGCCCTGATGCCA\
+GTGCCTAATCTTTTGGAGTCCTCTCAGGGCCACTAGATGCCATGCTACGCGTCCCAGGTT\
+GGCCTGAGGGTCTACACGGAGTGGGAAGCATGGGTACCTTAGCGAACATTCATACTGGCC\
+TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
+"""
+
+b = """\
+TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
+GACTGTAGACTTGAACCTCGATGGAATGCAGGTCCCATTCTCTGGCCTGACTCATGGAAC\
+CGAGGCCAAAAAAGCATGGCACGAAGACGCTATGCGAGGGTGCTCGCCCATGTCGTCGCC\
+GTACCACGACAGATTTATACAATGCGTTTCTACAGGCCCCATTGGGAACAAACAAAAAGT\
+CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
+"""
+
+def test_partition_on_abundance_1():
+    print (a,)
+    print (b,)
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+        
+    for i in range(10):
+        print kh.consume_and_tag(b)
+
+    p = kh.do_subset_partition_with_abundance(10, 50)
+    print kh.subset_count_partitions(p)
+    assert 0
+
+def test_partition_on_abundance_2():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+        
+    for i in range(5):
+        print kh.consume_and_tag(b)
+
+    p = kh.do_subset_partition_with_abundance(10, 50)
+    print kh.subset_count_partitions(p)
+    assert 0

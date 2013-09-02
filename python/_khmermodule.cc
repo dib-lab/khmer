@@ -1289,6 +1289,18 @@ static PyObject * ktable_intersect(PyObject * self, PyObject * args)
 // KCountingHash object
 //
 
+void free_pre_partition_info(void * p)
+{
+  _pre_partition_info * ppi = (_pre_partition_info *) p;
+  delete ppi;
+}
+
+void free_subset_partition_info(void * p)
+{
+  khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
+  delete subset_p;
+}
+
 typedef struct {
   PyObject_HEAD
   khmer::CountingHash * counting;
@@ -2020,6 +2032,159 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
 static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
 						    PyObject * args);
 
+static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * seq;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &seq)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed = 0;
+  try {
+    // @CTB needs to normalize
+    counting->consume_sequence_and_tag(seq, n_consumed);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("L", n_consumed);
+}
+
+static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    counting->consume_fasta_and_tag(filename, total_reads, n_consumed,
+				    _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
+}
+
+static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self, PyObject *args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * kmer_s = NULL;
+  unsigned int min_count, max_count;
+
+  if (!PyArg_ParseTuple(args, "sii", &kmer_s, &min_count, &max_count)) {
+    return NULL;
+  }
+
+  if (strlen(kmer_s) < counting->ksize()) { // @@
+    return NULL;
+  }
+
+  _pre_partition_info * ppi = NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+
+    khmer::HashIntoType kmer, kmer_f, kmer_r;
+    kmer = khmer::_hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
+
+    ppi = new _pre_partition_info(kmer);
+    counting->partition->find_all_tags_truncate_on_abundance(kmer_f, kmer_r,
+							     ppi->tagged_kmers,
+							     counting->all_tags,
+							     min_count,
+							     max_count);
+    counting->add_kmer_to_tags(kmer);
+
+  Py_END_ALLOW_THREADS
+
+  return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
+}
+
+static PyObject * hash_do_subset_partition_with_abundance(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  PyObject * callback_obj = NULL;
+  khmer::HashIntoType start_kmer = 0, end_kmer = 0;
+  PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
+  unsigned int min_count, max_count;
+
+  if (!PyArg_ParseTuple(args, "ii|KKOOO",
+			&min_count, &max_count,
+			&start_kmer, &end_kmer,
+			&break_on_stop_tags_o,
+			&stop_big_traversals_o,
+			&callback_obj)) {
+    return NULL;
+  }
+
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
+  }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
+
+  khmer::SubsetPartition * subset_p = NULL;
+  try {
+    Py_BEGIN_ALLOW_THREADS
+    subset_p = new khmer::SubsetPartition(counting);
+    subset_p->do_partition_with_abundance(start_kmer, end_kmer,
+					  min_count, max_count,
+					  break_on_stop_tags,
+					  stop_big_traversals,
+					  _report_fn, callback_obj);
+    Py_END_ALLOW_THREADS
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+}
+
+
+static PyObject * hash_subset_count_partitions(PyObject * self,
+					       PyObject * args)
+{
+  PyObject * subset_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    return NULL;
+  }
+  
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  unsigned int n_partitions = 0, n_unassigned = 0;
+  subset_p->count_partitions(n_partitions, n_unassigned);
+
+  return Py_BuildValue("ii", n_partitions, n_unassigned);
+}
+
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
@@ -2051,6 +2216,11 @@ static PyMethodDef khmer_counting_methods[] = {
   { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
   { "collect_high_abundance_kmers", hash_collect_high_abundance_kmers,
     METH_VARARGS, "" },
+  { "consume_and_tag", hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
+  { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
+  { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
+  { "subset_count_partitions", hash_subset_count_partitions, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -2516,12 +2686,6 @@ static PyObject * hashbits_identify_stoptags_by_position(PyObject * self, PyObje
   return x;
 }
 
-void free_subset_partition_info(void * p)
-{
-  khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
-  delete subset_p;
-}
-
 static PyObject * hashbits_do_subset_partition(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2832,12 +2996,6 @@ static PyObject * hashbits_consume_partitioned_fasta(PyObject * self, PyObject *
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
-void free_pre_partition_info(void * p)
-{
-  _pre_partition_info * ppi = (_pre_partition_info *) p;
-  delete ppi;
-}
-
 static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3129,24 +3287,6 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
   
   unsigned int n_partitions = 0, n_unassigned = 0;
   hashbits->partition->count_partitions(n_partitions, n_unassigned);
-
-  return Py_BuildValue("ii", n_partitions, n_unassigned);
-}
-
-static PyObject * hashbits_subset_count_partitions(PyObject * self,
-					       PyObject * args)
-{
-  PyObject * subset_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
-    return NULL;
-  }
-  
-  khmer::SubsetPartition * subset_p;
-  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
-
-  unsigned int n_partitions = 0, n_unassigned = 0;
-  subset_p->count_partitions(n_partitions, n_unassigned);
 
   return Py_BuildValue("ii", n_partitions, n_unassigned);
 }
@@ -3707,7 +3847,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "merge_subset", hashbits_merge_subset, METH_VARARGS, "" },
   { "merge_subset_from_disk", hashbits_merge_from_disk, METH_VARARGS, "" },
   { "count_partitions", hashbits_count_partitions, METH_VARARGS, "" },
-  { "subset_count_partitions", hashbits_subset_count_partitions, METH_VARARGS, "" },
+  { "subset_count_partitions", hash_subset_count_partitions, METH_VARARGS, "" },
   { "subset_partition_size_distribution", hashbits_subset_partition_size_distribution, METH_VARARGS, "" },
   { "save_subset_partitionmap", hashbits_save_subset_partitionmap, METH_VARARGS },
   { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },

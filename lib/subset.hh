@@ -63,12 +63,30 @@ namespace khmer {
 		       bool break_on_stop_tags=false,
 		       bool stop_big_traversals=false);
 
+    void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
+					     HashIntoType kmer_r,
+					     SeenSet& tagged_kmers,
+					     const SeenSet& all_tags,
+					     BoundedCounterType min_count,
+					     BoundedCounterType max_count,
+					     bool break_on_stop_tags=false,
+					     bool stop_big_traversals=false);
+
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
 		      bool break_on_stop_tags=false,
 		      bool stop_big_traversals=false,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
+
+    void do_partition_with_abundance(HashIntoType first_kmer,
+				     HashIntoType last_kmer,
+				     BoundedCounterType min_count,
+				     BoundedCounterType max_count,
+				     bool break_on_stop_tags=false,
+				     bool stop_big_traversals=false,
+				     CallbackFn callback=0,
+				     void * callback_data=0);
 
     void count_partitions(unsigned int& n_partitions,
 			  unsigned int& n_unassigned);
