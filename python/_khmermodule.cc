@@ -2397,27 +2397,6 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
   return PyInt_FromLong(next_largest);
 }
 
-static PyObject * hashbits_hitraverse_to_stoptags(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  PyObject * counting_o = NULL;
-  unsigned int cutoff = 0;
-  char * filename = NULL;
-
-  if (!PyArg_ParseTuple(args, "sOI", &filename, &counting_o, &cutoff)) {
-    return NULL;
-  }
-
-  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
-
-  hashbits->hitraverse_to_stoptags(filename, *counting, cutoff);
-  
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 static PyObject * hashbits_get(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2483,58 +2462,6 @@ static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
   }
 
   return PyInt_FromLong(hashbits->kmer_degree(kmer_s));
-}
-
-static PyObject * hashbits_trim_on_degree(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * seq = NULL;
-  unsigned int max_degree = 0;
-
-  if (!PyArg_ParseTuple(args, "si", &seq, &max_degree)) {
-    return NULL;
-  }
-
-  unsigned int trim_at;
-  Py_BEGIN_ALLOW_THREADS
-
-    trim_at = hashbits->trim_on_degree(seq, max_degree);
-
-  Py_END_ALLOW_THREADS;
-
-  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
-  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
-  Py_DECREF(trim_seq);
-
-  return ret;
-}
-
-static PyObject * hashbits_trim_on_sodd(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * seq = NULL;
-  unsigned int max_sodd = 0;
-
-  if (!PyArg_ParseTuple(args, "si", &seq, &max_sodd)) {
-    return NULL;
-  }
-
-  unsigned int trim_at;
-  Py_BEGIN_ALLOW_THREADS
-
-    trim_at = hashbits->trim_on_sodd(seq, max_sodd);
-
-  Py_END_ALLOW_THREADS;
-
-  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
-  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
-  Py_DECREF(trim_seq);
-
-  return ret;
 }
 
 static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
@@ -2757,31 +2684,6 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
   if (exc_raised) return NULL;
 
   return Py_BuildValue("iL", total_reads, n_consumed);
-}
-
-static PyObject * hashbits_traverse_from_reads(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * filename;
-  unsigned int radius, big_threshold, transfer_threshold;
-  PyObject * counting_o = NULL;
-
-  if (!PyArg_ParseTuple(args, "siiiO", &filename,
-			&radius, &big_threshold, &transfer_threshold,
-			&counting_o)) {
-    return NULL;
-  }
-
-  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
-
-  hashbits->traverse_from_reads(filename, radius, big_threshold,
-				transfer_threshold, *counting);
-      
-
-  Py_INCREF(Py_None);
-  return Py_None;
 }
 
 static PyObject * hashbits_consume_fasta_and_traverse(PyObject * self, PyObject * args)
@@ -3645,33 +3547,6 @@ static PyObject * hashbits_count_kmers_on_radius(PyObject * self, PyObject * arg
   return PyLong_FromUnsignedLong(n);
 }
 
-static PyObject * hashbits_trim_on_density_explosion(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * seq = NULL;
-  unsigned long radius = 0;
-  unsigned long max_volume = 0;
-
-  if (!PyArg_ParseTuple(args, "sLL", &seq, &radius, &max_volume)) {
-    return NULL;
-  }
-
-  unsigned int trim_at;
-  Py_BEGIN_ALLOW_THREADS
-
-    trim_at = hashbits->trim_on_density_explosion(seq, radius, max_volume);
-
-  Py_END_ALLOW_THREADS;
-
-  PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
-  PyObject * ret = Py_BuildValue("Oi", trim_seq, trim_at);
-  Py_DECREF(trim_seq);
-
-  return ret;
-}
-
 static PyObject * hashbits_find_radius_for_volume(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3797,11 +3672,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "get", hashbits_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "calc_connected_graph_size", hashbits_calc_connected_graph_size, METH_VARARGS, "" },
   { "kmer_degree", hashbits_kmer_degree, METH_VARARGS, "" },
-  { "trim_on_degree", hashbits_trim_on_degree, METH_VARARGS, "" },
-  { "trim_on_sodd", hashbits_trim_on_sodd, METH_VARARGS, "" },
   { "trim_on_stoptags", hashbits_trim_on_stoptags, METH_VARARGS, "" },
   { "identify_stoptags_by_position", hashbits_identify_stoptags_by_position, METH_VARARGS, "" },
-  { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
@@ -3828,7 +3700,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_and_tag_with_reads_parser", hashbits_consume_fasta_and_tag_with_reads_parser, 
     METH_VARARGS, "Count all k-mers using a given reads parser" },
-  { "traverse_from_reads", hashbits_traverse_from_reads, METH_VARARGS, "" },
   { "consume_fasta_and_traverse", hashbits_consume_fasta_and_traverse, METH_VARARGS, "" },
   { "consume_fasta_and_tag_with_stoptags", hashbits_consume_fasta_and_tag_with_stoptags, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_partitioned_fasta", hashbits_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
@@ -3850,7 +3721,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
   { "count_kmers_on_radius", hashbits_count_kmers_on_radius, METH_VARARGS, "" },
   { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },
-  { "hitraverse_to_stoptags", hashbits_hitraverse_to_stoptags, METH_VARARGS, "" },
   { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
   { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },

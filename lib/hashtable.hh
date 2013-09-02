@@ -415,6 +415,7 @@ namespace khmer {
       CallbackFn	  callback	  = NULL,
       void *		  callback_data	  = NULL
     );
+
     // Count every k-mer from a stream of FASTA or FASTQ reads, 
     // using the supplied parser.
     // Tag certain ones on the connectivity graph.
@@ -478,14 +479,6 @@ namespace khmer {
 				       unsigned int radius,
 				       unsigned int max_volume) const;
 
-    unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
-      const;
-    unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
-      const;
-
-    unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
-      const;
-
     unsigned int trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
@@ -500,16 +493,6 @@ namespace khmer {
     unsigned int count_and_transfer_to_stoptags(SeenSet &keeper,
 						unsigned int threshold,
 						CountingHash &counting);
-
-    void traverse_from_reads(std::string filename,
-			     unsigned int radius,
-			     unsigned int big_threshold,
-			     unsigned int transfer_threshold,
-			     CountingHash &counting);
-
-    void hitraverse_to_stoptags(std::string filename,
-				CountingHash &counting,
-				unsigned int cutoff);
 
     virtual void print_tagset(std::string);
     virtual void print_stop_tags(std::string);

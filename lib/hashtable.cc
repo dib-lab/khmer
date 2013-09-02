@@ -1493,101 +1493,6 @@ const
   return count;
 }
 
-unsigned int Hashtable::trim_on_degree(std::string seq, unsigned int max_degree)
-const
-{
-  if (!check_and_normalize_read(seq)) {
-    return 0;
-
-  }
-
-  HashIntoType kmer_f = 0, kmer_r = 0;
-  KMerIterator kmers(seq.c_str(), _ksize);
-
-  unsigned int i = _ksize;
-  while(!kmers.done()) {
-    kmers.next(kmer_f, kmer_r);
-  
-    if (kmer_degree(kmer_f, kmer_r) > max_degree) {
-      return i;
-    }
-    i++;
-  }
-
-  return seq.length();
-}
-
-unsigned int Hashtable::trim_on_sodd(std::string seq, unsigned int max_degree)
-const
-{
-  if (!check_and_normalize_read(seq)) {
-    return 0;
-  }
-
-  const unsigned int RADIUS = 2;
-  const unsigned int INCR = 2*RADIUS;
-  const char * first_kmer = seq.c_str();
-
-  HashIntoType kmer_f, kmer_r;
-  _hash(first_kmer, _ksize, kmer_f, kmer_r);
-  if (count_kmers_on_radius(kmer_f, kmer_r, RADIUS, 20) > max_degree) {
-    return _ksize - 1;
-  }
-
-  for (unsigned int i = INCR; i < seq.length() - _ksize + 1; i += INCR) {
-    _hash(first_kmer + i, _ksize, kmer_f, kmer_r);
-    if (count_kmers_on_radius(kmer_f, kmer_r, RADIUS, 20) > max_degree) {
-
-      i -= INCR;
-      unsigned int pos = 1;
-
-      for (; pos < INCR; pos++) {
-	_hash(first_kmer + i + pos, _ksize, kmer_f, kmer_r);
-	if (count_kmers_on_radius(kmer_f, kmer_r, RADIUS, 20) > max_degree) {
-	  break;
-	}
-      }
-
-      if (pos == INCR) pos--;
-      return i + pos + _ksize - 1;
-    }
-  }
-
-  return seq.length();
-}
-
-unsigned int Hashtable::trim_on_density_explosion(std::string seq,
-						 unsigned int radius,
-						 unsigned int max_volume)
-  const
-{
-  if (!check_and_normalize_read(seq)) {
-    return 0;
-  }
-  unsigned int count;
-  SeenSet path;
-
-  HashIntoType kmer_f = 0, kmer_r = 0;
-  SeenSet seen;
-
-  KMerIterator kmers(seq.c_str(), _ksize);
-
-  unsigned int i = _ksize - 2;
-  while(!kmers.done()) {
-    kmers.next(kmer_f, kmer_r);
-    count = count_kmers_within_depth(kmer_f, kmer_r, radius,
-				     max_volume, &seen);
-    if (count >= max_volume) {
-      return i;
-    }
-    
-    i++;
-  }
-
-  
-  return seq.length();
-}
-
 unsigned int Hashtable::trim_on_stoptags(std::string seq) const
 {
   if (!check_and_normalize_read(seq)) {
@@ -1791,45 +1696,6 @@ const
   return total;
 }
 
-void Hashtable::hitraverse_to_stoptags(std::string filename,
-				      CountingHash &counting,
-				      unsigned int cutoff)
-{
-  Read read;
-  IParser* parser = IParser::get_parser(filename);
-  string name;
-  string seq;
-  unsigned int read_num = 0;
-
-  while(!parser->is_complete()) {
-    read = parser->get_next_read();
-    seq = read.sequence;
-
-    if (check_and_normalize_read(seq)) {
-      for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-	string kmer = seq.substr(i, i + _ksize); // @CTB this wrong!
-	HashIntoType kmer_n = _hash(kmer.c_str(), _ksize);
-	BoundedCounterType n = counting.get_count(kmer_n);
-
-	if (n >= cutoff) {
-	  stop_tags.insert(kmer_n);
-	}
-      }
-
-      name.clear();
-      seq.clear();
-    }
-
-    read_num += 1;
-  }
-
-  delete parser;
-
-#if VERBOSE_REPARTITION
-  std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
-#endif // 0
-}
-
 void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 {
   ifstream infile(infilename.c_str(), ios::binary);
@@ -1938,58 +1804,6 @@ unsigned int Hashtable::count_and_transfer_to_stoptags(SeenSet &keeper,
   }
 
   return n_inserted;
-}
-
-void Hashtable::traverse_from_reads(std::string filename,
-				   unsigned int radius,
-				   unsigned int big_threshold,
-				   unsigned int transfer_threshold,
-				   CountingHash &counting)
-{
-  unsigned long long total_reads = 0;
-  unsigned long long total_stop = 0;
-
-  IParser* parser = IParser::get_parser(filename.c_str());
-  Read read;
-  SeenSet keeper;
-
-  string seq = "";
-
-  //
-  // iterate through the FASTA file & consume the reads.
-  //
-
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    seq = read.sequence;
-
-    if (check_and_normalize_read(seq)) {	// process?
-      const char * last_kmer = seq.c_str() + seq.length() - _ksize;
-      HashIntoType kmer = _hash(last_kmer, _ksize);
-
-      unsigned int n = traverse_from_kmer(kmer, radius, keeper);
-
-      if (n >= big_threshold) {
-#if VERBOSE_REPARTITION
-	std::cout << "lump: " << n << "; added: " << total_stop << "\n";
-#endif
-	total_stop += count_and_transfer_to_stoptags(keeper,
-						     transfer_threshold,
-						     counting);
-      }
-
-      keeper.clear();
-    }
-	       
-    // reset the sequence info, increment read number
-    total_reads++;
-
-    // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0) {
-      std::cout << "n reads: " << total_reads << "; n tags: " << stop_tags.size() << "\n";
-    }
-  }
-  delete parser;
 }
 
 void Hashtable::identify_stop_tags_by_position(std::string seq,
