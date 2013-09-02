@@ -9,8 +9,8 @@
 #include "khmer_config.hh"
 #include "ktable.hh"
 #include "hashtable.hh"
-#include "hashbits.hh"
 #include "counting.hh"
+#include "hashbits.hh"
 #include "storage.hh"
 #include "aligner.hh"
 
@@ -1471,36 +1471,6 @@ static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *arg
   return PyInt_FromLong(0);
 }
 
-static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  char * filename;
-  unsigned int total_reads;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "si|O", &filename, &total_reads,
-			&callback_obj)) {
-    return NULL;
-  }
-
-  khmer::MinMaxTable * mmt;
-  try {
-    mmt = counting->fasta_file_to_minmax(filename, total_reads, 
-					  _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-  
-  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
-    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
-
-  minmax_obj->mmt = mmt;
-
-  return (PyObject *) minmax_obj;
-}
-
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
@@ -2062,7 +2032,6 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
     METH_VARARGS, "Count all k-mers using a given reads parser" },
-  { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },

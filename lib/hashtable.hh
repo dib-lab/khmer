@@ -15,24 +15,21 @@
 #include "khmer.hh"
 #include "storage.hh"
 #include "read_parsers.hh"
+#include "subset.hh"
+
+#define MAX_KEEPER_SIZE int(1e6)
+
+#define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | (twobit_repr(ch)))
+#define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
+
+#define prev_f(kmer_f, ch) ((kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift)
+#define prev_r(kmer_r, ch) ((((kmer_r) << 2) & bitmask) | (twobit_comp(ch)))
+
+#define set_contains(s, e) ((s).find(e) != (s).end())
 
 #define CALLBACK_PERIOD 100000
 
 namespace khmer {
-
-  typedef unsigned int PartitionID;
-  typedef std::set<HashIntoType> SeenSet;
-  typedef std::set<PartitionID> PartitionSet;
-  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
-  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
-  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
-  typedef std::set<PartitionID *> PartitionPtrSet;
-  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
-  typedef std::queue<HashIntoType> NodeQueue;
-  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
-  typedef std::map<HashIntoType, unsigned int> TagCountMap;
-  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
-  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 
   struct HashTablePerformanceMetrics : public IPerformanceMetrics
   {
@@ -141,8 +138,9 @@ namespace khmer {
 
 
   class Hashtable {		// Base class implementation of a Bloom ht.
-
+    friend class SubsetPartition;
   protected:
+    unsigned int _tag_density;
 
     struct Hasher
     {
@@ -192,7 +190,13 @@ namespace khmer {
 	_max_count( MAX_COUNT - number_of_threads + 1 ),
 	_max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
 	_ksize( ksize )
-    { _init_bitstuff( ); }
+    {
+      _tag_density = DEFAULT_TAG_DENSITY;
+      assert(_tag_density % 2 == 0);
+      partition = new SubsetPartition(this);
+      _init_bitstuff();
+      _all_tags_spin_lock = 0;
+    }
 
     virtual ~Hashtable( )
     {
@@ -297,7 +301,19 @@ namespace khmer {
       return uniqify_rc(h, r);
     }
 
+    void _clear_all_partitions() {
+      if (partition != NULL) {
+	partition->_clear_all_partitions();
+      }
+    }
+
+    uint32_t _all_tags_spin_lock;
+
   public:
+    SubsetPartition * partition;
+    SeenSet all_tags;
+    SeenSet stop_tags;
+    SeenSet repart_small_tags;
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -356,7 +372,195 @@ namespace khmer {
 			  float &average,
 			  float &stddev);
 
+    // partitioning stuff
+    void _validate_pmap() {
+      if (partition) { partition->_validate_pmap(); }
+    }
+
+    virtual void save_tagset(std::string);
+    virtual void load_tagset(std::string, bool clear_tags=true);
+
+    // for debugging/testing purposes only!
+    void _set_tag_density(unsigned int d) {
+      assert(d % 2 == 0);	// must be even
+      assert(all_tags.size() == 0); // no tags exist!
+      _tag_density = d;
+    }
+
+    unsigned int _get_tag_density() const {
+      return _tag_density;
+    }
+
+    void add_tag(HashIntoType tag) { all_tags.insert(tag); }
+    void add_stop_tag(HashIntoType tag) { stop_tags.insert(tag); }
+
+    // Partitioning stuff.
+
+    unsigned int n_tags() const { return all_tags.size(); }
+
+    void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
+
+    void add_kmer_to_tags(HashIntoType kmer) {
+      all_tags.insert(kmer);
+    }
+
+    void clear_tags() { all_tags.clear(); }
+
+    // Count every k-mer in a FASTA or FASTQ file.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+      std::string const	  &filename,
+      unsigned int	  &total_reads,
+      unsigned long long  &n_consumed,
+      CallbackFn	  callback	  = NULL,
+      void *		  callback_data	  = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads, 
+    // using the supplied parser.
+    // Tag certain ones on the connectivity graph.
+    void consume_fasta_and_tag(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
+
+    void consume_sequence_and_tag(const std::string& seq,
+				  unsigned long long& n_consumed,
+				  SeenSet * new_tags = 0);
+
+
+    void consume_fasta_and_tag_with_stoptags(const std::string &filename,
+					     unsigned int &total_reads,
+					     unsigned long long &n_consumed,
+					     CallbackFn callback = 0,
+					     void * callback_data = 0);
+
+    void consume_fasta_and_traverse(const std::string &filename,
+				    unsigned int distance,
+				    unsigned int big_threshold,
+				    unsigned int transfer_threshold,
+				    CountingHash &counting);
+
+    void consume_partitioned_fasta(const std::string &filename,
+				   unsigned int &total_reads,
+				   unsigned long long &n_consumed,
+				   CallbackFn callback = 0,
+				   void * callback_data = 0);
+
+    virtual const BoundedCounterType test_and_set_bits(const char * kmer) = 0;
+    virtual const bool test_and_set_bits(HashIntoType khash) = 0;
+
+    void filter_if_present(const std::string infilename,
+			   const std::string outputfilename,
+			   CallbackFn callback=0,
+			   void * callback_data=0);
+
+    unsigned int count_kmers_within_radius(HashIntoType kmer_f,
+					   HashIntoType kmer_r,
+					   unsigned int radius,
+					   unsigned int max_count,
+					   const SeenSet * seen=0) const;
+    unsigned int count_kmers_within_depth(HashIntoType kmer_f,
+					  HashIntoType kmer_r,
+					  unsigned int depth,
+					  unsigned int max_count,
+					  SeenSet * seen) const;
+
+    unsigned int find_radius_for_volume(HashIntoType kmer_f,
+					HashIntoType kmer_r,
+					unsigned int max_count,
+					unsigned int max_radius) const;
+
+    unsigned int count_kmers_on_radius(HashIntoType kmer_f,
+				       HashIntoType kmer_r,
+				       unsigned int radius,
+				       unsigned int max_volume) const;
+
+    unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
+      const;
+    unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
+      const;
+
+    unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
+      const;
+
+    unsigned int trim_on_stoptags(std::string sequence) const;
+
+    void traverse_from_tags(unsigned int distance,
+			    unsigned int threshold,
+			    unsigned int num_high_todo,
+			    CountingHash &counting);
+
+    unsigned int traverse_from_kmer(HashIntoType start,
+				    unsigned int radius,
+				    SeenSet &keeper) const;
+
+    unsigned int count_and_transfer_to_stoptags(SeenSet &keeper,
+						unsigned int threshold,
+						CountingHash &counting);
+
+    void traverse_from_reads(std::string filename,
+			     unsigned int radius,
+			     unsigned int big_threshold,
+			     unsigned int transfer_threshold,
+			     CountingHash &counting);
+
+    void hitraverse_to_stoptags(std::string filename,
+				CountingHash &counting,
+				unsigned int cutoff);
+
+    virtual void print_tagset(std::string);
+    virtual void print_stop_tags(std::string);
+    virtual void save_stop_tags(std::string);
+    void load_stop_tags(std::string filename, bool clear_tags=true);
+
+    void identify_stop_tags_by_position(std::string sequence,
+					std::vector<unsigned int> &posns)
+      const;
+
+    void extract_unique_paths(std::string seq,
+			      unsigned int min_length,
+			      float min_unique_f,
+			      std::vector<std::string> &results);
+
+    void calc_connected_graph_size(const char * kmer,
+				   unsigned long long& count,
+				   SeenSet& keeper,
+				   const unsigned long long threshold=0,
+				   bool break_on_circum=false) const{
+      HashIntoType r, f;
+      _hash(kmer, _ksize, f, r);
+      calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
+    }
+
+    void calc_connected_graph_size(const HashIntoType kmer_f,
+				   const HashIntoType kmer_r,
+				   unsigned long long& count,
+				   SeenSet& keeper,
+				   const unsigned long long threshold=0,
+				   bool break_on_circum=false) const;
+
+    typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
+
+
+    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
+    unsigned int kmer_degree(const char * kmer_s) const {
+      HashIntoType kmer_f, kmer_r;
+      _hash(kmer_s, _ksize, kmer_f, kmer_r);
+
+      return kmer_degree(kmer_f, kmer_r);
+    }
   };
 };
+
+
+
+#define ACQUIRE_ALL_TAGS_SPIN_LOCK \
+  while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));
+
+#define RELEASE_ALL_TAGS_SPIN_LOCK \
+  __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
 
 #endif // HASHTABLE_HH

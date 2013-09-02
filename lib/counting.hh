@@ -3,8 +3,6 @@
 
 #include <vector>
 #include "khmer_config.hh"
-#include "hashtable.hh"
-#include "hashbits.hh"
 
 namespace khmer {
   typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -81,6 +79,14 @@ namespace khmer {
 	_n_tables = 0;
       }
     }
+
+    // @CTB fix.
+    virtual const BoundedCounterType test_and_set_bits(const char * kmer) {
+      return 0;
+    }
+
+    // @CTB fix.
+    virtual const bool test_and_set_bits(HashIntoType khash) { return false; }
 
     std::vector<HashIntoType> get_tablesizes() const {
       return _tablesizes;
@@ -170,11 +176,6 @@ namespace khmer {
       }
       return min_count;
     }
-
-    MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
-				      unsigned long long total_reads,
-				      CallbackFn callback = NULL,
-				      void * callback_data = NULL);
 
     void output_fasta_kmer_pos_freq(const std::string &inputfile,
                                     const std::string &outputfile);
