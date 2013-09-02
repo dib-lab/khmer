@@ -103,7 +103,6 @@ namespace khmer {
     // Get and set the hashbits for the given kmer.
     inline
     virtual
-    const
     BoundedCounterType
     test_and_set_bits(const char * kmer)
     {
@@ -118,8 +117,7 @@ namespace khmer {
     // software engineering wisdom.
     inline
     virtual
-    const
-    bool
+    BoundedCounterType
     test_and_set_bits( HashIntoType khash ) 
     {
       bool is_new_kmer = false;
@@ -141,10 +139,10 @@ namespace khmer {
       if (is_new_kmer)
       {
 	__sync_add_and_fetch( &_n_unique_kmers, 1 );
-	return true; // kmer not seen before
+	return 1; // kmer not seen before
       }
 
-      return false; // kmer already seen
+      return 0; // kmer already seen
     } // test_and_set_bits
 
     virtual const HashIntoType n_overlap_kmers(HashIntoType start=0,

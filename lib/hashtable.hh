@@ -450,8 +450,8 @@ namespace khmer {
 				   CallbackFn callback = 0,
 				   void * callback_data = 0);
 
-    virtual const BoundedCounterType test_and_set_bits(const char * kmer) = 0;
-    virtual const bool test_and_set_bits(HashIntoType khash) = 0;
+    virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
 
     void filter_if_present(const std::string infilename,
 			   const std::string outputfilename,

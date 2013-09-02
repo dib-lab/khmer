@@ -80,13 +80,17 @@ namespace khmer {
       }
     }
 
-    // @CTB fix.
-    virtual const BoundedCounterType test_and_set_bits(const char * kmer) {
-      return 0;
+    virtual BoundedCounterType test_and_set_bits(const char * kmer) {
+      BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
+      count(kmer);
+      return !x;
     }
 
-    // @CTB fix.
-    virtual const bool test_and_set_bits(HashIntoType khash) { return false; }
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) {
+      BoundedCounterType x = get_count(khash);
+      count(khash);
+      return !x;
+    }
 
     std::vector<HashIntoType> get_tablesizes() const {
       return _tablesizes;
