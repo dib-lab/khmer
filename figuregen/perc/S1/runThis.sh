@@ -1,4 +1,12 @@
 #!/bin/sh -login
+
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
+
+
 #PBS -l nodes=1:ppn=1,walltime=4:00:00,mem=4gb
 #PBS -j oe
 

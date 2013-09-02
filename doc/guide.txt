@@ -43,7 +43,7 @@ paper
 the `digital normalization paper <http://arxiv.org/abs/1203.4802>`__.
 
 There are many blog posts about this stuff on `Titus Brown's blog
-<http://ivory.idyll.org/blog/>`__.  We wil ltry to link them in where
+<http://ivory.idyll.org/blog/>`__.  We will try to link them in where
 appropriate.
 
 Asking for help
