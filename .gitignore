@@ -9,3 +9,5 @@ doc/_build
 *.log
 *env
 *ENV
+/.project
+/.pydevproject
