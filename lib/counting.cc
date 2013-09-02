@@ -11,53 +11,6 @@ using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
-MinMaxTable * CountingHash::fasta_file_to_minmax(
-    const std::string &inputfile,
-    unsigned long long total_reads,
-    CallbackFn callback,
-    void * callback_data
-)
-{
-    IParser* parser = IParser::get_parser(inputfile.c_str());
-    Read read;
-    string seq = "";
-    unsigned long long read_num = 0;
-
-    MinMaxTable * mmt = new MinMaxTable(total_reads);
-
-    while(!parser->is_complete()) {
-        read = parser->get_next_read();
-        seq = read.sequence;
-
-        bool valid_read = true;
-        valid_read = check_and_normalize_read(seq);
-        if (valid_read) {
-            BoundedCounterType minval = get_min_count(seq);
-            BoundedCounterType maxval = get_max_count(seq);
-
-            mmt->add_min(read_num, minval);
-            mmt->add_max(read_num, maxval);
-        }
-
-        seq.clear();
-        read_num += 1;
-
-        // run callback, if specified
-        if (read_num % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("fasta_file_to_minmax", callback_data, read_num, 0);
-            } catch (...) {
-                delete mmt;
-                throw;
-            }
-        }
-    }
-
-    delete parser;
-
-    return mmt;
-}
-
 ///
 /// output_fasta_kmer_pos_freq: outputs the kmer frequencies for each read
 ///

@@ -56,8 +56,8 @@ ht-diff: $(HT_DIFF_OBJS)
 bittest: bittest.o ktable.o
 	$(CXX) -o $@ bittest.o ktable.o
 
-ktable_test: ktable_test.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ ktable_test.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # NOTE: Disabled due to broken constructor call.
 #graphtest: graphtest.o ktable.o hashtable.o

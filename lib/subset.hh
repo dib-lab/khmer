@@ -1,10 +1,9 @@
 #ifndef SUBSET_HH
 #define SUBSET_HH
 
-#include "hashtable.hh"
-
 namespace khmer {
   class CountingHash;
+  class Hashtable;
   class Hashbits;
 
   struct pre_partition_info {
@@ -15,10 +14,10 @@ namespace khmer {
   };
 
   class SubsetPartition {
-    friend class Hashbits;
+    friend class Hashtable;
   protected:
     unsigned int next_partition_id;
-    Hashbits * _ht;
+    Hashtable * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -30,7 +29,7 @@ namespace khmer {
 					   const HashIntoType kmer);
 
   public:
-    SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
+    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht) {
       ;
     };
 
