@@ -9,6 +9,9 @@
   - Decide whether probabilities should be modifible without recompiling
   - Implement trusted kmer detection (cutoff vs probability)
   - Model error vs trusted kmers
+      - Another state? (probably not...)
+      - Another emission probability?
+      - Have to make sure they aren't less probable than a mismatch, or insert/mismatch/insert
  */
 
 #ifndef READ_ALIGNER_HH
