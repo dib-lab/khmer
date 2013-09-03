@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import sys, os, shutil
 from cStringIO import StringIO
 import traceback
@@ -408,7 +413,7 @@ def test_normalize_by_median_dumpfrequency():
     infiles = [utils.get_temp_filename('test-0.fq')]
     in_dir = os.path.dirname(infiles[0])
     for x in range(1,5):
-        infiles.append(utils.get_temp_filename('test-{}.fq'.format(x),
+        infiles.append(utils.get_temp_filename('test-{x}.fq'.format(x=x),
                                                 tempdir=in_dir))
     
     for infile in infiles:
