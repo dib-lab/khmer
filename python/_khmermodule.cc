@@ -2220,6 +2220,35 @@ static PyObject * hash_subset_compare_partitions(PyObject * self,
   return Py_BuildValue("iii", n_only1, n_only2, n_shared);
 }
 
+static PyObject * hash_subset_partition_size_distribution(PyObject * self,
+					       PyObject * args)
+{
+  PyObject * subset_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+    return NULL;
+  }
+  
+  khmer::SubsetPartition * subset_p;
+  subset_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+
+  khmer::PartitionCountDistribution d;
+
+  unsigned int n_unassigned = 0;
+  subset_p->partition_size_distribution(d, n_unassigned);
+
+  PyObject * x = PyList_New(d.size());
+  khmer::PartitionCountDistribution::const_iterator di;
+
+  unsigned int i;
+  for (i = 0, di = d.begin(); di != d.end(); di++, i++) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("LL", di->first, di->second));
+  }
+  assert (i == d.size());
+
+  return Py_BuildValue("Oi", x, n_unassigned);
+}
+
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
@@ -2259,6 +2288,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "subset_count_partitions", hash_subset_count_partitions, METH_VARARGS, "" },
   { "subset_report_on_partitions", hash_subset_report_on_partitions, METH_VARARGS, "" },
   { "subset_compare_partitions", hash_subset_compare_partitions, METH_VARARGS, "" },
+  { "subset_partition_size_distribution", hash_subset_partition_size_distribution, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };

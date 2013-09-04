@@ -1209,6 +1209,7 @@ const
   PartitionCountMap cm;
   n_unassigned = 0;
 
+  // @CTB: should this be all_tags? See count_partitions.
   for (PartitionMap::const_iterator pi = partition_map.begin();
        pi != partition_map.end(); pi++) {
     if (pi->second) {
