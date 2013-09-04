@@ -509,3 +509,19 @@ def test_get_hashsizes():
 #
 #    kh = khmer.new_counting_hash(18, 1e6, 4)
 #    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
+
+def test_consume_high_abund_kmers():
+    kh = khmer.new_counting_hash(4, 100, 4)
+
+    # count AAAA/TTTT 5x.
+    c = kh.consume("AAAAAAAA")
+    assert c == 5
+
+    c = kh.consume_high_abund_kmers("AAAA", 6)
+    assert c == 0
+    
+    c = kh.consume_high_abund_kmers("AAAA", 5)
+    assert c == 1
+
+    c = kh.consume_high_abund_kmers("AAAT", 1)
+    assert c == 0
