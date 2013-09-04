@@ -200,8 +200,6 @@ namespace khmer {
                               khmer::Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
-			      HashIntoType lower_bound,
-			      HashIntoType upper_bound,
 			      CallbackFn callback,
 			      void * callback_data);
 
@@ -209,16 +207,11 @@ namespace khmer {
 
     // just for overlap k-mer counting!
     unsigned int check_and_process_read_overlap(std::string &read,
-					    bool &is_valid,HashIntoType lower_bound,
-                                            HashIntoType upper_bound,
+					    bool &is_valid,
                                             khmer::Hashbits &ht2);
     // for overlap k-mer counting!
     unsigned int consume_string_overlap(const std::string &s,
-				       HashIntoType lower_bound,
-				       HashIntoType upper_bound,khmer::Hashbits &ht2);
-
-
-
+					khmer::Hashbits &ht2);
 
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
     unsigned int kmer_degree(const char * kmer_s) const {
