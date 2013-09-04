@@ -403,6 +403,7 @@ def test_partition_on_abundance_1():
     for i in range(10):
         print kh.consume_and_tag(b)
 
+    # all paths in 'a' and 'b'
     p = kh.do_subset_partition_with_abundance(10, 50)
     x = kh.subset_count_partitions(p)
     assert x == (1, 0)                  # one partition, no remainders
@@ -415,6 +416,7 @@ def test_partition_on_abundance_2():
     for i in range(5):
         print kh.consume_and_tag(b)
 
+    # all paths in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
     x = kh.subset_count_partitions(p)
     assert x == (1, 6)                  # one partition, six disconnected
@@ -427,8 +429,12 @@ def test_partition_on_abundance_3():
     for i in range(5):
         print kh.consume_and_tag(b)
 
+    # this will get paths only in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'b'
     p = kh.do_subset_partition_with_abundance(5, 10)
+    
     x = kh.subset_count_partitions(p)
     print x
     assert x == (2, 2)                  # two partitions, two ignored tags
