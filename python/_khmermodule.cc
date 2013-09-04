@@ -2193,6 +2193,33 @@ static PyObject * hash_subset_report_on_partitions(PyObject * self,
   return Py_None;
 }
 
+static PyObject * hash_subset_compare_partitions(PyObject * self,
+						 PyObject * args)
+{
+  PyObject * subset1_obj = NULL;
+  PyObject * subset2_obj = NULL;
+  unsigned int pid1, pid2;	// @CTB ensure that these are unsigned?
+
+  if (!PyArg_ParseTuple(args, "OiOi",
+			&subset1_obj, &pid1,
+			&subset2_obj, &pid2)) {
+    return NULL;
+  }
+
+  khmer::SubsetPartition * subset1_p;
+  subset1_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
+
+  khmer::SubsetPartition * subset2_p;
+  subset2_p = (khmer::SubsetPartition *) PyCObject_AsVoidPtr(subset2_obj);
+
+  unsigned int n_only1 = 0, n_only2 = 0, n_shared = 0;
+  subset1_p->compare_to_partition((PartitionID) pid1,
+				  subset2_p, (PartitionID) pid2,
+				  n_only1, n_only2, n_shared);
+
+  return Py_BuildValue("iii", n_only1, n_only2, n_shared);
+}
+
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
@@ -2231,6 +2258,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
   { "subset_count_partitions", hash_subset_count_partitions, METH_VARARGS, "" },
   { "subset_report_on_partitions", hash_subset_report_on_partitions, METH_VARARGS, "" },
+  { "subset_compare_partitions", hash_subset_compare_partitions, METH_VARARGS, "" },
 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };

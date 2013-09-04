@@ -127,6 +127,11 @@ namespace khmer {
 		      PartitionPtrMap& diskp_to_pp);
 
     void report_on_partitions();
+
+    void compare_to_partition(PartitionID, SubsetPartition *, PartitionID,
+			      unsigned int &n_only1,
+			      unsigned int &n_only2,
+			      unsigned int &n_shared);
   };
 }
 

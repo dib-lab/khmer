@@ -1429,7 +1429,8 @@ void SubsetPartition::_clear_partition(PartitionID the_partition,
 
 void SubsetPartition::report_on_partitions()
 {
-  std::cout << "FOO.\n";
+  std::cout << _ht->all_tags.size() << " tags total\n";
+  std::cout << reverse_pmap.size() << " partitions total\n";
 
   for (SeenSet::iterator ti = _ht->all_tags.begin();
        ti != _ht->all_tags.end(); ti++) {
@@ -1442,4 +1443,37 @@ void SubsetPartition::report_on_partitions()
     }
     std::cout << "--\n";
   }
+}
+
+void SubsetPartition::compare_to_partition(PartitionID pid1,
+					   SubsetPartition *p2,
+					   PartitionID pid2,
+					   unsigned int &n_only1,
+					   unsigned int &n_only2,
+					   unsigned int &n_shared)
+{
+  SubsetPartition * p1 = this;
+
+  for (PartitionMap::iterator pi = p1->partition_map.begin();
+       pi != p1->partition_map.end(); pi++) {
+    PartitionID * pid = pi->second;
+    if (pid && *pid == pid1) {
+      PartitionID * pp2 = p2->partition_map[pi->first];
+      if (pp2 && *pp2 == pid2) {
+	n_shared++;
+      } else {
+	n_only1++;
+      }
+    }
+  }
+
+  for (PartitionMap::iterator pi = p2->partition_map.begin();
+       pi != p2->partition_map.end(); pi++) {
+    PartitionID * pid = pi->second;
+    if (pid && *pid == pid2) {
+      n_only2++;
+    }
+  }
+
+  n_only2 -= n_shared;
 }
