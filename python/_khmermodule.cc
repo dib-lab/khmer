@@ -1314,6 +1314,11 @@ typedef struct {
 
 typedef struct {
   PyObject_HEAD
+  khmer::SubsetPartition * subset;
+} khmer_KSubsetPartitionObject;
+
+typedef struct {
+  PyObject_HEAD
   khmer::Hashbits * hashbits;
 } khmer_KHashbitsObject;
 
@@ -1345,6 +1350,35 @@ static PyTypeObject khmer_KHashbitsType = {
 };
 
 #define is_hashbits_obj(v)  ((v)->ob_type == &khmer_KHashbitsType)
+
+static void khmer_subset_dealloc(PyObject *);
+static PyObject * khmer_subset_getattr(PyObject * obj, char * name);
+
+static PyTypeObject khmer_KSubsetPartitionType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "KSubset", sizeof(khmer_KSubsetPartitionObject),
+    0,
+    khmer_subset_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_subset_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "subset object",           /* tp_doc */
+};
+
+#define is_subset_obj(v)  ((v)->ob_type == &khmer_KSubsetPartitionType)
 
 /* GRAPHALIGN addition */
 typedef struct {
@@ -3934,6 +3968,16 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_hashbits_methods, obj, name);
 }
 
+static PyMethodDef khmer_subset_methods[] = {
+  {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyObject *
+khmer_subset_getattr(PyObject * obj, char * name)
+{
+  return Py_FindMethod(khmer_subset_methods, obj, name);
+}
+
 //
 // GRAPHALIGN addition
 //
@@ -4165,6 +4209,20 @@ static void khmer_hashbits_dealloc(PyObject* self)
   
   PyObject_Del((PyObject *) obj);
 }
+
+//
+// khmer_subset_dealloc -- clean up a hashbits object.
+//
+
+static void khmer_subset_dealloc(PyObject* self)
+{
+  khmer_KSubsetPartitionObject * obj = (khmer_KSubsetPartitionObject *) self;
+  delete obj->subset;
+  obj->subset = NULL;
+  
+  PyObject_Del((PyObject *) obj);
+}
+
 
 //////////////////////////////
 // standalone functions
