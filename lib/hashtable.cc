@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #include "khmer.hh"
 #include "hashtable.hh"
 #include "read_parsers.hh"
@@ -86,15 +92,13 @@ Hashtable:: Hasher::
 //
 
 unsigned int Hashtable::check_and_process_read(std::string &read,
-					    bool &is_valid,
-                                            HashIntoType lower_bound,
-                                            HashIntoType upper_bound)
+					       bool &is_valid)
 {
    is_valid = check_and_normalize_read(read);
 
    if (!is_valid) { return 0; }
 
-   return consume_string(read, lower_bound, upper_bound);
+   return consume_string(read);
 }
 
 //
@@ -149,7 +153,6 @@ Hashtable::
 consume_fasta(
   std:: string const  &filename,
   unsigned int	      &total_reads, unsigned long long	&n_consumed,
-  HashIntoType	      lower_bound,  HashIntoType	upper_bound,
   CallbackFn	      callback,	    void *		callback_data
 )
 {
@@ -165,7 +168,6 @@ consume_fasta(
   consume_fasta(
     parser, 
     total_reads, n_consumed, 
-    lower_bound, upper_bound, 
     callback, callback_data
   );
 
@@ -177,7 +179,6 @@ Hashtable::
 consume_fasta(
   read_parsers:: IParser *  parser,
   unsigned int		    &total_reads, unsigned long long  &n_consumed,
-  HashIntoType		    lower_bound,  HashIntoType	      upper_bound,
   CallbackFn		    callback,	  void *	      callback_data
 )
 {
@@ -202,7 +203,7 @@ consume_fasta(
     read = parser->get_next_read( );
 
     this_n_consumed = 
-    check_and_process_read(read.sequence, is_valid, lower_bound, upper_bound);
+      check_and_process_read(read.sequence, is_valid);
 
 #ifdef WITH_INTERNAL_METRICS
     hasher.pmetrics.start_timers( );
@@ -252,30 +253,45 @@ consume_fasta(
 // consume_string: run through every k-mer in the given string, & hash it.
 //
 
-unsigned int Hashtable::consume_string(const std::string &s,
-				       HashIntoType lower_bound,
-				       HashIntoType upper_bound)
+unsigned int Hashtable::consume_string(const std::string &s)
 {
   const char * sp = s.c_str();
   unsigned int n_consumed = 0;
 
-  bool bounded = true;
-
   KMerIterator kmers(sp, _ksize);
   HashIntoType kmer;
-
-  if (lower_bound == upper_bound && upper_bound == 0) {
-    bounded = false;
-  }
 
   while(!kmers.done()) {
     kmer = kmers.next();
   
-    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
+    count(kmer);
+    n_consumed++;
+  }
 
+  return n_consumed;
+}
+
+//
+// consume_high_abund_kmers: run through every k-mer in the given string,
+//     and if the k-mer is high enough abundance, add it. Return number
+//     of consumed k-mers.
+//
+
+unsigned int Hashtable::consume_high_abund_kmers(const std::string &s,
+						 BoundedCounterType min_count)
+{
+  const char * sp = s.c_str();
+  unsigned int n_consumed = 0;
+
+  KMerIterator kmers(sp, _ksize);
+  HashIntoType kmer;
+
+  while(!kmers.done()) {
+    kmer = kmers.next();
+
+    if (get_count(kmer) >= min_count) {
       count(kmer);
       n_consumed++;
-
     }
   }
 

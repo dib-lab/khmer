@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import os
 import khmer
 
@@ -34,16 +39,3 @@ def test_raise_in_consume_fasta():
         pass
     except:
         raise
-
-def test_raise_in_fasta_file_to_minmax():
-    return # @@CTB fix
-    ht = khmer.new_hashtable(4, 4**4)
-
-    try:
-        ht.fasta_file_to_minmax(reads_filename, N_READS, callback_raise)
-        assert 0
-    except GoodException:
-        pass
-    except:
-        raise
-
