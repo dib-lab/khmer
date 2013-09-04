@@ -457,4 +457,27 @@ def test_partition_overlap_1():
     #kh.subset_report_on_partitions(p2)
 
     x = kh.subset_compare_partitions(p1, 3, p2, 3)
-    assert x == (0, 0, 14)
+    assert x == (0, 0, 14), x
+
+def test_partition_overlap_2():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        kh.consume_and_tag(a)
+        
+    for i in range(5):
+        kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p1 = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'b'
+    p2 = kh.do_subset_partition_with_abundance(5, 10)
+
+    #kh.subset_report_on_partitions(p1)
+    #kh.subset_report_on_partitions(p2)
+
+    x = kh.subset_compare_partitions(p1, 3, p2, 3)
+    assert x == (8, 6, 0), x
+
+    x = kh.subset_compare_partitions(p1, 3, p2, 5)
+    assert x == (2, 0, 6), x
