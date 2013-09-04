@@ -42,8 +42,6 @@ consume
 
 consume_fasta
 
-fasta_file_to_minmax
-
 filter_fasta_file_max
 
 get
@@ -52,33 +50,12 @@ get_min_count
 
 get_max_count
 
-minmaxtable methods
--------------------
-
-get_min
-
-get_max
-
-add_min
-
-add_max
-
-clear
-
-merge
-
-load
-
-save
-
 module methods
 --------------
 
 new_ktable
 
 new_hashtable
-
-new_minmax
 
 consume_genome
 

@@ -39,16 +39,3 @@ def test_raise_in_consume_fasta():
         pass
     except:
         raise
-
-def test_raise_in_fasta_file_to_minmax():
-    return # @@CTB fix
-    ht = khmer.new_hashtable(4, 4**4)
-
-    try:
-        ht.fasta_file_to_minmax(reads_filename, N_READS, callback_raise)
-        assert 0
-    except GoodException:
-        pass
-    except:
-        raise
-
