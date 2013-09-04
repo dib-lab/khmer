@@ -34,6 +34,9 @@ namespace khmer {
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 
+  typedef unsigned int Color;
+  typedef std::multimap<HashIntoType, Color> TagColorMap;
+
   struct HashTablePerformanceMetrics : public IPerformanceMetrics
   {
 	
