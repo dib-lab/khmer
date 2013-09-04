@@ -45,9 +45,9 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
   // go through all the tagged kmers and count partitions/orphan.
   //
 
-  for (PartitionMap::const_iterator pi = partition_map.begin();
-       pi != partition_map.end(); pi++) {
-    PartitionID * partition_p = pi->second;
+  for (SeenSet::iterator ti = _ht->all_tags.begin();
+       ti != _ht->all_tags.end(); ti++) {
+    PartitionID * partition_p = partition_map[*ti];
     if (partition_p) {
       partitions.insert(*partition_p);
     }
@@ -697,7 +697,6 @@ void SubsetPartition::do_partition_with_abundance(HashIntoType first_kmer,
 
     // assign the partition ID
     assign_partition_id(kmer, tagged_kmers);
-    std::cout << "kmer " << _revhash(kmer, ksize) << " joined to " << tagged_kmers.size() << "\n";
 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
@@ -1420,4 +1419,21 @@ void SubsetPartition::_clear_partition(PartitionID the_partition,
   delete ps;
 
   reverse_pmap.erase(the_partition);
+}
+
+void SubsetPartition::report_on_partitions()
+{
+  std::cout << "FOO.\n";
+
+  for (SeenSet::iterator ti = _ht->all_tags.begin();
+       ti != _ht->all_tags.end(); ti++) {
+    std::cout << "TAG: " << _revhash(*ti, _ht->ksize()) << "\n";
+    PartitionID *pid = partition_map[*ti];
+    if (pid) {
+      std::cout << "partition: " << *(partition_map[*ti]) << "\n";
+    } else {
+      std::cout << "NULL.\n";
+    }
+    std::cout << "--\n";
+  }
 }
