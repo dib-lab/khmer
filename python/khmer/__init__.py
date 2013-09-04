@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 __version__ = "0.4"
 
 import _khmer
@@ -7,7 +12,6 @@ from _khmer import new_ktable
 from _khmer import new_hashtable
 from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
-from _khmer import new_minmax
 from _khmer import new_readaligner
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback

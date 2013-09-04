@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #include "hashtable.hh"
 #include "counting.hh"
 #include "hashbits.hh"
@@ -42,57 +48,39 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
    outfile.close();
 }
 
-BoundedCounterType CountingHash::get_min_count(const std::string &s,
-					    HashIntoType lower_bound,
-					    HashIntoType upper_bound)
+BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
   KMerIterator kmers(s.c_str(), _ksize);
   HashIntoType kmer;
 
   BoundedCounterType min_count = MAX_COUNT, count;
 
-  bool bounded = true;
-  if (lower_bound == upper_bound && upper_bound == 0) {
-    bounded = false;
-  }
-
   while(!kmers.done()) {
     kmer = kmers.next();
 
-    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
-      count = this->get_count(kmer);
+    count = this->get_count(kmer);
     
-      if (count < min_count) {
-	min_count = count;
-      }
+    if (count < min_count) {
+      min_count = count;
     }
   }
   return min_count;
 }
 
-BoundedCounterType CountingHash::get_max_count(const std::string &s,
-					    HashIntoType lower_bound,
-					    HashIntoType upper_bound)
+BoundedCounterType CountingHash::get_max_count(const std::string &s)
 {
   KMerIterator kmers(s.c_str(), _ksize);
 
   BoundedCounterType max_count = 0, count;
 
-  bool bounded = true;
-  if (lower_bound == upper_bound && upper_bound == 0) {
-    bounded = false;
-  }
-
   HashIntoType kmer;
   while(!kmers.done()) {
     kmer = kmers.next();
 
-    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
-      count = this->get_count(kmer);
+    count = this->get_count(kmer);
 
-      if (count > max_count) {
-	max_count = count;
-      }
+    if (count > max_count) {
+      max_count = count;
     }
   }
   return max_count;

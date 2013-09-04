@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #include <iostream>
 #include "hashtable.hh"
 #include "hashbits.hh"
@@ -96,15 +102,14 @@ void Hashbits::load(std::string infilename)
 //
 
 unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
-					    bool &is_valid,HashIntoType lower_bound,
-                                            HashIntoType upper_bound,
+					    bool &is_valid,
                                             Hashbits &ht2)
 {
    is_valid = check_and_normalize_read(read);
 
    if (!is_valid) { return 0; }
 
-   return consume_string_overlap(read, lower_bound, upper_bound, ht2);
+   return consume_string_overlap(read, ht2);
 }
 
 //
@@ -115,8 +120,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
                               HashIntoType curve[2][100],Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
-			      HashIntoType lower_bound,
-			      HashIntoType upper_bound,
 			      CallbackFn callback,
 			      void * callback_data)
 {
@@ -158,9 +161,7 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
       bool is_valid;
 
       this_n_consumed = check_and_process_read_overlap(currSeq,
-					       is_valid,
-					       lower_bound,
-					       upper_bound,ht2);
+					       is_valid, ht2);
 
         n_consumed += this_n_consumed;
 	       
@@ -191,28 +192,19 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 //
 
 unsigned int Hashbits::consume_string_overlap(const std::string &s,
-				       HashIntoType lower_bound,
-				       HashIntoType upper_bound,Hashbits &ht2)
+					      Hashbits &ht2)
 {
   const char * sp = s.c_str();
   unsigned int n_consumed = 0;
 
-  bool bounded = true;
-
   KMerIterator kmers(sp, _ksize);
   HashIntoType kmer;
-
-  if (lower_bound == upper_bound && upper_bound == 0) {
-    bounded = false;
-  }
 
   while(!kmers.done()) {
     kmer = kmers.next();
   
-    if (!bounded || (kmer >= lower_bound && kmer < upper_bound)) {
-      count_overlap(kmer,ht2);
-      n_consumed++;
-    }
+    count_overlap(kmer,ht2);
+    n_consumed++;
   }
 
   return n_consumed;
