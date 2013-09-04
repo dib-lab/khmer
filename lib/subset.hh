@@ -119,6 +119,8 @@ namespace khmer {
     void _merge_other(HashIntoType tag,
 		      PartitionID other_partition,
 		      PartitionPtrMap& diskp_to_pp);
+
+    void report_on_partitions();
   };
 }
 
