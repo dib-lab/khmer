@@ -119,6 +119,9 @@ namespace khmer {
     void partition_size_distribution(PartitionCountDistribution &d,
 				    unsigned int& n_unassigned) const;
 
+    void partition_average_coverages(PartitionCountMap &cm,
+				     CountingHash * ht) const;
+
     unsigned int repartition_largest_partition(unsigned int, unsigned int,
 					       unsigned int, CountingHash&);
 
