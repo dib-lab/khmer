@@ -481,3 +481,10 @@ def test_partition_overlap_2():
 
     x = p1.compare_partitions(3, p2, 5)
     assert x == (2, 0, 6), x
+
+    x = p1.partition_sizes()
+    assert x == ([(3L, 8L)], 0), x
+    
+    x = p2.partition_sizes()
+    assert x == ([(3L, 6L), (5L, 6L)], 2), x
+    
