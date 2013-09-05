@@ -113,6 +113,9 @@ namespace khmer {
 
     void join_partitions_by_path(std::string sequence);
 
+    void partition_sizes(PartitionCountMap &cm,
+			 unsigned int& n_unassigned) const;
+
     void partition_size_distribution(PartitionCountDistribution &d,
 				    unsigned int& n_unassigned) const;
 
