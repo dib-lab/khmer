@@ -468,10 +468,12 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
 }
 
 /* This is essentially the same code as above, only it assigns colors to the
- * tags through a multimap
+ * tags through multimap TagColorMap defined in hashtable.hh, declared in
+ * hashbits.hh
  */
 void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
 					unsigned long long& n_consumed,
+					Color& current_color,
 					SeenSet * found_tags)
 {
   bool is_new_kmer;
@@ -489,19 +491,27 @@ void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
       ++n_consumed;
 
 #if (1)
-    if (is_new_kmer) ++since;
-    else
-    {
+    if (is_new_kmer) {
+      ++since;
+    } else {
       ACQUIRE_ALL_TAGS_SPIN_LOCK
       kmer_tagged = set_contains(all_tags, kmer);
       RELEASE_ALL_TAGS_SPIN_LOCK
-      if (kmer_tagged)
-      {
-	since = 1;
-	if (found_tags) { found_tags->insert(kmer); }
-      }
-      else ++since;
+      if (kmer_tagged) {
+	    since = 1;
+	    
+	    // Coloring code
+	    // TODO: MAKE THREADSAFE!
+	    
+	    if (!_map_contains(color_map, kmer, current_color)) {
+	      color_map.insert(TagColorPair(kmer, current_color))
+	    }
+	    if (found_tags) {
+	      found_tags->insert(kmer);
+	    }
+      }  else ++since;
     }
+    // Should I bother adding new code down here?
 #else
     if (!is_new_kmer && set_contains(all_tags, kmer)) {
       since = 1;
@@ -510,11 +520,16 @@ void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
       since++;
     }
 #endif
-
+    //
     if (since >= _tag_density) {
       ACQUIRE_ALL_TAGS_SPIN_LOCK
       all_tags.insert(kmer);
       RELEASE_ALL_TAGS_SPIN_LOCK
+      
+      // Coloring code
+      // TODO: MAKE THREADSAFE!
+      color_map.insert(TagColorPair(kmer, current_color))
+      
       if (found_tags) { found_tags->insert(kmer); }
       since = 1;
     }
@@ -525,6 +540,10 @@ void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
     ACQUIRE_ALL_TAGS_SPIN_LOCK
     all_tags.insert(kmer);	// insert the last k-mer, too.
     RELEASE_ALL_TAGS_SPIN_LOCK
+    
+    // Color code: TODO: MAKE THREADSAFE!
+    color_map.insert(TagColorPair(kmer, current_color))
+    
     if (found_tags) { found_tags->insert(kmer); }
   }
 }

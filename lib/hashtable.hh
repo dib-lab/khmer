@@ -36,6 +36,7 @@ namespace khmer {
 
   typedef unsigned int Color;
   typedef std::multimap<HashIntoType, Color> TagColorMap;
+  typedef std::pair<HashIntoType, Color> TagColorPair;
 
   struct HashTablePerformanceMetrics : public IPerformanceMetrics
   {
