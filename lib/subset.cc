@@ -1218,7 +1218,6 @@ const
 
 void SubsetPartition::partition_sizes(PartitionCountMap &cm,
 				      unsigned int& n_unassigned)
-
 const
 {
   n_unassigned = 0;
@@ -1231,6 +1230,28 @@ const
     } else {
       n_unassigned++;
     }
+  }
+}
+
+void SubsetPartition::partition_average_coverages(PartitionCountMap& cm,
+						  CountingHash * ht) const
+{
+  PartitionCountMap csum;
+  PartitionCountMap cN;
+
+  // CTB: should *only* be members of this partition, so *not* all_tags.
+  for (PartitionMap::const_iterator pi = partition_map.begin();
+       pi != partition_map.end(); pi++) {
+    if (pi->second) {
+      BoundedCounterType count = ht->get_count(pi->first);
+      csum[*(pi->second)] += count;
+      cN[*(pi->second)]++;
+    }
+  }
+
+  for (PartitionCountMap::iterator pi = csum.begin();
+       pi != csum.end(); pi++) {
+    cm[pi->first] = pi->second / float(cN[pi->first]);
   }
 }
 
