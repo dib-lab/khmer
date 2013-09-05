@@ -405,7 +405,7 @@ def test_partition_on_abundance_1():
 
     # all paths in 'a' and 'b'
     p = kh.do_subset_partition_with_abundance(10, 50)
-    x = kh.subset_count_partitions(p)
+    x = p.count_partitions()
     assert x == (1, 0)                  # one partition, no remainders
 
 def test_partition_on_abundance_2():
@@ -418,7 +418,7 @@ def test_partition_on_abundance_2():
 
     # all paths in 'a'
     p = kh.do_subset_partition_with_abundance(10, 50)
-    x = kh.subset_count_partitions(p)
+    x = p.count_partitions()
     assert x == (1, 6)                  # one partition, six disconnected
 
 def test_partition_on_abundance_3():
@@ -435,7 +435,7 @@ def test_partition_on_abundance_3():
     # this will get paths only in 'b'
     p = kh.do_subset_partition_with_abundance(5, 10)
     
-    x = kh.subset_count_partitions(p)
+    x = p.count_partitions()
     print x
     assert x == (2, 2)                  # two partitions, two ignored tags
 
@@ -453,10 +453,10 @@ def test_partition_overlap_1():
     # this will get paths only in 'a', again -- should be the same!
     p2 = kh.do_subset_partition_with_abundance(10, 50)
 
-    #kh.subset_report_on_partitions(p1)
-    #kh.subset_report_on_partitions(p2)
+    #p1.report_on_partitions()
+    #p2.report_on_partitions()
 
-    x = kh.subset_compare_partitions(p1, 3, p2, 3)
+    x = p1.compare_partitions(3, p2, 3)
     assert x == (0, 0, 14), x
 
 def test_partition_overlap_2():
@@ -473,11 +473,11 @@ def test_partition_overlap_2():
     # this will get paths only in 'b'
     p2 = kh.do_subset_partition_with_abundance(5, 10)
 
-    #kh.subset_report_on_partitions(p1)
-    #kh.subset_report_on_partitions(p2)
+    #p1.report_on_partitions()
+    #p2.report_on_partitions()
 
-    x = kh.subset_compare_partitions(p1, 3, p2, 3)
+    x = p1.compare_partitions(3, p2, 3)
     assert x == (8, 6, 0), x
 
-    x = kh.subset_compare_partitions(p1, 3, p2, 5)
+    x = p1.compare_partitions(3, p2, 5)
     assert x == (2, 0, 6), x
