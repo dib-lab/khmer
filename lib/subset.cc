@@ -1207,6 +1207,20 @@ void SubsetPartition::partition_size_distribution(PartitionCountDistribution &d,
 const
 {
   PartitionCountMap cm;
+
+  partition_sizes(cm, n_unassigned);
+
+  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+       cmi++) {
+    d[cmi->second]++;
+  }
+}
+
+void SubsetPartition::partition_sizes(PartitionCountMap &cm,
+				      unsigned int& n_unassigned)
+
+const
+{
   n_unassigned = 0;
 
   // @CTB: should this be all_tags? See count_partitions.
@@ -1217,11 +1231,6 @@ const
     } else {
       n_unassigned++;
     }
-  }
-
-  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
-       cmi++) {
-    d[cmi->second]++;
   }
 }
 

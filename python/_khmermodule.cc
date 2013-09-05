@@ -3963,11 +3963,47 @@ static PyObject * subset_partition_size_distribution(PyObject * self,
   return Py_BuildValue("Oi", x, n_unassigned);
 }
 
+static PyObject * subset_partition_sizes(PyObject * self,
+					 PyObject * args)
+{
+  khmer_KSubsetPartitionObject * me = (khmer_KSubsetPartitionObject *) self;
+  khmer::SubsetPartition * subset_p = me->subset;
+
+  unsigned int min_size = 0;
+
+  if (!PyArg_ParseTuple(args, "|i", &min_size)) {
+    return NULL;
+  }
+  
+  khmer::PartitionCountMap cm;
+  unsigned int n_unassigned = 0;
+  subset_p->partition_sizes(cm, n_unassigned);
+
+  unsigned int i;
+  khmer::PartitionCountMap::const_iterator mi;
+  for (i = 0, mi = cm.begin(); mi != cm.end(); mi++) {
+    if (mi->second >= min_size) i++;
+  }
+
+  PyObject * x = PyList_New(i);
+
+  // this should probably be a dict. @CTB
+  for (i = 0, mi = cm.begin(); mi != cm.end(); mi++) {
+    if (mi->second >= min_size) {
+      PyList_SET_ITEM(x, i, Py_BuildValue("LL", mi->first, mi->second));
+      i++;
+    }
+  }
+
+  return Py_BuildValue("Oi", x, n_unassigned);
+}
+
 static PyMethodDef khmer_subset_methods[] = {
   { "count_partitions", subset_count_partitions, METH_VARARGS, "" },
   { "report_on_partitions", subset_report_on_partitions, METH_VARARGS, "" },
   { "compare_partitions", subset_compare_partitions, METH_VARARGS, "" },
   { "partition_size_distribution", subset_partition_size_distribution, METH_VARARGS, "" },
+  { "partition_sizes", subset_partition_sizes, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
