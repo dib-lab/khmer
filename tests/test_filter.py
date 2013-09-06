@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import khmer
 import screed
 from screed.fasta import fasta_iter
@@ -34,26 +39,3 @@ class Test_Filter(object):
         assert ['1']*(114-10+1) == output
 
         fd.close()
-
-def test_filter_sodd():
-   K = 32
-   HASHTABLE_SIZE=int(8e7)
-   N_HT = 4
-   MAX_SODD=3
-   
-   ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
-   filename = utils.get_test_data('../../data/high-sodd.fa')
-
-   ht.consume_fasta(filename)
-
-   seq = "CGTTAGTTGCGGTGCCGACCGGCAAACTTGGTTTTGCCAAAAATTTTTACAGTTAGAAATTATTCACAAAGTTGCACCGGAATTCGGTTACAAACGTCATTCTAACTAAT"
-   trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
-   assert trim_seq == "CGTTAGTTGCGGTGCCGACCGGCAAACTTGGT"
-
-   seq = "ACAAAATTCCACATATAGTCATAATTGTGGGCAATTTTCGTCCCAAATTAGTTAGAATGACGTTTGTAACCGAATTCCGGTGCAACTTTGTGAATAATTTCTAACTGTAAAAAT"
-   trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
-   assert trim_seq == "ACAAAATTCCACATATAGTCATAATTGTGGGCAATT"
-
-   seq = "GCACGCAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTG"
-   trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
-   assert trim_seq == seq

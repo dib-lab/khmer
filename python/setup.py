@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 from distribute_setup import use_setuptools
 use_setuptools()
 
@@ -40,7 +45,7 @@ extra_objs.extend( map(
     ]
 ) )
 
-build_depends = extra_objs
+build_depends = list(extra_objs)
 build_depends.extend( map(
     lambda bn: path_join( path_pardir, "lib", bn + ".hh" ),
     [

@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import khmer
 import screed
 
@@ -371,3 +376,121 @@ def test_small_real_partitions():
     assert set(parts) != set(['0'])
 
 test_small_real_partitions.runme = True
+
+a = """\
+CAGACTTGGAAGCTGAGAGTCCGACGTCACTGCCTCAACTCGCGCAAATGTTCCCGCCAA\
+ATTGTATCCTAGGGATCTTCCATAAGCTTATATACGGGGGTTTCCAAGGCCCTGATGCCA\
+GTGCCTAATCTTTTGGAGTCCTCTCAGGGCCACTAGATGCCATGCTACGCGTCCCAGGTT\
+GGCCTGAGGGTCTACACGGAGTGGGAAGCATGGGTACCTTAGCGAACATTCATACTGGCC\
+TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
+"""
+
+b = """\
+TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
+GACTGTAGACTTGAACCTCGATGGAATGCAGGTCCCATTCTCTGGCCTGACTCATGGAAC\
+CGAGGCCAAAAAAGCATGGCACGAAGACGCTATGCGAGGGTGCTCGCCCATGTCGTCGCC\
+GTACCACGACAGATTTATACAATGCGTTTCTACAGGCCCCATTGGGAACAAACAAAAAGT\
+CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
+"""
+
+def test_partition_on_abundance_1():
+    print (a,)
+    print (b,)
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+        
+    for i in range(10):
+        print kh.consume_and_tag(b)
+
+    # all paths in 'a' and 'b'
+    p = kh.do_subset_partition_with_abundance(10, 50)
+    x = p.count_partitions()
+    assert x == (1, 0)                  # one partition, no remainders
+
+def test_partition_on_abundance_2():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+        
+    for i in range(5):
+        print kh.consume_and_tag(b)
+
+    # all paths in 'a'
+    p = kh.do_subset_partition_with_abundance(10, 50)
+    x = p.count_partitions()
+    assert x == (1, 6)                  # one partition, six disconnected
+
+def test_partition_on_abundance_3():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+        
+    for i in range(5):
+        print kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'b'
+    p = kh.do_subset_partition_with_abundance(5, 10)
+    
+    x = p.count_partitions()
+    print x
+    assert x == (2, 2)                  # two partitions, two ignored tags
+
+def test_partition_overlap_1():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        kh.consume_and_tag(a)
+        
+    for i in range(10):
+        kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p1 = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'a', again -- should be the same!
+    p2 = kh.do_subset_partition_with_abundance(10, 50)
+
+    #p1.report_on_partitions()
+    #p2.report_on_partitions()
+
+    x = p1.compare_partitions(3, p2, 3)
+    assert x == (0, 0, 14), x
+
+def test_partition_overlap_2():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        kh.consume_and_tag(a)
+        
+    for i in range(5):
+        kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p1 = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'b'
+    p2 = kh.do_subset_partition_with_abundance(5, 10)
+
+    #p1.report_on_partitions()
+    #p2.report_on_partitions()
+
+    x = p1.compare_partitions(3, p2, 3)
+    assert x == (8, 6, 0), x
+
+    x = p1.compare_partitions(3, p2, 5)
+    assert x == (2, 0, 6), x
+
+    x = p1.partition_sizes()
+    assert x == ([(3L, 8L)], 0), x
+    
+    x = p2.partition_sizes()
+    assert x == ([(3L, 6L), (5L, 6L)], 2), x
+
+    x = p1.partition_average_coverages(kh)
+    assert x == [(3L, 11L)]
+
+    x = p2.partition_average_coverages(kh)
+    assert x == [(3L, 5L), (5L, 10L)], x
+
