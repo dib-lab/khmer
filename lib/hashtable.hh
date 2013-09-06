@@ -142,7 +142,6 @@ namespace khmer {
     bool done() { return index >= length; }
   }; // class KMerIterator
 
-
   class Hashtable {		// Base class implementation of a Bloom ht.
     friend class SubsetPartition;
   protected:
@@ -183,20 +182,31 @@ namespace khmer {
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    // Check if the given TagToColorMap already has the tag with the given color
-    bool _cmap_contains(TagToColorMap& cmap,
+    // Does the given tag already have the given color?
+    bool _cmap_contains_color(const TagColorPtrMap& cmap,
                         HashIntoType& kmer,
                         Color& the_color)
     {
-      std::pair<TagColorPair::iterator, TagColorPair::iterator> ret;
+      std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
       ret = cmap->equal_range(kmer);
-      for (TagToColorMap::iterator it=ret.first; it!=ret.second; ++it) {
-        if (it->second == the_color) return true;
+      for (TagColorPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+        if (*(it->second) == the_color) return true;
       }
       return false;
     }
 
-
+    // Does the given color already have a tag associated with it?
+    bool _cmap_contains_tag(const ColorTagPtrMap& cmap,
+                            Color& the_color,
+                            HashIntoType& kmer) {
+      std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
+      ret = cmap->equal_range(the_color);
+      for (ColorTagPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+        if(*(it->second) == kmer) return true;
+      }
+      return false;
+    }
+    
     Hashtable(
 	WordLength	ksize,
 	uint32_t const	number_of_threads   = 
@@ -476,6 +486,11 @@ namespace khmer {
 					unsigned long long& n_consumed,
 					Color& current_color,
 					SeenSet * new_tags = 0)
+
+    void link_tag_and_color(HashIntoType& kmer, Color& color) {
+        tag_colors.insert(TagColorPtrPair(kmer, &current_color));
+        color_tag_ptrs.insert(ColorTagPtrPair(current_color, &kmer));
+    }
 
     void consume_fasta_and_traverse(const std::string &filename,
 				    unsigned int distance,
