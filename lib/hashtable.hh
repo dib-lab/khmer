@@ -188,7 +188,7 @@ namespace khmer {
                         Color& the_color)
     {
       std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
-      ret = cmap->equal_range(kmer);
+      ret = cmap.equal_range(kmer);
       for (TagColorPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
         if (*(it->second) == the_color) return true;
       }
@@ -200,11 +200,37 @@ namespace khmer {
                             Color& the_color,
                             HashIntoType& kmer) {
       std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
-      ret = cmap->equal_range(the_color);
+      ret = cmap.equal_range(the_color);
       for (ColorTagPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
         if(*(it->second) == kmer) return true;
       }
       return false;
+    }
+    
+    unsigned int _get_tag_colors(const HashIntoType& tag,
+                          const TagColorPrtMap& cmap,
+                          ColorPtrSet& found_colors) {
+        unsigned int num_colors = 0;
+        std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
+        ret = cmap.equal_range(tag);
+        for (TagColorPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+            found_colors.insert(it->second);
+            ++num_colors;
+        }
+        return num_colors;
+    }
+    
+    unsigned int _get_tags_from_color(const Color& color,
+                               const ColorTagPtrMap& cmap,
+                               TagPtrSet& colored_tags) {
+        unsigned int num_tags = 0;
+        std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
+        ret = cmap.equal_range(color);
+        for (ColorTagPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+            color_tags.insert(it->second);
+            ++num_tags;
+        }
+        return num_tags;
     }
     
     Hashtable(

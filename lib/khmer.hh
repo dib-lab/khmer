@@ -88,9 +88,12 @@ namespace khmer {
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
   
   typedef unsigned int Color;
-  typedef std::multimap<HashIntoType, Color> TagColorMap;
+  typedef std::multimap<HashIntoType, Color*> TagColorPtrMap;
   typedef std::multimap<Color, HashIntoType*> ColorTagPtrMap;
-  typedef std::pair<HashIntoType, Color> TagColorPair;
+  typedef std::pair<HashIntoType, Color*> TagColorPtrPair;
+  typedef std::pair<Color, HashIntoType*> ColorTagPtrPair;
+  typedef std::set<Color*> ColorPtrSet;
+  typedef std::set<HashIntoType*> TagPtrSet;
 }
 
 #endif // KHMER_HH
