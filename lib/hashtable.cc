@@ -2098,8 +2098,9 @@ void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
 	    // Coloring code
 	    // TODO: MAKE THREADSAFE!
 	    
-	    if (!_map_contains(color_map, kmer, current_color)) {
+	    if (!_cmap_contains(color_map, kmer, current_color)) {
 	      color_map.insert(TagColorPair(kmer, current_color))
+	      
 	    }
 	    if (found_tags) {
 	      found_tags->insert(kmer);

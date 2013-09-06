@@ -183,6 +183,20 @@ namespace khmer {
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
+    // Check if the given TagToColorMap already has the tag with the given color
+    bool _cmap_contains(TagToColorMap& cmap,
+                        HashIntoType& kmer,
+                        Color& the_color)
+    {
+      std::pair<TagColorPair::iterator, TagColorPair::iterator> ret;
+      ret = cmap->equal_range(kmer);
+      for (TagToColorMap::iterator it=ret.first; it!=ret.second; ++it) {
+        if (it->second == the_color) return true;
+      }
+      return false;
+    }
+
+
     Hashtable(
 	WordLength	ksize,
 	uint32_t const	number_of_threads   = 
