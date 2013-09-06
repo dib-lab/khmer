@@ -1951,7 +1951,7 @@ void Hashtable::extract_unique_paths(std::string seq,
  */
 
 void
-Hashbits::
+Hashtable::
 consume_fasta_and_tag_with_colors(
   std:: string const  &filename,
   unsigned int	      &total_reads, unsigned long long	&n_consumed,
@@ -1978,7 +1978,7 @@ consume_fasta_and_tag_with_colors(
 }
 
 void
-Hashbits::
+Hashtable::
 consume_fasta_and_tag_with_colors(
   read_parsers:: IParser *  parser,
   unsigned int		    &total_reads,   unsigned long long	&n_consumed,
@@ -2066,7 +2066,7 @@ consume_fasta_and_tag_with_colors(
  * tags through multimap TagColorMap defined in hashtable.hh, declared in
  * hashbits.hh
  */
-void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
+void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
 					unsigned long long& n_consumed,
 					Color& current_color,
 					SeenSet * found_tags)
@@ -2099,8 +2099,7 @@ void Hashbits::consume_sequence_and_tag_with_colors(const std::string& seq,
 	    // TODO: MAKE THREADSAFE!
 	    
 	    if (!_cmap_contains(color_map, kmer, current_color)) {
-	      color_map.insert(TagColorPair(kmer, current_color))
-	      
+	      link_tag_and_color(kmer, current_color);
 	    }
 	    if (found_tags) {
 	      found_tags->insert(kmer);
