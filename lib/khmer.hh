@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #ifndef KHMER_HH
 #   define KHMER_HH
 
@@ -18,6 +24,9 @@ extern "C"
 
 // C++ standard exceptions are subclassed almost ubiquitously.
 #include <exception>
+#include <set>
+#include <map>
+#include <queue>
 
 #   define VERSION "0.4"
 
@@ -63,6 +72,24 @@ namespace khmer {
   struct InvalidStreamBuffer : public std:: exception
   { };
 
+
+  typedef unsigned int PartitionID;
+  typedef std::set<HashIntoType> SeenSet;
+  typedef std::set<PartitionID> PartitionSet;
+  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
+  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
+  typedef std::set<PartitionID *> PartitionPtrSet;
+  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
+  typedef std::queue<HashIntoType> NodeQueue;
+  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+  typedef std::map<HashIntoType, unsigned int> TagCountMap;
+  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+  
+  typedef unsigned int Color;
+  typedef std::multimap<HashIntoType, Color> TagColorMap;
+  typedef std::pair<HashIntoType, Color> TagColorPair;
 }
 
 #endif // KHMER_HH
