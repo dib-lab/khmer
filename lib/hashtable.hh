@@ -320,6 +320,8 @@ namespace khmer {
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
+    TagColorMap tag_colors;
+    ColorTagPrtMap color_tag_ptrs;
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -439,6 +441,27 @@ namespace khmer {
 					     unsigned long long &n_consumed,
 					     CallbackFn callback = 0,
 					     void * callback_data = 0);
+					     
+
+    
+    void consume_fasta_and_tag_with_colors(
+                        std::string const	  &filename,
+                        unsigned int	  &total_reads,
+                        unsigned long long  &n_consumed,
+                        CallbackFn	  callback	  = NULL,
+                        void *		  callback_data	  = NULL);
+
+    void consume_fasta_and_tag_with_colors(
+	                read_parsers:: IParser *	    parser,
+	                unsigned int	    &total_reads,
+	                unsigned long long  &n_consumed,
+	                CallbackFn	    callback	    = NULL,
+	                void *		    callback_data   = NULL);
+				  
+    void consume_sequence_and_tag_with_colors(const std::string& seq,
+					unsigned long long& n_consumed,
+					Color& current_color,
+					SeenSet * new_tags = 0)
 
     void consume_fasta_and_traverse(const std::string &filename,
 				    unsigned int distance,
