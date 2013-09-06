@@ -1951,8 +1951,7 @@ void Hashtable::extract_unique_paths(std::string seq,
  */
 
 void
-Hashtable::
-consume_fasta_and_tag_with_colors(
+Hashtable::consume_fasta_and_tag_with_colors(
   std:: string const  &filename,
   unsigned int	      &total_reads, unsigned long long	&n_consumed,
   CallbackFn	      callback,	    void *		callback_data
@@ -1978,88 +1977,87 @@ consume_fasta_and_tag_with_colors(
 }
 
 void
-Hashtable::
-consume_fasta_and_tag_with_colors(
-  read_parsers:: IParser *  parser,
-  unsigned int		    &total_reads,   unsigned long long	&n_consumed,
-  CallbackFn		    callback,	    void *		callback_data
-)
-{
-  Hasher		  &hasher		= 
-  _get_hasher( parser->uuid( ) );
-  unsigned int		  total_reads_LOCAL	= 0;
-#if (0) // Note: Used with callback - currently disabled.
-  unsigned long long int  n_consumed_LOCAL	= 0;
-#endif
-  Read			  read;
-
-  // TODO? Delete the following assignments.
-  total_reads = 0;
-  n_consumed = 0;
-  
-  hasher.trace_logger(
-    TraceLogger:: TLVL_DEBUG2,
-    "Starting trace of 'consume_fasta_and_tag'....\n"
-  );
-
-  // Iterate through the reads and consume their k-mers.
-  while (!parser->is_complete( ))
+Hashtable::consume_fasta_and_tag_with_colors(
+    read_parsers:: IParser *  parser,
+    unsigned int		    &total_reads,   unsigned long long	&n_consumed,
+    CallbackFn		    callback,	    void *		callback_data
+  )
   {
-    unsigned long long this_n_consumed   = 0;
+    Hasher		  &hasher		= 
+    _get_hasher( parser->uuid( ) );
+    unsigned int		  total_reads_LOCAL	= 0;
+  #if (0) // Note: Used with callback - currently disabled.
+    unsigned long long int  n_consumed_LOCAL	= 0;
+  #endif
+    Read			  read;
 
-    read = parser->get_next_read( );
+    // TODO? Delete the following assignments.
+    total_reads = 0;
+    n_consumed = 0;
+    
+    hasher.trace_logger(
+      TraceLogger:: TLVL_DEBUG2,
+      "Starting trace of 'consume_fasta_and_tag'....\n"
+    );
 
-    if (check_and_normalize_read( read.sequence ))
+    // Iterate through the reads and consume their k-mers.
+    while (!parser->is_complete( ))
     {
-      // TODO: make threadsafe!
-      consume_sequence_and_tag_with_colors( read.sequence,
-					    this_n_consumed,
-					    _tag_color );
-      ++_tag_color;
+      unsigned long long this_n_consumed   = 0;
 
-#ifdef WITH_INTERNAL_METRICS
-      hasher.pmetrics.start_timers( );
-#endif
-#if (0) // Note: Used with callback - currently disabled.
-      n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#else
-      __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#endif
-      total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
-#ifdef WITH_INTERNAL_METRICS
-      hasher.pmetrics.stop_timers( );
-      hasher.pmetrics.accumulate_timer_deltas(
-	(uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
-      );
-#endif
-    }
+      read = parser->get_next_read( );
 
-    if (0 == (total_reads_LOCAL % 10000))
-      hasher.trace_logger(
-	TraceLogger:: TLVL_DEBUG3,
-	"Total number of reads processed: %llu\n",
-	(unsigned long long int)total_reads_LOCAL
-      );
+      if (check_and_normalize_read( read.sequence ))
+      {
+        // TODO: make threadsafe!
+        consume_sequence_and_tag_with_colors( read.sequence,
+					      this_n_consumed,
+					      _tag_color );
+        ++_tag_color;
 
-    // TODO: Figure out alternative to callback into Python VM
-    //       Cannot use in multi-threaded operation.
-#if (0)
-      // run callback, if specified
-      if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
-	std::cout << "n tags: " << all_tags.size() << "\n";
-	try {
-	  callback("consume_fasta_and_tag", callback_data, total_reads_TL,
-		   n_consumed);
-	} catch (...) {
-	  delete parser;
-	  throw;
-	}
+  #ifdef WITH_INTERNAL_METRICS
+        hasher.pmetrics.start_timers( );
+  #endif
+  #if (0) // Note: Used with callback - currently disabled.
+        n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+  #else
+        __sync_add_and_fetch( &n_consumed, this_n_consumed );
+  #endif
+        total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+  #ifdef WITH_INTERNAL_METRICS
+        hasher.pmetrics.stop_timers( );
+        hasher.pmetrics.accumulate_timer_deltas(
+	  (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
+        );
+  #endif
       }
-#endif // 0
 
-  } // while reads left for parser
+      if (0 == (total_reads_LOCAL % 10000))
+        hasher.trace_logger(
+	  TraceLogger:: TLVL_DEBUG3,
+	  "Total number of reads processed: %llu\n",
+	  (unsigned long long int)total_reads_LOCAL
+        );
 
-}
+      // TODO: Figure out alternative to callback into Python VM
+      //       Cannot use in multi-threaded operation.
+  #if (0)
+        // run callback, if specified
+        if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
+	  std::cout << "n tags: " << all_tags.size() << "\n";
+	  try {
+	    callback("consume_fasta_and_tag", callback_data, total_reads_TL,
+		     n_consumed);
+	  } catch (...) {
+	    delete parser;
+	    throw;
+	  }
+        }
+  #endif // 0
+
+    } // while reads left for parser
+
+  }
 
 
 /* This is essentially the same code as above, only it assigns colors to the
@@ -2070,79 +2068,120 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
 					unsigned long long& n_consumed,
 					Color& current_color,
 					SeenSet * found_tags)
-{
-  bool is_new_kmer;
-  bool kmer_tagged;
+  {
+    bool is_new_kmer;
+    bool kmer_tagged;
 
-  KMerIterator kmers(seq.c_str(), _ksize);
-  HashIntoType kmer;
+    KMerIterator kmers(seq.c_str(), _ksize);
+    HashIntoType kmer;
 
-  unsigned int since = _tag_density / 2 + 1;
+    unsigned int since = _tag_density / 2 + 1;
 
-  while(!kmers.done()) {
-    kmer = kmers.next();
+    while(!kmers.done()) {
+      kmer = kmers.next();
 
-    if ((is_new_kmer = test_and_set_bits( kmer )))
-      ++n_consumed;
+      if ((is_new_kmer = test_and_set_bits( kmer )))
+        ++n_consumed;
 
-#if (1)
-    if (is_new_kmer) {
-      ++since;
-    } else {
+  #if (1)
+      if (is_new_kmer) {
+        ++since;
+      } else {
+        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        kmer_tagged = set_contains(all_tags, kmer);
+        RELEASE_ALL_TAGS_SPIN_LOCK
+        if (kmer_tagged) {
+	      since = 1;
+	      
+	      // Coloring code
+	      // TODO: MAKE THREADSAFE!
+	      
+	      if (!_cmap_contains_color(color_map, kmer, current_color)) {
+	        link_tag_and_color(kmer, current_color);
+	      }
+	      if (found_tags) {
+	        found_tags->insert(kmer);
+	      }
+        }  else ++since;
+      }
+      // Should I bother adding new code down here?
+  #else
+      if (!is_new_kmer && set_contains(all_tags, kmer)) {
+        since = 1;
+        if (found_tags) { found_tags->insert(kmer); }
+      } else {
+        since++;
+      }
+  #endif
+      //
+      if (since >= _tag_density) {
+        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        all_tags.insert(kmer);
+        RELEASE_ALL_TAGS_SPIN_LOCK
+        
+        // Coloring code
+        // TODO: MAKE THREADSAFE!
+        link_tag_and_color(kmer, current_color)
+        
+        if (found_tags) { found_tags->insert(kmer); }
+        since = 1;
+      }
+
+    } // iteration over kmers
+
+    if (since >= _tag_density/2 - 1) {
       ACQUIRE_ALL_TAGS_SPIN_LOCK
-      kmer_tagged = set_contains(all_tags, kmer);
-      RELEASE_ALL_TAGS_SPIN_LOCK
-      if (kmer_tagged) {
-	    since = 1;
-	    
-	    // Coloring code
-	    // TODO: MAKE THREADSAFE!
-	    
-	    if (!_cmap_contains(color_map, kmer, current_color)) {
-	      link_tag_and_color(kmer, current_color);
-	    }
-	    if (found_tags) {
-	      found_tags->insert(kmer);
-	    }
-      }  else ++since;
-    }
-    // Should I bother adding new code down here?
-#else
-    if (!is_new_kmer && set_contains(all_tags, kmer)) {
-      since = 1;
-      if (found_tags) { found_tags->insert(kmer); }
-    } else {
-      since++;
-    }
-#endif
-    //
-    if (since >= _tag_density) {
-      ACQUIRE_ALL_TAGS_SPIN_LOCK
-      all_tags.insert(kmer);
+      all_tags.insert(kmer);	// insert the last k-mer, too.
       RELEASE_ALL_TAGS_SPIN_LOCK
       
-      // Coloring code
-      // TODO: MAKE THREADSAFE!
-      color_map.insert(TagColorPair(kmer, current_color))
+      // Color code: TODO: MAKE THREADSAFE!
+      link_tag_and_color(kmer, current_color)
       
       if (found_tags) { found_tags->insert(kmer); }
-      since = 1;
     }
-
-  } // iteration over kmers
-
-  if (since >= _tag_density/2 - 1) {
-    ACQUIRE_ALL_TAGS_SPIN_LOCK
-    all_tags.insert(kmer);	// insert the last k-mer, too.
-    RELEASE_ALL_TAGS_SPIN_LOCK
-    
-    // Color code: TODO: MAKE THREADSAFE!
-    color_map.insert(TagColorPair(kmer, current_color))
-    
-    if (found_tags) { found_tags->insert(kmer); }
   }
+/*
+ * Find all colors associated with the sequence
+ * For now, check /every/ k-mer with find_all_tags
+ * THIS SUCKS AND IT'S YOUR FAULT @CTB
+ */
+void Hashtable::sweep_sequence_for_colors(const std::string& seq,
+					unsigned long long& n_consumed,
+					SeenSet * found_tags,
+					bool break_on_stoptags,
+					bool stop_big_traversals) {
+					
+    SeenSet tagged_kmers;
+    ColorPtrSet found_colors;
+    
+    const unsigned char ksize = _ht->ktsize();
+    HashIntoType kmer_f, kmer_r, kmer;
+    
+    KMerIterator kmers(seq.c_str(), _ksize);
+    HashIntoType kmer_s;
+
+    while (!kmers.done()) {
+      kmer_s = kmers.next();
+      kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+      
+      find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+          break_on_stoptags, stop_big_traversals);
+    }
 }
 
+void Hashtable::traverse_colors_and_resolve(const SeenSet& tagged_kmers,
+                                              ColorPtrSet& found_colors) {
+  
+  SeenSet::const_iterator si;
+  unsigned int num_colors = 0;
+  for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
+    tag = *si;
+    // get the colors associated with this tag
+    num_colors = _get_tag_colors(tag, tag_colors, found_colors)
+    if (num_colors > 1) {
+      // reconcile colors
+    }
+  }
 }
 
 // vim: set sts=2 sw=2:
