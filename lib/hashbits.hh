@@ -186,6 +186,22 @@ namespace khmer {
 	void *		    callback_data   = NULL
     );
 
+    
+    void consume_fasta_and_tag_with_colors(
+      std::string const	  &filename,
+      unsigned int	  &total_reads,
+      unsigned long long  &n_consumed,
+      CallbackFn	  callback	  = NULL,
+      void *		  callback_data	  = NULL
+    );
+
+    void consume_fasta_and_tag_with_colors(
+	read_parsers:: IParser *	    parser,
+	unsigned int	    &total_reads,
+	unsigned long long  &n_consumed,
+	CallbackFn	    callback	    = NULL,
+	void *		    callback_data   = NULL
+    );
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,
 				  SeenSet * new_tags = 0);

@@ -467,6 +467,124 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
   }
 }
 
+/*
+ * Pretty much copy-pasta from the above functions
+ * Might be time for a refactor: could do a general consume_fasta
+ * function which accepts a consume_sequence function pointer as a parameter
+ */
+
+void
+Hashbits::
+consume_fasta_and_tag_with_colors(
+  std:: string const  &filename,
+  unsigned int	      &total_reads, unsigned long long	&n_consumed,
+  CallbackFn	      callback,	    void *		callback_data
+)
+{
+  khmer:: Config    &the_config	  = khmer:: get_active_config( );
+
+  // Note: Always assume only 1 thread if invoked this way.
+  IParser *	  parser = 
+  IParser::get_parser(
+    filename, 1, the_config.get_reads_input_buffer_size( ),
+    the_config.get_reads_parser_trace_level( )
+  );
+
+
+  consume_fasta_and_tag_with_colors(
+    parser,
+    total_reads, n_consumed,
+    callback, callback_data
+  );
+
+  delete parser;
+}
+
+void
+Hashbits::
+consume_fasta_and_tag_with_colors(
+  read_parsers:: IParser *  parser,
+  unsigned int		    &total_reads,   unsigned long long	&n_consumed,
+  CallbackFn		    callback,	    void *		callback_data
+)
+{
+  Hasher		  &hasher		= 
+  _get_hasher( parser->uuid( ) );
+  unsigned int		  total_reads_LOCAL	= 0;
+#if (0) // Note: Used with callback - currently disabled.
+  unsigned long long int  n_consumed_LOCAL	= 0;
+#endif
+  Read			  read;
+
+  // TODO? Delete the following assignments.
+  total_reads = 0;
+  n_consumed = 0;
+  
+  hasher.trace_logger(
+    TraceLogger:: TLVL_DEBUG2,
+    "Starting trace of 'consume_fasta_and_tag'....\n"
+  );
+
+  // Iterate through the reads and consume their k-mers.
+  while (!parser->is_complete( ))
+  {
+    unsigned long long this_n_consumed   = 0;
+
+    read = parser->get_next_read( );
+
+    if (check_and_normalize_read( read.sequence ))
+    {
+      // TODO: make threadsafe!
+      consume_sequence_and_tag_with_colors( read.sequence,
+					    this_n_consumed,
+					    _tag_color );
+      ++_tag_color;
+
+#ifdef WITH_INTERNAL_METRICS
+      hasher.pmetrics.start_timers( );
+#endif
+#if (0) // Note: Used with callback - currently disabled.
+      n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#else
+      __sync_add_and_fetch( &n_consumed, this_n_consumed );
+#endif
+      total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+#ifdef WITH_INTERNAL_METRICS
+      hasher.pmetrics.stop_timers( );
+      hasher.pmetrics.accumulate_timer_deltas(
+	(uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
+      );
+#endif
+    }
+
+    if (0 == (total_reads_LOCAL % 10000))
+      hasher.trace_logger(
+	TraceLogger:: TLVL_DEBUG3,
+	"Total number of reads processed: %llu\n",
+	(unsigned long long int)total_reads_LOCAL
+      );
+
+    // TODO: Figure out alternative to callback into Python VM
+    //       Cannot use in multi-threaded operation.
+#if (0)
+      // run callback, if specified
+      if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
+	std::cout << "n tags: " << all_tags.size() << "\n";
+	try {
+	  callback("consume_fasta_and_tag", callback_data, total_reads_TL,
+		   n_consumed);
+	} catch (...) {
+	  delete parser;
+	  throw;
+	}
+      }
+#endif // 0
+
+  } // while reads left for parser
+
+}
+
+
 /* This is essentially the same code as above, only it assigns colors to the
  * tags through multimap TagColorMap defined in hashtable.hh, declared in
  * hashbits.hh
