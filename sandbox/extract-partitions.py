@@ -16,6 +16,13 @@ output_unassigned = False
 
 
 def read_partition_file(filename):
+    
+    # For each record in input file, yield its index, name, partition ID and sequence
+    # Input file format looks like:
+    #
+    # >name    partition_id
+    # SEQUENCE
+    #
     for n, record in enumerate(screed.open(filename)):
         name = record.name
         name, partition_id = name.rsplit('\t', 1)
@@ -25,15 +32,21 @@ def read_partition_file(filename):
 
 filename = sys.argv[1]
 
+# If prefix is given as second arg, pick it up.
+# Else, use filename-sans-path as prefix
+
 prefix = os.path.basename(filename)
 if len(sys.argv) > 2:
     prefix = sys.argv[2]
 
+# Create dist file and open to write
 distfilename = prefix + '.dist'
 distfp = open(distfilename, 'w')
 
 print '---'
 print 'reading partitioned file:', filename
+
+# Output reads after grouping them by partition annotation
 if output_groups:
     print 'outputting to files named "%s.groupN.fa"' % prefix
     print 'min reads to keep a partition:', THRESHOLD
@@ -41,9 +54,11 @@ if output_groups:
 else:
     print 'NOT outputting groups! Beware!'
 
+# Output reads unassigned to any partition to a separate file
 if output_unassigned:
     print 'outputting unassigned reads to "%s.unassigned.fa"' % prefix
 
+# Output details on partition size distribution
 print 'partition size distribution will go to %s' % distfilename
 print '---'
 
@@ -53,18 +68,27 @@ count = {}
 
 ###
 
+# Open unassigned-reads-file to write into
 if output_unassigned:
     unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
 
+# Get details of each sequence
 for n, name, pid, seq in read_partition_file(filename):
+    # Progress indicator
     if n % 100000 == 0:
         print '...', n
 
+    # Count number of sequences in partition with ID=pid
+    # If this is the first member of a partition, initialize
+    # count to 1
     count[pid] = count.get(pid, 0) + 1
 
+    # If current pid is 0 (no partition allocated), write
+    # read to unassigned-reads-file
     if pid == 0 and output_unassigned:
         print >>unassigned_fp, '>%s\n%s' % (name, seq)
 
+# Close unassigned-reads-file if open
 if output_unassigned:
     unassigned_fp.close()
 
@@ -72,6 +96,8 @@ if 0 in count:                          # eliminate unpartitioned sequences
     del count[0]
 
 # develop histogram of partition sizes
+# operation equivalent to 
+# COUNT(*) GROUP BY PARTITION_SIZE  
 dist = {}
 for pid, size in count.items():
     dist[size] = dist.get(size, 0) + 1
@@ -79,6 +105,8 @@ for pid, size in count.items():
 # output histogram
 total = 0
 wtotal = 0
+# Iterate thru sorted group-size-count distribution and
+# write group-size, group-size-count, cumul-sum, weighted-cumul-sum
 for c, n in sorted(dist.items()):
     total += n
     wtotal += c * n
@@ -88,7 +116,8 @@ distfp.close()
 if not output_groups:
     sys.exit(0)
 
-# sort groups by size
+# sort groups by size and filter out groups with size
+# below THRESHOLD
 divvy = sorted(count.items(), key=lambda y: y[1])
 divvy = filter(lambda y: y[1] > THRESHOLD, divvy)
 
