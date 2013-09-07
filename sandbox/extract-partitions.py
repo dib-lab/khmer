@@ -127,11 +127,19 @@ total = 0
 group = set()
 group_n = 0
 group_d = {}
+# Iterating through pid:count(reads) in sorted+filtered group-data,
 for partition_id, n_reads in divvy:
+    # We add the pid to our "group" set;
     group.add(partition_id)
+    # and the count(reads) to a total counter
     total += n_reads
-
+    
+    # If the total count of reads in groups tracked until current iteration
+    # is more than a pre-determined max size 
     if total > MAX_SIZE:
+        # package the current groups and open a new container for
+        # the next set of groups. Each pack bears the ID of the
+        # last partition of the group of partitions
         for partition_id in group:
             group_d[partition_id] = group_n
             # print 'group_d', partition_id, group_n
@@ -139,7 +147,8 @@ for partition_id, n_reads in divvy:
         group_n += 1
         group = set()
         total = 0
-
+# Final cleanup - for the final batch of groups processed,
+# because their total read count might not be >MAX_SIZE 
 if group:
     for partition_id in group:
         group_d[partition_id] = group_n
@@ -157,19 +166,29 @@ for n in range(group_n):
 
 ## write 'em all out!
 
+# Get index, seqName, pid and seq from inFile and process as
+# follows:
 for n, name, partition_id, seq in read_partition_file(filename):
+    # If 100,000 seqs have been processed, print a progress message
     if n % 100000 == 0:
         print '...x2', n
 
+    # If no partition allocated to read, skip it
     if partition_id == 0:
         continue
 
+    # Check if there exists a group of partition with the current
+    # pid
     try:
         group_n = group_d[partition_id]
     except KeyError:
+        # If not, ensure that count of seqs with the matching pid
+        # is > THRESHOLD and skip
         assert count[partition_id] <= THRESHOLD
         continue
 
+    # Pick the current output file
     outfp = group_fps[group_n]
 
+    # Write to the output file
     outfp.write('>%s\t%s\n%s\n' % (name, partition_id, seq))
