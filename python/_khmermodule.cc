@@ -2195,15 +2195,15 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self, PyObj
   return (PyObject *) subset_obj;
 }
 
-static PyObject * hash_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
+static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
 {
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
   
-  PyObject * callback_obs = NULL;
+  PyObject * callback_obj = NULL;
   PyObject * rparser_obj = NULL;
   
-  if (!PyArg_ParseType(args, "O|O", &rparser_obj, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "O|O", &rparser_obj, &callback_obj)) {
     return NULL;
   }
   
@@ -2215,10 +2215,10 @@ static PyObject * hash_consume_fasta_and_tag_with_colors(PyObject * self, PyObje
   
   Py_BEGIN_ALLOW_THREADS
   try {
-    counting->consume_fasta_and_tag_with_colors(rparser, total_reads, n_consumed,
+    hb->consume_fasta_and_tag_with_colors(rparser, total_reads, n_consumed,
                                                 _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
-    exc_raised = TRUE;
+    exc_raised = true;
   }
   Py_END_ALLOW_THREADS
   if (exc_raised) return NULL;
@@ -2227,9 +2227,9 @@ static PyObject * hash_consume_fasta_and_tag_with_colors(PyObject * self, PyObje
   
 }
 
-static PyObject * hash_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
+static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
   
   char * seq = NULL;
   bool break_on_stoptags = NULL;
@@ -2239,11 +2239,33 @@ static PyObject * hash_sweep_sequence_for_colors(PyObject * self, PyObject * arg
     return NULL;
   }
   
-  if (strlen(kmer_s) < counting->ksize()) {
+  if (strlen(seq) < hb->ksize()) {
     return NULL;
   }
   
-  _pre_partition_info
+  //std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
+  ColorPtrSet found_colors;
+  
+  bool exc_raised = false;
+  Py_BEGIN_ALLOW_THREADS
+  try {
+    hb->sweep_sequence_for_colors(seq, found_colors, break_on_stoptags, stop_big_traversals);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  Py_END_ALLOW_THREADS
+  
+  if (exc_raised) return NULL;
+  
+  PyObject * x =  PyList_New(found_colors.size());
+  khmer::ColorPtrSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("i", *(*si)));
+    i++;
+  }
+  
+  return x;
 }
 
 static PyMethodDef khmer_counting_methods[] = {
@@ -2282,7 +2304,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
   { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
-  { "consume_fasta_and_tag_with_colors", hash_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
+  
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -3937,7 +3959,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
   { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
-
+  { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
+  { "sweep_sequence_for_colors", hashbits_sweep_sequence_for_colors, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
