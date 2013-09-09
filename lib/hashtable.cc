@@ -1943,7 +1943,7 @@ void Hashtable::extract_unique_paths(std::string seq,
       i++;
     }
   }
-  
+}
 /*
  * Pretty much copy-pasta
  * Might be time for a refactor: could do a general consume_fasta
@@ -1999,7 +1999,9 @@ Hashtable::consume_fasta_and_tag_with_colors(
       TraceLogger:: TLVL_DEBUG2,
       "Starting trace of 'consume_fasta_and_tag'....\n"
     );
-
+    
+    Color _tag_color = 0;
+    Color * the_color = new Color(_tag_color++);
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))
     {
@@ -2012,8 +2014,8 @@ Hashtable::consume_fasta_and_tag_with_colors(
         // TODO: make threadsafe!
         consume_sequence_and_tag_with_colors( read.sequence,
 					      this_n_consumed,
-					      _tag_color );
-        ++_tag_color;
+					      *the_color );
+        the_color = new Color(_tag_color++);
 
   #ifdef WITH_INTERNAL_METRICS
         hasher.pmetrics.start_timers( );
@@ -2059,7 +2061,10 @@ Hashtable::consume_fasta_and_tag_with_colors(
 
   }
 
-
+void Hashtable::link_tag_and_color(HashIntoType& kmer, Color& kmer_color) {
+  tag_colors.insert(TagColorPtrPair(kmer, &kmer_color));
+  color_tag_ptrs.insert(ColorTagPtrPair(kmer_color, &kmer));
+}
 /* This is essentially the same code as above, only it assigns colors to the
  * tags through multimap TagColorMap defined in hashtable.hh, declared in
  * hashbits.hh
@@ -2096,7 +2101,7 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
 	      // Coloring code
 	      // TODO: MAKE THREADSAFE!
 	      
-	      if (!_cmap_contains_color(color_map, kmer, current_color)) {
+	      if (!_cmap_contains_color(tag_colors, kmer, current_color)) {
 	        ACQUIRE_TAG_COLORS_SPIN_LOCK
 	        link_tag_and_color(kmer, current_color);
 	        RELEASE_TAG_COLORS_SPIN_LOCK
@@ -2124,7 +2129,7 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
         // Coloring code
         // TODO: MAKE THREADSAFE!
         ACQUIRE_TAG_COLORS_SPIN_LOCK
-        link_tag_and_color(kmer, current_color)
+        link_tag_and_color(kmer, current_color);
         RELEASE_TAG_COLORS_SPIN_LOCK
         
         if (found_tags) { found_tags->insert(kmer); }
@@ -2139,7 +2144,7 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
       RELEASE_ALL_TAGS_SPIN_LOCK
       
       // Color code: TODO: MAKE THREADSAFE!
-      link_tag_and_color(kmer, current_color)
+      link_tag_and_color(kmer, current_color);
       
       if (found_tags) { found_tags->insert(kmer); }
     }
@@ -2157,17 +2162,17 @@ void Hashtable::sweep_sequence_for_colors(const std::string& seq,
     SeenSet tagged_kmers;
     //ColorPtrSet found_colors;
     
-    const unsigned char ksize = _ht->ktsize();
     HashIntoType kmer_f, kmer_r, kmer;
     
     KMerIterator kmers(seq.c_str(), _ksize);
-    HashIntoType kmer_s;
+    std::string kmer_s;
 
     while (!kmers.done()) {
-      kmer_s = kmers.next();
-      kmer = _hash(kmer_s.c_str(), ksize, kmer_f, kmer_r);
+      kmer = kmers.next();
+      kmer_s = _revhash(kmer, _ksize);
+      _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
       
-      find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
+      partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, all_tags,
           break_on_stoptags, stop_big_traversals);
       traverse_colors_and_resolve(tagged_kmers, found_colors);
     }
@@ -2179,9 +2184,9 @@ void Hashtable::traverse_colors_and_resolve(const SeenSet& tagged_kmers,
   SeenSet::const_iterator si;
   unsigned int num_colors = 0;
   for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
-    tag = *si;
+    HashIntoType tag = *si;
     // get the colors associated with this tag
-    num_colors = _get_tag_colors(tag, tag_colors, found_colors)
+    num_colors = _get_tag_colors(tag, tag_colors, found_colors);
     if (num_colors > 1) {
       // reconcile colors
       // for now do nothing ha

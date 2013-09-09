@@ -60,13 +60,6 @@ namespace khmer {
 	virtual void	accumulate_timer_deltas( uint32_t metrics_key );
 
   };
-  
-  struct tag_color_info {
-    HashIntoType kmer;
-    SeenSet tagged_kmers;
-    
-  
-  };
 
   //
   // Sequence iterator class, test.  Not really a C++ iterator yet.
@@ -194,9 +187,9 @@ namespace khmer {
                         HashIntoType& kmer,
                         Color& the_color)
     {
-      std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
+      std::pair<TagColorPtrMap::const_iterator, TagColorPtrMap::const_iterator> ret;
       ret = cmap.equal_range(kmer);
-      for (TagColorPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+      for (TagColorPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
         if (*(it->second) == the_color) return true;
       }
       return false;
@@ -206,21 +199,21 @@ namespace khmer {
     bool _cmap_contains_tag(const ColorTagPtrMap& cmap,
                             Color& the_color,
                             HashIntoType& kmer) {
-      std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
+      std::pair<ColorTagPtrMap::const_iterator, ColorTagPtrMap::const_iterator> ret;
       ret = cmap.equal_range(the_color);
-      for (ColorTagPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+      for (ColorTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
         if(*(it->second) == kmer) return true;
       }
       return false;
     }
     
     unsigned int _get_tag_colors(const HashIntoType& tag,
-                          const TagColorPrtMap& cmap,
+                          const TagColorPtrMap& cmap,
                           ColorPtrSet& found_colors) {
         unsigned int num_colors = 0;
-        std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
+        std::pair<TagColorPtrMap::const_iterator, TagColorPtrMap::const_iterator> ret;
         ret = cmap.equal_range(tag);
-        for (TagColorPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
+        for (TagColorPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
             found_colors.insert(it->second);
             ++num_colors;
         }
@@ -231,10 +224,10 @@ namespace khmer {
                                const ColorTagPtrMap& cmap,
                                TagPtrSet& colored_tags) {
         unsigned int num_tags = 0;
-        std::pair<ColorTagPtrPair:: iterator, ColorTagPtrPair::iterator> ret;
+        std::pair<ColorTagPtrMap::const_iterator, ColorTagPtrMap::const_iterator> ret;
         ret = cmap.equal_range(color);
-        for (ColorTagPtrMap::iterator it=ret.first; it!=ret.second; ++it) {
-            color_tags.insert(it->second);
+        for (ColorTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            colored_tags.insert(it->second);
             ++num_tags;
         }
         return num_tags;
@@ -378,8 +371,8 @@ namespace khmer {
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
-    TagColorMap tag_colors;
-    ColorTagPrtMap color_tag_ptrs;
+    TagColorPtrMap tag_colors;
+    ColorTagPtrMap color_tag_ptrs;
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -519,12 +512,17 @@ namespace khmer {
     void consume_sequence_and_tag_with_colors(const std::string& seq,
 					unsigned long long& n_consumed,
 					Color& current_color,
-					SeenSet * new_tags = 0)
+					SeenSet * new_tags = 0);
 
-    void link_tag_and_color(HashIntoType& kmer, Color& color) {
-        tag_colors.insert(TagColorPtrPair(kmer, &current_color));
-        color_tag_ptrs.insert(ColorTagPtrPair(current_color, &kmer));
-    }
+    void link_tag_and_color(HashIntoType& kmer, Color& color);
+    
+    void sweep_sequence_for_colors(const std::string& seq,
+					ColorPtrSet& found_colors,
+					bool break_on_stoptags,
+					bool stop_big_traversals);
+					
+	void traverse_colors_and_resolve(const SeenSet& tagged_kmers,
+                                     ColorPtrSet& found_colors);
 
     void consume_fasta_and_traverse(const std::string &filename,
 				    unsigned int distance,
@@ -637,7 +635,7 @@ namespace khmer {
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
   while(!__sync_bool_compare_and_swap( &_tag_colors_spin_lock, 0, 1));
 
-#define ACQUIRE_TAG_COLORS_SPIN_LOCK \
+#define RELEASE_TAG_COLORS_SPIN_LOCK \
   __sync_bool_compare_and_swap( &_tag_colors_spin_lock, 1, 0);
 
 #endif // HASHTABLE_HH
