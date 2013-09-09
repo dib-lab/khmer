@@ -2147,12 +2147,12 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
  */
 void Hashtable::sweep_sequence_for_colors(const std::string& seq,
 					unsigned long long& n_consumed,
-					SeenSet * found_tags,
+					ColorPtrSet& found_colors,
 					bool break_on_stoptags,
 					bool stop_big_traversals) {
 					
     SeenSet tagged_kmers;
-    ColorPtrSet found_colors;
+    //ColorPtrSet found_colors;
     
     const unsigned char ksize = _ht->ktsize();
     HashIntoType kmer_f, kmer_r, kmer;
@@ -2166,6 +2166,7 @@ void Hashtable::sweep_sequence_for_colors(const std::string& seq,
       
       find_all_tags(kmer_f, kmer_r, tagged_kmers, _ht->all_tags,
           break_on_stoptags, stop_big_traversals);
+      traverse_colors_and_resolve(tagged_kmers, found_colors);
     }
 }
 
@@ -2180,6 +2181,7 @@ void Hashtable::traverse_colors_and_resolve(const SeenSet& tagged_kmers,
     num_colors = _get_tag_colors(tag, tag_colors, found_colors)
     if (num_colors > 1) {
       // reconcile colors
+      // for now do nothing ha
     }
   }
 }
