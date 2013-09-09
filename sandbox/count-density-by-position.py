@@ -1,52 +1,87 @@
+
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
+
 import sys
 import screed.fasta
 import os
 import khmer
-
-K = 32
-HASHTABLE_SIZE = int(8e9)
-N_HT = 4
+import argparse
 
 ###
 
-MAX_DENSITY = 2000
+DEFAULT_MAX_DENSITY = 2000
+DEFAULT_RADIUS = 10
+DEFAULT_NUM_READS = int(1e6)
 
-infile = sys.argv[1]
-outfile = sys.argv[2]
+MAX_READ_LENGTH = 200
 
-print 'saving to:', outfile
+###
 
-print 'making hashtable'
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+def main():
+    parser = argparse.ArgumentParser(description=\
+                 'Calculate local graph density by starting position in read')
 
-print 'eating', infile
-# ht.consume_fasta(infile)
-ht.load(infile + '.ht')
+    parser.add_argument('-M', '--max-density', type=int, dest='max_density',
+                        default=DEFAULT_MAX_DENSITY)
+    parser.add_argument('-r', '--radius', type=int, dest='radius',
+                        default=DEFAULT_RADIUS)
+    parser.add_argument('-n', '--num-reads', type=int, dest='num_reads',
+                        default=DEFAULT_NUM_READS,
+                        help="Number of reads to use to calculate average")
 
-RADIUS = 10
-hist = [0.0] * 200
-histcount = [0] * 200
+    parser.add_argument('htfile')
+    parser.add_argument('input')
+    parser.add_argument('output')
 
-for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
-    if n % 1000 == 0:
-        print '... saving', n
-    seq = record['sequence']
+    args = parser.parse_args()
 
-    for pos in range(0, len(seq) - K + 1):
-        density = ht.count_kmers_within_radius(seq[pos:pos + K], RADIUS,
-                                               MAX_DENSITY)
-        density /= float(RADIUS)
-        hist[pos] += density
-        histcount[pos] += 1
+    htfile = args.htfile
+    infile = args.input
+    outfile = args.output
 
-    if n % 1000 == 0:
-        outfp = open(outfile, 'w')
-        for i in range(len(hist)):
-            if histcount[i]:
-                print >>outfp, i, hist[i], histcount[i], hist[i] / histcount[i]
+    print 'hashtable in:', htfile
+    print 'reading from:', infile
+    print 'saving to:', outfile
+
+    ht = khmer.new_hashbits(1, 1, 1)
+    print 'loading hashtable', htfile
+    ht.load(htfile)
+    K = ht.ksize()
+    RADIUS = args.radius
+
+    print 'K is', K
+    print 'RADIUS is', RADIUS
+
+    hist = [0.0] * MAX_READ_LENGTH
+    histcount = [0] * MAX_READ_LENGTH
+
+    for n, record in enumerate(screed.open(infile)):
+        seq = record['sequence']
+
+        for pos in range(0, len(seq) - K + 1):
+            density = ht.count_kmers_within_radius(seq[pos:pos + K], RADIUS,
+                                                   args.max_density)
+            density /= float(RADIUS)
+            hist[pos] += density
+            histcount[pos] += 1
+
+        if n % 1000 == 0:
+            print '... saving', n
+
+            outfp = open(outfile, 'w')
+            for i in range(len(hist)):
+                if histcount[i]:
+                    print >>outfp, i, hist[i], histcount[i], \
+                        hist[i] / histcount[i]
+            outfp.close()
+
+            if n >= args.num_reads:
+                break
+
+if __name__ == '__main__':
+    main()

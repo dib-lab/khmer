@@ -22,13 +22,20 @@ from khmer.hashbits_args import build_construct_args
 from khmer.counting_args import report_on_config
 from khmer.threading_args import add_threading_args
 
+DEFAULT_TAG_DENSITY=None                # this is compiled in...
 
 def main():
     parser = build_construct_args()
     add_threading_args(parser)
+    
     parser.add_argument('--no-build-tagset', '-n', default=False,
                         action='store_true', dest='no_build_tagset',
                         help='Do NOT construct tagset while loading sequences')
+    
+    parser.add_argument('--tag-density', '-d', default=DEFAULT_TAG_DENSITY,
+                        dest='tag_density',
+                        help='Alter the spacing of the sparse tags.')
+    
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
 
@@ -42,6 +49,7 @@ def main():
     base = args.output_filename
     filenames = args.input_filenames
     n_threads = int(args.n_threads)
+    tag_density = args.tag_density
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)

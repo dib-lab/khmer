@@ -14,7 +14,7 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser test-HashTables
+DRV_PROGS=bittest ktable_test outline_index_test   #test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=#ht-diff
 
@@ -28,7 +28,7 @@ clean:
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS) $(AUX_PROGS)
 
-test: $(DRV_PROGS) $(AUX_PROGS)
+test: $(DRV_PROGS) $(AUX_PROGS) outline_index_test
 
 DRV_TEST_STREAM_READER_OBJS=test-StreamReader.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 DRV_TEST_CACHE_MANAGER_OBJS=test-CacheManager.o read_parsers.o $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
@@ -111,6 +111,8 @@ subset.o: subset.cc subset.hh hashbits.hh ktable.hh khmer.hh
 
 counting.o: counting.cc counting.hh hashtable.hh ktable.hh khmer.hh
 
+outline_index.o: outline_index.cc outline_index.hh  hashtable.hh ktable.hh khmer.hh
+
 test-StreamReader.o: test-StreamReader.cc read_parsers.hh
 
 test-CacheManager.o: test-CacheManager.cc read_parsers.hh
@@ -124,3 +126,5 @@ test-HashTables.o: test-HashTables.cc read_parsers.hh primes.hh
 
 ht-diff.o: counting.hh hashtable.hh ktable.hh khmer.hh
 
+outline_index_test: outline_index_test.o outline_index.o  hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	 $(CXX) -o $@ outline_index_test.o outline_index.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)

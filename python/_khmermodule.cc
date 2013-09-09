@@ -19,6 +19,7 @@
 #include "counting.hh"
 #include "storage.hh"
 #include "aligner.hh"
+#include "outline_index.hh"
 
 //
 // Function necessary for Python loading:
@@ -3005,6 +3006,62 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
   return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
 }
 
+static PyObject * hashbits_find_all_tags_to_taglist(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  PyObject * kmer_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "O", &kmer_o)) {
+    return NULL;
+  }
+
+  khmer::HashIntoType kmer, kmer_f, kmer_r;
+  if (PyLong_Check(kmer_o)) {
+    kmer = PyLong_AsUnsignedLongLong(kmer_o);
+    std::cout << "CONVERTING foo\n";
+
+    std::string kmer_s = khmer::_revhash(kmer, hashbits->ksize());
+    kmer = khmer::_hash(kmer_s.c_str(), hashbits->ksize(), kmer_f, kmer_r);
+  } else if (PyString_Check(kmer_o)) {
+    char * kmer_s = PyString_AsString(kmer_o);
+
+    if (strlen(kmer_s) < hashbits->ksize()) { // @@
+      // std::cout << "ERROR 1" << std::endl;
+      return NULL;
+    }
+    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
+  } else {
+    // std::cout << "ERROR 2" << std::endl;
+    return NULL;
+  }
+
+  if (PyErr_Occurred()) {
+    return NULL;
+  }
+
+  SeenSet tagged_kmers;
+
+  Py_BEGIN_ALLOW_THREADS
+
+    hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
+				       hashbits->all_tags);
+    hashbits->add_kmer_to_tags(kmer);
+
+  Py_END_ALLOW_THREADS
+
+  PyObject * x = PyList_New(tagged_kmers.size());
+
+  Py_ssize_t i = 0;
+  for (khmer::SeenSet::const_iterator si = tagged_kmers.begin();
+       si != tagged_kmers.end(); si++, i++) {
+    PyObject * ko = PyLong_FromUnsignedLongLong(*si);
+    PyList_SET_ITEM(x, i, ko);
+  }
+  return x;
+}
+
 static PyObject * hashbits_assign_partition_id(PyObject * self, PyObject *args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3750,6 +3807,37 @@ static PyObject * hashbits_get_ksize(PyObject * self, PyObject * args)
   return PyInt_FromLong(k);
 }
 
+//
+// hashbits_build_outline_index
+//
+
+static PyObject* hashbits_build_outline_index(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * bin_filename_ptr = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &bin_filename_ptr)) {
+    return NULL;
+  }
+
+  std::string index_filename = bin_filename_ptr;
+  index_filename += ".index";
+
+  // @CTB: how much of this can be built into the outline index?
+  std::vector<khmer::HashIntoType> sorted_tags;
+  for (SeenSet::iterator pi = hashbits->all_tags.begin();
+       pi != hashbits->all_tags.end();
+	 pi++) {
+    sorted_tags.push_back(*pi);
+  } 
+  std::sort(sorted_tags.begin(), sorted_tags.end());
+
+  khmer::build_index(bin_filename_ptr, sorted_tags, hashbits->ksize());
+
+  return PyString_FromString(index_filename.c_str());
+}
 
 static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
 {
@@ -3821,6 +3909,7 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
 static PyMethodDef khmer_hashbits_methods[] = {
   { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
+  { "build_outline_index", hashbits_build_outline_index, METH_VARARGS, "" },
   { "hashsizes", hashbits_get_hashsizes, METH_VARARGS, "" },
   { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
   { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
@@ -3841,6 +3930,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "trim_on_density_explosion", hashbits_trim_on_density_explosion, METH_VARARGS, "" },
   { "do_subset_partition", hashbits_do_subset_partition, METH_VARARGS, "" },
   { "find_all_tags", hashbits_find_all_tags, METH_VARARGS, "" },
+  { "find_all_tags_to_taglist", hashbits_find_all_tags_to_taglist, METH_VARARGS, "" },
   { "assign_partition_id", hashbits_assign_partition_id, METH_VARARGS, "" },
   { "output_partitions", hashbits_output_partitions, METH_VARARGS, "" },
   { "find_unpart", hashbits_find_unpart, METH_VARARGS, "" },
@@ -4075,6 +4165,89 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
   khashbits_obj->hashbits = new khmer::Hashbits(k, sizes);
 
   return (PyObject *) khashbits_obj;
+}
+
+//
+// convert_fasta_to_indexed_bin
+//
+
+static PyObject* convert_fasta_to_indexed_bin(PyObject * self, PyObject * args)
+{
+  char * fasta_filename_ptr;
+
+  if (!PyArg_ParseTuple(args, "s", &fasta_filename_ptr)) {
+    return NULL;
+  }
+
+  std::string fasta_filename = std::string(fasta_filename_ptr);
+
+  std::string bin_filename = fasta_filename;
+  bin_filename += ".bin";
+
+  khmer::convertFastaToBin(fasta_filename, bin_filename);
+
+  return PyString_FromString(bin_filename.c_str());
+}
+
+//
+// outline_retrieve_read_by_id
+//
+
+static PyObject* outline_retrieve_read_by_id(PyObject * self, PyObject * args)
+{
+  char * bin_filename = NULL;
+  long read_id = 0;
+
+  if (!PyArg_ParseTuple(args, "sl", &bin_filename, &read_id)) {
+    return NULL;
+  }
+
+  std::vector<long> read_ids;
+  std::vector<std::string> reads;
+
+  read_ids.push_back(read_id);
+  khmer::retrieve_read_by_id(bin_filename, read_ids, reads);
+
+  std::string read = reads[0];
+
+  return PyString_FromString(read.c_str());
+}
+
+
+//
+// outline_retrieve_read_ids_by_taglist
+//
+
+static PyObject* outline_retrieve_read_ids_by_taglist(PyObject * self, PyObject * args)
+{
+  char * index_filename = NULL;
+  PyObject * taglist;
+
+  if (!PyArg_ParseTuple(args, "sO", &index_filename, &taglist)) {
+    return NULL;
+  }
+
+  if (!PyList_Check(taglist)) {
+    return NULL;
+  }
+
+  std::vector<khmer::HashIntoType> tag_ids;
+  std::vector<long> read_ids;
+
+  for (Py_ssize_t i = 0; i < PyList_Size(taglist); i++) {
+    PyObject * ko = PyList_GetItem(taglist, i);
+    khmer::HashIntoType k = PyLong_AsUnsignedLongLong(ko);
+    tag_ids.push_back(k);
+  }
+
+  khmer::retrieve_read_ids_by_tag(index_filename, tag_ids, read_ids);
+
+  PyObject * x = PyList_New(read_ids.size());
+  for (unsigned int i = 0; i < read_ids.size(); i++) {
+    PyList_SET_ITEM(x, i, PyLong_FromLong(read_ids[i]));
+  }
+
+  return x;
 }
 
 static PyObject * hash_collect_high_abundance_kmers(PyObject * self, PyObject * args)
@@ -4449,6 +4622,12 @@ static PyMethodDef KhmerMethods[] = {
       METH_VARARGS,		"", },
     { "set_reporting_callback",	set_reporting_callback,
       METH_VARARGS,		"" },
+    { "convert_fasta_to_indexed_bin",	convert_fasta_to_indexed_bin,
+      METH_VARARGS,		"Index a FASTA file for easy retrieval" },
+    { "outline_retrieve_read_by_id",	outline_retrieve_read_by_id,
+      METH_VARARGS,		"Retrieve a specific sequence ID from a bin file"},
+    { "outline_retrieve_read_ids_by_taglist",	outline_retrieve_read_ids_by_taglist,
+      METH_VARARGS,		"Retrieve a specific sequence ID from a bin file"},
 
     { NULL, NULL, 0, NULL } // sentinel
 };
