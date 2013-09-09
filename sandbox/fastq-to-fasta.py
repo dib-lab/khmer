@@ -1,9 +1,14 @@
+#! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import sys
 sys.path.insert(0, '/u/t/dev/screed')
 import screed
-from screed.fastq import fastq_iter
 
-for n, record in enumerate(fastq_iter(open(sys.argv[1]))):
+for n, record in enumerate(screed.open(sys.argv[1])):
     if n % 10000 == 0:
         print>>sys.stderr, '...', n
 

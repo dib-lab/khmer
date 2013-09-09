@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Build a graph from the given sequences, save in <htname>.
 
@@ -63,13 +68,9 @@ def main():
     else:
         target_method = ht.consume_fasta_and_tag_with_reads_parser
 
-    if args.tag_density is None:
-        print 'tag density is DEFAULT:', ht._get_tag_density()
-    else:
-        tag_density = int(args.tag_density)
-        assert tag_density % 2 == 0, "tagging density must be even."
-        print 'setting tag density to:', tag_density
-        ht._set_tag_density(tag_density)
+    config = khmer.get_config()
+    bufsz = config.get_reads_input_buffer_size()
+    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     for n, filename in enumerate(filenames):
         

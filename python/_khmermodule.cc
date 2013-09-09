@@ -1,4 +1,10 @@
 //
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
+//
 // A module for Python that exports khmer C++ library functions.
 //
 
@@ -1834,9 +1840,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 
   char * filename = NULL;
   PyObject * tracking_obj = NULL;
-  PyObject * callback_obj = NULL;
-  if (!PyArg_ParseTuple(args, "sO|O", &filename, &tracking_obj,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "sO", &filename, &tracking_obj)) {
     return NULL;
   }
 
@@ -1847,8 +1851,46 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
 
 
   khmer::HashIntoType * dist;
-  dist = counting->abundance_distribution(filename, hashbits,
-					  _report_fn, callback_obj);
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(filename, hashbits);
+  Py_END_ALLOW_THREADS
+  
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+  }
+
+  delete[] dist;
+
+  return x;
+}
+
+static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  PyObject * rparser_obj = NULL;
+  PyObject * tracking_obj = NULL;
+  if (!PyArg_ParseTuple(args, "OO", &rparser_obj, &tracking_obj)) {
+    return NULL;
+  }
+
+  khmer:: read_parsers:: IParser * rparser = 
+    _PyObject_to_khmer_ReadParser(rparser_obj);
+
+  assert(is_hashbits_obj(tracking_obj));
+
+  khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
+  khmer::Hashbits * hashbits = tracking_o->hashbits;
+
+
+  khmer::HashIntoType * dist;
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(rparser, hashbits);
+  Py_END_ALLOW_THREADS
   
   PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
@@ -2038,6 +2080,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
+  { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
   { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
   { "load", hash_load, METH_VARARGS, "" },

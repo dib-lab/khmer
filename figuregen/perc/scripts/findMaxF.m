@@ -1,3 +1,8 @@
+%
+% This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+% Copyright (C) Michigan State University, 2009-2013. It is licensed under
+% the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+%
 function [P,N,mm] = findMaxF(fileString,doMax)
     N=0.010:0.001:doMax;
     %N=0.001:0.001:0.300;

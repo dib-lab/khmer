@@ -1,3 +1,9 @@
+#! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import sys
 import khmer
 
@@ -13,4 +19,5 @@ ht = khmer.new_counting_hash(1, 1, 1)
 ht.load(sys.argv[1])
 
 for i, infile in enumerate(files):
-    ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")
+   print 'outputting', infile + '.freq'
+   ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")

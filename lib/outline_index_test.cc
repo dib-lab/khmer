@@ -54,96 +54,72 @@ int main(int argc,char *argv[])
         optind++;
     }
 
-  
-    //creaate reads binary file
-    std::cout<<"\ncreating reads binary file ....\n";
+    //step 1: creaate reads binary file
+    //std::cout<<"Creating reads binary file ....\n";
     std::string readsfilenamebin=readsfilename+".bin";
-    convertFastaToBin(readsfilename,readsfilenamebin);
-    std::cout<<"done...\n";
-  
-  
+    //convertFastaToBin(readsfilename,readsfilenamebin);
+    //std::cout<<"\tdone...\n";
+    
     unsigned int ksize   = 0;
     unsigned int density = 0;
 
-    std::cout<<"sampling k-mer postions\n";
-    //std::cout<<"note: to sample every k-mer you must send d=1 if d=0 no k-mers will be chosen\n";
+    //step 2: choose the seeds
     ksize = kmer_size ; density = density_size ;
     std::set<khmer::HashIntoType> all_seeds;
-    all_seeds =  consume_fasta_and_tag( readsfilename, ksize, density);	
-    std::cout<<"d:"<<density<<"\t"<<"#num of seeds:"<<all_seeds.size()<<std::endl;
-    for (std::set<khmer::HashIntoType>::iterator pi = all_seeds.begin(); pi != all_seeds.end();
+    //std::cout<<"Sampling k-mer every "<<density<<" positions\n";
+    //all_seeds =  consume_fasta_and_tag( readsfilename, ksize, density);	
+    //std::cout<<"\tdensity:"<<density<<"\t"<<"#num of seeds:"<<all_seeds.size()<<std::endl;
+    /*for (std::set<khmer::HashIntoType>::iterator pi = all_seeds.begin(); pi != all_seeds.end();
          pi++) {
     	std::cout<<*pi<<" ";
     	}
     std::cout<<std::endl;
+    */
     std::string density_str=""; std::ostringstream convert;     convert << density;     density_str = convert.str();
     std::string outfilename=readsfilename+".seedset.d"+density_str;
     //if the seeds is created then it is will be default tags file 
     taggedkmerfilename=outfilename;
-    std::cout<<"saving the seeds set to file:"<<outfilename<<std::endl;
-    save_seedset(outfilename,all_seeds,ksize, density);
+    //std::cout<<"\tsaving the seeds set to file:"<<outfilename<<std::endl;
+    //save_seedset(outfilename,all_seeds,ksize, density);
  
-    //intilization
-    std::cout<<"\nload seeds k-mers and sort them ...\n";
+    //step 3: load the seeds
+    std::cout<<"load seeds k-mers and sort them ...\n";
     std::vector<khmer::HashIntoType> sorted_kmer_vector;
     //unsigned int save_ksize=0;
     //unsigned int  _tag_density=0; 
-    /*
-    load_tagset(taggedkmerfilename,sorted_kmer_vector,ksize,density);
-    std::cout<<"done..., the num of tags are:"<<sorted_kmer_vector.size()<<std::endl;
-    std::cout<<"saved ksize is:"<<ksize<<"\n";
-    std::cout<<"saved density is:"<<density<<"\n";
-    test the printing procedure
-    std::cout<<"print the tagset into file xxx.tagset.dx.str\n";
-    print_tagset(taggedkmerfilename+"str", sorted_kmer_vector, ksize);
-    sortedKhmerVector.clear();
-    */
-    //load seeds functions
     
     load_seedset(taggedkmerfilename,sorted_kmer_vector,ksize,density);
-    std::cout<<"test if we correctly load the the seeds\n";
+
+    /*std::cout<<"test if we correctly load the the seeds\n";
     for (int i=0; i<sorted_kmer_vector.size(); i++) {
         std::cout<<sorted_kmer_vector[i]<<" ";
     }
     std::cout<<std::endl;
-    //std::cout<<"print the seedset into file xxx.seedset.dx.str.seed\n";
-    //print_seedset(taggedkmerfilename+"str.",sorted_kmer_vector, ksize);
+    */
 
-
-     //Iam not sure why this is not working any more!
-    /*load_tagset(tagedKhmerFileName,sortedKhmerVector,save_ksize,_tag_density);
-    std::cout<<"done..., the num of tags are:"<<sortedKhmerVector.size()<<std::endl;
-    std::cout<<"	the saved k:"<<save_ksize<<std::cout<<std::endl;    
-    std::cout<<"	the density:"<<_tag_density<<std::cout<<std::endl;
-*/
-    //build the index
-    std::cout<<"\nbuild the index ...\n";
+    //step 4: build the index
+    //std::cout<<"Build the index ...\n";
     //start the timer
     time_t start,end;
     double diff;
     time (&start);
-    //build_index(readsFileNameBin,sortedKhmerVector,save_ksize);
-    build_index(readsfilenamebin,density,sorted_kmer_vector,ksize);
+    //build_index(readsfilenamebin,density,sorted_kmer_vector,ksize);
     time (&end);
     diff = difftime (end,start);
-    printf ("It took you %.2lf seconds to build the tree.\n", diff );
-    std::cout<<"done...\n";
+    //printf ("\tIt took you %.2lf seconds to build the tree.\n", diff );
+    //std::cout<<"\tdone...\n";
   
-    
-    
-    //query example
-    std::cout<<"\tin Load_Queries...\n";
-    
+    //step 5: Query process
+    std::cout<<"Start Load_Queries...\n";
     std::string indexfilename;	std::string statfilename;
-    //std::string density_str="";	std::ostringstream convert;	convert << density;	density_str = convert.str(); 
     indexfilename=readsfilenamebin+".index.d"+density_str;
-    statfilename=readsfilename+".stat.d"+density_str;// give info like desinty;
-  
-  //the query file is set of seq sampled from input file
+    statfilename=readsfilename+".stat.d"+density_str;
+  #if 0
+    //the query file is set of seq sampled from input file
     std::fstream inQfile(queryfilename.c_str(),std::ios::in);
     std::fstream out_stat_file(statfilename.c_str(),std::ios::out);
     assert(inQfile.is_open());	assert(out_stat_file.is_open());
-    out_stat_file<<"q_seq_id r_seq_id score\n";
+    out_stat_file<<"q_seq_id  r_seq_id  score\n";
     
     std::string seq="";
     std::set<khmer::HashIntoType> qeuery_tagged_khmer;
@@ -163,38 +139,30 @@ int main(int argc,char *argv[])
    Read read;
    while(!parser->is_complete())  {
 	read = parser->get_next_read();
+	std::transform(read.sequence.begin(), read.sequence.end(), read.sequence.begin(), ::toupper);
         total_q_seq++;
 	seq=read.sequence;
-	std::cout<<"process q-seq-id"<<total_q_seq<<std::endl;
+	//std::cout<<"process q-seq-id"<<total_q_seq<<std::endl;
 	extract_tags_from_seq(seq,ksize,indexfilename,qeuery_tagged_khmer);
 	retrieve_read_ids_by_tag(indexfilename,qeuery_tagged_khmer,reads_ids );
-  	std::cout<<"output the rertive id result\n";
+  	/*std::cout<<"output the rertive id result\n";
         for (std::set<long>::iterator pi = reads_ids.begin(); pi != reads_ids.end();
          pi++) {
         	std::cout<<*pi<<" ";
         	}
-	
 	std::cout<<std::endl;
-	if (enable_scoring){
-        //std::cout<<"\tcompute the similarities\n";
-        //retrieve reads by read ids
-	//retrieve_read_by_id(readsfilenamebin,reads_ids,reads);
-	retrieve_read_by_id(readsfilenamebin,reads_ids,mymap);
-	//output the retreieved reads
-	std::cout<<"output the retreieved reads\n";
-	for (it=mymap.begin(); it!=mymap.end(); ++it)
-    		std::cout << it->first << "\t" << mymap[it->first]/*it->second*/ << '\n';
-	
-	/*
-	for (int i=0; i< reads.size(); i++) {
-		std::cout<<reads[i]<<std::endl;
-		score = 0 ;
-                score = sim_measure ( seq, reads[i], ksize ) ;
-                std::cout<<"score "<<score<<std::endl;
-		//note we are losing the actuall read id and just increment the vlaue
-                out_stat_file << q_id << "\t" << i+1 << "\t" << score << "\n" ;
-                        }
 	*/
+	if (enable_scoring){
+        //retrieve reads by read ids
+	retrieve_read_by_id(readsfilenamebin,reads_ids,mymap);
+	//std::cout<<"output the retreieved reads\n";
+	for (it=mymap.begin(); it!=mymap.end(); ++it) {
+    		//std::cout << it->first << "\t" << it->second << '\n';
+		score = 0 ;
+                score = sim_measure ( seq, it->second, ksize ) ;
+                //std::cout<<"score "<<score<<std::endl;
+                out_stat_file << q_id << "\t" << it->first << "\t" << score << "\n" ;
+			}
 		}
 	//clean the var for next query seq
 	seq=""; 
@@ -202,17 +170,19 @@ int main(int argc,char *argv[])
         reads_ids.clear(); 
 	q_id++;
 	mymap.clear();
-	} // whle
-
+	} // iterat over q-seq
+    std::cout<<"\tdone...\n";
     out_stat_file.close(); 
- 
-    bool enable_stat=false;
+#endif
+    bool enable_stat=true;
     //test the create_stat fucntion
     if (enable_stat)	{
     	std::cout<<"create and print statistics\n";
-    	create_stat(statfilename);
+    	create_stat(statfilename,sorted_kmer_vector.size(),density);
  	}
+
     // the sampling process
+    //samplefromfile();
     //samplefrombinary();
     
     return 0;

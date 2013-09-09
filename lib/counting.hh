@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
@@ -191,10 +197,10 @@ namespace khmer {
 			  BoundedCounterType &kadian,
 			  unsigned int nk = 1);
 
+    HashIntoType * abundance_distribution(read_parsers::IParser * parser,
+					  Hashbits * tracking);
     HashIntoType * abundance_distribution(std::string filename,
-					  Hashbits * tracking,
-					  CallbackFn callback = NULL,
-					  void * callback_data = NULL) const;
+					  Hashbits * tracking);
 
     HashIntoType * fasta_count_kmers_by_position(const std::string &inputfile,
 					 const unsigned int max_read_len,

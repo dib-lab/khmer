@@ -43,7 +43,7 @@ paper
 the `digital normalization paper <http://arxiv.org/abs/1203.4802>`__.
 
 There are many blog posts about this stuff on `Titus Brown's blog
-<http://ivory.idyll.org/blog/>`__.  We wil ltry to link them in where
+<http://ivory.idyll.org/blog/>`__.  We will try to link them in where
 appropriate.
 
 Asking for help
@@ -99,7 +99,7 @@ strip-and-split-for-assembly, and normalize-by-median the pe and se
 files to C=5 (in that order).
 
 For low-coverage libraries (< 50x) do single-pass digital normalization:
-run normalize-by-median to C=5.
+run normalize-by-median to C=10.
 
 2. Extract any remaining paired-end reads and lump remaining orphan
 reads into singletons using strip-and-split-for-assembly

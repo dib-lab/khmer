@@ -33,7 +33,7 @@ void khmer::convertFastaToBin(std::string readsFileName,std::string readsBinFile
         readBin.setSeq(read.sequence.size(),read.sequence);
         WriteToDiskRead(readBinFile,&readBin,total_reads);
     }
-    std::cout<<"the num of reads consumed is :"<<total_reads<<std::endl;
+    std::cout<<"\tthe num of reads consumed is :"<<total_reads<<std::endl;
     //write header of the bin file
     WriteToDiskHeader(readBinFile,&total_reads);
     readBinFile.close();
@@ -132,7 +132,8 @@ std::set<khmer::HashIntoType>  khmer:: consume_fasta_and_tag(std::string readsFi
         read = parser->get_next_read();
         total_reads++;
 	//KHMER_EXTRA_SANITY_CHECKS flag in kmer iterators  must be set
-        new_seeds.clear();
+        std::transform(read.sequence.begin(), read.sequence.end(), read.sequence.begin(), ::toupper);
+	new_seeds.clear();
  	new_seeds = consume_sequence_and_tag(read.sequence, save_ksize, tag_density);
 	all_seeds.insert(new_seeds.begin(), new_seeds.end());
 	}
@@ -317,12 +318,12 @@ void khmer::build_index(std::string readsBinFileName, unsigned int density,  std
     std::string density_str=""; std::ostringstream convert;     convert << density;     density_str = convert.str();
     std::string outfilename2= readsBinFileName+".readDist.d"+density_str;
     std::ofstream outfile2(outfilename2.c_str());
-    std::cout<<"wrting the class size array into xxx.readDist.dx file:\n";
+    std::cout<<"\twriting the class size array into xxx.readDist.dx file:\n";
     for (int i=0;i< numTkmer ;i++){ 
 	outfile2<<i+1<<"\t"<<classSize[i]<<"\n";
 	}
     outfile2.close();
-    std::cout<<std::endl;
+    //std::cout<<std::endl;
     
     std::cout<<"\tsaving the index information...\n";
     int indexSize=0;
@@ -341,7 +342,7 @@ void khmer::build_index(std::string readsBinFileName, unsigned int density,  std
     for (std::vector<khmer::HashIntoType>::iterator it = sortedKhmerVector.begin() ; it != sortedKhmerVector.end(); ++it,++i) {
         buf[i]= *it;/* std::cout<<*it<<" ";*/
     }
-    std::cout<<std::endl;
+    //std::cout<<std::endl;
     outfile.write((const char *) buf, sizeof(HashIntoType) * numTkmer);
     indexSize+=sizeof(HashIntoType) * numTkmer;
     delete buf;
@@ -373,7 +374,7 @@ void khmer::build_index(std::string readsBinFileName, unsigned int density,  std
         //	std::cout<<"/";
     }
     indexSize+=sizeof(long)*cnt;
-    std::cout<<"the size of the index is:"<<indexSize<<std::endl;
+    std::cout<<"\tthe size of the index is:"<<indexSize<<std::endl;
     //std::cout<<std::endl;
     outfile.close();
     readBinFile.close();
@@ -603,10 +604,50 @@ unsigned int khmer::sim_measure(std::string seq1, std::string seq2, unsigned int
         } //while
     for (unsigned int i=0; i<sorted_khmer.size();i++)
 	if (ary[i]==true)	score++;
+    score = ((float) (score * 100)) / (float)sorted_khmer.size();
 
-    return score;
+    return score ;
 }
 //------- Sampling Procedures ---------------
+void khmer::samplefromfile(){
+    std::cout<<" in samplefromfile\n";
+    std::string   readsfilename="", queryfilename="";
+    int num_q=0;
+   
+    std::cout<<"enter the reads file name:";     std::cin>>readsfilename;	std::cout<<std::endl;
+    std::cout<<"enter the query file name:";     std::cin>>queryfilename;    	std::cout<<std::endl;
+    std::cout<<"enter the number of qureies:",          std::cin>>num_q;      	std::cout<<std::endl;
+     
+    std::fstream queryfile;
+    queryfile.open(queryfilename.c_str(),std::ios::out);
+
+    long total_reads = 0;
+    unsigned int k  = 1, cnt = 0, i = 0;
+
+    using namespace khmer:: read_parsers;
+    IParser *                 parser  = IParser::get_parser(readsfilename.c_str());
+    Read read;
+   
+    std::cout<<"enter the skipping paramter k value:"; std::cin>>k; std::cout<<std::endl;//skipping paramater
+
+    while(!parser->is_complete() && ( total_reads < num_q ) )  {
+	if (cnt % k == 0 ) {
+	cnt++;
+        read = parser->get_next_read();
+        total_reads++;
+        //KHMER_EXTRA_SANITY_CHECKS flag in kmer iterators  must be set
+        std::transform(read.sequence.begin(), read.sequence.end(), read.sequence.begin(), ::toupper);
+	queryfile<<">"<<read.name<<std::endl;
+	queryfile<<read.sequence<<std::endl;
+		}
+	else	{
+		read = parser->get_next_read(); 
+  		cnt ++; 
+		}
+	} //while 
+   
+    queryfile.close();
+}
 void khmer::samplefrombinary(){
     std::cout<<"in sampling from binary sequnce file\n";
     /*
@@ -646,7 +687,7 @@ th substrings
    //in fixed length case we have L, then select reandomly a pos in (s,e-L+1) then str=seq[pos,pos+l] 
    //if substring is vaialbe, then selct the pos in(s,e-1) and then select l in (1,e-pos+1) then str=seq[pos,pos+l)
    long location=0; readNode readBin; 
-  if (full_length){
+   if (full_length){
 	std::cout<<"in smapling the entire reads mode\n";
 	unsigned int k; k=rand()%100;
 	std::cout<<"enter the skipping paramter k value:"; std::cin>>k; std::cout<<std::endl;//skipping paramater
@@ -659,7 +700,7 @@ th substrings
 	}
 
 	}
-  if (!full_length){
+   if (!full_length){
 	std::cout<<" in smapling sub strings mode\n";
 	std::cout<<" the defualt is to sample variable length sub strings\n";
 	std::cout<<" if you want to smaple with fixed length please enter the length othewise enter 0:";
@@ -678,8 +719,8 @@ th substrings
 
 //----- stat --------
 //mean=E(X), std= sgr( E(x^2)- (E(x)^2) )
-void khmer::create_stat(std::string statfilename){
-   std::cout<<"in create_stat\n";
+void khmer::create_stat(std::string statfilename, unsigned int  num_seeds,unsigned int density){
+   //std::cout<<"in create_stat\n";
    std::ifstream infile(statfilename.c_str(), std::ios::in);
    assert(infile.is_open());
    //std::cout<<"the fiel name sent is : "<<statfilename<<std::endl;
@@ -711,11 +752,11 @@ void khmer::create_stat(std::string statfilename){
 	std_dev    = sqrt (second_mom - first_mom * first_mom);
 	
 	//print local info
-	std::cout<< "local stat for q-seq:" << seq_id << std::endl
+	/*std::cout<< "local stat for q-seq:" << seq_id << std::endl
                  << " # ret_reads:" << read_sum
 		 << " avg_score:" << first_mom
 		 << " std_score:" << std_dev <<std::endl;
-	
+	*/
 	//update global info
 	global_score_sum  += score_sum; //first_mom;
 	global_score_ssum += score_ssum;//first_mom * first_mom;
@@ -728,21 +769,27 @@ void khmer::create_stat(std::string statfilename){
 		}	
 	} // outert while
 
+	std::string statfilenamesummary=statfilename+".summary";
+        std::ofstream outfile(statfilenamesummary.c_str(), std::ios::out);
+        assert(outfile.is_open());
+        outfile<<"density, num_Seeds, avg_ret_reads, std_ret_reads, avg_score, std_score\n";
+	outfile<<density<<"\t"<<num_seeds<<"\t";
    	//print global info
-   	std::cout<< "global  stat" << std::endl;
+   	std::cout<< "\tglobal-stat" << std::endl;
 	first_mom  =( float) global_read_sum / (float) cnt; 
 	second_mom = (float) global_read_ssum / (float) cnt;
 	std_dev    = sqrt (second_mom - first_mom * first_mom);
-	std::cout<< " avg_ret_reads:" << first_mom
-		 << " std_ret_reads:" << std_dev << std::endl;
-	
+	std::cout<< "\t\tavg_ret_reads:" << first_mom
+		 << "\t\tstd_ret_reads:" << std_dev << std::endl;
+	outfile<<first_mom<<"\t"<<std_dev<<"\t";
 	first_mom  =(float) global_score_sum  / (float) global_read_sum ;//(float) cnt;
 	second_mom =(float) global_score_ssum / (float) global_read_sum;// (float) cnt;
 	std_dev    = sqrt (second_mom - first_mom * first_mom);
 	//std::cout<<" cnt:"<<cnt<<"global_score_sum:"<<global_score_sum<<" global_score_ssum:"<<global_score_ssum<<std::endl;
-	std::cout<< " avg_score:" << first_mom
-                 << " std_score:" << std_dev <<std::endl;
+	std::cout<< "\t\tavg_score:" << first_mom
+                 << "\t\tstd_score:" << std_dev <<std::endl;
+	outfile<<first_mom<<"\t"<<std_dev<<"\t";
 
-	
-   infile.close();
+	outfile.close();
+   	infile.close();
 }

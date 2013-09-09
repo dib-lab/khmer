@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #include <iostream>
 #include "hashtable.hh"
 #include "hashbits.hh"
@@ -204,7 +210,7 @@ void Hashbits::save_tagset(std::string outfilename)
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::load_tagset(std::string infilename, bool clear_tags)
@@ -240,7 +246,7 @@ void Hashbits::load_tagset(std::string infilename, bool clear_tags)
     all_tags.insert(buf[i]);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 unsigned int Hashbits::kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r)
@@ -1521,6 +1527,8 @@ void Hashbits::hitraverse_to_stoptags(std::string filename,
     read_num += 1;
   }
 
+  delete parser;
+
 #if VERBOSE_REPARTITION
   std::cout << "Inserted " << stop_tags.size() << " stop tags\n";
 #endif // 0
@@ -1557,7 +1565,7 @@ void Hashbits::load_stop_tags(std::string infilename, bool clear_tags)
     stop_tags.insert(buf[i]);
   }
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::save_stop_tags(std::string outfilename)
@@ -1586,7 +1594,7 @@ void Hashbits::save_stop_tags(std::string outfilename)
   outfile.write((const char *) buf, sizeof(HashIntoType) * tagset_size);
   outfile.close();
 
-  delete buf;
+  delete[] buf;
 }
 
 void Hashbits::print_stop_tags(std::string infilename)
@@ -1921,6 +1929,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
   
   total_reads = 0;
   khmer::HashIntoType start = 0, stop = 0;
+  
+  delete parser;
   parser = IParser::get_parser(filename.c_str());
 
 
@@ -1965,6 +1975,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     }
 
   } // while
+  
+  delete parser;
 }
 
 //

@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import os
 import argparse
 
@@ -6,10 +11,12 @@ DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
 
-def build_construct_args():
+def build_construct_args(descr=None):
 
-    parser = argparse.ArgumentParser(description=
-                                     'Build & load a counting Bloom filter.')
+    if descr is None:
+        descr = 'Build & load a counting Bloom filter.'
+
+    parser = argparse.ArgumentParser(description=descr)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)

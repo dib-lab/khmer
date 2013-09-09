@@ -1,3 +1,8 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import sys, os, shutil
 from cStringIO import StringIO
 import traceback
@@ -14,7 +19,7 @@ def scriptpath(scriptfile):
 def teardown():
     utils.cleanup()
 
-def runscript(scriptname, args, in_directory=None):
+def runscript(scriptname, args, in_directory=None, fail_ok=False):
     """
     Run the given Python script, with the given args, in the given directory,
     using 'execfile'.
@@ -37,6 +42,7 @@ def runscript(scriptname, args, in_directory=None):
 
         try:
             print 'running:', scriptname, 'in:', in_directory
+            print 'arguments', sysargs
             execfile(scriptname, { '__name__' : '__main__' })
             status = 0
         except:
@@ -49,12 +55,17 @@ def runscript(scriptname, args, in_directory=None):
 
         os.chdir(cwd)
 
+    if status != 0 and not fail_ok:
+        raise Exception(status, out, err)
+
     return status, out, err
 
-def DEBUG_runscript(scriptname, args, in_directory=None):
+def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
     """
     Run the given Python script, with the given args, in the given directory,
     using 'execfile'.
+
+    @CTB what does this do differently from runscript?
     """
     sysargs = [scriptname]
     sysargs.extend(args)
@@ -80,6 +91,9 @@ def DEBUG_runscript(scriptname, args, in_directory=None):
 
         os.chdir(cwd)
 
+    if status != 0 and not fail_ok:
+        raise Exception(status)
+    
     return status, "", ""
 
 ####
@@ -93,8 +107,7 @@ def test_load_into_counting():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
     assert os.path.exists(outfile)
 
 def test_load_into_counting_fail():
@@ -106,22 +119,24 @@ def test_load_into_counting_fail():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = runscript(script, args, fail_ok=True)
     print out
     print err
     assert status == -1
     assert "ERROR:" in err
 
-def _make_counting(infilename, SIZE=1e7, N=2, K=20):
+def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = scriptpath('load-into-counting.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+
+    if not BIGCOUNT:
+        args.append('-b')
     
     outfile = utils.get_temp_filename('out.kh')
 
     args.extend([outfile, infilename])
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
     assert os.path.exists(outfile)
 
     return outfile
@@ -135,8 +150,7 @@ def test_filter_abund_1():
 
     script = scriptpath('filter-abund.py')
     args = [counting_ht, infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
@@ -154,8 +168,7 @@ def test_filter_abund_2():
 
     script = scriptpath('filter-abund.py')
     args = ['-C', '1', counting_ht, infile, infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
@@ -165,8 +178,7 @@ def test_filter_abund_2():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 # make sure that FASTQ records are retained.
-
-def test_filter_abund_3():
+def test_filter_abund_3_fq_retained():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
 
@@ -175,8 +187,7 @@ def test_filter_abund_3():
 
     script = scriptpath('filter-abund.py')
     args = ['-C', '1', counting_ht, infile, infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
@@ -189,6 +200,85 @@ def test_filter_abund_3():
     seqs = set([ r.accuracy for r in screed.open(outfile) ])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
+
+def test_filter_abund_1_singlefile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
+    runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+# test that the -V option does not trim sequences that are low abundance
+def test_filter_abund_4_retain_low_abund():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = scriptpath('filter-abund.py')
+    args = ['-V', counting_ht, infile]
+    runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+# test that the -V option *does* trim sequences that are low abundance
+def test_filter_abund_5_trim_high_abund():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = scriptpath('filter-abund.py')
+    args = ['-V', counting_ht, infile]
+    runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 2, seqs
+
+    # trimmed sequence @ error
+    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGC' in seqs
+
+# test that -V/-Z setting - should not trip if -Z is set high enough.
+def test_filter_abund_6_trim_high_abund_Z():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = scriptpath('filter-abund.py')
+    args = ['-V', '-Z', '25', counting_ht, infile]
+    runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.sequence for r in screed.open(outfile) ])
+    assert len(seqs) == 2, seqs
+
+    # untrimmed seq.
+    badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGGGATTTCCGGGCGG'
+    assert badseq in seqs       # should be there, untrimmed
 
 def test_filter_stoptags():
     infile = utils.get_temp_filename('test.fa')
@@ -208,10 +298,7 @@ def test_filter_stoptags():
     # finally, run filter-stoptags.
     script = scriptpath('filter-stoptags.py')
     args = ['-k', str(K), stopfile, infile, infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    print out
-    print err
-    assert status == 0
+    runscript(script, args, in_dir)
 
     # verify that the basic output file exists
     outfile = infile + '.stopfilt'
@@ -233,8 +320,7 @@ def test_normalize_by_median():
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-k', '17', infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -253,8 +339,7 @@ def test_normalize_by_median_2():
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-k', '17', infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -274,8 +359,7 @@ def test_normalize_by_median_paired():
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -290,13 +374,66 @@ def test_normalize_by_median_impaired():
 
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
-
+    
     shutil.copyfile(utils.get_test_data('test-abund-read-impaired.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    runscript(script, args, in_dir, fail_ok=True)
+
+def test_normalize_by_median_force():
+    CUTOFF='1'
+    
+    corrupt_infile = utils.get_temp_filename('test-corrupt.fq')
+    good_infile = utils.get_temp_filename('test-good.fq',
+                                        tempdir=os.path.dirname(corrupt_infile))
+    
+    in_dir = os.path.dirname(good_infile)
+    
+    shutil.copyfile(utils.get_test_data('test-error-reads.fq'), corrupt_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), good_infile)
+    
+    script = scriptpath('normalize-by-median.py')
+    args = ['-f', '-C', CUTOFF, '-k', '17', corrupt_infile, good_infile]
+    
     (status, out, err) = runscript(script, args, in_dir)
-    assert status != 0
+    
+    test_ht = khmer.load_counting_hash(corrupt_infile + '.ht.failed')
+    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
+    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
+    assert test_ht.count(test_good_read[:17]) > 0
+    assert test_ht.count(test_good_read2[:17]) > 0
+    assert os.path.exists(corrupt_infile + '.ht.failed')
+    assert '*** Skipping' in err
+    assert '** IOErrors' in err
+
+def test_normalize_by_median_dumpfrequency():
+    CUTOFF='1'
+    
+    infiles = [utils.get_temp_filename('test-0.fq')]
+    in_dir = os.path.dirname(infiles[0])
+    for x in range(1,5):
+        infiles.append(utils.get_temp_filename('test-{x}.fq'.format(x=x),
+                                                tempdir=in_dir))
+    
+    for infile in infiles:
+        shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+    
+    script = scriptpath('normalize-by-median.py')
+    args = ['-d', '2', '-C', CUTOFF, '-k', '17']
+    args.extend(infiles)
+    
+    (status, out, err) = runscript(script, args, in_dir)
+
+    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ht'))
+    test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
+    test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
+    assert test_ht.count(test_good_read[:17]) > 0
+    assert test_ht.count(test_good_read2[:17]) > 0
+    
+    assert os.path.exists(os.path.join(in_dir, 'backup.ht'))
+    assert out.count('Backup: Saving') == 2
+    assert 'Nothing' in out
 
 def test_normalize_by_median_empty():
     CUTOFF='1'
@@ -308,8 +445,7 @@ def test_normalize_by_median_empty():
 
     script = scriptpath('normalize-by-median.py')
     args = ['-C', CUTOFF, '-k', '17', infile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -324,8 +460,7 @@ def test_count_median():
 
     script = scriptpath('count-median.py')
     args = [counting_ht, infile, outfile]
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     assert os.path.exists(outfile), outfile
 
@@ -346,8 +481,7 @@ def test_load_graph():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     ht_file = outfile + '.ht'
     assert os.path.exists(ht_file), ht_file
@@ -374,8 +508,7 @@ def test_load_graph_no_tags():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     ht_file = outfile + '.ht'
     assert os.path.exists(ht_file), ht_file
@@ -397,7 +530,7 @@ def test_load_graph_fail():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = runscript(script, args, fail_ok=True)
     assert status == -1
     assert "ERROR:" in err
 
@@ -413,8 +546,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     ht_file = outfile + '.ht'
     assert os.path.exists(ht_file), ht_file
@@ -427,17 +559,11 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
         args = [outfile]
         if stop_big_traverse:
             args.insert(0, '--no-big-traverse')
-        (status, out, err) = runscript(script, args)
-        print out
-        print err
-        assert status == 0
+        runscript(script, args)
 
         script = scriptpath('merge-partitions.py')
         args = [outfile, '-k', str(K)]
-        (status, out, err) = runscript(script, args)
-        print out
-        print err
-        assert status == 0
+        runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
         assert os.path.exists(final_pmap_file)
@@ -447,8 +573,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
             args = ["-k", str(K), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
-            (status, out, err) = runscript(script, args, in_dir)
-            assert status == 0
+            runscript(script, args, in_dir)
 
             baseinfile = os.path.basename(infilename)
             assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
@@ -467,8 +592,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
 
     args.extend([outfile, infile])
 
-    (status, out, err) = DEBUG_runscript(script, args)
-    assert status == 0
+    DEBUG_runscript(script, args)
 
     ht_file = outfile + '.ht'
     assert os.path.exists(ht_file), ht_file
@@ -482,18 +606,12 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
         args = [outfile]
         if stop_big_traverse:
             args.insert(0, '--no-big-traverse')
-        (status, out, err) = DEBUG_runscript(script, args)
-        print out
-        print err
-        assert status == 0
+        DEBUG_runscript(script, args)
 
 	print ">>>> DEBUG: Merging Partitions <<<"
         script = scriptpath('merge-partitions.py')
         args = [outfile, '-k', str(K)]
-        (status, out, err) = DEBUG_runscript(script, args)
-        print out
-        print err
-        assert status == 0
+        DEBUG_runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
         assert os.path.exists(final_pmap_file)
@@ -504,8 +622,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
             args = ["-k", str(K), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
-            (status, out, err) = DEBUG_runscript(script, args, in_dir)
-            assert status == 0
+            DEBUG_runscript(script, args, in_dir)
 
             baseinfile = os.path.basename(infilename)
             assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
@@ -519,16 +636,12 @@ def test_partition_graph_1():
     script = scriptpath('partition-graph.py')
     args = [graphbase]
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     script = scriptpath('merge-partitions.py')
     args = [graphbase, '-k', str(20)]
-    (status, out, err) = runscript(script, args)
-    print out
-    print err
-    assert status == 0
-
+    runscript(script, args)
+    
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
@@ -546,15 +659,11 @@ def test_partition_graph_nojoin_k21():
     script = scriptpath('partition-graph.py')
     args = [graphbase]
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     script = scriptpath('merge-partitions.py')
     args = [graphbase, '-k', str(21)]
-    (status, out, err) = runscript(script, args)
-    print out
-    print err
-    assert status == 0
+    runscript(script, args)
 
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
@@ -581,15 +690,11 @@ def test_partition_graph_nojoin_stoptags():
     script = scriptpath('partition-graph.py')
     args = ['--stoptags', stoptags_file, graphbase]
 
-    (status, out, err) = runscript(script, args)
-    assert status == 0
+    runscript(script, args)
 
     script = scriptpath('merge-partitions.py')
     args = [graphbase, '-k', str(20)]
-    (status, out, err) = runscript(script, args)
-    print out
-    print err
-    assert status == 0
+    runscript(script, args)
 
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
@@ -640,8 +745,7 @@ def test_annotate_partitions():
 
     script = scriptpath('annotate-partitions.py')
     args = ["-k", "20", graphbase, seqfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     partfile = os.path.join(in_dir, 'random-20-a.fa.part')
 
@@ -663,8 +767,7 @@ def test_annotate_partitions_2():
 
     script = scriptpath('annotate-partitions.py')
     args = ["-k", "21", graphbase, seqfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     partfile = os.path.join(in_dir, 'random-20-a.fa.part')
 
@@ -685,10 +788,7 @@ def test_extract_partitions():
     script = scriptpath('extract-partitions.py')
     args = ['extracted', partfile]
     
-    (status, out, err) = runscript(script, args, in_dir)
-    print out
-    print err
-    assert status == 0
+    runscript(script, args, in_dir)
 
     distfile = os.path.join(in_dir, 'extracted.dist')
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
@@ -714,14 +814,66 @@ def test_abundance_dist():
 
     script = scriptpath('abundance-dist.py')
     args = ['-z', htfile, infile, outfile]
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0
+    runscript(script, args, in_dir)
 
     fp = iter(open(outfile))
     line = fp.next().strip()
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
+
+def test_abundance_dist_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    htfile = _make_counting(infile, K=17, BIGCOUNT=False)
+
+    script = scriptpath('abundance-dist.py')
+    args = ['-z', htfile, infile, outfile]
+    runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line
+
+def test_abundance_dist_single():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
+    runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+def test_abundance_dist_single_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-b', infile, outfile]
+    runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line
 
 def test_do_partition():
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -731,8 +883,7 @@ def test_do_partition():
     script = scriptpath('do-partition.py')
     args = ["-k", "20", graphbase, seqfile]
 
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0, (out,err)
+    runscript(script, args, in_dir)
 
     partfile = os.path.join(in_dir, 'random-20-a.fa.part')
 
@@ -750,8 +901,7 @@ def test_do_partition_2():
     script = scriptpath('do-partition.py')
     args = ["-k", "21", graphbase, seqfile]
 
-    (status, out, err) = runscript(script, args, in_dir)
-    assert status == 0, (out,err)
+    runscript(script, args, in_dir)
 
     partfile = os.path.join(in_dir, 'random-20-a.fa.part')
 
@@ -760,3 +910,188 @@ def test_do_partition_2():
 
     assert len(parts) == 99, len(parts)
 
+####
+
+def test_interleave_reads_1_fq():
+    # test input files
+    infile1 = utils.get_test_data('paired.fq.1')
+    infile2 = utils.get_test_data('paired.fq.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    runscript(script, args)
+
+    r = open(ex_outfile).read()
+    q = open(outfile).read()
+
+    assert r == q, (r, q)
+
+def test_interleave_reads_2_fa():
+    # test input files
+    infile1 = utils.get_test_data('paired.fa.1')
+    infile2 = utils.get_test_data('paired.fa.2')
+
+    # correct output
+    ex_outfile = utils.get_test_data('paired.fa')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fa')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    runscript(script, args)
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile), screed.open(outfile)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+def test_extract_paired_reads_1_fa():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fa')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fa.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fa.se')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired-mixed.fa.pe')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired-mixed.fa.se', in_dir)
+
+    script = scriptpath('extract-paired-reads.py')
+    args = [infile]
+
+    runscript(script, args, in_dir)
+    
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+def test_extract_paired_reads_2_fq():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fq')
+
+    ex_outfile1 = utils.get_test_data('paired-mixed.fq.pe')
+    ex_outfile2 = utils.get_test_data('paired-mixed.fq.se')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired-mixed.fq.pe')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired-mixed.fq.se', in_dir)
+
+    script = scriptpath('extract-paired-reads.py')
+    args = [infile]
+
+    runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+def test_split_paired_reads_1_fa():
+    # test input file
+    infile = utils.get_test_data('paired.fa')
+
+    ex_outfile1 = utils.get_test_data('paired.fa.1')
+    ex_outfile2 = utils.get_test_data('paired.fa.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fa.1')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fa.2', in_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = [infile]
+
+    runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+    assert n > 0
+
+def test_split_paired_reads_2_fq():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fq.1')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fq.2', in_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = [infile]
+
+    runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0

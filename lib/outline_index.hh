@@ -154,9 +154,10 @@ void retrieve_read_by_id(std::string infilename, std::set<long>& reads_ids, std:
 void retrieve_read_by_id(std::string readsBinFileName, std::set<long>& reads_ids, std::map<long,std::string>& mymap);
 unsigned int sim_measure(std::string seq1, std::string seq2, unsigned int save_ksize);
 //------ sampling procedure --------
+void samplefromfile();
 void samplefrombinary();
 //------- stat ----------
-void create_stat(std::string statfilename);
+void create_stat(std::string statfilename,unsigned int num_seeds,unsigned int density);
 
 };
 
