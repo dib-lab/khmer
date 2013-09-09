@@ -2150,7 +2150,6 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
  * THIS SUCKS AND IT'S YOUR FAULT @CTB
  */
 void Hashtable::sweep_sequence_for_colors(const std::string& seq,
-					unsigned long long& n_consumed,
 					ColorPtrSet& found_colors,
 					bool break_on_stoptags,
 					bool stop_big_traversals) {

@@ -60,6 +60,13 @@ namespace khmer {
 	virtual void	accumulate_timer_deltas( uint32_t metrics_key );
 
   };
+  
+  struct tag_color_info {
+    HashIntoType kmer;
+    SeenSet tagged_kmers;
+    
+  
+  };
 
   //
   // Sequence iterator class, test.  Not really a C++ iterator yet.
