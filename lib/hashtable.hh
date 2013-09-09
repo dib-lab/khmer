@@ -252,6 +252,7 @@ namespace khmer {
       partition = new SubsetPartition(this);
       _init_bitstuff();
       _all_tags_spin_lock = 0;
+      _tag_colors_spin_lock = 0;
     }
 
     virtual ~Hashtable( )
@@ -364,7 +365,7 @@ namespace khmer {
     }
 
     uint32_t _all_tags_spin_lock;
-
+    uint32_t _tag_colors_spin_lock;
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
@@ -625,5 +626,11 @@ namespace khmer {
 
 #define RELEASE_ALL_TAGS_SPIN_LOCK \
   __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
+
+#define ACQUIRE_TAG_COLORS_SPIN_LOCK \
+  while(!__sync_bool_compare_and_swap( &_tag_colors_spin_lock, 0, 1));
+
+#define ACQUIRE_TAG_COLORS_SPIN_LOCK \
+  __sync_bool_compare_and_swap( &_tag_colors_spin_lock, 1, 0);
 
 #endif // HASHTABLE_HH
