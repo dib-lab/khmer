@@ -2227,6 +2227,25 @@ static PyObject * hash_consume_fasta_and_tag_with_colors(PyObject * self, PyObje
   
 }
 
+static PyObject * hash_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+  
+  char * seq = NULL;
+  bool break_on_stoptags = NULL;
+  bool stop_big_traversals = NULL;
+  
+  if(!PyArg_ParseTuple(args, "spp", &seq, &break_on_stoptags, &stop_big_traversals)) {
+    return NULL;
+  }
+  
+  if (strlen(kmer_s) < counting->ksize()) {
+    return NULL;
+  }
+  
+  _pre_partition_info
+}
+
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
