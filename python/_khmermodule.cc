@@ -2195,6 +2195,37 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self, PyObj
   return (PyObject *) subset_obj;
 }
 
+static PyObject * hash_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+  
+  PyObject * callback_obs = NULL;
+  PyObject * rparser_obj = NULL;
+  
+  if (!PyArg_ParseType(args, "O|O", &rparser_obj, &callback_obj)) {
+    return NULL;
+  }
+  
+  khmer:: read_parsers:: IParser * rparser =
+  _PyObject_to_khmer_ReadParser( rparser_obj );
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+  bool exc_raised = false;
+  
+  Py_BEGIN_ALLOW_THREADS
+  try {
+    counting->consume_fasta_and_tag_with_colors(rparser, total_reads, n_consumed,
+                                                _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    exc_raised = TRUE;
+  }
+  Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
+  
+  return Py_BuildValue("iL", total_reads, n_consumed);
+  
+}
 
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
@@ -2232,7 +2263,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
   { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
   { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
-
+  { "consume_fasta_and_tag_with_colors", hash_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
