@@ -2097,7 +2097,9 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
 	      // TODO: MAKE THREADSAFE!
 	      
 	      if (!_cmap_contains_color(color_map, kmer, current_color)) {
+	        ACQUIRE_TAG_COLORS_SPIN_LOCK
 	        link_tag_and_color(kmer, current_color);
+	        RELEASE_TAG_COLORS_SPIN_LOCK
 	      }
 	      if (found_tags) {
 	        found_tags->insert(kmer);
@@ -2121,7 +2123,9 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
         
         // Coloring code
         // TODO: MAKE THREADSAFE!
+        ACQUIRE_TAG_COLORS_SPIN_LOCK
         link_tag_and_color(kmer, current_color)
+        RELEASE_TAG_COLORS_SPIN_LOCK
         
         if (found_tags) { found_tags->insert(kmer); }
         since = 1;
