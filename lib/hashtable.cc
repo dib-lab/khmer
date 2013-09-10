@@ -1950,6 +1950,10 @@ void Hashtable::extract_unique_paths(std::string seq,
  * function which accepts a consume_sequence function pointer as a parameter
  */
 
+void Hashtable::do_nothing() {
+  std::cout << "doing nothing\n";
+}
+
 void
 Hashtable::consume_fasta_and_tag_with_colors(
   std:: string const  &filename,
