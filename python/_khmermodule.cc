@@ -2195,79 +2195,6 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self, PyObj
   return (PyObject *) subset_obj;
 }
 
-static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  PyObject * callback_obj = NULL;
-  PyObject * rparser_obj = NULL;
-  
-  if (!PyArg_ParseTuple(args, "O|O", &rparser_obj, &callback_obj)) {
-    return NULL;
-  }
-  
-  khmer:: read_parsers:: IParser * rparser =
-  _PyObject_to_khmer_ReadParser( rparser_obj );
-  unsigned long long n_consumed;
-  unsigned int total_reads;
-  bool exc_raised = false;
-  
-  Py_BEGIN_ALLOW_THREADS
-  try {
-    hb->consume_fasta_and_tag_with_colors(rparser, total_reads, n_consumed,
-                                                _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    exc_raised = true;
-  }
-  Py_END_ALLOW_THREADS
-  if (exc_raised) return NULL;
-  
-  return Py_BuildValue("iL", total_reads, n_consumed);
-  
-}
-
-static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  char * seq = NULL;
-  bool break_on_stoptags = NULL;
-  bool stop_big_traversals = NULL;
-  
-  if(!PyArg_ParseTuple(args, "spp", &seq, &break_on_stoptags, &stop_big_traversals)) {
-    return NULL;
-  }
-  
-  if (strlen(seq) < hb->ksize()) {
-    return NULL;
-  }
-  
-  //std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
-  ColorPtrSet found_colors;
-  
-  bool exc_raised = false;
-  Py_BEGIN_ALLOW_THREADS
-  try {
-    hb->sweep_sequence_for_colors(seq, found_colors, break_on_stoptags, stop_big_traversals);
-  } catch (_khmer_signal &e) {
-    exc_raised = true;
-  }
-  Py_END_ALLOW_THREADS
-  
-  if (exc_raised) return NULL;
-  
-  PyObject * x =  PyList_New(found_colors.size());
-  khmer::ColorPtrSet::const_iterator si;
-  unsigned long long i = 0;
-  for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
-    PyList_SET_ITEM(x, i, Py_BuildValue("i", *(*si)));
-    i++;
-  }
-  
-  return x;
-}
-
 static PyMethodDef khmer_counting_methods[] = {
   { "ksize", hash_get_ksize, METH_VARARGS, "" },
   { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
@@ -3891,6 +3818,109 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
+static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
+  
+  std::ofstream outfile;
+  outfile.open("lazyoutput.txt");
+  outfile << ">> we're in c++ land folks\n";
+  
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+  
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+  bool exc_raised = false;
+  
+  outfile << ">> about to start the tagging function...\n";
+  outfile.close();
+  //Py_BEGIN_ALLOW_THREADS
+  try {
+    hb->consume_fasta_and_tag_with_colors(filename, total_reads, n_consumed,
+                                                _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  //Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
+  
+  return Py_BuildValue("iL", total_reads, n_consumed);
+  
+}
+
+static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
+  
+  char * seq = NULL;
+  PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|OO", &seq,
+			&break_on_stop_tags_o,
+			&stop_big_traversals_o)) {
+    return NULL;
+  }
+
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
+  }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
+  
+  if (strlen(seq) < hb->ksize()) {
+    return NULL;
+  }
+  
+  //std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
+  ColorPtrSet found_colors;
+  
+  bool exc_raised = false;
+  //Py_BEGIN_ALLOW_THREADS
+  try {
+    hb->sweep_sequence_for_colors(seq, found_colors, break_on_stop_tags, stop_big_traversals);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  //Py_END_ALLOW_THREADS
+  
+  if (exc_raised) return NULL;
+  
+  PyObject * x =  PyList_New(found_colors.size());
+  khmer::ColorPtrSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("i", *(*si)));
+    i++;
+  }
+  
+  return x;
+}
+
+static PyObject * hashbits_do_nothing(PyObject * self, PyObject * args) {
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
+  
+  bool exc_raised = false;
+  try {
+    hb->do_nothing();
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  if (exc_raised) return NULL;
+  
+  return Py_True;
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
   { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
@@ -3961,6 +3991,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
   { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
   { "sweep_sequence_for_colors", hashbits_sweep_sequence_for_colors, METH_VARARGS, "" },
+  { "do_nothing", hashbits_do_nothing, METH_VARARGS, ""},
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

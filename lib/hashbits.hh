@@ -22,8 +22,6 @@ namespace khmer {
 	HashIntoType _n_overlap_kmers;
     Byte ** _counts;
 
-    Color _tag_color;
-
     virtual void _allocate_counters() {
       _n_tables = _tablesizes.size();
 
@@ -49,8 +47,6 @@ namespace khmer {
       _occupied_bins = 0;
       _n_unique_kmers = 0;
       _n_overlap_kmers = 0;
-
-      _tag_color = 0;
 
       _allocate_counters();
     }
