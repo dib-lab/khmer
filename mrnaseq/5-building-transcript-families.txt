@@ -8,7 +8,10 @@ m1.xlarge machine.
 
 You'll also need to install some eel-pond scripts::
 
-   git clone https://github.com/ctb/eel-pond.git /usr/local/share/eel-pond
+   cd /usr/local/share
+   git clone https://github.com/ctb/eel-pond.git
+   cd eel-pond
+   git checkout protocols-v0.8.3
 
 Copy in your data
 =================
