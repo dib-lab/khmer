@@ -21,9 +21,8 @@ To install Trinity::
    cd /root
 
    curl -L http://sourceforge.net/projects/trinityrnaseq/files/latest/download?source=files > trinity.tar.gz
-
    tar xzf trinity.tar.gz
-   cd trinityrnaseq*
+   cd trinityrnaseq*/
    export FORCE_UNSAFE_CONFIGURE=1
    make
 
@@ -37,6 +36,19 @@ Download and install bowtie::
    unzip bowtie-0.12.7-linux-x86_64.zip
    cd bowtie-0.12.7
    cp bowtie bowtie-build bowtie-inspect /usr/local/bin
+
+Install samtools
+----------------
+
+Download and install samtools::
+
+   cd /root
+   curl -L http://sourceforge.net/projects/samtools/files/latest/download?source=files >samtools.tar.bz2
+   tar xjf samtools.tar.bz2
+   mv samtools-* samtools-latest
+   cd samtools-latest/
+   make
+   cp samtools bcftools/bcftools misc/* /usr/local/bin
 
 Build the files to assemble
 ---------------------------
@@ -62,7 +74,7 @@ Assembling with Trinity
 
 Run the assembler! ::
 
-   /root/trinityrnaseq_r2013-02-25/Trinity.pl --left left.fq --right right.fq --seqType fq -JM 15G
+   /root/trinityrnaseq*/Trinity.pl --left left.fq --right right.fq --seqType fq -JM 15G
 
 Note that this last bit (15G) is the maximum amount of memory to use.  You
 can increase (or decrease) it based on what machine you rented.  This size
