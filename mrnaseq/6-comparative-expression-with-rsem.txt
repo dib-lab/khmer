@@ -1,0 +1,110 @@
+6. Comparative expression analysis (with RSEM)
+==============================================
+
+You'll need to have your partitioned and renamed data from
+:doc:`5-building-transcript-families` in a file called
+'nematostella.fa'.  (It doesn't need to be annotated, but it does need
+to have the transcript family assignments.)
+
+In addition to screed, khmer, and eel-pond, you'll also need to
+install bowtie (see :doc:`3-big-assembly`).
+
+Installing rsem
+---------------
+
+We'll be using the `RSEM package <http://deweylab.biostat.wisc.edu/rsem/>`__
+to do some expression analysis.  To install it::
+
+   cd /root
+
+   curl -O http://deweylab.biostat.wisc.edu/rsem/src/rsem-1.2.5.tar.gz
+
+   tar xzvf rsem-1.2.5.tar.gz
+   cd rsem-1.2.5
+   make
+
+And now add this directory into your PATH, which is where Unix looks for
+things to run::
+
+   echo 'export PATH=$PATH:/root/rsem-1.2.5' >> /root/.bashrc
+   source /root/.bashrc
+
+Installing bowtie
+-----------------
+
+If you didn't install bowtie on this machine already (e.g. as part of
+:doc:`de-novo-assembly`), RSEM needs it; do::
+
+   cd /root
+   curl -O -L http://sourceforge.net/projects/bowtie-bio/files/bowtie/0.12.7/bowtie-0.12.7-linux-x86_64.zip
+   unzip bowtie-0.12.7-linux-x86_64.zip
+   cd bowtie-0.12.7
+   cp bowtie bowtie-build bowtie-inspect /usr/local/bin
+
+Prepare the reference
+---------------------
+
+Go to a working directory on /mnt::
+
+   cd /mnt
+   mkdir rsem
+   cd rsem
+
+Make a transcript-to-gene-map file::
+
+   python /usr/local/share/eel-pond/make-transcript-to-gene-map-file.py nematostella.fa nematostella.fa.tr_to_genes
+
+and ask RSEM to prepare the reference against which to map the reads::
+
+   rsem-prepare-reference --transcript-to-gene-map nematostella.fa.tr_to_genes nematostella.fa nema
+
+(Here, the 'nema' at the end is what to call the reference; the other
+two are just file names.)
+
+This last step will take about half an hour or more.
+
+Find and list the reads
+-----------------------
+
+Find the QC reads, and link them in; e.g. if using the Nematostella
+reads, make a volume from snap-126cc847, mount it as /data, and do::
+
+   ln -fs /data/*.pe.qc.fq.gz .
+
+Now, make a list of the data files::
+
+   ls -1 *.pe.qc.fq.gz > list.txt
+
+Note, the order of the files in this list is going to determine the
+order in the final RSEM output matrix.  You might consider rearranging
+it so that your controls are first, etc.
+
+Run RSEM
+--------
+
+Now, for each one of the files in 'list.txt', run RSEM.  This will
+take a long time for lots of data, so definitely run this step in screen! ::
+
+   n=1
+   for filename in $(cat list.txt)
+   do
+       echo mapping $filename
+       gunzip -c $filename > ${n}.fq
+       /usr/local/share/khmer/scripts/split-paired-reads.py ${n}.fq
+       rsem-calculate-expression --paired-end ${n}.fq.1 ${n}.fq.2 nema -p 4 ${n}.fq
+       rm ${n}.fq ${n}.fq.[12] ${n}.fq.transcript.bam ${n}.fq.transcript.sorted.bam
+       n=$(($n + 1))
+   done
+
+Gather results::
+
+   rsem-generate-data-matrix ?.fq.genes.results ??.fq.genes.results > genes.results
+   rsem-generate-data-matrix ?.fq.isoforms.results ??.fq.isoforms.results > isoforms.results
+
+...and voila, you now have two files, 'genes.results' and
+'isoforms.results', which are tab-separated files (that Excel can
+load) containing a matrix of gene expression levels in FPKM (rows) vs
+condition (columns).  The '1' condition will be the first file in
+list.txt, the '2' condition will be the second file, etc.
+
+(Yes, still TODO: write some scripts to bring in annotations and gene names.)
