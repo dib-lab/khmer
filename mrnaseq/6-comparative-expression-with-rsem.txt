@@ -1,13 +1,21 @@
 6. Comparative expression analysis (with RSEM)
 ==============================================
 
+In addition to screed, khmer, and eel-pond, you'll also need to
+install bowtie (see :doc:`3-big-assembly`).
+
 You'll need to have your partitioned and renamed data from
 :doc:`5-building-transcript-families` in a file called
 'nematostella.fa'.  (It doesn't need to be annotated, but it does need
 to have the transcript family assignments.)
 
-In addition to screed, khmer, and eel-pond, you'll also need to
-install bowtie (see :doc:`3-big-assembly`).
+.. note::
+
+   You can grab the one for nematostella here::
+
+      cd /mnt
+      curl -O http://athyra.idyll.org/~t/trinity-nematostella.renamed.fa.gz
+      gunzip -c trinity-nematostella.renamed.fa.gz > nematostella.fa
 
 Installing rsem
 ---------------
