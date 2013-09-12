@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 CYTHON_ENABLED = False
-=======
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
@@ -9,11 +7,8 @@ CYTHON_ENABLED = False
 from distribute_setup import use_setuptools
 use_setuptools()
 
->>>>>>> 824ef597774ded7785f778bad718c7ef50d9b4aa
 from distutils.core import setup
 from distutils.extension import Extension
-if CYTHON_ENABLED:
-    from Cython.Distutils import build_ext
 
 from os.path import (
     pardir	    as path_pardir,
