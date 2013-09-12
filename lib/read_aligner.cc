@@ -104,9 +104,9 @@ namespace khmer {
 
 	if(next_state == MATCH) {
 	  if(next_nucl == seq[next_seq_idx]) {
-	    sc = m_sm.match;
+	    sc = (kmerCov >= m_trusted_cutoff)? m_sm.trusted_match : m_sm.untrusted_match;
 	  } else {
-	    sc = m_sm.mismatch;
+	    sc = (kmerCov >= m_trusted_cutoff)? m_sm.trusted_mismatch : m_sm.untrusted_mismatch;
 	  }
 	} else {
 	  sc = 0;
@@ -129,7 +129,7 @@ namespace khmer {
 	next->f_score = next->score + next->h_score;
 	//std::cerr << "\t" << i << " " << next_nucl << " " << next->score << " " << next->h_score << " " << next->f_score << " " << state_labels[next->state] << " " << trans_labels[trans] << " " << hash << " " << _revhash(hash, m_ch->ksize()) << " " << _revhash(next_fwd, m_ch->ksize()) << " " << _revhash(next_rc, ch->ksize()) << " " << kmerCov << std::endl;
 	
-	if (isCorrect && next->score - GetNull(next->length) > next->length * 0) {
+	if (isCorrect && next->score - GetNull(next->length) > next->length * m_bits_theta) {
 	  open.push(next);
 	} else {
 	  delete next;
@@ -228,7 +228,7 @@ namespace khmer {
       std::string kmer = read.substr(i, k);
       
       int kCov = m_ch->get_count(kmer.c_str());
-      if(kCov > 0) {
+      if(kCov >= m_trusted_cutoff) {
 	HashIntoType fhash, rhash;
 	_hash(kmer.c_str(), k, fhash, rhash);
 	//std::cerr << "Starting kmer: " << kmer << " " << _revhash(fhash, m_ch->ksize()) << " " << _revhash(rhash, m_ch->ksize()) << " idx: " << i << ", " << i + k - 1 << " emission: " << kmer[k - 1] << std::endl;
@@ -249,9 +249,9 @@ namespace khmer {
 	  break;
 	}
 	AlignmentNode start(NULL, e, i + k - 1, MATCH, fhash, rhash, k);
-	start.score = k * m_sm.match + k * m_sm.tsc[MM];
+	start.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
 	AlignmentNode* end = Subalign(&start, read.length(), true, read);
-	/*Alignment* forward = ExtractAlignment(end, read, kmer);
+	Alignment* forward = ExtractAlignment(end, read, kmer);
 	end = Subalign(&start, read.length(), false, read);
 	Alignment* reverse = ExtractAlignment(end, read, kmer);
 
@@ -259,8 +259,8 @@ namespace khmer {
 	ret->score = reverse->score + forward->score;
 	ret->read_alignment = reverse->read_alignment + kmer + forward->read_alignment;
 	ret->graph_alignment = reverse->graph_alignment + kmer + forward->graph_alignment;
-	ret->truncated = forward->truncated || reverse->truncated;*/
-	return ExtractAlignment(end, read, kmer);
+	ret->truncated = forward->truncated || reverse->truncated;
+	return forward;
       }
     }
     return NULL;

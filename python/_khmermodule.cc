@@ -3986,8 +3986,10 @@ static PyTypeObject khmer_ReadAlignerType = {
 static PyObject* new_readaligner(PyObject * self, PyObject * args)
 {
   PyObject * py_obj;
+  unsigned int trusted_cov_cutoff = 2;
+  double bits_theta = 1;
 
-  if(!PyArg_ParseTuple(args, "O", &py_obj)) {
+  if(!PyArg_ParseTuple(args, "O|Id", &py_obj, &trusted_cov_cutoff, &bits_theta)) {
     return NULL;
   }
 
@@ -3996,7 +3998,7 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  readaligner_obj->aligner = new khmer::ReadAligner(ch->counting);
+  readaligner_obj->aligner = new khmer::ReadAligner(ch->counting, trusted_cov_cutoff, bits_theta);
 
   return (PyObject *) readaligner_obj; 
 }
