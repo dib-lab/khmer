@@ -74,11 +74,14 @@ namespace khmer {
 
 
   struct ScoringMatrix {
-    const double match;
-    const double mismatch;
+    const double trusted_match;
+    const double trusted_mismatch;
+    const double untrusted_match;
+    const double untrusted_mismatch;
+
     const double* tsc;
 
-    ScoringMatrix(double match, double mismatch, double* trans): match(match), mismatch(mismatch), tsc(trans) {}
+    ScoringMatrix(double trusted_match, double trusted_mismatch, double untrusted_match, double untrusted_mismatch, double* trans): trusted_match(trusted_match), trusted_mismatch(trusted_mismatch), untrusted_match(untrusted_match), untrusted_mismatch(untrusted_mismatch), tsc(trans) {}
   };
 
     
@@ -92,7 +95,7 @@ namespace khmer {
   // Constants for state transitions
   enum Transition { MM, MI, MD, IM, II, DM, DD, disallowed };
   // log probabilities for state transitions
-  static double trans_default[] = { log2(.98), log2(.01), log2(.01), log2(.95), log2(.05), log2(.95), log2(.05)};
+  static double trans_default[] = { log2(.98), log2(.01), log2(.01), log2(.99), log2(.01), log2(.99), log2(.01)};
   
   
   class ReadAligner {
@@ -110,6 +113,9 @@ namespace khmer {
     const HashIntoType bitmask;
     const unsigned int rc_left_shift;
 
+    unsigned int m_trusted_cutoff;
+    double m_bits_theta;
+    
     HashIntoType comp_bitmask(WordLength k) {
       HashIntoType ret = 0;
       for (unsigned int i = 0; i < k; i++) {
@@ -121,8 +127,8 @@ namespace khmer {
   public:
     Alignment* Align(const std::string&);
 
-    ReadAligner(khmer::CountingHash* ch)
-      : m_ch(ch), bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_sm(log2(.99), log2(.01), trans_default) {}
+    ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
+      : m_ch(ch), bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_sm(log2(.99), log2(.005), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
   };
 }
 
