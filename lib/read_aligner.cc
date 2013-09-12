@@ -129,7 +129,7 @@ namespace khmer {
 	next->f_score = next->score + next->h_score;
 	//std::cerr << "\t" << i << " " << next_nucl << " " << next->score << " " << next->h_score << " " << next->f_score << " " << state_labels[next->state] << " " << trans_labels[trans] << " " << hash << " " << _revhash(hash, m_ch->ksize()) << " " << _revhash(next_fwd, m_ch->ksize()) << " " << _revhash(next_rc, ch->ksize()) << " " << kmerCov << std::endl;
 	
-	if (isCorrect && next->score - GetNull(next->length) > next->length) {
+	if (isCorrect && next->score - GetNull(next->length) > next->length * 0) {
 	  open.push(next);
 	} else {
 	  delete next;
@@ -222,7 +222,9 @@ namespace khmer {
   
   Alignment* ReadAligner::Align(const std::string& read) {
     int k = m_ch->ksize();
-    for (unsigned int i = 0; i < read.length() - k + 1; i++) {
+    int num_kmers = read.length() - k + 1;
+    
+    for (unsigned int i = 0; i < num_kmers; i++) {
       std::string kmer = read.substr(i, k);
       
       int kCov = m_ch->get_count(kmer.c_str());
@@ -249,6 +251,15 @@ namespace khmer {
 	AlignmentNode start(NULL, e, i + k - 1, MATCH, fhash, rhash, k);
 	start.score = k * m_sm.match + k * m_sm.tsc[MM];
 	AlignmentNode* end = Subalign(&start, read.length(), true, read);
+	/*Alignment* forward = ExtractAlignment(end, read, kmer);
+	end = Subalign(&start, read.length(), false, read);
+	Alignment* reverse = ExtractAlignment(end, read, kmer);
+
+	Alignment* ret = new Alignment;
+	ret->score = reverse->score + forward->score;
+	ret->read_alignment = reverse->read_alignment + kmer + forward->read_alignment;
+	ret->graph_alignment = reverse->graph_alignment + kmer + forward->graph_alignment;
+	ret->truncated = forward->truncated || reverse->truncated;*/
 	return ExtractAlignment(end, read, kmer);
       }
     }

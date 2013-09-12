@@ -38,8 +38,8 @@ def main():
     
     ### the filtering loop
     for infile in infiles:
+        print 'aligning', infile
         for n, record in enumerate(screed.open(infile)):
-            print 'aligning', infile
 
             name = record['name']
             seq = record['sequence'].upper()
