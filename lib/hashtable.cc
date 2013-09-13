@@ -2065,10 +2065,64 @@ Hashtable::consume_fasta_and_tag_with_colors(
 
   }
 
+void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string &filename,
+					  unsigned int &total_reads,
+					  unsigned long long &n_consumed,
+					  CallbackFn callback,
+					  void * callback_data)
+{
+  total_reads = 0;
+  n_consumed = 0;
+
+  IParser* parser = IParser::get_parser(filename.c_str());
+  Read read;
+
+  string seq = "";
+
+  // reset the master subset partition
+  delete partition;
+  partition = new SubsetPartition(this);
+
+  //
+  // iterate through the FASTA file & consume the reads.
+  //
+  Color * c;
+  while(!parser->is_complete())  {
+    read = parser->get_next_read();
+    seq = read.sequence;
+
+    if (check_and_normalize_read(seq)) {
+      // First, figure out what the partition is (if non-zero), and save that.
+      c = new Color(_parse_partition_id(read.name));
+
+      consume_sequence_and_tag_with_colors( seq,
+					      n_consumed,
+					      *c );
+    }
+	       
+    // reset the sequence info, increment read number
+    total_reads++;
+
+    // run callback, if specified
+    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+      try {
+        callback("consume_partitioned_fasta_and_tag_with_colors", callback_data, 
+        total_reads, n_consumed);
+      } catch (...) {
+	delete parser;
+        throw;
+      }
+    }
+  }
+
+  delete parser;
+}
+
 void Hashtable::link_tag_and_color(HashIntoType& kmer, Color& kmer_color) {
   tag_colors.insert(TagColorPtrPair(kmer, &kmer_color));
   color_tag_ptrs.insert(ColorTagPtrPair(kmer_color, &kmer));
 }
+
 /* This is essentially the same code as above, only it assigns colors to the
  * tags through multimap TagColorMap defined in hashtable.hh, declared in
  * hashbits.hh

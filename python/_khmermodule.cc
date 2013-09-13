@@ -3824,8 +3824,6 @@ static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, Py
   khmer::Hashbits * hb = me->hashbits;
   
   std::ofstream outfile;
-  outfile.open("lazyoutput.txt");
-  outfile << ">> we're in c++ land folks\n";
   
   char * filename;
   PyObject * callback_obj = NULL;
@@ -3838,8 +3836,6 @@ static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, Py
   unsigned int total_reads;
   bool exc_raised = false;
   
-  outfile << ">> about to start the tagging function...\n";
-  outfile.close();
   //Py_BEGIN_ALLOW_THREADS
   try {
     hb->consume_fasta_and_tag_with_colors(filename, total_reads, n_consumed,
@@ -3852,6 +3848,34 @@ static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, Py
   
   return Py_BuildValue("iL", total_reads, n_consumed);
   
+}
+
+static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_colors(
+                                            PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    hashbits->consume_partitioned_fasta_and_tag_with_colors(filename, 
+    total_reads, n_consumed, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
 static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
@@ -3992,6 +4016,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
   { "sweep_sequence_for_colors", hashbits_sweep_sequence_for_colors, METH_VARARGS, "" },
   { "do_nothing", hashbits_do_nothing, METH_VARARGS, ""},
+  {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
+  
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
