@@ -21,6 +21,7 @@
 #include "hashtable.hh"
 #include "counting.hh"
 
+#include <limits>
 #include <algorithm>
 #include <set>
 #include <vector>
@@ -101,7 +102,7 @@ namespace khmer {
   class ReadAligner {
   private:
 
-    Alignment* ExtractAlignment(khmer::AlignmentNode*, const std::string&, const std::string&);
+    Alignment* ExtractAlignment(khmer::AlignmentNode*, bool forward, const std::string&, const std::string&);
     void Enumerate(NodeHeap&, khmer::AlignmentNode*, bool, const std::string&);
     AlignmentNode* Subalign(AlignmentNode*, unsigned int, bool, const std::string&);
     
@@ -128,7 +129,7 @@ namespace khmer {
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
-      : m_ch(ch), bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_sm(log2(.99), log2(.005), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
+      : m_ch(ch), bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_sm(log2(.985), log2(.01), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
   };
 }
 

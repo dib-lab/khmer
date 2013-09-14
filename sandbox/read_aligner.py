@@ -34,7 +34,7 @@ def main():
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
-    aligner = khmer.new_readaligner(ht)
+    aligner = khmer.new_readaligner(ht, 2, 1.0) # counting hash, trusted kmer coverage cutoff, bits theta (threshold value for terminating unproductive alignemnts)
     
     ### the filtering loop
     for infile in infiles:
@@ -43,6 +43,7 @@ def main():
 
             name = record['name']
             seq = record['sequence'].upper()
+            print name
             print seq
 
             score, graph_alignment, read_alignment, truncated = aligner.align(seq)
