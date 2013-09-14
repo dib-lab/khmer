@@ -175,7 +175,7 @@ namespace khmer {
     return curr;
   }
 
-  Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node, const std::string& read, const std::string& kmer) {
+  Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node, bool forward, const std::string& read, const std::string& kmer) {
     Alignment* ret = new Alignment;
     if(node == NULL) {
       ret->score = 0;
@@ -186,10 +186,10 @@ namespace khmer {
     }
 
     assert(node->seq_idx < read.length());
-    assert(node->seq_idx > 0);
+    assert(node->seq_idx >= 0);
     std::string read_alignment = "";
     std::string graph_alignment = "";
-    ret->score = node->score - GetNull(read.length());
+    ret->score = node->score;
     ret->truncated = (node->seq_idx != 0) && (node->seq_idx != read.length() - 1);
     //std::cerr << "Alignment end: " << node->prev << " " << node->base << " " << node->seq_idx << " " << node->state << " " << node->score << std::endl;
 
@@ -210,12 +210,17 @@ namespace khmer {
 	graph_base = '?';
 	read_base = '?';
       }
-      graph_alignment = graph_base + graph_alignment;
-      read_alignment = read_base + read_alignment;
+      if(forward) {
+	graph_alignment = graph_base + graph_alignment;
+	read_alignment = read_base + read_alignment;
+      } else {
+	graph_alignment = graph_alignment + graph_base;
+	read_alignment = read_alignment + read_base;
+      }	
       node = node->prev;
     }
-    ret->graph_alignment = kmer + graph_alignment;
-    ret->read_alignment = kmer + read_alignment;
+    ret->graph_alignment = graph_alignment;
+    ret->read_alignment = read_alignment;
     
     return ret;
   }
@@ -249,21 +254,41 @@ namespace khmer {
 	  break;
 	}
 	AlignmentNode start(NULL, e, i + k - 1, MATCH, fhash, rhash, k);
-	start.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
-	AlignmentNode* end = Subalign(&start, read.length(), true, read);
-	Alignment* forward = ExtractAlignment(end, read, kmer);
-	end = Subalign(&start, read.length(), false, read);
-	Alignment* reverse = ExtractAlignment(end, read, kmer);
+	AlignmentNode* end;
+	Alignment* forward;
+	Alignment* reverse;
+	int final_length;
 
+	start.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
+
+	end = Subalign(&start, read.length(), true, read);
+	final_length = end->length;
+	forward = ExtractAlignment(end, true, read, kmer);
+
+	start.seq_idx = i;
+	end = Subalign(&start, read.length(), false, read);
+	final_length += end->length;
+	reverse = ExtractAlignment(end, false, read, kmer);
+	
 	Alignment* ret = new Alignment;
-	ret->score = reverse->score + forward->score;
+	ret->score = reverse->score + forward->score - start.score; //We've actually counted the starting node score twice, so we need to adjust for that
 	ret->read_alignment = reverse->read_alignment + kmer + forward->read_alignment;
 	ret->graph_alignment = reverse->graph_alignment + kmer + forward->graph_alignment;
+	ret->score = ret->score - GetNull(final_length - k); //Again, we've counted the k-size twice
 	ret->truncated = forward->truncated || reverse->truncated;
-	return forward;
+
+	delete forward;
+	delete reverse;
+	return ret;
       }
     }
-    return NULL;
+
+    Alignment* ret = new Alignment;
+    ret->score = -std::numeric_limits<double>::infinity();
+    ret->read_alignment = "";
+    ret->graph_alignment = "";
+    ret->truncated = true;
+    return ret;
   }
 
 }
