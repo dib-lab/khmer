@@ -77,11 +77,11 @@ namespace khmer {
     virtual ~CountingHash() {
       if (_counts) {
 	for (unsigned int i = 0; i < _n_tables; i++) {
-	  delete _counts[i];
+	  delete[] _counts[i];
 	  _counts[i] = NULL;
 	}
 
-	delete _counts;
+	delete[] _counts;
 	_counts = NULL;
 
 	_n_tables = 0;

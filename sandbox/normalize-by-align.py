@@ -82,7 +82,7 @@ def main():
             if len(record.sequence) < K:
                 continue
 
-            seq = record.sequence.replace('N', 'A')
+            seq = record.sequence.upper().replace('N', 'A')
 
             ##
             score, graph_alignment, read_alignment, truncated = aligner.align(record.sequence)
