@@ -493,6 +493,7 @@ namespace khmer {
 					     CallbackFn callback = 0,
 					     void * callback_data = 0);
 					     
+    // @CTB ahem?
     void do_nothing();
     
     void consume_fasta_and_tag_with_colors(
