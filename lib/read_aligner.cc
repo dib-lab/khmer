@@ -7,6 +7,20 @@
 
 namespace khmer {
 
+  struct del_alignment_node_t
+  {
+    del_alignment_node_t& operator()(AlignmentNode* p)
+    {
+      delete p;
+      return *this;
+    }
+  };
+
+  del_alignment_node_t del_alignment_node()
+  {
+    return del_alignment_node_t();
+  }
+  
   /*
     Compute the null model (random sequence) log odds probability for a given length
    */
@@ -46,13 +60,14 @@ namespace khmer {
 
   void ReadAligner::Enumerate(
 		       NodeHeap& open,
+		       std::vector<AlignmentNode*>& all_nodes,
 		       AlignmentNode* curr,
 		       bool forward,
 		       const std::string& seq
 		       ) {
     int next_seq_idx;
     int remaining;
-    int kmerCov;
+    unsigned int kmerCov;
     double hcost;
     double sc;
     Transition trans;
@@ -114,13 +129,13 @@ namespace khmer {
 
 	if(next_state == MATCH) {
 	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state,
-				   next_fwd, next_rc, curr->length + 1);
+					      next_fwd, next_rc, curr->length + 1);
 	} else if(next_state == INSERT_GRAPH) {
 	  next = new AlignmentNode(curr, (Nucl)i, curr->seq_idx, (State)next_state,
-				   next_fwd, next_rc, curr->length);
+					      next_fwd, next_rc, curr->length);
 	} else if(next_state == INSERT_READ) {
 	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state,
-				   curr->fwd_hash, curr->rc_hash, curr->length + 1);
+					      curr->fwd_hash, curr->rc_hash, curr->length + 1);
 	}
 
 	next->score = curr->score + sc + m_sm.tsc[trans];
@@ -131,6 +146,7 @@ namespace khmer {
 	
 	if (isCorrect && next->score - GetNull(next->length) > next->length * m_bits_theta) {
 	  open.push(next);
+	  all_nodes.push_back(next);
 	} else {
 	  delete next;
 	}
@@ -138,15 +154,17 @@ namespace khmer {
     }
   }
 
-  AlignmentNode* ReadAligner::Subalign(AlignmentNode* startVert,
+  Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
 				   unsigned int seqLen,
 				   bool forward,
 				   const std::string& seq) {
-    
+    std::vector<AlignmentNode*> all_nodes;
     NodeHeap open;
     std::set<AlignmentNode> closed;
-    open.push(startVert);
-    AlignmentNode* curr;
+    open.push(start_vert);
+    //all_nodes.insert(start_vert);
+    
+    AlignmentNode* curr = NULL;
     AlignmentNode* best = NULL;
 
     while (!open.empty()) {
@@ -160,7 +178,8 @@ namespace khmer {
       
       if (curr->seq_idx == seqLen-1 ||
 	  curr->seq_idx == 0) {
-	return curr;
+	best = curr;
+	break;
       }
 
       if(set_contains(closed, *curr)) {
@@ -169,13 +188,16 @@ namespace khmer {
 
       closed.insert(*curr);
       
-      Enumerate(open, curr, forward, seq);
+      Enumerate(open, all_nodes, curr, forward, seq);
     }
+
+    Alignment* ret = ExtractAlignment(best, forward, seq);
+    std::for_each(all_nodes.begin(), all_nodes.end(), del_alignment_node());
     
-    return curr;
+    return ret;
   }
 
-  Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node, bool forward, const std::string& read, const std::string& kmer) {
+  Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node, bool forward, const std::string& read) {
     Alignment* ret = new Alignment;
     if(node == NULL) {
       ret->score = 0;
@@ -232,13 +254,13 @@ namespace khmer {
     for (unsigned int i = 0; i < num_kmers; i++) {
       std::string kmer = read.substr(i, k);
       
-      int kCov = m_ch->get_count(kmer.c_str());
-      if(kCov >= m_trusted_cutoff) {
-	HashIntoType fhash, rhash;
+      unsigned int kCov = m_ch->get_count(kmer.c_str());
+      if(kCov >= 1) {
+	HashIntoType fhash = 0, rhash = 0;
 	_hash(kmer.c_str(), k, fhash, rhash);
 	//std::cerr << "Starting kmer: " << kmer << " " << _revhash(fhash, m_ch->ksize()) << " " << _revhash(rhash, m_ch->ksize()) << " idx: " << i << ", " << i + k - 1 << " emission: " << kmer[k - 1] << std::endl;
 	char base = toupper(kmer[k - 1]);
-	Nucl e;
+	Nucl e = A;
 	switch(base) {
 	case 'A':
 	  e = A;
@@ -253,22 +275,25 @@ namespace khmer {
 	  e = T;
 	  break;
 	}
-	AlignmentNode start(NULL, e, i + k - 1, MATCH, fhash, rhash, k);
-	AlignmentNode* end;
-	Alignment* forward;
-	Alignment* reverse;
-	int final_length;
+	AlignmentNode start = AlignmentNode(NULL, e, i + k - 1, MATCH, fhash, rhash, k);
+	start.f_score = 0;
+	start.h_score = 0;
+	Alignment* forward = NULL;
+	Alignment* reverse = NULL;
+	int final_length = 0;
 
-	start.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
+	if(kCov >= m_trusted_cutoff) {
+	  start.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
+	} else {
+	  start.score = k * m_sm.untrusted_match + k * m_sm.tsc[MM];
+	}	  
 
-	end = Subalign(&start, read.length(), true, read);
-	final_length = end->length;
-	forward = ExtractAlignment(end, true, read, kmer);
+	forward = Subalign(&start, read.length(), true, read);
+	final_length = forward->read_alignment.length();
 
 	start.seq_idx = i;
-	end = Subalign(&start, read.length(), false, read);
-	final_length += end->length;
-	reverse = ExtractAlignment(end, false, read, kmer);
+	reverse = Subalign(&start, read.length(), false, read);
+	final_length += reverse->read_alignment.length();
 	
 	Alignment* ret = new Alignment;
 	ret->score = reverse->score + forward->score - start.score; //We've actually counted the starting node score twice, so we need to adjust for that
