@@ -26,6 +26,7 @@
 #include <set>
 #include <vector>
 #include <queue>
+#include <memory>
 
 namespace khmer {
 
@@ -102,17 +103,17 @@ namespace khmer {
   class ReadAligner {
   private:
 
-    Alignment* ExtractAlignment(khmer::AlignmentNode*, bool forward, const std::string&, const std::string&);
-    void Enumerate(NodeHeap&, khmer::AlignmentNode*, bool, const std::string&);
-    AlignmentNode* Subalign(AlignmentNode*, unsigned int, bool, const std::string&);
+    Alignment* ExtractAlignment(AlignmentNode*, bool forward, const std::string&);
+    void Enumerate(NodeHeap&, std::vector<AlignmentNode*>& all_nodes, AlignmentNode*, bool, const std::string&);
+    Alignment* Subalign(AlignmentNode*, unsigned int, bool, const std::string&);
     
-    khmer::CountingHash* m_ch;
-    ScoringMatrix m_sm;
-
     // These variables are required to use the _revhash and hash macros
     // might as well just compute them once
     const HashIntoType bitmask;
     const unsigned int rc_left_shift;
+
+    khmer::CountingHash* m_ch;
+    ScoringMatrix m_sm;
 
     unsigned int m_trusted_cutoff;
     double m_bits_theta;
@@ -129,7 +130,7 @@ namespace khmer {
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
-      : m_ch(ch), bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_sm(log2(.985), log2(.01), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
+      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.985), log2(.01), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
   };
 }
 
