@@ -29,7 +29,6 @@ const std::string toalign = "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATAATTTT
 
 int main(void) {
   Primes primetab( ht_size );
-  ScoringMatrix sm = default_sm;
   std::vector<HashIntoType> ht_sizes;
   for ( unsigned int i = 0; i < ht_count; ++i )
   {
@@ -42,19 +41,20 @@ int main(void) {
     ht.consume_string(test_seqs[index]);
   }
 
-  std::cout << "Match: " << sm.match << ", mismatch: " << sm.mismatch << std::endl;
-  for(unsigned int state = MM;state <= DD;state++) {
-    std::cout << "Transition: " << state << ", prob: " << sm.tsc[state] << " " << pow(2, sm.tsc[state]) << std::endl;
-  }
-
   std::cout << std::endl << test_seqs[0] << std::endl << toalign << std::endl << std::endl;
-
-  ReadAligner aligner = ReadAligner(&ht);
-  Alignment* alignment = aligner.align_test(toalign);
+  
+  ReadAligner aligner = ReadAligner(&ht, 1, 1.0);
+  for(unsigned int i = 0;i < 100;i++) {
+    Alignment* alignment = aligner.Align(toalign);
+    if(i % 10 == 0) {
+      std::cout << i << std::endl;
+      std::cout << "Alignment Score: " << alignment->score << std::endl;
+      std::cout << "Read alignment:  " << alignment->read_alignment << std::endl;
+      std::cout << "Graph alignment: " << alignment->graph_alignment << std::endl;
+    }
+    delete alignment;
+  }
   //Alignment* alignment = aligner.align_test(test_seqs[0]);
   std::cout << "Bloom read:      " << test_seqs[0] << std::endl;
   std::cout << "Query read:      " << toalign << std::endl;
-  std::cout << "Alignment Score: " << alignment->score << std::endl;
-  std::cout << "Read alignment:  " << alignment->read_alignment << std::endl;
-  std::cout << "Graph alignment: " << alignment->graph_alignment << std::endl;
 }
