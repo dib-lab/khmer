@@ -2991,7 +2991,7 @@ static PyObject * hashbits_consume_partitioned_fasta(PyObject * self, PyObject *
   try {
     hashbits->consume_partitioned_fasta(filename, total_reads, n_consumed,
 					 _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
+  } catch (_khmer_signal) {
     return NULL;
   }
 
@@ -3945,6 +3945,52 @@ static PyObject * hashbits_do_nothing(PyObject * self, PyObject * args) {
   return Py_True;
 }
 
+// Same as find_all_tags, but returns tags in a way actually useable by python
+static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  char * kmer_s = NULL;
+
+  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+    return NULL;
+  }
+
+  if (strlen(kmer_s) < hashbits->ksize()) { // @@
+    return NULL;
+  }
+
+  khmer::SeenSet tagged_kmers;
+  
+  //Py_BEGIN_ALLOW_THREADS
+
+    khmer::HashIntoType kmer, kmer_f, kmer_r;
+    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
+
+    hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
+				       hashbits->all_tags);
+    hashbits->add_kmer_to_tags(kmer);
+
+  //Py_END_ALLOW_THREADS
+
+  PyObject * x =  PyList_New(tagged_kmers.size());
+  khmer::SeenSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
+    //std::string kmer_s = _revhash(*si, hashbits->ksize());
+    PyList_SET_ITEM(x, i, Py_BuildValue("i", *si));
+    i++;
+  }
+
+  return x;
+}
+
+
+static PyObject * hashbits_get_tag_colors(PyObject * self, PyObject * args) {
+  return Py_True;
+}
+
 static PyMethodDef khmer_hashbits_methods[] = {
   { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
@@ -4017,7 +4063,8 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "sweep_sequence_for_colors", hashbits_sweep_sequence_for_colors, METH_VARARGS, "" },
   { "do_nothing", hashbits_do_nothing, METH_VARARGS, ""},
   {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
-  
+  {"get_all_tags", hashbits_get_all_tags, METH_VARARGS, "" },
+ 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 

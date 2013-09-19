@@ -2239,13 +2239,19 @@ void Hashtable::sweep_sequence_for_colors(const std::string& seq,
     }
 }
 
-ColorPtrSet& Hashtable::get_tag_colors(const HashIntoType& tag) {
+ColorPtrSet Hashtable::get_tag_colors(const HashIntoType& tag) {
   ColorPtrSet colors;
-  num_colors = _get_tag_colors(tag, tag_colors, colors);
-  return &colors;
+  unsigned int num_colors;
+  _get_tag_colors(tag, tag_colors, colors);
+  return colors;
 }
 
-
+TagPtrSet Hashtable::get_color_tags(const Color& color) {
+  TagPtrSet tags;
+  unsigned int num_tags;
+  _get_tags_from_color(color, color_tag_ptrs, tags);
+  return tags;
+}
 
 void Hashtable::traverse_colors_and_resolve(const SeenSet& tagged_kmers,
                                               ColorPtrSet& found_colors) {
