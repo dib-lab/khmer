@@ -94,6 +94,12 @@ namespace khmer {
   typedef std::pair<Color, HashIntoType*> ColorTagPtrPair;
   typedef std::set<Color*> ColorPtrSet;
   typedef std::set<HashIntoType*> TagPtrSet;
+
+  Template <typename T>
+  void deallocate_ptr_set(T& s) {
+    for (typename T::iterator i = c.begin(); i != c.end(); ++i)
+      delete *i;
+  }
 }
 
 #endif // KHMER_HH

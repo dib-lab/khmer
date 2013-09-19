@@ -520,6 +520,9 @@ namespace khmer {
 					unsigned long long& n_consumed,
 					Color& current_color,
 					SeenSet * new_tags = 0);
+    
+    ColorPtrSet get_tag_colors(const HashIntoType& tag);
+    TagPtrSet get_color_tags(const Color& color);
 
     void link_tag_and_color(HashIntoType& kmer, Color& color);
     
@@ -528,7 +531,7 @@ namespace khmer {
 					bool break_on_stoptags,
 					bool stop_big_traversals);
 					
-	void traverse_colors_and_resolve(const SeenSet& tagged_kmers,
+    void traverse_colors_and_resolve(const SeenSet& tagged_kmers,
                                      ColorPtrSet& found_colors);
 
     void consume_fasta_and_traverse(const std::string &filename,
