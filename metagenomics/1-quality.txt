@@ -14,8 +14,9 @@ of the example data set.
 
 .. note::
 
-   The end results of this tutorial are available as public snapshot
-   XXX on EC2/EBS.
+   The raw data for this tutorial is available as public snapshot
+   snap-05633504 on EC2/EBS. The end results of this tutorial are
+   available as public snapshot snap-85653384 on EC2/EBS.
 
 Also see:  :doc:`../mrnaseq/using-screen`.
 
@@ -24,16 +25,17 @@ Install software
 
 Install screed::
 
-   pip install git+https://github.com/ged-lab/screed.git
+   pip install screed
 
 Install the bleeding-edge version of khmer::
 
    cd /usr/local/share
-   git clone https://github.com/ged-lab/khmer.git -b bleeding-edge
+   git clone https://github.com/ged-lab/khmer.git
    cd khmer
+   git checkout protocols-v0.8.3
    make
 
-   echo 'export PYTHONPATH=/usr/local/share/khmer/python' >> ~/.bashrc
+   echo 'export PYTHONPATH=/usr/local/share/khmer/python:$PYTHONPATH' >> ~/.bashrc
    source ~/.bashrc
 
 Install Trimmomatic::
@@ -73,6 +75,19 @@ Let's create a place to work::
 
 Link in the data
 ================
+
+If you want to play along with the data specific to this tutorial
+(highly advised on a first runthrough!), please see
+:doc:`../mrnaseq/0-download-and-save` and follow the instructions to
+(a) create a volume from snapshot snap-05633504 and (b) mount it as
+/data.
+
+Once you've done that, check that 'ls /data' shows exactl four FASTQ
+files, and then type::
+
+   ln -fs /data/SRR49206?_?.fastq.gz .
+
+This links the data into the /mnt/assembly directory.
 
 Trim and quality filter
 =======================

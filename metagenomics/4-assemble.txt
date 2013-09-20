@@ -24,6 +24,7 @@ And also IDBA::
    tar xzf idba-1.1.1.tar.gz
    cd idba-1.1.1
    ./configure && make
+   cp bin/idba_ud /usr/local/bin
 
 Splitting out PE and SE reads
 =============================
@@ -32,12 +33,13 @@ Let's assemble just one group, for now -- group 5 should be nice and
 small.  Generally assemblers will want interleaved reads to be
 distinguished from orphaned reads, so let's split 'em out::
 
+  cd /mnt/assembly
   mkdir group5
   cd group5    
-  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa.gz
-  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa.gz.sweep3
-  mv kak.group0005.fa.gz.sweep3.pe kak.group5.nodn.pe
-  mv kak.group0005.fa.gz.sweep3.se kak.group5.nodn.se
+  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa
+  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa.sweep3
+  mv kak.group0005.fa.sweep3.pe kak.group5.nodn.pe
+  mv kak.group0005.fa.sweep3.se kak.group5.nodn.se
 
 Using Velvet
 ============
@@ -51,7 +53,7 @@ So, let's just assemble across a lot of k's. ::
 
    for k in {21..43..2}
    do
-      velveth dn.$k $k -fasta -shortPaired kak.group0005.fa.gz.pe -short kak.group0005.fa.gz.se
+      velveth dn.$k $k -fasta -shortPaired kak.group0005.fa.pe -short kak.group0005.fa.se
       velvetg dn.$k -exp_cov auto
    done
 
@@ -67,7 +69,7 @@ Using IDBA
 
 I've heard good things about IDBA.  Let's give it a try::
 
-   idba_ud --pre_correction -r kak.group0005.fa.gz.pe -o idba.dn.d
+   idba_ud --pre_correction -r kak.group0005.fa.pe -o idba.dn.d/
 
    idba_ud --pre_correction -r kak.group5.nodn.pe -o idba.nodn.d/
 
@@ -114,8 +116,8 @@ Let's say that we want to work with the sequences in dn.43/contigs.fa, but we wa
 
 Easy::
 
-   /usr/local/share/khmer/sandbox/extract-long-sequences.py 500 dn.43/contigs.fa > group5-assembly.fa
+   python /usr/local/share/khmer/sandbox/extract-long-sequences.py 500 dn.43/contigs.fa > group5-assembly.fa
 
 ----
 
-Next: :doc:`5-mapping-and-quantitation`.
+.. Next: :doc:`5-mapping-and-quantitation`.

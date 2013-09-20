@@ -9,5 +9,5 @@ The Kalamazoo Metagenome Assembly Tutorial
    1-quality
    2-diginorm
    3-partition
-..   4-assemble
+   4-assemble
 ..   5-mapping-and-quantitation
