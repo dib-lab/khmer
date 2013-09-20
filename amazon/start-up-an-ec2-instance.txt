@@ -1,0 +1,87 @@
+Start up an EC2 instance
+========================
+
+Log in
+~~~~~~
+
+Go to 'https://aws.amazon.com' in a Web browser.
+
+Select 'My Account/Console' menu option 'AWS Management Console."
+
+Log in with your username & password.
+
+Click on EC2 (upper left).
+
+Select your zone
+~~~~~~~~~~~~~~~~
+
+Many of the resources that we use are hosted by Amazon on the East coast.
+Make sure that your dashboard has 'N. Virginia' on the upper right:
+
+.. image:: images/ec2-dashboard-zone.png
+   :width: 80%
+
+If it doesn't say N. Virginia, click on it and select "US East (N. Virginia)".
+
+The launch wizard
+~~~~~~~~~~~~~~~~~
+
+Select "Launch Instance" (midway down the page), and select "Quick
+Launch Wizard".
+
+.. image:: images/ec2-wizard.png
+   :width: 90%
+
+On this page,
+
+1. Name your new computer something (here, "Adam"; name it after yourself instead).
+
+2. Create a new key pair (here, "Adam"; name it after yourself instead) and Download it.
+
+3. Select "More Amazon machine images."
+
+4. Click on "Continue."  This will be greyed out until you download the
+   key pair (button, upper right).
+
+**Note:** You only need to create a new key pair the first time you're
+doing this -- you can select the one you created the first time, if you
+still have a copy of the key file you downloaded stored somewhere.
+
+"Create a new instance" page 1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Enter 'ami-c17ec8a8' into the search box and click "search".  Select
+it, and hit Continue.
+
+(If it doesn't show up, exit the wizard and make sure you're in US East
+zone -- see upper right of EC2 console.)
+
+"Create a new instance" page 2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On this page, "Edit details" until it looks like the below image --
+
+.. image:: images/ec2-details.png
+   :width: 90%
+
+1. Make sure your "Type" is m1.large.
+
+2. Make sure your "Availability zone" is something specific, like us-east-1c.
+
+3. Make sure your "Security group" is set to default.
+
+Then, click "Launch".
+
+Wait for your instance to be running
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Go to the 'instances' list and make sure your particular instance is
+running.
+
+.. image:: images/ec2-instance-running.png
+   :width: 90%
+
+You'll need the hostname of your new computer, on the bottom (ec2-...) --
+we suggest selecting this and copying it somewhere.
+
+Now go to :doc:`security-rules`.

@@ -1,0 +1,38 @@
+===============================
+Getting started with Amazon EC2
+===============================
+
+.. toctree::
+   :maxdepth: 2
+
+   start-up-an-ec2-instance
+   security-rules
+   log-in-with-ssh-win
+   log-in-with-ssh-mac
+
+   installing-dropbox
+
+A final checklist:
+
+- EC2 instance is running;
+- used AMI ami-c17ec8a8;
+- NOT micro instance (m1.large, or bigger);
+- SSH, HTTP, HTTPS are enabled on the security group;
+
+IPython Notebook access
+-----------------------
+
+You can access IPython Notebook on your computer by going to
+https:// + YOUR MACHINE NAME, and then entering 'beacon' as the password.
+
+Amazon Web Services reference material
+--------------------------------------
+
+`Instance types <http://aws.amazon.com/ec2/instance-types/>`__
+`Instance costs <http://aws.amazon.com/ec2/pricing/>`__
+
+.. Survey for course assessment
+.. ----------------------------
+
+.. There will be a survey today ~3-3:30pm to help us assess the course; go
+.. `here <https://docs.google.com/forms/d/1D5iw8K696SlouRFIkgalC06hfEhSvb4TfBP_STrWdDY/viewform>`__.
