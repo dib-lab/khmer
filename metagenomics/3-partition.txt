@@ -70,7 +70,11 @@ do have to combine all of the raw (unpartitioned) reads into a single
 file, because the script to reinflate the partitions takes only single
 file.  Sorry :(. ::
 
-   gunzip -c /class/cbrown/data/SRR49206?.?e.qc.fq.gz > all.fq
+   gunzip -c SRR49206?.?e.qc.fq.gz > all.fq
+
+Now, run the command to pull all of the reads for each group from 'all.fq'
+into reinflated files::
+
    python /usr/local/share/khmer/sandbox/sweep-reads3.py -x 1e8 kak.group*.fa all.fq
 
 ----

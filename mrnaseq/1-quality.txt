@@ -25,13 +25,15 @@ Install screed::
    cd /usr/local/share
    git clone https://github.com/ged-lab/screed.git
    cd screed
+   git checkout protocols-v0.8.3
    python setup.py install
 
-Install the bleeding-edge version of khmer::
+Install khmer::
 
    cd /usr/local/share
-   git clone https://github.com/ged-lab/khmer.git -b bleeding-edge
+   git clone https://github.com/ged-lab/khmer.git
    cd khmer
+   git checkout protocols-v0.8.3
    make
 
    echo 'export PYTHONPATH=/usr/local/share/khmer/python' >> ~/.bashrc
