@@ -1,4 +1,4 @@
-===========================================
+x===========================================
 0. Downloading and Saving Your Initial Data
 ===========================================
 
@@ -36,7 +36,7 @@ snapshot into a volume.
 Getting started
 ---------------
 
-Run through :doc:`saving-data-persistently` once, to get the hang of
+Run through :doc:`../amazon/index` once, to get the hang of
 the mechanics.  Essentially you create a disk; attach it; format it;
 and then copy things to and from it.
 
@@ -70,7 +70,7 @@ download files one at a time from Web or FTP sites.
 
 Once you have the files, figure out their size using 'du -sk' (e.g. after the
 above, 'du -sk /mnt' will tell you how much data you have saved under /mnt),
-and go create and attach a volume (see :doc:`saving-data-persistently`).
+and go create and attach a volume (see :doc:`../amazon/index`).
 
 This data is now something that will *stick around* when you shut down
 your instance.  It's a good rule of thumb to do "savepoints" -- whenever

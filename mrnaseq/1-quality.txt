@@ -365,7 +365,7 @@ calculates the size.
 
 Now, create a volume of the given size -- divide by a thousand to get
 gigabytes, multiply by 1.1 to make sure you have enough room, and then
-follow the instructions in :doc:`saving-data-persistently`.  Once
+follow the instructions in :doc:`../amazon/index`.  Once
 you've mounted it properly (I would suggest mounting it on /save
 instead of /data!), then do ::
 
