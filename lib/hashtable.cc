@@ -1946,13 +1946,10 @@ void Hashtable::extract_unique_paths(std::string seq,
 }
 /*
  * Pretty much copy-pasta
+ * @cswelcher
  * Might be time for a refactor: could do a general consume_fasta
  * function which accepts a consume_sequence function pointer as a parameter
  */
-
-void Hashtable::do_nothing() {
-  std::cout << "doing nothing\n";
-}
 
 void
 Hashtable::consume_fasta_and_tag_with_colors(

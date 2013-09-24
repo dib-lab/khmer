@@ -3923,26 +3923,11 @@ static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject *
   khmer::ColorPtrSet::const_iterator si;
   unsigned long long i = 0;
   for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
-    PyList_SET_ITEM(x, i, Py_BuildValue("i", *(*si)));
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
     i++;
   }
   
   return x;
-}
-
-static PyObject * hashbits_do_nothing(PyObject * self, PyObject * args) {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  bool exc_raised = false;
-  try {
-    hb->do_nothing();
-  } catch (_khmer_signal &e) {
-    exc_raised = true;
-  }
-  if (exc_raised) return NULL;
-  
-  return Py_True;
 }
 
 // Same as find_all_tags, but returns tags in a way actually useable by python
@@ -3970,7 +3955,6 @@ static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
 
     hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
 				       hashbits->all_tags);
-    hashbits->add_kmer_to_tags(kmer);
 
   //Py_END_ALLOW_THREADS
 
@@ -3979,7 +3963,8 @@ static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
   unsigned long long i = 0;
   for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
     //std::string kmer_s = _revhash(*si, hashbits->ksize());
-    PyList_SET_ITEM(x, i, Py_BuildValue("i", *si));
+    // type K for python unsigned long long
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
     i++;
   }
 
@@ -3988,7 +3973,31 @@ static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
 
 
 static PyObject * hashbits_get_tag_colors(PyObject * self, PyObject * args) {
-  return Py_True;
+  
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+  
+  khmer::HashIntoType tag;
+  
+  if (!PyArg_ParseTuple(args, "K", &tag)) {
+    return NULL;
+  }
+  
+  khmer::ColorPtrSet colors;
+  
+  colors = hashbits->get_tag_colors(tag);
+  
+  PyObject * x =  PyList_New(colors.size());
+  khmer::ColorPtrSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=colors.begin(); si!=colors.end(); ++si) {
+    //std::string kmer_s = _revhash(*si, hashbits->ksize());
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+    i++;
+  }
+
+  return x;
+  
 }
 
 static PyMethodDef khmer_hashbits_methods[] = {
@@ -4061,9 +4070,9 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
   { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
   { "sweep_sequence_for_colors", hashbits_sweep_sequence_for_colors, METH_VARARGS, "" },
-  { "do_nothing", hashbits_do_nothing, METH_VARARGS, ""},
   {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
   {"get_all_tags", hashbits_get_all_tags, METH_VARARGS, "" },
+  {"get_tag_colors", hashbits_get_tag_colors, METH_VARARGS, ""},
  
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
