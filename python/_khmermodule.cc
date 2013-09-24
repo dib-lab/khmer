@@ -3931,30 +3931,51 @@ static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject *
 }
 
 // Same as find_all_tags, but returns tags in a way actually useable by python
+// @cswelcher TODO: this is broken az, fix it asap
+// need a tags_in_sequence iterator or function in c++ land for reuse in all
+// these functions
 static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
-  char * kmer_s = NULL;
+  std::string seq = NULL;
+  PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+  if (!PyArg_ParseTuple(args, "s|OO", &seq,
+			&break_on_stop_tags_o,
+			&stop_big_traversals_o)) {
     return NULL;
   }
 
-  if (strlen(kmer_s) < hashbits->ksize()) { // @@
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
+  }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
+  
+  if (strlen(seq) < hashbits->ksize()) {
     return NULL;
   }
 
   khmer::SeenSet tagged_kmers;
-  
+  khmer::HashIntoType kmer_f, kmer_r, kmer;
+  KMerIterator kmers(seq.c_str(), hashbits->_ksize());
+  std::string kmer_s;
   //Py_BEGIN_ALLOW_THREADS
 
-    khmer::HashIntoType kmer, kmer_f, kmer_r;
-    kmer = khmer::_hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
-
-    hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
-				       hashbits->all_tags);
+    while (!kmers.done()) {
+      kmer = kmers.next();
+      kmer_s = khmer::_revhash(kmer, hashbits->(_ksize));
+      kmer = khmer::_hash(kmer_s.c_str(), hashbits->_ksize(), kmer_f, kmer_r);
+      
+      hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, 
+            hashbits->all_tags, break_on_stoptags, stop_big_traversals);
+    }
 
   //Py_END_ALLOW_THREADS
 
