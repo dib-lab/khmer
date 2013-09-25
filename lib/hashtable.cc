@@ -2003,8 +2003,6 @@ Hashtable::consume_fasta_and_tag_with_colors(
     
     Color _tag_color = 0;
 
-    // @CTB: pls keep increment separate from function call so that
-    // order is explicit.
     Color * the_color = new Color(_tag_color);
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))

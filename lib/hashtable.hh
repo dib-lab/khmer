@@ -452,7 +452,7 @@ namespace khmer {
     // Partitioning stuff.
 
     unsigned int n_tags() const { return all_tags.size(); }
-    unsigned int N-colors() const { return tag_colors.size(); }
+    unsigned int n_colors() const { return tag_colors.size(); }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
