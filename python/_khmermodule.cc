@@ -4018,7 +4018,18 @@ static PyObject * hashbits_get_tag_colors(PyObject * self, PyObject * args) {
   }
 
   return x;
-  
+}
+
+static PyObject * hashbits_n_colors(PyObject * self, PyObject * args)
+{
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hashbits = me->hashbits;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(hashbits->n_colors());
 }
 
 static PyMethodDef khmer_hashbits_methods[] = {
@@ -4094,6 +4105,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
   {"get_all_tags", hashbits_get_all_tags, METH_VARARGS, "" },
   {"get_tag_colors", hashbits_get_tag_colors, METH_VARARGS, ""},
+  {"n_colors", hashbits_n_colors, METH_VARARGS, ""},
  
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
