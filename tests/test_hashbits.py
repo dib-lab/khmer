@@ -500,3 +500,17 @@ def test_simple_median():
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
+
+def test_consume_fasta_and_tag_with_colors():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    
+    filename = utils.get_test_data('test-transcript.fa')
+    total_reads, n_consumed = hb.consume_fasta_and_tag_with_colors(filename)
+    
+    #assert n_consumed == 3
+    assert total_reads == 3
+    
+    assert hb.n_colors() == 3
+    
+    
+    
