@@ -3939,7 +3939,7 @@ static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
-  std::string seq = NULL;
+  char * seq = NULL;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
@@ -3964,17 +3964,17 @@ static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
 
   khmer::SeenSet tagged_kmers;
   khmer::HashIntoType kmer_f, kmer_r, kmer;
-  KMerIterator kmers(seq.c_str(), hashbits->_ksize());
+  KMerIterator kmers(seq, hashbits->ksize());
   std::string kmer_s;
   //Py_BEGIN_ALLOW_THREADS
 
     while (!kmers.done()) {
       kmer = kmers.next();
-      kmer_s = khmer::_revhash(kmer, hashbits->(_ksize));
-      kmer = khmer::_hash(kmer_s.c_str(), hashbits->_ksize(), kmer_f, kmer_r);
+      kmer_s = khmer::_revhash(kmer, hashbits->ksize());
+      kmer = khmer::_hash(kmer_s.c_str(), hashbits->ksize(), kmer_f, kmer_r);
       
       hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, 
-            hashbits->all_tags, break_on_stoptags, stop_big_traversals);
+            hashbits->all_tags, break_on_stop_tags, stop_big_traversals);
     }
 
   //Py_END_ALLOW_THREADS
