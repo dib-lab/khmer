@@ -2085,14 +2085,21 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
   //
   // iterate through the FASTA file & consume the reads.
   //
+  ColorPtrMap colors;
   Color * c;
+  PartitionID p;
   while(!parser->is_complete())  {
     read = parser->get_next_read();
     seq = read.sequence;
 
     if (check_and_normalize_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
-      c = new Color(_parse_partition_id(read.name));
+      p = _parse_partition_id(read.name);
+      if (colors.count(p)) {
+	c = colors[p];
+      } else {
+	c = new Color(p);
+      }
 
       consume_sequence_and_tag_with_colors( seq,
 					      n_consumed,
@@ -2114,9 +2121,11 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
     }
   }
 
+  // @cswelcher TODO: deallocate ColorPtrMap
   delete parser;
 }
 
+// @cswelcher: double-check -- is it valid to pull the address from a reference?
 void Hashtable::link_tag_and_color(HashIntoType& kmer, Color& kmer_color) {
   tag_colors.insert(TagColorPtrPair(kmer, &kmer_color));
   color_tag_ptrs.insert(ColorTagPtrPair(kmer_color, &kmer));
@@ -2168,7 +2177,6 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
 	      }
         }  else ++since;
       }
-      // Should I bother adding new code down here?
   #else
       if (!is_new_kmer && set_contains(all_tags, kmer)) {
         since = 1;
