@@ -2005,7 +2005,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
 
     // @CTB: pls keep increment separate from function call so that
     // order is explicit.
-    Color * the_color = new Color(_tag_color++);
+    Color * the_color = new Color(_tag_color);
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))
     {
@@ -2019,7 +2019,8 @@ Hashtable::consume_fasta_and_tag_with_colors(
         consume_sequence_and_tag_with_colors( read.sequence,
 					      this_n_consumed,
 					      *the_color );
-        the_color = new Color(_tag_color++);
+	    _tag_color++;
+        the_color = new Color(_tag_color);
 
   #ifdef WITH_INTERNAL_METRICS
         hasher.pmetrics.start_timers( );
