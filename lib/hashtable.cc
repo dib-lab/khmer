@@ -2123,7 +2123,7 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
 
   // @cswelcher TODO: check that deallocate ColorPtrMap is correct
   delete parser;
-  delete colors;
+  colors.clear();
 }
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
