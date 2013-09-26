@@ -87,7 +87,7 @@ namespace khmer {
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
   
-  typedef unsigned int Color;
+  typedef unsigned long long int Color;
   typedef std::multimap<HashIntoType, Color*> TagColorPtrMap;
   typedef std::multimap<Color, HashIntoType*> ColorTagPtrMap;
   typedef std::pair<HashIntoType, Color*> TagColorPtrPair;
@@ -95,9 +95,9 @@ namespace khmer {
   typedef std::set<Color*> ColorPtrSet;
   typedef std::set<HashIntoType*> TagPtrSet;
 
-  Template <typename T>
+  template <typename T>
   void deallocate_ptr_set(T& s) {
-    for (typename T::iterator i = c.begin(); i != c.end(); ++i)
+    for (typename T::iterator i = s.begin(); i != s.end(); ++i)
       delete *i;
   }
 }
