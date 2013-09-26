@@ -501,16 +501,56 @@ def test_simple_median():
     assert average == 1.0
     assert stddev == 0.0
 
+def test_get_all_tags():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('single-read.fq')
+    hb.consume_fasta_and_tag(filename)
+    
+    tags = hb.get_all_tags('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    assert len(tags) == 1
+    assert tags.pop() == 173473779682L
+
+def test_get_tag_colors():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('single-read.fq')
+    hb.consume_fasta_and_tag_with_colors(filename)
+    tag = 173473779682L
+
+    colors = hb.get_tag_colors(tag)
+    assert len(colors) == 1
+    assert colors.pop() == 0L
+
+def test_sweep_sequence_for_colors():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('single-read.fq')
+    hb.consume_fasta_and_tag_with_colors(filename)
+    
+    colors = hb.sweep_sequence_for_colors('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    assert len(colors) == 1
+    assert colors.pop() == 0L
+
 def test_consume_fasta_and_tag_with_colors():
     hb = khmer.new_hashbits(20, 1e7, 4)
-    
+    read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
+
     total_reads, n_consumed = hb.consume_fasta_and_tag_with_colors(filename)
     
-    #assert n_consumed == 3
+    assert hb.get(read_1[:20])
     assert total_reads == 3
+    #assert hb.n_colors() == 3
     
-    assert hb.n_colors() == 3
-    
-    
-    
+ 
+def test_consume_partitioned_fasta_and_tag_with_colors():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('real-partition-small.fa')
+
+    total_reads, n_consumed = hb.consume_partitioned_fasta_and_tag_with_colors(filename)
+    #assert hb.n_colors() == 1
+    colors = set()
+    for record in screed.open(filename):
+        seq = record.sequence
+        colors.update(hb.sweep_sequence_for_colors(seq, False, False))
+    assert len(colors) == 1
+    assert colors.pop() == 2L
+    #assert hb.n_colors() == 1   
