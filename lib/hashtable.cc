@@ -2232,15 +2232,19 @@ void Hashtable::sweep_sequence_for_colors(const std::string& seq,
     
     KMerIterator kmers(seq.c_str(), _ksize);
     std::string kmer_s;
-
+    // keep a list of kmers which have already been traversed
+    SeenSet traversed_kmers;
     while (!kmers.done()) {
       kmer = kmers.next();
       kmer_s = _revhash(kmer, _ksize);
       _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
       
-      partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, all_tags,
-          break_on_stoptags, stop_big_traversals);
-      traverse_colors_and_resolve(tagged_kmers, found_colors);
+      // don't even try traversing from k-mers not in the hashtable
+      if (get_count(uniqify_rc(kmer_f,kmer_r))) {
+        partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
+          traversed_kmers, all_tags, break_on_stoptags, stop_big_traversals);
+        traverse_colors_and_resolve(tagged_kmers, found_colors);
+      }
     }
 }
 

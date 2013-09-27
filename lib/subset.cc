@@ -446,6 +446,152 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   }
 }
 
+// Same as find_all_tags, but keep track of traversed k-mers 
+//
+void SubsetPartition::find_all_tags(HashIntoType kmer_f,
+				    HashIntoType kmer_r,
+				    SeenSet& tagged_kmers,
+				    SeenSet& traversed_kmers,
+				    const SeenSet& all_tags,
+				    bool break_on_stop_tags,
+				    bool stop_big_traversals)
+{
+  const HashIntoType bitmask = _ht->bitmask;
+
+  HashIntoType f, r;
+  bool first = true;
+  NodeQueue node_q;
+  std::queue<unsigned int> breadth_q;
+  unsigned int cur_breadth = 0;
+  unsigned int breadth = 0;
+  const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
+
+  const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
+  unsigned int total = 0;
+
+  // start breadth-first search.
+
+  node_q.push(kmer_f);
+  node_q.push(kmer_r);
+  breadth_q.push(0);
+
+  while(!node_q.empty()) {
+    if (stop_big_traversals && traversed_kmers.size() > BIG_TRAVERSALS_ARE) {
+      tagged_kmers.clear();
+      break;
+    }
+
+    kmer_f = node_q.front();
+    node_q.pop();
+    kmer_r = node_q.front();
+    node_q.pop();
+    breadth = breadth_q.front();
+    breadth_q.pop();
+
+    HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
+
+    // Have we already seen this k-mer?  If so, skip.
+    if (set_contains(traversed_kmers, kmer)) {
+      continue;
+    }
+
+    // Do we want to traverse through this k-mer?  If not, skip.
+    if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
+      // @CTB optimize by inserting into traversed_kmers set?
+      continue;
+    }
+
+    // keep track of seen kmers
+    traversed_kmers.insert(kmer);
+    total++;
+
+    // Is this a kmer-to-tag, and have we put this tag in a partition already?
+    // Search no further in this direction.  (This is where we connect
+    // partitions.)
+    if (!first && set_contains(all_tags, kmer)) {
+      tagged_kmers.insert(kmer);
+      continue;
+    }
+
+    assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+    if (breadth > cur_breadth) { cur_breadth = breadth; }
+
+    if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
+
+    //
+    // Enqueue next set of nodes.
+    //
+
+    // NEXT
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
+    if (_ht->get_count(uniqify_rc(f,r)) &&
+	!set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    // PREVIOUS.
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+    
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    first = false;
+  }
+}
+
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
 //    connected to kmer_f/kmer_r in the graph.
 
