@@ -501,6 +501,11 @@ def test_simple_median():
     assert average == 1.0
     assert stddev == 0.0
 
+#
+# @cswelcher TODO: more tests! 
+#  * thread-safety
+#  * n_colors -- make sure to use test-data with multi-colored tags
+
 def test_get_all_tags():
     hb = khmer.new_hashbits(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
@@ -539,7 +544,48 @@ def test_consume_fasta_and_tag_with_colors():
     assert hb.get(read_1[:20])
     assert total_reads == 3
     #assert hb.n_colors() == 3
+
+'''
+* The test data set as four reads: A, B, C, and D
+* Overlaps are A <-> B <-> C, with D on its own
+* Thus, traversing from A should find colors from A and B,
+  traversing from B should find colors from A, B, and C,
+  and traversing from C should find colors from B and C
+'''
+def test_color_tag_correctness():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('test-colors.fa')
+    hb.consume_fasta_and_tag_with_colors(filename)
     
+    # read A
+    colors = hb.sweep_sequence_for_colors('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')
+    
+    print colors
+    assert len(colors) == 2
+    assert 0L in colors
+    assert 1L in colors
+    
+    # read B
+    colors = hb.sweep_sequence_for_colors('GCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+    print colors
+    assert len(colors) == 3
+    assert 0L in colors
+    assert 1L in colors
+    assert 2L in colors
+    
+    # read C
+    colors = hb.sweep_sequence_for_colors('TGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
+    print colors
+    assert len(colors) == 2
+    assert 1L in colors
+    assert 2L in colors
+    
+    # read D
+    colors = hb.sweep_sequence_for_colors('TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    print colors
+    assert len(colors) == 1
+    assert 3L in colors
+        
  
 def test_consume_partitioned_fasta_and_tag_with_colors():
     hb = khmer.new_hashbits(20, 1e7, 4)
