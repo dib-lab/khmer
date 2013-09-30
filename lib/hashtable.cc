@@ -2215,7 +2215,7 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
  * For now, check /every/ k-mer with find_all_tags
  * THIS SUCKS AND IT'S YOUR FAULT @CTB
  */
-void Hashtable::sweep_sequence_for_colors(const std::string& seq,
+unsigned int Hashtable::sweep_sequence_for_colors(const std::string& seq,
 					ColorPtrSet& found_colors,
 					bool break_on_stoptags,
 					bool stop_big_traversals) {
@@ -2241,6 +2241,7 @@ void Hashtable::sweep_sequence_for_colors(const std::string& seq,
         traverse_colors_and_resolve(tagged_kmers, found_colors);
       }
     }
+    return traversed_kmers.size()
 }
 
 ColorPtrSet Hashtable::get_tag_colors(const HashIntoType& tag) {
