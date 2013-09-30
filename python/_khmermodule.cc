@@ -3889,10 +3889,11 @@ static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self,
   }
   
   unsigned long long n_consumed = 0;
-  khmer::Color * the_color = new Color(c);
+  khmer::Color * the_color = hb->check_and_allocate_color(c);
 
   try { 
   //if (hb->check_and_normalize_read(seq)) {
+    
     hb->consume_sequence_and_tag_with_colors(seq, n_consumed, *the_color);
   //}
   } catch (_khmer_signal &e) {
@@ -3946,7 +3947,7 @@ static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject *
   khmer::ColorPtrSet::const_iterator si;
   unsigned long long i = 0;
   for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
-    PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
     i++;
   }
   
