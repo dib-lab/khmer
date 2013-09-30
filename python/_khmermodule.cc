@@ -3883,7 +3883,7 @@ static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self,
   khmer::Hashbits * hb = me->hashbits;
   
   char * seq = NULL;
-  unsigned long long c;
+  unsigned long long c = NULL;
   if (!PyArg_ParseTuple(args, "sK", &seq, &c)) {
     return NULL;
   }
@@ -3902,15 +3902,16 @@ static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self,
   return Py_BuildValue("L", n_consumed);
 }
 
-static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
+static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * args) {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hb = me->hashbits;
   
   char * seq = NULL;
+  unsigned int range = NULL;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|OO", &seq,
+  if (!PyArg_ParseTuple(args, "si|OO", &seq, &range,
 			&break_on_stop_tags_o,
 			&stop_big_traversals_o)) {
     return NULL;
@@ -3935,7 +3936,7 @@ static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject *
   bool exc_raised = false;
   //Py_BEGIN_ALLOW_THREADS
   try {
-    hb->sweep_sequence_for_colors(seq, found_colors, break_on_stop_tags, stop_big_traversals);
+    hb->sweep_sequence_for_colors(seq, found_colors, range, break_on_stop_tags, stop_big_traversals);
   } catch (_khmer_signal &e) {
     exc_raised = true;
   }
@@ -3958,16 +3959,17 @@ static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject *
 // @cswelcher TODO: this is broken az, fix it asap
 // need a tags_in_sequence iterator or function in c++ land for reuse in all
 // these functions
-static PyObject * hashbits_get_all_tags(PyObject * self, PyObject *args)
+static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * seq = NULL;
+  unsigned long range = NULL;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|OO", &seq,
+  if (!PyArg_ParseTuple(args, "si|OO", &seq, &range,
 			&break_on_stop_tags_o,
 			&stop_big_traversals_o)) {
     return NULL;

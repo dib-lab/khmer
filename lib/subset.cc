@@ -296,6 +296,80 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
   return n_singletons;
 }
 
+/* @cswelcher Brilliant idea: let's *not* copy this same piece of code
+ * over and over again!
+ */
+void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
+                                    HashIntoType kmer_r,
+                                    NodeQueue& node_q,
+                                    std::queue<unsigned int> breadth_q) {
+    
+    f = next_f(kmer_f, 'A');
+    r = next_r(kmer_r, 'A');
+    if (_ht->get_count(uniqify_rc(f,r)) &&
+	!set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = next_f(kmer_f, 'C');
+    r = next_r(kmer_r, 'C');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = next_f(kmer_f, 'G');
+    r = next_r(kmer_r, 'G');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    f = next_f(kmer_f, 'T');
+    r = next_r(kmer_r, 'T');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    // PREVIOUS.
+    r = prev_r(kmer_r, 'A');
+    f = prev_f(kmer_f, 'A');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = prev_r(kmer_r, 'C');
+    f = prev_f(kmer_f, 'C');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+    
+    r = prev_r(kmer_r, 'G');
+    f = prev_f(kmer_f, 'G');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+
+    r = prev_r(kmer_r, 'T');
+    f = prev_f(kmer_f, 'T');
+    if (_ht->get_count(uniqify_rc(f,r)) && 
+        !set_contains(keeper, uniqify_rc(f,r))) {
+      node_q.push(f); node_q.push(r);
+      breadth_q.push(breadth + 1);
+    }
+}
+
 ///
 
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
@@ -345,6 +419,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 
     // Have we already seen this k-mer?  If so, skip.
+    // @cswelcher this is redundant, as we already check before queuing
     if (set_contains(keeper, kmer)) {
       continue;
     }
@@ -446,12 +521,13 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
   }
 }
 
-// Same as find_all_tags, but keep track of traversed k-mers 
-//
-void SubsetPartition::find_all_tags(HashIntoType kmer_f,
+
+
+// Perform a breadth-first search starting from the k-mers in the given sequence
+void SubsetPartition::sweep_for_tags(
+                    HashIntoType kmer_f,
 				    HashIntoType kmer_r,
 				    SeenSet& tagged_kmers,
-				    SeenSet& traversed_kmers,
 				    const SeenSet& all_tags,
 				    bool break_on_stop_tags,
 				    bool stop_big_traversals)
@@ -491,9 +567,10 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 
     // Have we already seen this k-mer?  If so, skip.
-    if (set_contains(traversed_kmers, kmer)) {
-      continue;
-    }
+    // @cswelcher we already check before queuing
+    //if (set_contains(traversed_kmers, kmer)) {
+    // continue;
+    //}
 
     // Do we want to traverse through this k-mer?  If not, skip.
     if (break_on_stop_tags && set_contains(_ht->stop_tags, kmer)) {
@@ -518,76 +595,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
     if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
 
-    //
-    // Enqueue next set of nodes.
-    //
-
-    // NEXT
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) &&
-	!set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-    
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
-      node_q.push(f); node_q.push(r);
-      breadth_q.push(breadth + 1);
-    }
-
+    queue_neighbors(kmer_f, kmer_r, node_q, breadth_q);    
     first = false;
   }
 }

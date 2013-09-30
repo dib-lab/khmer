@@ -455,7 +455,7 @@ namespace khmer {
     // Partitioning stuff.
 
     unsigned int n_tags() const { return all_tags.size(); }
-    unsigned int n_colors() const { return tag_colors.size(); }
+    unsigned int n_colors() const { return colors_ptrs.size(); }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
@@ -538,7 +538,7 @@ namespace khmer {
 
     void link_tag_and_color(HashIntoType& kmer, Color& color);
     
-    void sweep_sequence_for_colors(const std::string& seq,
+    unsigned int sweep_sequence_for_colors(const std::string& seq,
 					ColorPtrSet& found_colors,
 					bool break_on_stoptags,
 					bool stop_big_traversals);
