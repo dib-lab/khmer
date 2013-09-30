@@ -233,6 +233,7 @@ namespace khmer {
         return num_tags;
     }
     
+    
     Hashtable(
 	WordLength	ksize,
 	uint32_t const	number_of_threads   = 
@@ -253,6 +254,7 @@ namespace khmer {
       _init_bitstuff();
       _all_tags_spin_lock = 0;
       _tag_colors_spin_lock = 0;
+      
     }
 
     virtual ~Hashtable( )
@@ -373,6 +375,7 @@ namespace khmer {
     SeenSet repart_small_tags;
     TagColorPtrMap tag_colors;
     ColorTagPtrMap color_tag_ptrs;
+    ColorPtrMap color_ptrs;
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -482,7 +485,18 @@ namespace khmer {
 	CallbackFn	    callback	    = NULL,
 	void *		    callback_data   = NULL
     );
-
+    
+    Color * check_and_allocate_color(Color new_color) {
+        Color * c;
+        if (color_ptrs.count(new_color)) {
+            c = color_ptrs[new_color];
+        } else {
+            c = new Color(new_color);
+            color_ptrs[*c] = c;
+        }
+        return c;
+    }
+    
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,
 				  SeenSet * new_tags = 0);

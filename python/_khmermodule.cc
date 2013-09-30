@@ -3878,6 +3878,29 @@ static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_colors(
   return Py_BuildValue("iL", total_reads, n_consumed);
 }
 
+static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self, PyObject * args) {
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
+  
+  char * seq = NULL;
+  unsigned long long c;
+  if (!PyArg_ParseTuple(args, "sK", &seq, &c)) {
+    return NULL;
+  }
+  
+  unsigned long long n_consumed = 0;
+  khmer::Color * the_color = new Color(c);
+
+  try { 
+  //if (hb->check_and_normalize_read(seq)) {
+    hb->consume_sequence_and_tag_with_colors(seq, n_consumed, *the_color);
+  //}
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  return Py_BuildValue("L", n_consumed);
+}
+
 static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject * args) {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hb = me->hashbits;
@@ -3923,7 +3946,7 @@ static PyObject * hashbits_sweep_sequence_for_colors(PyObject * self, PyObject *
   khmer::ColorPtrSet::const_iterator si;
   unsigned long long i = 0;
   for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
-    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
     i++;
   }
   
@@ -4105,6 +4128,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
   {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
   {"get_all_tags", hashbits_get_all_tags, METH_VARARGS, "" },
   {"get_tag_colors", hashbits_get_tag_colors, METH_VARARGS, ""},
+  {"consume_sequence_and_tag_with_colors", hashbits_consume_sequence_and_tag_with_colors, METH_VARARGS, "" },
   {"n_colors", hashbits_n_colors, METH_VARARGS, ""},
  
   {NULL, NULL, 0, NULL}           /* sentinel */

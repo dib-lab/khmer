@@ -2003,7 +2003,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
     
     Color _tag_color = 0;
 
-    Color * the_color = new Color(_tag_color);
+    Color * the_color = check_and_allocate_color(_tag_color);
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))
     {
@@ -2018,7 +2018,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
 					      this_n_consumed,
 					      *the_color );
 	    _tag_color++;
-        the_color = new Color(_tag_color);
+        the_color = check_and_allocate_color(_tag_color);
 
   #ifdef WITH_INTERNAL_METRICS
         hasher.pmetrics.start_timers( );
@@ -2085,7 +2085,6 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
   //
   // iterate through the FASTA file & consume the reads.
   //
-  ColorPtrMap colors;
   Color * c;
   PartitionID p;
   while(!parser->is_complete())  {
@@ -2095,11 +2094,7 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
     if (check_and_normalize_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
       p = _parse_partition_id(read.name);
-      if (colors.count(p)) {
-	c = colors[p];
-      } else {
-	c = new Color(p);
-      }
+      c = check_and_allocate_color(p);
 
       consume_sequence_and_tag_with_colors( seq,
 					      n_consumed,
@@ -2123,7 +2118,6 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
 
   // @cswelcher TODO: check that deallocate ColorPtrMap is correct
   delete parser;
-  colors.clear();
 }
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
@@ -2135,6 +2129,7 @@ void Hashtable::link_tag_and_color(HashIntoType& kmer, Color& kmer_color) {
 /* This is essentially the same code as above, only it assigns colors to the
  * tags through multimap TagColorMap defined in hashtable.hh, declared in
  * hashbits.hh
+ * @cswelcher TODO: should I instead send in the pointer to the new color?
  */
 void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
 					unsigned long long& n_consumed,
