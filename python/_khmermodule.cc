@@ -3936,7 +3936,7 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
   bool exc_raised = false;
   //Py_BEGIN_ALLOW_THREADS
   try {
-    hb->sweep_sequence_for_colors(seq, found_colors, range, break_on_stop_tags, stop_big_traversals);
+    hb->sweep_sequence_for_colors(seq, found_colors, break_on_stop_tags, stop_big_traversals);
   } catch (_khmer_signal &e) {
     exc_raised = true;
   }
@@ -3965,7 +3965,7 @@ static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *arg
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * seq = NULL;
-  PyObject * r = NULL;
+  unsigned int r = NULL;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
@@ -3975,7 +3975,7 @@ static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *arg
     return NULL;
   }
 
-  unsigned int range = (2 * hashbits->_tag_density) + 1;
+  unsigned int range = (2 * hashbits->_get_tag_density()) + 1;
   if (r) {
     range = r;
   }
@@ -3994,19 +3994,11 @@ static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *arg
   }
 
   khmer::SeenSet tagged_kmers;
-  khmer::HashIntoType kmer_f, kmer_r, kmer;
-  KMerIterator kmers(seq, hashbits->ksize());
-  std::string kmer_s;
+
   //Py_BEGIN_ALLOW_THREADS
 
-    while (!kmers.done()) {
-      kmer = kmers.next();
-      kmer_s = khmer::_revhash(kmer, hashbits->ksize());
-      kmer = khmer::_hash(kmer_s.c_str(), hashbits->ksize(), kmer_f, kmer_r);
-      
-      hashbits->partition->find_all_tags(kmer_f, kmer_r, tagged_kmers, 
-            hashbits->all_tags, break_on_stop_tags, stop_big_traversals);
-    }
+  hashbits->partition->sweep_for_tags(seq, tagged_kmers, 
+            hashbits->all_tags, range, break_on_stop_tags, stop_big_traversals);
 
   //Py_END_ALLOW_THREADS
 
@@ -4132,9 +4124,9 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
   { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
-  { "sweep_sequence_for_colors", hashbits_sweep_sequence_for_colors, METH_VARARGS, "" },
+  { "sweep_color_neighborhood", hashbits_sweep_color_neighborhood, METH_VARARGS, "" },
   {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
-  {"get_all_tags", hashbits_get_all_tags, METH_VARARGS, "" },
+  {"sweep_tag_neighborhood", hashbits_sweep_tag_neighborhood, METH_VARARGS, "" },
   {"get_tag_colors", hashbits_get_tag_colors, METH_VARARGS, ""},
   {"consume_sequence_and_tag_with_colors", hashbits_consume_sequence_and_tag_with_colors, METH_VARARGS, "" },
   {"n_colors", hashbits_n_colors, METH_VARARGS, ""},

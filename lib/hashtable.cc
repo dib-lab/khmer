@@ -2235,13 +2235,14 @@ unsigned int Hashtable::sweep_sequence_for_colors(const std::string& seq,
       _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
       
       // don't even try traversing from k-mers not in the hashtable
+      //traversed_kmers.clear();
       if (get_count(uniqify_rc(kmer_f,kmer_r))) {
         partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
-          traversed_kmers, all_tags, break_on_stoptags, stop_big_traversals);
+                   all_tags, break_on_stoptags, stop_big_traversals);
         traverse_colors_and_resolve(tagged_kmers, found_colors);
       }
     }
-    return traversed_kmers.size()
+    return traversed_kmers.size();
 }
 
 ColorPtrSet Hashtable::get_tag_colors(const HashIntoType& tag) {
