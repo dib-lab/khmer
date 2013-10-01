@@ -530,7 +530,7 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
 
 // Perform a breadth-first search starting from the k-mers in the given sequence
-unsigned int SubsetPartition::sweep_for_tags(char * seq,
+unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
 				    SeenSet& tagged_kmers,
 				    const SeenSet& all_tags,
 				    unsigned int range,
@@ -551,16 +551,17 @@ unsigned int SubsetPartition::sweep_for_tags(char * seq,
   // start breadth-first search.
 
   HashIntoType kmer_f, kmer_r, kmer;
-  KMerIterator kmers(seq, _ht->ksize());
+  KMerIterator kmers(seq.c_str(), _ht->ksize());
   std::string kmer_s;
   
-  // Queue up all the sequenes k-mers at breadth zero
+  // Queue up all the sequence's k-mers at breadth zero
   // We are searching around the perimeter of the known k-mers
   // @cswelcher still using kludgy kmer iterator, let's fix this sometime...
   while (!kmers.done()) {
     kmer = kmers.next();
     kmer_s = _revhash(kmer, _ht->ksize());
     kmer = _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
+    traversed_kmers.insert(kmer);
     
     node_q.push(kmer_f);
     node_q.push(kmer_r);
@@ -599,10 +600,8 @@ unsigned int SubsetPartition::sweep_for_tags(char * seq,
     traversed_kmers.insert(kmer);
     total++;
 
-    // Is this a kmer-to-tag, and have we put this tag in a partition already?
-    // Search no further in this direction.  (This is where we connect
-    // partitions.)
-    if (breadth && set_contains(all_tags, kmer)) {
+    // 
+    if (set_contains(all_tags, kmer)) {
       tagged_kmers.insert(kmer);
       continue;
     }

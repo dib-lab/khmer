@@ -543,6 +543,12 @@ namespace khmer {
 					bool break_on_stoptags,
 					bool stop_big_traversals);
 					
+    unsigned int sweep_color_neighborhood(const std::string & seq,
+                                                  ColorPtrSet& found_colors,
+                                                  unsigned int range,
+                                                  bool break_on_stoptags,
+                                                  bool stop_big_traversals);
+                                                  			
     void traverse_colors_and_resolve(const SeenSet& tagged_kmers,
                                      ColorPtrSet& found_colors);
 
