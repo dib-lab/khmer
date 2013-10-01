@@ -504,7 +504,26 @@ def test_simple_median():
 #
 # @cswelcher TODO: more tests! 
 #  * thread-safety
-#  * n_colors -- make sure to use test-data with multi-colored tags
+
+def test_n_colors():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('test-colors.fa')
+    hb.consume_fasta_and_tag_with_colors(filename)
+    
+    print hb.n_colors()
+    assert hb.n_colors() == 4
+
+def test_get_color_dict():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('test-colors.fa')
+    hb.consume_fasta_and_tag_with_colors(filename)
+    
+    colors = hb.get_color_dict()
+    expected = [0L, 1L, 2L, 3L]
+    for e_color in expected:
+        assert e_color in colors
+    for a_color in colors:
+        assert a_color in expected
 
 def test_sweep_tag_neighborhood():
     hb = khmer.new_hashbits(20, 1e7, 4)

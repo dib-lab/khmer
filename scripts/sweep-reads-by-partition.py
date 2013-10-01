@@ -77,13 +77,13 @@ def main():
             print >>sys.stderr,'** sweeping {read_file} for colors...'.format(read_file=read_file)
             
             for n, record in enumerate(screed.open(read_file)):
-                if n % 10000 == 0:
-                    print >>sys.stderr, '\tswept {n} reads [{nc} colored, {no} orphaned' \
+                if n % 50000 == 0:
+                    print >>sys.stderr, '\tswept {n} reads [{nc} colored, {no} orphaned]' \
                                         .format(n=n, nc=n_colored, no=n_orphaned)
                 seq = record.sequence
                 name = record.name
                 
-                colors = ht.sweep_sequence_for_colors(seq, False, False)
+                colors = ht.sweep_color_neighborhood(seq)
                 color_number_dist.append(len(colors))
                 if colors:
                     n_colored += 1
