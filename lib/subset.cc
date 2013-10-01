@@ -303,6 +303,8 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
                                     HashIntoType kmer_r,
                                     NodeQueue& node_q,
                                     std::queue<unsigned int> breadth_q) {
+                                    
+    HashIntoType f, r;
     
     f = next_f(kmer_f, 'A');
     r = next_r(kmer_r, 'A');
@@ -524,18 +526,16 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
 
 // Perform a breadth-first search starting from the k-mers in the given sequence
-void SubsetPartition::sweep_for_tags(
-                    HashIntoType kmer_f,
-				    HashIntoType kmer_r,
+unsigned int SubsetPartition::sweep_for_tags(char * seq,
 				    SeenSet& tagged_kmers,
 				    const SeenSet& all_tags,
+				    unsigned int range,
 				    bool break_on_stop_tags,
 				    bool stop_big_traversals)
 {
   const HashIntoType bitmask = _ht->bitmask;
 
-  HashIntoType f, r;
-  bool first = true;
+  SeenSet traversed_kmers;
   NodeQueue node_q;
   std::queue<unsigned int> breadth_q;
   unsigned int cur_breadth = 0;
@@ -547,11 +547,25 @@ void SubsetPartition::sweep_for_tags(
 
   // start breadth-first search.
 
-  node_q.push(kmer_f);
-  node_q.push(kmer_r);
-  breadth_q.push(0);
+  HashIntoType kmer_f, kmer_r, kmer;
+  KMerIterator kmers(seq, ksize());
+  str::string kmer_s;
+  
+  // Queue up all the sequenes k-mers at breadth zero
+  // We are searching around the perimeter of the known k-mers
+  // @cswelcher still using kludgy kmer iterator, let's fix this sometime...
+  while (!kmers.done()) {
+    kmer = kmers.next();
+    kmer_s = revhash(kmer, ksize());
+    kmer = _hash(kmer_s.c_str(), ksize(), kmer_f, kmer_r);
+    
+    node_q.push(kmer_f);
+    node_q.push(kmer_r);
+    breadth_q.push(0);
+  }
 
   while(!node_q.empty()) {
+    // change this to a better hueristic
     if (stop_big_traversals && traversed_kmers.size() > BIG_TRAVERSALS_ARE) {
       tagged_kmers.clear();
       break;
@@ -585,7 +599,7 @@ void SubsetPartition::sweep_for_tags(
     // Is this a kmer-to-tag, and have we put this tag in a partition already?
     // Search no further in this direction.  (This is where we connect
     // partitions.)
-    if (!first && set_contains(all_tags, kmer)) {
+    if (breadth && set_contains(all_tags, kmer)) {
       tagged_kmers.insert(kmer);
       continue;
     }
@@ -593,11 +607,11 @@ void SubsetPartition::sweep_for_tags(
     assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     if (breadth > cur_breadth) { cur_breadth = breadth; }
 
-    if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
+    if (breadth >= max_breadth or breatdth >= range) { continue; } // truncate search @CTB exit?
 
     queue_neighbors(kmer_f, kmer_r, node_q, breadth_q);    
-    first = false;
   }
+  return total;
 }
 
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
