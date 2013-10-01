@@ -304,7 +304,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
                                     unsigned int breadth,
                                     SeenSet& traversed_kmers,
                                     NodeQueue& node_q,
-                                    std::queue<unsigned int> breadth_q) {
+                                    std::queue<unsigned int>& breadth_q) {
                                     
     HashIntoType f, r;
     const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
