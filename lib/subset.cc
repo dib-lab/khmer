@@ -301,15 +301,19 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
  */
 void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
                                     HashIntoType kmer_r,
+                                    unsigned int breadth,
+                                    SeenSet& traversed_kmers,
                                     NodeQueue& node_q,
                                     std::queue<unsigned int> breadth_q) {
                                     
     HashIntoType f, r;
+    const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
+    const HashIntoType bitmask = _ht->bitmask;
     
     f = next_f(kmer_f, 'A');
     r = next_r(kmer_r, 'A');
     if (_ht->get_count(uniqify_rc(f,r)) &&
-	!set_contains(keeper, uniqify_rc(f,r))) {
+	!set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -317,7 +321,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     f = next_f(kmer_f, 'C');
     r = next_r(kmer_r, 'C');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -325,7 +329,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     f = next_f(kmer_f, 'G');
     r = next_r(kmer_r, 'G');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -333,7 +337,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     f = next_f(kmer_f, 'T');
     r = next_r(kmer_r, 'T');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -342,7 +346,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'A');
     f = prev_f(kmer_f, 'A');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -350,7 +354,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'C');
     f = prev_f(kmer_f, 'C');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -358,7 +362,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'G');
     f = prev_f(kmer_f, 'G');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -366,7 +370,7 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
     r = prev_r(kmer_r, 'T');
     f = prev_f(kmer_f, 'T');
     if (_ht->get_count(uniqify_rc(f,r)) && 
-        !set_contains(keeper, uniqify_rc(f,r))) {
+        !set_contains(traversed_kmers, uniqify_rc(f,r))) {
       node_q.push(f); node_q.push(r);
       breadth_q.push(breadth + 1);
     }
@@ -533,7 +537,6 @@ unsigned int SubsetPartition::sweep_for_tags(char * seq,
 				    bool break_on_stop_tags,
 				    bool stop_big_traversals)
 {
-  const HashIntoType bitmask = _ht->bitmask;
 
   SeenSet traversed_kmers;
   NodeQueue node_q;
@@ -542,22 +545,22 @@ unsigned int SubsetPartition::sweep_for_tags(char * seq,
   unsigned int breadth = 0;
   const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
 
-  const unsigned int rc_left_shift = _ht->ksize()*2 - 2;
+
   unsigned int total = 0;
 
   // start breadth-first search.
 
   HashIntoType kmer_f, kmer_r, kmer;
-  KMerIterator kmers(seq, ksize());
-  str::string kmer_s;
+  KMerIterator kmers(seq, _ht->ksize());
+  std::string kmer_s;
   
   // Queue up all the sequenes k-mers at breadth zero
   // We are searching around the perimeter of the known k-mers
   // @cswelcher still using kludgy kmer iterator, let's fix this sometime...
   while (!kmers.done()) {
     kmer = kmers.next();
-    kmer_s = revhash(kmer, ksize());
-    kmer = _hash(kmer_s.c_str(), ksize(), kmer_f, kmer_r);
+    kmer_s = _revhash(kmer, _ht->ksize());
+    kmer = _hash(kmer_s.c_str(), _ht->ksize(), kmer_f, kmer_r);
     
     node_q.push(kmer_f);
     node_q.push(kmer_r);
@@ -604,12 +607,13 @@ unsigned int SubsetPartition::sweep_for_tags(char * seq,
       continue;
     }
 
-    assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
-    if (breadth > cur_breadth) { cur_breadth = breadth; }
+    // removed for not doing anything
+    //assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+    //if (breadth > cur_breadth) { cur_breadth = breadth; }
 
-    if (breadth >= max_breadth or breatdth >= range) { continue; } // truncate search @CTB exit?
+    if (breadth >= max_breadth or breadth >= range) { continue; } // truncate search @CTB exit?
 
-    queue_neighbors(kmer_f, kmer_r, node_q, breadth_q);    
+    queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q, breadth_q);    
   }
   return total;
 }
@@ -690,6 +694,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
       continue;
     }
 
+    // @cswelcher Do these lines actually do anything?
     assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     if (breadth > cur_breadth) { cur_breadth = breadth; }
 
