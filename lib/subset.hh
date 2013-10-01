@@ -68,7 +68,7 @@ namespace khmer {
                                     unsigned int breadth,
                                     SeenSet& traversed_kmers,
                                     NodeQueue& node_q,
-                                    std::queue<unsigned int> breadth_q);
+                                    std::queue<unsigned int>& breadth_q);
 
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
 		       SeenSet& tagged_kmers,
