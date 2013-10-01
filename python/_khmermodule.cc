@@ -3965,14 +3965,19 @@ static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *arg
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * seq = NULL;
-  unsigned long range = NULL;
+  PyObject * r = NULL;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "si|OO", &seq, &range,
+  if (!PyArg_ParseTuple(args, "s|iOO", &seq, &r,
 			&break_on_stop_tags_o,
 			&stop_big_traversals_o)) {
     return NULL;
+  }
+
+  unsigned int range = (2 * hashbits->_tag_density) + 1;
+  if (r) {
+    range = r;
   }
 
   bool break_on_stop_tags = false;

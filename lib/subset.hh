@@ -76,6 +76,13 @@ namespace khmer {
 				    const SeenSet& all_tags,
 				    bool break_on_stop_tags,
 				    bool stop_big_traversals);
+
+    unsigned int sweep_for_tags(char * seq,
+				    SeenSet& tagged_kmers,
+				    const SeenSet& all_tags,
+				    unsigned int range,
+				    bool break_on_stop_tags,
+				    bool stop_big_traversals);
 				    
     void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
 					     HashIntoType kmer_r,
