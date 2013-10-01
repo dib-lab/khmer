@@ -2003,7 +2003,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
     
     Color _tag_color = 0;
 
-    Color * the_color = check_and_allocate_color(_tag_color);
+    Color * the_color;
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))
     {
@@ -2014,11 +2014,11 @@ Hashtable::consume_fasta_and_tag_with_colors(
       if (check_and_normalize_read( read.sequence ))
       {
         // TODO: make threadsafe!
+        the_color = check_and_allocate_color(_tag_color);
         consume_sequence_and_tag_with_colors( read.sequence,
 					      this_n_consumed,
 					      *the_color );
 	    _tag_color++;
-        the_color = check_and_allocate_color(_tag_color);
 
   #ifdef WITH_INTERNAL_METRICS
         hasher.pmetrics.start_timers( );
@@ -2243,6 +2243,21 @@ unsigned int Hashtable::sweep_sequence_for_colors(const std::string& seq,
       }
     }
     return traversed_kmers.size();
+}
+
+unsigned int Hashtable::sweep_color_neighborhood(const std::string& seq,
+                                                  ColorPtrSet& found_colors,
+                                                  unsigned int range,
+                                                  bool break_on_stoptags,
+                                                  bool stop_big_traversals) {
+
+    SeenSet tagged_kmers;
+    unsigned int num_traversed;
+    num_traversed = partition->sweep_for_tags(seq, tagged_kmers, all_tags, 
+                              range, break_on_stoptags, stop_big_traversals);
+    traverse_colors_and_resolve(tagged_kmers, found_colors);
+
+    return num_traversed;
 }
 
 ColorPtrSet Hashtable::get_tag_colors(const HashIntoType& tag) {

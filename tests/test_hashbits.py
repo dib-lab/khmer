@@ -506,12 +506,12 @@ def test_simple_median():
 #  * thread-safety
 #  * n_colors -- make sure to use test-data with multi-colored tags
 
-def test_get_all_tags():
+def test_sweep_tag_neighborhood():
     hb = khmer.new_hashbits(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     hb.consume_fasta_and_tag(filename)
     
-    tags = hb.get_all_tags('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    tags = hb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
     assert tags.pop() == 173473779682L
 
@@ -530,9 +530,24 @@ def test_sweep_sequence_for_colors():
     filename = utils.get_test_data('single-read.fq')
     hb.consume_fasta_and_tag_with_colors(filename)
     
-    colors = hb.sweep_sequence_for_colors('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    colors = hb.sweep_color_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(colors) == 1
     assert colors.pop() == 0L
+
+def test_consume_partitioned_fasta_and_tag_with_colors():
+    hb = khmer.new_hashbits(20, 1e7, 4)
+    filename = utils.get_test_data('real-partition-small.fa')
+
+    total_reads, n_consumed = hb.consume_partitioned_fasta_and_tag_with_colors(filename)
+    colors = set()
+    for record in screed.open(filename):
+        seq = record.sequence
+        colors.update(hb.sweep_color_neighborhood(seq, False, False))
+    #print hb.n_colors()
+    #print colors
+    assert len(colors) == 1
+    assert colors.pop() == 2L
+    assert hb.n_colors() == 1 
 
 def test_consume_fasta_and_tag_with_colors():
     hb = khmer.new_hashbits(20, 1e7, 4)
@@ -540,10 +555,17 @@ def test_consume_fasta_and_tag_with_colors():
     filename = utils.get_test_data('test-transcript.fa')
 
     total_reads, n_consumed = hb.consume_fasta_and_tag_with_colors(filename)
-    
+
     assert hb.get(read_1[:20])
     assert total_reads == 3
-    #assert hb.n_colors() == 3
+    print hb.n_colors()
+    print hb.get_color_dict()
+    for tag in hb.get_tagset():
+        print tag, khmer.forward_hash(tag, 20)
+    for record in screed.open(filename):
+        print hb.sweep_tag_neighborhood(record.sequence, 40)
+        print hb.sweep_color_neighborhood(record.sequence, 40)
+    assert hb.n_colors() == 3
 
 '''
 * The test data set as four reads: A, B, C, and D
@@ -558,7 +580,7 @@ def test_color_tag_correctness():
     hb.consume_fasta_and_tag_with_colors(filename)
     
     # read A
-    colors = hb.sweep_sequence_for_colors('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')
+    colors = hb.sweep_color_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')
     
     print colors
     assert len(colors) == 2
@@ -566,7 +588,7 @@ def test_color_tag_correctness():
     assert 1L in colors
     
     # read B
-    colors = hb.sweep_sequence_for_colors('GCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+    colors = hb.sweep_color_neighborhood('GCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
     print colors
     assert len(colors) == 3
     assert 0L in colors
@@ -574,29 +596,14 @@ def test_color_tag_correctness():
     assert 2L in colors
     
     # read C
-    colors = hb.sweep_sequence_for_colors('TGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
+    colors = hb.sweep_color_neighborhood('TGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
     print colors
     assert len(colors) == 2
     assert 1L in colors
     assert 2L in colors
     
     # read D
-    colors = hb.sweep_sequence_for_colors('TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    colors = hb.sweep_color_neighborhood('TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
     print colors
     assert len(colors) == 1
-    assert 3L in colors
-        
- 
-def test_consume_partitioned_fasta_and_tag_with_colors():
-    hb = khmer.new_hashbits(20, 1e7, 4)
-    filename = utils.get_test_data('real-partition-small.fa')
-
-    total_reads, n_consumed = hb.consume_partitioned_fasta_and_tag_with_colors(filename)
-    #assert hb.n_colors() == 1
-    colors = set()
-    for record in screed.open(filename):
-        seq = record.sequence
-        colors.update(hb.sweep_sequence_for_colors(seq, False, False))
-    assert len(colors) == 1
-    assert colors.pop() == 2L
-    #assert hb.n_colors() == 1   
+    assert 3L in colors 

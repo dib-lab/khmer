@@ -3818,6 +3818,20 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
+static PyObject * hashbits_get_color_dict(PyObject * self, PyObject * args) {
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
+  
+  PyObject * d = PyDict_New();
+  khmer::ColorPtrMap::iterator it;
+  
+  for (it = hb->color_ptrs.begin(); it!=hb->color_ptrs.end(); ++it) {
+    PyDict_SetItem(d, Py_BuildValue("K", it->first), Py_BuildValue("K", it->second));
+  }
+  
+  return d;
+}
+
 static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3907,11 +3921,69 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
   khmer::Hashbits * hb = me->hashbits;
   
   char * seq = NULL;
-  unsigned int range = NULL;
+  unsigned int r = NULL;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "si|OO", &seq, &range,
+  if (!PyArg_ParseTuple(args, "s|iOO", &seq, &r,
+			&break_on_stop_tags_o,
+			&stop_big_traversals_o)) {
+    return NULL;
+  }
+
+  unsigned int range = (2 * hb->_get_tag_density()) + 1;
+  if (r) {
+    range = r;
+  }
+
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
+  }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
+  
+  if (strlen(seq) < hb->ksize()) {
+    return NULL;
+  }
+  
+  //std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
+  ColorPtrSet found_colors;
+  
+  bool exc_raised = false;
+  //Py_BEGIN_ALLOW_THREADS
+  try {
+    hb->sweep_color_neighborhood(seq, found_colors, range, break_on_stop_tags, stop_big_traversals);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  //Py_END_ALLOW_THREADS
+  
+  if (exc_raised) return NULL;
+  
+  PyObject * x =  PyList_New(found_colors.size());
+  khmer::ColorPtrSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+    i++;
+  }
+  
+  return x;
+}
+
+
+static PyObject * hashbits_sweep_color_neighborhood_old(PyObject * self, PyObject * args) {
+  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+  khmer::Hashbits * hb = me->hashbits;
+  
+  char * seq = NULL;
+  PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|OO", &seq,
 			&break_on_stop_tags_o,
 			&stop_big_traversals_o)) {
     return NULL;
@@ -3955,8 +4027,7 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
   return x;
 }
 
-// Same as find_all_tags, but returns tags in a way actually useable by python
-// @cswelcher TODO: this is broken az, fix it asap
+// Similar to find_all_tags, but returns tags in a way actually useable by python
 // need a tags_in_sequence iterator or function in c++ land for reuse in all
 // these functions
 static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *args)
@@ -4125,11 +4196,13 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
   { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
   { "sweep_color_neighborhood", hashbits_sweep_color_neighborhood, METH_VARARGS, "" },
+  { "sweep_color_neighborhood_old", hashbits_sweep_color_neighborhood_old, METH_VARARGS, "" },
   {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
   {"sweep_tag_neighborhood", hashbits_sweep_tag_neighborhood, METH_VARARGS, "" },
   {"get_tag_colors", hashbits_get_tag_colors, METH_VARARGS, ""},
   {"consume_sequence_and_tag_with_colors", hashbits_consume_sequence_and_tag_with_colors, METH_VARARGS, "" },
   {"n_colors", hashbits_n_colors, METH_VARARGS, ""},
+  {"get_color_dict", hashbits_get_color_dict, METH_VARARGS, "" },
  
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
