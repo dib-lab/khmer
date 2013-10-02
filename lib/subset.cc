@@ -544,7 +544,7 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
   unsigned int cur_breadth = 0;
   unsigned int breadth = 0;
   const unsigned int max_breadth = range;
-
+  unsigned int breadth_seen = 0;
 
   unsigned int total = 0;
 
@@ -571,6 +571,7 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
   unsigned int seq_length = node_q.size() / 2;
   unsigned int BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
+  unsigned int cur_it = 0;
   while(!node_q.empty()) {
     // change this to a better hueristic
     if (stop_big_traversals && traversed_kmers.size() > BIG_PERIMETER_TRAVERSALS) {
@@ -584,6 +585,12 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
     node_q.pop();
     breadth = breadth_q.front();
     breadth_q.pop();
+    cur_it++;
+    printf("current iteration: %u, current breadth: %u\n", cur_it, breadth);
+    
+    if (breadth > breadth_seen) {
+      breadth_seen = breadth;
+    }
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 
@@ -617,6 +624,7 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
 
     queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q, breadth_q);    
   }
+  printf("breadth_seen=%u, total=%u, traverse_kmers=%u\n", breadth_seen, total, traversed_kmers.size());
   return total;
 }
 
