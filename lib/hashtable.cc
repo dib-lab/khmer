@@ -2256,7 +2256,10 @@ unsigned int Hashtable::sweep_color_neighborhood(const std::string& seq,
     num_traversed = partition->sweep_for_tags(seq, tagged_kmers, all_tags, 
                               range, break_on_stoptags, stop_big_traversals);
     traverse_colors_and_resolve(tagged_kmers, found_colors);
-
+    //printf("range=%u ", range);
+    if (range == 0) {
+      assert(num_traversed == seq.length()-ksize()+1);
+    }
     return num_traversed;
 }
 

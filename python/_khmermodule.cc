@@ -3889,7 +3889,7 @@ static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_colors(
     return NULL;
   }
 
-  return Py_BuildValue("iL", total_reads, n_consumed);
+  return Py_BuildValue("iK", total_reads, n_consumed);
 }
 
 static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self, PyObject * args) {
@@ -3932,7 +3932,7 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
   }
 
   unsigned int range = (2 * hb->_get_tag_density()) + 1;
-  if (r) {
+  if (r >= 0) {
     range = r;
   }
 
@@ -3953,13 +3953,16 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
   ColorPtrSet found_colors;
   
   bool exc_raised = false;
+  unsigned int num_traversed = 0;
   //Py_BEGIN_ALLOW_THREADS
   try {
-    hb->sweep_color_neighborhood(seq, found_colors, range, break_on_stop_tags, stop_big_traversals);
+    num_traversed = hb->sweep_color_neighborhood(seq, found_colors, range, break_on_stop_tags, stop_big_traversals);
   } catch (_khmer_signal &e) {
     exc_raised = true;
   }
   //Py_END_ALLOW_THREADS
+  
+  //printf("...%u kmers traversed\n", num_traversed);
   
   if (exc_raised) return NULL;
   
@@ -4047,7 +4050,7 @@ static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *arg
   }
 
   unsigned int range = (2 * hashbits->_get_tag_density()) + 1;
-  if (r) {
+  if (r >= 0) {
     range = r;
   }
 
