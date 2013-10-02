@@ -543,7 +543,7 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
   std::queue<unsigned int> breadth_q;
   unsigned int cur_breadth = 0;
   unsigned int breadth = 0;
-  const unsigned int max_breadth = (2 * _ht->_tag_density) + 1;
+  const unsigned int max_breadth = range;
 
 
   unsigned int total = 0;
@@ -568,9 +568,12 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
     breadth_q.push(0);
   }
 
+  unsigned int seq_length = node_q.size() / 2;
+  unsigned int BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
+
   while(!node_q.empty()) {
     // change this to a better hueristic
-    if (stop_big_traversals && traversed_kmers.size() > BIG_TRAVERSALS_ARE) {
+    if (stop_big_traversals && traversed_kmers.size() > BIG_PERIMETER_TRAVERSALS) {
       tagged_kmers.clear();
       break;
     }
