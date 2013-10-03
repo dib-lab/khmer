@@ -525,8 +525,8 @@ namespace khmer {
     void consume_partitioned_fasta_and_tag_with_colors(const std::string &filename,
 					  unsigned int &total_reads,
 					  unsigned long long &n_consumed,
-					  CallbackFn callback,
-					  void * callback_data);
+					  CallbackFn callback = NULL,
+					  void * callback_datac = NULL);
 					  			  
     void consume_sequence_and_tag_with_colors(const std::string& seq,
 					unsigned long long& n_consumed,

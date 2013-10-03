@@ -46,12 +46,12 @@ int main( int argc, char * argv[ ] )
     float		ht_size_FP	    = 1.0E8;
     unsigned long	ht_count	    = 4;
     uint64_t		cache_size	    = 4L * 1024 * 1024 * 1024;
-    unsigned int	range		    = 40;
+    unsigned int	range		    = 1;
     int			rc		    = 0;
     int			opt		    = -1;
     char *		conv_residue	    = NULL;
-    string		rfile_name = "/mnt/scratch/tg/w/khmer/tests/test-data/test-reads.fa";
-    string		ifile_name = "/mnt/scratch/tg/w/khmer/tests/test-data/test-reads.fa";
+    string		rfile_name = "/mnt/scratch/tg/w/2013-lamprey/data/AK.fq.gz";
+    string		ifile_name = "/mnt/scratch/tg/w/petMar_test.fp";
     // FILE *		ofile		    = NULL;
     HashIntoType	    ht_size		= (HashIntoType)ht_size_FP;
     Primes primetab( ht_size );
@@ -61,25 +61,30 @@ int main( int argc, char * argv[ ] )
 
     unsigned int	    reads_total		= 0;
     unsigned long long int  n_consumed		= 0;
-
+    printf("consuming test fastp...\n");
     Hashbits ht( kmer_length, ht_sizes );
-    ht.consume_fasta_and_tag_with_colors( ifile_name, reads_total, n_consumed );
+    ht.consume_partitioned_fasta_and_tag_with_colors( ifile_name, reads_total, n_consumed );
+    printf("consume %u sequences, graph has %u colors\n", reads_total, ht.n_colors());
     IParser * parser = IParser:: get_parser(rfile_name.c_str());
     Read read;
     unsigned int num_traversed;
+    unsigned int num_reads = 0;
     string seq = "";
-    clock_t st;
+    clock_t st = clock();
     while(!parser->is_complete()) {
 	read = parser->get_next_read();
 	seq = read.sequence;
-	st = clock();
 	ColorPtrSet found_colors;
 	num_traversed = ht.sweep_color_neighborhood(seq, found_colors, range, false, false);
-	st = clock() - st;
-	printf("traversed %u reads in %d ticks (%f seconds)\n", num_traversed,
+	if (num_reads % 50000 == 0) {
+	    st = clock() - st;
+	    printf("traversed %u kmers in %d ticks (%f seconds)\n", num_traversed,
 								st,
 								((float)st/CLOCKS_PER_SEC));
-	
+	st = clock();
+	}
+	found_colors.clear();
+	num_reads++;
     }
     return rc;
 }
