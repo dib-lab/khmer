@@ -140,26 +140,22 @@ export CXX
 export CXXFLAGS
 export LIBS
 
-all: lib_files python_files
+all:
+	python setup.py build
 
 clean:
+	python setup.py clean --all
 	cd lib && make clean
-	cd python && make clean
 	cd tests && rm -rf khmertest_*
 
 doc: FORCE
-	cd doc && make html
+	python setup.py build_sphinx
 
 lib_files:
 	cd lib && \
 	make
 
-python_files: lib_files
-	cd python && \
-	make 	DEFINE_KHMER_EXTRA_SANITY_CHECKS="$(DEFINE_KHMER_EXTRA_SANITY_CHECKS)" \
-		CXX_DEBUG_FLAGS="$(CXX_DEBUG_FLAGS)" 
-
 test: all
-	nosetests -v -x -a \!known_failing
+	python setup.py nosetests
 
 FORCE:
