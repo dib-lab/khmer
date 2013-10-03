@@ -125,5 +125,6 @@ class build_ext(_build_ext):
 		_build_ext.run(self)
 
 
+setup(cmdclass={'build_ext': build_ext}, **setup_metadata )
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
