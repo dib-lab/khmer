@@ -124,15 +124,6 @@ class build_ext(_build_ext):
 		bzip2_status = call('cd ' + bzip2dir + ' && make -f Makefile-libbz2_so all', shell=True)
 		_build_ext.run(self)
 
-from distutils.command.test import test as _test
 
-class test(_test)
-	"""Synonym for nosetests"""
-
-	def run(self):
-		
-
-
-setup(cmdclass={'build_ext': build_ext}, **setup_metadata )
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
