@@ -600,7 +600,7 @@ def test_color_tag_correctness():
     
     # read A
     colors = hb.sweep_color_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
-    print hb.sweep_tag_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+    print hb.sweep_tag_neighborhood('TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
     print colors
     print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')-19 
     assert len(colors) == 2
@@ -608,7 +608,7 @@ def test_color_tag_correctness():
     assert 1L in colors
     
     # read B
-    colors = hb.sweep_color_neighborhood('GCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+    colors = hb.sweep_color_neighborhood('GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
     print colors
     assert len(colors) == 3
     assert 0L in colors
@@ -616,7 +616,7 @@ def test_color_tag_correctness():
     assert 2L in colors
     
     # read C
-    colors = hb.sweep_color_neighborhood('TGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
+    colors = hb.sweep_color_neighborhood('TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
     print colors
     assert len(colors) == 2
     assert 1L in colors
