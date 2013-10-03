@@ -61,14 +61,12 @@ sources.extend( map(
 extension_mod_DICT = \
     {
 	"sources": sources,
-	"extra_compile_args": [ '-Wall', '-O3', "-pg", "-fprofile-arcs", "-ftest-coverage","-O0"],
-#	"extra_link_args": filter( None, [ ] ),
-	"include_dirs": [ "lib", ],
+	"extra_compile_args": [ '-Wall', '-O3', ],
 	"library_dirs": [ "lib", ],
 	"extra_objects": extra_objs,
 	"depends": build_depends,
 	"language": "c++",
-	"libraries": [ "stdc++", "gcov" ],
+	"libraries": [ "stdc++", ],
     }
 
 extension_mod = Extension( "khmer._khmermodule", **extension_mod_DICT )
