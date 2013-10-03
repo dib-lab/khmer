@@ -599,9 +599,10 @@ def test_color_tag_correctness():
     hb.consume_fasta_and_tag_with_colors(filename)
     
     # read A
-    colors = hb.sweep_color_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')
-    
+    colors = hb.sweep_color_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+    print hb.sweep_tag_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
     print colors
+    print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')-19 
     assert len(colors) == 2
     assert 0L in colors
     assert 1L in colors
@@ -625,4 +626,4 @@ def test_color_tag_correctness():
     colors = hb.sweep_color_neighborhood('TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
     print colors
     assert len(colors) == 1
-    assert 3L in colors 
+    assert 3L in colors
