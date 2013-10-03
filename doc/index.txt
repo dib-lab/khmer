@@ -6,7 +6,9 @@
 khmer -- k-mer counting & filtering FTW
 =======================================
 
-:Authors: C. Titus Brown, Jason Pell, and Adina Howe.
+:Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe,
+Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason Pell, Jared Simpson,
+C. S. Welcher, Qingpeng Zhang, and C. Titus Brown
 :Contact: ctb@msu.edu
 :License: BSD
 
