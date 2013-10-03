@@ -541,10 +541,10 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
   SeenSet traversed_kmers;
   NodeQueue node_q;
   std::queue<unsigned int> breadth_q;
-  unsigned int cur_breadth = 0;
+  //unsigned int cur_breadth = 0;
   unsigned int breadth = 0;
-  const unsigned int max_breadth = range;
-  unsigned int breadth_seen = 0;
+  unsigned int max_breadth = range;
+  //unsigned int breadth_seen = 0;
 
   unsigned int total = 0;
 
@@ -571,7 +571,7 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
   unsigned int seq_length = node_q.size() / 2;
   unsigned int BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
-  unsigned int cur_it = 0;
+  //unsigned int cur_it = 0;
   while(!node_q.empty()) {
     // change this to a better hueristic
     if (stop_big_traversals && traversed_kmers.size() > BIG_PERIMETER_TRAVERSALS) {
@@ -585,12 +585,12 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
     node_q.pop();
     breadth = breadth_q.front();
     breadth_q.pop();
-    cur_it++;
-    printf("current iteration: %u, current breadth: %u\n", cur_it, breadth);
+    //cur_it++;
+    //printf("current iteration: %u, current breadth: %u\n", cur_it, breadth);
     
-    if (breadth > breadth_seen) {
-      breadth_seen = breadth;
-    }
+    //if (breadth > breadth_seen) {
+    //  breadth_seen = breadth;
+    //}
 
     HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
 
@@ -613,6 +613,9 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
     // 
     if (set_contains(all_tags, kmer)) {
       tagged_kmers.insert(kmer);
+      // if we find a tag, finish the remaining queued nodes,
+      // but don't queue up any more
+      max_breadth = breadth;
       continue;
     }
 
@@ -620,11 +623,15 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
     //assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
     //if (breadth > cur_breadth) { cur_breadth = breadth; }
 
-    if (breadth >= max_breadth or breadth >= range) { continue; } // truncate search @CTB exit?
+    if (breadth == max_breadth) { continue; }
+    // finish up nodes on the current level, but if we go beyond, end it immediately
+    // this keeps from having to look at nodes which have already been queued once we
+    // lower the limit after finding a tag
+    else if (breadth > max_breadth) { return total; } // truncate search @CTB exit?
 
     queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q, breadth_q);    
   }
-  printf("breadth_seen=%u, total=%u, traverse_kmers=%u\n", breadth_seen, total, traversed_kmers.size());
+  //printf("breadth_seen=%u, total=%u, traverse_kmers=%u\n", breadth_seen, total, traversed_kmers.size());
   return total;
 }
 
