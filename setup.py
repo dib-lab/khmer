@@ -68,7 +68,7 @@ extension_mod_DICT = \
 	"extra_objects": extra_objs,
 	"depends": build_depends,
 	"language": "c++",
-	"libraries": [ "stdc++" ],
+	"libraries": [ "stdc++", "gcov" ],
     }
 
 extension_mod = Extension( "khmer._khmermodule", **extension_mod_DICT )
@@ -90,8 +90,8 @@ setup_metadata = \
         "maintainer_email": 'mcrusoe@msu.edu',
 	"url": 'http://ged.msu.edu/',
 	"packages": [ 'khmer' ],
-	"install_requires": [ "screed>=0.7", 'argparse>=1.2.1', ],
-	"setup_requires": [ 'nose>=1.0', 'setuptools-git >= 0.3', ],
+	"install_requires": [ "screed >= 0.7", 'argparse >= 1.2.1', ],
+	"setup_requires": [ 'nose >= 1.0', 'setuptools-git >= 0.3', ],
 	"scripts": scripts,
 	"ext_modules": [ extension_mod, ],
 	#"platforms": 'TODO', #??
@@ -123,6 +123,15 @@ class build_ext(_build_ext):
 		zlib_status = call('cd ' + zlibdir +' && ( test -f Makefile || ./configure --shared ) && make libz.a', shell=True)
 		bzip2_status = call('cd ' + bzip2dir + ' && make -f Makefile-libbz2_so all', shell=True)
 		_build_ext.run(self)
+
+from distutils.command.test import test as _test
+
+class test(_test)
+	"""Synonym for nosetests"""
+
+	def run(self):
+		
+
 
 setup(cmdclass={'build_ext': build_ext}, **setup_metadata )
 
