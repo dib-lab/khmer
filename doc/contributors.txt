@@ -26,4 +26,6 @@ Eric McDonald thoroughly revised many aspects of the code base, made
 much of the codebase threadsafe, and otherwise improved performance
 dramatically.
 
-CTB 3/13
+Michael R. Crusoe is the new maintainer of khmer.
+
+MRC 2013-10-03
