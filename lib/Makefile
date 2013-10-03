@@ -14,8 +14,9 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser test-HashTables
+#DRV_PROGS=bittest ktable_test test-Colors # test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
+DRV_PROGS=test-Colors
 AUX_PROGS=#ht-diff
 
 CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
@@ -37,7 +38,9 @@ DRV_TEST_HASHTABLES_OBJS= \
 	test-HashTables.o counting.o hashbits.o hashtable.o subset.o \
 	$(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 HT_DIFF_OBJS=ht-diff.o counting.o hashtable.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-
+DRV_TEST_COLORS_OBJS= \
+	test-Colors.o counting.o hashbits.o hashtable.o subset.o \
+	$(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 test-StreamReader: $(DRV_TEST_STREAM_READER_OBJS)
 	$(CXX) -o $@ $(DRV_TEST_STREAM_READER_OBJS) $(LIBS)
 
@@ -49,6 +52,9 @@ test-Parser: $(DRV_TEST_PARSER_OBJS)
 
 test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
 	$(CXX) -o $@ $(DRV_TEST_HASHTABLES_OBJS) $(LIBS) -fopenmp
+test-Colors: $(DRV_TEST_COLORS_OBJS)
+	$(CXX) -o $@ $(DRV_TEST_COLORS_OBJS) $(LIBS) -fopenmp
+
 
 ht-diff: $(HT_DIFF_OBJS)
 	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
@@ -56,8 +62,11 @@ ht-diff: $(HT_DIFF_OBJS)
 bittest: bittest.o ktable.o
 	$(CXX) -o $@ bittest.o ktable.o
 
-ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+#ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+#	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+color_test: test-Colors.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+
 
 # NOTE: Disabled due to broken constructor call.
 #graphtest: graphtest.o ktable.o hashtable.o
