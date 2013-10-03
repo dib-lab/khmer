@@ -61,7 +61,8 @@ sources.extend( map(
 extension_mod_DICT = \
     {
 	"sources": sources,
-	"extra_compile_args": [ '-Wall', '-O3', ],
+	"extra_compile_args": [ '-O3', ],
+	"include_dirs": [ "lib", ],
 	"library_dirs": [ "lib", ],
 	"extra_objects": extra_objs,
 	"depends": build_depends,
