@@ -2260,6 +2260,7 @@ unsigned int Hashtable::sweep_color_neighborhood(const std::string& seq,
     if (range == 0) {
       assert(num_traversed == seq.length()-ksize()+1);
     }
+    tagged_kmers.clear();
     return num_traversed;
 }
 
