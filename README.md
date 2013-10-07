@@ -1,8 +1,8 @@
 khmer
 =====
-Welcome to khmer, k-mer counting, filtering and graph traversal FTW!
+Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 
-[![Stories in Ready](http://badge.waffle.io/ged-lab/khmer.png)](http://waffle.io/ged-lab/khmer)  
+[![Stories in Ready](https://badge.waffle.io/ged-lab/khmer.png)](http://waffle.io/ged-lab/khmer)  
 
 The official repository is at
 
@@ -27,18 +27,17 @@ mind that (a) the code may have undiscovered bugs in it, (b) you
 should cite us, and (c) you should get in touch if you need to cite
 us, as we are writing up the project.
 
-INSTRUCTIONS:
--------------
-`make all` to build.
+INSTALL INSTRUCTIONS:
+---------------------
 
-You'll need 'screed' installed: https://github.com/ged-lab/screed
+khmer requires Python 2.7+
 
-`make test` to test (you may need to set your PYTHONPATH to find screed).
+`pip install khmer` to install the latest stable version.
 
-`make doc` to build docs.  You'll need Sphinx installed.
+The use of a virtualenv is recommended, see http://www.virtualenv.org/en/latest/#installation
 
 khmer is under the BSD license; see doc/LICENSE.txt.  Distribution,
 modification and redistribution, incorporation into other software,
 and pretty much everything else is allowed.
 
-CTB 05/2012.
+MRC 2014-10-07
