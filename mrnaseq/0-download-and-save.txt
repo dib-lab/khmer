@@ -87,7 +87,11 @@ the source is `this excellent paper
 <http://www.evodevojournal.com/content/4/1/16>`__ by Tulin et al., "A
 quantitative reference transcriptome for Nematostella vectensis".  The
 data is on snapshot 'snap-f5a9dea7', so go create a volume from that
-and mount it as '/data' to get started.
+and mount it as '/data' to get started; to mount it read-only, do::
+
+   mount -o ro /dev/xvdf /mnt
+
+after attaching the volume as 'sdf'.
 
 ----
 

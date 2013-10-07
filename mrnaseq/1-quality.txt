@@ -20,7 +20,7 @@ of the Nematostella data set.
 Install software
 ----------------
 
-Install screed::
+Install `screed <http://screed.readthedocs.org/>`__::
 
    cd /usr/local/share
    git clone https://github.com/ged-lab/screed.git
@@ -28,7 +28,7 @@ Install screed::
    git checkout protocols-v0.8.3
    python setup.py install
 
-Install khmer::
+Install `khmer <http://khmer.readthedocs.org>`__::
 
    cd /usr/local/share
    git clone https://github.com/ged-lab/khmer.git
@@ -39,14 +39,16 @@ Install khmer::
    echo 'export PYTHONPATH=/usr/local/share/khmer/python' >> ~/.bashrc
    source ~/.bashrc
 
-Install Trimmomatic::
+Install `Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`__::
 
    cd /root
-   curl -O http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.27.zip
-   unzip Trimmomatic-0.27.zip 
-   cp Trimmomatic-0.27/trimmomatic-0.27.jar /usr/local/bin
+   curl -O http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.30.zip
+   unzip Trimmomatic-0.30.zip
+   cd Trimmomatic-0.30/
+   cp trimmomatic-0.30.jar /usr/local/bin
+   cp -r adapters /usr/local/share/adapters
 
-Install libgtextutils and fastx::
+Install `libgtextutils and fastx <http://hannonlab.cshl.edu/fastx_toolkit/>`__::
 
    cd /root
    curl -O http://hannonlab.cshl.edu/fastx_toolkit/libgtextutils-0.6.1.tar.bz2
@@ -103,25 +105,45 @@ Now, do an 'ls' to list the files.  If you see only one entry, ``*.fastq.gz``,
 then the ln command above didn't work properly.  One possibility is that
 your files aren't in /data; another is that they're not named *.fastq.gz.
 
-Download the Illumina adapters
-------------------------------
+.. note::
 
-In the working directory, ::
+   This protocol takes many hours (days!) to run, so you might not want
+   to run it on all the data the first time.  If you're using the
+   example data, you can work with a subset of it by running this command
+   instead of the `ln -fs` command above::
 
-   curl -O https://s3.amazonaws.com/public.ged.msu.edu/illuminaClipping.fa
+      for i in /data/*.fastq.gz
+      do
+          gunzip -c $i | head -400000 | gzip > $(basename $i)
+      done
+
+   This will pull out the first 100,000 reads of each file (4 lines per record)
+   and put them in the current directory, which should be /mnt/work.
+
+Find the right Illumina adapters
+--------------------------------
+
+You'll need to know which Illumina sequencing adapters were used for
+your library in order to trim them off; do ::
+
+   ls /usr/local/share/adapters/
+
+to see which ones are available.  Below, we will use the TruSeq3-PE.fa
+adapters.
 
 .. note::
 
-   You'll need to make sure these are the right adapters for your data.
-   If they are, you should see that some of them are trimmed off, below;
-   if they're not, you shouldn't see anything get trimmed.
+   You'll need to make sure these are the right adapters for your
+   data.  If they are the right adapters, you should see that some of
+   the reads are trimmed; if they're not, you won't see anything
+   get trimmed.
 
 Adapter trim each pair of files
 -------------------------------
 
 (From this point on, you may want to be running things inside of
 screen, so that you detach and log out while it's running; see
-:doc:`using-screen` for more information.)
+:doc:`../amazon/using-screen` for more information.)
 
 If you're following along using the Nematostella data, you should have a
 bunch of files that look like this (use 'ls' to show them)::
@@ -147,7 +169,7 @@ For *each* of these pairs, run the following::
    cd trim
 
    # run trimmomatic
-   java -jar /usr/local/bin/trimmomatic-0.27.jar PE <R1 FILE> <R2 FILE> s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+   java -jar /usr/local/bin/trimmomatic-0.30.jar PE <R1 FILE> <R2 FILE> s1_pe s1_se s2_pe s2_se ILLUMINACLIP:/usr/local/share/adapters/TruSeq3-PE.fa:2:30:10
 
    # interleave the remaining paired-end files
    /usr/local/share/khmer/scripts/interleave-reads.py s1_pe s2_pe | gzip -9c > ../<SAMPLE NAME>.pe.fq.gz
