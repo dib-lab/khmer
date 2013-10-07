@@ -1,5 +1,5 @@
 all:
-	python setup.py build
+	python setup.py develop
 
 clean:
 	python setup.py clean --all
