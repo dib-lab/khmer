@@ -5,10 +5,19 @@ Installing and running khmer
 You'll need Python 2.7+, `virtualenv
 <http://www.virtualenv.org/en/latest/#installation>`__, and internet access. 
 
-Latest stable release
--------------------
+Build requirements
+------------------
 
-1) Install virtualenv/pip::
+OS X
+^^^^
+
+1) Install Xcode from the `Mac App Store (requires root) <https://developer.apple.com/xcode/>`_
+
+2) `Register as an Apple Developer <https://developer.apple.com/register>`_
+
+3) Install the Xcode command-line tools: Xcode -> preferences -> Downloads -> Command Line Tools (requires root)
+
+4) From a terminal install virtualenv/pip::
 
 	curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
 	python get-pip.py --user
@@ -17,12 +26,24 @@ Latest stable release
 	source ~/.bash_profile
 	pip install --user virtualenv
 
+
+Linux
+^^^^^
+
+1) Install the python development environment, virtualenv, pip, and gcc; on Debian and Ubuntu this can be done with::
+
+	apt-get install python2.7-dev python-virtualenv python-pip gcc
+
+
+Latest stable release
+-------------------
+
 1) Create a virtualenv and activate it::
 
 	virtualenv env
 	. env/bin/activate
 
-2) Use pip to download khmer and any unmet dependencies::
+2) Use pip to download, build, and install khmer and its dependencies::
 
 	pip install khmer
 
@@ -37,69 +58,9 @@ virtualenv first::
 Latest development release
 --------------------------
 
-Compiling from source has additional requirements.
-
-Linux instructions
-^^^^^^^^^^^^^^^^^^
-
-1) Install the python development environment and git; on Debian and Ubuntu, this can be done with::
-
-	apt-get install python-dev git
-
-2) Create a virtualenv and activate it::
-
-	virtualenv env
-	. env/bin/activate
-
-3) Use pip to download khmer from GitHub and any unmet dependencies::
+Repeat the above but modify the pip install line::
 
 	pip install -e git+git@github.com:ged-lab/khmer.git@master#egg=khmer
-
-4) The scripts are now in the ``env/bin`` directory and ready for your use. You can
-directly use them by name, see :doc:`scripts`. 
-
-5) When returning to khmer after installing it you will need to reactivate the
-virtualenv::
-
-	. env/bin/activate
-
-
-
-OS X instructions
-^^^^^^^^^^^^^^^^^
-
-1) Install Xcode from the `Mac App Store (requires root) <https://developer.apple.com/xcode/>`_
-
-2) `Register as an Apple Developer <https://developer.apple.com/register>`_
-
-3) Install the Xcode command-line tools: Xcode -> preferences -> Downloads -> Command Line Tools (requires root)
-
-4) Install virtualenv/pip::
-
-	curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
-	python get-pip.py --user
-	#add the python user binaries to your path if needed
-	echo "PATH=\$PATH:`python2.7 -c "import site; print site.getuserbase()"`/bin; export PATH" >> ~/.bash_profile
-	source ~/.bash_profile
-	pip install --user virtualenv
-
-5) Create a virtualenv and activate it::
-
-	vitualenv env
-	. env/bin/activate
-
-6) Use pip to download khmer from GitHub and any unmet dependencies
-
-	pip install -e git+git@github.com:ged-lab/khmer.git@master#egg=khmer
-
-7) The scripts are now in the ``env/bin`` directory and ready for your use. You can
-directly use them by name, see :doc:`scripts`. 
-
-8) When returning to khmer after installing it you will need to reactivate the
-virtualenv first::
-
-	. env/bin/activate
-
 
 Run the tests
 ^^^^^^^^^^^^^
@@ -108,5 +69,3 @@ Run the tests
 
 	cd env/src/khmer
 	python setup.py nosetests
-
-

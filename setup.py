@@ -84,7 +84,7 @@ setup_metadata = \
 	"description": 'khmer k-mer counting library',
 	"long_description": open("README.md").read(),
 	"author": 'Michael R. Crusoe and Greg Edvenson and Jordan Fish and Adina Howe and Eric McDonald and Joshua Nahum and Kaben Nanlohy and Jason Pell and Jared Simpson and C. S. Welcher and Qingpeng Zhang and C. Titus Brown',
-	"author_email": 'ctb@msu.edu',
+	"author_email": 'khmer-project@idyll.org',
 	"maintainer": 'Michael R. Crusoe',
         "maintainer_email": 'mcrusoe@msu.edu',
 	"url": 'http://ged.msu.edu/',
@@ -119,7 +119,7 @@ class build_ext(_build_ext):
 	"""Specialized Python extension builder."""
 	
 	def run(self):
-		zlib_status = call('cd ' + zlibdir +' && ( test -f Makefile || ./configure --shared ) && make libz.a', shell=True)
+		zlib_status = call('cd ' + zlibdir +' && ( test -f Makefile || (chmod u+x ./configure; ./configure --shared )) && make libz.a', shell=True)
 		bzip2_status = call('cd ' + bzip2dir + ' && make -f Makefile-libbz2_so all', shell=True)
 		_build_ext.run(self)
 
