@@ -30,9 +30,11 @@ us, as we are writing up the project.
 INSTALL INSTRUCTIONS:
 ---------------------
 
-khmer requires Python 2.7+
+khmer requires Python 2.7+. Linux users will need the python development libraries and gcc. OS X users will need XCode installed. For more details see doc/install.txt
 
-`pip install khmer` to install the latest stable version.
+In short:
+
+`pip install khmer` to download, build, and install the latest stable version.
 
 The use of a virtualenv is recommended, see http://www.virtualenv.org/en/latest/#installation
 
