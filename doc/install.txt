@@ -36,7 +36,7 @@ Linux
 
 
 Latest stable release
--------------------
+---------------------
 
 1) Create a virtualenv and activate it::
 
