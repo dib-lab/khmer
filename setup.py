@@ -28,6 +28,7 @@ extra_objs.extend(map(
     [
         "adler32", "compress", "crc32", "deflate", "gzio",
         "infback", "inffast", "inflate", "inftrees", "trees", "uncompr",
+        "zutil"
     ]
 ))
 extra_objs.extend(map(
