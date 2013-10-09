@@ -203,10 +203,10 @@ Partitioning
 
 	partition-graph.py [ options ] <graphbase>
 
-   Partition the given graph (ht + tagset) into disconnected subgraphs,
-   and save the resulting partitionmap(s) as *.pmap files.
+Partition the given graph (ht + tagset) into disconnected subgraphs, and save
+the resulting partitionmap(s) as ``*.pmap`` files.
 
-   See 'Artifact removal' to understand the stoptags argument.
+See 'Artifact removal' to understand the stoptags argument.
 
 **merge-partitions.py**: merge pmap files into a single merged pmap file.
 
