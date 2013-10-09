@@ -77,9 +77,7 @@ mangling.
 Picking hash table sizes and k parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For hash table sizes, read this:
-
-   http://khmer.readthedocs.org/en/latest/choosing-hash-sizes.html
+For hash table sizes, read :doc:`choosing-hash-sizes`
 
 For k-mer sizes, we recommend k=20 for digital normalization and k=32
 for partitioning; then assemble with a variety of k parameters.
