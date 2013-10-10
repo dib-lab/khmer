@@ -24,8 +24,7 @@ fi
 pip install --quiet nosexcover
 python setup.py nosetests --with-xcoverage --with-xunit --cover-package=khmer --cover-erase --attr=\!known_failing
 
-
-makedoc
+make doc
 
 pip install --quiet pylint
 pylint -f parseable doc/*.py figuregen/*.py novelty/*.py khmer/*.py sandbox/*.py scripts/*.py tests khmer | tee ../pylint.out
