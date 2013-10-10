@@ -36,10 +36,10 @@ class Seq:
 
 class ReadBuffer:
 
-    def __init__(self, max_files=512, max_reads=1000000, est_files=100000, output_pref='reads_'):
+    def __init__(self, max_buffers=10000, max_reads=1000000, est_files=100000, output_pref='reads_'):
         self.buffers = {}
         self.buffer_counts = {}
-        self.max_files = max_files
+        self.max_buffers = max_buffers
         self.max_reads = max_reads
 
         self.est_files = est_files
@@ -57,6 +57,7 @@ class ReadBuffer:
             self.buffer_counts[color] += 1
             if count > self.buffer_flush:
                 self.flush_buffer(color)
+                self.del_buffer(color)
 
         else:
             self.buffers[color] = [seq]
@@ -64,20 +65,40 @@ class ReadBuffer:
         self.cur_reads += 1
         if self.cur_reads > self.max_reads:
             self.flush_all()
+        if len(self.buffers) > self.max_buffers:
+            #self.clean_buffers(2)
+            self.flush_all()
     
     def flush_buffer(self, color):
         with open('{}{}.fa'.format(self.output_pref, color), 'a') as outfp:
             for read in self.buffers[color]:
                 read.write(outfp)
                 self.cur_reads -= 1
-            del self.buffer_counts[color]
-            del self.buffers[color]
+            
+    def del_buffer(self, color):
+        del self.buffer_counts[color]
+        del self.buffers[color]
 
     def flush_all(self):
         print >>sys.stderr, '** reached max buffer size, flushing all to files...'
         for color in self.buffers:
             self.flush_buffer(color)
+        colors = self.buffers.keys()
+        for color in colors:
+            self.del_buffer(color)
+        del colors
         assert self.cur_reads == 0
+
+    def clean_buffers(self, cutoff):
+        print >>sys.stderr, '** flushing low-abundance buffers...'
+        flushed = []
+        for color in self.buffers:
+            if self.buffer_counts[color] < cutoff:
+                self.flush_buffer(color)
+                flushed.append(color)
+        for color in flushed:
+            self.del_buffer(color)
+        del flushed
 
 def main():
 
@@ -85,15 +106,17 @@ def main():
     parser.add_argument('-b', '--buffer_size', dest='buffer_size', type=int)
     parser.add_argument('-e', '--files_estimate', dest='files_estimate', type=int)
     parser.add_argument('-o', '--output_prefix', dest='output_prefix')
+    parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int)
     parser.add_argument('input_files', nargs='+')
     args = parser.parse_args()
 
+    max_buffers = args.max_buffers
     output_pref = args.output_prefix
     buf_size = args.buffer_size
     est = args.files_estimate
     input_files = args.input_files
 
-    output_buffer = ReadBuffer(max_reads=buf_size, est_files=est, output_pref=output_pref)
+    output_buffer = ReadBuffer(max_buffers=max_buffers, max_reads=buf_size, est_files=est, output_pref=output_pref)
 
     multi_fp = open('{}_multi.fa'.format(output_pref), 'a')
     
