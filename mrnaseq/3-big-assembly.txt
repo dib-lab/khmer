@@ -86,4 +86,4 @@ you'll have an assembled transcriptome in trinity_out_dir/Trinity.fasta.
 You can now copy it over via Dropbox, or set it up for BLAST (see
 :doc:`installing-blastkit`).
 
-Next: :doc:`5-building-transcript-families`.
+Next: :doc:`5-building-transcript-families` (or :doc:`installing-blastkit`).

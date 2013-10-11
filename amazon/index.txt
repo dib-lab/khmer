@@ -24,4 +24,5 @@ Amazon Web Services reference material
 --------------------------------------
 
 `Instance types <http://aws.amazon.com/ec2/instance-types/>`__
+
 `Instance costs <http://aws.amazon.com/ec2/pricing/>`__

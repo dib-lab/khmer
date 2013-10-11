@@ -1,4 +1,4 @@
-6. Comparative expression analysis (with RSEM)
+7. Comparative expression analysis (with RSEM)
 ==============================================
 
 In addition to screed, khmer, and eel-pond, you'll also need to

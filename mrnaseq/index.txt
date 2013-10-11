@@ -18,7 +18,8 @@ The tutorial:
    installing-blastkit
 
    5-building-transcript-families
-   6-comparative-expression-with-rsem
+   6-annotating-transcript-families
+   7-comparative-expression-with-rsem
 
 ..   de-novo-assembly
 ..   rsem

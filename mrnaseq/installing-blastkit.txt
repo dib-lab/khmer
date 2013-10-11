@@ -105,3 +105,6 @@ Make sure you have enabled port 80 in your security settings on Amazon.
    GGATGATTGAAGGGAATTCAG
 
 It should match something in your assembly.)
+
+Next: :doc:`5-building-transcript-families`
+
