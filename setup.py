@@ -82,20 +82,23 @@ setup_metadata = \
         "version": "0.6",
         "description": 'khmer k-mer counting library',
         "long_description": open("README.md").read(),
-        "author": 'Michael R. Crusoe and Greg Edvenson and Jordan Fish and'
-        ' Adina Howe and Eric McDonald and Joshua Nahum and Kaben Nanlohy'
-        ' and Jason Pell and Jared Simpson and C. S. Welcher and'
-        ' Qingpeng Zhanmg and C. Titus Brown',
+        "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
+        ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy'
+        ' Jason Pell, Jared Simpson, C. S. Welcher,'
+        ' Qingpeng Zhang, and C. Titus Brown',
         "author_email": 'khmer-project@idyll.org',
-        "maintainer": 'Michael R. Crusoe',
-        "maintainer_email": 'mcrusoe@msu.edu',
+        #"maintainer": 'Michael R. Crusoe', # this overrides the author field
+        #"maintainer_email": 'mcrusoe@msu.edu', # so don't include it
+        #http://docs.python.org/2/distutils/setupscript.html
+        # #additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
         "install_requires": ["screed >= 0.7", 'argparse >= 1.2.1', ],
-        "setup_requires": ['nose >= 1.0', 'setuptools-git >= 0.3', 'sphinx' ],
+        "setup_requires": ['nose >= 1.0', 'setuptools-git >= 0.3', 'sphinx', ],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
-        #"platforms": 'TODO', #??
+        #"platforms": '', # empty as is conveyed by the classifiers below
+        #"license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
         "classifiers":  [
             "Development Status :: 4 - Beta",
@@ -121,8 +124,8 @@ class build_ext(_build_ext):
         """Specialized Python extension builder."""
 
         def run(self):
-                call('cd ' + zlibdir + ' && ( test -f Makefile || (chmod u+x'
-                     './configure; ./configure --shared )) && make libz.a',
+                call('cd ' + zlibdir + ' && ( test -f Makefile || bash'
+                     ' ./configure --shared ) && make libz.a',
                      shell=True)
                 call('cd ' + bzip2dir + ' && make -f Makefile-libbz2_so all',
                      shell=True)
