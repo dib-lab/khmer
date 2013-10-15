@@ -11,6 +11,9 @@ clean:
 
 doc: FORCE
 	python setup.py build_sphinx --fresh-env
+	@echo ''
+	@echo '--> docs in build/sphinx/html <--'
+	@echo ''
 
 lib:
 	cd lib && \
