@@ -17,7 +17,7 @@ if [[ "${NODE_LABELS}" == *linux* ]]
 then
 	if type gcov >/dev/null 2>&1
 	then
-		coverage_pre='CFLAGS="-pg -fprofile-arcs -ftest-coverage"'
+		export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
 		coverage_post='--debug --inplace --libraries gcov'
 	else
 		echo "gcov was not found, skipping coverage check"
@@ -27,7 +27,7 @@ else
 		
 fi
 
-if [[ "${JOB_NAME}" == "khmer-multi" ]]
+if [[ "${JOB_NAME}" == khmer-multi/* ]]
 then
 	if [[ -x ${cov_analysis_dir}/${cov_analysis_bin} ]]
 	then
@@ -46,7 +46,7 @@ else
 	echo "Not the main build so skipping the coverity scan"
 fi
 
-${coverage_pre} ${coverity} python setup.py build_ext ${coverage_post}
+${coverity} python setup.py build_ext ${coverage_post}
 
 if [[ -v coverity ]]
 then
