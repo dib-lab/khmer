@@ -70,7 +70,8 @@ pip install --quiet pylint
 pylint -f parseable doc/*.py figuregen/*.py novelty/*.py khmer/*.py sandbox/*.py \
        	scripts/*.py tests khmer | tee ../pylint.out
 
-if [[ -v coverage_pre ]]
+if [[ -n "${coverage_post}" ]]
+	# was -v coverage_post but OS X bash not new enough
 then
 	pip install -U gcovr
 	gcovr -r $PWD --xml > coverage-gcovr.xml
