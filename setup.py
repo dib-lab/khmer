@@ -79,7 +79,7 @@ scripts.extend([path_join("scripts", script)
 setup_metadata = \
     {
         "name": "khmer",
-        "version": "0.6",
+        "version": "0.6.1",
         "description": 'khmer k-mer counting library',
         "long_description": open("README.md").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
