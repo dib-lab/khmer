@@ -49,7 +49,8 @@ fi
 
 ${coverity} python setup.py build_ext ${coverage_post}
 
-if [[ -v coverity ]]
+if [[ -n "$coverity" ]]
+	# was -v coverity but OS X bash not new enough
 then
 	tar czf khmer-cov.tgz cov-int
 	curl --form project=Khmer --form token=${COVERITY_TOKEN} --form \
