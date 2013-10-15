@@ -38,7 +38,11 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'khmer'
-copyright = u'2010-2013, Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason Pell, Jared Simpson, C. S. Welcher, Qingpeng Zhanmg, and C. Titus Brown'
+
+copyright = u'''2010-2013, Michael R. Crusoe, Greg Edvenson, Jordan
+Fish, Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason
+Pell, Jared Simpson, C. S. Welcher, Qingpeng Zhamg, and C. Titus
+Brown'''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
