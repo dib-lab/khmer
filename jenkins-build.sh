@@ -31,7 +31,8 @@ if [[ "${JOB_NAME}" == khmer-multi/* ]]
 then
 	if [[ -x ${cov_analysis_dir}/${cov_analysis_bin} ]]
 	then
-		if [[ -v COVERITY_TOKEN ]]
+		if [[ -z COVERITY_TOKEN ]]
+			#was -v, but OS X bash not new enough
 		then
 			PATH=${PATH}:${cov_analysis_dir}
 			coverity="${cov_analysis_bin} --dir cov-int"
