@@ -1,0 +1,26 @@
+2013-10-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.6
+
+* Switch to setuptools to run the entire build
+
+* The various Makefiles have been merged into one inside lib for posterity
+
+* A new top-level Makefile wraps "python setup.py"
+
+* argparse.py has been removed and is installed automatically by setuptools/pip
+
+* setup.py and the python/khmer directory have been moved to the root of the
+project to conform to the standard layout
+
+* The project contact address is now khmer-project@idyll.org
+
+* Due to the new build system the project now easily builds under OS X + XCode
+
+* In light of the above the installation instructions have been rewritten
+
+* Sphinx now builds the documentation without warnings or errors
+
+* It is now easy to calculate code coverage.
+
+* setup.py is now PEP8 compliant
