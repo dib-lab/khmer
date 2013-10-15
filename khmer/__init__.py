@@ -3,7 +3,7 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
-__version__ = "0.4"
+__version__ = "0.6"
 
 import _khmer
 from _khmer import get_config

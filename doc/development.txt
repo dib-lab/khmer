@@ -88,3 +88,9 @@ CLI reading:
 
    http://figshare.com/articles/tutorial_pdf/643388
 
+Upstream sources
+----------------
+
+ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
+
+Before major releases it should be examined to see if there is a new version
