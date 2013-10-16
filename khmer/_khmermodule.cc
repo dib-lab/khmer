@@ -1275,7 +1275,9 @@ static PyObject * ktable_intersect(PyObject * self, PyObject * args)
 
   PyObject * other_o;
 
-  PyArg_ParseTuple(args, "O", &other_o);
+  if (!PyArg_ParseTuple(args, "O", &other_o)) {
+  	return NULL;
+  }
 
   assert(is_ktable_obj(other_o));
 
