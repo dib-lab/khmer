@@ -1850,7 +1850,7 @@ static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
     PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
   }
 
-  delete dist;
+  delete[] dist;
 
   return x;
 }
