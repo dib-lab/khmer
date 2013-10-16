@@ -50,12 +50,6 @@ namespace khmer {
       }
     }
             
-    void _clear_all_partitions() {
-      if (partition != NULL) {
-	partition->_clear_all_partitions();
-      }
-    }
-
     uint32_t _all_tags_spin_lock;
 
   public:
@@ -95,8 +89,7 @@ namespace khmer {
 	_n_tables = 0;
       }
 
-      _clear_all_partitions();
-      delete partition;
+     delete partition;
     }
 
     std::vector<HashIntoType> get_tablesizes() const {
