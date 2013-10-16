@@ -3,7 +3,7 @@
 cov_analysis_dir=/usr/local/cov-analysis-linux64-6.6.1/bin
 cov_analysis_bin=cov-build
 
-rm -Rf .env build dist khmer/_khmermodule.so
+rm -Rf .env build dist khmer/_khmermodule.so cov-int
 
 virtualenv .env
 
