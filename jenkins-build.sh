@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cov_analysis_dir=/usr/local/cov-analysis-linux64-6.5.1/bin
+cov_analysis_dir=/usr/local/cov-analysis-linux64-6.6.1/bin
 cov_analysis_bin=cov-build
 
 rm -Rf .env build dist khmer/_khmermodule.so
@@ -9,7 +9,7 @@ virtualenv .env
 
 . .env/bin/activate
 
-python setup.py clean --all
+make clean
 
 unset coverage_pre coverage_post coverity
 
