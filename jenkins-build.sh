@@ -67,8 +67,7 @@ python setup.py nosetests --with-xcoverage --with-xunit --cover-package=khmer \
 make doc
 
 pip install --quiet pylint
-pylint -f parseable doc/*.py figuregen/*.py novelty/*.py khmer/*.py sandbox/*.py \
-       	scripts/*.py tests khmer | tee ../pylint.out
+pylint -f parseable khmer/*.py scripts/*.py tests khmer | tee ../pylint.out
 
 if [[ -n "${coverage_post}" ]]
 	# was -v coverage_post but OS X bash not new enough
@@ -76,8 +75,7 @@ then
 	pip install -U gcovr
 	gcovr -r $PWD --xml > coverage-gcovr.xml
 
-	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ -i lib/zlib/ \
-		-i lib/bzip2/ -DVALIDATE_PARTITIONS --xml lib 2> cppcheck-result.xml
+	make cppcheck
 
 	mkdir -p doc/doxygen
 	doxygen
