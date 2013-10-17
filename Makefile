@@ -15,6 +15,15 @@ doc: FORCE
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
 
+cppcheck-result.xml: FORCE
+	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ \
+		-i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS \
+		--xml lib 2> cppcheck-result.xml
+
+cppcheck: FORCE
+	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ \
+		-i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS lib 
+
 lib:
 	cd lib && \
 	$(MAKE)
