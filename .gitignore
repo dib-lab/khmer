@@ -1,9 +1,12 @@
 *.pyc
 *.o
 *.so
+*.gcno
+*.swp
+*.egg-info
 *~
-python/build
-python/_khmermodule.cpp
+build
+dist
 lib/test
 doc/_build
 *.log
