@@ -4,7 +4,9 @@ khmer
 Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 
 [![Stories in Ready](https://badge.waffle.io/ged-lab/khmer.png)]
-(http://waffle.io/ged-lab/khmer)  
+(http://waffle.io/ged-lab/khmer)
+[![Build Status](http://ci.ged.msu.edu/job/khmer-multi/badge/icon)]
+(http://ci.ged.msu.edu/job/khmer-multi/)
 
 The official repository is at
 
