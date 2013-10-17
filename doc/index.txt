@@ -6,8 +6,11 @@
 khmer -- k-mer counting & filtering FTW
 =======================================
 
-:Authors: C. Titus Brown, Jason Pell, and Adina Howe.
-:Contact: ctb@msu.edu
+:Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe, 
+          Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason Pell, Jared Simpson,
+          C. S. Welcher, Qingpeng Zhang, and C. Titus Brown
+
+:Contact: khmer-project@idyll.org
 :License: BSD
 
 khmer is a library and suite of command line tools for working with
@@ -50,6 +53,8 @@ Contents:
    design
    details
    development
+   sequence-access-patterns
+   release
    crazy-ideas
    contributors
    biblio
