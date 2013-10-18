@@ -1,4 +1,6 @@
+===========================
 How to make a khmer release
+===========================
 
 Update references to the version number
 
