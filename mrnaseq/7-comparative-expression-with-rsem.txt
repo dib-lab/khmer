@@ -5,13 +5,13 @@ In addition to screed, khmer, and eel-pond, you'll also need to
 install bowtie (see :doc:`3-big-assembly`).
 
 You'll need to have your partitioned and renamed data from
-:doc:`5-building-transcript-families` in a file called
+:doc:`6-annotating-transcript-families` in a file called
 'nematostella.fa'.  (It doesn't need to be annotated, but it does need
 to have the transcript family assignments.)
 
 .. note::
 
-   You can grab the one for nematostella here::
+   You can grab the partitioned and renamed data for nematostella here::
 
       cd /mnt
       curl -O http://athyra.idyll.org/~t/trinity-nematostella.renamed.fa.gz
@@ -57,6 +57,10 @@ Go to a working directory on /mnt::
    cd /mnt
    mkdir rsem
    cd rsem
+
+Link in the nematostella file::
+
+   ln -fs ../nematostella.fa .
 
 Make a transcript-to-gene-map file::
 
@@ -106,8 +110,8 @@ take a long time for lots of data, so definitely run this step in screen! ::
 
 Gather results::
 
-   rsem-generate-data-matrix ?.fq.genes.results ??.fq.genes.results > genes.results
-   rsem-generate-data-matrix ?.fq.isoforms.results ??.fq.isoforms.results > isoforms.results
+   rsem-generate-data-matrix *.fq.genes.results > genes.results
+   rsem-generate-data-matrix *.fq.isoforms.results > isoforms.results
 
 ...and voila, you now have two files, 'genes.results' and
 'isoforms.results', which are tab-separated files (that Excel can

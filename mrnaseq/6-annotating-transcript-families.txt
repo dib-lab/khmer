@@ -40,8 +40,9 @@ Format both as BLAST databases::
    formatdb -i mouse.protein.faa -o T -p T
    formatdb -i trinity-nematostella.renamed.fa -o T -p F
 
-And, now, run BLAST in both directions.  Note, this may take ~24 hours or
-longer; you probably want to run it in screen::
+And, now, if you haven't downloaded the canned BLAST data above, run
+BLAST in both directions.  Note, this may take ~24 hours or longer;
+you probably want to run it in screen::
 
    blastall -i trinity-nematostella.renamed.fa -d mouse.protein.faa -e 1e-3 -p blastx -o nema.x.mouse -a 8 -v 4 -b 4
    blastall -i mouse.protein.faa -d trinity-nematostella.renamed.fa -e 1e-3 -p tblastn -o mouse.x.nema -a 8 -v 4 -b 4
@@ -75,8 +76,6 @@ After this last, you should see::
 If any of these numbers are zero on the nematostella data, then you
 probably need to redo the BLAST.
 
-.. @CTB -z
-
 This will produce a file 'trinity-nematostella.renamed.fa.annot', which
 will have sequences that look like this::
 
@@ -85,6 +84,6 @@ will have sequences that look like this::
 I suggest renaming this file to 'nematostella.fa' and using it for
 BLASTs (see :doc:`installing-blastkit`).
 
-.. -z to annotate-seqs and make-reciprocal best
 .. mouse foo
 
+Next: :doc:`7-comparative-expression-with-rsem`.
