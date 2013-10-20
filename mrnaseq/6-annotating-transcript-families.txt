@@ -84,6 +84,19 @@ will have sequences that look like this::
 I suggest renaming this file to 'nematostella.fa' and using it for
 BLASTs (see :doc:`installing-blastkit`).
 
+The annotate-seqs command will *also* produce two CSV files.  The first,
+``trinity-nematostella.renamed.fa.annot.csv``, is small, and contains
+sequence names linked to orthology and homology information.  The secnod,
+``trinity-nematostella.renamed.fa.annot.large.csv``, is large, and
+contains all of the same information as in the first but *also* contains
+all of the actual DNA sequence in the last column.  (Some spreadsheet
+programs may not be able to open it.)  You can do::
+
+   cp *.csv /root/Dropbox
+
+to copy them locally, if you have set up Dropbox (see:
+:doc:`../amazon/installing-dropbox`).
+
 .. mouse foo
 
 Next: :doc:`7-comparative-expression-with-rsem`.

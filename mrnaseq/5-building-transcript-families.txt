@@ -44,10 +44,6 @@ sequences::
 .. tail n.dist
 .. (warning)
 
-.. 
-
-.. (explain sequence names)
-
 Looking at the renamed sequences
 ================================
 
@@ -77,5 +73,3 @@ Some explanation:
 * 'len' is the sequence length.
 
 Next: :doc:`6-annotating-transcript-families`
-
-.. -z to annotate-seqs and make-reciprocal best
