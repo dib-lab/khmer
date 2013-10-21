@@ -218,6 +218,8 @@ namespace khmer {
 				   BoundedCounterType min_abund) const;
     unsigned int trim_below_abundance(std::string seq,
 				      BoundedCounterType max_abund) const;
+    unsigned int find_first_low_abund_kmer(std::string seq,
+				   BoundedCounterType min_abund) const;
 
     void collect_high_abundance_kmers(const std::string &infilename,
 				      unsigned int lower_count,

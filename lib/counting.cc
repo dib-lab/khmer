@@ -443,8 +443,6 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 
   KMerIterator kmers(seq.c_str(), _ksize);
 
-  SeenSet path;
-
   HashIntoType kmer;
 
   if (kmers.done()) { return 0; }
@@ -478,8 +476,6 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
 
   KMerIterator kmers(seq.c_str(), _ksize);
 
-  SeenSet path;
-
   HashIntoType kmer;
 
   if (kmers.done()) { return 0; }
@@ -499,6 +495,45 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
     i++;
   }
 
+  return seq.length();
+}
+
+unsigned int CountingHash::find_first_low_abund_kmer(std::string seq,
+						  BoundedCounterType min_abund)
+  const
+{
+  if (!check_and_normalize_read(seq)) {
+    return 0;
+  }
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+
+  HashIntoType kmer;
+
+  if (kmers.done()) { return 0; }
+
+  // start from the beginning -- is the first k-mer low-count? if so,
+  // iterate until you find a high-count k-mer.
+  if (get_count(kmer) < min_abund) {
+    unsigned int i = 0;
+    while (1) {
+      kmer = kmers.next();
+      if (get_count(kmer) >= min_abund) {
+	return i;
+      }
+      i++;
+    }
+  } else { // ok, if the first k-mer is fine, iterate 'til you find low-count.
+    unsigned int i = _ksize;
+    while (!kmers.done()) {
+      kmer = kmers.next();
+
+      if (get_count(kmer) < min_abund) {
+	return i;
+      }
+      i++;
+    }
+  }
   return seq.length();
 }
 
