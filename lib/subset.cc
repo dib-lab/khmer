@@ -128,8 +128,14 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
       }
 
       if (partition_id > 0 || output_unassigned) {
-	outfile << ">" << read.name << "\t" << partition_id;
-	outfile << "\n" << seq << "\n";
+	if (read.accuracy.length()) { // FASTQ
+	  outfile << "@" << read.name << "\t" << partition_id << "\n";
+	  outfile << seq << "\n+\n";
+	  outfile << read.accuracy << "\n";
+	} else {		// FASTA
+	  outfile << ">" << read.name << "\t" << partition_id;
+	  outfile << "\n" << seq << "\n";
+	}
       }
 #ifdef VALIDATE_PARTITIONS
       std::cout << "checking: " << read.name << "\n";
