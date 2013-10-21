@@ -28,9 +28,14 @@ DEFAULT_THRESHOLD = 5
 
 def read_partition_file(filename):
     for n, record in enumerate(screed.open(filename, parse_description=False)):
-        name = record.name
-        name, partition_id = name.rsplit('\t', 1)
-        yield n, name, int(partition_id), record.sequence
+        name, partition_id = record.name.rsplit('\t', 1)
+        yield n, record, int(partition_id)
+
+def output_single(r):
+    if hasattr(r, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+    else:
+        return ">%s\n%s\n" % (r.name, r.sequence)
 
 #
 
@@ -80,19 +85,39 @@ def main():
 
     #
 
-    if output_unassigned:
-        unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
+    SUFFIX = 'fa'
+    is_fastq = False
 
+    for n, r, pid in read_partition_file(args.part_filenames[0]):
+        if hasattr(r, 'accuracy'):
+            SUFFIX = 'fq'
+            is_fastq = True
+        break
+
+    for filename in args.part_filenames:
+        for n, r, pid in read_partition_file(filename):
+            if is_fastq:
+                assert hasattr(r, 'accuracy'), \
+                    "all input files must be FASTQ if the first one is"
+            else:
+                assert not hasattr(r, 'accuracy'), \
+                    "all input files must be FASTA if the first one is"
+                
+            break
+
+    if output_unassigned:
+        unassigned_fp = open('%s.unassigned.%s' % (prefix, SUFFIX), 'w')
+        
     count = {}
     for filename in args.part_filenames:
-        for n, name, pid, seq in read_partition_file(filename):
+        for n, r, pid in read_partition_file(filename):
             if n % 100000 == 0:
                 print '...', n
 
             count[pid] = count.get(pid, 0) + 1
 
             if pid == 0 and output_unassigned:
-                print >>unassigned_fp, '>%s\n%s' % (name, seq)
+                print >>unassigned_fp, output_single(r)
 
     if output_unassigned:
         unassigned_fp.close()
@@ -156,13 +181,13 @@ def main():
     # open a bunch of output files for the different groups
     group_fps = {}
     for n in range(group_n):
-        fp = open('%s.group%04d.fa' % (prefix, n), 'w')
+        fp = open('%s.group%04d.%s' % (prefix, n, SUFFIX), 'w')
         group_fps[n] = fp
 
     # write 'em all out!
 
     for filename in args.part_filenames:
-        for n, name, partition_id, seq in read_partition_file(filename):
+        for n, r, partition_id in read_partition_file(filename):
             if n % 100000 == 0:
                 print '...x2', n
 
@@ -177,7 +202,7 @@ def main():
 
             outfp = group_fps[group_n]
 
-            outfp.write('>%s\t%s\n%s\n' % (name, partition_id, seq))
+            outfp.write(output_single(r))
 
 if __name__ == '__main__':
     main()
