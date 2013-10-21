@@ -112,7 +112,7 @@ setup_metadata = \
         # #additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
-        "install_requires": ['screed >= 0.7', 'argparse >= 1.2.1', ],
+        "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
         "setup_requires": ['nose >= 1.0', 'sphinx', ],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
