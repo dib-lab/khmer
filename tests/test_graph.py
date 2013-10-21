@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 import khmer
+import screed
 
 import khmer_tst_utils as utils
 
@@ -226,6 +227,22 @@ class Test_Partitioning(object):
 
         assert len1 > 0
         assert len2 == 0, len2
+
+    def test_output_fq(self):
+        filename = utils.get_test_data('random-20-a.fq')
+
+        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+        subset = ht.do_subset_partition(0, 0)
+        ht.merge_subset(subset)
+
+        output_file = utils.get_temp_filename('parttest')
+        ht.output_partitions(filename, output_file, False)
+
+        print open(output_file).read()
+
+        x = set([ r.accuracy for r in screed.open(output_file) ])
+        assert x, x
 
     @attr('highmem')
     def test_disconnected_20_a(self):
