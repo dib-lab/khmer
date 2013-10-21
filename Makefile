@@ -1,5 +1,5 @@
 all:
-	python setup.py build
+	python setup.py build_ext -i
 
 install:
 	python setup.py install
@@ -8,6 +8,7 @@ clean:
 	python setup.py clean --all
 	cd lib && make clean
 	cd tests && rm -rf khmertest_*
+	rm -f khmer/_khmermodule.so
 
 doc: FORCE
 	python setup.py build_sphinx --fresh-env
