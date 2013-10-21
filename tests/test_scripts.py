@@ -3,9 +3,7 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
-import sys
-import os
-import shutil
+import sys, os, shutil
 from cStringIO import StringIO
 import subprocess
 import traceback
@@ -942,6 +940,36 @@ def test_extract_partitions():
     parts = set(parts)
     assert len(parts) == 1, len(parts)
 
+def test_extract_partitions_fq():
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+    
+    runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fq')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+    quals = set([ r.accuracy for r in screed.open(partfile) ])
+    quals = list(quals)
+    assert quals[0], quals
 
 def test_abundance_dist():
     infile = utils.get_temp_filename('test.fa')
