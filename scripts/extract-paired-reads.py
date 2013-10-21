@@ -72,6 +72,7 @@ def main():
     n_pe = 0
     n_se = 0
 
+    record = None
     for n, record in enumerate(screed.open(sys.argv[1])):
         if n % 100000 == 0 and n > 0:
             print '...', n
