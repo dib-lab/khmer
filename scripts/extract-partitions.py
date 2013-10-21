@@ -68,6 +68,8 @@ def main():
     prefix = args.prefix
     distfilename = prefix + '.dist'
 
+    n_unassigned = 0
+
     print '---'
     print 'reading partitioned files:', repr(args.part_filenames)
     if output_groups:
@@ -116,8 +118,10 @@ def main():
 
             count[pid] = count.get(pid, 0) + 1
 
-            if pid == 0 and output_unassigned:
-                print >>unassigned_fp, output_single(r)
+            if pid == 0:
+                n_unassigned += 1
+                if output_unassigned:
+                    print >>unassigned_fp, output_single(r)
 
     if output_unassigned:
         unassigned_fp.close()
@@ -186,8 +190,12 @@ def main():
 
     # write 'em all out!
 
+    total_seqs = 0
+    part_seqs = 0
+    toosmall_parts = 0
     for filename in args.part_filenames:
         for n, r, partition_id in read_partition_file(filename):
+            total_seqs += 1
             if n % 100000 == 0:
                 print '...x2', n
 
@@ -198,11 +206,24 @@ def main():
                 group_n = group_d[partition_id]
             except KeyError:
                 assert count[partition_id] <= THRESHOLD
+                toosmall_parts += 1
                 continue
 
             outfp = group_fps[group_n]
 
             outfp.write(output_single(r))
+            part_seqs += 1
+
+    print '---'
+    print 'Of %d total seqs,' % total_seqs
+    print 'extracted %d partitioned seqs into group files,' % part_seqs
+    print 'discarded %d sequences from small partitions (see -X),' % \
+        toosmall_parts
+    print 'and found %d unpartitioned sequences (see -U).' % n_unassigned
+    print ''
+    print 'Created %d group files named %s.groupXXXX.%s' % (len(group_fps),
+                                                            prefix,
+                                                            SUFFIX)
 
 if __name__ == '__main__':
     main()
