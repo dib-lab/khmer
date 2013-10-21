@@ -2,12 +2,12 @@
 How to make a khmer release
 ===========================
 
-Update references to the version number
+Update the version number
 
-1. lib/khmer.h
-2. python/setup.py{,.in}
-3. python/khmer/__init__.py
-4. doc/conf.py
+1. khmer/__init__.py
+
+Setuptools and sphinx have both been configured to pull from khmer.__version__
+which is defined in khmer/__init__.py
 
 Setup a pull request
 

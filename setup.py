@@ -19,6 +19,8 @@ from os import (
 
 from subprocess import call
 
+import khmer
+
 zlibdir = 'lib/zlib'
 bzip2dir = 'lib/bzip2'
 
@@ -67,6 +69,7 @@ extension_mod_DICT = \
         "depends": build_depends,
         "language": "c++",
         "libraries": ["stdc++", ],
+        "define": ["VERSION", '.'.join(khmer.__version__.split('.')[:2])
     }
 
 extension_mod = Extension("khmer._khmermodule", **extension_mod_DICT)
@@ -79,7 +82,7 @@ scripts.extend([path_join("scripts", script)
 setup_metadata = \
     {
         "name": "khmer",
-        "version": "0.6.1",
+        "version": khmer.__version__,
         "description": 'khmer k-mer counting library',
         "long_description": open("README.md").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
