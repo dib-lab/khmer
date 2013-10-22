@@ -1,6 +1,6 @@
 # Profile?
 # Set this variable to true if you wish to profile the codes.
-WANT_PROFILING=false
+WANT_PROFILING=true
 
 # Which profiling tool to use?
 # Assuming you have TAU installed and setup properly, 
@@ -207,8 +207,8 @@ bittest: bittest.o ktable.o
 
 #ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
 #	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
-color_test: test-Colors.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+#color_test: test-Colors.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+#	$(CXX) -o $@ hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # NOTE: Disabled due to broken constructor call.
 #graphtest: graphtest.o ktable.o hashtable.o
@@ -261,6 +261,9 @@ hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh ktable.hh khmer.hh co
 subset.o: subset.cc subset.hh hashbits.hh ktable.hh khmer.hh
 
 counting.o: counting.cc counting.hh hashtable.hh ktable.hh khmer.hh
+
+test-Colors.o: test-Colors.cc
+	$(CXX) $(CXXFLAGS) -c -o $@ test-Colors.cc -fopenmp
 
 test-StreamReader.o: test-StreamReader.cc read_parsers.hh
 
