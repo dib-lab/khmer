@@ -3,6 +3,10 @@ khmer
 
 Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 
+[![PyPI version](https://badge.fury.io/py/khmer.png)]
+(http://badge.fury.io/py/khmer)
+[![Downloads](https://pypip.in/d/khmer/badge.png)]
+(https://crate.io/package/khmer)
 [![Stories in Ready](https://badge.waffle.io/ged-lab/khmer.png)]
 (http://waffle.io/ged-lab/khmer)
 [![Build Status](http://ci.ged.msu.edu/job/khmer-multi/badge/icon)]
