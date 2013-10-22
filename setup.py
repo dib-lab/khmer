@@ -1,4 +1,4 @@
-#
+#!/usr/bin/env python
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
@@ -100,8 +100,8 @@ setup_metadata = \
         # #additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
-        "install_requires": ["screed >= 0.7", 'argparse >= 1.2.1', ],
-        "setup_requires": ['nose >= 1.0', 'setuptools-git >= 0.3', 'sphinx', ],
+        "install_requires": [ 'screed >= 0.7', 'argparse >= 1.2.1', ],
+        "setup_requires": [ 'nose >= 1.0', 'setuptools-git >= 0.3', 'sphinx', ],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
         #"platforms": '', # empty as is conveyed by the classifiers below
