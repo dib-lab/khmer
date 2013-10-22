@@ -9,6 +9,10 @@ from _khmer import _new_counting_hash
 from _khmer import _new_hashbits
 from _khmer import set_reporting_callback
 
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
 ###
 
 
@@ -135,3 +139,5 @@ def get_n_primes_above_x(n, x):
             primes.append(i)
         i += 2
     return primes
+
+
