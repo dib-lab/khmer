@@ -46,12 +46,12 @@ int main( int argc, char * argv[ ] )
     float		ht_size_FP	    = 1.0E8;
     unsigned long	ht_count	    = 4;
     uint64_t		cache_size	    = 4L * 1024 * 1024 * 1024;
-    unsigned int	range		    = 1;
+    unsigned int	range		    = 82;
     int			rc		    = 0;
     int			opt		    = -1;
     char *		conv_residue	    = NULL;
-    string		rfile_name = "/mnt/scratch/tg/w/2013-lamprey/data/AK.fq.gz";
-    string		ifile_name = "/mnt/scratch/tg/w/petMar_test.fp";
+    string		rfile_name = "/w/tag_coloring/test_reads.fq";
+    string		ifile_name = "/w/tag_coloring/petMar_test.fp";
     // FILE *		ofile		    = NULL;
     HashIntoType	    ht_size		= (HashIntoType)ht_size_FP;
     Primes primetab( ht_size );
