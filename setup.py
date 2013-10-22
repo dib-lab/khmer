@@ -88,7 +88,7 @@ setup_metadata = \
         "name": "khmer",
         "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
-        "long_description": open("README.md").read(),
+        "long_description": open("README.rst").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
         ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy'
         ' Jason Pell, Jared Simpson, C. S. Welcher,'
