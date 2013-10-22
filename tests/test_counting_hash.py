@@ -382,7 +382,7 @@ def test_find_low_abund_kmer_3():
     hi.consume(DNA[1:])
 
     posns = hi.find_low_abund_kmers(DNA, 2)
-    assert posns == [0], posns
+    assert posns == [], posns  # cannot find in first k
 
 def test_find_low_abund_kmer_4():
     hi = khmer.new_counting_hash(8, 1e6, 2)
