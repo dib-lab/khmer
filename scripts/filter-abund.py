@@ -16,7 +16,7 @@ import sys
 import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-
+from khmer import threading_args as targs
 from khmer.counting_args import build_counting_multifile_args
 
 ###
@@ -26,6 +26,7 @@ DEFAULT_CUTOFF = 2
 
 def main():
     parser = build_counting_multifile_args()
+    targs.add_threading_args(parser)
     parser.add_argument('--cutoff', '-C', dest='cutoff',
                         default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
@@ -40,6 +41,7 @@ def main():
 
     counting_ht = args.input_table
     infiles = args.input_filenames
+    n_threads = int(args.n_threads)
 
     print 'file with ht: %s' % counting_ht
 
@@ -74,7 +76,7 @@ def main():
         outfile = os.path.basename(infile) + '.abundfilt'
         outfp = open(outfile, 'w')
 
-        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp = ThreadedSequenceProcessor(process_fn, n_workers=n_threads)
         tsp.start(verbose_loader(infile), outfp)
 
         print 'output in', outfile
