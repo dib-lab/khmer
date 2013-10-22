@@ -7,7 +7,7 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
     :target: http://badge.fury.io/py/khmer
 .. image:: https://pypip.in/d/khmer/badge.png
     :target: https://crate.io/packages/khmer
-.. image:: http://ci.ged.msu.edu/buildStatus/icon?job=khmer-multi
+.. image:: http://ci.ged.msu.edu/job/khmer-multi/badge/icon
     :target: http://ci.ged.msu.edu/job/khmer-multi/
 
 The official repository is at
