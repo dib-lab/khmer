@@ -382,7 +382,15 @@ def test_find_low_abund_kmer_3():
     hi.consume(DNA[1:])
 
     pos = hi.find_first_low_abund_kmer(DNA, 2)
-    assert pos == 1, pos
+    assert pos == 0, pos
+
+def test_find_low_abund_kmer_4():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+
+    pos = hi.find_first_low_abund_kmer(DNA, 2)
+    assert pos == len(DNA), pos
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
