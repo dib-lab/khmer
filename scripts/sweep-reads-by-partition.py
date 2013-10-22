@@ -19,6 +19,7 @@ import sys
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
 DEFAULT_PPF = 1
+MAX_FILES=512
 
 def write_read(fp, seq, name, color):
     fp.write('>{name}\t{color}\n{seq}\n'.format(seq=seq, name=name, color=color))
@@ -28,6 +29,7 @@ def main():
     parser.add_argument('-p', '--partitions_per_file', 
                         dest='partitions_per_file', default=DEFAULT_PPF)
     parser.add_argument('-i', '--input_fastp', dest='input_fastp')
+    parser.add_argument('-r', '--traversal_range', dest='traversal_range')
     parser.add_argument('input_reads', nargs='+')
     args = parser.parse_args()
     
@@ -55,6 +57,7 @@ def main():
     HT_SIZE = args.min_hashsize
     N_HT = args.n_hashes
     
+    traversal_range = args.traversal_range
     input_reads = args.input_reads
     input_fastp = args.input_fastp
     ppf = args.partitions_per_file
