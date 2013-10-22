@@ -9,6 +9,12 @@ ez_setup.use_setuptools()
 from setuptools import setup
 from setuptools import Extension
 
+import versioneer
+versioneer.versionfile_source = 'khmer/_version.py'
+versioneer.versionfile_build = 'khmer/_version.py'
+versioneer.tag_prefix = 'v'  # tags are like v1.2.0
+versioneer.parentdir_prefix = '.'
+
 from os.path import (
     join as path_join,
 )
@@ -18,8 +24,6 @@ from os import (
 )
 
 from subprocess import call
-
-import khmer
 
 zlibdir = 'lib/zlib'
 bzip2dir = 'lib/bzip2'
@@ -69,7 +73,7 @@ extension_mod_DICT = \
         "depends": build_depends,
         "language": "c++",
         "libraries": ["stdc++", ],
-        "define": ["VERSION", '.'.join(khmer.__version__.split('.')[:2])
+        "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
 extension_mod = Extension("khmer._khmermodule", **extension_mod_DICT)
@@ -82,7 +86,7 @@ scripts.extend([path_join("scripts", script)
 setup_metadata = \
     {
         "name": "khmer",
-        "version": khmer.__version__,
+        "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
         "long_description": open("README.md").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
@@ -134,5 +138,8 @@ class build_ext(_build_ext):
                      shell=True)
                 _build_ext.run(self)
 
+_cmdclass = versioneer.get_cmdclass()
+_cmdclass.update({'build_ext': build_ext})
 
-setup(cmdclass={'build_ext': build_ext}, **setup_metadata)
+setup(cmdclass=_cmdclass,
+      **setup_metadata)
