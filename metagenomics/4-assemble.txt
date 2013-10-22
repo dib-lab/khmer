@@ -48,7 +48,12 @@ Preparing the data
 .. note::
 
    The below steps work on any set of files named .pe.fq.gz with or
-   without accompanying .se.fq.gz files. @CTB
+   without accompanying .se.fq.gz files. @CTB @@combine SRR dn.
+
+   foo::
+
+      gunzip -c /data/SRR492065.pe.* | gzip -c > data.pe.fq.gz
+      gunzip -c /data/SRR492065.se.* | gzip -c > data.se.fq.gz
 
 Each assembler takes in data in a slightly different format.  Velvet
 is the most flexible: it can take in paired-end and orphaned reads,
@@ -101,8 +106,8 @@ So, let's just do that::
       pefile=$name.pe.fq.gz
       sefile=$name.se.fq.gz;
       for k in {19..51..2}; do
-         echo "velveth $name.velvet.$k $k -fastq.gz -shortPaired $pefile -short $sefile && \
-              velvetg $name.velvet.$k -exp_cov auto -cov_cutoff auto"
+         echo "velveth $name.velvet.$k.d $k -fastq.gz -shortPaired $pefile -short $sefile && \
+              velvetg $name.velvet.$k.d -exp_cov auto -cov_cutoff auto"
       done
    done >> do-assembly.sh
 
@@ -131,9 +136,13 @@ And also set up a bunch of SPADes runs::
 Running the assemblies
 ----------------------
 
-Now, run them all::
+Now, run them all in parallel::
 
    parallel -j 4 < do-assembly.sh
+
+or, if you're memory limited, one by one::
+
+   bash do-assembly.sh
 
 Getting stats for the assemblies
 ================================
