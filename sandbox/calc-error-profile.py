@@ -3,12 +3,13 @@ import argparse
 import khmer
 import screed
 
+# @CTB is there a problem with C=5?
+
 N_HT = 4
 HASHSIZE = 1e8
 K=20
-C=20
+C=5
 MAX_SEQ_LEN = 65535
-
 
 def main():
     parser = argparse.ArgumentParser()
