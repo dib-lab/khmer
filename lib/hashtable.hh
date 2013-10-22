@@ -143,6 +143,9 @@ namespace khmer {
     HashIntoType next() { return next(_kmer_f, _kmer_r); }
 
     bool done() { return index >= length; }
+
+    unsigned int get_start_pos() const { return index - _ksize; }
+    unsigned int get_end_pos() const { return index; }
   }; // class KMerIterator
 
 

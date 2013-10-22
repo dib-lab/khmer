@@ -1787,7 +1787,7 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
   return ret;
 }
 
-static PyObject * count_find_first_low_abund_kmer(PyObject * self, PyObject * args)
+static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting = me->counting;
@@ -1799,16 +1799,21 @@ static PyObject * count_find_first_low_abund_kmer(PyObject * self, PyObject * ar
     return NULL;
   }
 
-  unsigned int location;
+  std::vector<unsigned int> posns;
   Py_BEGIN_ALLOW_THREADS
 
     khmer::BoundedCounterType min_count = min_count_i;
 
-    location = counting->find_first_low_abund_kmer(seq, min_count);
+    posns = counting->find_low_abund_kmers(seq, min_count);
 
   Py_END_ALLOW_THREADS;
 
-  return Py_BuildValue("i", location);
+  PyObject * x = PyList_New(posns.size());
+  for (unsigned int i = 0; i < posns.size(); i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(posns[i]));
+  }
+
+  return x;
 }
 
 static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
@@ -2057,7 +2062,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
   { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
-  { "find_first_low_abund_kmer", count_find_first_low_abund_kmer, METH_VARARGS, "Identify low-abundance k-mers" },
+  { "find_low_abund_kmers", count_find_low_abund_kmers, METH_VARARGS, "Identify positions of low-abundance k-mers" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
   { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
   { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },

@@ -498,42 +498,46 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
   return seq.length();
 }
 
-unsigned int CountingHash::find_first_low_abund_kmer(std::string seq,
+std::vector<unsigned int> CountingHash::find_low_abund_kmers(std::string seq,
 						  BoundedCounterType min_abund)
   const
 {
+  std::vector<unsigned int> posns;
   if (!check_and_normalize_read(seq)) {
-    return 0;
+    return posns;
   }
 
   KMerIterator kmers(seq.c_str(), _ksize);
 
-  if (kmers.done()) { return seq.length(); }
   HashIntoType kmer = kmers.next();
+  if (kmers.done()) { return posns; }
 
-  // start from the beginning -- is the first k-mer low-count? if so,
-  // iterate until you find a high-count k-mer.
-  if (get_count(kmer) < min_abund) {
-    unsigned int i = 0;
+  while (!kmers.done()) {
+    kmer = kmers.next();
+    if (get_count(kmer) >= min_abund) {
+      break;
+    }
+  }
 
+  while (!kmers.done()) {
+    // find next erroneous
+    while (!kmers.done()) {
+      kmer = kmers.next();
+      if (get_count(kmer) < min_abund) {
+	posns.push_back(kmers.get_end_pos() - 1);
+	break;
+      }
+    }
+    // find next good
     while (!kmers.done()) {
       kmer = kmers.next();
       if (get_count(kmer) >= min_abund) {
-	return i;
+	break;
       }
-      i++;
-    }
-  } else { // ok, if the first k-mer is fine, iterate 'til you find low-count.
-    unsigned int i = _ksize;
-    while (!kmers.done()) {
-      if (get_count(kmer) < min_abund) {
-	return i;
-      }
-      kmer = kmers.next();
-      i++;
     }
   }
-  return seq.length();
+
+  return posns;
 }
 
 

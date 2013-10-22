@@ -3,10 +3,6 @@ import argparse
 import khmer
 import screed
 
-# @CTB ideas: load in the high-abund k-mers only, as in streaming, past C=20.
-# @CTB ideas: count the number of tags; requires merging in running stuff.
-# @CTB ideas: extend to include internal/isolated errors
-
 N_HT = 4
 HASHSIZE = 1e8
 K=20
@@ -44,14 +40,27 @@ def main():
                 bp_consumed += len(seq)
                 ht.consume(seq)
             else:
-                pos = ht.find_first_low_abund_kmer(seq, 2)
+                posns = ht.find_low_abund_kmers(seq, 2)
                 lengths.append(len(seq))
-                if pos != len(seq):
-                    positions[pos] += 1
+
+                for p in posns:
+                    positions[p] += 1
+
+    lengths.sort()
+    max_length = lengths[-1]
+
+    length_count = [0]*max_length
+    for j in range(max_length):
+        length_count[j] = sum([ 1 for i in lengths if i >= j ])
+
+
+    last_zero = len(positions) - 1
+    while positions[last_zero] == 0:
+        last_zero -= 1
 
     fp = open('out.hist', 'w')
-    for n, i in enumerate(positions):
-        print >>fp, n, i
+    for n, i in enumerate(positions[:last_zero + 1]):
+        print >>fp, n, i, float(i) / float(length_count[n])
     fp.close()
 
     print 'total sequences:', total
