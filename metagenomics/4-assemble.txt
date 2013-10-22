@@ -5,10 +5,15 @@
 At last!  All that filtering and diginorming is done, and we can get
 down to the serious business of assembling.  Huzzah!
 
+Let's start with some collection of group files in ``/mnt/assembly``.
+
 Install some assemblers
 =======================
 
-First, let's install Velvet::
+Let's try assembling the sequences with three different assemblers: Velvet,
+IDBA, and SPADes.
+
+First, let's install `Velvet <http://www.ebi.ac.uk/~zerbino/velvet/>`__::
 
    cd /root
    curl -O http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.10.tgz
@@ -17,7 +22,7 @@ First, let's install Velvet::
    make MAXKMERLENGTH=51
    cp velvet? /usr/local/bin
 
-And also IDBA::
+And also `IDBA <https://code.google.com/p/hku-idba/>`__::
 
    cd /root
    curl -O http://hku-idba.googlecode.com/files/idba-1.1.1.tar.gz
@@ -26,52 +31,109 @@ And also IDBA::
    ./configure && make
    cp bin/idba_ud /usr/local/bin
 
-Splitting out PE and SE reads
-=============================
+And also `SPADes <http://bioinf.spbau.ru/spades/>`__.  First::
 
-Let's assemble just one group, for now -- group 5 should be nice and
-small.  Generally assemblers will want interleaved reads to be
-distinguished from orphaned reads, so let's split 'em out::
+   apt-get -y install cmake
 
-  cd /mnt/assembly
-  mkdir group5
-  cd group5    
-  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa
-  python /usr/local/share/khmer/scripts/extract-paired-reads.py ../kak.group0005.fa.sweep3
-  mv kak.group0005.fa.sweep3.pe kak.group5.nodn.pe
-  mv kak.group0005.fa.sweep3.se kak.group5.nodn.se
+then::
 
-Using Velvet
-============
+   wget http://spades.bioinf.spbau.ru/release2.5.1/SPAdes-2.5.1.tar.gz
+   tar -xzf SPAdes-2.5.1.tar.gz
+   cd SPAdes-2.5.1
+   PREFIX=/usr/local ./spades_compile.sh
 
-I personally really like the Velvet assembler, since it yields pretty
-good results in a wide variety of situations.  It's also rather fast.
-The downside is that you have to specify a 'k' parameter, which gets
-annoying because it gives you different results (see presentation).
+Preparing the data
+==================
 
-So, let's just assemble across a lot of k's. ::
+.. note::
 
-   for k in {21..43..2}
+   The below steps work on any set of files named .pe.fq.gz with or
+   without accompanying .se.fq.gz files. @CTB
+
+Each assembler takes in data in a slightly different format.  Velvet
+is the most flexible: it can take in paired-end and orphaned reads,
+in FASTA or FASTQ format, gzipped or not.  However, SPADes requires
+paired-end FASTQ, while IDBA requires paired-end FASTA.  So we need
+to do some conversions.
+
+First, let's gunzip all of the pe.fq files (for SPADes)::
+
+   for i in *.pe.fq.gz
    do
-      velveth dn.$k $k -fasta -shortPaired kak.group0005.fa.pe -short kak.group0005.fa.se
-      velvetg dn.$k -exp_cov auto
+      gunzip -c $i > $(basename $i .gz)
    done
 
-   for k in {21..43..2}
+and convert them all into FASTA (for IDBA)::
+
+   for i in *.pe.fq
    do
-      velveth nodn.$k $k -fasta -shortPaired kak.group5.nodn.pe -short kak.group5.nodn.se
-      velvetg nodn.$k -exp_cov auto
+      name=$(basename $i .fq).fa
+      python /usr/local/share/khmer/sandbox/fastq-to-fasta.py $i > $name
    done
 
+Setting up the assemblies
+=========================
 
-Using IDBA
-==========
+@@ctb install parallel
 
-I've heard good things about IDBA.  Let's give it a try::
+We're going to set up a bunch of assemblies in a script called
+'do-assembly.sh'.  This will let us execute them in parallel if we
+want to, and just keep track of things if we don't want to.
 
-   idba_ud --pre_correction -r kak.group0005.fa.pe -o idba.dn.d/
+Let's make sure the file is empty first::
 
-   idba_ud --pre_correction -r kak.group5.nodn.pe -o idba.nodn.d/
+   rm -f do-assembly.sh
+
+Setting up Velvet runs
+----------------------
+
+I personally really like the Velvet assembler as a first cut
+assembler, since it yields pretty good results in a wide variety of
+situations.  It's also rather fast.  The downside is that you have to
+specify a 'k' parameter, which gets annoying because it gives you
+different results and you have to run a lot of assemblies.  Typically,
+I just run a bunch of 'k's, and evaluate the results.
+
+So, let's just do that::
+
+   for i in *.pe.fq.gz; do
+      name=$(basename $i .pe.fq.gz);
+      pefile=$name.pe.fq.gz
+      sefile=$name.se.fq.gz;
+      for k in {19..51..2}; do
+         echo "velveth $name.velvet.$k $k -fastq.gz -shortPaired $pefile -short $sefile && \
+              velvetg $name.velvet.$k -exp_cov auto -cov_cutoff auto"
+      done
+   done >> do-assembly.sh
+
+Setting up IDBA runs
+--------------------
+
+Set up a bunch of IDBA runs::
+
+   for i in *.pe.fa
+   do
+      name=$(basename $i .pe.fa);
+      echo "idba_ud --pre_correction -r $i -o $name.idba.d"
+   done >> do-assembly.sh
+
+Setting up SPADes runs
+----------------------
+
+And also set up a bunch of SPADes runs::
+
+   for i in *.pe.fq
+   do
+      name=$(basename $i .pe.fq);
+      echo "spades.py --pe1-12 $name.pe.fq -o $name.spades.d"
+   done >> do-assembly.sh
+
+Running the assemblies
+----------------------
+
+Now, run them all::
+
+   parallel -j 4 < do-assembly.sh
 
 Getting stats for the assemblies
 ================================

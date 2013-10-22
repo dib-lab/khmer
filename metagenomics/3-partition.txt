@@ -4,10 +4,17 @@
 
 .. note::
 
+   Partitioning may not be needed or useful for data sets with low or
+   medium richness.  You can proceed to :doc:`4-assemble` and use the
+   pe.qc.fq.gz and se.fq.fq.gz files from :doc:`2-diginorm` in place of
+   XXX. @@
+
+.. note::
+
    Make sure you're running in screen!
 
 Start with the QC'ed files from :doc:`2-diginorm` or copy them into a
-working directory.
+working directory; you should be in /mnt/assembly below.
 
 Simple partitioning
 ===================
@@ -15,16 +22,36 @@ Simple partitioning
 Partitioning is a rather complex process -- nowhere near as nice and
 simple as digital normalization.  However, we do have a simple script
 to run the basic stuff; if this script is too slow, or doesn't work
-well for big chunks of data, we might have remedies.  But for the
-meantime, try the simple script::
+well for big chunks of data, we might have remedies, so please
+`contact us <mailto:protocols@lists.idyll.org>`__.  But in the
+meantime, here is a simple procedure.
 
-   /usr/local/share/khmer/scripts/do-partition.py -k 32 -x 1e9 --threads 4 kak *.kak.qc.fq.gz
+First, eliminate highly repetitive k-mers that could join multiple species
+and rename the files appropriately::
+
+   python /usr/local/share/khmer/sandbox/filter-below-abund.py normC5k20.kh *.fq.gz
+
+   for i in *.below
+   do
+      mv $i $i.fq
+   done
+
+.. note::
+
+   You will need the normC5k20.kh file from :doc:`2-diginorm` for this
+   step.  If you don't have it, you can regenerate it like so::
+
+      /usr/local/share/khmer/scripts/load-into-counting.py -k 20 -N 4 -x 5e8 normC5k20.kh *.qc.fq.gz
+
+Next, run partitioning::
+
+   /usr/local/share/khmer/scripts/do-partition.py -k 32 -x 1e9 --threads 4 kak *.kak.qc.fq.gz.below.fq
    
 This should take about 15 minutes, and will produce '.part' files.  These
-are now FASTA files that contain partition annotations.  For example, check
+are now FASTQ files that contain partition annotations.  For example, check
 out::
 
-   head SRR492065.pe.kak.qc.fq.gz.part
+   head SRR492065.pe.kak.qc.fq.gz.below.part
 
 Extracting the partitions into groups
 =====================================
@@ -35,27 +62,31 @@ To do this, ::
 
    /usr/local/share/khmer/scripts/extract-partitions.py -X 100000 kak *.part
 
-This will leave you with a bunch of 'kak.group*.fa', as well as a '.dist'
-file containing the distribution of partition sizes (how many sequences are
-in a given partition).
+This will leave you with a bunch of ``kak.group*.fq``, as well as a
+``kak.dist`` file containing the distribution of partition sizes (how
+many sequences are in a given partition).
 
 Here, the '-X' sets the number of sequences stuck into a group file.
 By default the -X parameter is 1 million, which would put all of the
 sequences into a single file for this data set.
 
-Occasionally (OK, rather frequently) you'll find that almost all of
-your sequences coalesce into one partition, which we unaffectionately
-call the 'lump'.  There are many possible reasons for this, and we
-have a series of increasingly large hammers that can be used on the
-lump.
+Separating groups into PE and SE
+================================
 
-For now, simply observe that::
+We still want to track paired and single-ended reads, so let's go ahead and
+extract the PE reads as before::
 
-   tail kak.dist
+   for i in kak*.fq
+   do
+      /usr/local/share/khmer/scripts/extract-paired-reads.py $i
+      name=$(basename $i .fq)
+      mv ${name}.fq.pe ${name}.pe.fq
+      mv ${name}.fq.se ${name}.se.fq                                           
+   done
 
-reports that about 2/3 of the sequences are in a single partition::
+And, finally, compress them::
 
-   1674746 1 112164 2539252
+   gzip *.pe.fq *.se.fq
 
 Reinflating partitions (optional)
 =================================
@@ -75,7 +106,39 @@ file.  Sorry :(. ::
 Now, run the command to pull all of the reads for each group from 'all.fq'
 into reinflated files::
 
-   python /usr/local/share/khmer/sandbox/sweep-reads3.py -x 1e8 kak.group*.fa all.fq
+   python /usr/local/share/khmer/sandbox/sweep-reads3.py -x 3e8 kak.group*.fq all.fq
+
+Finally, split the resulting ``.sweep3`` files into PE/SE::
+
+   for i in kak*.sweep3
+   do
+      /usr/local/share/khmer/scripts/extract-paired-reads.py $i
+      name=$(basename $i .fq.sweep3)
+      mv $i.pe ${name}.nodn.pe.fq
+      mv $i.se ${name}.nodn.se.fq
+   done
+
+and compress::
+
+   gzip *.nodn.se.fq *.nodn.pe.fq
+
+Cleaning up
+===========
+
+At this point, you can get rid of quite a few intermediate files, all of
+which can be removed::
+
+   rm *.part
+   rm kak.group*.fq
+   rm all.fq
+   rm *.sweep3
+   rm *.kh
+   rm *.below.fq
+
+You'll be left with 18 pairs of files named ``kak.group00XX.pe.fq.gz``
+and ``kak.group00xx.se.fq.gz``, and (if you reinflated the
+partitions), another 18 pairs of files named
+``kak.group0000.nodn.pe.fq.gz`` and ``kak.group0000.nodn.se.fq.gz``.
 
 ----
 

@@ -18,16 +18,19 @@ of the example data set.
    snap-05633504 on EC2/EBS. The end results of this tutorial are
    available as public snapshot snap-85653384 on EC2/EBS.
 
-Also see:  :doc:`../mrnaseq/using-screen`.
+.. note::
+
+   Some of these commands may take a very long time.  Please see
+   :doc:`../amazon/using-screen`.
 
 Install software
 ================
 
-Install screed::
+Install `screed <http://screed.readthedocs.org/>`__::
 
    pip install screed
 
-Install the bleeding-edge version of khmer::
+Install `khmer <http://khmer.readthedocs.org/>`__::
 
    cd /usr/local/share
    git clone https://github.com/ged-lab/khmer.git
@@ -38,7 +41,7 @@ Install the bleeding-edge version of khmer::
    echo 'export PYTHONPATH=/usr/local/share/khmer/python:$PYTHONPATH' >> ~/.bashrc
    source ~/.bashrc
 
-Install Trimmomatic::
+Install `Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`__::
 
    cd /root
    curl -O http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.30.zip
@@ -47,7 +50,7 @@ Install Trimmomatic::
    cp trimmomatic-0.30.jar /usr/local/bin
    cp -r adapters /usr/local/share/adapters
 
-Install libgtextutils and fastx::
+Install `libgtextutils and fastx <http://hannonlab.cshl.edu/fastx_toolkit/>`__::
 
    cd /root
    curl -O http://hannonlab.cshl.edu/fastx_toolkit/libgtextutils-0.6.1.tar.bz2
@@ -84,7 +87,7 @@ If you want to play along with the data specific to this tutorial
 (a) create a volume from snapshot snap-05633504 and (b) mount it as
 /data.
 
-Once you've done that, check that 'ls /data' shows exactl four FASTQ
+Once you've done that, check that 'ls /data' shows exactly four FASTQ
 files, and then type::
 
    ln -fs /data/SRR49206?_?.fastq.gz .

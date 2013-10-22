@@ -7,7 +7,7 @@
    Make sure you're running in screen!
 
 Start with the QC'ed files from :doc:`1-quality` or copy them into a
-working directory.
+working directory; you should start this in /mnt/assembly.
 
 Run a first round of digital normalization
 ==========================================
@@ -28,11 +28,12 @@ Error-trim your data
 ====================
 
 Use 'filter-abund' to trim off any k-mers that are abundance-1 in
-high-coverage reads (-V option, for variable coverage)::
+high-coverage reads.  The -V option is used to make this work better
+for variable coverage data sets::
 
    /usr/local/share/khmer/scripts/filter-abund.py -V normC20k20.kh *.keep
 
-This produces .abundfilt files.
+This produces .abundfilt files containing the trimmed sequences.
 
 The process of error trimming could have orphaned reads, so split the
 PE file into still-interleaved and non-interleaved reads::
@@ -42,10 +43,10 @@ PE file into still-interleaved and non-interleaved reads::
       /usr/local/share/khmer/scripts/extract-paired-reads.py $i
    done
 
-This leaves you with PE files (.pe.qc.fq.gz.keep.abundfilt.pe :) and
+This leaves you with PE files (.pe.qc.fq.gz.keep.abundfilt.pe) and
 two sets of SE files (.se.qc.fq.gz.keep.abundfilt and
-.pe.qc.fq.gz.keep.abundfilt.se).  (Yes, I did indeed devise this naming
-scheme.  It makes sense. Trust me.)
+.pe.qc.fq.gz.keep.abundfilt.se).  (Yes, the naming scheme does make
+sense.  Trust me.)
 
 Normalize down to C=5
 =====================
@@ -86,9 +87,16 @@ by typing::
 
    rm *.keep *.abundfilt *.pe *.se
 
-You may also want to remove the k-mer hash tables::
+If you are *not* doing partitioning (see :doc:`3-partition`), you may
+also want to remove the k-mer hash tables::
 
    rm *.kh
+
+If you *are* running partitioning, you can remove the ``normC20k20.kh`` file::
+
+   rm normC20k20.kh
+
+but you will need the ``normC5k20.kh`` file.
 
 Read stats
 ==========

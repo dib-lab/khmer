@@ -19,12 +19,23 @@ the latest released version.)
 Protocols:
 ----------
 
-.. toctree::
-   :maxdepth: 1
-   :glob:
+mRNAseq assembly: the Eel Pond Protocol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   mrnaseq/index
-   metagenomics/index
+:doc:`mrnaseq/index`
+
+This is a lightweight protocol for assembling up to a few hundred
+million mRNAseq reads, annotating the resulting assembly, and doing
+differential expression with RSEM.
+
+Metagenome assembly: the Kalamazoo Protocol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:doc:`metagenomics/index`
+
+This is a protocol for assembling low- and medium-diversity metagenomes.
+Marine sediment and soil data sets may not be assemblable in the cloud
+just yet.
 
 Additional information
 ----------------------
