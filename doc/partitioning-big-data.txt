@@ -61,14 +61,14 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   python scripts/partition-graph.py --threads 4 -s 1e5 50m
   
   # now, merge the pmap files into one big pmap file, 50m.pmap.merged
-  python scripts/merge-partitions 50m
+  python scripts/merge-partitions.py 50m
   
   # next, annotate the original sequences with their partition numbers.
   # this will create iowa-corn-50m.fa.gz.part
   python scripts/annotate-partitions.py 50m iowa-corn-50m.fa.gz
   
   # now, extract the partitions in groups into 'iowa-corn-50m.groupNNNN.fa'
-  python scripts/extract-partitions iowa-corn-50m iowa-corn-50m.fa.gz.part
+  python scripts/extract-partitions.py iowa-corn-50m iowa-corn-50m.fa.gz.part
   
   # at this point, you can assemble the group files individually.  Note,
   # however, that the last one them is quite big?  this is because it's
