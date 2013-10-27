@@ -382,11 +382,11 @@ and separate paired from orphans.
 
       scripts/extract-paired-reads.py tests/test-data/paired.fq
 
-**interleave-reads.py:** take left (/1) and right (/2) reads, and interleave them.
+**interleave.py:** take left (/1) and right (/2) reads, and interleave them.
 
    Usage::
 
-      interleave-reads.py <R1> <R2> [ -o output ]
+      interleave.py <R1> <R2> [ -o output ]
 
    The output is an interleaved set of reads, with each read in <R1> paired
    with a read in <R2>. By default, the output goes to stdout unless
@@ -398,7 +398,7 @@ and separate paired from orphans.
 
    Example::
 
-      scripts/interleave-reads.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq
+      sandbox/interleave.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq
 
 **split-paired-reads.py:** split interleaved read files into two files, one left and one right.
 
