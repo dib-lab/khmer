@@ -25,17 +25,55 @@ git and github strategies
 Still in the works, but read `this
 <http://scottchacon.com/2011/08/31/github-flow.html>`__.
 
+Make a branch on ged-lab (preferred so others can contribute) or fork there
+repository and make a branch there.
+
+Each piece or fix you are working on should have its own branch; make a pull-
+request to ged-lab/master to aid in code review, testing, and feedback.
+
+If you want your code integrated then it needs to be mergable
+
+Example pull request update using the command line:
+
+1. Clone the source of the pull request (if needed)
+```git clone git@github.com:mr-c/khmer.git```
+2. Checkout the source branch of the pull request
+```git checkout my-pull-request```
+3. Pull in the destination of the pull request and resolve any conflicts.
+```git pull git@github.com:ged-lab/khmer.git master```
+4. Push your update to the source of the pull request
+```git push```
+5. Jenkins will automatically attempt to build and test your pull requests
+
+#explain the different branches: legacy, master, bleeding-edge, others.
+
+#explain the Jenkins pull request magic words
+	#explain how Jenkins works
+
+#changes need to be documented in the Changelog
+
 Testing
 -------
 
-'nosetests' is the canonical way to run the tests.  This is what 'make test'
-does.
+python setup.py nosetest is the canonical way to run the tests.  This is what
+'make test' does.
 
-Pipelines
+# this is configured via setup.cfg in the nosetest stanza
+
+Code coverage
+-------------
+
+# How to view it
+
+# all new code should be reasonably well covered 
+# code coverage should never go down
+# use the code coverage to guide where to test next
+
+Standards
 ---------
 
-All khmer scripts used by a published recommended analysis pipeline must be
-included in scripts/ and meet the standards therein implied.
+All khmer scripts used by a published recommended analysis pipeline or paper
+must be included in scripts/ and meet the standards therein implied.
 
 Command line scripts
 --------------------
@@ -87,4 +125,3 @@ CLI reading:
    http://catb.org/esr/writings/taoup/html/ch11s06.html
 
    http://figshare.com/articles/tutorial_pdf/643388
-
