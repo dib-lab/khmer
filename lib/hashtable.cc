@@ -344,4 +344,33 @@ void Hashtable::get_median_count(const std::string &s,
   median = counts[counts.size() / 2]; // rounds down
 }
 
+// get the sparse median at kmers spaced distance apart
+// don't bother with avg or std dev for performance
+// TODO: separate sdev and avg into their own functions
+// in normal get_median
+void Hashtable::get_sparse_median_count(const std::string &s,
+				 BoundedCounterType &median,
+				 unsigned int &distance)
+{
+  BoundedCounterType count;
+  std::vector<BoundedCounterType> counts;
+  char * cstr = s.c_str();
+
+  for (i=(distance/2); i < s.length(); i+=distance) {
+    // move the pointer forward by distance
+    cstr += distance;
+    HashIntoType kmer = khmer::_hash(kmer, _ksize);
+    count = this->get_count(kmer);
+    counts.push_back(count);
+  }
+  assert(counts.size());
+
+  if (!counts.size()) {
+    median = 0;
+    return;
+  }
+  sort(counts.begin(), counts.end());
+  median = counts[counts.size() / 2]; // rounds down
+}
+
 // vim: set sts=2 sw=2:
