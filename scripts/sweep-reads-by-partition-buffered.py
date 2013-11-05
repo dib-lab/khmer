@@ -1,4 +1,4 @@
-#! /w/khmer_dev/bin/python
+#! /usr/bin/python
 
 import screed
 import sys
