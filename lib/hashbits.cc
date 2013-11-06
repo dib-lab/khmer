@@ -472,7 +472,7 @@ void Hashbits::consume_sequence_and_tag(const std::string& seq,
     if (found_tags) { found_tags->insert(kmer); }
   }
 }
-//
+/
 // consume_fasta_and_tag_with_stoptags: consume a FASTA file of reads,
 //     tagging reads every so often.  Do not insert matches to stoptags,
 //     and join the tags across those gaps.

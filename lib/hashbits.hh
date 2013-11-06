@@ -33,8 +33,6 @@ namespace khmer {
 	HashIntoType _n_overlap_kmers;
     Byte ** _counts;
 
-    Color _tag_color;
-
     virtual void _allocate_counters() {
       _n_tables = _tablesizes.size();
 
@@ -57,20 +55,6 @@ namespace khmer {
 	partition->_clear_all_partitions();
       }
     }
-    
-    
-    // Check if the given TagToColorMap already has the tag with the given color
-    bool _map_contains(TagToColorMap& cmap,
-                        HashIntoType& kmer,
-                        Color& the_color)
-    {
-      std::pair<TagColorPair::iterator, TagColorPair::iterator> ret;
-      ret = cmap->equal_range(kmer);
-      for (TagToColorMap::iterator it=ret.first; it!=ret.second; ++it) {
-        if (it->second == the_color) return true;
-      }
-      return false;
-    }
 
     uint32_t _all_tags_spin_lock;
 
@@ -79,8 +63,6 @@ namespace khmer {
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
-    TagToColorMap color_map;
-
 
     void _validate_pmap() {
       if (partition) { partition->_validate_pmap(); }
@@ -97,8 +79,6 @@ namespace khmer {
       _occupied_bins = 0;
       _n_unique_kmers = 0;
       _n_overlap_kmers = 0;
-
-      _tag_color = 0;
 
       _allocate_counters();
     }
