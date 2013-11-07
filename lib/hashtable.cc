@@ -354,12 +354,13 @@ void Hashtable::get_sparse_median_count(const std::string &s,
 {
   BoundedCounterType count;
   std::vector<BoundedCounterType> counts;
-  char * cstr = s.c_str();
+  char * cstr = new char [s.length()+1];
+  std::strcpy (cstr, s.c_str());
 
-  for (i=(distance/2); i < s.length(); i+=distance) {
+  for (int i=(distance/2); i < s.length(); i+=distance) {
     // move the pointer forward by distance
     cstr += distance;
-    HashIntoType kmer = khmer::_hash(kmer, _ksize);
+    HashIntoType kmer = khmer::_hash(cstr, _ksize);
     count = this->get_count(kmer);
     counts.push_back(count);
   }
