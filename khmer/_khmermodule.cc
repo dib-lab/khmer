@@ -1553,7 +1553,7 @@ static PyObject * hash_consume_high_abund_kmers(PyObject * self,
 
   unsigned int n_consumed;
   n_consumed = counting->consume_high_abund_kmers(long_str,
-					     (BoundedCounterType) min_count);
+						  (khmer::BoundedCounterType) min_count);
 
   return PyInt_FromLong(n_consumed);
 }
