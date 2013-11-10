@@ -18,7 +18,7 @@
 #include "hashbits.hh"
 #include "counting.hh"
 #include "storage.hh"
-#include "aligner.hh"
+#include "read_aligner.hh"
 
 //
 // Function necessary for Python loading:
@@ -1027,7 +1027,7 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
   unsigned long count = 0;
 
   if(PyLong_Check(arg)) {
-    HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
+    khmer::HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
     count = ktable->get_count(pos);
   } else if (PyInt_Check(arg)) {
     long pos = PyInt_AsLong(arg);
@@ -1337,45 +1337,8 @@ static PyTypeObject khmer_KHashbitsType = {
 /* GRAPHALIGN addition */
 typedef struct {
   PyObject_HEAD
-  Aligner * aligner;
+  khmer::ReadAligner * aligner;
 } khmer_ReadAlignerObject;
-
-typedef struct {
-  PyObject_HEAD
-  khmer::MinMaxTable * mmt;
-} khmer_MinMaxObject;
-
-
-#define is_minmax_obj(v)  ((v)->ob_type == &khmer_MinMaxType)
-
-static void khmer_minmax_dealloc(PyObject* self);
-static PyObject * khmer_minmax_getattr(PyObject *, char *);
-
-static PyTypeObject khmer_MinMaxType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "MinMax", sizeof(khmer_MinMaxObject),
-    0,
-    khmer_minmax_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_minmax_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "minmax object",           /* tp_doc */
-};
-
-
 
 static void khmer_counting_dealloc(PyObject *);
 
@@ -1477,47 +1440,16 @@ static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *arg
   return PyInt_FromLong(0);
 }
 
-static PyObject * hash_fasta_file_to_minmax(PyObject * self, PyObject *args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  char * filename;
-  unsigned int total_reads;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "si|O", &filename, &total_reads,
-			&callback_obj)) {
-    return NULL;
-  }
-
-  khmer::MinMaxTable * mmt;
-  try {
-    mmt = counting->fasta_file_to_minmax(filename, total_reads, 
-					  _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-  
-  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
-    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
-
-  minmax_obj->mmt = mmt;
-
-  return (PyObject *) minmax_obj;
-}
-
 static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting  = me->counting;
 
   char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(
-    args, "s|iiO", &filename, &lower_bound, &upper_bound, &callback_obj
+    args, "s|O", &filename, &callback_obj
   )) {
       return NULL;
   }
@@ -1527,7 +1459,6 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
   unsigned int	      total_reads   = 0;
   try {
     counting->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -1544,11 +1475,10 @@ static PyObject * hash_consume_fasta_with_reads_parser(
   khmer::CountingHash * counting  = me->counting;
 
   PyObject * rparser_obj = NULL;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(
-    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
+    args, "O|O", &rparser_obj, &callback_obj
   )) {
       return NULL;
   }
@@ -1563,7 +1493,6 @@ static PyObject * hash_consume_fasta_with_reads_parser(
   Py_BEGIN_ALLOW_THREADS
   try {
     counting->consume_fasta(rparser, total_reads, n_consumed,
-			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     exc_raised = true;
@@ -1580,9 +1509,8 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * long_str;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
   
@@ -1593,7 +1521,39 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
   }
 
   unsigned int n_consumed;
-  n_consumed = counting->consume_string(long_str, lower_bound, upper_bound);
+  n_consumed = counting->consume_string(long_str);
+
+  return PyInt_FromLong(n_consumed);
+}
+
+static PyObject * hash_consume_high_abund_kmers(PyObject * self,
+						PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * long_str;
+  unsigned int min_count;
+
+  if (!PyArg_ParseTuple(args, "sI", &long_str, &min_count)) {
+    return NULL;
+  }
+  
+  if (strlen(long_str) < counting->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  if (min_count > MAX_COUNT) {
+    PyErr_SetString(PyExc_ValueError,
+		    "min count specified is > maximum possible count");
+    return NULL;
+  }
+
+  unsigned int n_consumed;
+  n_consumed = counting->consume_high_abund_kmers(long_str,
+						  (khmer::BoundedCounterType) min_count);
 
   return PyInt_FromLong(n_consumed);
 }
@@ -1602,11 +1562,10 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting = me->counting;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
 
@@ -1616,9 +1575,7 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::BoundedCounterType c = counting->get_min_count(long_str,
-							 lower_bound,
-							 upper_bound);
+  khmer::BoundedCounterType c = counting->get_min_count(long_str);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
@@ -1628,11 +1585,10 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
   khmer::CountingHash * counting = me->counting;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
   char * long_str;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
 
@@ -1642,9 +1598,7 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  khmer::BoundedCounterType c = counting->get_max_count(long_str,
-							 lower_bound,
-							 upper_bound);
+  khmer::BoundedCounterType c = counting->get_max_count(long_str);
   unsigned int N = c;
 
   return PyInt_FromLong(N);
@@ -2065,10 +2019,10 @@ static PyMethodDef khmer_counting_methods[] = {
   { "n_entries", hash_n_entries, METH_VARARGS, "" },
   { "count", hash_count, METH_VARARGS, "Count the given kmer" },
   { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+  { "consume_high_abund_kmers", hash_consume_high_abund_kmers, METH_VARARGS, "Count all k-mers in the given string with abund >= min specified" },
   { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
   { "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser, 
     METH_VARARGS, "Count all k-mers using a given reads parser" },
-  { "fasta_file_to_minmax", hash_fasta_file_to_minmax, METH_VARARGS, "" },
   { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
   { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
   { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
@@ -2200,11 +2154,10 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
   khmer_KHashbitsObject * ht2_argu;
   char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
   khmer::Hashbits * ht2;
 
-  if (!PyArg_ParseTuple(args, "sO|iiO", &filename, &ht2_argu,&lower_bound, &upper_bound,
+  if (!PyArg_ParseTuple(args, "sO|O", &filename, &ht2_argu,
 			&callback_obj)) {
     return NULL;
   }
@@ -2219,7 +2172,7 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
 
   try {
     hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed,
-			     lower_bound, upper_bound, _report_fn, callback_obj);
+				    _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
   }
@@ -2296,9 +2249,8 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * long_str;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
 
-  if (!PyArg_ParseTuple(args, "s|ll", &long_str, &lower_bound, &upper_bound)) {
+  if (!PyArg_ParseTuple(args, "s", &long_str)) {
     return NULL;
   }
   
@@ -2309,7 +2261,7 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
   }
 
   unsigned int n_consumed;
-  n_consumed = hashbits->consume_string(long_str, lower_bound, upper_bound);
+  n_consumed = hashbits->consume_string(long_str);
 
   return PyInt_FromLong(n_consumed);
 }
@@ -2734,11 +2686,9 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * filename;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|iiO", &filename, &lower_bound, &upper_bound,
-			&callback_obj)) {
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
     return NULL;
   }
 
@@ -2749,7 +2699,6 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
   try {
     hashbits->consume_fasta(filename, total_reads, n_consumed,
-			     lower_bound, upper_bound, 
 			     _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -2766,12 +2715,10 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
   khmer::Hashbits * hashbits = me->hashbits;
 
   PyObject * rparser_obj = NULL;
-  khmer::HashIntoType lower_bound = 0, upper_bound = 0;
   PyObject * callback_obj = NULL;
 
   if (!PyArg_ParseTuple(
-    args, "O|iiO", &rparser_obj, &lower_bound, &upper_bound, &callback_obj
-  )) {
+    args, "O|O", &rparser_obj, &callback_obj)) {
       return NULL;
   }
 
@@ -2785,7 +2732,6 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
   Py_BEGIN_ALLOW_THREADS
   try {
     hashbits->consume_fasta(rparser, total_reads, n_consumed,
-			    lower_bound, upper_bound, 
 			    _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     exc_raised = true;
@@ -3908,65 +3854,33 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 static PyObject * readaligner_align(PyObject * self, PyObject * args)
 {
   khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-  Aligner * aligner = me->aligner;
+  khmer::ReadAligner* aligner = me->aligner;
 
-  char * read;
+  char* read;
 
   if (!PyArg_ParseTuple(args, "s", &read)) {
     return NULL;
   }
 
-  if (strlen(read) < (unsigned int)aligner->ksize()) {
+  /*if (strlen(read) < (unsigned int)aligner->ksize()) {
     PyErr_SetString(PyExc_ValueError,
                     "string length must >= the hashtable k-mer size");
     return NULL;
-  }
+    }*/
 
-  CandidateAlignment aln;
-  std::string rA;
+  khmer::Alignment* aln;
+  aln = aligner->Align(read);
 
-  Py_BEGIN_ALLOW_THREADS
-
-  aln = aligner->alignRead(read);
-  rA = aln.getReadAlignment(read);
-
-  Py_END_ALLOW_THREADS
-
-  const char* alignment = aln.alignment.c_str();
-  const char* readAlignment = rA.c_str();
-
+  const char* alignment = aln->graph_alignment.c_str();
+  const char* readAlignment = aln->read_alignment.c_str();
+  PyObject* ret = Py_BuildValue("dssO", aln->score, alignment, readAlignment, (aln->truncated)? Py_True : Py_False);
+  delete aln;
  
-  return Py_BuildValue("ss", alignment,
-                              readAlignment);
-}
-
-static PyObject * readaligner_printErrorFootprint(PyObject * self, 
-                                                PyObject * args)
-{
-  khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-  Aligner * aligner = me->aligner;
-
-  char * read;
-
-  if (!PyArg_ParseTuple(args, "s", &read)) {
-    return NULL;
-  }
-
-  if (strlen(read) < (unsigned int)aligner->ksize()) {
-    PyErr_SetString(PyExc_ValueError,
-                    "string length must >= the hashtable k-mer size");
-    return NULL;
-  }
-
-  aligner->printErrorFootprint(read);
-  
-  Py_INCREF(Py_None);
-  return Py_None;
+  return ret;
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {
   {"align", readaligner_align, METH_VARARGS, ""},
-  {"printErrorFootprint", readaligner_printErrorFootprint, METH_VARARGS, ""},
   {NULL, NULL, 0, NULL}
 };
 
@@ -4020,12 +3934,10 @@ static PyTypeObject khmer_ReadAlignerType = {
 static PyObject* new_readaligner(PyObject * self, PyObject * args)
 {
   PyObject * py_obj;
-  double lambdaOne = 0.0;
-  double lambdaTwo = 0.0;
-  unsigned int maxErrorRegion = UINT_MAX;
+  unsigned int trusted_cov_cutoff = 2;
+  double bits_theta = 1;
 
-  if(!PyArg_ParseTuple(args, "O|ddI", &py_obj, 
-                       &lambdaOne, &lambdaTwo, &maxErrorRegion)) {
+  if(!PyArg_ParseTuple(args, "O|Id", &py_obj, &trusted_cov_cutoff, &bits_theta)) {
     return NULL;
   }
 
@@ -4034,18 +3946,7 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
-  if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == UINT_MAX) { 
-    readaligner_obj->aligner = new Aligner(ch->counting);
-  } else if
-    (maxErrorRegion == UINT_MAX && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
-    readaligner_obj->aligner = new Aligner(ch->counting, 
-                                           lambdaOne, lambdaTwo);
-  } else {
-    readaligner_obj->aligner = new Aligner(ch->counting, 
-                                           lambdaOne, lambdaTwo, 
-                                           maxErrorRegion);
-
-  }
+  readaligner_obj->aligner = new khmer::ReadAligner(ch->counting, trusted_cov_cutoff, bits_theta);
 
   return (PyObject *) readaligner_obj; 
 }
@@ -4132,211 +4033,6 @@ static void khmer_hashbits_dealloc(PyObject* self)
   
   PyObject_Del((PyObject *) obj);
 }
-
-//
-// MinMaxTable object
-//
-
-static PyObject * minmax_clear(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  mmt->clear(index);
-  
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_get_min(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  unsigned int val = mmt->get_min(index);
-
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_get_max(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-
-  if (!PyArg_ParseTuple(args, "I", &index)) {
-    return NULL;
-  }
-
-  unsigned int val = mmt->get_max(index);
-
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_add_min(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-  unsigned int val;
-
-  if (!PyArg_ParseTuple(args, "II", &index, &val)) {
-    return NULL;
-  }
-
-  val = mmt->add_min(index, val);
-  
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_add_max(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  unsigned int index;
-  unsigned int val;
-
-  if (!PyArg_ParseTuple(args, "II", &index, &val)) {
-    return NULL;
-  }
-
-  val = mmt->add_max(index, val);
-  
-  return PyInt_FromLong(val);
-}
-
-static PyObject * minmax_merge(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  PyObject * other_py_obj;
-
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  if (!PyArg_ParseTuple(args, "O", &other_py_obj)) {
-    return NULL;
-  }
-
-  khmer_MinMaxObject * other = (khmer_MinMaxObject *) other_py_obj;
-
-  mmt->merge(*(other->mmt));
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_save(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-
-  khmer::MinMaxTable * mmt = me->mmt;
-  char * filename;
-
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-  }
-
-  mmt->save(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_load(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-
-  khmer::MinMaxTable * mmt = me->mmt;
-  char * filename;
-
-  if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-  }
-
-  mmt->load(filename);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject * minmax_tablesize(PyObject * self, PyObject * args)
-{
-  khmer_MinMaxObject * me = (khmer_MinMaxObject *) self;
-  khmer::MinMaxTable * mmt = me->mmt;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(mmt->get_tablesize());
-}
-
-static PyMethodDef khmer_minmax_methods[] = {
-  { "tablesize", minmax_tablesize, METH_VARARGS, "" },
-  { "get_min", minmax_get_min, METH_VARARGS, "" },
-  { "get_max", minmax_get_max, METH_VARARGS, "" },
-  { "add_min", minmax_add_min, METH_VARARGS, "" },
-  { "add_max", minmax_add_max, METH_VARARGS, "" },
-  { "clear", minmax_clear, METH_VARARGS, "" },
-  { "merge", minmax_merge, METH_VARARGS, "" },
-  { "load", minmax_load, METH_VARARGS, "" },
-  { "save", minmax_save, METH_VARARGS, "" },
-  {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static PyObject *
-khmer_minmax_getattr(PyObject * obj, char * name)
-{
-  return Py_FindMethod(khmer_minmax_methods, obj, name);
-}
-
-//
-// new_minmax
-//
-
-static PyObject* new_minmax(PyObject * self, PyObject * args)
-{
-  unsigned int size = 0;
-
-  if (!PyArg_ParseTuple(args, "I", &size)) {
-    return NULL;
-  }
-
-  khmer_MinMaxObject * minmax_obj = (khmer_MinMaxObject *) \
-    PyObject_New(khmer_MinMaxObject, &khmer_MinMaxType);
-
-  minmax_obj->mmt = new khmer::MinMaxTable(size);
-
-  return (PyObject *) minmax_obj;
-}
-
-//
-// khmer_minmax_dealloc -- clean up a minmax object.
-//
-
-static void khmer_minmax_dealloc(PyObject* self)
-{
-  khmer_MinMaxObject * obj = (khmer_MinMaxObject *) self;
-  delete obj->mmt;
-  obj->mmt = NULL;
-  
-  PyObject_Del((PyObject *) obj);
-}
-
 
 //////////////////////////////
 // standalone functions
@@ -4437,8 +4133,6 @@ static PyMethodDef KhmerMethods[] = {
       METH_VARARGS,		"Create an empty counting hash" },
     { "_new_hashbits",		_new_hashbits,
       METH_VARARGS,		"Create an empty hashbits table" },
-    { "new_minmax",		new_minmax,
-      METH_VARARGS,		"Create a new min/max value table" },
     { "new_readaligner",        new_readaligner,
       METH_VARARGS,             "Create a read aligner object" },
     { "forward_hash",		forward_hash,

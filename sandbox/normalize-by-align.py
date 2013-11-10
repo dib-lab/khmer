@@ -1,14 +1,11 @@
 #! /usr/bin/env python
-#
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-#
 """
-Eliminate reads with kadian k-mer abundance higher than
-DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keepkad'.
+XXX
 
-% python scripts/normalize-by-median.py [ -C <cutoff> ] <data1> <data2> ...
+Eliminate reads with minimum k-mer abundance higher than
+DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
+
+% python scripts/normalize-by-min.py [ -C <cutoff> ] <data1> <data2> ...
 
 Use '-h' for parameter help.
 """
@@ -19,13 +16,15 @@ import os
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
-DEFAULT_DESIRED_COVERAGE = 5
+DEFAULT_MINIMUM_COVERAGE = 5
 
 
 def main():
     parser = build_construct_args()
+    parser.add_argument("-t", "--trusted-cutoff", dest="trusted_cutoff", type=int, default=3)
+    parser.add_argument("--bits-theta", help="Tuning parameter controlling trade off of speed vs alignment sensitivity", default=1.0, type=float, dest="bits_theta")
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
-                        default=DEFAULT_DESIRED_COVERAGE)
+                        default=DEFAULT_MINIMUM_COVERAGE)
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
     parser.add_argument('-l', '--loadhash', dest='loadhash',
                         default='')
@@ -35,20 +34,19 @@ def main():
 
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print >>sys.stderr, \
-                "** WARNING: hashsize is default!  " \
+            print >>sys.stderr, "** WARNING: hashsize is default!  " \
                 "You absodefly want to increase this!\n** " \
                 "Please read the docs!"
 
         print >>sys.stderr, '\nPARAMETERS:'
         print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
         print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print >>sys.stderr, \
-            ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
+        print >>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % \
+            args.min_hashsize
         print >>sys.stderr, ''
-        print >>sys.stderr, \
-            'Estimated memory usage is %.2g bytes (n_hashes x min_hashsize)' \
-            % (args.n_hashes * args.min_hashsize)
+        print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
+            '(n_hashes x min_hashsize)' % (
+            args.n_hashes * args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
@@ -65,10 +63,12 @@ def main():
         print 'making hashtable'
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
+    aligner = khmer.new_readaligner(ht, args.trusted_cutoff, args.bits_theta)
+            
     total = 0
     discarded = 0
     for input_filename in filenames:
-        output_name = os.path.basename(input_filename) + '.keepkad'
+        output_name = os.path.basename(input_filename) + '.keepalign'
         outfp = open(output_name, 'w')
 
         for n, record in enumerate(screed.open(input_filename)):
@@ -82,12 +82,28 @@ def main():
             if len(record.sequence) < K:
                 continue
 
-            seq = record.sequence.replace('N', 'A')
-            kad = ht.get_kadian_count(seq)
+            seq = record.sequence.upper().replace('N', 'A')
 
-            if kad < DESIRED_COVERAGE:
+            ##
+            score, graph_alignment, read_alignment, truncated = aligner.align(record.sequence)
+            print >>sys.stderr, "{0}\t{1:0.2f}\t{2}".format(record.name, score, truncated);
+
+            keep = False
+            if truncated:
+                keep = True
+            else:
+                graph_seq = graph_alignment.replace('-', '')
+                mincount = ht.get_min_count(graph_seq)
+
+                if mincount < DESIRED_COVERAGE:
+                    keep = True
+                    seq = graph_seq
+                else:
+                    assert not keep
+                    
+            if keep:
                 ht.consume(seq)
-                outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+                outfp.write('>%s\n%s\n' % (record.name, seq))
             else:
                 discarded += 1
 

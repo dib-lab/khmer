@@ -1,0 +1,16 @@
+===========================
+How to make a khmer release
+===========================
+
+Update references to the version number
+
+1. lib/khmer.h
+2. python/setup.py{,.in}
+3. python/khmer/__init__.py
+4. doc/conf.py
+
+Setup a pull request
+
+Create a new (draft) release: https://github.com/ged-lab/khmer/releases
+
+Publish it
