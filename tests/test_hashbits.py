@@ -195,12 +195,12 @@ def test_count_within_radius_big():
    ht = khmer.new_hashbits(20, 1e6, 4)
 
    ht.consume_fasta(inpfile)
-   n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', 1e6)
+   n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', int(1e6))
    assert n == 3960
    
    ht = khmer.new_hashbits(21, 1e6, 4)
    ht.consume_fasta(inpfile)
-   n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', 1e6)
+   n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', int(1e6))
    assert n == 39
 
 def test_count_kmer_degree():
