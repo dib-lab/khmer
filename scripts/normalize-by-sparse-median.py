@@ -21,6 +21,8 @@ from itertools import izip
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 import argparse
 
+import yep
+
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
@@ -244,6 +246,7 @@ def main():
         sys.exit(-1)
 
 if __name__ == '__main__':
+    yep.start('sparse_test.prof')
     main()
-
+    yep.stop()
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
