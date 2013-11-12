@@ -24,6 +24,9 @@ extern "C"
 
 // C++ standard exceptions are subclassed almost ubiquitously.
 #include <exception>
+#include <set>
+#include <map>
+#include <queue>
 
 #   define VERSION "0.4"
 
@@ -69,6 +72,35 @@ namespace khmer {
   struct InvalidStreamBuffer : public std:: exception
   { };
 
+
+  typedef unsigned int PartitionID;
+  typedef std::set<HashIntoType> SeenSet;
+  typedef std::set<PartitionID> PartitionSet;
+  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
+  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
+  typedef std::set<PartitionID *> PartitionPtrSet;
+  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
+  typedef std::queue<HashIntoType> NodeQueue;
+  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+  typedef std::map<HashIntoType, unsigned int> TagCountMap;
+  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+  
+  typedef unsigned long long int Color;
+  typedef std::multimap<HashIntoType, Color*> TagColorPtrMap;
+  typedef std::multimap<Color, HashIntoType*> ColorTagPtrMap;
+  typedef std::pair<HashIntoType, Color*> TagColorPtrPair;
+  typedef std::pair<Color, HashIntoType*> ColorTagPtrPair;
+  typedef std::set<Color*> ColorPtrSet;
+  typedef std::set<HashIntoType*> TagPtrSet;
+  typedef std::map<Color, Color*> ColorPtrMap;
+
+  template <typename T>
+  void deallocate_ptr_set(T& s) {
+    for (typename T::iterator i = s.begin(); i != s.end(); ++i)
+      delete *i;
+  }
 }
 
 #endif // KHMER_HH

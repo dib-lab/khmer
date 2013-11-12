@@ -9,8 +9,6 @@
 
 #include <vector>
 #include "khmer_config.hh"
-#include "hashtable.hh"
-#include "hashbits.hh"
 
 namespace khmer {
   typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -86,6 +84,18 @@ namespace khmer {
 
 	_n_tables = 0;
       }
+    }
+
+    virtual BoundedCounterType test_and_set_bits(const char * kmer) {
+      BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
+      count(kmer);
+      return !x;
+    }
+
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) {
+      BoundedCounterType x = get_count(khash);
+      count(khash);
+      return !x;
     }
 
     std::vector<HashIntoType> get_tablesizes() const {
