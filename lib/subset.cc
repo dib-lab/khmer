@@ -615,7 +615,7 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
       tagged_kmers.insert(kmer);
       // if we find a tag, finish the remaining queued nodes,
       // but don't queue up any more
-      max_breadth = breadth;
+      // max_breadth = breadth;
       continue;
     }
 
