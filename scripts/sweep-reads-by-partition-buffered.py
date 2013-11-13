@@ -30,8 +30,19 @@ class Seq:
         self.name = name
         self.color = color
         self.seq = seq
+    
+    def __repr__(self):
+        return '''>{name}\t{color}\n
+{seq}\n'''.format(name=self.name, color=self.color, seq=self.seq)
+
     def write(self, fp):
-        fp.write('>{}\t{}\n{}\n'.format(self.name, self.color, self.seq))
+        try:
+            fp.write('\n>{}\t{}\n{}\n'.format(self.name, self.color, self.seq))
+        except IOError:
+            print >>sys.stderr, 'Error writing {seq} to {fn}'.format(seq=self, fn=fp)
+            return 1
+        else:
+            return 0
 
 # stores reads in memory and flushes them to their approriate files
 # when certain criteria are met
@@ -54,6 +65,9 @@ class ReadBuffer:
         self.cur_reads = 0
         self.cur_files = 0
 
+        self.num_write_errors = 0
+        self.num_file_errors = 0
+
     def add_seq(self, seq):
         color = seq.color
         if color in self.buffers:
@@ -75,11 +89,19 @@ class ReadBuffer:
             self.flush_all()
     
     def flush_buffer(self, color):
-        with open('{}_{}.fa'.format(self.output_pref, color), 'a') as outfp:
+        fn = '{}_{}.fa'.format(self.output_pref, color)
+        try:
+            outfp = open(fn, 'a')
+        except IOError as e:
+            print >>sys.stderr, 'ERROR: {e}'.format(e=e)
+            print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fn)
+            self.num_file_errors += 1
+        else:
             for read in self.buffers[color]:
-                read.write(outfp)
+                self.num_write_errors += read.write(outfp)
                 self.cur_reads -= 1
-            
+            outfp.close()
+
     def del_buffer(self, color):
         del self.buffer_counts[color]
         del self.buffers[color]
@@ -154,11 +176,21 @@ def main():
     est = args.files_estimate
     input_files = args.input_files
 
-    output_buffer = ReadBuffer(max_buffers=max_buffers, max_reads=buf_size, est_files=est, output_pref=output_pref)
+    output_buffer = ReadBuffer(max_buffers, buf_size, est, output_pref)
 
 	# file for multicolored reads, just keep this one around the whole time
-    multi_fp = open('{}_multi.fp'.format(output_pref), 'a')
-    orphaned_fp = open('{}_orphaned.fa'.format(output_pref), 'a')
+    multi_fn = '{}_multi.fp'.format(output_pref)
+    try:
+        multi_fp = open(multi_fn, 'a')
+    except IOError as e:
+        print >>sys.stderr, 'ERROR: {e}'.format(e=e)
+        print >>sys.stderr, '*** Failed to open {fn}'.format(multi_fn)
+    orphaned_fn = '{}_orphaned.fa'.format(output_pref)
+    try:
+        orphaned_fp = open(orphaned_fn, 'a')
+    except IOError as e:
+        print >>sys.stderr, 'ERROR: {e}'.format(e=e)
+        print >>sys.stderr, '*** Failed to open {fn}'.format(orphaned_fn)
 
 	# consume the partitioned fasta with which to color the graph
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -170,19 +202,25 @@ def main():
     n_orphaned = 0
     n_colored = 0
     n_mcolored = 0
-    try:
-        total_t = time.clock()
-        start_t = time.clock()
-        for read_file in input_files:
-            print >>sys.stderr,'** sweeping {read_file} for colors...'.format(read_file=read_file)
-            file_t = 0.0
-            for n, record in enumerate(screed.open(read_file)):
 
+    total_t = time.clock()
+    start_t = time.clock()
+    for read_file in input_files:
+        print >>sys.stderr,'** sweeping {read_file} for colors...'.format(read_file=read_file)
+        file_t = 0.0
+        try:
+            read_fp = screed.open(read_file)
+        except IOError as e:
+            print >>sys.stderr, 'ERROR:', e
+            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(read_file)
+        else:
+            for n, record in enumerate(read_fp):
                 if n % 50000 == 0:
                     end_t = time.clock()
                     batch_t = end_t - start_t
                     file_t += batch_t
-                    print >>sys.stderr, '\tswept {n} reads [{nc} colored, {no} orphaned] ** {sec}s ({sect}s total)' \
+                    print >>sys.stderr, '\tswept {n} reads [{nc} colored, {no} orphaned] \
+                                        ** {sec}s ({sect}s total)' \
                                         .format(n=n, nc=n_colored, no=n_orphaned, sec=batch_t, sect=file_t)
                     start_t = time.clock()
                 seq = record.sequence
@@ -190,6 +228,7 @@ def main():
                 
                 colors = ht.sweep_color_neighborhood(seq, traversal_range)
                 color_number_dist.append(len(colors))
+                SeqOb = Seq
                 if colors:
                     n_colored += 1
                     if len(colors) > 1:
@@ -199,12 +238,12 @@ def main():
                 else:
                     n_orphaned += 1
                     orphaned_fp.write('>{}\n{}\n'.format(name, seq))
-
-    except IOError as e:
-        print >>sys.stderr, 'ERROR:', e
-        print >>sys.stderr, '** exiting...'
+            read_fp.close()
     
 	total_t = time.clock() - total_t
+
+    multi_fp.close()
+    orphaned_fp.close()
 
     print >>sys.stderr, 'swept {n_reads} for colors...'.format(n_reads=n)
     print >>sys.stderr, '...with {nc} colored and {no} orphaned'.format(
