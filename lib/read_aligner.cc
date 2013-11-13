@@ -299,8 +299,13 @@ namespace khmer {
 	ret->score = reverse->score + forward->score - start.score; //We've actually counted the starting node score twice, so we need to adjust for that
 	ret->read_alignment = reverse->read_alignment + kmer + forward->read_alignment;
 	ret->graph_alignment = reverse->graph_alignment + kmer + forward->graph_alignment;
-	ret->score = ret->score - GetNull(final_length - k); //Again, we've counted the k-size twice
+	ret->score = ret->score + start.score - GetNull(final_length + k); //Again, we've counted the k-size twice
 	ret->truncated = forward->truncated || reverse->truncated;
+
+	#if 0
+	printf("FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n", forward->read_alignment.c_str(), forward->graph_alignment.c_str(), forward->score, forward->truncated);
+	printf("REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n", reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(), reverse->score, reverse->truncated);
+	#endif
 
 	delete forward;
 	delete reverse;
