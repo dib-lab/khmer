@@ -10,6 +10,13 @@ Find all reads connected to the given contigs on a per-partition basis.
 
 % python scripts/normalize-by-median.py -r <range> -i <contigs fastp> \
 <reads1> <reads2> ... <readsN>
+
+This script is very lenient on IO errors, due to the large number of file
+operations needed. Thus, errors opening a file for buffer flush or writeing
+a read to a file will not crash the program; instead, if there were errors,
+the user will be warned at the end of execution. Errors with opening read files
+are also handled -- we move on to the next read file if there is an error opening.
+
 """
 
 import screed
@@ -244,6 +251,11 @@ def main():
 
     multi_fp.close()
     orphaned_fp.close()
+    
+    if output_buffer.num_write_errors > 0 or output_buffer.num_file_errors > 0:
+        print >>sys.stderr, 'WARNING: Sweep finished with errors!'
+        print >>sys.stderr, '** {writee} reads not written'.format(writee=output_buffer.num_write_errors)
+        print >>sys.stderr, '** {filee} errors opening files'.format(filee=output_buffer.num_file_errors)
 
     print >>sys.stderr, 'swept {n_reads} for colors...'.format(n_reads=n)
     print >>sys.stderr, '...with {nc} colored and {no} orphaned'.format(
