@@ -663,8 +663,10 @@ _ReadParser_iternext( PyObject * self )
 
     // Note: Can simply return NULL instead of setting the StopIteration 
     //	     exception.
-    if (stop_iteration)
+    if (stop_iteration) {
+	delete the_read_PTR;
 	return NULL;
+    }
 
     if (invalid_file_format)
     {
@@ -1012,9 +1014,9 @@ static PyObject * ktable_consume(PyObject * self, PyObject * args)
 
   ktable->consume_string(long_str);
 
-  unsigned int n_consumed = strlen(long_str) - ktable->ksize() + 1;
+  size_t n_consumed = strlen(long_str) - ktable->ksize() + 1;
 
-  return PyInt_FromLong(n_consumed);
+  return PyInt_FromSize_t(n_consumed);
 }
 
 static PyObject * ktable_get(PyObject * self, PyObject * args)
@@ -1028,7 +1030,7 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  unsigned long count = 0;
+  ExactCounterType count = 0;
 
   if(PyLong_Check(arg)) {
     HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
@@ -1041,7 +1043,7 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
     count = ktable->get_count(s.c_str());
   }
 
-  return PyInt_FromLong(count);
+  return PyLong_FromUnsignedLongLong(count);
 }
 
 static PyObject * ktable__getitem__(PyObject * self, Py_ssize_t index)
@@ -1051,7 +1053,7 @@ static PyObject * ktable__getitem__(PyObject * self, Py_ssize_t index)
 
   khmer::ExactCounterType count = ktable->get_count(index);
 
-  return PyInt_FromLong(count);
+  return PyLong_FromUnsignedLongLong(count);
 }
 
 static int ktable__contains__( PyObject * self, PyObject * val )
@@ -1097,7 +1099,7 @@ static PyObject * ktable_max_hash(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(ktable->max_hash());
+  return PyLong_FromUnsignedLongLong(ktable->max_hash());
 }
 
 static PyObject * ktable_n_entries(PyObject * self, PyObject * args)
@@ -1109,7 +1111,7 @@ static PyObject * ktable_n_entries(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(ktable->n_entries());
+  return PyLong_FromUnsignedLongLong(ktable->n_entries());
 }
 
 Py_ssize_t ktable__len__(PyObject * self)
@@ -1396,7 +1398,7 @@ static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
 
   khmer::HashIntoType n = counting->n_occupied(start, stop);
 
-  return PyInt_FromLong(n);
+  return PyLong_FromUnsignedLongLong(n);
 }
 
 static PyObject * hash_n_entries(PyObject * self, PyObject * args)
@@ -1408,7 +1410,7 @@ static PyObject * hash_n_entries(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(counting->n_entries());
+  return PyLong_FromUnsignedLongLong(counting->n_entries());
 }
 
 static PyObject * hash_count(PyObject * self, PyObject * args)
@@ -1831,7 +1833,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
       return NULL;
   }
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
   }
 
   delete[] dist;
@@ -1867,11 +1869,11 @@ static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
   
   PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
   if (x == NULL) {
-      delete dist;
+      delete[] dist;
       return NULL;
   }
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(dist[i]));
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
   }
 
   delete[] dist;
@@ -1904,7 +1906,7 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
   }
 
   for (int i = 0; i < max_read_len; i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(counts[i]));
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(counts[i]));
   }
 
   delete counts;
@@ -2025,7 +2027,7 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
 
   PyObject * x = PyList_New(ts.size());
   for (unsigned int i = 0; i < ts.size(); i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(ts[i]));
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(ts[i]));
   }
 
   return x;
@@ -2180,7 +2182,7 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     
     khmer::HashIntoType n = hashbits->n_kmers(start, stop);
     
-    return PyInt_FromLong(n);
+    return PyLong_FromUnsignedLongLong(n);
 }
 
 
@@ -2242,7 +2244,7 @@ static PyObject * hashbits_n_occupied(PyObject * self, PyObject * args)
 
   khmer::HashIntoType n = hashbits->n_occupied(start, stop);
 
-  return PyInt_FromLong(n);
+  return PyLong_FromUnsignedLongLong(n);
 }
 
 static PyObject * hashbits_n_tags(PyObject * self, PyObject * args)
@@ -2486,7 +2488,7 @@ static PyObject * hashbits_calc_connected_graph_size(PyObject * self, PyObject *
 				      break_on_circum);
   Py_END_ALLOW_THREADS
 
-  return PyInt_FromLong(size);
+  return PyLong_FromUnsignedLongLong(size);
 }
 
 static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
@@ -3670,10 +3672,10 @@ static PyObject * hashbits_trim_on_density_explosion(PyObject * self, PyObject *
   khmer::Hashbits * hashbits = me->hashbits;
 
   const char * seq = NULL;
-  unsigned long radius = 0;
-  unsigned long max_volume = 0;
+  unsigned int radius = 0;
+  unsigned int max_volume = 0;
 
-  if (!PyArg_ParseTuple(args, "skk", &seq, &radius, &max_volume)) {
+  if (!PyArg_ParseTuple(args, "sII", &seq, &radius, &max_volume)) {
     return NULL;
   }
 
@@ -3750,7 +3752,7 @@ static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
 
   PyObject * x = PyList_New(ts.size());
   for (unsigned int i = 0; i < ts.size(); i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(ts[i]));
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(ts[i]));
   }
 
   return x;
