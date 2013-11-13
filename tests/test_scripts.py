@@ -1095,3 +1095,24 @@ def test_split_paired_reads_2_fq():
         assert r.sequence == q.sequence
         assert r.accuracy == q.accuracy
     assert n > 0
+
+def test_sample_reads_randomly():
+    infile = utils.get_temp_filename('test.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+
+    script = scriptpath('sample-reads-randomly.py')
+    args = ['-N', '10', '-R', '1'] # fix random number seed for reproducibility
+    args.append('test.fq')
+    runscript(script, args, in_dir)
+
+    outfile = infile + '.subset'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([ r.name for r in screed.open(outfile) ])
+    assert seqs == set(['895:1:1:1326:7273', '895:1:1:1373:4848',
+                        '895:1:1:1264:15854', '895:1:1:1338:15407',
+                        '895:1:1:1327:15301', '895:1:1:1265:2265',
+                        '895:1:1:1327:13028', '895:1:1:1368:4434',
+                        '895:1:1:1335:19932', '895:1:1:1340:19387'])
