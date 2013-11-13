@@ -1121,3 +1121,15 @@ def test_sample_reads_randomly():
                         '895:1:1:1327:15301', '895:1:1:1265:2265',
                         '895:1:1:1327:13028', '895:1:1:1368:4434',
                         '895:1:1:1335:19932', '895:1:1:1340:19387'])
+
+def test_sweep_reads_by_partition_buffered():
+    readfile = utils.get_temp_filename('reads.fa')
+    contigfile = utils.get_temp_filename('contigs.fp')
+    in_dir = os.path.dirname(infile)
+    
+    shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)    
+
+    script = scriptpath('sweep-reads-by-partition-buffered.py')
+    args = ['-o', 'test', '-i', contigfile, readfile]
+
