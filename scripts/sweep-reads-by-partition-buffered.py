@@ -30,6 +30,10 @@ DEFAULT_NUM_BUFFERS=50000
 DEFAULT_BUFFER_SIZE=1000000
 DEFAULT_NUM_PARTITIONS=100000
 DEFAULT_OUT_PREF='reads_'
+DEFAULT_RANGE=-1
+
+MIN_HSIZE=4e7
+MIN_KSIZE=21
 
 # little class to store sequence information for the buffering class
 class Seq:
@@ -59,15 +63,15 @@ class Seq:
 # we should expect the mean buffer size to be 10 reads
 class ReadBuffer:
 
-    def __init__(self, max_buffers, max_reads, est_files, output_pref):
+    def __init__(self, max_buffers, max_size, est_files, output_pref):
         self.buffers = {}
         self.buffer_counts = {}
         self.max_buffers = max_buffers
-        self.max_reads = max_reads
+        self.max_size = max_size
 
         self.est_files = est_files
         self.output_pref = output_pref
-        self.buffer_flush = self.max_reads / self.est_files
+        self.buffer_flush = self.max_size / self.est_files
 
         self.cur_reads = 0
         self.cur_files = 0
@@ -89,7 +93,7 @@ class ReadBuffer:
             self.buffers[color] = [seq]
             self.buffer_counts[color] = 1
         self.cur_reads += 1
-        if self.cur_reads > self.max_reads:
+        if self.cur_reads > self.max_size:
             self.flush_all()
         if len(self.buffers) > self.max_buffers:
             #self.clean_buffers(2)
@@ -138,7 +142,8 @@ def main():
 
     parser = build_construct_args()
     parser.add_argument('-i', '--input_fastp',dest='input_fastp')
-    parser.add_argument('-r', '--traversal_range', type=int, dest='traversal_range')
+    parser.add_argument('-r', '--traversal_range', type=int, dest='traversal_range', \
+                        default=DEFAULT_RANGE)
     parser.add_argument('-b', '--buffer_size', dest='buffer_size', type=int, \
                         default=DEFAULT_BUFFER_SIZE)
     parser.add_argument('-e', '--files_estimate', dest='files_estimate', type=int, \
@@ -150,6 +155,15 @@ def main():
     parser.add_argument('input_files', nargs='+')
     args = parser.parse_args()
     
+   
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    if HT_SIZE < MIN_HSIZE:
+        HT_SIZE = MIN_HSIZE
+    if K < MIN_KSIZE:
+        K = MIN_KSIZE
+    N_HT = args.n_hashes
+
     if not args.quiet:
         if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
             print >>sys.stderr, \
@@ -159,20 +173,16 @@ def main():
 
         print >>sys.stderr, '\nPARAMETERS:'
         print >>sys.stderr, \
-            ' - kmer size =    {ksize:d} \t\t(-k)'.format(ksize=args.ksize)
+            ' - kmer size =    {ksize:d} \t\t(-k)'.format(ksize=K)
         print >>sys.stderr, \
             ' - n hashes =     {nhash:d} \t\t(-N)'.format(nhash=args.n_hashes)
         print >>sys.stderr, \
-            ' - min hashsize = {mh:-5.2g} \t(-x)'.format(mh=args.min_hashsize)
+            ' - min hashsize = {mh:-5.2g} \t(-x)'.format(mh=HT_SIZE)
         print >>sys.stderr, ''
         print >>sys.stderr, \
             'Estimated memory usage is {prod:.2g} bytes \
             (n_hashes x min_hashsize / 8)'.format(prod=args.n_hashes*args.min_hashsize/8)
         print >>sys.stderr, '-' * 8
-    
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
     
     traversal_range = args.traversal_range
     input_fastp = args.input_fastp
@@ -235,7 +245,6 @@ def main():
                 
                 colors = ht.sweep_color_neighborhood(seq, traversal_range)
                 color_number_dist.append(len(colors))
-                SeqOb = Seq
                 if colors:
                     n_colored += 1
                     if len(colors) > 1:
