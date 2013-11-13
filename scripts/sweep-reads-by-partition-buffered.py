@@ -1,4 +1,16 @@
 #! /usr/bin/python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
+
+"""
+Find all reads connected to the given contigs on a per-partition basis.
+
+% python scripts/normalize-by-median.py -r <range> -i <contigs fastp> \
+<reads1> <reads2> ... <readsN>
+"""
 
 import screed
 import sys
@@ -6,6 +18,11 @@ import argparse
 import time
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+
+DEFAULT_NUM_BUFFERS=50000
+DEFAULT_BUFFER_SIZE=1000000
+DEFAULT_NUM_PARTITIONS=100000
+DEFAULT_OUT_PREF='reads_'
 
 # little class to store sequence information for the buffering class
 class Seq:
@@ -24,7 +41,7 @@ class Seq:
 # we should expect the mean buffer size to be 10 reads
 class ReadBuffer:
 
-    def __init__(self, max_buffers=10000, max_reads=1000000, est_files=100000, output_pref='reads_'):
+    def __init__(self, max_buffers, max_reads, est_files, output_pref):
         self.buffers = {}
         self.buffer_counts = {}
         self.max_buffers = max_buffers
@@ -93,10 +110,14 @@ def main():
     parser = build_construct_args()
     parser.add_argument('-i', '--input_fastp',dest='input_fastp')
     parser.add_argument('-r', '--traversal_range', type=int, dest='traversal_range')
-    parser.add_argument('-b', '--buffer_size', dest='buffer_size', type=int)
-    parser.add_argument('-e', '--files_estimate', dest='files_estimate', type=int)
-    parser.add_argument('-o', '--output_prefix', dest='output_prefix')
-    parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int)
+    parser.add_argument('-b', '--buffer_size', dest='buffer_size', type=int, \
+                        default=DEFAULT_BUFFER_SIZE)
+    parser.add_argument('-e', '--files_estimate', dest='files_estimate', type=int, \
+                        default=DEFAULT_NUM_PARTITIONS)
+    parser.add_argument('-o', '--output_prefix', dest='output_prefix',
+                        default=DEFAULT_OUT_PREF)
+    parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int, \
+                        default=DEFAULT_NUM_BUFFERS)
     parser.add_argument('input_files', nargs='+')
     args = parser.parse_args()
     
