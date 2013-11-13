@@ -1292,6 +1292,7 @@ static PyObject * ktable_intersect(PyObject * self, PyObject * args)
   khmer_KTableObject * ktable_obj = (khmer_KTableObject *) \
     PyObject_New(khmer_KTableObject, &khmer_KTableType);
   if (ktable_obj == NULL) {
+      delete intersection;
       return NULL;
   }
   ktable_obj->ktable = intersection;
@@ -1826,6 +1827,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
   
   PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
   if (x == NULL) {
+      delete[] dist;
       return NULL;
   }
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
@@ -1865,6 +1867,7 @@ static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
   
   PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
   if (x == NULL) {
+      delete dist;
       return NULL;
   }
   for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
@@ -1872,7 +1875,6 @@ static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
   }
 
   delete dist;
-
   return x;
 }
 
