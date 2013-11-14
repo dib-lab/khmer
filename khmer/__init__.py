@@ -16,7 +16,7 @@ from _khmer import new_readaligner
 from _khmer import forward_hash, forward_hash_no_rc, reverse_hash
 from _khmer import set_reporting_callback
 
-###
+#
 
 
 def new_hashbits(k, starting_size, n_tables=2):
@@ -69,10 +69,11 @@ def calc_expected_collisions(ht):
 
     return fp_all
 
-###
+#
 
 
 class KmerCount(object):
+
     def __init__(self, size, report_zero=False):
         self._kt = new_ktable(size)
         self.report_zero = report_zero
