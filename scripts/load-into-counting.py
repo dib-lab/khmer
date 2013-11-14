@@ -18,7 +18,7 @@ import khmer
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
-###
+#
 
 
 def main():
@@ -44,7 +44,7 @@ def main():
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
 
-    ###
+    #
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)

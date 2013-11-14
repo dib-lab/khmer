@@ -20,6 +20,7 @@ import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
+
 def main():
     parser = build_construct_args(
         "Output k-mer abundance distribution (single file version).")
@@ -46,7 +47,7 @@ def main():
     HT_SIZE = args.min_hashsize
     N_HT = args.n_hashes
     n_threads = int(args.n_threads)
-    
+
     datafile = args.datafile
     histout = args.histout
 
@@ -83,6 +84,7 @@ def main():
         t.join()
 
     z_list = []
+
     def do_abundance_dist(r):
         z = ht.abundance_distribution_with_reads_parser(r, tracking)
         z_list.append(z)
