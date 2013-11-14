@@ -1156,5 +1156,6 @@ def test_sweep_reads_by_partition_buffered():
     print seqso
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
-    assert seqsm == set(['read4_multi\t0\t1'])
+    assert (seqsm == set(['read4_multi\t0\t1']) or \
+            seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
