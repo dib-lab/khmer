@@ -152,6 +152,7 @@ def main():
                         default=DEFAULT_OUT_PREF)
     parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int, \
                         default=DEFAULT_NUM_BUFFERS)
+    parser.add_argument('-d', '--debug', dest='debug', default=None)
     parser.add_argument('input_files', nargs='+')
     args = parser.parse_args()
     
@@ -193,6 +194,10 @@ def main():
     est = args.files_estimate
     input_files = args.input_files
 
+    debug = args.debug
+    if debug:
+        import yep
+
     output_buffer = ReadBuffer(max_buffers, buf_size, est, output_pref)
 
 	# file for multicolored reads, just keep this one around the whole time
@@ -212,6 +217,8 @@ def main():
 	# consume the partitioned fasta with which to color the graph
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
     print >>sys.stderr, 'consuming fastp...'
+    if debug:
+        yep.start(debug)
     ht.consume_partitioned_fasta_and_tag_with_colors(input_fastp)
 
     color_number_dist = []
@@ -260,7 +267,8 @@ def main():
 
     multi_fp.close()
     orphaned_fp.close()
-    
+    if debug:
+        yep.stop()
     if output_buffer.num_write_errors > 0 or output_buffer.num_file_errors > 0:
         print >>sys.stderr, 'WARNING: Sweep finished with errors!'
         print >>sys.stderr, '** {writee} reads not written'.format(writee=output_buffer.num_write_errors)
