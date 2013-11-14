@@ -297,8 +297,8 @@ def test_filter_abund_6_trim_high_abund_Z():
     assert len(seqs) == 2, seqs
 
     # untrimmed seq.
-    badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGGGA'
-    'TTTCCGGGCGG'
+    badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
+             'GATTTCCGGGCGG'
     assert badseq in seqs       # should be there, untrimmed
 
 
