@@ -1125,16 +1125,24 @@ def test_sample_reads_randomly():
 def test_sweep_reads_by_partition_buffered():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
-    in_dir = os.path.dirname(infile)
+    in_dir = os.path.dirname(contigfile)
     
-    shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)    
 
     script = scriptpath('sweep-reads-by-partition-buffered.py')
-    args = ['-o', 'test', '-i', contigfile, readfile]
+    args = ['-k', '25', '-o', 'test', '-i', contigfile, readfile]
     status, out, err = runscript(script, args, in_dir)
     
-    outfiles = ['test_0.fa', 'test_1.fa']
+    out1 = os.path.join(in_dir, 'test_0.fa')
+    out2 = os.path.join(in_dir, 'test_1.fa')
+    
+    print os.listdir(in_dir)
 
-    seqs1 = set([r.name for r in screed.open(outfiles[0])])
-    seqs2 = set([r.name for r in screed.open(outfiles[1])])
+    seqs1 = set([r.name for r in screed.open(out1)])
+    seqs2 = set([r.name for r in screed.open(out2)])
+    
+    print seqs1
+    print seqs2
+    assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
+    assert seqs2 == set(['read3_p1\t1'])
