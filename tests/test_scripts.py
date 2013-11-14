@@ -1131,9 +1131,13 @@ def test_sweep_reads_by_partition_buffered():
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)    
 
     script = scriptpath('sweep-reads-by-partition-buffered.py')
-    args = ['-k', '25', '-o', 'test', '-i', contigfile, readfile]
+    args = ['-k', '25', '-o', 'test', '-i', contigfile, readfile, 'junkfile.fa']
     status, out, err = runscript(script, args, in_dir)
     
+    # check if the bad file was skipped without issue
+    assert 'ERROR' in err
+    assert 'skipping' in err
+
     out1 = os.path.join(in_dir, 'test_0.fa')
     out2 = os.path.join(in_dir, 'test_1.fa')
     mout = os.path.join(in_dir, 'test_multi.fa')
