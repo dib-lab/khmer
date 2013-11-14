@@ -63,7 +63,7 @@ class Seq:
 # we should expect the mean buffer size to be 10 reads
 class ReadBuffer:
 
-    def __init__(self, max_buffers, max_size, est_files, output_pref):
+    def __init__(self, max_buffers, max_size, est_files, output_pref, outdir):
         self.buffers = {}
         self.buffer_counts = {}
         self.max_buffers = max_buffers
@@ -71,6 +71,7 @@ class ReadBuffer:
 
         self.est_files = est_files
         self.output_pref = output_pref
+        self.outdir = outdir
         self.buffer_flush = self.max_size / self.est_files
 
         self.cur_reads = 0
@@ -101,11 +102,12 @@ class ReadBuffer:
     
     def flush_buffer(self, color):
         fn = '{}_{}.fa'.format(self.output_pref, color)
+        fpath = os.path.join(self.outdir, fn)
         try:
-            outfp = open(fn, 'a')
+            outfp = open(fpath, 'a')
         except IOError as e:
             print >>sys.stderr, 'ERROR: {e}'.format(e=e)
-            print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fn)
+            print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fpath)
             self.num_file_errors += 1
         else:
             for read in self.buffers[color]:
@@ -187,6 +189,7 @@ def main():
     
     traversal_range = args.traversal_range
     input_fastp = args.input_fastp
+    outdir = os.path.dirname(input_fastp)
 
     max_buffers = args.max_buffers
     output_pref = args.output_prefix
@@ -198,16 +201,16 @@ def main():
     if debug:
         import yep
 
-    output_buffer = ReadBuffer(max_buffers, buf_size, est, output_pref)
+    output_buffer = ReadBuffer(max_buffers, buf_size, est, output_pref, outdir)
 
 	# file for multicolored reads, just keep this one around the whole time
-    multi_fn = '{}_multi.fp'.format(output_pref)
+    multi_fn = os.path.join(outdir, '{}_multi.fp'.format(output_pref))
     try:
         multi_fp = open(multi_fn, 'a')
     except IOError as e:
         print >>sys.stderr, 'ERROR: {e}'.format(e=e)
         print >>sys.stderr, '*** Failed to open {fn}'.format(multi_fn)
-    orphaned_fn = '{}_orphaned.fa'.format(output_pref)
+    orphaned_fn = os.path.join(outdir, '{}_orphaned.fa'.format(output_pref))
     try:
         orphaned_fp = open(orphaned_fn, 'a')
     except IOError as e:
