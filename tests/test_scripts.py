@@ -1136,13 +1136,21 @@ def test_sweep_reads_by_partition_buffered():
     
     out1 = os.path.join(in_dir, 'test_0.fa')
     out2 = os.path.join(in_dir, 'test_1.fa')
+    mout = os.path.join(in_dir, 'test_multi.fa')
+    oout = os.path.join(in_dir, 'test_orphaned.fa')
     
     print os.listdir(in_dir)
 
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
-    
+    seqsm = set([r.name for r in screed.open(mout)])
+    seqso = set([r.name for r in screed.open(oout)])    
+
     print seqs1
     print seqs2
+    print seqsm
+    print seqso
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
+    assert seqsm == set(['read4_multi\t0\t1'])
+    assert seqso == set(['read5_orphan'])
