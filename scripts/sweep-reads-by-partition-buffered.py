@@ -205,7 +205,7 @@ def main():
     output_buffer = ReadBuffer(max_buffers, buf_size, est, output_pref, outdir)
 
 	# file for multicolored reads, just keep this one around the whole time
-    multi_fn = os.path.join(outdir, '{}_multi.fp'.format(output_pref))
+    multi_fn = os.path.join(outdir, '{}_multi.fa'.format(output_pref))
     try:
         multi_fp = open(multi_fn, 'a')
     except IOError as e:
