@@ -27,6 +27,8 @@
 #include <queue>
 #include <memory>
 
+#define READ_ALIGNER_DEBUG 0
+
 namespace khmer {
 
   enum State { MATCH, INSERT_READ, INSERT_GRAPH };
@@ -44,6 +46,7 @@ namespace khmer {
     double score;
     double f_score;
     double h_score;
+    bool trusted;
 
     unsigned int length;
     
@@ -89,6 +92,7 @@ namespace khmer {
   struct Alignment {
     std::string graph_alignment;
     std::string read_alignment;
+    std::string trusted;
     double score;
     bool truncated;
   };
@@ -96,7 +100,9 @@ namespace khmer {
   // Constants for state transitions
   enum Transition { MM, MI, MD, IM, II, DM, DD, disallowed };
   // log probabilities for state transitions
-  static double trans_default[] = { log2(.98), log2(.01), log2(.01), log2(.99), log2(.01), log2(.99), log2(.01)};
+  static double trans_default[] = { log2(.9), log2(.05), log2(.05),
+				    log2(.95), log2(.05),
+				    log2(.95), log2(.05)};
   
   
   class ReadAligner {
