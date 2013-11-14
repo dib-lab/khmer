@@ -1132,4 +1132,9 @@ def test_sweep_reads_by_partition_buffered():
 
     script = scriptpath('sweep-reads-by-partition-buffered.py')
     args = ['-o', 'test', '-i', contigfile, readfile]
+    status, out, err = runscript(script, args, in_dir)
+    
+    outfiles = ['test_0.fa', 'test_1.fa']
 
+    seqs1 = set([r.name for r in screed.open(outfiles[0])])
+    seqs2 = set([r.name for r in screed.open(outfiles[1])])
