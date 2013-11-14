@@ -49,7 +49,7 @@ class Seq:
 
     def write(self, fp):
         try:
-            fp.write('\n>{}\t{}\n{}\n'.format(self.name, self.color, self.seq))
+            fp.write('>{}\t{}\n{}\n'.format(self.name, self.color, self.seq))
         except IOError:
             print >>sys.stderr, 'Error writing {seq} to {fn}'.format(seq=self, fn=fp)
             return 1
@@ -270,7 +270,7 @@ def main():
 
     # gotta output anything left in the buffers at the end!
     output_buffer.flush_all() 
-	total_t = time.clock() - total_t
+    total_t = time.clock() - total_t
 
     multi_fp.close()
     orphaned_fp.close()
