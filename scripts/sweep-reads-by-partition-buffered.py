@@ -265,8 +265,11 @@ def main():
                 else:
                     n_orphaned += 1
                     orphaned_fp.write('>{}\n{}\n'.format(name, seq))
+            output_buffer.flush_all()
             read_fp.close()
-    
+
+    # gotta output anything left in the buffers at the end!
+    output_buffer.flush_all() 
 	total_t = time.clock() - total_t
 
     multi_fp.close()
@@ -278,7 +281,7 @@ def main():
         print >>sys.stderr, '** {writee} reads not written'.format(writee=output_buffer.num_write_errors)
         print >>sys.stderr, '** {filee} errors opening files'.format(filee=output_buffer.num_file_errors)
 
-    print >>sys.stderr, 'swept {n_reads} for colors...'.format(n_reads=n)
+    print >>sys.stderr, 'swept {n_reads} for colors...'.format(n_reads=n_colored+n_mcolored+n_orphaned)
     print >>sys.stderr, '...with {nc} colored and {no} orphaned'.format(
                                     nc=n_colored, no=n_orphaned)
     print >>sys.stderr, '...and {nmc} multicolored'.format(nmc=n_mcolored)
