@@ -95,11 +95,10 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
             for record in batch:
                 if hasattr(record, 'accuracy'):
                     outfp.write(
-                        '@{name}\n{seq}\n+\n{acc}\n'.format(name=record.name,
-                                                            seq=
-                                                            record.sequence,
-                                                            acc=
-                                                            record.accuracy))
+                        '@{name}\n{seq}\n'
+                        '+\n{acc}\n'.format(name=record.name,
+                                            seq=record.sequence,
+                                            acc=record.accuracy))
                 else:
                     outfp.write(
                         '>{name}\n{seq}\n'.format(name=record.name,
