@@ -185,7 +185,7 @@ def main():
         print >>sys.stderr, ''
         print >>sys.stderr, \
             'Estimated memory usage is {prod:.2g} bytes \
-            (n_hashes x min_hashsize / 8)'.format(prod=args.n_hashes*args.min_hashsize/8)
+            (n_hashes x min_hashsize / 8)'.format(prod=args.n_hashes*HT_SIZE/8)
         print >>sys.stderr, '-' * 8
     
     traversal_range = args.traversal_range
