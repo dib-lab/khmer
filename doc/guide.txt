@@ -200,13 +200,13 @@ Iterative and independent normalization
 You can use --loadhash and --savehash to do iterative normalizations on
 multiple files in multiple steps. For example, break ::
 
-  normalize-by-median [ ... ] file1.fa file2.fa file3.fa
+  normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa
 
 into multiple steps like so::
 
-  normalize-by-median [ ... ] --savehash file1.kh file1.fa
-  normalize-by-median [ ... ] --loadhash file1.kh --savehash file2.kh file2.fa
-  normalize-by-median [ ... ] --loadhash file2.kh --savehash file3.kh file3.fa
+  normalize-by-median.py [ ... ] --savehash file1.kh file1.fa
+  normalize-by-median.py [ ... ] --loadhash file1.kh --savehash file2.kh file2.fa
+  normalize-by-median.py [ ... ] --loadhash file2.kh --savehash file3.kh file3.fa
 
 The results should be identical!
 
@@ -214,17 +214,17 @@ If you want to independently normalize multiple files for speed reasons, go
 ahead.  Just remember to do a combined normalization at the end.  For example,
 instead of ::
 
-  normalize-by-median [ ... ] file1.fa file2.fa file3.fa
+  normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa
 
 you could do ::
 
-  normalize-by-median [ ... ] file1.fa
-  normalize-by-median [ ... ] file2.fa
-  normalize-by-median [ ... ] file3.fa
+  normalize-by-median.py [ ... ] file1.fa
+  normalize-by-median.py [ ... ] file2.fa
+  normalize-by-median.py [ ... ] file3.fa
 
 and then do a final ::
 
-  normalize-by-median [ ... ] file1.fa.keep file2.fa.keep file3.fa.keep
+  normalize-by-median.py [ ... ] file1.fa.keep file2.fa.keep file3.fa.keep
 
 The results will not be identical, but should not differ
 significantly.  The multipass approach will take more total time but
