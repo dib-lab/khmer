@@ -7,12 +7,15 @@ import khmer
 
 import khmer_tst_utils as utils
 
+
 def teardown():
     utils.cleanup()
 
+
 class Test_ExactGraphFu(object):
+
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4**12)
+        self.ht = khmer.new_hashbits(12, 4 ** 12)
 
     def test_counts(self):
         ht = self.ht
@@ -21,7 +24,7 @@ class Test_ExactGraphFu(object):
         kmer = "TTAGGACTGCAC"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 69, x
-        
+
         kmer = "TGCGTTTCAATC"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 68, x
@@ -65,7 +68,7 @@ class Test_ExactGraphFu(object):
 
         x = ht.calc_connected_graph_size(word)
         assert x == 2
-        
+
     def test_graph_links_prev_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -102,9 +105,11 @@ class Test_ExactGraphFu(object):
         x = ht.calc_connected_graph_size(word)
         assert x == 2
 
+
 class Test_InexactGraphFu(object):
+
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4**8+1)
+        self.ht = khmer.new_hashbits(12, 4 ** 8 + 1)
 
     def test_graph_links_next_a(self):
         ht = self.ht
@@ -141,7 +146,7 @@ class Test_InexactGraphFu(object):
 
         x = ht.calc_connected_graph_size(word)
         assert x == 2
-        
+
     def test_graph_links_prev_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -178,9 +183,11 @@ class Test_InexactGraphFu(object):
         x = ht.calc_connected_graph_size(word)
         assert x == 2
 
-###
+#
+
 
 class Test_Partitioning(object):
+
     def test_output_unassigned(self):
         import screed
 
@@ -275,11 +282,13 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ K = 31
 
-###
+#
+
 
 class Test_PythonAPI(object):
+
     def test_ordered_connect(self):
-        ht = khmer.new_hashbits(20, 4**15+1)
+        ht = khmer.new_hashbits(20, 4 ** 15 + 1)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
@@ -289,16 +298,15 @@ class Test_PythonAPI(object):
         ppi = ht.find_all_tags(a[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 0, pid
-        
+
         print ht.consume(b)
         ppi = ht.find_all_tags(b[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 0, pid
-        
+
         print ht.consume(c)
         ppi = ht.find_all_tags(c[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 2, pid
 
-###
-
+#
