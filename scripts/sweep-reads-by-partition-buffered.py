@@ -21,6 +21,7 @@ are also handled -- we move on to the next read file if there is an error openin
 
 import screed
 import sys
+import os
 import argparse
 import time
 import khmer
@@ -239,7 +240,7 @@ def main():
             read_fp = screed.open(read_file)
         except IOError as e:
             print >>sys.stderr, 'ERROR:', e
-            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(read_file)
+            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(fn=read_file)
         else:
             for n, record in enumerate(read_fp):
                 if n % 50000 == 0:
