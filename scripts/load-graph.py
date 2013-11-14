@@ -50,7 +50,7 @@ def main():
     else:
         print 'We WILL build the tagset (for partitioning/traversal).'
 
-    ###
+    #
 
     print 'making hashtable'
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -65,7 +65,7 @@ def main():
     config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     for n, filename in enumerate(filenames):
-        
+
         rparser = khmer.ReadParser(filename, n_threads)
         threads = []
         print 'consuming input', filename

@@ -23,7 +23,7 @@ import os
 import khmer
 import argparse
 
-###
+#
 
 
 def main():

@@ -24,7 +24,7 @@ import os
 import math
 
 
-###
+#
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
 DEFAULT_HASHSIZE = 1e6
