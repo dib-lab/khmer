@@ -23,6 +23,8 @@ DEFAULT_MAX_ERROR_REGION = 40
 
 def main():
     parser = build_counting_multifile_args()
+    parser.add_argument("--trusted-cov", dest="trusted_cov", type=int, default=2)
+    parser.add_argument("--theta", type=float, default=1.0)
     args = parser.parse_args()
 
     counting_ht = args.input_table
@@ -34,7 +36,7 @@ def main():
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
-    aligner = khmer.new_readaligner(ht, 2, 1.0) # counting hash, trusted kmer coverage cutoff, bits theta (threshold value for terminating unproductive alignemnts)
+    aligner = khmer.new_readaligner(ht, args.trusted_cov, args.theta) # counting hash, trusted kmer coverage cutoff, bits theta (threshold value for terminating unproductive alignemnts)
     
     ### the filtering loop
     for infile in infiles:
