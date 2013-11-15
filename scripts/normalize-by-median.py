@@ -158,7 +158,7 @@ def main():
             'Estimated memory usage is {prod:.2g} bytes \
             (n_hashes x min_hashsize)'.format(prod=args.n_hashes*args.min_hashsize)
         print >>sys.stderr, '-' * 8
-        if args.spare_distance:
+        if args.sparse_distance:
             print >>sys.stderr, 'Sparse median is ON using d=', args.sparse_distance
 
     K = args.ksize
