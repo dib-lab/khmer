@@ -1641,6 +1641,31 @@ static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
+static PyObject * hash_get_sparse_median_count(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * long_str;
+  unsigned int distance;
+
+  if (!PyArg_ParseTuple(args, "si", &long_str, &distance)) {
+    return NULL;
+  }
+
+  if (strlen(long_str) < counting->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+		    "string length must >= the hashtable k-mer size");
+    return NULL;
+  }
+
+  khmer::BoundedCounterType med = 0;
+
+  counting->get_sparse_median_count(long_str, med, distance);
+
+  return Py_BuildValue("i", med);
+}
+
 static PyObject * hash_get_kadian_count(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -2056,6 +2081,7 @@ static PyMethodDef khmer_counting_methods[] = {
   { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
   { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
   { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
+  { "get_sparse_median_count", hash_get_sparse_median_count, METH_VARARGS, "" },
   { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
   { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },

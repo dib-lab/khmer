@@ -357,7 +357,9 @@ namespace khmer {
 			  BoundedCounterType &median,
 			  float &average,
 			  float &stddev);
-
+    void get_sparse_median_count(const std::string &s,
+                                BoundedCounterType &median,
+				unsigned int &distance);
   };
 };
 
