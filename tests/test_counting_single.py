@@ -239,7 +239,7 @@ def test_64bitshift():
     assert 0 < kh.get_min_count(substr), kh.get_min_count(substr)
 
 
-@attr('known_failing-lowmem')
+@attr('highmem')
 def test_64bitshift_2():
     kh = khmer.new_hashtable(25, 4 ** 10)
     fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"
@@ -250,7 +250,7 @@ def test_64bitshift_2():
         assert kh.get(substr) > 0
 
 
-@attr('known_failing-lowmem')
+@attr('highmem')
 def test_very_short_read():
     short_filename = utils.get_test_data('test-short.fa')
     kh = khmer.new_hashtable(9, 4 ** 4 + 1)
@@ -276,7 +276,7 @@ class Test_ConsumeString(object):
         n = self.kh.consume('AACT')
         assert self.kh.n_occupied() == 2
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_abundance_by_pos(self):
         kh = self.kh
 
@@ -296,7 +296,7 @@ class Test_ConsumeString(object):
         assert dist[2] == 1
         assert sum(dist) == 2
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_abundance_by_pos_bigcount(self):
         kh = self.kh
         kh.set_use_bigcount(True)       # count past MAX_COUNT
@@ -364,7 +364,7 @@ class Test_AbundanceDistribution(object):
         A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_fasta(A_filename)
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')
 
