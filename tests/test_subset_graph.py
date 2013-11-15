@@ -191,7 +191,7 @@ class Test_RandomData(object):
 
 class Test_SaveLoadPmap(object):
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_save_load_merge(self):
         ht = khmer.new_hashbits(20, 4 ** 14 + 1)
         filename = utils.get_test_data('test-graph2.fa')
@@ -224,7 +224,7 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_save_load_merge_2(self):
         ht = khmer.new_hashbits(20, 4 ** 14 + 1)
         filename = utils.get_test_data('random-20-a.fa')
@@ -255,7 +255,7 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_save_merge_from_disk(self):
         ht = khmer.new_hashbits(20, 4 ** 14 + 1)
         filename = utils.get_test_data('test-graph2.fa')
@@ -285,7 +285,7 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_save_merge_from_disk_2(self):
         ht = khmer.new_hashbits(20, 4 ** 14 + 1)
         filename = utils.get_test_data('random-20-a.fa')

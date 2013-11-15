@@ -23,7 +23,7 @@ def load_fa_seq_names(filename):
 
 class Test_Filter(object):
 
-    @attr('known_failing-lowmem')
+    @attr('highmem')
     def test_abund(self):
         ht = khmer.new_hashtable(10, 4 ** 10)
 
@@ -46,7 +46,7 @@ class Test_Filter(object):
         fd.close()
 
 
-@attr('known_failing-lowmem')
+@attr('highmem')
 def test_filter_sodd():
     K = 32
     HASHTABLE_SIZE = int(8e7)
