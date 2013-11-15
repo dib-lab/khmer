@@ -8,6 +8,7 @@ import khmer
 from screed.fasta import fasta_iter
 
 import khmer_tst_utils as utils
+from nose.plugins.attrib import attr
 
 
 def teardown():
@@ -132,6 +133,7 @@ def test_bloom_c_2():  # simple one
     assert ht2.n_unique_kmers() == 3
 
 
+@attr('known_failing-lowmem')
 def test_filter_if_present():
     ht = khmer.new_hashbits(32, 1e6, 2)
 
@@ -147,6 +149,7 @@ def test_filter_if_present():
     assert records[0]['name'] == '3'
 
 
+@attr('known_failing-lowmem')
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.new_hashbits(32, 1, 1)
@@ -172,6 +175,7 @@ def test_combine_pe():
     assert ht.count_partitions() == (1, 0)
 
 
+@attr('known_failing-lowmem')
 def test_load_partitioned():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.new_hashbits(32, 1, 1)
@@ -189,6 +193,7 @@ def test_load_partitioned():
     assert ht.get(s3)
 
 
+@attr('known_failing-lowmem')
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.new_hashbits(4, 1e6, 2)
@@ -201,6 +206,7 @@ def test_count_within_radius_simple():
     assert n == 1
 
 
+@attr('known_failing-lowmem')
 def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
     ht = khmer.new_hashbits(20, 1e6, 4)
@@ -215,6 +221,7 @@ def test_count_within_radius_big():
     assert n == 39
 
 
+@attr('known_failing-lowmem')
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.new_hashbits(4, 1e6, 2)
@@ -226,6 +233,7 @@ def test_count_kmer_degree():
     assert ht.kmer_degree('TAAA') == 1
 
 
+@attr('known_failing-lowmem')
 def test_find_radius_for_volume():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.new_hashbits(4, 1e6, 2)
@@ -299,6 +307,7 @@ def test_save_load_tagset_noclear():
     assert len(data) == 30, len(data)
 
 
+@attr('known_failing-lowmem')
 def test_stop_traverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -320,6 +329,7 @@ def test_stop_traverse():
     assert n == 2, n
 
 
+@attr('known_failing-lowmem')
 def test_tag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -348,6 +358,7 @@ def test_tag_across_stoptraverse():
     assert n == 1, n
 
 
+@attr('known_failing-lowmem')
 def test_notag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -450,6 +461,7 @@ def test_extract_unique_paths_4():
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
+@attr('known_failing-lowmem')
 def test_find_unpart():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -472,6 +484,7 @@ def test_find_unpart():
     assert n == 1, n                     # all sequences connect
 
 
+@attr('known_failing-lowmem')
 def test_find_unpart_notraverse():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -494,6 +507,7 @@ def test_find_unpart_notraverse():
     assert n == 99, n                    # all sequences disconnected
 
 
+@attr('known_failing-lowmem')
 def test_find_unpart_fail():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd

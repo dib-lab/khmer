@@ -7,11 +7,13 @@ import khmer
 import screed
 
 import khmer_tst_utils as utils
+from nose.plugins.attrib import attr
 
 # Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
 # which the last 79 bases are common between the 3 sequences.
 
 
+@attr('known_failing-lowmem')
 def test_fakelump_together():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -27,6 +29,7 @@ def test_fakelump_together():
 # try loading stop tags from previously saved
 
 
+@attr('known_failing-lowmem')
 def test_fakelump_stop():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_stoptags_txt = utils.get_test_data('fakelump.fa.stoptags.txt')
@@ -46,6 +49,7 @@ def test_fakelump_stop():
 # check specific insertion of stop tag
 
 
+@attr('known_failing-lowmem')
 def test_fakelump_stop2():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -63,6 +67,7 @@ def test_fakelump_stop2():
 # try repartitioning
 
 
+@attr('known_failing-lowmem')
 def test_fakelump_repartitioning():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
