@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
@@ -18,6 +19,18 @@ from os import (
 )
 
 from subprocess import call
+
+# strip out -Wstrict-prototypes; a hack suggested by
+# http://stackoverflow.com/a/9740721
+# proper fix coming in http://bugs.python.org/issue1222585
+# numpy has a "nicer" fix:
+# https://github.com/numpy/numpy/blob/master/numpy/distutils/ccompiler.py
+import os
+from distutils.sysconfig import get_config_vars
+(opt,) = get_config_vars('OPT')
+os.environ['OPT'] = " ".join(
+    flag for flag in opt.split() if flag != '-Wstrict-prototypes'
+)
 
 zlibdir = 'lib/zlib'
 bzip2dir = 'lib/bzip2'

@@ -4,6 +4,7 @@ from cStringIO import StringIO
 from screed.fasta import fasta_iter
 from screed.fastq import fastq_iter
 import Queue
+from nose.plugins.attrib import attr
 
 
 def load_records(stringio_fp):
