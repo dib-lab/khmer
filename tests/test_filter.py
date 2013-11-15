@@ -5,6 +5,7 @@
 #
 import khmer
 from screed.fasta import fasta_iter
+from nose.plugins.attrib import attr
 
 import khmer_tst_utils as utils
 
@@ -22,6 +23,7 @@ def load_fa_seq_names(filename):
 
 class Test_Filter(object):
 
+    @attr('highmem')
     def test_abund(self):
         ht = khmer.new_hashtable(10, 4 ** 10)
 
@@ -44,6 +46,7 @@ class Test_Filter(object):
         fd.close()
 
 
+@attr('highmem')
 def test_filter_sodd():
     K = 32
     HASHTABLE_SIZE = int(8e7)

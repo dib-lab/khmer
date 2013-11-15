@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 import khmer
+from nose.plugins.attrib import attr
 
 
 def test_forward_hash():
