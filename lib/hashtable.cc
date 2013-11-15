@@ -303,7 +303,8 @@ unsigned int Hashtable::consume_high_abund_kmers(const std::string &s,
 void Hashtable::get_median_count(const std::string &s,
 				 BoundedCounterType &median,
 				 float &average,
-				 float &stddev)
+				 float &stddev,
+                 bool avg_and_dev)
 {
   BoundedCounterType count;
   std::vector<BoundedCounterType> counts;
@@ -325,20 +326,22 @@ void Hashtable::get_median_count(const std::string &s,
     return;
   }
 
-  average = 0;
-  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-       i != counts.end(); i++) {
-    average += *i;
-  }
-  average /= float(counts.size());
+  if (avg_and_dev) {
+    average = 0;
+    for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
+         i != counts.end(); i++) {
+      average += *i;
+    }
+    average /= float(counts.size());
 
-  stddev = 0;
-  for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-       i != counts.end(); i++) {
-    stddev += (float(*i) - average) * (float(*i) - average);
+    stddev = 0;
+    for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
+         i != counts.end(); i++) {
+      stddev += (float(*i) - average) * (float(*i) - average);
+    }
+    stddev /= float(counts.size());
+    stddev = sqrt(stddev);
   }
-  stddev /= float(counts.size());
-  stddev = sqrt(stddev);
 
   sort(counts.begin(), counts.end());
   median = counts[counts.size() / 2]; // rounds down
@@ -364,7 +367,6 @@ void Hashtable::get_sparse_median_count(const std::string &s,
     count = this->get_count(kmer);
     counts.push_back(count);
   }
-  assert(counts.size());
 
   if (!counts.size()) {
     median = 0;

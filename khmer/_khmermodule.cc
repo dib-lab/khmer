@@ -1610,9 +1610,15 @@ static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * long_str;
+  PyObject * avg_and_dev_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s|o", &long_str, avg_and_dev_o)) {
     return NULL;
+  }
+
+  bool avg_and_dev = true;
+  if (avg_and_dev_o && PyObject_Not(avg_and_dev_o)) {
+    avg_and_dev = false;
   }
 
   if (strlen(long_str) < counting->ksize()) {
@@ -1624,7 +1630,7 @@ static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
   khmer::BoundedCounterType med = 0;
   float average = 0, stddev = 0;
 
-  counting->get_median_count(long_str, med, average, stddev);
+  counting->get_median_count(long_str, med, average, stddev, avg_and_dev);
 
   return Py_BuildValue("iff", med, average, stddev);
 }
@@ -3771,9 +3777,15 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   char * long_str;
+  PyObject * avg_and_dev_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "s", &long_str)) {
+  if (!PyArg_ParseTuple(args, "s|O", &long_str, &avg_and_dev_o)) {
     return NULL;
+  }
+
+  bool avg_and_dev = true;
+  if (avg_and_dev_o && PyObject_Not(avg_and_dev_o)) {
+    avg_and_dev = false;
   }
 
   if (strlen(long_str) < hashbits->ksize()) {
@@ -3785,7 +3797,7 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
   khmer::BoundedCounterType med = 0;
   float average = 0, stddev = 0;
 
-  hashbits->get_median_count(long_str, med, average, stddev);
+  hashbits->get_median_count(long_str, med, average, stddev, avg_and_dev);
 
   return Py_BuildValue("iff", med, average, stddev);
 }
