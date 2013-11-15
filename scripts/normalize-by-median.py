@@ -81,7 +81,10 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
                 continue
 
             seq = record.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
+            if args.sparse_distance:
+                med = ht.get_sparse_median_count(seq, args.sparse_distance)
+            else:
+                med, _, _ = ht.get_median_count(seq)
 
             if med < DESIRED_COVERAGE:
                 ht.consume(seq)
@@ -129,6 +132,8 @@ def main():
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump hashtable every d files',
                         default=-1)
+    parser.add_argument('-j', '--sparse_distance', dest='sparse_distance',
+                        type=int, default=0)
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
@@ -153,6 +158,8 @@ def main():
             'Estimated memory usage is {prod:.2g} bytes \
             (n_hashes x min_hashsize)'.format(prod=args.n_hashes*args.min_hashsize)
         print >>sys.stderr, '-' * 8
+        if args.spare_distance:
+            print >>sys.stderr, 'Sparse median is ON using d=', args.sparse_distance
 
     K = args.ksize
     HT_SIZE = args.min_hashsize
