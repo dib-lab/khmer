@@ -28,6 +28,7 @@ def main():
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
     parser.add_argument('-l', '--loadhash', dest='loadhash',
                         default='')
+    parser.add_argument('--details-out', dest="details_out")
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
@@ -65,6 +66,11 @@ def main():
 
     aligner = khmer.new_readaligner(ht, args.trusted_cutoff, args.bits_theta)
             
+    if args.details_out != None:
+        details_out = open(args.details_out, "w")
+    else:
+        details_out = None
+
     total = 0
     discarded = 0
     for input_filename in filenames:
@@ -86,21 +92,35 @@ def main():
 
             ##
             score, graph_alignment, read_alignment, truncated = aligner.align(record.sequence)
-            print >>sys.stderr, "{0}\t{1:0.2f}\t{2}".format(record.name, score, truncated);
 
             keep = False
             if truncated:
                 keep = True
             else:
-                graph_seq = graph_alignment.replace('-', '')
-                mincount = ht.get_min_count(graph_seq)
-
-                if mincount < DESIRED_COVERAGE:
-                    keep = True
-                    seq = graph_seq
+                if False:
+                    graph_seq = graph_alignment.replace("-", "")
                 else:
-                    assert not keep
-                    
+                    graph_seq = ""
+                    for i in range(len(graph_alignment)):
+                        if graph_alignment[i] == "-":
+                            graph_seq += read_alignment[i]
+                        else:
+                            graph_seq += graph_alignment[i]
+
+                mincount = ht.get_min_count(graph_seq)
+                keep = True
+                seq = graph_seq
+
+                #if mincount < DESIRED_COVERAGE:
+                #    keep = True
+                #    seq = graph_seq
+                #else:
+                #    assert not keep
+
+            if details_out != None:
+                details_out.write("+{7}\t{0:0.2f}\t{3}\t{4}\nread:      {6}\ngraph_aln: {1}\nread_aln:  {2}\nstored_seq:{5}\n".format(score, graph_alignment, read_alignment, truncated, keep, seq, record.sequence, record.name))
+
+
             if keep:
                 ht.consume(seq)
                 outfp.write('>%s\n%s\n' % (record.name, seq))

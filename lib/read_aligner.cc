@@ -268,19 +268,18 @@ namespace khmer {
     int mid_kmer = num_kmers / 2;
 
     SearchStart start;
-    start.k_cov = -1;
+    start.k_cov = 0;
     
     for (unsigned int i = 0; i < num_kmers; i++) {
       std::string kmer = read.substr(i, k);
       
       unsigned int kCov = m_ch->get_count(kmer.c_str());
-      if(kCov >= m_trusted_cutoff) {
+      if(kCov > 0) {
 	if(start.k_cov < m_trusted_cutoff || abs(mid_kmer - i) < abs(mid_kmer - start.kmer_idx)) {
 	  start.kmer_idx = i;
 	  start.k_cov = kCov;
 	  start.kmer = kmer;
 	}
-	
       }
     }
 
