@@ -101,7 +101,7 @@ namespace khmer {
   // Constants for state transitions
   enum Transition { MM, MI, MD, IM, II, DM, DD, disallowed };
   // log probabilities for state transitions
-  static double trans_default[] = { log2(.9), log2(.05), log2(.05),
+  static double trans_default[] = { log2(.99998), log2(.00001), log2(.00001),
 				    log2(.95), log2(.05),
 				    log2(.95), log2(.05)};
   
@@ -136,7 +136,7 @@ namespace khmer {
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
-      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.985), log2(.01), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
+      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.945), log2(.05), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
   };
 }
 
