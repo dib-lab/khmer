@@ -30,9 +30,9 @@ def main():
     counting_ht = args.input_table
     infiles = args.input_filenames
 
-    print 'file with ht: %s' % counting_ht
+    print >>sys.stderr, 'file with ht: %s' % counting_ht
 
-    print 'loading hashtable'
+    print >>sys.stderr, 'loading hashtable'
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
@@ -40,19 +40,20 @@ def main():
     
     ### the filtering loop
     for infile in infiles:
-        print 'aligning', infile
+        print >>sys.stderr, 'aligning', infile
         for n, record in enumerate(screed.open(infile)):
 
             name = record['name']
             seq = record['sequence'].upper()
-            print name
-            print seq
+            print >>sys.stderr, name
+            print >>sys.stderr, seq
 
             score, graph_alignment, read_alignment, truncated = aligner.align(seq)
-            print score
-            print graph_alignment
-            print read_alignment
-            print truncated
+            print >>sys.stderr, score
+            print >>sys.stderr, graph_alignment
+            print >>sys.stderr, read_alignment
+            print >>sys.stderr, truncated
+            print ">{0}\n{1}".format(name, graph_alignment)
 
 if __name__ == '__main__':
     main()
