@@ -47,32 +47,33 @@ def build_counting_multifile_args():
     return parser
 
 
-def report_on_config( args ):
+def report_on_config(args):
     """
-        Summarizes the configuration produced by the command-line arguments 
+        Summarizes the configuration produced by the command-line arguments
         made available by this module.
     """
 
     from khmer.utils import print_error
 
-    if args.quiet: return
+    if args.quiet:
+        return
 
-    print_error( "\nPARAMETERS:" )
-    print_error( " - kmer size =    {0} \t\t(-k)".format( args.ksize ) )
-    print_error( " - n hashes =     {0} \t\t(-N)".format( args.n_hashes ) )
+    print_error("\nPARAMETERS:")
+    print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
+    print_error(" - n hashes =     {0} \t\t(-N)".format(args.n_hashes))
     print_error(
-        " - min hashsize = {0:5.2g} \t(-x)".format( args.min_hashsize )
+        " - min hashsize = {0:5.2g} \t(-x)".format(args.min_hashsize)
     )
-    print_error( "" )
+    print_error("")
     print_error(
         "Estimated memory usage is {0:.2g} bytes "
-        "(n_hashes x min_hashsize)".format( args.n_hashes * args.min_hashsize )
+        "(n_hashes x min_hashsize)".format(args.n_hashes * args.min_hashsize)
     )
-    print_error( "-" * 8 )
+    print_error("-" * 8)
 
     if DEFAULT_MIN_HASHSIZE == args.min_hashsize:
         print_error(
-            "** WARNING: hashsize is default!  " 
+            "** WARNING: hashsize is default!  "
             "You absodefly want to increase this!\n** "
             "Please read the docs!"
         )

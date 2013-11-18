@@ -32,16 +32,19 @@ def batchwise(t, size):
     return izip(*[it] * size)
 
 # Returns true if the pair of records are properly pairs
+
+
 def validpair(r0, r1):
     return r0.name[-1] == "1" and \
         r1.name[-1] == "2" and \
         r0.name[0:-1] == r1.name[0:-1]
 
+
 def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
 
     DESIRED_COVERAGE = args.cutoff
     K = ht.ksize()
-    
+
     # In paired mode we read two records at a time
     batch_size = 1
     if args.paired:
@@ -54,7 +57,7 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
             input_filename), batch_size)):
         if n > 0 and n % 100000 == 0:
             print '... kept {kept} of {total} or {perc:2}%'.format(
-                kept=total-discarded, total=total,
+                kept=total - discarded, total=total,
                 perc=int(100. - discarded / float(total) * 100.))
             print '... in file', input_filename
 
@@ -91,16 +94,20 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
         if passed_length and passed_filter:
             for record in batch:
                 if hasattr(record, 'accuracy'):
-                    outfp.write('@{name}\n{seq}\n+\n{acc}\n'.format(name=record.name,
-                                                          seq=record.sequence,
-                                                          acc=record.accuracy))
+                    outfp.write(
+                        '@{name}\n{seq}\n'
+                        '+\n{acc}\n'.format(name=record.name,
+                                            seq=record.sequence,
+                                            acc=record.accuracy))
                 else:
                     outfp.write(
-                        '>{name}\n{seq}\n'.format(name=record.name, seq=record.sequence))
+                        '>{name}\n{seq}\n'.format(name=record.name,
+                                                  seq=record.sequence))
         else:
             discarded += batch_size
-    
+
     return total, discarded
+
 
 def handle_error(error, output_name, input_name, ht):
     print >>sys.stderr, '** ERROR:', error
@@ -112,6 +119,7 @@ def handle_error(error, output_name, input_name, ht):
         os.remove(output_name)
     except:
         print >>sys.stderr, '** ERROR: problem removing erroneous .keep file'
+
 
 def main():
     parser = build_construct_args()
@@ -151,7 +159,8 @@ def main():
         print >>sys.stderr, ''
         print >>sys.stderr, \
             'Estimated memory usage is {prod:.2g} bytes \
-            (n_hashes x min_hashsize)'.format(prod=args.n_hashes*args.min_hashsize)
+            (n_hashes x min_hashsize)'.format(prod=args.n_hashes
+                                              * args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
@@ -160,13 +169,13 @@ def main():
 
     report_fp = args.report_file
     filenames = args.input_filenames
-    force=args.force
+    force = args.force
     dump_frequency = args.dump_frequency
-    
+
     # list to save error files along with throwing exceptions
-    if force == True:
+    if force is True:
         corrupt_files = []
-    
+
     if args.loadhash:
         print 'loading hashtable from', args.loadhash
         ht = khmer.load_counting_hash(args.loadhash)
@@ -180,12 +189,12 @@ def main():
     for n, input_filename in enumerate(filenames):
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')
-        
+
         total_acc = 0
         discarded_acc = 0
-        
+
         try:
-            total_acc, discarded_acc = normalize_by_median(input_filename, 
+            total_acc, discarded_acc = normalize_by_median(input_filename,
                                                            outfp, ht, args,
                                                            report_fp)
         except IOError as e:
@@ -205,8 +214,8 @@ def main():
                 discarded += discarded_acc
                 print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
                     .format(inp=input_filename,
-                    kept=total-discarded, total=total,
-                    perc=int(100. - discarded / float(total) * 100.))
+                            kept=total - discarded, total=total,
+                            perc=int(100. - discarded / float(total) * 100.))
                 print 'output in', output_name
 
         if dump_frequency > 0 and n > 0 and n % dump_frequency == 0:
@@ -218,7 +227,6 @@ def main():
                 hashname = 'backup.ht'
                 print 'Nothing given for savehash, saving to', hashname
             ht.save(hashname)
-            
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
@@ -228,12 +236,12 @@ def main():
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(ht)
     print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
-    
+
     if force and len(corrupt_files) > 0:
         print >>sys.stderr, "** WARNING: Finished with errors!"
         print >>sys.stderr, "** IOErrors occurred in the following files:"
         print >>sys.stderr, "\t", " ".join(corrupt_files)
-    
+
     if fp_rate > 0.20:
         print >>sys.stderr, "**"
         print >>sys.stderr, "** ERROR: the counting hash is too small for"
