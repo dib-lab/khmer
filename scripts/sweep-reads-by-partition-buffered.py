@@ -81,6 +81,13 @@ class ReadBuffer:
         self.num_write_errors = 0
         self.num_file_errors = 0
 
+        print >>sys.stderr, '''Init new ReadBuffer [
+        Max Buffers: {num_bufs}
+        Max Reads: {max_reads}
+        Est. Files: {est_files}
+        ]'''.format(num_bufs=self.max_buffers, max_reads=self.max_size,
+                    est_files=self.est_files)
+
     def add_seq(self, seq):
         color = seq.color
         if color in self.buffers:
@@ -96,9 +103,11 @@ class ReadBuffer:
             self.buffer_counts[color] = 1
         self.cur_reads += 1
         if self.cur_reads > self.max_size:
+            print >>sys.stderr, '** Reached max num reads...'
             self.flush_all()
         if len(self.buffers) > self.max_buffers:
             #self.clean_buffers(2)
+            print >>sys.stderr, '** Reached max num buffers...'
             self.flush_all()
     
     def flush_buffer(self, color):
@@ -107,7 +116,7 @@ class ReadBuffer:
         try:
             outfp = open(fpath, 'a')
         except IOError as e:
-            print >>sys.stderr, 'ERROR: {e}'.format(e=e)
+            print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
             print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fpath)
             self.num_file_errors += 1
         else:
@@ -121,7 +130,7 @@ class ReadBuffer:
         del self.buffers[color]
 
     def flush_all(self):
-        print >>sys.stderr, '** reached max buffer size, flushing all to files...'
+        print >>sys.stderr, '*** Flushing all to files...'
         for color in self.buffers:
             self.flush_buffer(color)
         colors = self.buffers.keys()
@@ -209,13 +218,13 @@ def main():
     try:
         multi_fp = open(multi_fn, 'a')
     except IOError as e:
-        print >>sys.stderr, 'ERROR: {e}'.format(e=e)
+        print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
         print >>sys.stderr, '*** Failed to open {fn}'.format(multi_fn)
     orphaned_fn = os.path.join(outdir, '{}_orphaned.fa'.format(output_pref))
     try:
         orphaned_fp = open(orphaned_fn, 'a')
     except IOError as e:
-        print >>sys.stderr, 'ERROR: {e}'.format(e=e)
+        print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
         print >>sys.stderr, '*** Failed to open {fn}'.format(orphaned_fn)
 
 	# consume the partitioned fasta with which to color the graph
@@ -239,7 +248,7 @@ def main():
         try:
             read_fp = screed.open(read_file)
         except IOError as e:
-            print >>sys.stderr, 'ERROR:', e
+            print >>sys.stderr, '!! ERROR: !!', e
             print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(fn=read_file)
         else:
             for n, record in enumerate(read_fp):
@@ -253,22 +262,29 @@ def main():
                     start_t = time.clock()
                 seq = record.sequence
                 name = record.name
-                
-                colors = ht.sweep_color_neighborhood(seq, traversal_range)
-                color_number_dist.append(len(colors))
-                if colors:
-                    n_colored += 1
-                    if len(colors) > 1:
-                        multi_fp.write('>{}\t{}\n{}\n'.format(name, '\t'.join([str(c) for c in colors]), seq))
-                    else:
-                        output_buffer.add_seq(Seq(name, colors[0], seq))
+                try:
+                    colors = ht.sweep_color_neighborhood(seq, traversal_range)
+                except ValueError as e:
+                    print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
+                    print >>sys.stderr, 'Read length less than k-mer size'
                 else:
-                    n_orphaned += 1
-                    orphaned_fp.write('>{}\n{}\n'.format(name, seq))
+                    color_number_dist.append(len(colors))
+                    if colors:
+                        n_colored += 1
+                        if len(colors) > 1:
+                            multi_fp.write('>{}\t{}\n{}\n'.format(
+                                name, '\t'.join([str(c) for c in colors]), seq))
+                        else:
+                            output_buffer.add_seq(Seq(name, colors[0], seq))
+                    else:
+                        n_orphaned += 1
+                        orphaned_fp.write('>{}\n{}\n'.format(name, seq))
+            print >>sys.stderr, '** End of file {fn}...'.format(fn=read_file)
             output_buffer.flush_all()
             read_fp.close()
 
     # gotta output anything left in the buffers at the end!
+    print >>sys.stderr, '** End of run...'
     output_buffer.flush_all() 
     total_t = time.clock() - total_t
 
@@ -277,7 +293,7 @@ def main():
     if debug:
         yep.stop()
     if output_buffer.num_write_errors > 0 or output_buffer.num_file_errors > 0:
-        print >>sys.stderr, 'WARNING: Sweep finished with errors!'
+        print >>sys.stderr, '! WARNING: Sweep finished with errors !'
         print >>sys.stderr, '** {writee} reads not written'.format(writee=output_buffer.num_write_errors)
         print >>sys.stderr, '** {filee} errors opening files'.format(filee=output_buffer.num_file_errors)
 
