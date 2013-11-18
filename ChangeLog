@@ -1,3 +1,9 @@
+2013-10-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.7
+
+* the version number is now only stored in one place
+
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
 * Version 0.6.1
