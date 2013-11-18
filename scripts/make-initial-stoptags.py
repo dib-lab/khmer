@@ -29,12 +29,12 @@ DEFAULT_COUNTING_HT_N = 4                     # number of counting hash tables
 # k-mer has been visited more than EXCURSION_KMER_COUNT_THRESHOLD times,
 # we will mark it as BAD and make it a stop tag for traversal.
 
-## don't change these!
+# don't change these!
 EXCURSION_DISTANCE = 40
 EXCURSION_KMER_THRESHOLD = 200
 EXCURSION_KMER_COUNT_THRESHOLD = 5
 
-##
+#
 
 
 def main():

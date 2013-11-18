@@ -88,6 +88,52 @@ CLI reading:
 
    http://figshare.com/articles/tutorial_pdf/643388
 
+Python / C integration
+----------------------
+
+The Python extension that wraps the C++ core of khmer lives in
+khmer/_khmermodule.CC
+
+This wrapper code is tedious and annoying so we use a static analysis tool to
+check for correctness.
+
+https://gcc-python-plugin.readthedocs.org/en/latest/cpychecker.html
+
+Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev package
+
+Example usage:
+
+  CC="/home/mcrusoe/src/gcc-plugin-python/gcc-python-plugin/gcc-with-cpychecker
+--maxtrans=512" python setup.py build_ext 2>&1 | less
+
+False positives abound: ignore errors about the C++ standard library. This tool
+is primarily useful for reference count checking, error-handling checking, and
+format string checking.
+
+Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
+"AttributeError: 'NoneType' object has no attribute 'file'"
+
+Warnings to address: 
+
+"khmer/_khmermodule.cc:3109:1: note: this function is too complicated for the
+reference-count checker to fully analyze: not all paths were analyze"
+
+Adjust --maxtrans and re-run.
+
+khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
+Py_BuildValue with format code "i" [enabled by default]
+  argument 2 ("D.68937") had type
+    "long long unsigned int"
+  but was expecting
+    "int"
+  for format code "i"
+
+See below for a format string cheatsheet One also benefits by matching C type
+with the function signature used later. 
+
+"I" for unsinged int
+"K" for unsigned long long a.k.a khmer::HashIntoType.
+
 Upstream sources
 ----------------
 

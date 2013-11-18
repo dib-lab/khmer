@@ -20,7 +20,7 @@ from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-###
+#
 
 
 def new_hashbits(k, starting_size, n_tables=2):
@@ -73,10 +73,11 @@ def calc_expected_collisions(ht):
 
     return fp_all
 
-###
+#
 
 
 class KmerCount(object):
+
     def __init__(self, size, report_zero=False):
         self._kt = new_ktable(size)
         self.report_zero = report_zero
