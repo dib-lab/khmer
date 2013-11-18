@@ -1030,7 +1030,7 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  ExactCounterType count = 0;
+  khmer::ExactCounterType count = 0;
 
   if(PyLong_Check(arg)) {
     khmer::HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
@@ -3992,6 +3992,10 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
 
+  if (readaligner_obj == NULL) {
+      return NULL;
+  }
+
   readaligner_obj->aligner = new khmer::ReadAligner(ch->counting, trusted_cov_cutoff, bits_theta);
 
   return (PyObject *) readaligner_obj; 
@@ -4093,7 +4097,7 @@ static void khmer_hashbits_dealloc(PyObject* self)
 static PyObject * forward_hash(PyObject * self, PyObject * args)
 {
   const char * kmer;
-  WordLength ksize;
+  khmer::WordLength ksize;
 
   if (!PyArg_ParseTuple(args, "sb", &kmer, &ksize)) {
     return NULL;
@@ -4110,7 +4114,7 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
 static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 {
   const char * kmer;
-  WordLength ksize;
+  khmer::WordLength ksize;
 
   if (!PyArg_ParseTuple(args, "sb", &kmer, &ksize)) {
     return NULL;
@@ -4133,7 +4137,7 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 static PyObject * reverse_hash(PyObject * self, PyObject * args)
 {
   khmer::HashIntoType val;
-  WordLength ksize;
+  khmer::WordLength ksize;
   
   if (!PyArg_ParseTuple(args, "Kb", &val, &ksize)) {
     return NULL;
