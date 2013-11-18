@@ -4,6 +4,9 @@ all:
 install:
 	python setup.py install
 
+dist:
+	python setup.py sdist
+
 clean:
 	python setup.py clean --all
 	cd lib && make clean
