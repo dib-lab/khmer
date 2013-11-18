@@ -14,7 +14,8 @@ up to date.
 
 5. (Optional) Publish the new release on the testing PyPI server.
 `python setup.py register --repository https://testpypi.python.org/pypi`
-Change your PyPI credentials as documented in https://wiki.python.org/moin/testpypi
+Change your PyPI credentials as documented in
+https://wiki.python.org/moin/TestPyPI
 `python setup.py sdist upload -r https://testpypi.python.org/pypi`
 Test the release in a new virtualenv
 `pip install -i https://testpypi.python.org/pypi khmer`
