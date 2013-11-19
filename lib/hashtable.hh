@@ -182,52 +182,52 @@ namespace khmer {
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    // Does the given tag already have the given color?
-    bool _cmap_contains_color(const TagColorPtrMap& cmap,
+    // Does the given tag already have the given label?
+    bool _cmap_contains_label(const TagLabelPtrMap& cmap,
                         HashIntoType& kmer,
-                        Color& the_color)
+                        Label& the_label)
     {
-      std::pair<TagColorPtrMap::const_iterator, TagColorPtrMap::const_iterator> ret;
+      std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
       ret = cmap.equal_range(kmer);
-      for (TagColorPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-        if (*(it->second) == the_color) return true;
+      for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+        if (*(it->second) == the_label) return true;
       }
       return false;
     }
 
-    // Does the given color already have a tag associated with it?
-    bool _cmap_contains_tag(const ColorTagPtrMap& cmap,
-                            Color& the_color,
+    // Does the given label already have a tag associated with it?
+    bool _cmap_contains_tag(const LabelTagPtrMap& cmap,
+                            Label& the_label,
                             HashIntoType& kmer) {
-      std::pair<ColorTagPtrMap::const_iterator, ColorTagPtrMap::const_iterator> ret;
-      ret = cmap.equal_range(the_color);
-      for (ColorTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+      std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
+      ret = cmap.equal_range(the_label);
+      for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
         if(*(it->second) == kmer) return true;
       }
       return false;
     }
     
-    unsigned int _get_tag_colors(const HashIntoType& tag,
-                          const TagColorPtrMap& cmap,
-                          ColorPtrSet& found_colors) {
-        unsigned int num_colors = 0;
-        std::pair<TagColorPtrMap::const_iterator, TagColorPtrMap::const_iterator> ret;
+    unsigned int _get_tag_labels(const HashIntoType& tag,
+                          const TagLabelPtrMap& cmap,
+                          LabelPtrSet& found_labels) {
+        unsigned int num_labels = 0;
+        std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
         ret = cmap.equal_range(tag);
-        for (TagColorPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            found_colors.insert(it->second);
-            ++num_colors;
+        for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            found_labels.insert(it->second);
+            ++num_labels;
         }
-        return num_colors;
+        return num_labels;
     }
     
-    unsigned int _get_tags_from_color(const Color& color,
-                               const ColorTagPtrMap& cmap,
-                               TagPtrSet& colored_tags) {
+    unsigned int _get_tags_from_label(const Label& label,
+                               const LabelTagPtrMap& cmap,
+                               TagPtrSet& labeled_tags) {
         unsigned int num_tags = 0;
-        std::pair<ColorTagPtrMap::const_iterator, ColorTagPtrMap::const_iterator> ret;
-        ret = cmap.equal_range(color);
-        for (ColorTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            colored_tags.insert(it->second);
+        std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
+        ret = cmap.equal_range(label);
+        for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
+            labeled_tags.insert(it->second);
             ++num_tags;
         }
         return num_tags;
@@ -253,7 +253,7 @@ namespace khmer {
       partition = new SubsetPartition(this);
       _init_bitstuff();
       _all_tags_spin_lock = 0;
-      _tag_colors_spin_lock = 0;
+      _tag_labels_spin_lock = 0;
       
     }
 
@@ -367,15 +367,15 @@ namespace khmer {
     }
 
     uint32_t _all_tags_spin_lock;
-    uint32_t _tag_colors_spin_lock;
+    uint32_t _tag_labels_spin_lock;
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
-    TagColorPtrMap tag_colors;
-    ColorTagPtrMap color_tag_ptrs;
-    ColorPtrMap color_ptrs;
+    TagLabelPtrMap tag_labels;
+    LabelTagPtrMap label_tag_ptrs;
+    LabelPtrMap label_ptrs;
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
@@ -455,7 +455,7 @@ namespace khmer {
     // Partitioning stuff.
 
     unsigned int n_tags() const { return all_tags.size(); }
-    unsigned int n_colors() const { return color_ptrs.size(); }
+    unsigned int n_labels() const { return label_ptrs.size(); }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
@@ -486,13 +486,13 @@ namespace khmer {
 	void *		    callback_data   = NULL
     );
     
-    Color * check_and_allocate_color(Color new_color) {
-        Color * c;
-        if (color_ptrs.count(new_color)) {
-            c = color_ptrs[new_color];
+    Label * check_and_allocate_label(Label new_label) {
+        Label * c;
+        if (label_ptrs.count(new_label)) {
+            c = label_ptrs[new_label];
         } else {
-            c = new Color(new_color);
-            color_ptrs[*c] = c;
+            c = new Label(new_label);
+            label_ptrs[*c] = c;
         }
         return c;
     }
@@ -508,49 +508,49 @@ namespace khmer {
 					     CallbackFn callback = 0,
 					     void * callback_data = 0);
     
-    void consume_fasta_and_tag_with_colors(
+    void consume_fasta_and_tag_with_labels(
                         std::string const	  &filename,
                         unsigned int	  &total_reads,
                         unsigned long long  &n_consumed,
                         CallbackFn	  callback	  = NULL,
                         void *		  callback_data	  = NULL);
 
-    void consume_fasta_and_tag_with_colors(
+    void consume_fasta_and_tag_with_labels(
 	                read_parsers:: IParser *	    parser,
 	                unsigned int	    &total_reads,
 	                unsigned long long  &n_consumed,
 	                CallbackFn	    callback	    = NULL,
 	                void *		    callback_data   = NULL);
 	                
-    void consume_partitioned_fasta_and_tag_with_colors(const std::string &filename,
+    void consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
 					  unsigned int &total_reads,
 					  unsigned long long &n_consumed,
 					  CallbackFn callback = NULL,
 					  void * callback_datac = NULL);
 					  			  
-    void consume_sequence_and_tag_with_colors(const std::string& seq,
+    void consume_sequence_and_tag_with_labels(const std::string& seq,
 					unsigned long long& n_consumed,
-					Color& current_color,
+					Label& current_label,
 					SeenSet * new_tags = 0);
     
-    ColorPtrSet get_tag_colors(const HashIntoType& tag);
-    TagPtrSet get_color_tags(const Color& color);
+    LabelPtrSet get_tag_labels(const HashIntoType& tag);
+    TagPtrSet get_label_tags(const Label& label);
 
-    void link_tag_and_color(HashIntoType& kmer, Color& color);
+    void link_tag_and_label(HashIntoType& kmer, Label& label);
     
-    unsigned int sweep_sequence_for_colors(const std::string& seq,
-					ColorPtrSet& found_colors,
+    unsigned int sweep_sequence_for_labels(const std::string& seq,
+					LabelPtrSet& found_labels,
 					bool break_on_stoptags,
 					bool stop_big_traversals);
 					
-    unsigned int sweep_color_neighborhood(const std::string & seq,
-                                                  ColorPtrSet& found_colors,
+    unsigned int sweep_label_neighborhood(const std::string & seq,
+                                                  LabelPtrSet& found_labels,
                                                   unsigned int range,
                                                   bool break_on_stoptags,
                                                   bool stop_big_traversals);
                                                   			
-    void traverse_colors_and_resolve(const SeenSet& tagged_kmers,
-                                     ColorPtrSet& found_colors);
+    void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
+                                     LabelPtrSet& found_labels);
 
     void consume_fasta_and_traverse(const std::string &filename,
 				    unsigned int distance,
@@ -661,9 +661,9 @@ namespace khmer {
   __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
-  while(!__sync_bool_compare_and_swap( &_tag_colors_spin_lock, 0, 1));
+  while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));
 
 #define RELEASE_TAG_COLORS_SPIN_LOCK \
-  __sync_bool_compare_and_swap( &_tag_colors_spin_lock, 1, 0);
+  __sync_bool_compare_and_swap( &_tag_labels_spin_lock, 1, 0);
 
 #endif // HASHTABLE_HH
