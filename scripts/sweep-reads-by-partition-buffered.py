@@ -117,7 +117,7 @@ class ReadBuffer:
             outfp = open(fpath, 'a')
         except IOError as e:
             print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
-            print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fpath)
+            print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fn=fpath)
             self.num_file_errors += 1
         else:
             for read in self.buffers[color]:
@@ -139,6 +139,7 @@ class ReadBuffer:
         del colors
         assert self.cur_reads == 0
 
+    # experimental, doesn't work very well
     def clean_buffers(self, cutoff):
         print >>sys.stderr, '** flushing low-abundance buffers...'
         flushed = []
@@ -214,18 +215,18 @@ def main():
     output_buffer = ReadBuffer(max_buffers, buf_size, est, output_pref, outdir)
 
 	# file for multicolored reads, just keep this one around the whole time
-    multi_fn = os.path.join(outdir, '{}_multi.fa'.format(output_pref))
+    multi_fn = os.path.join(outdir, '{pref}_multi.fa'.format(pref=output_pref))
     try:
         multi_fp = open(multi_fn, 'a')
     except IOError as e:
         print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
-        print >>sys.stderr, '*** Failed to open {fn}'.format(multi_fn)
-    orphaned_fn = os.path.join(outdir, '{}_orphaned.fa'.format(output_pref))
+        print >>sys.stderr, '*** Failed to open {fn}'.format(fn=multi_fn)
+    orphaned_fn = os.path.join(outdir, '{pref}_orphaned.fa'.format(pref=output_pref))
     try:
         orphaned_fp = open(orphaned_fn, 'a')
     except IOError as e:
         print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
-        print >>sys.stderr, '*** Failed to open {fn}'.format(orphaned_fn)
+        print >>sys.stderr, '*** Failed to open {fn}'.format(fn=orphaned_fn)
 
 	# consume the partitioned fasta with which to color the graph
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
