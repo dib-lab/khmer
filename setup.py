@@ -102,7 +102,7 @@ setup_metadata = \
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
-        ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy'
+        ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
         ' Jason Pell, Jared Simpson, C. S. Welcher,'
         ' Qingpeng Zhang, and C. Titus Brown',
         "author_email": 'khmer-project@idyll.org',
@@ -112,8 +112,8 @@ setup_metadata = \
         # #additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
-        "install_requires": [ 'screed >= 0.7', 'argparse >= 1.2.1', ],
-        "setup_requires": [ 'nose >= 1.0', 'setuptools-git >= 0.3', 'sphinx', ],
+        "install_requires": ['screed >= 0.7', 'argparse >= 1.2.1', ],
+        "setup_requires": ['nose >= 1.0', 'sphinx', ],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
         #"platforms": '', # empty as is conveyed by the classifiers below

@@ -1,13 +1,13 @@
 all:
 	python setup.py build_ext -i
 
-install:
+install: FORCE
 	python setup.py install
 
-dist:
+dist: FORCE
 	python setup.py sdist
 
-clean:
+clean: FORCE
 	python setup.py clean --all
 	cd lib && make clean
 	cd tests && rm -rf khmertest_*
