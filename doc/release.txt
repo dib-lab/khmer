@@ -9,8 +9,8 @@ up to date.
 
 3. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-multi/
 
-4. Tag the branch with the new version number prefixed by the letter 'v':
-`git tag v0.7`
+4. Tag the branch with the new version number prefixed by the letter 'v',
+ example: `git tag v0.7`
 
 5. (Optional) Publish the new release on the testing PyPI server.
 `python setup.py register --repository https://testpypi.python.org/pypi`
@@ -20,13 +20,32 @@ https://wiki.python.org/moin/TestPyPI
 Test the release in a new virtualenv
 `pip install -i https://testpypi.python.org/pypi khmer`
 
-6. Publish the new release on PyPI (requires an authorized account)
+6. Not optional: manually test the release.
+
+  virtualenv testenv1
+  virtualenv testenv2
+  cd testenv1
+  source bin/activate
+  pip install -e git+git@github.com:ged-lab/khmer.git@master#egg=khmer
+  cd khmer* 
+  make dist
+  cp dist/khmer* ../../testenv2
+  cd ../../testenv2
+  deactivate
+  source bin/activate
+  pip install khmer*
+  tar xzf khmer*
+  cd khmer*
+  make dist
+  make test
+
+7. Publish the new release on PyPI (requires an authorized account)
 `python setup.py register sdist upload`
 
-7. Push the tags to github
+8. Push the tags to github
 `git push; git push --tags`
 
-8. Tweet about the new release. Optionally send email to khmer@lists.idyll.org
+9. Tweet about the new release. Optionally send email to khmer@lists.idyll.org
 
 Upstream sources
 ----------------
