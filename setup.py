@@ -6,7 +6,7 @@
 import ez_setup
 ez_setup.use_setuptools()
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools import Extension
 
 import versioneer
@@ -111,9 +111,10 @@ setup_metadata = \
         #http://docs.python.org/2/distutils/setupscript.html
         # #additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
-        "packages": find_packages(),
-        "install_requires": [ 'screed >= 0.7', 'argparse >= 1.2.1', ],
-        "setup_requires": [ 'nose >= 1.0', 'setuptools-git >= 1.0', 'sphinx', ],
+        "packages": ['khmer'],
+        "install_requires": ['screed >= 0.7', 'argparse >= 1.2.1', ],
+        "setup_requires": ['nose >= 1.0', 'setuptools-git >= 1.0', 'sphinx',
+                           'setuptools >= 1.4'],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
         #"platforms": '', # empty as is conveyed by the classifiers below
