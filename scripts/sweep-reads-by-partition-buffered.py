@@ -272,8 +272,6 @@ def main():
     output_buffer.flush_all() 
     total_t = time.clock() - total_t
 
-    multi_fp.close()
-    orphaned_fp.close()
     if debug:
         yep.stop()
     if output_buffer.num_write_errors > 0 or output_buffer.num_file_errors > 0:
