@@ -3818,21 +3818,21 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
-static PyObject * hashbits_get_color_dict(PyObject * self, PyObject * args) {
+static PyObject * hashbits_get_label_dict(PyObject * self, PyObject * args) {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hb = me->hashbits;
   
   PyObject * d = PyDict_New();
-  khmer::ColorPtrMap::iterator it;
+  khmer::LabelPtrMap::iterator it;
   
-  for (it = hb->color_ptrs.begin(); it!=hb->color_ptrs.end(); ++it) {
+  for (it = hb->label_ptrs.begin(); it!=hb->label_ptrs.end(); ++it) {
     PyDict_SetItem(d, Py_BuildValue("K", it->first), Py_BuildValue("K", it->second));
   }
   
   return d;
 }
 
-static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, PyObject * args)
+static PyObject * hashbits_consume_fasta_and_tag_with_labels(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hb = me->hashbits;
@@ -3852,7 +3852,7 @@ static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, Py
   
   //Py_BEGIN_ALLOW_THREADS
   try {
-    hb->consume_fasta_and_tag_with_colors(filename, total_reads, n_consumed,
+    hb->consume_fasta_and_tag_with_labels(filename, total_reads, n_consumed,
                                                 _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     exc_raised = true;
@@ -3864,7 +3864,7 @@ static PyObject * hashbits_consume_fasta_and_tag_with_colors(PyObject * self, Py
   
 }
 
-static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_colors(
+static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_labels(
                                             PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3883,7 +3883,7 @@ static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_colors(
   unsigned int total_reads;
 
   try {
-    hashbits->consume_partitioned_fasta_and_tag_with_colors(filename, 
+    hashbits->consume_partitioned_fasta_and_tag_with_labels(filename, 
     total_reads, n_consumed, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
     return NULL;
@@ -3892,7 +3892,7 @@ static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_colors(
   return Py_BuildValue("iK", total_reads, n_consumed);
 }
 
-static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self, PyObject * args) {
+static PyObject * hashbits_consume_sequence_and_tag_with_labels(PyObject * self, PyObject * args) {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hb = me->hashbits;
   
@@ -3903,12 +3903,12 @@ static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self,
   }
   
   unsigned long long n_consumed = 0;
-  khmer::Color * the_color = hb->check_and_allocate_color(c);
+  khmer::Label * the_label = hb->check_and_allocate_label(c);
 
   try { 
   //if (hb->check_and_normalize_read(seq)) {
     
-    hb->consume_sequence_and_tag_with_colors(seq, n_consumed, *the_color);
+    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
   //}
   } catch (_khmer_signal &e) {
     return NULL;
@@ -3916,7 +3916,7 @@ static PyObject * hashbits_consume_sequence_and_tag_with_colors(PyObject * self,
   return Py_BuildValue("L", n_consumed);
 }
 
-static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * args) {
+static PyObject * hashbits_sweep_label_neighborhood(PyObject * self, PyObject * args) {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hb = me->hashbits;
   
@@ -3949,14 +3949,14 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
     return NULL;
   }
   
-  //std::pair<TagColorPtrPair::iterator, TagColorPtrPair::iterator> ret;
-  ColorPtrSet found_colors;
+  //std::pair<TagLabelPtrPair::iterator, TagLabelPtrPair::iterator> ret;
+  LabelPtrSet found_labels;
   
   bool exc_raised = false;
   unsigned int num_traversed = 0;
   //Py_BEGIN_ALLOW_THREADS
   try {
-    num_traversed = hb->sweep_color_neighborhood(seq, found_colors, range, break_on_stop_tags, stop_big_traversals);
+    num_traversed = hb->sweep_label_neighborhood(seq, found_labels, range, break_on_stop_tags, stop_big_traversals);
   } catch (_khmer_signal &e) {
     exc_raised = true;
   }
@@ -3966,10 +3966,10 @@ static PyObject * hashbits_sweep_color_neighborhood(PyObject * self, PyObject * 
   
   if (exc_raised) return NULL;
   
-  PyObject * x =  PyList_New(found_colors.size());
-  khmer::ColorPtrSet::const_iterator si;
+  PyObject * x =  PyList_New(found_labels.size());
+  khmer::LabelPtrSet::const_iterator si;
   unsigned long long i = 0;
-  for (si=found_colors.begin(); si!=found_colors.end(); ++si) {
+  for (si=found_labels.begin(); si!=found_labels.end(); ++si) {
     PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
     i++;
   }
@@ -4038,7 +4038,7 @@ static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *arg
 }
 
 
-static PyObject * hashbits_get_tag_colors(PyObject * self, PyObject * args) {
+static PyObject * hashbits_get_tag_labels(PyObject * self, PyObject * args) {
   
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
@@ -4049,14 +4049,14 @@ static PyObject * hashbits_get_tag_colors(PyObject * self, PyObject * args) {
     return NULL;
   }
   
-  khmer::ColorPtrSet colors;
+  khmer::LabelPtrSet labels;
   
-  colors = hashbits->get_tag_colors(tag);
+  labels = hashbits->get_tag_labels(tag);
   
-  PyObject * x =  PyList_New(colors.size());
-  khmer::ColorPtrSet::const_iterator si;
+  PyObject * x =  PyList_New(labels.size());
+  khmer::LabelPtrSet::const_iterator si;
   unsigned long long i = 0;
-  for (si=colors.begin(); si!=colors.end(); ++si) {
+  for (si=labels.begin(); si!=labels.end(); ++si) {
     //std::string kmer_s = _revhash(*si, hashbits->ksize());
     PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
     i++;
@@ -4065,7 +4065,7 @@ static PyObject * hashbits_get_tag_colors(PyObject * self, PyObject * args) {
   return x;
 }
 
-static PyObject * hashbits_n_colors(PyObject * self, PyObject * args)
+static PyObject * hashbits_n_labels(PyObject * self, PyObject * args)
 {
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
@@ -4074,7 +4074,7 @@ static PyObject * hashbits_n_colors(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  return PyInt_FromLong(hashbits->n_colors());
+  return PyInt_FromLong(hashbits->n_labels());
 }
 
 static PyMethodDef khmer_hashbits_methods[] = {
@@ -4145,14 +4145,14 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
   { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
-  { "consume_fasta_and_tag_with_colors", hashbits_consume_fasta_and_tag_with_colors, METH_VARARGS, "" },
-  { "sweep_color_neighborhood", hashbits_sweep_color_neighborhood, METH_VARARGS, "" },
-  {"consume_partitioned_fasta_and_tag_with_colors", hashbits_consume_partitioned_fasta_and_tag_with_colors, METH_VARARGS, "" },
+  { "consume_fasta_and_tag_with_labels", hashbits_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
+  { "sweep_label_neighborhood", hashbits_sweep_label_neighborhood, METH_VARARGS, "" },
+  {"consume_partitioned_fasta_and_tag_with_labels", hashbits_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
   {"sweep_tag_neighborhood", hashbits_sweep_tag_neighborhood, METH_VARARGS, "" },
-  {"get_tag_colors", hashbits_get_tag_colors, METH_VARARGS, ""},
-  {"consume_sequence_and_tag_with_colors", hashbits_consume_sequence_and_tag_with_colors, METH_VARARGS, "" },
-  {"n_colors", hashbits_n_colors, METH_VARARGS, ""},
-  {"get_color_dict", hashbits_get_color_dict, METH_VARARGS, "" },
+  {"get_tag_labels", hashbits_get_tag_labels, METH_VARARGS, ""},
+  {"consume_sequence_and_tag_with_labels", hashbits_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
+  {"n_labels", hashbits_n_labels, METH_VARARGS, ""},
+  {"get_label_dict", hashbits_get_label_dict, METH_VARARGS, "" },
  
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
