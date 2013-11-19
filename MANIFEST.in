@@ -1,0 +1,10 @@
+include ChangeLog Doxyfile ez_setup.py IDEAS Makefile README.rst setup.cfg versioneer.py
+graft examples
+graft figuregen
+recursive-include lib *.hh *.cc
+graft doc
+prune doc/doxygen
+graft data
+exclude data/1m-filtered.fa
+graft tests
+
