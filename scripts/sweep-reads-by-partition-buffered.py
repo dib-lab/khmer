@@ -215,7 +215,7 @@ def main():
     print >>sys.stderr, 'consuming fastp...'
     if debug:
         yep.start(debug)
-    ht.consume_partitioned_fasta_and_tag_with_colors(input_fastp)
+    ht.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
 
     label_number_dist = []
     
@@ -246,7 +246,7 @@ def main():
                 seq = record.sequence
                 name = record.name
                 try:
-                    labels = ht.sweep_color_neighborhood(seq, traversal_range)
+                    labels = ht.sweep_label_neighborhood(seq, traversal_range)
                 except ValueError as e:
                     print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
                     print >>sys.stderr, 'Read length less than k-mer size'
