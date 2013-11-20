@@ -168,7 +168,14 @@ namespace khmer {
     while (!open.empty()) {
       curr = open.top();
       #if READ_ALIGNER_DEBUG
-      std::cerr << "curr: " << curr->prev << " " << _revhash(curr->fwd_hash, m_ch->ksize()) << " " << _revhash(curr->rc_hash, m_ch->ksize()) << " " << curr->base << " " << curr->seq_idx << " " << curr->score << " " << curr->f_score << " " << curr->score - GetNull(curr->length) << " " << ((best != NULL)? best->score - GetNull(best->length) : -1) << std::endl;
+      std::cerr << "curr: " << curr->prev << " "
+		<< _revhash(curr->fwd_hash, m_ch->ksize()) << " " << _revhash(curr->rc_hash, m_ch->ksize())
+		<< " cov=" << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
+		<< " emission=" << curr->base
+		<< " seqidx=" << curr->seq_idx
+		<< " score=" << curr->score
+	        << " fscore=" << curr->f_score
+	        << " bits_saved=" << curr->score - GetNull(curr->length) << " " << ((best != NULL)? best->score - GetNull(best->length) : -1) << std::endl;
       #endif
       open.pop();
 
@@ -214,6 +221,7 @@ namespace khmer {
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";
+    std::string cov = "";
     ret->score = node->score;
     ret->truncated = (node->seq_idx != 0) && (node->seq_idx != read.length() - 1);
     #if READ_ALIGNER_DEBUG
@@ -334,8 +342,8 @@ namespace khmer {
       ret->truncated = forward->truncated || reverse->truncated;
 
       #if READ_ALIGNER_DEBUG
-      printf("FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n", forward->read_alignment.c_str(), forward->graph_alignment.c_str(), forward->score, forward->truncated);
-      printf("REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n", reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(), reverse->score, reverse->truncated);
+      fprintf(stderr, "FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n", forward->read_alignment.c_str(), forward->graph_alignment.c_str(), forward->score, forward->truncated);
+      fprintf(stderr, "REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n", reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(), reverse->score, reverse->truncated);
       #endif
       
       delete forward;
