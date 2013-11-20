@@ -53,7 +53,10 @@ def main():
             print >>sys.stderr, graph_alignment
             print >>sys.stderr, read_alignment
             print >>sys.stderr, truncated
-            print ">{0}\n{1}".format(name, graph_alignment)
+            if truncated:
+                print ">{0}\n{1}".format(name, seq)
+            else:
+                print ">{0}\n{1}".format(name, graph_alignment)
 
 if __name__ == '__main__':
     main()

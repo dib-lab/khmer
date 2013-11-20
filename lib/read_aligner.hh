@@ -136,7 +136,11 @@ namespace khmer {
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
-      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.945), log2(.05), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {}
+      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.945), log2(.05), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {
+      #if READ_ALIGNER_DEBUG
+      std::cerr << "Trusted cutoff: " << m_trusted_cutoff << " bits theta: " << bits_theta << " trusted match: " << m_sm.trusted_match << " untrusted match: " << m_sm.untrusted_match << " trusted mismatch: " << m_sm.trusted_mismatch << " untrusted mismatch: " << m_sm.untrusted_mismatch << std::endl;
+      #endif
+    }
   };
 }
 
