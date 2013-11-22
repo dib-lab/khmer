@@ -32,7 +32,7 @@ def read_partition_file(filename):
         name, partition_id = name.rsplit('\t', 1)
         yield n, name, int(partition_id), record.sequence
 
-###
+#
 
 
 def main():
@@ -78,7 +78,7 @@ def main():
     print 'partition size distribution will go to %s' % distfilename
     print '---'
 
-    ###
+    #
 
     if output_unassigned:
         unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
@@ -123,8 +123,8 @@ def main():
     divvy = sorted(count.items(), key=lambda y: y[1])
     divvy = filter(lambda y: y[1] > THRESHOLD, divvy)
 
-    ## divvy up into different groups, based on having MAX_SIZE sequences
-    ## in each group.
+    # divvy up into different groups, based on having MAX_SIZE sequences
+    # in each group.
     total = 0
     group = set()
     group_n = 0
@@ -153,13 +153,13 @@ def main():
         print 'nothing to output; exiting!'
         return
 
-    ## open a bunch of output files for the different groups
+    # open a bunch of output files for the different groups
     group_fps = {}
     for n in range(group_n):
         fp = open('%s.group%04d.fa' % (prefix, n), 'w')
         group_fps[n] = fp
 
-    ## write 'em all out!
+    # write 'em all out!
 
     for filename in args.part_filenames:
         for n, name, partition_id, seq in read_partition_file(filename):

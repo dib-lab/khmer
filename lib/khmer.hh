@@ -25,8 +25,6 @@ extern "C"
 // C++ standard exceptions are subclassed almost ubiquitously.
 #include <exception>
 
-#   define VERSION "0.4"
-
 #   define MAX_COUNT 255
 #   define MAX_BIGCOUNT 65535
 #   define DEFAULT_TAG_DENSITY 40   // must be even
