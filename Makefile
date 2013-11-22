@@ -10,6 +10,10 @@ clean:
 	cd tests && rm -rf khmertest_*
 	rm -f khmer/_khmermodule.so
 
+debug:
+	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug
+	python setup.py install
+
 doc: FORCE
 	python setup.py build_sphinx --fresh-env
 	@echo ''
