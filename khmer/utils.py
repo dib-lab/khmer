@@ -3,11 +3,11 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
-# Convenience functions for performing common argument-checking tasks in 
+# Convenience functions for performing common argument-checking tasks in
 # scripts.
 
 
-def print_error( msg ):
+def print_error(msg):
     """
         Prints the given message to 'stderr'.
     """
@@ -15,6 +15,6 @@ def print_error( msg ):
     import sys
 
     print >>sys.stderr, msg
-    
+
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

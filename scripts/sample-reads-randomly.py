@@ -3,7 +3,7 @@
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-# 
+#
 """
 Take a list of files containing sequences, and subsample 100,000 sequences (-N)
 uniformly, using reservoir sampling.  Stop after first 100m sequences (-M).
@@ -19,9 +19,10 @@ import screed
 import os.path
 import random
 
-DEFAULT_NUM_READS=int(1e5)
-DEFAULT_MAX_READS=int(1e8)
-DEBUG=True
+DEFAULT_NUM_READS = int(1e5)
+DEFAULT_MAX_READS = int(1e8)
+DEBUG = True
+
 
 def output_single(r):
     if hasattr(r, 'accuracy'):
@@ -29,8 +30,9 @@ def output_single(r):
     else:
         return ">%s\n%s\n" % (r.name, r.sequence)
 
+
 def main():
-    parser = argparse.ArgumentParser(\
+    parser = argparse.ArgumentParser(
         "Uniformly subsample sequences from a collection of files")
 
     parser.add_argument('filenames', nargs='+')
@@ -41,7 +43,7 @@ def main():
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('w'), default=None)
-    
+
     args = parser.parse_args()
 
     # seed the random number generator?
