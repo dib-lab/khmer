@@ -30,8 +30,8 @@ from collections import namedtuple as nt
 
 
 DEFAULT_NUM_BUFFERS=50000
-DEFAULT_BUFFER_SIZE=1000000
-DEFAULT_NUM_PARTITIONS=100000
+DEFAULT_MAX_READS=1000000
+DEFAULT_BUFFER_SIZE=10
 DEFAULT_OUT_PREF='reads_'
 DEFAULT_RANGE=-1
 
@@ -80,16 +80,15 @@ class ReadBuffer:
 
 class ReadBufferManager:
 
-    def __init__(self, max_buffers, max_size, est_files, output_pref, outdir):
+    def __init__(self, max_buffers, max_reads, max_size, output_pref, outdir):
         self.buffers = {}
         self.buffer_counts = {}
         self.max_buffers = max_buffers
-        self.max_size = max_size
+        self.max_reads = max_reads
 
-        self.est_files = est_files
         self.output_pref = output_pref
         self.outdir = outdir
-        self.buffer_flush = self.max_size / self.est_files
+        self.buffer_flush = max_size
 
         self.cur_reads = 0
         self.cur_files = 0
@@ -100,10 +99,9 @@ class ReadBufferManager:
         print >>sys.stderr, '''Init new ReadBuffer [
         Max Buffers: {num_bufs}
         Max Reads: {max_reads}
-        Est. Files: {est_files}
         Buffer flush: {buf_flush}
-        ]'''.format(num_bufs=self.max_buffers, max_reads=self.max_size,
-                    est_files=self.est_files, buf_flush=self.buffer_flush)
+        ]'''.format(num_bufs=self.max_buffers, max_reads=self.max_reads,
+                    buf_flush=self.buffer_flush)
 
     def flush_buffer(self, buf_id):
         fn = '{}_{}.fa'.format(self.output_pref, buf_id)
@@ -132,7 +130,7 @@ class ReadBufferManager:
             self.buffers[buf_id] = new_buf
             
         self.cur_reads += 1
-        if self.cur_reads > self.max_size:
+        if self.cur_reads > self.max_reads:
             print >>sys.stderr, '** Reached max num reads...'
             self.flush_all()
         if len(self.buffers) > self.max_buffers:
@@ -153,10 +151,10 @@ def main():
     parser.add_argument('-i', '--input_fastp',dest='input_fastp')
     parser.add_argument('-r', '--traversal_range', type=int, dest='traversal_range', \
                         default=DEFAULT_RANGE)
-    parser.add_argument('-b', '--buffer_size', dest='buffer_size', type=int, \
+    parser.add_argument('-b', '--buffer_size', dest='max_reads', type=int, \
+                        default=DEFAULT_MAX_READS)
+    parser.add_argument('-l', '--buffer_length', dest='buffer_size', type=int, \
                         default=DEFAULT_BUFFER_SIZE)
-    parser.add_argument('-e', '--files_estimate', dest='files_estimate', type=int, \
-                        default=DEFAULT_NUM_PARTITIONS)
     parser.add_argument('-o', '--output_prefix', dest='output_prefix',
                         default=DEFAULT_OUT_PREF)
     parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int, \
@@ -200,10 +198,11 @@ def main():
     max_buffers = args.max_buffers
     output_pref = args.output_prefix
     buf_size = args.buffer_size
-    est = args.files_estimate
+    max_reads = args.max_reads
+    
     input_files = args.input_files
 
-    output_buffer = ReadBufferManager(max_buffers, buf_size, est, output_pref, outdir)
+    output_buffer = ReadBufferManager(max_buffers, max_reads, buf_size, output_pref, outdir)
 
 	# consume the partitioned fasta with which to label the graph
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
