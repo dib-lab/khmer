@@ -41,7 +41,7 @@ INSTALL INSTRUCTIONS:
 
 khmer requires Python 2.7+. Linux users will need the python development
 libraries and gcc. OS X users will need XCode installed. For more
-details see doc/install.txt
+details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/install.html>`_
 
 In short:
 
