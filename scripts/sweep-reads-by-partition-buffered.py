@@ -39,7 +39,7 @@ MIN_HSIZE=4e7
 MIN_KSIZE=21
     
 def fmt_fasta(name, seq, labels=[]):
-        return '>{name}\t{labels}\n{seq}'.format(name=name, 
+        return '>{name}\t{labels}\n{seq}\n'.format(name=name, 
             labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 def write_seq(fp, name, seq, labels=[]):
@@ -67,7 +67,7 @@ class ReadBuffer:
         self.buf.append(seq_str)
 
     def flush(self):
-        return '\n'.join(self.buf)
+        return ''.join(self.buf)
 
     def is_full(self, full):
         if len(self.buf) >= full:
