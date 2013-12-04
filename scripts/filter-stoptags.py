@@ -22,7 +22,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
 
-###
+#
 
 
 def main():
@@ -56,7 +56,7 @@ def main():
 
         return None, None
 
-    ### the filtering loop
+    # the filtering loop
     for infile in infiles:
         print 'filtering', infile
         outfile = os.path.basename(infile) + '.stopfilt'

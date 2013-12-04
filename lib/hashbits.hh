@@ -39,6 +39,8 @@ namespace khmer {
       }
     }
             
+    uint32_t _all_tags_spin_lock;
+
   public:
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
     : khmer::Hashtable(ksize),
@@ -63,7 +65,7 @@ namespace khmer {
 	_n_tables = 0;
       }
 
-      _clear_all_partitions();
+     delete partition;
     }
 
     std::vector<HashIntoType> get_tablesizes() const {
