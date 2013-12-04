@@ -505,25 +505,25 @@ def test_simple_median():
 # @cswelcher TODO: more tests! 
 #  * thread-safety
 
-def test_n_colors():
+def test_n_labels():
     hb = khmer.new_hashbits(20, 1e7, 4)
-    filename = utils.get_test_data('test-colors.fa')
-    hb.consume_fasta_and_tag_with_colors(filename)
+    filename = utils.get_test_data('test-labels.fa')
+    hb.consume_fasta_and_tag_with_labels(filename)
     
-    print hb.n_colors()
-    assert hb.n_colors() == 4
+    print hb.n_labels()
+    assert hb.n_labels() == 4
 
-def test_get_color_dict():
+def test_get_label_dict():
     hb = khmer.new_hashbits(20, 1e7, 4)
-    filename = utils.get_test_data('test-colors.fa')
-    hb.consume_fasta_and_tag_with_colors(filename)
+    filename = utils.get_test_data('test-labels.fa')
+    hb.consume_fasta_and_tag_with_labels(filename)
     
-    colors = hb.get_color_dict()
+    labels = hb.get_label_dict()
     expected = [0L, 1L, 2L, 3L]
-    for e_color in expected:
-        assert e_color in colors
-    for a_color in colors:
-        assert a_color in expected
+    for e_label in expected:
+        assert e_label in labels
+    for a_label in labels:
+        assert a_label in expected
 
 def test_sweep_tag_neighborhood():
     hb = khmer.new_hashbits(20, 1e7, 4)
@@ -534,96 +534,96 @@ def test_sweep_tag_neighborhood():
     assert len(tags) == 1
     assert tags.pop() == 173473779682L
 
-def test_get_tag_colors():
+def test_get_tag_labels():
     hb = khmer.new_hashbits(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    hb.consume_fasta_and_tag_with_colors(filename)
+    hb.consume_fasta_and_tag_with_labels(filename)
     tag = 173473779682L
 
-    colors = hb.get_tag_colors(tag)
-    assert len(colors) == 1
-    assert colors.pop() == 0L
+    labels = hb.get_tag_labels(tag)
+    assert len(labels) == 1
+    assert labels.pop() == 0L
 
-def test_sweep_sequence_for_colors():
+def test_sweep_sequence_for_labels():
     hb = khmer.new_hashbits(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
-    hb.consume_fasta_and_tag_with_colors(filename)
+    hb.consume_fasta_and_tag_with_labels(filename)
     
-    colors = hb.sweep_color_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
-    assert len(colors) == 1
-    assert colors.pop() == 0L
+    labels = hb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    assert len(labels) == 1
+    assert labels.pop() == 0L
 
-def test_consume_partitioned_fasta_and_tag_with_colors():
+def test_consume_partitioned_fasta_and_tag_with_labels():
     hb = khmer.new_hashbits(20, 1e7, 4)
     filename = utils.get_test_data('real-partition-small.fa')
 
-    total_reads, n_consumed = hb.consume_partitioned_fasta_and_tag_with_colors(filename)
-    colors = set()
+    total_reads, n_consumed = hb.consume_partitioned_fasta_and_tag_with_labels(filename)
+    labels = set()
     for record in screed.open(filename):
         seq = record.sequence
-        colors.update(hb.sweep_color_neighborhood(seq, False, False))
-    #print hb.n_colors()
-    #print colors
-    assert len(colors) == 1
-    assert colors.pop() == 2L
-    assert hb.n_colors() == 1 
+        labels.update(hb.sweep_label_neighborhood(seq, False, False))
+    #print hb.n_labels()
+    #print labels
+    assert len(labels) == 1
+    assert labels.pop() == 2L
+    assert hb.n_labels() == 1 
 
-def test_consume_fasta_and_tag_with_colors():
+def test_consume_fasta_and_tag_with_labels():
     hb = khmer.new_hashbits(20, 1e7, 4)
     read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
     filename = utils.get_test_data('test-transcript.fa')
 
-    total_reads, n_consumed = hb.consume_fasta_and_tag_with_colors(filename)
+    total_reads, n_consumed = hb.consume_fasta_and_tag_with_labels(filename)
 
     assert hb.get(read_1[:20])
     assert total_reads == 3
-    print hb.n_colors()
-    print hb.get_color_dict()
+    print hb.n_labels()
+    print hb.get_label_dict()
     for tag in hb.get_tagset():
         print tag, khmer.forward_hash(tag, 20)
     for record in screed.open(filename):
         print hb.sweep_tag_neighborhood(record.sequence, 40)
-        print hb.sweep_color_neighborhood(record.sequence, 40)
-    assert hb.n_colors() == 3
+        print hb.sweep_label_neighborhood(record.sequence, 40)
+    assert hb.n_labels() == 3
 
 '''
 * The test data set as four reads: A, B, C, and D
 * Overlaps are A <-> B <-> C, with D on its own
-* Thus, traversing from A should find colors from A and B,
-  traversing from B should find colors from A, B, and C,
-  and traversing from C should find colors from B and C
+* Thus, traversing from A should find labels from A and B,
+  traversing from B should find labels from A, B, and C,
+  and traversing from C should find labels from B and C
 '''
-def test_color_tag_correctness():
+def test_label_tag_correctness():
     hb = khmer.new_hashbits(20, 1e7, 4)
-    filename = utils.get_test_data('test-colors.fa')
-    hb.consume_fasta_and_tag_with_colors(filename)
+    filename = utils.get_test_data('test-labels.fa')
+    hb.consume_fasta_and_tag_with_labels(filename)
     
     # read A
-    colors = hb.sweep_color_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
+    labels = hb.sweep_label_neighborhood('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
     print hb.sweep_tag_neighborhood('TTCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGGCTCTGCCTAGAGCTAGGCTAGGTGTGCTCTGCCTAGAGCTAGGCTAGGTGT')
-    print colors
+    print labels
     print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG')-19 
-    assert len(colors) == 2
-    assert 0L in colors
-    assert 1L in colors
+    assert len(labels) == 2
+    assert 0L in labels
+    assert 1L in labels
     
     # read B
-    colors = hb.sweep_color_neighborhood('GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
-    print colors
-    assert len(colors) == 3
-    assert 0L in colors
-    assert 1L in colors
-    assert 2L in colors
+    labels = hb.sweep_label_neighborhood('GCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAGCTCTGCCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
+    print labels
+    assert len(labels) == 3
+    assert 0L in labels
+    assert 1L in labels
+    assert 2L in labels
     
     # read C
-    colors = hb.sweep_color_neighborhood('TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
-    print colors
-    assert len(colors) == 2
-    assert 1L in colors
-    assert 2L in colors
+    labels = hb.sweep_label_neighborhood('TGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGAGTTGGGGATAGATAGATAGATGAGTGTAGATCCAACAACACATACA')
+    print labels
+    assert len(labels) == 2
+    assert 1L in labels
+    assert 2L in labels
     
     # read D
-    colors = hb.sweep_color_neighborhood('TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
-    print colors
-    assert len(colors) == 1
-    assert 3L in colors
+    labels = hb.sweep_label_neighborhood('TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
+    print labels
+    assert len(labels) == 1
+    assert 3L in labels
