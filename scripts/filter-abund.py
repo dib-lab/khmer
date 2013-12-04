@@ -12,17 +12,17 @@ hash table.  Output sequences will be placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-import sys
 import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import threading_args as targs
 from khmer.counting_args import build_counting_multifile_args
 
-###
+#
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
+
 
 def main():
     parser = build_counting_multifile_args()
@@ -34,7 +34,8 @@ def main():
     parser.add_argument('-V', '--variable-coverage', action='store_true',
                         dest='variable_coverage', default=False)
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
-                        help='base variable-coverage cutoff on this median k-mer abundance',
+                        help='base variable-coverage cutoff on this median'
+                        ' k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
     args = parser.parse_args()
@@ -51,14 +52,14 @@ def main():
 
     print "K:", K
 
-    ### the filtering function.
+    # the filtering function.
     def process_fn(record):
         name = record['name']
         seq = record['sequence']
         if 'N' in seq:
             return None, None
 
-        if args.variable_coverage: # only trim when sequence has high enough C
+        if args.variable_coverage:  # only trim when sequence has high enough C
             med, _, _ = ht.get_median_count(seq)
             if med < args.normalize_to:
                 return name, seq
@@ -70,7 +71,7 @@ def main():
 
         return None, None
 
-    ### the filtering loop
+    # the filtering loop
     for infile in infiles:
         print 'filtering', infile
         outfile = os.path.basename(infile) + '.abundfilt'

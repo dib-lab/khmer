@@ -140,6 +140,11 @@ export CXX
 export CXXFLAGS
 export LIBS
 
+VERSION = $(shell python getVersion.py)
+
+export VERSION
+
+CXXFLAGS+= -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
 

@@ -1,3 +1,41 @@
+2013-11-22  CS Welcher  <cs.welcher@gmail.com>
+
+* Makefile: Added debug target for profiling.
+
+2013-10-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.7
+
+* New script: sample-reads-randomly.py which does a single pass random
+subsample using reservoir sampling.
+
+* the version number is now only stored in one place
+
+* Makefile: new dist, cppcheck, pep8, and autopep8 targets for developers.
+VERSION is now set by versioneer and exported to C/C++ code.
+
+* README switched from MarkDown to ReStructuredText format to clean up PyPI
+listing. Install count badge added.
+
+* doc/: updates to how the scripts are called. Sphinx now pulls version
+number from versioneer. C/Python integration is now partially documented.
+Reference to bleeding-edge has been removed. Release instructions have been
+clarified and simplified.
+
+* all python code in khmer/, scripts/, and tests/ should be PEP8 compliant now.
+
+* khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
+were eliminated and the error checking has improved.
+
+* Several fixes motivated by the results of a Coverity C/C++ scan. 
+
+* Tests that require greater than 0.5 gigabytes of memory are now annotated as
+being 'highmem' and be skipped by changing two lines in setup.cfg
+
+* warnings about -Wstrict-prototypes will no longer appear
+
+* contributors to this release are: ctb, mr-c and cswelcher. 
+
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
 * Version 0.6.1
