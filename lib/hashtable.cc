@@ -1952,7 +1952,7 @@ void Hashtable::extract_unique_paths(std::string seq,
  */
 
 void
-Hashtable::consume_fasta_and_tag_with_colors(
+Hashtable::consume_fasta_and_tag_with_labels(
   std:: string const  &filename,
   unsigned int	      &total_reads, unsigned long long	&n_consumed,
   CallbackFn	      callback,	    void *		callback_data
@@ -1968,7 +1968,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
   );
 
 
-  consume_fasta_and_tag_with_colors(
+  consume_fasta_and_tag_with_labels(
     parser,
     total_reads, n_consumed,
     callback, callback_data
@@ -1978,7 +1978,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
 }
 
 void
-Hashtable::consume_fasta_and_tag_with_colors(
+Hashtable::consume_fasta_and_tag_with_labels(
     read_parsers:: IParser *  parser,
     unsigned int		    &total_reads,   unsigned long long	&n_consumed,
     CallbackFn		    callback,	    void *		callback_data
@@ -2001,9 +2001,9 @@ Hashtable::consume_fasta_and_tag_with_colors(
       "Starting trace of 'consume_fasta_and_tag'....\n"
     );
     
-    Color _tag_color = 0;
+    Label _tag_label = 0;
 
-    Color * the_color;
+    Label * the_label;
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))
     {
@@ -2014,11 +2014,11 @@ Hashtable::consume_fasta_and_tag_with_colors(
       if (check_and_normalize_read( read.sequence ))
       {
         // TODO: make threadsafe!
-        the_color = check_and_allocate_color(_tag_color);
-        consume_sequence_and_tag_with_colors( read.sequence,
+        the_label = check_and_allocate_label(_tag_label);
+        consume_sequence_and_tag_with_labels( read.sequence,
 					      this_n_consumed,
-					      *the_color );
-	    _tag_color++;
+					      *the_label );
+	    _tag_label++;
 
   #ifdef WITH_INTERNAL_METRICS
         hasher.pmetrics.start_timers( );
@@ -2064,7 +2064,7 @@ Hashtable::consume_fasta_and_tag_with_colors(
 
   }
 
-void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string &filename,
+void Hashtable::consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
 					  unsigned int &total_reads,
 					  unsigned long long &n_consumed,
 					  CallbackFn callback,
@@ -2085,7 +2085,7 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
   //
   // iterate through the FASTA file & consume the reads.
   //
-  Color * c;
+  Label * c;
   PartitionID p;
   while(!parser->is_complete())  {
     read = parser->get_next_read();
@@ -2094,9 +2094,9 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
     if (check_and_normalize_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
       p = _parse_partition_id(read.name);
-      c = check_and_allocate_color(p);
+      c = check_and_allocate_label(p);
 
-      consume_sequence_and_tag_with_colors( seq,
+      consume_sequence_and_tag_with_labels( seq,
 					      n_consumed,
 					      *c );
     }
@@ -2107,7 +2107,7 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
     // run callback, if specified
     if (total_reads % CALLBACK_PERIOD == 0 && callback) {
       try {
-        callback("consume_partitioned_fasta_and_tag_with_colors", callback_data, 
+        callback("consume_partitioned_fasta_and_tag_with_labels", callback_data, 
         total_reads, n_consumed);
       } catch (...) {
 	delete parser;
@@ -2116,24 +2116,24 @@ void Hashtable::consume_partitioned_fasta_and_tag_with_colors(const std::string 
     }
   }
 
-  // @cswelcher TODO: check that deallocate ColorPtrMap is correct
+  // @cswelcher TODO: check that deallocate LabelPtrMap is correct
   delete parser;
 }
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
-void Hashtable::link_tag_and_color(HashIntoType& kmer, Color& kmer_color) {
-  tag_colors.insert(TagColorPtrPair(kmer, &kmer_color));
-  color_tag_ptrs.insert(ColorTagPtrPair(kmer_color, &kmer));
+void Hashtable::link_tag_and_label(HashIntoType& kmer, Label& kmer_label) {
+  tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
+  label_tag_ptrs.insert(LabelTagPtrPair(kmer_label, &kmer));
 }
 
-/* This is essentially the same code as above, only it assigns colors to the
- * tags through multimap TagColorMap defined in hashtable.hh, declared in
+/* This is essentially the same code as above, only it assigns labels to the
+ * tags through multimap TagLabelMap defined in hashtable.hh, declared in
  * hashbits.hh
- * @cswelcher TODO: should I instead send in the pointer to the new color?
+ * @cswelcher TODO: should I instead send in the pointer to the new label?
  */
-void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
+void Hashtable::consume_sequence_and_tag_with_labels(const std::string& seq,
 					unsigned long long& n_consumed,
-					Color& current_color,
+					Label& current_label,
 					SeenSet * found_tags)
   {
     bool is_new_kmer;
@@ -2160,12 +2160,12 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
         if (kmer_tagged) {
 	      since = 1;
 	      
-	      // Coloring code
+	      // Labeling code
 	      // TODO: MAKE THREADSAFE!
 	      
-	      if (!_cmap_contains_color(tag_colors, kmer, current_color)) {
+	      if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
 	        ACQUIRE_TAG_COLORS_SPIN_LOCK
-	        link_tag_and_color(kmer, current_color);
+	        link_tag_and_label(kmer, current_label);
 	        RELEASE_TAG_COLORS_SPIN_LOCK
 	      }
 	      if (found_tags) {
@@ -2187,10 +2187,10 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
         all_tags.insert(kmer);
         RELEASE_ALL_TAGS_SPIN_LOCK
         
-        // Coloring code
+        // Labeling code
         // TODO: MAKE THREADSAFE!
         ACQUIRE_TAG_COLORS_SPIN_LOCK
-        link_tag_and_color(kmer, current_color);
+        link_tag_and_label(kmer, current_label);
         RELEASE_TAG_COLORS_SPIN_LOCK
         
         if (found_tags) { found_tags->insert(kmer); }
@@ -2204,24 +2204,24 @@ void Hashtable::consume_sequence_and_tag_with_colors(const std::string& seq,
       all_tags.insert(kmer);	// insert the last k-mer, too.
       RELEASE_ALL_TAGS_SPIN_LOCK
       
-      // Color code: TODO: MAKE THREADSAFE!
-      link_tag_and_color(kmer, current_color);
+      // Label code: TODO: MAKE THREADSAFE!
+      link_tag_and_label(kmer, current_label);
       
       if (found_tags) { found_tags->insert(kmer); }
     }
   }
 /*
- * Find all colors associated with the sequence
+ * Find all labels associated with the sequence
  * For now, check /every/ k-mer with find_all_tags
  * THIS SUCKS AND IT'S YOUR FAULT @CTB
  */
-unsigned int Hashtable::sweep_sequence_for_colors(const std::string& seq,
-					ColorPtrSet& found_colors,
+unsigned int Hashtable::sweep_sequence_for_labels(const std::string& seq,
+					LabelPtrSet& found_labels,
 					bool break_on_stoptags,
 					bool stop_big_traversals) {
 					
     SeenSet tagged_kmers;
-    //ColorPtrSet found_colors;
+    //LabelPtrSet found_labels;
     
     HashIntoType kmer_f, kmer_r, kmer;
     
@@ -2239,14 +2239,14 @@ unsigned int Hashtable::sweep_sequence_for_colors(const std::string& seq,
       if (get_count(uniqify_rc(kmer_f,kmer_r))) {
         partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
                    all_tags, break_on_stoptags, stop_big_traversals);
-        traverse_colors_and_resolve(tagged_kmers, found_colors);
+        traverse_labels_and_resolve(tagged_kmers, found_labels);
       }
     }
     return traversed_kmers.size();
 }
 
-unsigned int Hashtable::sweep_color_neighborhood(const std::string& seq,
-                                                  ColorPtrSet& found_colors,
+unsigned int Hashtable::sweep_label_neighborhood(const std::string& seq,
+                                                  LabelPtrSet& found_labels,
                                                   unsigned int range,
                                                   bool break_on_stoptags,
                                                   bool stop_big_traversals) {
@@ -2255,7 +2255,7 @@ unsigned int Hashtable::sweep_color_neighborhood(const std::string& seq,
     unsigned int num_traversed;
     num_traversed = partition->sweep_for_tags(seq, tagged_kmers, all_tags, 
                               range, break_on_stoptags, stop_big_traversals);
-    traverse_colors_and_resolve(tagged_kmers, found_colors);
+    traverse_labels_and_resolve(tagged_kmers, found_labels);
     //printf("range=%u ", range);
     if (range == 0) {
       assert(num_traversed == seq.length()-ksize()+1);
@@ -2264,31 +2264,31 @@ unsigned int Hashtable::sweep_color_neighborhood(const std::string& seq,
     return num_traversed;
 }
 
-ColorPtrSet Hashtable::get_tag_colors(const HashIntoType& tag) {
-  ColorPtrSet colors;
-  unsigned int num_colors;
-  _get_tag_colors(tag, tag_colors, colors);
-  return colors;
+LabelPtrSet Hashtable::get_tag_labels(const HashIntoType& tag) {
+  LabelPtrSet labels;
+  unsigned int num_labels;
+  _get_tag_labels(tag, tag_labels, labels);
+  return labels;
 }
 
-TagPtrSet Hashtable::get_color_tags(const Color& color) {
+TagPtrSet Hashtable::get_label_tags(const Label& label) {
   TagPtrSet tags;
   unsigned int num_tags;
-  _get_tags_from_color(color, color_tag_ptrs, tags);
+  _get_tags_from_label(label, label_tag_ptrs, tags);
   return tags;
 }
 
-void Hashtable::traverse_colors_and_resolve(const SeenSet& tagged_kmers,
-                                              ColorPtrSet& found_colors) {
+void Hashtable::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
+                                              LabelPtrSet& found_labels) {
   
   SeenSet::const_iterator si;
-  unsigned int num_colors = 0;
+  unsigned int num_labels = 0;
   for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
     HashIntoType tag = *si;
-    // get the colors associated with this tag
-    num_colors = _get_tag_colors(tag, tag_colors, found_colors);
-    if (num_colors > 1) {
-      // reconcile colors
+    // get the labels associated with this tag
+    num_labels = _get_tag_labels(tag, tag_labels, found_labels);
+    if (num_labels > 1) {
+      // reconcile labels
       // for now do nothing ha
     }
   }
