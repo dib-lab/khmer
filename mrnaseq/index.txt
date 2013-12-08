@@ -20,8 +20,5 @@ The tutorial:
 
    5-building-transcript-families
    6-annotating-transcript-families
-   7-comparative-expression-with-rsem
-
-..   de-novo-assembly
-..   rsem
-
+   7-expression-analysis
+   8-differential-expression

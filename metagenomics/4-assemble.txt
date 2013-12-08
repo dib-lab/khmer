@@ -130,7 +130,7 @@ And also set up a bunch of SPADes runs::
    for i in *.pe.fq
    do
       name=$(basename $i .pe.fq);
-      echo "spades.py --pe1-12 $name.pe.fq -o $name.spades.d"
+      echo "spades.py --sc --pe1-12 $name.pe.fq.gz -o $name.spades.d"
    done >> do-assembly.sh
 
 Running the assemblies
@@ -147,9 +147,30 @@ or, if you're memory limited, one by one::
 Getting stats for the assemblies
 ================================
 
+foo ::
+
+   for i in {0..1000};
+   do
+	groupid=$(printf kak.group%04d $i);
+	if [ -e ${groupid}.pe.fq.gz ]; then
+	   echo $groupid
+	fi
+   done > grouplist.txt
+
+   for group in $(cat grouplist.txt)
+   do
+      python /usr/local/share/khmer/sandbox/calc-best-assembly.py -q $group.{*velvet.*.d/contigs.fa,*idba.d/scaffold.fa,*spades.d/contigs.fasta} -o $group.best.fa
+   done > best-assemblies.txt
+
+   cat *.best.fa > final-assembly.fa
+
+   cat best-assemblies.txt
+
 To get some basic stats for the assemblies, run::
 
-   python /usr/local/share/khmer/sandbox/assemstats3.py 500 *.??/contigs.fa idba.*.d/scaffold.fa
+   python /usr/local/share/khmer/sandbox/assemstats3.py 500 *.velvet.*.d/contigs.fa *idba.d/scaffold.fa *.spades.d/contigs.fasta
+
+   python /usr/local/share/khmer/sandbox/assemstats3.py 500 final-assembly.fa
 
 This will yield something like::
 

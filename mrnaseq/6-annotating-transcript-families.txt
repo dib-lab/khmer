@@ -6,6 +6,7 @@ You can start with the 'trinity-nematostella.renamed.fa.gz' file from the
 previous page (:doc:`5-building-transcript-families`) _or_ download
 a precomputed one::
 
+      cd /mnt
       curl -O http://public.ged.msu.edu.s3.amazonaws.com/trinity-nematostella.renamed.fa.gz
 
 .. note::
@@ -13,6 +14,7 @@ a precomputed one::
    The BLASTs below will take a *long* time, like 24-36 hours.  If you
    want to work with canned BLASTs, do::
 
+      cd /mnt
       curl -O http://public.ged.msu.edu.s3.amazonaws.com/nema.x.mouse.gz
       curl -O http://public.ged.msu.edu.s3.amazonaws.com/mouse.x.nema.gz
       gunzip nema.x.mouse.gz
@@ -28,6 +30,7 @@ Now let's assign putative homology & orthology to these transcripts, by
 doing BLASTs & reciprocal best hit analysis.  First, uncompress your
 transcripts file::
 
+   cd /mnt
    gunzip trinity-nematostella.renamed.fa.gz 
 
 Now, grab the latest mouse RefSeq::

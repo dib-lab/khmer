@@ -1,6 +1,6 @@
-============================================================
-5. Building transcript families and annotating the sequences
-============================================================
+===============================
+5. Building transcript families
+===============================
 
 Install khmer, screed, and BLAST.  (See :doc:`1-quality` and
 :doc:`installing-blastkit`).  I would suggest using an m1.large or
