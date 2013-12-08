@@ -58,4 +58,22 @@ that have been assigned to that transcript family.
 
 This file can be opened directly in Excel or most any spreadsheet program.
 
-.. @@ extract columns
+To visualize the distribution of gene expression in the two conditions you
+can do::
+
+   python /usr/local/share/eel-pond/plot-expression.py 0-vs-6-hour.matrix 5,5 0-vs-6-hour.changed.csv
+
+This will produce a .PNG image showing all of the genes' expression levels
+in condition 1 against their levels in condition 2, and will show in a
+separate color those genes that are differentially expressed.  Running it
+on the demo data set will produce an image as below
+
+.. image:: images/0-vs-6-hour.matrix.png
+   :width: 40%
+
+----
+
+...and that's all, folks!
+
+
+
