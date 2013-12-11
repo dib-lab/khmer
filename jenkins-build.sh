@@ -72,7 +72,9 @@ pylint -f parseable khmer/*.py scripts/*.py tests khmer | tee ../pylint.out
 if [[ -n "${coverage_post}" ]]
 	# was -v coverage_post but OS X bash not new enough
 then
-	pip install -U gcovr
+	#pip install -U gcovr
+	# work around a bug in 3.1
+	pip install -e  git+git@github.com:nschum/gcovr.git@fix-argument-type#egg=gcovr
 	gcovr -r $PWD --xml > coverage-gcovr.xml
 
 	make cppcheck
