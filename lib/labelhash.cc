@@ -326,14 +326,14 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
 
 LabelPtrSet LabelHash::get_tag_labels(const HashIntoType& tag) {
   LabelPtrSet labels;
-  unsigned int num_labels;
+  //unsigned int num_labels;
   _get_tag_labels(tag, tag_labels, labels);
   return labels;
 }
 
 TagPtrSet LabelHash::get_label_tags(const Label& label) {
   TagPtrSet tags;
-  unsigned int num_tags;
+  //unsigned int num_tags;
   _get_tags_from_label(label, label_tag_ptrs, tags);
   return tags;
 }

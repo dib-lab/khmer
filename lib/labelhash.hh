@@ -7,13 +7,16 @@
 #ifndef LABELHASH_HH
 #define LABELHASH_HH
 
+#include <string>
+
 #include "khmer.hh"
+#include "hashbits.hh"
 
 namespace khmer {
     
-    class LabelHash : public khmer:Hashbits {
+    class LabelHash : public khmer::Hashbits {
     protected:
-        LabelHash( WordLength ksize, std::vector<HashIntoType& tablesizes)
+        LabelHash( WordLength ksize, std::vector<HashIntoType>& tablesizes)
         : khmer::Hashbits(ksize, tablesizes)
         {
             // constructor
@@ -137,7 +140,7 @@ namespace khmer {
         void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
                                          LabelPtrSet& found_labels);
 
-    }
+    };
 }
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
@@ -146,4 +149,4 @@ namespace khmer {
 #define RELEASE_TAG_COLORS_SPIN_LOCK \
   __sync_bool_compare_and_swap( &_tag_labels_spin_lock, 1, 0);
 
-#endif LABELHASH_HH
+#endif
