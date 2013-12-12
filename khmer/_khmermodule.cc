@@ -21,6 +21,7 @@
 #include "hashbits.hh"
 #include "storage.hh"
 #include "aligner.hh"
+#include "labelhash.hh"
 
 //
 // Function necessary for Python loading:
@@ -3853,265 +3854,6 @@ static PyObject * hashbits_get_median_count(PyObject * self, PyObject * args)
   return Py_BuildValue("iff", med, average, stddev);
 }
 
-static PyObject * hashbits_get_label_dict(PyObject * self, PyObject * args) {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  PyObject * d = PyDict_New();
-  khmer::LabelPtrMap::iterator it;
-  
-  for (it = hb->label_ptrs.begin(); it!=hb->label_ptrs.end(); ++it) {
-    PyDict_SetItem(d, Py_BuildValue("K", it->first), Py_BuildValue("K", it->second));
-  }
-  
-  return d;
-}
-
-static PyObject * hashbits_consume_fasta_and_tag_with_labels(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  std::ofstream outfile;
-  
-  char * filename;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
-    return NULL;
-  }
-  
-  unsigned long long n_consumed;
-  unsigned int total_reads;
-  bool exc_raised = false;
-  
-  //Py_BEGIN_ALLOW_THREADS
-  try {
-    hb->consume_fasta_and_tag_with_labels(filename, total_reads, n_consumed,
-                                                _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    exc_raised = true;
-  }
-  //Py_END_ALLOW_THREADS
-  if (exc_raised) return NULL;
-  
-  return Py_BuildValue("iL", total_reads, n_consumed);
-  
-}
-
-static PyObject * hashbits_consume_partitioned_fasta_and_tag_with_labels(
-                                            PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * filename;
-  PyObject * callback_obj = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
-    return NULL;
-  }
-
-  // call the C++ function, and trap signals => Python
-
-  unsigned long long n_consumed;
-  unsigned int total_reads;
-
-  try {
-    hashbits->consume_partitioned_fasta_and_tag_with_labels(filename, 
-    total_reads, n_consumed, _report_fn, callback_obj);
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-
-  return Py_BuildValue("iK", total_reads, n_consumed);
-}
-
-static PyObject * hashbits_consume_sequence_and_tag_with_labels(PyObject * self, PyObject * args) {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  char * seq = NULL;
-  unsigned long long c = NULL;
-  if (!PyArg_ParseTuple(args, "sK", &seq, &c)) {
-    return NULL;
-  }
-  
-  unsigned long long n_consumed = 0;
-  khmer::Label * the_label = hb->check_and_allocate_label(c);
-
-  try { 
-  //if (hb->check_and_normalize_read(seq)) {
-    
-    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
-  //}
-  } catch (_khmer_signal &e) {
-    return NULL;
-  }
-  return Py_BuildValue("L", n_consumed);
-}
-
-static PyObject * hashbits_sweep_label_neighborhood(PyObject * self, PyObject * args) {
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hb = me->hashbits;
-  
-  char * seq = NULL;
-  unsigned int r = NULL;
-  PyObject * break_on_stop_tags_o = NULL;
-  PyObject * stop_big_traversals_o = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|iOO", &seq, &r,
-			&break_on_stop_tags_o,
-			&stop_big_traversals_o)) {
-    return NULL;
-  }
-
-  unsigned int range = (2 * hb->_get_tag_density()) + 1;
-  if (r >= 0) {
-    range = r;
-  }
-
-  bool break_on_stop_tags = false;
-  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
-    break_on_stop_tags = true;
-  }
-  bool stop_big_traversals = false;
-  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
-    stop_big_traversals = true;
-  }
-  
-  if (strlen(seq) < hb->ksize()) {
-    return NULL;
-  }
-  
-  //std::pair<TagLabelPtrPair::iterator, TagLabelPtrPair::iterator> ret;
-  LabelPtrSet found_labels;
-  
-  bool exc_raised = false;
-  unsigned int num_traversed = 0;
-  //Py_BEGIN_ALLOW_THREADS
-  try {
-    num_traversed = hb->sweep_label_neighborhood(seq, found_labels, range, break_on_stop_tags, stop_big_traversals);
-  } catch (_khmer_signal &e) {
-    exc_raised = true;
-  }
-  //Py_END_ALLOW_THREADS
-  
-  //printf("...%u kmers traversed\n", num_traversed);
-  
-  if (exc_raised) return NULL;
-  
-  PyObject * x =  PyList_New(found_labels.size());
-  khmer::LabelPtrSet::const_iterator si;
-  unsigned long long i = 0;
-  for (si=found_labels.begin(); si!=found_labels.end(); ++si) {
-    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
-    i++;
-  }
-  
-  return x;
-}
-
-
-// Similar to find_all_tags, but returns tags in a way actually useable by python
-// need a tags_in_sequence iterator or function in c++ land for reuse in all
-// these functions
-static PyObject * hashbits_sweep_tag_neighborhood(PyObject * self, PyObject *args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  char * seq = NULL;
-  unsigned int r = NULL;
-  PyObject * break_on_stop_tags_o = NULL;
-  PyObject * stop_big_traversals_o = NULL;
-
-  if (!PyArg_ParseTuple(args, "s|iOO", &seq, &r,
-			&break_on_stop_tags_o,
-			&stop_big_traversals_o)) {
-    return NULL;
-  }
-
-  unsigned int range = (2 * hashbits->_get_tag_density()) + 1;
-  if (r >= 0) {
-    range = r;
-  }
-
-  bool break_on_stop_tags = false;
-  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
-    break_on_stop_tags = true;
-  }
-  bool stop_big_traversals = false;
-  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
-    stop_big_traversals = true;
-  }
-  
-  if (strlen(seq) < hashbits->ksize()) {
-    return NULL;
-  }
-
-  khmer::SeenSet tagged_kmers;
-
-  //Py_BEGIN_ALLOW_THREADS
-
-  hashbits->partition->sweep_for_tags(seq, tagged_kmers, 
-            hashbits->all_tags, range, break_on_stop_tags, stop_big_traversals);
-
-  //Py_END_ALLOW_THREADS
-
-  PyObject * x =  PyList_New(tagged_kmers.size());
-  khmer::SeenSet::const_iterator si;
-  unsigned long long i = 0;
-  for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
-    //std::string kmer_s = _revhash(*si, hashbits->ksize());
-    // type K for python unsigned long long
-    PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
-    i++;
-  }
-
-  return x;
-}
-
-
-static PyObject * hashbits_get_tag_labels(PyObject * self, PyObject * args) {
-  
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-  
-  khmer::HashIntoType tag;
-  
-  if (!PyArg_ParseTuple(args, "K", &tag)) {
-    return NULL;
-  }
-  
-  khmer::LabelPtrSet labels;
-  
-  labels = hashbits->get_tag_labels(tag);
-  
-  PyObject * x =  PyList_New(labels.size());
-  khmer::LabelPtrSet::const_iterator si;
-  unsigned long long i = 0;
-  for (si=labels.begin(); si!=labels.end(); ++si) {
-    //std::string kmer_s = _revhash(*si, hashbits->ksize());
-    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
-    i++;
-  }
-
-  return x;
-}
-
-static PyObject * hashbits_n_labels(PyObject * self, PyObject * args)
-{
-  khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-  khmer::Hashbits * hashbits = me->hashbits;
-
-  if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-  }
-
-  return PyInt_FromLong(hashbits->n_labels());
-}
-
 static PyMethodDef khmer_hashbits_methods[] = {
   { "extract_unique_paths", hashbits_extract_unique_paths, METH_VARARGS, "" },
   { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
@@ -4180,15 +3922,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
   { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
   { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
   { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
-  { "consume_fasta_and_tag_with_labels", hashbits_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
-  { "sweep_label_neighborhood", hashbits_sweep_label_neighborhood, METH_VARARGS, "" },
-  {"consume_partitioned_fasta_and_tag_with_labels", hashbits_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
-  {"sweep_tag_neighborhood", hashbits_sweep_tag_neighborhood, METH_VARARGS, "" },
-  {"get_tag_labels", hashbits_get_tag_labels, METH_VARARGS, ""},
-  {"consume_sequence_and_tag_with_labels", hashbits_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
-  {"n_labels", hashbits_n_labels, METH_VARARGS, ""},
-  {"get_label_dict", hashbits_get_label_dict, METH_VARARGS, "" },
- 
   {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -4364,6 +4097,356 @@ khmer_subset_getattr(PyObject * obj, char * name)
 {
   return Py_FindMethod(khmer_subset_methods, obj, name);
 }
+
+/////////////////
+// LabelHash
+/////////////////
+
+// LabelHash addition
+typedef struct {
+  PyObject_HEAD
+
+  /* @camillescott late night notes:
+     need to experiment. might be able to call hashbits py methods
+     directly with the labelhash object, because they all instantiate
+     a new hashbits pointer on themselves to call the functions and labelhash
+     inherits from hashbits; or, we define a hashbits object as part of this struct
+     as called for in the c-api reference. need to grok that still.
+     If this is how it's done, remove PyObject_HEAD, which will already be included
+     in the base class struct.
+     See http://docs.python.org/2.7/extending/newtypes.html#subclassing-other-types
+     for details...
+  */
+  LabelHash * labelhash;
+} khmer_KLabelHashObject;
+
+static void khmer_labelhash_dealloc(PyObject *);
+static PyObject * khmer_labelhash_getattr(PyObject * obj, char * name);
+
+static PyTypeObject khmer_KLabelHashType = {
+    PyObject_HEAD_INIT(NULL)
+    0,
+    "KLabelHash", sizeof(khmer_KLabelHashObject),
+    0,
+    khmer_labelhash_dealloc,	/*tp_dealloc*/
+    0,				/*tp_print*/
+    khmer_labelhash_getattr,	/*tp_getattr*/
+    0,				/*tp_setattr*/
+    0,				/*tp_compare*/
+    0,				/*tp_repr*/
+    0,				/*tp_as_number*/
+    0,				/*tp_as_sequence*/
+    0,				/*tp_as_mapping*/
+    0,				/*tp_hash */
+    0,				/*tp_call*/
+    0,				/*tp_str*/
+    0,				/*tp_getattro*/
+    0,				/*tp_setattro*/
+    0,				/*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    "labelhash object",           /* tp_doc */
+};
+
+#define is_labelhash_obj(v)  ((v)->ob_type == &khmer_KLabelHashType)
+
+
+static PyObject * labelhash_get_label_dict(PyObject * self, PyObject * args) {
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * hb = me->labelhash;
+  
+  PyObject * d = PyDict_New();
+  khmer::LabelPtrMap::iterator it;
+  
+  for (it = hb->label_ptrs.begin(); it!=hb->label_ptrs.end(); ++it) {
+    PyDict_SetItem(d, Py_BuildValue("K", it->first), Py_BuildValue("K", it->second));
+  }
+  
+  return d;
+}
+
+static PyObject * labelhash_consume_fasta_and_tag_with_labels(PyObject * self, PyObject * args)
+{
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * hb = me->labelhash;
+  
+  std::ofstream outfile;
+  
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+  
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+  bool exc_raised = false;
+  
+  //Py_BEGIN_ALLOW_THREADS
+  try {
+    hb->consume_fasta_and_tag_with_labels(filename, total_reads, n_consumed,
+                                                _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  //Py_END_ALLOW_THREADS
+  if (exc_raised) return NULL;
+  
+  return Py_BuildValue("iL", total_reads, n_consumed);
+  
+}
+
+static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
+                                            PyObject * self, PyObject * args)
+{
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * labelhash = me->labelhash;
+
+  char * filename;
+  PyObject * callback_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    return NULL;
+  }
+
+  // call the C++ function, and trap signals => Python
+
+  unsigned long long n_consumed;
+  unsigned int total_reads;
+
+  try {
+    labelhash->consume_partitioned_fasta_and_tag_with_labels(filename, 
+    total_reads, n_consumed, _report_fn, callback_obj);
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+
+  return Py_BuildValue("iK", total_reads, n_consumed);
+}
+
+static PyObject * labelhash_consume_sequence_and_tag_with_labels(PyObject * self, PyObject * args) {
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * hb = me->labelhash;
+  
+  char * seq = NULL;
+  unsigned long long c = NULL;
+  if (!PyArg_ParseTuple(args, "sK", &seq, &c)) {
+    return NULL;
+  }
+  
+  unsigned long long n_consumed = 0;
+  khmer::Label * the_label = hb->check_and_allocate_label(c);
+
+  try { 
+  //if (hb->check_and_normalize_read(seq)) {
+    
+    hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
+  //}
+  } catch (_khmer_signal &e) {
+    return NULL;
+  }
+  return Py_BuildValue("L", n_consumed);
+}
+
+static PyObject * labelhash_sweep_label_neighborhood(PyObject * self, PyObject * args) {
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * hb = me->labelhash;
+  
+  char * seq = NULL;
+  unsigned int r = NULL;
+  PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|iOO", &seq, &r,
+			&break_on_stop_tags_o,
+			&stop_big_traversals_o)) {
+    return NULL;
+  }
+
+  unsigned int range = (2 * hb->_get_tag_density()) + 1;
+  if (r >= 0) {
+    range = r;
+  }
+
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
+  }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
+  
+  if (strlen(seq) < hb->ksize()) {
+    return NULL;
+  }
+  
+  //std::pair<TagLabelPtrPair::iterator, TagLabelPtrPair::iterator> ret;
+  LabelPtrSet found_labels;
+  
+  bool exc_raised = false;
+  unsigned int num_traversed = 0;
+  //Py_BEGIN_ALLOW_THREADS
+  try {
+    num_traversed = hb->sweep_label_neighborhood(seq, found_labels, range, break_on_stop_tags, stop_big_traversals);
+  } catch (_khmer_signal &e) {
+    exc_raised = true;
+  }
+  //Py_END_ALLOW_THREADS
+  
+  //printf("...%u kmers traversed\n", num_traversed);
+  
+  if (exc_raised) return NULL;
+  
+  PyObject * x =  PyList_New(found_labels.size());
+  khmer::LabelPtrSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=found_labels.begin(); si!=found_labels.end(); ++si) {
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+    i++;
+  }
+  
+  return x;
+}
+
+
+// Similar to find_all_tags, but returns tags in a way actually useable by python
+// need a tags_in_sequence iterator or function in c++ land for reuse in all
+// these functions
+static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self, PyObject *args)
+{
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * labelhash = me->labelhash;
+
+  char * seq = NULL;
+  unsigned int r = NULL;
+  PyObject * break_on_stop_tags_o = NULL;
+  PyObject * stop_big_traversals_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "s|iOO", &seq, &r,
+			&break_on_stop_tags_o,
+			&stop_big_traversals_o)) {
+    return NULL;
+  }
+
+  unsigned int range = (2 * labelhash->_get_tag_density()) + 1;
+  if (r >= 0) {
+    range = r;
+  }
+
+  bool break_on_stop_tags = false;
+  if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+    break_on_stop_tags = true;
+  }
+  bool stop_big_traversals = false;
+  if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+    stop_big_traversals = true;
+  }
+  
+  if (strlen(seq) < labelhash->ksize()) {
+    return NULL;
+  }
+
+  khmer::SeenSet tagged_kmers;
+
+  //Py_BEGIN_ALLOW_THREADS
+
+  labelhash->partition->sweep_for_tags(seq, tagged_kmers, 
+            labelhash->all_tags, range, break_on_stop_tags, stop_big_traversals);
+
+  //Py_END_ALLOW_THREADS
+
+  PyObject * x =  PyList_New(tagged_kmers.size());
+  khmer::SeenSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
+    //std::string kmer_s = _revhash(*si, labelhash->ksize());
+    // type K for python unsigned long long
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+    i++;
+  }
+
+  return x;
+}
+
+
+static PyObject * labelhash_get_tag_labels(PyObject * self, PyObject * args) {
+  
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * labelhash = me->labelhash;
+  
+  khmer::HashIntoType tag;
+  
+  if (!PyArg_ParseTuple(args, "K", &tag)) {
+    return NULL;
+  }
+  
+  khmer::LabelPtrSet labels;
+  
+  labels = labelhash->get_tag_labels(tag);
+  
+  PyObject * x =  PyList_New(labels.size());
+  khmer::LabelPtrSet::const_iterator si;
+  unsigned long long i = 0;
+  for (si=labels.begin(); si!=labels.end(); ++si) {
+    //std::string kmer_s = _revhash(*si, labelhash->ksize());
+    PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+    i++;
+  }
+
+  return x;
+}
+
+static PyObject * labelhash_n_labels(PyObject * self, PyObject * args)
+{
+  khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+  khmer::LabelHash * labelhash = me->labelhash;
+
+  if (!PyArg_ParseTuple(args, "")) {
+    return NULL;
+  }
+
+  return PyInt_FromLong(labelhash->n_labels());
+}
+
+
+static PyMethodDef khmer_labelhash_methods[] = {
+  { "ksize", labelhash_get_ksize, METH_VARARGS, "" },
+  { "hashsizes", labelhash_get_hashsizes, METH_VARARGS, "" },
+  { "n_occupied", labelhash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
+  { "n_unique_kmers", labelhash_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
+  { "count", labelhash_count, METH_VARARGS, "Count the given kmer" },
+  { "get", labelhash_get, METH_VARARGS, "Get the count for the given k-mer" },
+  { "kmer_degree", labelhash_kmer_degree, METH_VARARGS, "" },
+  { "load", labelhash_load, METH_VARARGS, "" },
+  { "save", labelhash_save, METH_VARARGS, "" },
+  { "load_tagset", labelhash_load_tagset, METH_VARARGS, "" },
+  { "save_tagset", labelhash_save_tagset, METH_VARARGS, "" },
+  { "n_tags", labelhash_n_tags, METH_VARARGS, "" },
+  { "_get_tag_density", labelhash__get_tag_density, METH_VARARGS, "" },
+  { "_set_tag_density", labelhash__set_tag_density, METH_VARARGS, "" },
+ { "consume_fasta_and_tag", labelhash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+  { "consume_fasta_and_tag_with_reads_parser", labelhash_consume_fasta_and_tag_with_reads_parser, 
+    METH_VARARGS, "Count all k-mers using a given reads parser" },
+ { "consume_partitioned_fasta", labelhash_consume_partitioned_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+ { "consume_fasta_and_tag_with_labels", labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
+  { "sweep_label_neighborhood", labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
+  {"consume_partitioned_fasta_and_tag_with_labels", labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
+  {"sweep_tag_neighborhood", labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
+  {"get_tag_labels", labelhash_get_tag_labels, METH_VARARGS, ""},
+  {"consume_sequence_and_tag_with_labels", labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
+  {"n_labels", labelhash_n_labels, METH_VARARGS, ""},
+  {"get_label_dict", labelhash_get_label_dict, METH_VARARGS, "" },
+ 
+  {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+static PyObject *
+khmer_labelhash_getattr(PyObject * obj, char * name)
+{
+  return Py_FindMethod(khmer_labelhash_methods, obj, name);
+}
+
 
 
 //
@@ -4549,6 +4632,37 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
   return (PyObject *) khashbits_obj;
 }
 
+//
+// new_labelhash
+//
+
+static PyObject* _new_labelhash(PyObject * self, PyObject * args)
+{
+  unsigned int k = 0;
+  PyObject* sizes_list_o = NULL;
+
+  if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+    return NULL;
+  }
+
+  std::vector<khmer::HashIntoType> sizes;
+  for (int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+    PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+    sizes.push_back(PyLong_AsLongLong(size_o));
+  }
+
+  khmer_KLabelHash * klabelhash_obj = (khmer_KLabelHashObject *) \
+    PyObject_New(khmer_KLabelHashsObject, &khmer_KLabelHashType);
+
+  if (klabelhash_obj == NULL) {
+      return NULL;
+  }
+  
+  klabelhash_obj->labelhash = new khmer::LabelHash(k, sizes);
+
+  return (PyObject *) klabelhash_obj;
+}
+
 static PyObject * hash_collect_high_abundance_kmers(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -4607,6 +4721,21 @@ static void khmer_hashbits_dealloc(PyObject* self)
   
   PyObject_Del((PyObject *) obj);
 }
+
+
+//
+// khmer_labelhash_dealloc -- clean up a labelhash object.
+//
+
+static void khmer_hashbits_dealloc(PyObject* self)
+{
+  khmer_KLabelHashObject * obj = (khmer_LabelHashObject *) self;
+  delete obj->labelhash;
+  obj->labelhash = NULL;
+  
+  PyObject_Del((PyObject *) obj);
+}
+
 //
 // khmer_subset_dealloc -- clean up a hashbits object.
 //
