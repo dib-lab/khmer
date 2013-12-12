@@ -6,7 +6,7 @@
 #
 """
 Eliminate reads with median k-mer abundance higher than
-DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
+DESIRED_COVERAGE.  Output sequences will be placed in 'infile.${postfix}'.
 
 % python scripts/normalize-by-median.py [ -C <cutoff> ] <data1> <data2> ...
 
@@ -118,7 +118,7 @@ def handle_error(error, output_name, input_name, ht):
     try:
         os.remove(output_name)
     except:
-        print >>sys.stderr, '** ERROR: problem removing erroneous .keep file'
+        print >>sys.stderr, '** ERROR: problem removing erroneous filtered file'
 
 
 def main():
@@ -137,6 +137,11 @@ def main():
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump hashtable every d files',
                         default=-1)
+    parser.add_argument('-b', '--prefix', dest='prefix', default='',
+                        help='filename prefix for filtered data (optional)')
+    parser.add_argument('-e', '--postfix', dest='postfix', default='.keep',
+                        help='filename postfix for filtered data (optional,'
+                        ' default is \'.keep\'')
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
@@ -171,6 +176,8 @@ def main():
     filenames = args.input_filenames
     force = args.force
     dump_frequency = args.dump_frequency
+    prefix = args.prefix
+    postfix = args.postfix
 
     # list to save error files along with throwing exceptions
     if force is True:
@@ -187,7 +194,7 @@ def main():
     discarded = 0
 
     for n, input_filename in enumerate(filenames):
-        output_name = os.path.basename(input_filename) + '.keep'
+        output_name = prefix + os.path.basename(input_filename) + postfix
         outfp = open(output_name, 'w')
 
         total_acc = 0
@@ -201,7 +208,7 @@ def main():
             handle_error(e, output_name, input_filename, ht)
             if not force:
                 print >>sys.stderr, '** Exiting!'
-                sys.exit(-1)
+                sys.exit(1)
             else:
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
@@ -248,7 +255,7 @@ def main():
         print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
         print >>sys.stderr, "**"
         print >>sys.stderr, "** Do not use these results!!"
-        sys.exit(-1)
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

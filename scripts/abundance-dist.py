@@ -51,7 +51,7 @@ def main():
     if os.path.exists(histout):
         if not args.squash_output:
             print >>sys.stderr, 'ERROR: %s exists; not squashing.' % histout
-            sys.exit(-1)
+            sys.exit(1)
 
         print '** squashing existing file %s' % histout
 
@@ -64,7 +64,7 @@ def main():
             "ERROR: abundance distribution is uniformly zero; " \
             "nothing to report."
         print >>sys.stderr, "\tPlease verify that the input files are valid."
-        sys.exit(-1)
+        sys.exit(1)
 
     fp = open(histout, 'w')
 

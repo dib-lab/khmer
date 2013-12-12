@@ -92,7 +92,7 @@ def main():
         print >>sys.stderr, "** ERROR: the counting hash is too small for"
         print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
         print >>sys.stderr, "**"
-        sys.exit(-1)
+        sys.exit(1)
 
     print 'DONE.'
 

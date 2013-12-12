@@ -61,7 +61,7 @@ def main():
         fail = True
 
     if fail:
-        sys.exit(-1)
+        sys.exit(1)
 
     print >>sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
 
