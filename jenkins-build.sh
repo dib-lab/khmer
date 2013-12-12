@@ -59,7 +59,7 @@ then
 		http://scan5.coverity.com/cgi-bin/upload.py
 fi
 
-
+python setup.py develop
 pip install --quiet nosexcover
 python setup.py nosetests --with-xcoverage --with-xunit --cover-package=khmer \
 	--cover-erase --attr=\!known_failing
