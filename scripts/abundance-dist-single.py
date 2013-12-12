@@ -118,7 +118,7 @@ def main():
             "ERROR: abundance distribution is uniformly zero; " \
             "nothing to report."
         print >>sys.stderr, "\tPlease verify that the input files are valid."
-        sys.exit(-1)
+        sys.exit(1)
 
     fp = open(histout, 'w')
 
