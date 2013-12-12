@@ -94,7 +94,7 @@ def main():
         print >>sys.stderr, "** ERROR: the graph structure is too small for"
         print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
         print >>sys.stderr, "**"
-        sys.exit(-1)
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

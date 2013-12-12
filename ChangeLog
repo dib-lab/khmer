@@ -3,6 +3,19 @@
 * Added a test to ensure that normalize-by-median.py has bigcount set to
   False.
 
+2013-12-11  Michael R. Crusoe <mcrusoe@msu.edu>
+
+* normalize-by-median.py: new optional arguments: --prefix & --postfix to
+specify how the filenames of the filtered data are formed. The default to
+'' and '.keep' respectively.
+
+* All commands that use the counting args now support the --version switch
+
+* abundance-dist-single.py, abundance-dist.py, do-partition.py,
+interleave-reads.py, load-graph.py, load-into-counting.py
+normalize-by-median.py now exit with return code 1 instead of 255 as is
+standard.
+
 2013-11-22  CS Welcher  <cs.welcher@gmail.com>
 
 * Makefile: Added debug target for profiling.
