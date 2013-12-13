@@ -112,10 +112,11 @@ Trim the first data set (~20 minutes)::
 
    fastq_quality_filter -Q33 -q 30 -p 50 -i combined.fq > combined-trim.fq
    fastq_quality_filter -Q33 -q 30 -p 50 -i s1_se > s1_se.trim
+   fastq_quality_filter -Q33 -q 30 -p 50 -i s2_se > s2_se.trim
    /usr/local/share/khmer/scripts/extract-paired-reads.py combined-trim.fq
 
    gzip -9c combined-trim.fq.pe > ../SRR492065.pe.qc.fq.gz
-   gzip -9c combined-trim.fq.se s1_se > ../SRR492065.se.qc.fq.gz
+   gzip -9c combined-trim.fq.se s1_se.trim s2_se.trim > ../SRR492065.se.qc.fq.gz
 
    cd ../
    rm -fr trim
@@ -131,10 +132,11 @@ Trim the second data set (~20 minutes)::
 
    fastq_quality_filter -Q33 -q 30 -p 50 -i combined.fq > combined-trim.fq
    fastq_quality_filter -Q33 -q 30 -p 50 -i s1_se > s1_se.trim
+   fastq_quality_filter -Q33 -q 30 -p 50 -i s2_se > s2_se.trim
    /usr/local/share/khmer/scripts/extract-paired-reads.py combined-trim.fq
 
    gzip -9c combined-trim.fq.pe > ../SRR492066.pe.qc.fq.gz
-   gzip -9c combined-trim.fq.se s1_se > ../SRR492066.se.qc.fq.gz
+   gzip -9c combined-trim.fq.se s1_se.trim s2_se.trim > ../SRR492066.se.qc.fq.gz
 
    cd ../
    rm -fr trim
