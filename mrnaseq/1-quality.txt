@@ -281,7 +281,7 @@ sequences in there.  Downstream, we will want to pay special attention
 to the remaining paired sequences, so we want to separate out the pe
 and se files.  How do we go about that?  Another script, of course!
 
-The khmer script 'strip-and-split-for-assembly.py' does exactly that.
+The khmer script 'extract-paired-reads.py' does exactly that.
 You run it on an interleaved file that may have some orphans, and it
 produces .pe and .se files afterwards, containing pairs and orphans
 respectively.
