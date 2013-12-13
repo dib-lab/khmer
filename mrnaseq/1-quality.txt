@@ -8,12 +8,6 @@ of the Nematostella data set.
 
 .. note::
 
-   This follows the NGS 2013 tutorial,
-   `Short-read quality evaluation <http://ged.msu.edu/angus/tutorials-2013/short-read-quality-evaluation.html>`__,
-   but for multiple files.
-
-.. note::
-
    The end results of this tutorial are available as public snapshot
    snap-8b155fd9 on EC2/EBS.
 

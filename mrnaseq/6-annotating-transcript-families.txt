@@ -102,4 +102,4 @@ to copy them locally, if you have set up Dropbox (see:
 
 .. mouse foo
 
-Next: :doc:`7-comparative-expression-with-rsem`.
+Next: :doc:`7-expression-analysis`.
