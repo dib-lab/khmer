@@ -106,6 +106,7 @@ So, finally, let's get rid of a lot of the old files ::
    rm *.keep
    rm *.abundfilt
    rm *.qc.fq.gz
+   rm *.kh
 
 Gut check
 ~~~~~~~~~

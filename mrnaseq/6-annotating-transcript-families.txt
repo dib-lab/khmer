@@ -23,6 +23,18 @@ a precomputed one::
    However, if you built your own transcript families, you'll need to
    rerun these BLASTs.
 
+Install BLAST
+=============
+
+Make sure you've updated BLAST, as in :doc:`installing-blastkit`::
+
+   cd /root
+
+   curl -O ftp://ftp.ncbi.nih.gov/blast/executables/release/2.2.24/blast-2.2.24-x64-linux.tar.gz
+   tar xzf blast-2.2.24-x64-linux.tar.gz
+   cp blast-2.2.24/bin/* /usr/local/bin
+   cp -r blast-2.2.24/data /usr/local/blast-data
+
 Doing a preliminary annotation against mouse
 ============================================
 
@@ -85,7 +97,9 @@ will have sequences that look like this::
    >nematostella.id1.tr115222 h=43% => suppressor of tumorigenicity 7 protein isoform 2 [Mus musculus] 1_of_7_in_tr115222 len=1635 id=1 tr=115222 1_of_7_in_tr115222 len=1635 id=1 tr=115222
 
 I suggest renaming this file to 'nematostella.fa' and using it for
-BLASTs (see :doc:`installing-blastkit`).
+BLASTs (see :doc:`installing-blastkit`). ::
+
+   cp trinity-nematostella.renamed.fa.annot nematostella.fa
 
 The annotate-seqs command will *also* produce two CSV files.  The first,
 ``trinity-nematostella.renamed.fa.annot.csv``, is small, and contains

@@ -16,8 +16,12 @@ You'll also need to install some eel-pond scripts::
 Copy in your data
 =================
 
-You need to get ahold of your assembled transcriptome (from
-e.g. :doc:`3-big-assembly`).  Put it in /mnt.
+You need your assembled transcriptome (from
+e.g. :doc:`3-big-assembly`).  Put it in /mnt as
+'trinity-nematostella-raw.fa.gz'::
+
+   cd /mnt
+   gzip -c work/trinity_out_dir/Trinity.fasta > trinity-nematostella-raw.fa.gz
 
 For the purposes of your first run through, I suggest just grabbing my copy
 of the Nematostella assembly::

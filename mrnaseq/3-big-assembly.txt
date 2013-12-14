@@ -74,9 +74,9 @@ Assembling with Trinity
 
 Run the assembler! ::
 
-   /root/trinityrnaseq*/Trinity.pl --left left.fq --right right.fq --seqType fq -JM 15G
+   /root/trinityrnaseq*/Trinity.pl --left left.fq --right right.fq --seqType fq -JM 10G
 
-Note that this last bit (15G) is the maximum amount of memory to use.  You
+Note that this last bit (10G) is the maximum amount of memory to use.  You
 can increase (or decrease) it based on what machine you rented.  This size
 works for the m1.xlarge machines.
 

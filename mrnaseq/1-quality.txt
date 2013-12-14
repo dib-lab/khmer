@@ -355,7 +355,7 @@ and also some mass combining::
      gunzip -c $otherfile > combine
      cat $i >> combine
      gzip -c combine > $otherfile
-     rm $i
+     rm $i combine
    done
 
 and finally, make the end product files read-only::

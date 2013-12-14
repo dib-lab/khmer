@@ -7,7 +7,7 @@
    and do::
 
       cd /mnt
-      cp /data/nematostella.fa.gz ./trinity-nematostella.renamed.fa.gz
+      gunzip -c /data/nematostella.fa.gz > ./nematostella.fa
       mkdir ebseq
       cd ebseq
 
@@ -47,7 +47,7 @@ and 5.
 Finally, let's extract differentially expressed genes, and combine
 them with the annotations in your transcripts file. ::
 
-   python /usr/local/share/eel-pond/extract-and-annotate-changed.py 0-vs-6-hour.changed /mnt/trinity-nematostella.renamed.fa.gz 0-vs-6-hour.changed.csv
+   python /usr/local/share/eel-pond/extract-and-annotate-changed.py 0-vs-6-hour.changed /mnt/nematostella.fa 0-vs-6-hour.changed.csv
 
 This will produce a file containing many rows, each with 5 columns:
 each row is a transcript family, and the columns are the probability
