@@ -10,10 +10,10 @@ import sys
 
 CUTOFF = 200
 
-
 n = 0
-for filename in sys.argv[1:]:
+prefix = sys.argv[1]
+for filename in sys.argv[2:]:
     for record in screed.open(filename):
         if len(record.sequence) >= CUTOFF:
             n += 1
-            print '>%s %s\n%s' % (n, record.name, record.sequence)
+            print '>%s.%s %s\n%s' % (prefix, n, record.name, record.sequence)
