@@ -1,4 +1,5 @@
-The Kalamazoo Metagenome Assembly Tutorial
+==========================================
+The Kalamazoo Metagenome Assembly protocol
 ==========================================
 
 :author: Adina Howe and Titus Brown
@@ -10,4 +11,6 @@ The Kalamazoo Metagenome Assembly Tutorial
    2-diginorm
    3-partition
    4-assemble
-..   5-mapping-and-quantitation
+   5-mapping-and-quantitation
+   6-annotating
+   installing-blastkit

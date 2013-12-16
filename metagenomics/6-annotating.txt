@@ -115,4 +115,4 @@ There will be a bunch of files in the dierctory 'metag/'.  Probably the
 most interesting is 'metag/testasm.faa', which will contain a set of
 annotated protein sequences derived from the metagenome.
 
-.. @blast
+Next: :doc:`installing-blastkit`
