@@ -58,7 +58,7 @@ Extracting the partitions into groups
 
 Generally there are *lots* of partitions, and for convenience sake we
 group them into group files that can be assembled in small chunks.
-To do this, ::
+To do this, run::
 
    /usr/local/share/khmer/scripts/extract-partitions.py -X 100000 kak *.part
 
@@ -98,7 +98,7 @@ abundances in there.
 
 So, ran you recover the abundances?  Of course you can!  However, you
 do have to combine all of the raw (unpartitioned) reads into a single
-file, because the script to reinflate the partitions takes only single
+file, because the script to reinflate the partitions takes only a single
 file.  Sorry :(. ::
 
    gunzip -c SRR49206?.?e.qc.fq.gz > all.fq
@@ -125,7 +125,7 @@ and compress::
 Cleaning up
 ===========
 
-At this point, you can get rid of quite a few intermediate files, all of
+At this point, you have quite a few intermediate files, all of
 which can be removed::
 
    rm *.part

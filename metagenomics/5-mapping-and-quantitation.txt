@@ -1,87 +1,88 @@
 =====================================
-6. Mapping and abundance quantitation
+5. Mapping and abundance quantitation
 =====================================
 
-Let's do some simple mapping to do abundance estimation in the group 5
-assembly.
+.. note::
+
+   You can start from this point by taking the following files from
+   the data on snapshot snap-8f89b092::
+
+      SRR492065.pe.qc.fq.gz
+      SRR492066.pe.qc.fq.gz
+      final-assembly.fa
+
+   Just do::
+
+      mkdir /mnt/assembly
+      cd /mnt/assembly
+      cp /data/SRR492065.pe.qc.fq.gz /data/SRR492066.pe.qc.fq.gz /data/final-assembly.fa .
+
+Let's do some simple mapping to do abundance estimation in final assembly.
 
 Setup
 =====
 
 First, move to a new directory::
 
-   cd 
+   cd /mnt
    mkdir mapping
    cd mapping
 
-   cp /class/cbrown/data/group5-assembly.fa.gz .
-
-   gunzip group5-assembly.fa
+   cp /mnt/assembly/final-assembly.fa metagenome.fa
 
 Bowtie mapping
 ==============
 
-`bowtie <http://bowtie-bio.sourceforge.net/index.shtml>`__ is a commonly
-used mapping tool.
+Let's start by installing `bowtie <http://bowtie-bio.sourceforge.net/index.shtml>`__::
 
-We need to build a bowtie reference::
+   cd /root
+   curl -O -L http://sourceforge.net/projects/bowtie-bio/files/bowtie/0.12.7/bowtie-0.12.7-linux-x86_64.zip
+   unzip bowtie-0.12.7-linux-x86_64.zip
+   cd bowtie-0.12.7
+   cp bowtie bowtie-build bowtie-inspect /usr/local/bin
 
-   bowtie-build group5-assembly.fa group5
+Next, build a bowtie reference from the assembly::
 
-and then let's map a subset of the reads (make it the single-ended ones,
-just to keep things fast)::
+   cd /mnt/mapping
+   bowtie-build metagenome.fa metagenome
 
-   gunzip -c ~/data/SRR492065.se.qc.fq.gz | \
-         	  bowtie -q group5 - > SRR492065.x.group5.map
-   gunzip -c ~/data/SRR492066.se.qc.fq.gz | \
-        	  bowtie -q group5 - > SRR492066.x.group5.map
+and then do the mapping::
 
-Here you should see the following output for the first::
+   gunzip -c ../assembly/SRR492065.pe.qc.fq.gz | bowtie -p 4 -q metagenome - > SRR492065.map
 
-   # reads processed: 802158
-   # reads with at least one reported alignment: 63226 (7.88%)
-   # reads that failed to align: 738932 (92.12%)
-   Reported 63226 alignments to 1 output stream(s)
+Do the same for the second set of reads::
 
-and the second::
-
-   # reads processed: 904157
-   # reads with at least one reported alignment: 39572 (4.38%)
-   # reads that failed to align: 864585 (95.62%)
-   Reported 39572 alignments to 1 output stream(s)
+   gunzip -c ../assembly/SRR492066.pe.qc.fq.gz | bowtie -p 4 -q metagenome - > SRR492066.map
 
 At the moment, there seems to be no good way to do automated differential
-analysis of two samples, so I'll content myself with showing you how to
-annotate the assembled sequences with the mapping abundances.
+analysis of two samples, so we'll just show you how to annotate the
+assembled sequences with the mapping abundance.  This will allow MG-RAST
+to properly weight annotation calls.
 
 To do this, we will need to make two copies of the annotated assembly
 -- one annotated with the first (SRR492065) and the other with the
 second (SRR492066) abundances. ::
 
-   python /class/stamps-software/share/khmer/sandbox/make-coverage.py group5-assembly.fa SRR492065.x.group5.map
-   mv group5-assembly.fa.cov group5.SRR492065.fa
+   python /usr/local/share/khmer/sandbox/make-coverage.py metagenome.fa SRR492065.map
+   mv metagenome.fa.cov metagenome.SRR492065.fa
 
-   python /class/stamps-software/share/khmer/sandbox/make-coverage.py group5-assembly.fa SRR492066.x.group5.map
-   mv group5-assembly.fa.cov group5.SRR492066.fa
+   python /usr/local/share/khmer/sandbox/make-coverage.py metagenome.fa SRR492066.map
+   mv metagenome.fa.cov metagenome.SRR492066.fa
 
-What you should see now is that there's a [cov] annotation for each
-sequence in every file -- ::
+What you will see now is that there's a [cov] annotation for each
+sequence in every file -- try::
 
-   head -1 group5.SRR49206?.fa
+   head -4 metagenome.SRR492065.fa
 
-and you should see something like this --
+and you should see::
 
-   ==> group5.SRR492065.fa <==
-   >NODE_1_length_3642_cov_7.200439[cov=1]
-
-   ==> group5.SRR492066.fa <==
-   >NODE_1_length_3642_cov_7.200439[cov=2]
+   >testasm.1[cov=259]
+   CAATTTATTTAAATTTTTCTACGATTCCAACA...
+   >testasm.2[cov=610]
+   ATTCTACTAATGTCATCTTTTTACCTTCTAGA...
 
 This format can be uploaded directly to MG-RAST as an
 abundance-annotated assembly, although there's no good way to do
-comparative analysis yet, it seems.
+comparative analysis yet.
 
-More generally, I would suggest looking into things like `RSEM
-<http://deweylab.biostat.wisc.edu/rsem/>`__, `DEseq
-<http://www-huber.embl.de/users/anders/DESeq/>`__, or other
-differential expression packages for mRNAseq.
+Next: :doc:`6-annotating`

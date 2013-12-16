@@ -81,8 +81,12 @@ Let's create a place to work::
 Link in the data
 ================
 
-If you want to play along with the data specific to this tutorial
-(highly advised on a first runthrough!), please see
+The tutorial data is from `Sharon et al. 2013
+<http://www.ncbi.nlm.nih.gov/pubmed/22936250>`__; it's two data points
+from an infant gut sample.
+
+If you want to play along with this data (guaranteed to work -- highly
+advised on a first runthrough!), please see
 :doc:`../mrnaseq/0-download-and-save` and follow the instructions to
 (a) create a volume from snapshot snap-05633504 and (b) mount it as
 /data.
@@ -97,16 +101,12 @@ This links the data into the /mnt/assembly directory.
 Trim and quality filter
 =======================
 
-Grab some Illumina adapters::
-
-   curl -O https://s3.amazonaws.com/public.ged.msu.edu/illuminaClipping.fa
-
 Trim the first data set (~20 minutes)::
 
    mkdir trim
    cd trim
 
-   java -jar /usr/local/bin/trimmomatic-0.27.jar PE ../SRR492065_?.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+   java -jar /usr/local/bin/trimmomatic-0.30.jar PE ../SRR492065_?.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:/usr/local/share/adapters/TruSeq3-PE.fa:2:30:10
 
    /usr/local/share/khmer/scripts/interleave-reads.py s?_pe > combined.fq
 
@@ -126,7 +126,7 @@ Trim the second data set (~20 minutes)::
    mkdir trim
    cd trim
 
-   java -jar /usr/local/bin/trimmomatic-0.27.jar PE ../SRR492066_?.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:../illuminaClipping.fa:2:30:10
+   java -jar /usr/local/bin/trimmomatic-0.30.jar PE ../SRR492066_?.fastq.gz s1_pe s1_se s2_pe s2_se ILLUMINACLIP:/usr/local/share/adapters/TruSeq3-PE.fa:2:30:10
 
    /usr/local/share/khmer/scripts/interleave-reads.py s?_pe > combined.fq
 

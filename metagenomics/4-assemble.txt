@@ -25,7 +25,7 @@ First, let's install `Velvet <http://www.ebi.ac.uk/~zerbino/velvet/>`__::
 And also `IDBA <https://code.google.com/p/hku-idba/>`__::
 
    cd /root
-   curl -O http://hku-idba.googlecode.com/files/idba-1.1.1.tar.gz
+   curl -O https://hku-idba.googlecode.com/files/idba-1.1.1.tar.gz
    tar xzf idba-1.1.1.tar.gz
    cd idba-1.1.1
    ./configure && make
@@ -45,15 +45,9 @@ then::
 Preparing the data
 ==================
 
-.. note::
+Start in the assembly work directory::
 
-   The below steps work on any set of files named .pe.fq.gz with or
-   without accompanying .se.fq.gz files. @CTB @@combine SRR dn.
-
-   foo::
-
-      gunzip -c /data/SRR492065.pe.* | gzip -c > data.pe.fq.gz
-      gunzip -c /data/SRR492065.se.* | gzip -c > data.se.fq.gz
+   cd /mnt/assembly
 
 Each assembler takes in data in a slightly different format.  Velvet
 is the most flexible: it can take in paired-end and orphaned reads,
@@ -79,8 +73,6 @@ and convert them all into FASTA (for IDBA)::
 Setting up the assemblies
 =========================
 
-@@ctb install parallel
-
 We're going to set up a bunch of assemblies in a script called
 'do-assembly.sh'.  This will let us execute them in parallel if we
 want to, and just keep track of things if we don't want to.
@@ -88,6 +80,15 @@ want to, and just keep track of things if we don't want to.
 Let's make sure the file is empty first::
 
    rm -f do-assembly.sh
+
+And install `GNU parallel <@@>`__:
+
+   cd /root
+   curl -O http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
+   tar xjf parallel-latest.tar.bz2
+   cd parallel-*
+   ./configure && make && make install
+   cd /mnt/assembly
 
 Setting up Velvet runs
 ----------------------
@@ -147,30 +148,9 @@ or, if you're memory limited, one by one::
 Getting stats for the assemblies
 ================================
 
-foo ::
-
-   for i in {0..1000};
-   do
-	groupid=$(printf kak.group%04d $i);
-	if [ -e ${groupid}.pe.fq.gz ]; then
-	   echo $groupid
-	fi
-   done > grouplist.txt
-
-   for group in $(cat grouplist.txt)
-   do
-      python /usr/local/share/khmer/sandbox/calc-best-assembly.py -q $group.{*velvet.*.d/contigs.fa,*idba.d/scaffold.fa,*spades.d/contigs.fasta} -o $group.best.fa
-   done > best-assemblies.txt
-
-   cat *.best.fa > final-assembly.fa
-
-   cat best-assemblies.txt
-
 To get some basic stats for the assemblies, run::
 
    python /usr/local/share/khmer/sandbox/assemstats3.py 500 *.velvet.*.d/contigs.fa *idba.d/scaffold.fa *.spades.d/contigs.fasta
-
-   python /usr/local/share/khmer/sandbox/assemstats3.py 500 final-assembly.fa
 
 This will yield something like::
 
@@ -201,15 +181,39 @@ This will yield something like::
    34      660289  83231   idba.dn.d/scaffold.fa
    45      666147  41120   idba.nodn.d/scaffold.fa
 
-Extracting sequences over a certain length
-==========================================
+Generating a final set of contigs
+=================================
 
-Let's say that we want to work with the sequences in dn.43/contigs.fa, but we want to get rid of all the small sequences.  How?
+Next, for each partition of input reads, let's pick one assembly to
+represent the partition.  (An alternative would be to use something like
+minimus2 to merge assemblies, but we think assembling assemblies is a
+bad idea.)  To pick the best assembly, we're going to choose the one
+that 
+foo ::
 
-Easy::
+   for i in {0..1000};
+   do
+	groupid=$(printf kak.group%04d $i);
+	if [ -e ${groupid}.pe.fq.gz ]; then
+	   echo $groupid
+	fi
+   done > grouplist.txt
 
-   python /usr/local/share/khmer/sandbox/extract-long-sequences.py 500 dn.43/contigs.fa > group5-assembly.fa
+   for group in $(cat grouplist.txt)
+   do
+      python /usr/local/share/khmer/sandbox/calc-best-assembly.py -q $group.{*velvet.*.d/contigs.fa,*idba.d/scaffold.fa,*spades.d/contigs.fasta} -o $group.best.fa
+   done > best-assemblies.txt
+
+   python /usr/local/share/khmer/sandbox/multi-rename.py testasm *.best.fa > final-assembly.fa
+
+After this, 'final-assembly.fa' will contain the final set of contigs,
+with each contig renamed to 'testasm.N'.  To get stats::
+
+   python /usr/local/share/khmer/sandbox/assemstats3.py 500 final-assembly.fa
+
+Note, 'best-assemblies.txt' contains the list of "best" assembly file names,
+if you want to know which ones were picked.
 
 ----
 
-.. Next: :doc:`5-mapping-and-quantitation`.
+Next: :doc:`5-mapping-and-quantitation`.

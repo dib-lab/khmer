@@ -1,0 +1,118 @@
+======================================
+Annotating your metagenome with Prokka
+======================================
+
+.. note::
+
+   You can start from this point by taking the assembly from
+   the data on snapshot snap-8f89b092.  Just do::
+
+      mkdir /mnt/assembly
+      cd /mnt/assembly
+      cp /data/final-assembly.fa .
+
+
+Installing Prokka
+=================
+
+We're going to use the `Prokka software
+<http://www.vicbioinformatics.com/software.prokka.shtml>`__ to
+annotate your newly assembled metagenome.
+
+We have to download and install a lot of stuff, though -- estimated ~15
+-20 minutes.
+
+First, we need to install BioPerl and NCBI BLAST+; for this we'll use
+the Debian Linux package installer, 'apt-get'::
+
+   apt-get update
+   apt-get -y install bioperl ncbi-blast+
+
+Now download and unpack Prokka::
+
+   cd /mnt
+   curl -O http://www.vicbioinformatics.com/prokka-1.7.tar.gz
+   tar xzf prokka-1.7.tar.gz 
+   curl -O http://www.vicbioinformatics.com/prokka-1.7.2
+   cp prokka-1.7.2 prokka-1.7/bin/prokka
+
+Prokka depends on a lot of other software, too; so we'll need to install
+all of that.
+
+Install `HMMER <http://hmmer.janelia.org/>`__::
+
+   cd /mnt
+   curl -O ftp://selab.janelia.org/pub/software/hmmer3/3.1b1/hmmer-3.1b1.tar.gz
+   tar xzf hmmer-3.1b1.tar.gz 
+   cd hmmer-3.1b1/
+   ./configure --prefix=/usr && make && make install
+
+Install `Aragorn <http://www.ncbi.nlm.nih.gov/pmc/articles/PMC373265/>`__::
+
+   cd /mnt
+   curl -O http://mbio-serv2.mbioekol.lu.se/ARAGORN/Downloads/aragorn1.2.36.tgz
+   tar -xvzf aragorn1.2.36.tgz
+   cd aragorn1.2.36/
+   gcc -O3 -ffast-math -finline-functions -o aragorn aragorn1.2.36.c
+   cp aragorn /usr/local/bin
+
+Install `Prodigal <http://prodigal.ornl.gov/>`__::
+
+   cd /mnt
+   curl -O http://prodigal.googlecode.com/files/prodigal.v2_60.tar.gz
+   tar xzf prodigal.v2_60.tar.gz 
+   cd prodigal.v2_60/
+   make
+   cp prodigal /usr/local/bin
+
+
+Install `tbl2asn <http://www.ncbi.nlm.nih.gov/genbank/tbl2asn2/>`__::
+
+   cd /mnt
+   curl -O ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64.tbl2asn.gz
+   gunzip linux64.tbl2asn.gz 
+   mv linux64.tbl2asn tbl2asn
+   chmod +x tbl2asn
+   cp tbl2asn /usr/local/bin
+
+Install `GNU Parallel <http://www.biostars.org/p/63816/>`__::
+
+   cd /mnt
+   curl -O http://ftp.gnu.org/gnu/parallel/parallel-20130822.tar.bz2
+   tar xjvf parallel-20130822.tar.bz2
+   cd parallel-20130822/
+   ls
+   ./configure && make && make install
+
+Install `Infernal <http://infernal.janelia.org/>`__::
+
+   cd /mnt
+   curl -O http://selab.janelia.org/software/infernal/infernal-1.1rc4.tar.gz
+   tar xzf infernal-1.1rc4.tar.gz 
+   cd infernal-1.1rc4/
+   ls
+   ./configure && make && make install
+
+Running Prokka
+==============
+
+Now, make a new directory::
+
+   cd /mnt
+   mkdir annot
+   cd annot
+
+Copy in the assembly and remove all the sequences with 'N's in them (since
+prodigal fails if there are too many, and prokka uses prodigal)::
+
+   python /usr/local/share/khmer/sandbox/remove-N.py /mnt/assembly/final-assembly.fa metagenome.fa
+
+Now, run Prokka::
+
+   /mnt/prokka-1.7/bin/prokka metagenome.fa --outdir metag --prefix testasm
+
+There will be a bunch of files in the dierctory 'metag/'.  Probably the
+most interesting is 'metag/testasm.faa', which will contain a set of
+annotated protein sequences derived from the metagenome.
+
+.. @blast

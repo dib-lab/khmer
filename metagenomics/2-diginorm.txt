@@ -9,6 +9,22 @@
 Start with the QC'ed files from :doc:`1-quality` or copy them into a
 working directory; you should start this in /mnt/assembly.
 
+.. note::
+
+   You can start from this point by taking the following files from
+   the data on snapshot snap-8f89b092::
+
+      SRR492065.pe.qc.fq.gz
+      SRR492065.se.qc.fq.gz
+      SRR492066.pe.qc.fq.gz
+      SRR492066.se.qc.fq.gz
+
+   Just do::
+
+      mkdir /mnt/assembly
+      cd /mnt/assembly
+      cp /data/SRR49206?.?e.qc.fq.gz /mnt/assembly
+
 Run a first round of digital normalization
 ==========================================
 
