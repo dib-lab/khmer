@@ -2,7 +2,9 @@
 Installing and running khmer
 ============================
 
-You'll need Python 2.7+ and internet access. 
+You'll need Python 2.7+ and internet access.
+
+The khmer project currently works with Python 2.6 but we target Python 2.7+. 
 
 Build requirements
 ------------------
