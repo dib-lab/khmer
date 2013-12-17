@@ -17,8 +17,8 @@
 #include "khmer_config.hh"
 #include "ktable.hh"
 #include "hashtable.hh"
-#include "counting.hh"
 #include "hashbits.hh"
+#include "counting.hh"
 #include "storage.hh"
 #include "aligner.hh"
 #include "labelhash.hh"
@@ -4933,13 +4933,14 @@ init_khmer(void)
         return;
     }
     // add LabelHash
+    
     khmer_KLabelHashType.tp_base = &khmer_KHashbitsType;
     khmer_KLabelHashType.tp_new = khmer_labelhash_new;
     if (PyType_Ready(&khmer_KLabelHashType) < 0) {
         std::cout << "_khmer.KLabelHashType failed PyType_Ready" << std::endl; 
         return;
     }
-
+    
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods, 
                         "interface for the khmer module low-level extensions" );
