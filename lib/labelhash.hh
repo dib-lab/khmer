@@ -11,21 +11,13 @@
 
 #include "khmer.hh"
 #include "hashbits.hh"
+#include "hashtable.hh"
+#include "read_parsers.hh"
 
 namespace khmer {
-    
+
     class LabelHash : public khmer::Hashbits {
     protected:
-        LabelHash( WordLength ksize, std::vector<HashIntoType>& tablesizes)
-        : khmer::Hashbits(ksize, tablesizes)
-        {
-            // constructor
-            _tag_labels_spin_lock = 0;
-
-        }
-        
-        ~LabelHash();
-
         // Does the given tag already have the given label?
         bool _cmap_contains_label(const TagLabelPtrMap& cmap,
                 HashIntoType& kmer,
@@ -79,6 +71,17 @@ namespace khmer {
         uint32_t _tag_labels_spin_lock;
 
     public:
+
+        LabelHash( WordLength ksize, std::vector<HashIntoType>& tablesizes)
+        : khmer::Hashbits(ksize, tablesizes)
+        {
+            // constructor
+            _tag_labels_spin_lock = 0;
+
+        }
+        
+        ~LabelHash();
+
         TagLabelPtrMap tag_labels;
         LabelTagPtrMap label_tag_ptrs;
         LabelPtrMap label_ptrs;
@@ -141,7 +144,7 @@ namespace khmer {
                                          LabelPtrSet& found_labels);
 
     };
-}
+};
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
   while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));

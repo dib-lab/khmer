@@ -455,7 +455,6 @@ namespace khmer {
     // Partitioning stuff.
 
     unsigned int n_tags() const { return all_tags.size(); }
-    unsigned int n_labels() const { return label_ptrs.size(); }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
@@ -485,18 +484,7 @@ namespace khmer {
 	CallbackFn	    callback	    = NULL,
 	void *		    callback_data   = NULL
     );
-    
-    Label * check_and_allocate_label(Label new_label) {
-        Label * c;
-        if (label_ptrs.count(new_label)) {
-            c = label_ptrs[new_label];
-        } else {
-            c = new Label(new_label);
-            label_ptrs[*c] = c;
-        }
-        return c;
-    }
-    
+       
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,
 				  SeenSet * new_tags = 0);
@@ -507,51 +495,6 @@ namespace khmer {
 					     unsigned long long &n_consumed,
 					     CallbackFn callback = 0,
 					     void * callback_data = 0);
-    
-    void consume_fasta_and_tag_with_labels(
-                        std::string const	  &filename,
-                        unsigned int	  &total_reads,
-                        unsigned long long  &n_consumed,
-                        CallbackFn	  callback	  = NULL,
-                        void *		  callback_data	  = NULL);
-
-    void consume_fasta_and_tag_with_labels(
-	                read_parsers:: IParser *	    parser,
-	                unsigned int	    &total_reads,
-	                unsigned long long  &n_consumed,
-	                CallbackFn	    callback	    = NULL,
-	                void *		    callback_data   = NULL);
-	                
-    void consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
-					  unsigned int &total_reads,
-					  unsigned long long &n_consumed,
-					  CallbackFn callback = NULL,
-					  void * callback_datac = NULL);
-					  			  
-    void consume_sequence_and_tag_with_labels(const std::string& seq,
-					unsigned long long& n_consumed,
-					Label& current_label,
-					SeenSet * new_tags = 0);
-    
-    LabelPtrSet get_tag_labels(const HashIntoType& tag);
-    TagPtrSet get_label_tags(const Label& label);
-
-    void link_tag_and_label(HashIntoType& kmer, Label& label);
-    
-    unsigned int sweep_sequence_for_labels(const std::string& seq,
-					LabelPtrSet& found_labels,
-					bool break_on_stoptags,
-					bool stop_big_traversals);
-					
-    unsigned int sweep_label_neighborhood(const std::string & seq,
-                                                  LabelPtrSet& found_labels,
-                                                  unsigned int range,
-                                                  bool break_on_stoptags,
-                                                  bool stop_big_traversals);
-                                                  			
-    void traverse_labels_and_resolve(const SeenSet& tagged_kmers,
-                                     LabelPtrSet& found_labels);
-
     void consume_fasta_and_traverse(const std::string &filename,
 				    unsigned int distance,
 				    unsigned int big_threshold,
@@ -659,11 +602,5 @@ namespace khmer {
 
 #define RELEASE_ALL_TAGS_SPIN_LOCK \
   __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
-
-#define ACQUIRE_TAG_COLORS_SPIN_LOCK \
-  while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));
-
-#define RELEASE_TAG_COLORS_SPIN_LOCK \
-  __sync_bool_compare_and_swap( &_tag_labels_spin_lock, 1, 0);
 
 #endif // HASHTABLE_HH
