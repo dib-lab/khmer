@@ -15,6 +15,7 @@ from _khmer import forward_hash_no_rc
 from _khmer import reverse_hash
 from _khmer import get_config
 from _khmer import ReadParser
+from _khmer import LabelHash
 
 from ._version import get_versions
 __version__ = get_versions()['version']
