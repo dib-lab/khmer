@@ -96,7 +96,7 @@ that is, diginormed.  That makes it hard to use them for abundance
 calculations, and some assemblers prefer to have the original
 abundances in there.
 
-So, ran you recover the abundances?  Of course you can!  However, you
+So, can you recover the abundances?  Of course you can!  However, you
 do have to combine all of the raw (unpartitioned) reads into a single
 file, because the script to reinflate the partitions takes only a single
 file.  Sorry :(. ::
