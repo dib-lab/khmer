@@ -6,9 +6,7 @@
 
 #include "labelhash.hh"
 
-using namespace std;
 using namespace khmer;
-using namespace khmer:: read_parsers;
 
 /*
  * @camillescott
