@@ -61,7 +61,7 @@ build_depends = list(extra_objs)
 build_depends.extend(map(
     lambda bn: path_join("lib", bn + ".hh"),
     [
-        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting",
+        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting", "hashbits",
     ]
 ))
 
@@ -70,9 +70,9 @@ sources.extend(map(
     lambda bn: path_join("lib", bn + ".cc"),
     [
         "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
-        "read_parsers", "ktable", "hashtable", "hashbits", "counting",
-        "subset", "aligner", "scoringmatrix", "node", "kmer",
-    ]
+        "read_parsers", "ktable", "hashtable", "hashbits", "labelhash", "counting",
+        "subset", "aligner", "scoringmatrix", "node", "kmer",  
+   ]
 ))
 
 extension_mod_DICT = \
@@ -103,7 +103,7 @@ setup_metadata = \
         "long_description": open("README.rst").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
         ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
-        ' Jason Pell, Jared Simpson, C. S. Welcher,'
+        ' Jason Pell, Jared Simpson, Camille Scott,'
         ' Qingpeng Zhang, and C. Titus Brown',
         "author_email": 'khmer-project@idyll.org',
         #"maintainer": 'Michael R. Crusoe', # this overrides the author field
