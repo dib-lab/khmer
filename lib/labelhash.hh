@@ -79,7 +79,7 @@ namespace khmer {
 
         }
         
-        //~LabelHash();
+        ~LabelHash() {};
 
         TagLabelPtrMap tag_labels;
         LabelTagPtrMap label_tag_ptrs;
