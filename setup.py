@@ -61,7 +61,7 @@ build_depends = list(extra_objs)
 build_depends.extend(map(
     lambda bn: path_join("lib", bn + ".hh"),
     [
-        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting", "hashbits",
+        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting", "hashbits", "labelhash",
     ]
 ))
 

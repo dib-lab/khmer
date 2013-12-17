@@ -75,12 +75,11 @@ namespace khmer {
         LabelHash( WordLength ksize, std::vector<HashIntoType>& tablesizes)
         : khmer::Hashbits(ksize, tablesizes)
         {
-            // constructor
             _tag_labels_spin_lock = 0;
 
         }
         
-        ~LabelHash();
+        //~LabelHash();
 
         TagLabelPtrMap tag_labels;
         LabelTagPtrMap label_tag_ptrs;
