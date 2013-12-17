@@ -7,6 +7,7 @@
 #include "labelhash.hh"
 
 using namespace khmer;
+using namespace khmer:: read_parsers;
 
 /*
  * @camillescott
@@ -139,7 +140,7 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string 
   IParser* parser = IParser::get_parser(filename.c_str());
   Read read;
 
-  string seq = "";
+  std::string seq = "";
 
   // reset the master subset partition
   delete partition;
