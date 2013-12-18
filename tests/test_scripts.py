@@ -435,6 +435,25 @@ def test_normalize_by_median_force():
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
+def test_normalize_by_median_no_bigcount():
+    infile = utils.get_temp_filename('test.fa')
+    hashfile = utils.get_temp_filename('test-out.kh')
+    outfile = infile + '.keep'
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1000', '-k 8', '--savehash', hashfile, infile]
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0, (out, err)
+    print (out, err)
+    
+    assert os.path.exists(hashfile), hashfile
+    kh = khmer.load_counting_hash(hashfile)
+    
+    assert kh.get('GGTTGACG') == 255
 
 def test_normalize_by_median_dumpfrequency():
     CUTOFF = '1'
