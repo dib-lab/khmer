@@ -6,7 +6,6 @@ Getting started with Amazon EC2
    :maxdepth: 2
 
    start-up-an-ec2-instance
-   security-rules
    log-in-with-ssh-win
    log-in-with-ssh-mac
 
@@ -18,7 +17,6 @@ A final checklist:
 - used AMI ami-c17ec8a8;
 - NOT micro instance (m1.large, or bigger);
 - SSH, HTTP, HTTPS are enabled on the security group;
-
 
 Amazon Web Services reference material
 --------------------------------------

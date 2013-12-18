@@ -12,76 +12,70 @@ Log in with your username & password.
 
 Click on EC2 (upper left).
 
+.. image:: images/ec2-1.png
+   :width: 80%
+
 Select your zone
 ~~~~~~~~~~~~~~~~
 
 Many of the resources that we use are hosted by Amazon on the East coast.
-Make sure that your dashboard has 'N. Virginia' on the upper right:
+Make sure that your dashboard has 'N. Virginia' on the upper right.
 
-.. image:: images/ec2-dashboard-zone.png
+Then click on Launch Instance.
+
+.. image:: images/ec2-2.png
    :width: 80%
 
-If it doesn't say N. Virginia, click on it and select "US East (N. Virginia)".
+Select the machine operating system to boot
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The launch wizard
-~~~~~~~~~~~~~~~~~
+Choose 'Community AMIs', enter 'beacon' into the search box, and
+click on 'Select'.
 
-Select "Launch Instance" (midway down the page), and select "Quick
-Launch Wizard".
+.. image:: images/ec2-3.png
+   :width: 80%
 
-.. image:: images/ec2-wizard.png
-   :width: 90%
+Choose the machine size
+~~~~~~~~~~~~~~~~~~~~~~~
 
-On this page,
+Select 'General purpose', 'm1.xlarge', and then 'Review and Launch'.
 
-1. Name your new computer something (here, "Adam"; name it after yourself instead).
+.. image:: images/ec2-4.png
+   :width: 80%
 
-2. Create a new key pair (here, "Adam"; name it after yourself instead) and Download it.
+Confirm and launch
+~~~~~~~~~~~~~~~~~~
 
-3. Select "More Amazon machine images."
+Review the details (ignore the warnings!) and click on Launch.
 
-4. Click on "Continue."  This will be greyed out until you download the
-   key pair (button, upper right).
+.. image:: images/ec2-5.png
+   :width: 80%
 
-**Note:** You only need to create a new key pair the first time you're
-doing this -- you can select the one you created the first time, if you
-still have a copy of the key file you downloaded stored somewhere.
+(First time through) generate a new key pair
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"Create a new instance" page 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you don't have any key pairs, enter a key pair name and
+then download a key pair.  Then click Launch Instance.
 
-Enter 'ami-c17ec8a8' into the search box and click "search".  Select
-it, and hit Continue.
+.. image:: images/ec2-6.png
+   :width: 80%
 
-(If it doesn't show up, exit the wizard and make sure you're in US East
-zone -- see upper right of EC2 console.)
+(Next times through) select an existing key pair
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"Create a new instance" page 2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Select a key pair and click 'Launch'.
 
-On this page, "Edit details" until it looks like the below image --
+.. image:: images/ec2-7.png
+   :width: 80%
 
-.. image:: images/ec2-details.png
-   :width: 90%
+Click on View Instances
+~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Make sure your "Type" is m1.large.
+.. image:: images/ec2-8.png
+   :width: 80%
 
-2. Make sure your "Availability zone" is something specific, like us-east-1c.
+Select the public DNS name for later use
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-3. Make sure your "Security group" is set to default.
-
-Then, click "Launch".
-
-Wait for your instance to be running
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Go to the 'instances' list and make sure your particular instance is
-running.
-
-.. image:: images/ec2-instance-running.png
-   :width: 90%
-
-You'll need the hostname of your new computer, on the bottom (ec2-...) --
-we suggest selecting this and copying it somewhere.
-
-Now go to :doc:`security-rules`.
+.. image:: images/ec2-9.png
+   :width: 80%
