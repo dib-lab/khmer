@@ -180,59 +180,7 @@ namespace khmer {
 
     WordLength	    _ksize;
     HashIntoType    bitmask;
-    unsigned int    _nbits_sub_1;
-
-    // Does the given tag already have the given label?
-    bool _cmap_contains_label(const TagLabelPtrMap& cmap,
-                        HashIntoType& kmer,
-                        Label& the_label)
-    {
-      std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
-      ret = cmap.equal_range(kmer);
-      for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-        if (*(it->second) == the_label) return true;
-      }
-      return false;
-    }
-
-    // Does the given label already have a tag associated with it?
-    bool _cmap_contains_tag(const LabelTagPtrMap& cmap,
-                            Label& the_label,
-                            HashIntoType& kmer) {
-      std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
-      ret = cmap.equal_range(the_label);
-      for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-        if(*(it->second) == kmer) return true;
-      }
-      return false;
-    }
-    
-    unsigned int _get_tag_labels(const HashIntoType& tag,
-                          const TagLabelPtrMap& cmap,
-                          LabelPtrSet& found_labels) {
-        unsigned int num_labels = 0;
-        std::pair<TagLabelPtrMap::const_iterator, TagLabelPtrMap::const_iterator> ret;
-        ret = cmap.equal_range(tag);
-        for (TagLabelPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            found_labels.insert(it->second);
-            ++num_labels;
-        }
-        return num_labels;
-    }
-    
-    unsigned int _get_tags_from_label(const Label& label,
-                               const LabelTagPtrMap& cmap,
-                               TagPtrSet& labeled_tags) {
-        unsigned int num_tags = 0;
-        std::pair<LabelTagPtrMap::const_iterator, LabelTagPtrMap::const_iterator> ret;
-        ret = cmap.equal_range(label);
-        for (LabelTagPtrMap::const_iterator it=ret.first; it!=ret.second; ++it) {
-            labeled_tags.insert(it->second);
-            ++num_tags;
-        }
-        return num_tags;
-    }
-    
+    unsigned int    _nbits_sub_1;  
     
     Hashtable(
 	WordLength	ksize,
@@ -253,7 +201,6 @@ namespace khmer {
       partition = new SubsetPartition(this);
       _init_bitstuff();
       _all_tags_spin_lock = 0;
-      _tag_labels_spin_lock = 0;
       
     }
 
@@ -367,15 +314,11 @@ namespace khmer {
     }
 
     uint32_t _all_tags_spin_lock;
-    uint32_t _tag_labels_spin_lock;
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
-    TagLabelPtrMap tag_labels;
-    LabelTagPtrMap label_tag_ptrs;
-    LabelPtrMap label_ptrs;
 
     // accessor to get 'k'
     const WordLength ksize() const { return _ksize; }
