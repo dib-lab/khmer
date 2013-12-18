@@ -4215,8 +4215,8 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
 
         // We want the hashbits pointer in the base class to point to our labelhash,
         // so that the KHashbits methods are called on the correct object (a LabelHash)
-        self->khashbits.hashbits = (khmer::Hashbits *)self->labelhash;
         self->labelhash = new khmer::LabelHash(k, sizes);
+        self->khashbits.hashbits = (khmer::Hashbits *)self->labelhash;
     }
 
     return (PyObject *) self;     
@@ -4226,6 +4226,7 @@ static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args, P
 {
     if (khmer_KHashbitsType.tp_init((PyObject *)self, args, kwds) < 0)
         return -1;
+    std::cout << "testing my pointer ref to hashbits: " << self->khashbits.hashbits->n_tags() << std::endl;
     return 0;
 }
 
@@ -4306,24 +4307,25 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
 static PyObject * labelhash_consume_sequence_and_tag_with_labels(PyObject * self, PyObject * args) {
   khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
   khmer::LabelHash * hb = me->labelhash;
-  
+  std::cout << "inside labelhash consume cpython func, parsing args..." << std::endl;
   char * seq = NULL;
   unsigned long long c = NULL;
   if (!PyArg_ParseTuple(args, "sK", &seq, &c)) {
     return NULL;
   }
-  
+  std::cout << "parsed args, getting new label" << std::endl;
   unsigned long long n_consumed = 0;
   khmer::Label * the_label = hb->check_and_allocate_label(c);
 
   try { 
   //if (hb->check_and_normalize_read(seq)) {
-    
+    std::cout << "calling low level consume func on labelhash..." << std::endl;
     hb->consume_sequence_and_tag_with_labels(seq, n_consumed, *the_label);
   //}
   } catch (_khmer_signal &e) {
     return NULL;
   }
+  std::cout << "packaging return value and returning!" << std::endl;
   return Py_BuildValue("L", n_consumed);
 }
 
@@ -4510,7 +4512,7 @@ khmer_labelhash_getattr(PyObject * obj, char * name)
 static PyTypeObject khmer_KLabelHashType = {
     PyObject_HEAD_INIT(NULL)
     0,                       /* ob_size */
-   "LabelHash",            /* tp_name */ 
+   "_LabelHash",            /* tp_name */ 
     sizeof(khmer_KLabelHashObject), /* tp_basicsize */
     0,                       /* tp_itemsize */
     (destructor)khmer_labelhash_dealloc, /* tp_dealloc */
@@ -4976,7 +4978,7 @@ init_khmer(void)
     PyModule_AddObject(m, "Hashbits", (PyObject *)&khmer_KHashbitsType);
 
     Py_INCREF(&khmer_KLabelHashType);
-    PyModule_AddObject(m, "LabelHash", (PyObject *)&khmer_KLabelHashType);
+    PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:

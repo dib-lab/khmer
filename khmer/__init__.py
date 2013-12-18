@@ -15,7 +15,7 @@ from _khmer import forward_hash_no_rc
 from _khmer import reverse_hash
 from _khmer import get_config
 from _khmer import ReadParser
-from _khmer import LabelHash
+from _khmer import _LabelHash
 
 from ._version import get_versions
 __version__ = get_versions()['version']
@@ -28,7 +28,6 @@ def new_hashbits(k, starting_size, n_tables=2):
     primes = get_n_primes_above_x(n_tables, starting_size)
 
     return _new_hashbits(k, primes)
-
 
 def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
     primes = get_n_primes_above_x(n_tables, starting_size)
@@ -149,4 +148,14 @@ def get_n_primes_above_x(n, x):
         i += 2
     return primes
 
+class LabelHash(_LabelHash):
+    def __new__(cls, k, starting_size, n_tables):
+        print "** LabelHash __new__"
+        print "\t*** Getting primes..."
+        primes = get_n_primes_above_x(n_tables, starting_size)
+        print "\t*** Invoking parent..."
+        c = _LabelHash.__new__(cls, k, primes)
+        print "\t*** Done with parent, returning class object"
+        c.primes = primes
+        return c
 

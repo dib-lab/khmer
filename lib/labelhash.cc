@@ -195,6 +195,8 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 					Label& current_label,
 					SeenSet * found_tags)
   {
+
+    std::cout << "inside low-level labelhash consume sequence function" << std::endl;
     bool is_new_kmer;
     bool kmer_tagged;
 
@@ -272,7 +274,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 /*
  * Find all labels associated with the sequence
  * For now, check /every/ k-mer with find_all_tags
- * THIS SUCKS AND IT'S YOUR FAULT @CTB
  */
 unsigned int LabelHash::sweep_sequence_for_labels(const std::string& seq,
 					LabelPtrSet& found_labels,
