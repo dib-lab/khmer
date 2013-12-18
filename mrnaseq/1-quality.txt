@@ -8,8 +8,8 @@ of the Nematostella data set.
 
 .. note::
 
-   The end results of this tutorial are available as public snapshot
-   snap-8b155fd9 on EC2/EBS.
+   The raw data for this tutorial is available as public snapshot
+   snap-f5a9dea7.
 
 Install software
 ----------------

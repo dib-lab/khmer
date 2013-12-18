@@ -1,6 +1,6 @@
-============================
-BLASTing your assembled data
-============================
+===============================
+7. BLASTing your assembled data
+===============================
 
 One thing everyone wants to do is BLAST sequence data, right?  Here's a
 simple way to set up a stylish little BLAST server that lets you search

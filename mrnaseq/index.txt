@@ -4,6 +4,14 @@ The Eel Pond mRNAseq Protocol
 
 :author: Titus Brown, Camille Scott, and Leigh Sheneman.
 
+This is a lightweight protocol for assembling up to a few hundred
+million mRNAseq reads, annotating the resulting assembly, and doing
+differential expression with RSEM.  It is part of khmer-protocols; see
+`the main page for this version <../index.html>`__ for citation
+information, and `the khmer-protocols site
+<http://khmer-protocols.readthedocs.org/>`__ for the latest released
+version.
+
 Special thanks to Dr. Joshua Rosenthal for his help in developing this,
 and to Dr. Leslie Babonis for her feedback on various problems!
 

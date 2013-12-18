@@ -4,6 +4,13 @@ The Kalamazoo Metagenome Assembly protocol
 
 :author: Adina Howe and Titus Brown
 
+This is a protocol for assembling low- and medium-diversity
+metagenomes. Marine sediment and soil data sets may not be assemblable
+in the cloud just yet.  It is part of khmer-protocols; see `the main
+page for this version <../index.html>`__ for citation information, and
+`the khmer-protocols site <http://khmer-protocols.readthedocs.org/>`__
+for the latest released version.
+
 .. toctree::
    :maxdepth: 1
 

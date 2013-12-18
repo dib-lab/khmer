@@ -1,6 +1,6 @@
-======================================
-Annotating your metagenome with Prokka
-======================================
+=========================================
+6. Annotating your metagenome with Prokka
+=========================================
 
 .. note::
 
@@ -109,7 +109,7 @@ prodigal fails if there are too many, and prokka uses prodigal)::
 
 Now, run Prokka::
 
-   /mnt/prokka-1.7/bin/prokka metagenome.fa --outdir metag --prefix testasm
+   /mnt/prokka-1.7/bin/prokka metagenome.fa --outdir metag --prefix testasm --metagenome
 
 There will be a bunch of files in the dierctory 'metag/'.  Probably the
 most interesting is 'metag/testasm.faa', which will contain a set of
