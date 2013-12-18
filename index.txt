@@ -20,7 +20,7 @@ discussions:
 If you need to reference these protocols, please cite::
 
    Brown, C. Titus; Scott, Camille; Crusoe, Michael; Sheneman, Leigh;
-   Rosenthal, Josh; Adina Howe (2013): khmer-protocols 0.8.3 documentation.
+   Rosenthal, Josh; Adina Howe (2013): khmer-protocols documentation.
    figshare. http://dx.doi.org/10.6084/m9.figshare.878460
 
 Protocols:
