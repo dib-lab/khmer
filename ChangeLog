@@ -8,6 +8,11 @@
 * Added a test to ensure that normalize-by-median.py has bigcount set to
   False.
 
+2013-12-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* doc/install.txt Add setup instructions for RHEL6 & fix invocation to get
+master branch to work for non-developers
+
 2013-11-22  CS Welcher  <cs.welcher@gmail.com>
 
 * Makefile: Added debug target for profiling.
