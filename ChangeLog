@@ -1,3 +1,8 @@
+2013-12-18  Titus Brown  <titus@idyll.org>
+
+* Added a test to ensure that normalize-by-median.py has bigcount set to
+  False.
+
 2013-11-22  CS Welcher  <cs.welcher@gmail.com>
 
 * Makefile: Added debug target for profiling.
