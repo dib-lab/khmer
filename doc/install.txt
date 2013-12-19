@@ -34,9 +34,16 @@ Linux
 ^^^^^
 
 Install the python development environment, virtualenv, pip, and
-gcc; on Debian and Ubuntu this can be done with::
+gcc.
+
+On Debian and Ubuntu this can be done with::
 
    apt-get install python2.7-dev python-virtualenv python-pip gcc
+
+For RHEL6:
+
+  yum install -y python-pip git gcc screen gcc-c++ python-devel make
+
 
 Latest stable release
 ---------------------
@@ -63,7 +70,7 @@ Latest development branch
 
 Repeat the above but modify the pip install line::
 
-   pip install -e git+git@github.com:ged-lab/khmer.git@master#egg=khmer
+   pip install -e git+https://github.com/ged-lab/khmer.git@master#egg=khmer
 
 Run the tests
 ^^^^^^^^^^^^^
