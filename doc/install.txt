@@ -38,12 +38,12 @@ gcc.
 
 On Debian and Ubuntu this can be done with::
 
-   apt-get install python2.7-dev python-virtualenv python-pip gcc
+   sudo apt-get install python2.7-dev python-virtualenv python-pip gcc
 
-For RHEL6:
+For RHEL6::
 
-  yum install -y python-pip git gcc screen gcc-c++ python-devel make
-
+   sudo yum install -y python-devel python-pip git gcc gcc-c++ make
+   sudo pip install virtualenv
 
 Latest stable release
 ---------------------
