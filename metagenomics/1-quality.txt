@@ -34,6 +34,8 @@ Install `khmer <http://khmer.readthedocs.org/>`__::
    echo 'export PYTHONPATH=/usr/local/share/khmer:$PYTHONPATH' >> ~/.bashrc
    source ~/.bashrc
 
+.. @@ ping.
+
 Install `Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`__::
 
    cd /root
