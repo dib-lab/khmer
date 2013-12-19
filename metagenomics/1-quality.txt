@@ -28,10 +28,10 @@ Install `khmer <http://khmer.readthedocs.org/>`__::
    cd /usr/local/share
    git clone https://github.com/ged-lab/khmer.git
    cd khmer
-   git checkout protocols-v0.8.3
+   git checkout protocols-v0.8.5
    make
 
-   echo 'export PYTHONPATH=/usr/local/share/khmer/python:$PYTHONPATH' >> ~/.bashrc
+   echo 'export PYTHONPATH=/usr/local/share/khmer:$PYTHONPATH' >> ~/.bashrc
    source ~/.bashrc
 
 Install `Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`__::
