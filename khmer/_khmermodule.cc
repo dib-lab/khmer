@@ -4795,6 +4795,7 @@ static void khmer_hashbits_dealloc(PyObject* self)
   delete obj->hashbits;
   obj->hashbits = NULL;
   
+  self->ob_type->tp_free((PyObject*)obj);
   PyObject_Del((PyObject *) obj);
 }
 
