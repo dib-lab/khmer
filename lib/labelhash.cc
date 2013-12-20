@@ -6,6 +6,9 @@
 
 #include "labelhash.hh"
 
+#define LABEL_DBG 1
+#define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
+
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
@@ -186,8 +189,10 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string 
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
 void LabelHash::link_tag_and_label(HashIntoType& kmer, Label& kmer_label) {
-  tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
-  label_tag_ptrs.insert(LabelTagPtrPair(kmer_label, &kmer));
+    printdbg(linking tag and label)
+    tag_labels.insert(TagLabelPtrPair(kmer, &kmer_label));
+    label_tag_ptrs.insert(LabelTagPtrPair(kmer_label, &kmer));
+    printdbg(done linking tag and label)
 }
 
 void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
@@ -196,7 +201,8 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 					SeenSet * found_tags)
   {
 
-    std::cout << "inside low-level labelhash consume sequence function" << std::endl;
+    printdbg(inside low-level labelhash consume sequence function)
+
     bool is_new_kmer;
     bool kmer_tagged;
 
@@ -204,35 +210,45 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
     HashIntoType kmer;
 
     unsigned int since = _tag_density / 2 + 1;
-
+    
+    printdbg(entering while loop)
     while(!kmers.done()) {
       kmer = kmers.next();
 
       if ((is_new_kmer = test_and_set_bits( kmer )))
         ++n_consumed;
+        printdbg(test_and_set_bits)
 
   #if (1)
       if (is_new_kmer) {
+        printdbg(new kmer...)
         ++since;
       } else {
+        printdbg(entering tag spin lock)
         ACQUIRE_ALL_TAGS_SPIN_LOCK
         kmer_tagged = set_contains(all_tags, kmer);
         RELEASE_ALL_TAGS_SPIN_LOCK
+        printdbg(released tag spin lock)
         if (kmer_tagged) {
 	      since = 1;
-	      
+	      printdbg(kmer already in all_tags)
 	      // Labeling code
 	      // TODO: MAKE THREADSAFE!
 	      
 	      if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
+            printdbg(tag was not labeled: adding to labels...)
 	        ACQUIRE_TAG_COLORS_SPIN_LOCK
 	        link_tag_and_label(kmer, current_label);
 	        RELEASE_TAG_COLORS_SPIN_LOCK
+            printdbg(released label spin lock)
 	      }
 	      if (found_tags) {
 	        found_tags->insert(kmer);
 	      }
-        }  else ++since;
+        }  else {
+            printdbg(inc since var)
+            ++since;
+        }
       }
   #else
       if (!is_new_kmer && set_contains(all_tags, kmer)) {
@@ -244,9 +260,12 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
   #endif
       //
       if (since >= _tag_density) {
+        printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
         ACQUIRE_ALL_TAGS_SPIN_LOCK
+        printdbg(in tag spin lock)
         all_tags.insert(kmer);
         RELEASE_ALL_TAGS_SPIN_LOCK
+        printdbg(released tag spin lock)
         
         // Labeling code
         // TODO: MAKE THREADSAFE!
@@ -257,9 +276,9 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
         if (found_tags) { found_tags->insert(kmer); }
         since = 1;
       }
-
+    printdbg(moving to next iter)
     } // iteration over kmers
-
+    printdbg(finished iteration: dropping last tag)
     if (since >= _tag_density/2 - 1) {
       ACQUIRE_ALL_TAGS_SPIN_LOCK
       all_tags.insert(kmer);	// insert the last k-mer, too.

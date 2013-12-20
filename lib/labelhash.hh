@@ -76,6 +76,7 @@ namespace khmer {
         : khmer::Hashbits(ksize, tablesizes)
         {
             _tag_labels_spin_lock = 0;
+            _all_tags_spin_lock = 0;
 
         }
         
