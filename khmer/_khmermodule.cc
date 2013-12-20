@@ -4982,7 +4982,7 @@ init_khmer(void)
     //	     Then, remove the corresponding factory functions.
 
     Py_INCREF(&khmer_KHashbitsType);
-    PyModule_AddObject(m, "Hashbits", (PyObject *)&khmer_KHashbitsType);
+    PyModule_AddObject(m, "_Hashbits", (PyObject *)&khmer_KHashbitsType);
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
