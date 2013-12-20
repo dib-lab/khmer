@@ -205,7 +205,7 @@ def main():
     output_buffer = ReadBufferManager(max_buffers, max_reads, buf_size, output_pref, outdir)
 
 	# consume the partitioned fasta with which to label the graph
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.LabelHash(K, HT_SIZE, N_HT)
     print >>sys.stderr, 'consuming fastp...'
     ht.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
 

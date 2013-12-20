@@ -6,7 +6,7 @@
 
 #include "labelhash.hh"
 
-#define LABEL_DBG 1
+#define LABEL_DBG 0
 #define printdbg(m) if(LABEL_DBG) std::cout << #m << std::endl;
 
 using namespace khmer;
@@ -146,8 +146,8 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string 
   std::string seq = "";
 
   // reset the master subset partition
-  delete partition;
-  partition = new SubsetPartition(this);
+  //delete partition;
+  //partition = new SubsetPartition(this);
 
   //
   // iterate through the FASTA file & consume the reads.
@@ -160,12 +160,15 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string 
 
     if (check_and_normalize_read(seq)) {
       // First, figure out what the partition is (if non-zero), and save that.
+      printdbg(parsing partition id)
       p = _parse_partition_id(read.name);
+      printdbg(checking label and allocating if necessary)
       c = check_and_allocate_label(p);
-
+      printdbg(consuming sequence and tagging)
       consume_sequence_and_tag_with_labels( seq,
 					      n_consumed,
 					      *c );
+      printdbg(back in consume_partitioned)
     }
 	       
     // reset the sequence info, increment read number
@@ -182,9 +185,11 @@ void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string 
       }
     }
   }
+  printdbg(done with while loop in consume_partitioned)
 
   // @cswelcher TODO: check that deallocate LabelPtrMap is correct
   delete parser;
+  printdbg(deleted parser and exiting)
 }
 
 // @cswelcher: double-check -- is it valid to pull the address from a reference?
@@ -225,9 +230,9 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
         ++since;
       } else {
         printdbg(entering tag spin lock)
-        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        //ACQUIRE_ALL_TAGS_SPIN_LOCK
         kmer_tagged = set_contains(all_tags, kmer);
-        RELEASE_ALL_TAGS_SPIN_LOCK
+        //RELEASE_ALL_TAGS_SPIN_LOCK
         printdbg(released tag spin lock)
         if (kmer_tagged) {
 	      since = 1;
@@ -237,9 +242,9 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 	      
 	      if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
             printdbg(tag was not labeled: adding to labels...)
-	        ACQUIRE_TAG_COLORS_SPIN_LOCK
+	        //ACQUIRE_TAG_COLORS_SPIN_LOCK
 	        link_tag_and_label(kmer, current_label);
-	        RELEASE_TAG_COLORS_SPIN_LOCK
+	        //RELEASE_TAG_COLORS_SPIN_LOCK
             printdbg(released label spin lock)
 	      }
 	      if (found_tags) {
@@ -261,17 +266,17 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
       //
       if (since >= _tag_density) {
         printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
-        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        //ACQUIRE_ALL_TAGS_SPIN_LOCK
         printdbg(in tag spin lock)
         all_tags.insert(kmer);
-        RELEASE_ALL_TAGS_SPIN_LOCK
+        //RELEASE_ALL_TAGS_SPIN_LOCK
         printdbg(released tag spin lock)
         
         // Labeling code
         // TODO: MAKE THREADSAFE!
-        ACQUIRE_TAG_COLORS_SPIN_LOCK
+        //ACQUIRE_TAG_COLORS_SPIN_LOCK
         link_tag_and_label(kmer, current_label);
-        RELEASE_TAG_COLORS_SPIN_LOCK
+        //RELEASE_TAG_COLORS_SPIN_LOCK
         
         if (found_tags) { found_tags->insert(kmer); }
         since = 1;
@@ -280,15 +285,16 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
     } // iteration over kmers
     printdbg(finished iteration: dropping last tag)
     if (since >= _tag_density/2 - 1) {
-      ACQUIRE_ALL_TAGS_SPIN_LOCK
+      //ACQUIRE_ALL_TAGS_SPIN_LOCK
       all_tags.insert(kmer);	// insert the last k-mer, too.
-      RELEASE_ALL_TAGS_SPIN_LOCK
+      //RELEASE_ALL_TAGS_SPIN_LOCK
       
       // Label code: TODO: MAKE THREADSAFE!
       link_tag_and_label(kmer, current_label);
       
       if (found_tags) { found_tags->insert(kmer); }
     }
+  printdbg(done with low-level consume)
   }
 /*
  * Find all labels associated with the sequence
