@@ -15,11 +15,6 @@ The example shows how to construct k-mer abundance histograms, as well
 as the effect of digital normalization and partitioning on the k-mer
 abundance distribution.
 
-**NOTE, May 2013** -- you may need to use the 'bleeding-edge' branch of khmer.
-You can check that out by doing::
-
-   git clone https://github.com/ged-lab/khmer.git -b bleeding-edge
-
 See `the script for running everything
 <https://github.com/ged-lab/khmer/blob/master/examples/stamps/do.sh>`__
 and `the IPython Notebook

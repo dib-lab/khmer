@@ -38,7 +38,7 @@ import khmer
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
-###
+#
 
 
 def worker(q, basename, stop_big_traversals):

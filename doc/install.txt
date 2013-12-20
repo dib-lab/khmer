@@ -2,7 +2,9 @@
 Installing and running khmer
 ============================
 
-You'll need Python 2.7+ and internet access. 
+You'll need Python 2.7+ and internet access.
+
+The khmer project currently works with Python 2.6 but we target Python 2.7+. 
 
 Build requirements
 ------------------
@@ -42,7 +44,7 @@ Latest stable release
 1) Create a virtualenv and activate it::
 
       virtualenv env
-      . env/bin/activate
+      source env/bin/activate
 
 2) Use pip to download, build, and install khmer and its dependencies::
 
@@ -54,7 +56,7 @@ Latest stable release
 4) When returning to khmer after installing it you will need to
    reactivate the virtualenv first::
 
-      . env/bin/activate
+      source env/bin/activate
 
 Latest development branch
 -------------------------
@@ -70,4 +72,4 @@ From within your activated virtualenv you will find the source in
 env/src/khmer::
 
    cd env/src/khmer
-   python setup.py nosetests
+   make test
