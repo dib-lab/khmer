@@ -74,7 +74,6 @@ WITH_INTERNAL_METRICS=false
 
 ### NOTE: No user-servicable parts below this line! ###
 
-
 CXXFLAGS=
 CXX_WARNING_FLAGS=-Wall
 CXX_OPTIMIZATION_FLAGS=-O3
@@ -171,7 +170,7 @@ CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o 
 PARSERS_OBJS= read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
-
+	echo ~~~~~~ YO WE IN THIS MAKEFILE ~~~~~~
 clean:
 	-(cd $(ZLIB_DIR) && make clean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
