@@ -1835,7 +1835,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  assert(is_hashbits_obj(tracking_obj));
+  //assert(is_hashbits_obj(tracking_obj));
 
   khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
   khmer::Hashbits * hashbits = tracking_o->hashbits;
@@ -1875,7 +1875,7 @@ static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
   khmer:: read_parsers:: IParser * rparser = 
     _PyObject_to_khmer_ReadParser(rparser_obj);
 
-  assert(is_hashbits_obj(tracking_obj));
+  //assert(is_hashbits_obj(tracking_obj));
 
   khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
   khmer::Hashbits * hashbits = tracking_o->hashbits;
@@ -4182,13 +4182,15 @@ static PyObject * khmer_labelhash_new(PyTypeObject * type, PyObject *args, PyObj
 // khmer_labelhash_dealloc -- clean up a labelhash object.
 //
 
-static void khmer_labelhash_dealloc(PyObject* self)
+static void khmer_labelhash_dealloc(PyObject* obj)
 {
-  khmer_KLabelHashObject * obj = (khmer_KLabelHashObject *) self;
-  delete obj->labelhash;
-  obj->labelhash = NULL;
+  khmer_KLabelHashObject * self = (khmer_KLabelHashObject *) obj;
+
+  delete self->labelhash;
+  self->labelhash = NULL;
   
-  PyObject_Del((PyObject *) obj);
+  obj->ob_type->tp_free((PyObject*)self);
+  //PyObject_Del((PyObject *) obj);
 }
 
 // a little wierd; we don't actually want to call Hashbits' new method. Rather, we
@@ -4204,6 +4206,7 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
         PyObject* sizes_list_o = NULL;
 
         if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+            Py_DECREF(self);
             return NULL;
         }
 
@@ -4227,6 +4230,8 @@ static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args, P
     if (khmer_KHashbitsType.tp_init((PyObject *)self, args, kwds) < 0)
         return -1;
     std::cout << "testing my pointer ref to hashbits: " << self->khashbits.hashbits->n_tags() << std::endl;
+    std::cout << "hashbits: " << self->khashbits.hashbits << std::endl;
+    std::cout << "labelhash: " << self->labelhash << std::endl;
     return 0;
 }
 
@@ -4298,9 +4303,10 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
     labelhash->consume_partitioned_fasta_and_tag_with_labels(filename, 
     total_reads, n_consumed, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
+    std::cout << "caught exception in consume_partitioned_fasta_and_tag_with_labels!" << std::endl;
     return NULL;
   }
-
+  std::cout << "building value for return..." << std::endl;
   return Py_BuildValue("iK", total_reads, n_consumed);
 }
 

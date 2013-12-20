@@ -48,6 +48,31 @@ def test_get_tag_labels():
     assert len(labels) == 1
     assert labels.pop() == 0L
 
+def test_consume_fasta_and_tag_with_labels():
+    lb = LabelHash(20, 1e7, 4)
+    read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
+    filename = utils.get_test_data('test-transcript.fa')
+
+    total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
+    print "doing get"
+    assert lb.get(read_1[:20])
+    assert total_reads == 3
+    print "doing n_labels"
+    print lb.n_labels()
+    print "doing label dict"
+    print lb.get_label_dict()
+    print "get tagset"
+    for tag in lb.get_tagset():
+        print "forward hash"
+        print tag, khmer.forward_hash(tag, 20)
+    for record in screed.open(filename):
+        print "Sweeping tags"
+        print lb.sweep_tag_neighborhood(record.sequence, 40)
+        print "Sweeping labels..."
+        print lb.sweep_label_neighborhood(record.sequence, 40)
+    assert lb.n_labels() == 3
+
+
 def test_consume_partitioned_fasta_and_tag_with_labels():
     lb = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('real-partition-small.fa')
@@ -63,23 +88,24 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     assert labels.pop() == 2L
     assert lb.n_labels() == 1 
 
-def test_consume_fasta_and_tag_with_labels():
+def test_sweep_tag_neighborhood():
     lb = LabelHash(20, 1e7, 4)
-    read_1 = 'ACGTAACCGGTTAAACCCGGGTTTAAAACCCCGGGGTTTT'
-    filename = utils.get_test_data('test-transcript.fa')
+    filename = utils.get_test_data('single-read.fq')
+    lb.consume_fasta_and_tag(filename)
+    
+    tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    assert len(tags) == 1
+    assert tags.pop() == 173473779682L
 
-    total_reads, n_consumed = lb.consume_fasta_and_tag_with_labels(filename)
 
-    assert lb.get(read_1[:20])
-    assert total_reads == 3
-    print lb.n_labels()
-    print lb.get_label_dict()
-    for tag in lb.get_tagset():
-        print tag, khmer.forward_hash(tag, 20)
-    for record in screed.open(filename):
-        print lb.sweep_tag_neighborhood(record.sequence, 40)
-        print lb.sweep_label_neighborhood(record.sequence, 40)
-    assert lb.n_labels() == 3
+def test_sweep_label_neighborhood():
+    lb = LabelHash(20, 1e7, 4)
+    filename = utils.get_test_data('single-read.fq')
+    lb.consume_fasta_and_tag_with_labels(filename)
+    
+    labels = lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+    assert len(labels) == 1
+    assert labels.pop() == 0L
 
 '''
 * The test data set as four reads: A, B, C, and D
@@ -123,21 +149,3 @@ def test_label_tag_correctness():
     assert len(labels) == 1
     assert 3L in labels
 
-def test_sweep_tag_neighborhood():
-    lb = LabelHash(20, 1e7, 4)
-    filename = utils.get_test_data('single-read.fq')
-    lb.consume_fasta_and_tag(filename)
-    
-    tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
-    assert len(tags) == 1
-    assert tags.pop() == 173473779682L
-
-
-def test_sweep_label_neighborhood():
-    lb = LabelHash(20, 1e7, 4)
-    filename = utils.get_test_data('single-read.fq')
-    lb.consume_fasta_and_tag_with_labels(filename)
-    
-    labels = lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
-    assert len(labels) == 1
-    assert labels.pop() == 0L
