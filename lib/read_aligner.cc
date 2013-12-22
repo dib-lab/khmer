@@ -37,21 +37,21 @@ namespace khmer {
       if(s2 == MATCH) {
 	return MM;
       } else if(s2 == INSERT_GRAPH) {
-	return MD;
+	return MIg;
       } else if(s2 == INSERT_READ) {
-	return MI;
+	return MIr;
       }
     } else if(s1 == INSERT_GRAPH) {
       if(s2 == MATCH) {
-	return DM;
+	return IgM;
       } else if(s2 == INSERT_GRAPH) {
-	return DD;
+	return IgIg;
       }
     } else if(s1 == INSERT_READ) {
       if(s2 == MATCH) {
-	return IM;
+	return IrM;
       } else if(s2 == INSERT_READ) {
-	return II;
+	return IrIr;
       }
     }
 
@@ -125,15 +125,19 @@ namespace khmer {
 	  sc = 0;
 	}
 
+	/*if(_revhash(next_fwd, m_ch->ksize()) == "TTTCCCTCTTTTCTTCTATATGTTTGATTATC" && next_state != INSERT_GRAPH) {
+	  continue;
+	  }*/
+
 	if(next_state == MATCH) {
-	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state,
+	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state, trans,
 					      next_fwd, next_rc, curr->length + 1);
-	} else if(next_state == INSERT_GRAPH) {
-	  next = new AlignmentNode(curr, (Nucl)i, curr->seq_idx, (State)next_state,
-					      next_fwd, next_rc, curr->length);
 	} else if(next_state == INSERT_READ) {
-	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state,
-					      curr->fwd_hash, curr->rc_hash, curr->length + 1);
+	  next = new AlignmentNode(curr, (Nucl)i, next_seq_idx, (State)next_state, trans,
+				   curr->fwd_hash, curr->rc_hash, curr->length + 1);
+	} else if(next_state == INSERT_GRAPH) {
+	  next = new AlignmentNode(curr, (Nucl)i, curr->seq_idx, (State)next_state, trans,
+					      next_fwd, next_rc, curr->length);
 	}
 
 	next->score = curr->score + sc + m_sm.tsc[trans];
@@ -164,11 +168,13 @@ namespace khmer {
     
     AlignmentNode* curr = NULL;
     AlignmentNode* best = NULL;
+    std::set<AlignmentNode>::iterator tmp;
 
     while (!open.empty()) {
       curr = open.top();
+
       #if READ_ALIGNER_DEBUG
-      std::cerr << "curr: " << curr->prev << " "
+      std::cerr << "curr: " << curr << " " << curr->prev << " " << " state=" << curr->state << " "
 		<< _revhash(curr->fwd_hash, m_ch->ksize()) << " " << _revhash(curr->rc_hash, m_ch->ksize())
 		<< " cov=" << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
 		<< " emission=" << curr->base
@@ -190,12 +196,19 @@ namespace khmer {
 	break;
       }
 
-      if(set_contains(closed, *curr)) {
+      tmp = closed.find(*curr);
+      if(tmp == closed.end()) {	
+	//do nothing
+      } else if ((*tmp).score > curr->score) {
+	closed.erase(tmp);
+      } else if ((*tmp).score == curr->score) {
+	//do nothing
+      } else {
 	continue;
       }
 
       closed.insert(*curr);
-      
+
       Enumerate(open, all_nodes, curr, forward, seq);
     }
 
@@ -231,6 +244,10 @@ namespace khmer {
     char read_base;
     char graph_base;
 
+    #if READ_ALIGNER_DEBUG
+    std::cerr << "graph_base" << "\t" << "read_base" << "\t" << "score\th_score\tf_score\tlength\tstate\ttrusted?\tseq_idx\tfwd_hash\trc_hash" << std::endl;
+    #endif
+    
     while(node != NULL && node->prev != NULL) {
       if(node->state == MATCH) {
 	graph_base = toupper(nucl_lookup[node->base]);
@@ -245,6 +262,11 @@ namespace khmer {
 	graph_base = '?';
 	read_base = '?';
       }
+
+      #if READ_ALIGNER_DEBUG
+      std::cerr << graph_base << "\t" << read_base << "\t" << node->score << "\t" << node->h_score << "\t" << node->f_score << "\t" << node->length << "\t" << node->state << "\t" << node->trusted << "\t" << node->seq_idx << "\t" << _revhash(node->fwd_hash, m_ch->ksize()) << "\t" << _revhash(node->rc_hash, m_ch->ksize()) << std::endl;
+      #endif
+      
       if(forward) {
 	graph_alignment = graph_base + graph_alignment;
 	read_alignment = read_base + read_alignment;
@@ -287,6 +309,7 @@ namespace khmer {
 	  start.kmer_idx = i;
 	  start.k_cov = kCov;
 	  start.kmer = kmer;
+	  break;
 	}
       }
     }
@@ -313,8 +336,8 @@ namespace khmer {
 	e = T;
 	break;
       }
-      
-      AlignmentNode startingNode = AlignmentNode(NULL, e, start.kmer_idx + k - 1, MATCH, fhash, rhash, k);
+
+      AlignmentNode startingNode = AlignmentNode(NULL, e, start.kmer_idx + k - 1, MATCH, MM, fhash, rhash, k);
       startingNode.f_score = 0;
       startingNode.h_score = 0;
       Alignment* forward = NULL;
