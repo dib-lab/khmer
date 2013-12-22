@@ -30,6 +30,9 @@ extern "C" {
   void init_khmer();
 }
 
+using namespace std;
+using namespace khmer;
+using namespace khmer::read_parsers;
 
 // Configure module logging.
 //#define WITH_INTERNAL_TRACING

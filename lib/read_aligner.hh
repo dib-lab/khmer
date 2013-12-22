@@ -1,17 +1,5 @@
 /*
   This line intentionally left blank to bother mr-c
-
-  TODO:
-  - Free allocated memory
-    - subalign will have to return an alignment object
-    - or take an alignment object to fill out (*)
-  - Document python return tuple (named tuple?)
-  - Decide whether probabilities should be modifible without recompiling
-  - Implement trusted kmer detection (cutoff vs probability)
-  - Model error vs trusted kmers
-      - Another state? (probably not...)
-      - Another emission probability?
-      - Have to make sure they aren't less probable than a mismatch, or insert/mismatch/insert
  */
 
 #ifndef READ_ALIGNER_HH
@@ -32,6 +20,14 @@
 namespace khmer {
 
   enum State { MATCH, INSERT_READ, INSERT_GRAPH };
+
+  // Constants for state transitions
+  enum Transition { MM, MIr, MIg, IrM, IrIr, IgM, IgIg, disallowed };
+  // log probabilities for state transitions
+  static double trans_default[] = { log2(.90), log2(.05), log2(.05),
+				    log2(.95), log2(.05),
+				    log2(.95), log2(.05)};
+
   enum Nucl {A, C, G, T};
   static const char nucl_lookup[4] = {'A', 'C', 'G', 'T'};
   
@@ -40,6 +36,7 @@ namespace khmer {
     Nucl base;
     unsigned int seq_idx;
     State state;
+    Transition trans;
     HashIntoType fwd_hash;
     HashIntoType rc_hash;
 
@@ -50,12 +47,13 @@ namespace khmer {
 
     unsigned int length;
     
-    AlignmentNode(AlignmentNode* _prev, Nucl _emission, int _seq_idx, State _state, HashIntoType _fwd_hash, HashIntoType _rc_hash, unsigned int _length)
-      :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), fwd_hash(_fwd_hash), rc_hash(_rc_hash), length(_length) {}
+    AlignmentNode(AlignmentNode* _prev, Nucl _emission, int _seq_idx, State _state, Transition _trans, HashIntoType _fwd_hash, HashIntoType _rc_hash, unsigned int _length)
+      :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), trans(_trans), fwd_hash(_fwd_hash), rc_hash(_rc_hash), length(_length) {}
     
     bool operator== (const AlignmentNode& rhs) const {
       return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
-	uniqify_rc(fwd_hash, rc_hash) == uniqify_rc(rhs.fwd_hash, rhs.rc_hash);
+	uniqify_rc(fwd_hash, rc_hash) == uniqify_rc(rhs.fwd_hash, rhs.rc_hash) &&
+	trans == rhs.trans;
     }
 
     bool operator< (const AlignmentNode& rhs) const {
@@ -75,7 +73,6 @@ namespace khmer {
   };
   
   typedef std::priority_queue<AlignmentNode*, std::vector<AlignmentNode*>, AlignmentNodeCompare> NodeHeap;
-
 
   struct ScoringMatrix {
     const double trusted_match;
@@ -97,14 +94,6 @@ namespace khmer {
     bool truncated;
   };
 
-  // Constants for state transitions
-  enum Transition { MM, MI, MD, IM, II, DM, DD, disallowed };
-  // log probabilities for state transitions
-  static double trans_default[] = { log2(.99998), log2(.00001), log2(.00001),
-				    log2(.95), log2(.05),
-				    log2(.95), log2(.05)};
-  
-  
   class ReadAligner {
   private:
 
@@ -135,7 +124,7 @@ namespace khmer {
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
-      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.945), log2(.05), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {
+      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.955), log2(.04), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {
       #if READ_ALIGNER_DEBUG
       std::cerr << "Trusted cutoff: " << m_trusted_cutoff << " bits theta: " << bits_theta << " trusted match: " << m_sm.trusted_match << " untrusted match: " << m_sm.untrusted_match << " trusted mismatch: " << m_sm.trusted_mismatch << " untrusted mismatch: " << m_sm.untrusted_mismatch << std::endl;
       #endif
