@@ -3904,7 +3904,7 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
   return Py_FindMethod(khmer_hashbits_methods, obj, name);
 }
 
-static void khmer_hashbits_dealloc(PyObject *);
+static void khmer_hashbits_dealloc(PyObject * obj);
 static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObject * kwds);
 static int khmer_hashbits_init(khmer_KHashbitsObject * self, PyObject * args, PyObject * kwds); 
 
@@ -3913,7 +3913,7 @@ static PyTypeObject khmer_KHashbitsType = {
     0,
     "Hashbits", sizeof(khmer_KHashbitsObject),
     0,
-    khmer_hashbits_dealloc,	/*tp_dealloc*/
+    (destructor)khmer_hashbits_dealloc,	/*tp_dealloc*/
     0,				/*tp_print*/
     khmer_hashbits_getattr,	/*tp_getattr*/
     0,				/*tp_setattr*/
@@ -4788,7 +4788,7 @@ static void khmer_counting_dealloc(PyObject* self)
 //
 // khmer_hashbits_dealloc -- clean up a hashbits object.
 //
-
+/*
 static void khmer_hashbits_dealloc(PyObject* self)
 {
   khmer_KHashbitsObject * obj = (khmer_KHashbitsObject *) self;
@@ -4798,6 +4798,18 @@ static void khmer_hashbits_dealloc(PyObject* self)
   self->ob_type->tp_free((PyObject*)obj);
   PyObject_Del((PyObject *) obj);
 }
+*/
+static void khmer_hashbits_dealloc(PyObject* obj)
+{
+  khmer_KHashbitsObject * self = (khmer_KHashbitsObject *) obj;
+
+  delete self->hashbits;
+  self->hashbits = NULL;
+  
+  self->ob_type->tp_free((PyObject*)obj);
+  //PyObject_Del((PyObject *) obj);
+}
+
 
 //
 // khmer_subset_dealloc -- clean up a hashbits object.
