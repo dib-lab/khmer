@@ -71,7 +71,7 @@ sources.extend(map(
     [
         "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
         "read_parsers", "ktable", "hashtable", "hashbits", "counting",
-        "subset", "aligner", "scoringmatrix", "node", "kmer",
+        "subset", "read_aligner",
     ]
 ))
 
