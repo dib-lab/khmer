@@ -1,4 +1,4 @@
-<tool id="gedlab-khmer-normalize-by-median" name="Normalize By Median" version="0.7.1">
+<tool id="gedlab-khmer-normalize-by-median" name="Normalize By Median" version="0.7.1.1">
     
     <!-- [REQUIRED] Tool description displayed after the tool name -->
     <description>Filters fastq/fasta files using digital normalization via median k-mer abundances.</description>
@@ -15,13 +15,13 @@
     
     <!-- [REQUIRED] The command to execute -->
 <command>
-	#if $advanced_parameters.adv_param == "show"
-	normalize-by-median.py --ksize=$ksize --n_hashes=$n_hashes --hashsize=$hashsize --cutoff=$cutoff $paired_switch --savehash=$hash --prefix=primary_${hashsize.id}_ --postfix _visible_${inputs[0].ext}
+	#if $parameters.type == "simple"
+		normalize-by-median.py --ksize=20 --n_hashes=4 --hashsize=$parameters.hashsize --cutoff=20 $paired_switch --savehash=$hash --prefix=primary_${hash.id}_ --postfix _visible_${inputs[0].ext}
 	#else
-	normalize-by-median.py --ksize=20 --n_hashes=4 --hashsize=$hashsize --cutoff=20 --savehash=$hash $paired_switch --prefix=primary_${hashsize.id}_ --postfix=_visible_${inputs[0].ext}
+		normalize-by-median.py --ksize=$parameters.ksize --n_hashes=$parameters.n_hashes --hashsize=$parameters.hashsize_specific --cutoff=$parameters.cutoff --savehash=$hash $paired_switch --prefix=primary_${hash.id}_ --postfix=_visible_${inputs[0].ext}
 	#end if
 	#for $input in $inputs:
-"${input}"
+${input}
 	#end for
 </command>
         
@@ -31,12 +31,12 @@
     
 		<param name="paired_switch" type="boolean" checked="false" truevalue="-p" label="Are the inputs interleaved paired ends?" help="If so, then selecting this option will process the paired ends together." />
        
-		<conditional name="advanced_parameters" >
-            		<param name="adv_param" type="select" label="Advanced Parameters" help="" >
-                		<option value="hide" selected="true">Hide</option>
-                		<option value="show">Show</option>
+		<conditional name="parameters">
+            		<param name="type" type="select" label="Advanced Parameters" help="ksize, n_hashess, a specific hashsize, cutoff" >
+				<option value="simple" selected="true">Hide</option>
+                		<option value="specific">Show</option>
             		</param>
-			<when value="hide">
+			<when value="simple">
 	    			<param name="hashsize" type="select" label="Sample Type" display="radio">
 					<option value="1e9" selected="true">Microbial Genome</option>
 					<option value="2e9"                >Animal Transcriptome</option>
@@ -44,10 +44,10 @@
 					<option value="16e9"               >Large Animal Genome</option>
 				</param>
 			</when>
-			<when value="show">
+			<when value="specific">
 		                <param name="ksize" type="integer" value="20" label="ksize" help="k-mer size to use" />
 				<param name="n_hashes" type="integer" min="1" value="4" label="n_hashes" help="number of hash tables to use" />
-				<param name="hashsize" type="text" label="hashsize" help="lower bound on the hashsize to use" />
+				<param name="hashsize_specifc" type="text" label="hashsize" help="lower bound on the hashsize to use" />
 				<param name="cutoff" type="integer" min="1" value="20" label="cutoff" />
 			</when>
 		</conditional>
@@ -56,7 +56,7 @@
     <!-- [REQUIRED] Output files -->
     <outputs>
 
-	    <data name="hash"	format="data" label="${tool.name} on ${inputs} hash table" />
+	    <data name="hash"	format="data" label="${tool.name} on #echo ', '.join(map(str, $inputs ))#'s hash table" />
 
         
         <!-- When the tool doesn't allow output files handling with pointers, 
@@ -91,155 +91,8 @@
     </tests>
     
     <!-- [OPTIONAL] Help displayed in Galaxy -->
-    <help>
-
-.. class:: infomark
-
-**Authors** First-name Name someone@somewhere.com
-
----------------------------------------------------
-
-.. class:: infomark
-
-**Please cite** If you use this tool, please cite `Author pub. Title and other. This is a bogus link &lt;http://www.ncbi.nlm.nih.gov/pubmed/23286517&gt;`_
-
----------------------------------------------------
-
-==============
-Tool Name
-==============
-
------------
-Description
------------
-
- | Description of the tool in 1 lines
- | or 2 lines
-
-
------------------
-Workflow position
------------------
-
-**Upstream tools**
-
-====== =========== ======= ============
-Name   output file format  parameter
-====== =========== ======= ============
-tool 1 outFile.tab tabular param name 1
-tool 2 outFile.csv csv     param name 2
-====== =========== ======= ============
-
-
-**Downstream tools**
-
-====== =========== =======
-Name   output file format 
-====== =========== =======
-tool 1 outFile.tab tabular
-tool 2 outFile.csv csv    
-====== =========== =======
-
-
------------
-Input files
------------
-
-+-------------------------+-----------+
-| Parameter : num + label |  Format   |
-+=========================+===========+
-| 1 : file1.tab           |  tabular  |
-+-------------------------+-----------+
-| 2 : file2.csv           |   csv     |
-+-------------------------+-----------+
-
-Constraints files : 
-	* column 1 : description
-	* column 5 : description
-
-
-----------
-Parameters
-----------
-
-parameter1
-	Parameter 1 description
-
-parameter2longer
-	| Parameter 2 description
-	| on 2 lines if needed
-
-
-------------
-Output files
-------------
-
-output.tab
-	| File description
-	| You can continue your analysis with the tool retcor or fillPeaks
-
-outFile.csv
-	File description
-
-	
----------------------------------------------------
-
----------------
-Working example
----------------
-
-Input files
-===========
-
-| **These input files can be used in the purview "URL/Text:" of the tool "Get Data/Upload File",**
-| **by checking the box "Convert spaces to tabs: YES"**
-
-file1.txt
-	Model input file::
-	
-		colonne1 colonne2 col3 etc
-		element1.1 element1.2 el1.3 ...
-		element2.1 elem2.2 el1.3 ...
-		elem3.1 3.2 el1.3 ...
-
-		
-Parameters
-==========
-
-Parameter 1  -> **content**
-
-Parameter 2  -> **content**
-
-
-Output files
-============
-
-output.pdf
-
-.. image:: ./static/images/output.png
-        :width: 500
-        :height: 400
-	
-
-output.txt
-
-========== ========== ===== ===
-colonne1   colonne 2  col3  etc
-========== ========== ===== ===
-element1.1 element1.2 el1.3 ...
-element2.1 elem 2.2   el1.3 ...
-elem3.1       3.2     el1.3 ...
-========== ========== ===== ===
-
-
-output.other::
-	Something
-	
----------------------------------------------------
-
-.. class:: infomark
-
-More information about formatting can be found here: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
-    </help>
-    
+    <!--
+	<help>
+	</help>
+    -->    
 </tool>
