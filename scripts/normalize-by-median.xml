@@ -1,0 +1,152 @@
+<tool	id="gedlab-khmer-normalize-by-median"
+	name="Normalize By Median"
+	version="0.7.1.1"
+	force_history_refresh="true">
+	
+	<description>
+		Filters fastq/fasta files using digital normalization via
+	    	median k-mer abundances.
+	</description>
+
+	<requirements>
+		<requirement
+			type="python-module"
+			version="0.7">
+				khmer
+		</requirement>
+    	</requirements>
+
+	<version_command>
+		normalize-by-median.py --version
+    	</version_command>
+    
+   	<command>
+		normalize-by-median.py
+		$paired_switch
+		--savehash=$hash
+		--prefix=primary_${hash.id}_
+		--postfix=_visible_${inputs[0].ext}
+		#if $parameters.type == "simple"
+			--ksize=20
+			--n_hashes=4
+			--hashsize=$parameters.hashsize
+			--cutoff=20
+		#else
+			--ksize=$parameters.ksize
+			--n_hashes=$parameters.n_hashes 
+			--hashsize=$parameters.hashsize_specific
+			--cutoff=$parameters.cutoff
+	    	#end if
+		#for $input in $inputs
+	    		${input}
+		#end for
+	</command>
+
+	<inputs> 
+		<param	name="inputs"
+			multiple="true"
+			type="data"
+			format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
+			label="FAST[AQ] file(s)"
+			help="Put in order of precedence such as longest reads first." />
+    
+		<param	name="paired_switch"
+			type="boolean"
+			checked="false"
+			truevalue="-p"
+			falsevalue=""
+			label="Are the inputs interleaved paired ends?"
+			help="If so, then selecting this option will process the paired ends together." />
+       
+		<conditional name="parameters">
+			<param	name="type"
+				type="select"
+				label="Advanced Parameters"
+				help="ksize, n_hashess, a specific hashsize, cutoff" >
+				<option	value="simple"
+					selected="true">
+					Hide
+				</option>
+				<option value="specific">
+					Show
+				</option>
+            		</param>
+			<when	value="simple">
+				<param	name="hashsize"
+					type="select"
+					label="Sample Type"
+					display="radio">
+					<option	value="1e9"
+						selected="true">
+						Microbial Genome
+					</option>
+					<option value="2e9">
+						Animal Transcriptome
+					</option>
+					<option value="4e9">
+						Small Animal Genome or Low-Diversity Metagenome
+					</option>
+					<option value="16e9">
+						Large Animal Genome
+					</option>
+				</param>
+			</when>
+			<when	value="specific">
+				<param	name="ksize"
+					type="integer"
+					value="20"
+					label="ksize"
+					help="k-mer size to use" />
+				<param	name="n_hashes"
+					type="integer"
+					min="1"
+					value="4"
+					label="n_hashes"
+					help="number of hash tables to use" />
+				<param	name="hashsize_specifc"
+					type="text"
+					label="hashsize"
+					help="lower bound on the hashsize to use" />
+				<param	name="cutoff"
+					type="integer"
+					min="1"
+					value="20"
+					label="cutoff" />
+			</when>
+		</conditional>
+       </inputs>
+       <outputs>
+		<data	name="hash"
+			format="data"
+			label="${tool.name} hash table from  #echo ', '.join(map(str, $inputs ))#" />
+		<data	name="output_dir"
+			from_work_dir="tool_output_file.txt"
+			label="${tool.name} diginormed reads" />       
+	</outputs>
+ 	<stdio>
+        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
+		<exit_code	range="1:"
+				level="fatal" />
+	</stdio>
+    
+    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
+    <tests>
+        <!-- [HELP] Test files have to be in the ~/test-data directory
+        <test>
+            <param name="input" value="input_test.tab" />
+            <param name="int"   value="10" />
+            <output name="output" file="output_test.txt" />
+	</test> -->
+        <!-- [HELP] Multiple tests can be defined with different parameters -->
+<!--
+        <test>
+        </test>
+-->
+    </tests>
+    
+    <!-- [OPTIONAL] Help displayed in Galaxy -->
+    <!--
+	<help>
+	</help>
+    -->    
+</tool>

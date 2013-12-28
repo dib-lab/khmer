@@ -5,6 +5,7 @@
 #
 import os
 import argparse
+import khmer
 
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -33,6 +34,7 @@ def build_construct_args(descr=None):
     parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
                         default=env_hashsize,
                         help='lower bound on hashsize to use')
+    parser.add_argument('--version', action='version', version='%(prog)s ' + khmer.__version__)
 
     return parser
 
