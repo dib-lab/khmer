@@ -383,47 +383,6 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
-def test_normalize_by_median_prefix():
-    CUTOFF = '1'
-
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '--prefix', 'test', infile]
-    runscript(script, args, in_dir)
-
-    in_split = os.path.split(infile)
-    outfile = in_split[0] + os.sep + 'test' + in_split[1] + '.keep'
-    assert os.path.exists(outfile), outfile
-
-    seqs = [r.sequence for r in screed.open(outfile)]
-    assert len(seqs) == 1, seqs
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-
-
-def test_normalize_by_median_postfix():
-    CUTOFF = '1'
-
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-
-    script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', '--postfix', '.test', infile]
-    runscript(script, args, in_dir)
-
-    outfile = infile + '.test'
-    assert os.path.exists(outfile), outfile
-
-    seqs = [r.sequence for r in screed.open(outfile)]
-    assert len(seqs) == 1, seqs
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
-
-
 def test_normalize_by_median_version():
 
     script = scriptpath('normalize-by-median.py')

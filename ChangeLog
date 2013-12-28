@@ -10,9 +10,9 @@
 
 2013-12-11  Michael R. Crusoe <mcrusoe@msu.edu>
 
-* normalize-by-median.py: new optional arguments: --prefix & --postfix to
-specify how the filenames of the filtered data are formed. The default to
-'' and '.keep' respectively.
+* normalize-by-median.py: new optional argument: --record-filenames to specify
+a path where a list of all the output filenames will be written to. Will
+be used to better integrate with Galaxy.
 
 * All commands that use the counting args now support the --version switch
 
