@@ -16,7 +16,7 @@
     <!-- [REQUIRED] The command to execute -->
 <command>
 	#if $parameters.type == "simple"
-		normalize-by-median.py --ksize=20 --n_hashes=4 --hashsize=$parameters.hashsize --cutoff=20 $paired_switch --savehash=$hash --prefix=primary_${hash.id}_ --postfix _visible_${inputs[0].ext}
+		normalize-by-median.py --ksize=20 --n_hashes=4 --hashsize=$parameters.hashsize --cutoff=20 $paired_switch --savehash=$hash --prefix=primary_${hash.id}_ --postfix=_visible_${inputs[0].ext}
 	#else
 		normalize-by-median.py --ksize=$parameters.ksize --n_hashes=$parameters.n_hashes --hashsize=$parameters.hashsize_specific --cutoff=$parameters.cutoff --savehash=$hash $paired_switch --prefix=primary_${hash.id}_ --postfix=_visible_${inputs[0].ext}
 	#end if
@@ -29,7 +29,7 @@ ${input}
 	<inputs> 
 		<param name="inputs" multiple="true" type="data" format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina" label="FAST[AQ] file(s)" help="Put in order of precedence such as longest reads first." />
     
-		<param name="paired_switch" type="boolean" checked="false" truevalue="-p" label="Are the inputs interleaved paired ends?" help="If so, then selecting this option will process the paired ends together." />
+		<param name="paired_switch" type="boolean" checked="false" truevalue="-p" falsevalue="" label="Are the inputs interleaved paired ends?" help="If so, then selecting this option will process the paired ends together." />
        
 		<conditional name="parameters">
             		<param name="type" type="select" label="Advanced Parameters" help="ksize, n_hashess, a specific hashsize, cutoff" >
