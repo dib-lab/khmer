@@ -34,25 +34,20 @@
 			--hashsize=$parameters.hashsize_specific
 			--cutoff=$parameters.cutoff
 		#end if
-		--output-single-file=$output
-		$input
+		--out=$output
+		#for input in $input
+			$input
+		#end for
 	</command>
 
 	<inputs>
-		<!-- TODO: support multiple inputs. users will have to concat 1st
-		     in the mean time
 		<param	name="inputs"
 			multiple="true"
 			type="data"
 			format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
 			label="FAST[AQ] file(s)"
 			help="Put in order of precedence such as longest reads first." />
-    		-->
-		<param	name="input"
-			type="data"
-			format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
-			label="FAST[AQ] file"
-			help="If combining multiple files into one then put them in order of precedence such as longest reads or largest fragment size first" />	
+
 		<param	name="paired_switch"
 			type="boolean"
 			checked="false"
