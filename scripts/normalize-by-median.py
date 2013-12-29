@@ -118,7 +118,7 @@ def handle_error(error, output_name, input_name, ht):
     try:
         os.remove(output_name)
     except:
-        print >>sys.stderr, '** ERROR: problem removing erroneous filtered file'
+        print >>sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
 def main():
@@ -137,10 +137,9 @@ def main():
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump hashtable every d files',
                         default=-1)
-    parser.add_argument('--record-filenames', dest='record_filenames_path',
-                        default='', help='if specified then write a file of'
-                        ' filenames to the path specified of all the outputs'
-                        ' we make (used by Galaxy)')
+    parser.add_argument('-o', '--out', dest='single_output_filename',
+                        default='', help='only output a single'
+                        ' file with the specified filename')
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
@@ -175,14 +174,10 @@ def main():
     filenames = args.input_filenames
     force = args.force
     dump_frequency = args.dump_frequency
-    record_filenames_path = args.record_filenames_path
 
     # list to save error files along with throwing exceptions
     if force is True:
         corrupt_files = []
-
-    if record_filenames_path != '':
-        output_files = []
 
     if args.loadhash:
         print 'loading hashtable from', args.loadhash
@@ -195,8 +190,12 @@ def main():
     discarded = 0
 
     for n, input_filename in enumerate(filenames):
-        output_name = os.path.basename(input_filename) + 'keep'
-        outfp = open(output_name, 'w')
+        if args.single_output_filename != '':
+            output_name = args.single_output_filename
+            outfp = open(args.single_output_filename, 'a')
+        else:
+            output_name = os.path.basename(input_filename) + '.keep'
+            outfp = open(output_name, 'w')
 
         total_acc = 0
         discarded_acc = 0
@@ -212,8 +211,7 @@ def main():
                 sys.exit(1)
             else:
                 print >>sys.stderr, '*** Skipping error file, moving on...'
-                if corrupt_files:
-                    corrupt_files.append(input_filename)
+                corrupt_files.append(input_filename)
                 pass
         else:
             if total_acc == 0 and discarded_acc == 0:
@@ -226,8 +224,6 @@ def main():
                             kept=total - discarded, total=total,
                             perc=int(100. - discarded / float(total) * 100.))
                 print 'output in', output_name
-                if output_files:
-                    output_files.append(output_name)
 
         if dump_frequency > 0 and n > 0 and n % dump_frequency == 0:
             print 'Backup: Saving hashfile through', input_filename
@@ -252,12 +248,6 @@ def main():
         print >>sys.stderr, "** WARNING: Finished with errors!"
         print >>sys.stderr, "** IOErrors occurred in the following files:"
         print >>sys.stderr, "\t", " ".join(corrupt_files)
-
-    if output_files:
-        file_of_outputfilenames = open(record_filenames_path, 'w')
-        for filename in output_files:
-            print >>file_of_outputfilenames, filename
-        close(file_of_outputfilenames)
 
     if fp_rate > 0.20:
         print >>sys.stderr, "**"
