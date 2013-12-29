@@ -35,7 +35,7 @@
 			--cutoff=$parameters.cutoff
 		#end if
 		--out=$output
-		#for input in $input
+		#for input in $inputs
 			$input
 		#end for
 	</command>
