@@ -34,6 +34,12 @@
 			--hashsize=$parameters.hashsize_specific
 			--cutoff=$parameters.cutoff
 		#end if
+		#if $save_hashtable
+			--savehash=$hash
+		#end if
+		#if $hashtable_to_load
+			--loadhash=$hashtable_to_load
+		#end if
 		--out=$output
 		#for input in $inputs
 			$input
@@ -55,7 +61,18 @@
 			falsevalue=""
 			label="Are the inputs interleaved paired ends?"
 			help="If so, then selecting this option will process the paired ends together." />
-       
+
+		<param	name="hashtable_to_load"
+			type="data"
+			optional="true"
+			label="an optional khmer hashtable to load"
+			help="The inputs file(s) will be processed using the kmer counts in the specified hashtable file as a starting point." />
+
+		<param	name="save_hashtable"
+			type="boolean"
+			label="Save the kmer counts hashtable(s) in a file"
+			help="" />
+
 		<conditional name="parameters">
 			<param	name="type"
 				type="select"
@@ -114,11 +131,11 @@
 		</conditional>
 	</inputs>
 	<outputs>
-	       	<!-- later
 		<data	name="hash"
 			format="data"
-			label="${tool.name} hash table from  #echo ', '.join(map(str, $inputs ))#" />
-		-->
+			label="${tool.name} kmer counts hashtable from  #echo ', '.join(map(str, $inputs ))#">
+			<filter>save_hashtable == True</filter>
+		</data>
 		<data	name="output"
 			format="input" />
 	</outputs>
