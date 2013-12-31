@@ -137,7 +137,8 @@
 			<filter>save_hashtable == True</filter>
 		</data>
 		<data	name="output"
-			format="input" />
+			format="input"
+		       	label="${tool.name} processed reads from #echop ', '.join(map(str, $inputs ))$"	/>
 	</outputs>
  	<stdio>
         <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
