@@ -1,0 +1,41 @@
+Deploying the khmer project tools on Galaxy
+===========================================
+
+We are developing the support for running normalize-by-median in `Galaxy 
+<http://galaxyproject.org/>`__.
+
+When this is mature we will make a Galaxy `Tool Shed <https://wiki.galaxyproject.org/Tool%20Shed>`__
+version available for easier installation.
+
+Install the tools & tool description
+------------------------------------
+
+If your installation uses a virtualenv be sure to activate it in your terminal
+before continuing.
+
+Checkout and install the branch of the Git repository where development of
+this feature is ongoing.::
+
+  pip install -e git+https://github.com/ged-lab/khmer.git@output_naming1#khmer
+
+
+Move to the `tools` directory in your Galaxy installation and copy in the
+tool definition file.::
+
+  cd tools
+  mkdir khmer
+  ln -s ../src/khmer/scripts/normalize-by-median.xml .
+
+
+Add the following to your tool_conf.xml inside the <toolbox> tag::
+
+  <section id="khmer-protocols-extra" name="khmer protocols">
+  <tool file="khmer/normalize-by-median.xml" />
+  </section>
+
+Then (re)start Galaxy.
+
+Usage
+-----
+
+

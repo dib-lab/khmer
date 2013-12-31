@@ -53,6 +53,7 @@ Contents:
    design
    details
    development
+   galaxy
    sequence-access-patterns
    release
    crazy-ideas
