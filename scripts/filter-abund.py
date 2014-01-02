@@ -36,7 +36,9 @@ def main():
                         help='base variable-coverage cutoff on this median'
                         ' k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
-
+    parser.add_argument('-o', '--out', dest='single_output_filename',
+                        default='', help='only output a single'
+                        ' file with the specified filename')
     args = parser.parse_args()
 
     counting_ht = args.input_table
@@ -72,8 +74,12 @@ def main():
     # the filtering loop
     for infile in infiles:
         print 'filtering', infile
-        outfile = os.path.basename(infile) + '.abundfilt'
-        outfp = open(outfile, 'w')
+        if args.single_output_filename != '':
+            outfile = args.single_output_filename
+            outfp = open(outfile, 'a')
+        else:
+            outfile = os.path.basename(infile) + '.abundfilt'
+            outfp = open(outfile, 'w')
 
         tsp = ThreadedSequenceProcessor(process_fn)
         tsp.start(verbose_loader(infile), outfp)
