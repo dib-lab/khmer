@@ -42,7 +42,8 @@ def build_construct_args(descr=None):
 def build_counting_multifile_args():
     parser = argparse.ArgumentParser(description=
                                      'Use a counting Bloom filter.')
-
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
     parser.add_argument('input_table')
     parser.add_argument('input_filenames', nargs='+')
 
