@@ -41,7 +41,7 @@
 		<param	name="variable_coverage"
 			type="boolean"
 			checked="false"
-			truevalue="--variable_coverage"
+			truevalue="--variable-coverage"
 			falsevalue=""
 			label="Variable coverage"
 			help="Only trim when a sequence has high enough coverage (median abundance > 20)" />
