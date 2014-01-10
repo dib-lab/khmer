@@ -698,10 +698,11 @@ def test_partition_graph_1():
     assert os.path.exists(final_pmap_file)
 
     ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
     x = ht.count_partitions()
-    assert x == (1, 0)          # should be exactly one partition.
+    assert x == (1, 0), x          # should be exactly one partition.
 
 
 def test_partition_graph_nojoin_k21():
@@ -721,10 +722,11 @@ def test_partition_graph_nojoin_k21():
     assert os.path.exists(final_pmap_file)
 
     ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
     x = ht.count_partitions()
-    assert x == (99, 0)          # should be 99 partitions at K=21
+    assert x == (99, 0), x          # should be 99 partitions at K=21
 
 
 def test_partition_graph_nojoin_stoptags():
@@ -752,10 +754,11 @@ def test_partition_graph_nojoin_stoptags():
     assert os.path.exists(final_pmap_file)
 
     ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
     x = ht.count_partitions()
-    assert x == (2, 0)          # should be 2 partitions
+    assert x == (2, 0), x          # should be 2 partitions
 
 
 def test_partition_graph_big_traverse():
@@ -766,10 +769,11 @@ def test_partition_graph_big_traverse():
     assert os.path.exists(final_pmap_file)
 
     ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
     x = ht.count_partitions()
-    assert x == (1, 0)          # should be exactly one partition.
+    assert x == (1, 0), x          # should be exactly one partition.
 
 
 def test_partition_graph_no_big_traverse():
@@ -781,10 +785,11 @@ def test_partition_graph_no_big_traverse():
     assert os.path.exists(final_pmap_file)
 
     ht = khmer.load_hashbits(graphbase + '.ht')
+    ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
     x = ht.count_partitions()
-    assert x == (4, 0), x       # should be four partitions, broken at knot.
+    assert x[0] == 4, x       # should be four partitions, broken at knot.
 
 
 def test_annotate_partitions():
