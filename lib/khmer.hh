@@ -24,6 +24,9 @@ extern "C"
 
 // C++ standard exceptions are subclassed almost ubiquitously.
 #include <exception>
+#include <set>
+#include <map>
+#include <queue>
 
 #   define MAX_COUNT 255
 #   define MAX_BIGCOUNT 65535
@@ -67,6 +70,20 @@ namespace khmer {
   struct InvalidStreamBuffer : public std:: exception
   { };
 
+
+  typedef unsigned int PartitionID;
+  typedef std::set<HashIntoType> SeenSet;
+  typedef std::set<PartitionID> PartitionSet;
+  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
+  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
+  typedef std::set<PartitionID *> PartitionPtrSet;
+  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
+  typedef std::queue<HashIntoType> NodeQueue;
+  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+  typedef std::map<HashIntoType, unsigned int> TagCountMap;
+  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 }
 
 #endif // KHMER_HH
