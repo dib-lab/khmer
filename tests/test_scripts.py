@@ -3,9 +3,7 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
-import sys
-import os
-import shutil
+import sys, os, shutil
 from cStringIO import StringIO
 import traceback
 
@@ -435,6 +433,25 @@ def test_normalize_by_median_force():
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
+def test_normalize_by_median_no_bigcount():
+    infile = utils.get_temp_filename('test.fa')
+    hashfile = utils.get_temp_filename('test-out.kh')
+    outfile = infile + '.keep'
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1000', '-k 8', '--savehash', hashfile, infile]
+
+    (status, out, err) = runscript(script, args)
+    assert status == 0, (out, err)
+    print (out, err)
+    
+    assert os.path.exists(hashfile), hashfile
+    kh = khmer.load_counting_hash(hashfile)
+    
+    assert kh.get('GGTTGACG') == 255
 
 def test_normalize_by_median_dumpfrequency():
     CUTOFF = '1'
@@ -847,6 +864,36 @@ def test_extract_partitions():
     parts = set(parts)
     assert len(parts) == 1, len(parts)
 
+def test_extract_partitions_fq():
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fq.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', partfile]
+    
+    runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fq')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+    quals = set([ r.accuracy for r in screed.open(partfile) ])
+    quals = list(quals)
+    assert quals[0], quals
 
 def test_abundance_dist():
     infile = utils.get_temp_filename('test.fa')
