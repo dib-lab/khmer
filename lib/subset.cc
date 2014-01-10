@@ -1406,7 +1406,7 @@ const
 
   partition_sizes(cm, n_unassigned);
 
-  for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
+  for (PartitionCountMap::iterator cmi = cm.begin(); cmi != cm.end();
        cmi++) {
     d[cmi->second]++;
   }
