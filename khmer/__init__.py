@@ -30,6 +30,7 @@ def new_hashbits(k, starting_size, n_tables=2):
 
     return _new_hashbits(k, primes)
 
+
 def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
     primes = get_n_primes_above_x(n_tables, starting_size)
 
@@ -156,17 +157,20 @@ factory methods to the constructors defined over in cpython land.
 Additional functionality can be added to these classes as appropriate.
 '''
 
+
 class LabelHash(_LabelHash):
+
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_above_x(n_tables, starting_size)
         c = _LabelHash.__new__(cls, k, primes)
         c.primes = primes
         return c
 
+
 class Hashbits(_Hashbits):
+
     def __new__(cls, k, starting_size, n_tables):
         primes = get_n_primes_above_x(n_tables, starting_size)
         c = _Hashbits.__new__(cls, k, primes)
         c.primes = primes
         return c
-

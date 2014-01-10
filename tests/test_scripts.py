@@ -3,7 +3,9 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
-import sys, os, shutil
+import sys
+import os
+import shutil
 from cStringIO import StringIO
 import traceback
 
@@ -433,6 +435,7 @@ def test_normalize_by_median_force():
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
+
 def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
     hashfile = utils.get_temp_filename('test-out.kh')
@@ -447,11 +450,12 @@ def test_normalize_by_median_no_bigcount():
     (status, out, err) = runscript(script, args)
     assert status == 0, (out, err)
     print (out, err)
-    
+
     assert os.path.exists(hashfile), hashfile
     kh = khmer.load_counting_hash(hashfile)
-    
+
     assert kh.get('GGTTGACG') == 255
+
 
 def test_normalize_by_median_dumpfrequency():
     CUTOFF = '1'
@@ -864,9 +868,11 @@ def test_extract_partitions():
     parts = set(parts)
     assert len(parts) == 1, len(parts)
 
+
 def test_extract_partitions_fq():
     seqfile = utils.get_test_data('random-20-a.fq')
-    graphbase = _make_graph(seqfile, do_partition=True, annotate_partitions=True)
+    graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
     in_dir = os.path.dirname(graphbase)
 
     # get the final part file
@@ -875,7 +881,7 @@ def test_extract_partitions_fq():
     # ok, now run extract-partitions.
     script = scriptpath('extract-partitions.py')
     args = ['extracted', partfile]
-    
+
     runscript(script, args, in_dir)
 
     distfile = os.path.join(in_dir, 'extracted.dist')
@@ -886,14 +892,15 @@ def test_extract_partitions_fq():
     dist = open(distfile).readline()
     assert dist.strip() == '99 1 1 99'
 
-    parts = [ r.name.split('\t')[1] for r in screed.open(partfile) ]
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
     assert len(parts) == 99, len(parts)
     parts = set(parts)
     assert len(parts) == 1, len(parts)
 
-    quals = set([ r.accuracy for r in screed.open(partfile) ])
+    quals = set([r.accuracy for r in screed.open(partfile)])
     quals = list(quals)
     assert quals[0], quals
+
 
 def test_abundance_dist():
     infile = utils.get_temp_filename('test.fa')
@@ -1222,18 +1229,20 @@ def test_sample_reads_randomly():
                         '895:1:1:1327:13028', '895:1:1:1368:4434',
                         '895:1:1:1335:19932', '895:1:1:1340:19387'])
 
+
 def test_sweep_reads_by_partition_buffered():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
     in_dir = os.path.dirname(contigfile)
-    
+
     shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
-    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)    
+    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads-by-partition-buffered.py')
-    args = ['-k', '25', '-o', 'test', '-i', contigfile, readfile, 'junkfile.fa']
+    args = ['-k', '25', '-o', 'test', '-i',
+            contigfile, readfile, 'junkfile.fa']
     status, out, err = runscript(script, args, in_dir)
-    
+
     # check if the bad file was skipped without issue
     assert 'ERROR' in err
     assert 'skipping' in err
@@ -1242,13 +1251,13 @@ def test_sweep_reads_by_partition_buffered():
     out2 = os.path.join(in_dir, 'test_1.fa')
     mout = os.path.join(in_dir, 'test_multi.fa')
     oout = os.path.join(in_dir, 'test_orphaned.fa')
-    
+
     print os.listdir(in_dir)
 
     seqs1 = set([r.name for r in screed.open(out1)])
     seqs2 = set([r.name for r in screed.open(out2)])
     seqsm = set([r.name for r in screed.open(mout)])
-    seqso = set([r.name for r in screed.open(oout)])    
+    seqso = set([r.name for r in screed.open(oout)])
 
     print seqs1
     print seqs2
@@ -1256,6 +1265,6 @@ def test_sweep_reads_by_partition_buffered():
     print seqso
     assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
     assert seqs2 == set(['read3_p1\t1'])
-    assert (seqsm == set(['read4_multi\t0\t1']) or \
+    assert (seqsm == set(['read4_multi\t0\t1']) or
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
