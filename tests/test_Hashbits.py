@@ -18,8 +18,10 @@ import screed
 import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
+
 def teardown():
     utils.cleanup()
+
 
 def test__get_set_tag_density():
     ht = khmer.Hashbits(32, 1, 1)
@@ -551,4 +553,3 @@ def test_simple_median():
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
-
