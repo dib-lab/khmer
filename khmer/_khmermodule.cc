@@ -4229,9 +4229,9 @@ static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args, P
 {
     if (khmer_KHashbitsType.tp_init((PyObject *)self, args, kwds) < 0)
         return -1;
-    std::cout << "testing my pointer ref to hashbits: " << self->khashbits.hashbits->n_tags() << std::endl;
-    std::cout << "hashbits: " << self->khashbits.hashbits << std::endl;
-    std::cout << "labelhash: " << self->labelhash << std::endl;
+    //std::cout << "testing my pointer ref to hashbits: " << self->khashbits.hashbits->n_tags() << std::endl;
+    //std::cout << "hashbits: " << self->khashbits.hashbits << std::endl;
+    //std::cout << "labelhash: " << self->labelhash << std::endl;
     return 0;
 }
 
