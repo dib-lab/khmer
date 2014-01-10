@@ -1,6 +1,6 @@
 # Profile?
 # Set this variable to true if you wish to profile the codes.
-WANT_PROFILING=true
+WANT_PROFILING=false
 
 # Which profiling tool to use?
 # Assuming you have TAU installed and setup properly, 
@@ -209,10 +209,8 @@ ht-diff: $(HT_DIFF_OBJS)
 bittest: bittest.o ktable.o
 	$(CXX) $(CXXFLAGS) -o $@ bittest.o ktable.o
 
-#ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-#	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
-#color_test: test-Colors.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-#	$(CXX) -o $@ hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
+	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
 
 # NOTE: Disabled due to broken constructor call.
 #graphtest: graphtest.o ktable.o hashtable.o
