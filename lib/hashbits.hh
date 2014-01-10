@@ -63,7 +63,7 @@ namespace khmer {
 	_n_tables = 0;
       }
 
-      _clear_all_partitions();
+     delete partition;
     }
 
     std::vector<HashIntoType> get_tablesizes() const {

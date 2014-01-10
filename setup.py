@@ -1,4 +1,4 @@
-#
+#!/usr/bin/env python
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
@@ -9,6 +9,12 @@ ez_setup.use_setuptools()
 from setuptools import setup
 from setuptools import Extension
 
+import versioneer
+versioneer.versionfile_source = 'khmer/_version.py'
+versioneer.versionfile_build = 'khmer/_version.py'
+versioneer.tag_prefix = 'v'  # tags are like v1.2.0
+versioneer.parentdir_prefix = '.'
+
 from os.path import (
     join as path_join,
 )
@@ -18,6 +24,18 @@ from os import (
 )
 
 from subprocess import call
+
+# strip out -Wstrict-prototypes; a hack suggested by
+# http://stackoverflow.com/a/9740721
+# proper fix coming in http://bugs.python.org/issue1222585
+# numpy has a "nicer" fix:
+# https://github.com/numpy/numpy/blob/master/numpy/distutils/ccompiler.py
+import os
+from distutils.sysconfig import get_config_vars
+(opt,) = get_config_vars('OPT')
+os.environ['OPT'] = " ".join(
+    flag for flag in opt.split() if flag != '-Wstrict-prototypes'
+)
 
 zlibdir = 'lib/zlib'
 bzip2dir = 'lib/bzip2'
@@ -67,6 +85,7 @@ extension_mod_DICT = \
         "depends": build_depends,
         "language": "c++",
         "libraries": ["stdc++", ],
+        "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
 extension_mod = Extension("khmer._khmermodule", **extension_mod_DICT)
@@ -79,11 +98,11 @@ scripts.extend([path_join("scripts", script)
 setup_metadata = \
     {
         "name": "khmer",
-        "version": "0.6.1",
+        "version": versioneer.get_version(),
         "description": 'khmer k-mer counting library',
-        "long_description": open("README.md").read(),
+        "long_description": open("README.rst").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
-        ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy'
+        ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
         ' Jason Pell, Jared Simpson, C. S. Welcher,'
         ' Qingpeng Zhang, and C. Titus Brown',
         "author_email": 'khmer-project@idyll.org',
@@ -93,8 +112,8 @@ setup_metadata = \
         # #additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
-        "install_requires": ["screed >= 0.7", 'argparse >= 1.2.1', ],
-        "setup_requires": ['nose >= 1.0', 'setuptools-git >= 0.3', 'sphinx', ],
+        "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
+        "setup_requires": ['nose >= 1.0', 'sphinx', ],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
         #"platforms": '', # empty as is conveyed by the classifiers below
@@ -131,5 +150,8 @@ class build_ext(_build_ext):
                      shell=True)
                 _build_ext.run(self)
 
+_cmdclass = versioneer.get_cmdclass()
+_cmdclass.update({'build_ext': build_ext})
 
-setup(cmdclass={'build_ext': build_ext}, **setup_metadata)
+setup(cmdclass=_cmdclass,
+      **setup_metadata)

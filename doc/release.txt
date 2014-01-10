@@ -2,15 +2,136 @@
 How to make a khmer release
 ===========================
 
-Update references to the version number
+Michael R. Crusoe is the current release maker. This is his checklist.
 
-1. lib/khmer.h
-2. python/setup.py{,.in}
-3. python/khmer/__init__.py
-4. doc/conf.py
+0. The below should be done in a clean checkout.
 
-Setup a pull request
+  cd `mktemp -d`
+  git clone git@github.com:ged-lab/khmer.git
+  cd khmer
 
-Create a new (draft) release: https://github.com/ged-lab/khmer/releases
+1. (Optional) Check for updates to ez_setup.py and versioneer.
 
-Publish it
+  wget -N https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+  wget -N https://raw.github.com/warner/python-versioneer/master/versioneer.py
+  git diff ez_setup.py
+
+  git add ez_setup.py
+  git commit -m "new version of ez_setup.py"
+  # or
+  git checkout -- ez_setup.py
+
+  git diff versioneer.py
+
+  git add versioneer.py
+  git commit -m "new version of versioneer.py"
+  # or
+  git checkout -- versioneer.py
+
+2. Review the git logs since the last release and diffs (if needed) and ensure
+that the Changelog is up to date.
+
+  git log --minimal --patch `git describe --tags --always --abbrev=0`..HEAD
+
+3. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-multi/
+
+4. Tag the branch with the release candidate version number prefixed by the
+letter 'v',
+
+  new_version=0.8
+  git tag v${new_version}-rc1
+
+5. Test the release candidate. Bonus: repeat on Mac OS X.
+
+  virtualenv testenv1
+  virtualenv testenv2
+  virtualenv testenv3
+  
+  # Does the tag work?
+  
+  cd testenv1
+  source bin/activate
+  git init git+https://github.com/ged-lab/khmer.git
+  git checkout v${new_version}-rc1
+  make test
+  
+  # What about from pip?
+  
+  cd testenv2
+  source bin/activate
+  pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
+  cd khmer* 
+  make dist
+  cp dist/khmer* ../../testenv3
+ 
+  # Is the distribution in testenv2 complete enough to build another
+  # functional distribution?
+
+  cd ../../testenv3
+  source bin/activate
+  pip install khmer*
+  tar xzf khmer*
+  cd khmer*
+  make dist
+  make test
+  
+  cd ..
+
+6. Publish the new release on the testing PyPI server.
+  python setup.py register --repository https://testpypi.python.org/pypi
+Change your PyPI credentials as documented in
+https://wiki.python.org/moin/TestPyPI
+  python setup.py sdist upload -r https://testpypi.python.org/pypi
+Test the PyPI release in a new virtualenv
+  pip install -i https://testpypi.python.org/pypi khmer
+
+7. Publish the new release on PyPI (requires an authorized account)
+  python setup.py register sdist upload
+
+8. Create the final tag and publish it to github
+  git tag v${new_version}
+  git push git@github.com:ged-lab/khmer.git
+  git push --tags git@github.com:ged-lab/khmer.git
+
+9. Tweet about the new release. Optionally send email including the contents of
+the Changelog to khmer@lists.idyll.org and khmer-announce@lists.idyll.org
+
+Upstream sources
+----------------
+
+ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
+versioneer.py is from
+https://raw.github.com/warner/python-versioneer/master/versioneer.py
+
+Before major releases they should be examined to see if there are new
+versions available and if the change would be useful
+
+
+Explanation
+-----------
+
+Versioneer, from https://github.com/warner/python-versioneer, is used to
+determine the version number and is called by Setuptools and Sphinx. See the
+files versioneer.py, the top of khmer/__init__.py, khmer/_version.py, setup.py,
+and doc/conf.py for the implementation.
+
+The version number is determined through several methods: see 
+https://github.com/warner/python-versioneer#version-identifiers
+
+If the source tree is from a git checkout then the version number is derived by
+`git describe --tags --dirty --always`. This will be in the format
+${tagVersion}-${commits_ahead}-${revision_id}-${isDirty}. Example:
+v0.6.1-18-g8a9e430-dirty
+
+If from an unpacked tarball then the name of the directory is queried.
+
+Lacking either of the two git-archive will record the version number at the top
+of khmer/_version.py via the `$Format:%d$` and `$Format:%H$` placeholders enabled by
+the "export-subst" entry in .gitattributes
+
+Non source distributions will have a customized khmer/_version.py that contains
+hard-coded version strings. (see build/*/khmer/_version.py after a
+`python setup.py build` for an example)
+
+ez_setup.py bootstraps setuptools (if needed) by downloading and installing an
+appropriate version

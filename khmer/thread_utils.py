@@ -26,6 +26,7 @@ verbose_fasta_iter = verbose_loader
 
 
 class SequenceGroup(object):
+
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
@@ -181,7 +182,7 @@ class ThreadedSequenceProcessor(object):
                 continue
 
             for name, seq, accuracy in g.seqlist:
-                if accuracy: # write FASTQ; CTB hack.
+                if accuracy:  # write FASTQ; CTB hack.
                     outfp.write('@%s\n%s\n+\n%s\n' % (name, seq, accuracy))
                 else:
                     outfp.write('>%s\n%s\n' % (name, seq,))
