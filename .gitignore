@@ -4,6 +4,7 @@
 *.gcno
 *.swp
 *.egg-info
+*.egg
 *~
 build
 dist
