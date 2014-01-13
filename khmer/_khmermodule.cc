@@ -31,7 +31,6 @@ extern "C" {
   void init_khmer();
 }
 
-
 // Configure module logging.
 //#define WITH_INTERNAL_TRACING
 namespace khmer
@@ -2315,6 +2314,7 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
   std::vector<khmer::HashIntoType> sizes;
   Py_ssize_t sizes_list_o_length = PyObject_Length(sizes_list_o);
   if (sizes_list_o_length == -1) {
+      PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
       return NULL;
   } 
   for (int i = 0; i < sizes_list_o_length; i++) {
@@ -2381,7 +2381,7 @@ static PyTypeObject khmer_KHashbitsType = {
     0,                       /* tp_dictoffset */
     (initproc)khmer_hashbits_init,   /* tp_init */
     0,                       /* tp_alloc */
-};
+} ;
 
 static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
 {
@@ -4400,6 +4400,8 @@ static PyObject * labelhash_sweep_label_neighborhood(PyObject * self, PyObject *
   }
   
   if (strlen(seq) < hb->ksize()) {
+      PyErr_SetString(PyExc_ValueError,
+	      "string length must >= the hashtable k-mer size");
     return NULL;
   }
   
@@ -4465,6 +4467,8 @@ static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self, PyObject *ar
   }
   
   if (strlen(seq) < labelhash->ksize()) {
+      PyErr_SetString(PyExc_ValueError,
+	      "string length must >= the hashtable k-mer size");
     return NULL;
   }
 
@@ -4478,6 +4482,9 @@ static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self, PyObject *ar
   //Py_END_ALLOW_THREADS
 
   PyObject * x =  PyList_New(tagged_kmers.size());
+  if (x == NULL) {
+      return NULL;
+  }
   khmer::SeenSet::iterator si;
   unsigned long long i = 0;
   for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
