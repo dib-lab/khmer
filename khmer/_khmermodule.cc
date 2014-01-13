@@ -4332,7 +4332,7 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
     labelhash->consume_partitioned_fasta_and_tag_with_labels(filename, 
     total_reads, n_consumed, _report_fn, callback_obj);
   } catch (_khmer_signal &e) {
-    std::cout << "caught exception in consume_partitioned_fasta_and_tag_with_labels!" << std::endl;
+    PyErr_SetString( PyExc_IOError, "error parsing in consume_partitioned_fasta_and_tag_with_labels");
     return NULL;
   }
   return Py_BuildValue("IK", total_reads, n_consumed);
