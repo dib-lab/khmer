@@ -1239,7 +1239,7 @@ def test_sweep_reads_by_partition_buffered():
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
     script = scriptpath('sweep-reads-by-partition-buffered.py')
-    args = ['-k', '25', '-o', 'test', '-i',
+    args = ['-k', '25', '-o', 'test',
             contigfile, readfile, 'junkfile.fa']
     status, out, err = runscript(script, args, in_dir)
 
