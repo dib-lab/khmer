@@ -4189,17 +4189,6 @@ khmer_subset_getattr(PyObject * obj, char * name)
 typedef struct {
   //PyObject_HEAD
   khmer_KHashbitsObject khashbits;
-  /* @camillescott late night notes:
-     need to experiment. might be able to call hashbits py methods
-     directly with the labelhash object, because they all instantiate
-     a new hashbits pointer on themselves to call the functions and labelhash
-     inherits from hashbits; or, we define a hashbits object as part of this struct
-     as called for in the c-api reference. need to grok that still.
-     If this is how it's done, remove PyObject_HEAD, which will already be included
-     in the base class struct.
-     See http://docs.python.org/2.7/extending/newtypes.html#subclassing-other-types
-     for details...
-  */
   khmer::LabelHash * labelhash;
 } khmer_KLabelHashObject;
 
