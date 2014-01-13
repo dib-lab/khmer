@@ -142,7 +142,6 @@ namespace khmer {
     bool done() { return index >= length; }
   }; // class KMerIterator
 
-
   class Hashtable {		// Base class implementation of a Bloom ht.
     friend class SubsetPartition;
   protected:
@@ -181,8 +180,8 @@ namespace khmer {
 
     WordLength	    _ksize;
     HashIntoType    bitmask;
-    unsigned int    _nbits_sub_1;
-
+    unsigned int    _nbits_sub_1;  
+    
     Hashtable(
 	WordLength	ksize,
 	uint32_t const	number_of_threads   = 
@@ -202,6 +201,7 @@ namespace khmer {
       partition = new SubsetPartition(this);
       _init_bitstuff();
       _all_tags_spin_lock = 0;
+      
     }
 
     virtual ~Hashtable( )
@@ -314,7 +314,6 @@ namespace khmer {
     }
 
     uint32_t _all_tags_spin_lock;
-
   public:
     SubsetPartition * partition;
     SeenSet all_tags;
@@ -428,7 +427,7 @@ namespace khmer {
 	CallbackFn	    callback	    = NULL,
 	void *		    callback_data   = NULL
     );
-
+       
     void consume_sequence_and_tag(const std::string& seq,
 				  unsigned long long& n_consumed,
 				  SeenSet * new_tags = 0);
@@ -439,7 +438,6 @@ namespace khmer {
 					     unsigned long long &n_consumed,
 					     CallbackFn callback = 0,
 					     void * callback_data = 0);
-
     void consume_fasta_and_traverse(const std::string &filename,
 				    unsigned int distance,
 				    unsigned int big_threshold,

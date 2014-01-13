@@ -84,6 +84,22 @@ namespace khmer {
   typedef std::map<HashIntoType, unsigned int> TagCountMap;
   typedef std::map<PartitionID, unsigned int> PartitionCountMap;
   typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+
+  // types used in @camillescott's sparse labeling extension  
+  typedef unsigned long long int Label;
+  typedef std::multimap<HashIntoType, Label*> TagLabelPtrMap;
+  typedef std::multimap<Label, HashIntoType*> LabelTagPtrMap;
+  typedef std::pair<HashIntoType, Label*> TagLabelPtrPair;
+  typedef std::pair<Label, HashIntoType*> LabelTagPtrPair;
+  typedef std::set<Label*> LabelPtrSet;
+  typedef std::set<HashIntoType*> TagPtrSet;
+  typedef std::map<Label, Label*> LabelPtrMap;
+
+  template <typename T>
+  void deallocate_ptr_set(T& s) {
+    for (typename T::iterator i = s.begin(); i != s.end(); ++i)
+      delete *i;
+  }
 }
 
 #endif // KHMER_HH

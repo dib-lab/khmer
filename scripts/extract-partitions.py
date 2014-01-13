@@ -31,6 +31,7 @@ def read_partition_file(filename):
         name, partition_id = record.name.rsplit('\t', 1)
         yield n, record, int(partition_id)
 
+
 def output_single(r):
     if hasattr(r, 'accuracy'):
         return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
@@ -104,12 +105,12 @@ def main():
             else:
                 assert not hasattr(r, 'accuracy'), \
                     "all input files must be FASTA if the first one is"
-                
+
             break
 
     if output_unassigned:
         unassigned_fp = open('%s.unassigned.%s' % (prefix, SUFFIX), 'w')
-        
+
     count = {}
     for filename in args.part_filenames:
         for n, r, pid in read_partition_file(filename):
