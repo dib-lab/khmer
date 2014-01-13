@@ -219,22 +219,27 @@ def main():
     total_t = time.clock()
     start_t = time.clock()
     for read_file in input_files:
-        print >>sys.stderr, '** sweeping {read_file} for labels...'.format(read_file=read_file)
+        print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
+                                                        read_file=read_file)
         file_t = 0.0
         try:
             read_fp = screed.open(read_file)
         except IOError as e:
             print >>sys.stderr, '!! ERROR: !!', e
-            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(fn=read_file)
+            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(
+                                                                 fn=read_file)
         else:
             for n, record in enumerate(read_fp):
                 if n % 50000 == 0:
                     end_t = time.clock()
                     batch_t = end_t - start_t
                     file_t += batch_t
-                    print >>sys.stderr, '\tswept {n} reads [{nc} labeled, {no} orphaned] \
+                    print >>sys.stderr, '\tswept {n} reads [{nc} labeled, \
+                                         {no} orphaned] \
                                         ** {sec}s ({sect}s total)' \
-                                        .format(n=n, nc=n_labeled, no=n_orphaned, sec=batch_t, sect=file_t)
+                                        .format(n=n, nc=n_labeled, 
+                                                no=n_orphaned, 
+                                                sec=batch_t, sect=file_t)
                     start_t = time.clock()
                 seq = record.sequence
                 name = record.name
