@@ -1936,7 +1936,6 @@ _is_valid_read_pair(
 		    ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
 
-
 } // namespace read_parsers
 
 

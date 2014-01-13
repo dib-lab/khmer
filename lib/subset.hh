@@ -63,12 +63,26 @@ namespace khmer {
     void load_partitionmap(std::string infile);
     void _validate_pmap();
 
+    void queue_neighbors(HashIntoType kmer_f,
+                                    HashIntoType kmer_r,
+                                    unsigned int breadth,
+                                    SeenSet& traversed_kmers,
+                                    NodeQueue& node_q,
+                                    std::queue<unsigned int>& breadth_q);
+
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
 		       SeenSet& tagged_kmers,
 		       const SeenSet& all_tags,
 		       bool break_on_stop_tags=false,
 		       bool stop_big_traversals=false);
 
+    unsigned int sweep_for_tags(const std::string& seq,
+				    SeenSet& tagged_kmers,
+				    const SeenSet& all_tags,
+				    unsigned int range,
+				    bool break_on_stop_tags,
+				    bool stop_big_traversals);
+				    
     void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
 					     HashIntoType kmer_r,
 					     SeenSet& tagged_kmers,

@@ -723,26 +723,6 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
   }
 }
 
-static PartitionID _parse_partition_id(string name)
-{
-  PartitionID p = 0;
-  const char * s = name.c_str() + name.length() - 1;
-  assert(*(s + 1) == (unsigned int) NULL);
-
-  while(*s != '\t' && s >= name.c_str()) {
-    s--;
-  }
-
-  if (*s == '\t') {
-    p = (PartitionID) atoi(s + 1);
-  } else {
-    cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
-    assert(0);
-  }
-
-  return p;
-}
-
 //
 // consume_partitioned_fasta: consume a FASTA file of reads
 //
@@ -1944,5 +1924,4 @@ void Hashtable::extract_unique_paths(std::string seq,
     }
   }
 }
-
 // vim: set sts=2 sw=2:

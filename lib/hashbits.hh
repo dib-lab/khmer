@@ -12,6 +12,7 @@
 
 namespace khmer {
   class CountingHash;
+  class LabelHash;
 
   class Hashbits : public khmer::Hashtable {
   protected:
@@ -39,6 +40,8 @@ namespace khmer {
       }
     }
             
+    uint32_t _all_tags_spin_lock;
+
   public:
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
     : khmer::Hashtable(ksize),
@@ -72,6 +75,7 @@ namespace khmer {
 
     virtual void save(std::string);
     virtual void load(std::string);
+    
     // for overlap k-mer counting
     void consume_fasta_overlap(const std::string &filename,HashIntoType curve[2][100],
                               khmer::Hashbits &ht2,
@@ -237,7 +241,7 @@ namespace khmer {
 };
 
 #include "counting.hh"
-
+#include "labelhash.hh"
 #endif // HASHBITS_HH
 
 // vim: set sts=2 sw=2:

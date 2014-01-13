@@ -3,7 +3,14 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
+
+#
+# This is an exact copy of test_hashbits, with all invocations of
+# khmer.new_hashbits replaced by khmer.Hashbits constructor calls
+#
+
 import khmer
+from khmer import Hashbits
 
 from screed.fasta import fasta_iter
 import screed
@@ -17,7 +24,7 @@ def teardown():
 
 
 def test__get_set_tag_density():
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.Hashbits(32, 1, 1)
 
     orig = ht._get_tag_density()
     assert orig != 2
@@ -33,7 +40,7 @@ def test_n_occupied_1():
     N_HT = 1  # number of hashtables
 
     # test modified c++ n_occupied code
-    ht1 = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht1 = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     for n, record in enumerate(fasta_iter(open(filename))):
         ht1.consume(record['sequence'])
@@ -50,7 +57,7 @@ def test_bloom_python_1():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht2 = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht2 = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     n_unique = 0
     for n, record in enumerate(fasta_iter(open(filename))):
@@ -76,7 +83,7 @@ def test_bloom_c_1():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht3 = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht3 = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     for n, record in enumerate(fasta_iter(open(filename))):
         ht3.consume(record['sequence'])
@@ -90,7 +97,7 @@ def test_n_occupied_2():  # simple one
     HT_SIZE = 10  # use 11
     N_HT = 1
 
-    ht1 = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht1 = khmer.Hashbits(K, HT_SIZE, N_HT)
     ht1.count('AAAA')  # 00 00 00 00 = 0
     assert ht1.n_occupied() == 1
 
@@ -111,7 +118,7 @@ def test_bloom_c_2():  # simple one
     N_HT2 = 2    # hashtable size = 11,13
 
     # use only 1 hashtable, no bloom filter
-    ht1 = khmer.new_hashbits(K, HT_SIZE, N_HT1)
+    ht1 = khmer.Hashbits(K, HT_SIZE, N_HT1)
     ht1.count('AAAA')  # 00 00 00 00 = 0
     ht1.count('ACTG')  # 00 10 01 11 =
     assert ht1.n_unique_kmers() == 2
@@ -121,7 +128,7 @@ def test_bloom_c_2():  # simple one
     assert ht1.n_unique_kmers() == 2
 
     # use two hashtables with 11,13
-    ht2 = khmer.new_hashbits(K, HT_SIZE, N_HT2)
+    ht2 = khmer.Hashbits(K, HT_SIZE, N_HT2)
     ht2.count('AAAA')  # 00 00 00 00 = 0
 
     ht2.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
@@ -136,7 +143,7 @@ def test_bloom_c_2():  # simple one
 
 @attr('highmem')
 def test_filter_if_present():
-    ht = khmer.new_hashbits(32, 1e6, 2)
+    ht = khmer.Hashbits(32, 1e6, 2)
 
     maskfile = utils.get_test_data('filter-test-A.fa')
     inputfile = utils.get_test_data('filter-test-B.fa')
@@ -153,7 +160,7 @@ def test_filter_if_present():
 @attr('highmem')
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.Hashbits(32, 1, 1)
 
     ht.consume_partitioned_fasta(inpfile)
     assert ht.count_partitions() == (2, 0)
@@ -179,7 +186,7 @@ def test_combine_pe():
 @attr('highmem')
 def test_load_partitioned():
     inpfile = utils.get_test_data('combine_parts_1.fa')
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.Hashbits(32, 1, 1)
 
     ht.consume_partitioned_fasta(inpfile)
     assert ht.count_partitions() == (2, 0)
@@ -197,7 +204,7 @@ def test_load_partitioned():
 @attr('highmem')
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.Hashbits(4, 1e6, 2)
 
     print ht.consume_fasta(inpfile)
     n = ht.count_kmers_within_radius('AAAA', 1)
@@ -210,13 +217,13 @@ def test_count_within_radius_simple():
 @attr('highmem')
 def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
-    ht = khmer.new_hashbits(20, 1e6, 4)
+    ht = khmer.Hashbits(20, 1e6, 4)
 
     ht.consume_fasta(inpfile)
     n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', int(1e6))
     assert n == 3960
 
-    ht = khmer.new_hashbits(21, 1e6, 4)
+    ht = khmer.Hashbits(21, 1e6, 4)
     ht.consume_fasta(inpfile)
     n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', int(1e6))
     assert n == 39
@@ -225,7 +232,7 @@ def test_count_within_radius_big():
 @attr('highmem')
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.Hashbits(4, 1e6, 2)
     ht.consume_fasta(inpfile)
 
     assert ht.kmer_degree('AAAA') == 2
@@ -237,7 +244,7 @@ def test_count_kmer_degree():
 @attr('highmem')
 def test_find_radius_for_volume():
     inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.Hashbits(4, 1e6, 2)
     ht.consume_fasta(inpfile)
 
     assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
@@ -246,7 +253,7 @@ def test_find_radius_for_volume():
 
 
 def test_circumference():
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.Hashbits(4, 1e6, 2)
 
     ht.count('ATGC')
     ht.count('GATG')
@@ -265,7 +272,7 @@ def test_circumference():
 
 
 def test_save_load_tagset():
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.Hashbits(32, 1, 1)
 
     outfile = utils.get_temp_filename('tagset')
 
@@ -287,7 +294,7 @@ def test_save_load_tagset():
 
 
 def test_save_load_tagset_noclear():
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.Hashbits(32, 1, 1)
 
     outfile = utils.get_temp_filename('tagset')
 
@@ -316,7 +323,7 @@ def test_stop_traverse():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     # without tagging/joining across consume, this breaks into two partition;
     # with, it is one partition.
@@ -338,7 +345,7 @@ def test_tag_across_stoptraverse():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     # without tagging/joining across consume, this breaks into two partition;
     # with, it is one partition.
@@ -367,7 +374,7 @@ def test_notag_across_stoptraverse():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
 
     # connecting k-mer at the beginning/end of a read: breaks up into two.
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
@@ -382,7 +389,7 @@ def test_notag_across_stoptraverse():
 
 
 def test_find_stoptags():
-    ht = khmer.new_hashbits(5, 1, 1)
+    ht = khmer.Hashbits(5, 1, 1)
     ht.add_stop_tag("AAAAA")
 
     assert ht.identify_stoptags_by_position("AAAAA") == [0]
@@ -392,7 +399,7 @@ def test_find_stoptags():
 
 
 def test_find_stoptags2():
-    ht = khmer.new_hashbits(4, 1, 1)
+    ht = khmer.Hashbits(4, 1, 1)
     ht.add_stop_tag("ATGC")
 
     x = ht.identify_stoptags_by_position("ATGCATGCGCAT")
@@ -400,17 +407,17 @@ def test_find_stoptags2():
 
 
 def test_get_ksize():
-    kh = khmer.new_hashbits(22, 1, 1)
+    kh = khmer.Hashbits(22, 1, 1)
     assert kh.ksize() == 22
 
 
 def test_get_hashsizes():
-    kh = khmer.new_hashbits(22, 100, 4)
+    kh = khmer.Hashbits(22, 100, 4)
     assert kh.hashsizes() == [101, 103, 107, 109], kh.hashsizes()
 
 
 def test_extract_unique_paths_0():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.Hashbits(10, 1e5, 4)
 
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGATG']
@@ -421,7 +428,7 @@ def test_extract_unique_paths_0():
 
 
 def test_extract_unique_paths_1():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.Hashbits(10, 1e5, 4)
 
     kh.consume('AGTGGCGATG')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
@@ -430,7 +437,7 @@ def test_extract_unique_paths_1():
 
 
 def test_extract_unique_paths_2():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.Hashbits(10, 1e5, 4)
 
     kh.consume('ATGGAGAGAC')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
@@ -439,7 +446,7 @@ def test_extract_unique_paths_2():
 
 
 def test_extract_unique_paths_3():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.Hashbits(10, 1e5, 4)
 
     kh.consume('ATGGAGAGAC')
     kh.consume('AGTGGCGATG')
@@ -450,7 +457,7 @@ def test_extract_unique_paths_3():
 
 
 def test_extract_unique_paths_4():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.Hashbits(10, 1e5, 4)
 
     kh.consume('ATGGAGAGAC')
     kh.consume('AGTGGCGATG')
@@ -471,7 +478,7 @@ def test_find_unpart():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
     ht.consume_fasta_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
@@ -494,7 +501,7 @@ def test_find_unpart_notraverse():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
     ht.consume_fasta_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
@@ -517,7 +524,7 @@ def test_find_unpart_fail():
     HT_SIZE = 100000  # size of hashtable
     N_HT = 3  # number of hashtables
 
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    ht = khmer.Hashbits(K, HT_SIZE, N_HT)
     ht.consume_fasta_and_tag(filename)
 
     subset = ht.do_subset_partition(0, 0)
@@ -532,7 +539,7 @@ def test_find_unpart_fail():
 
 
 def test_simple_median():
-    hi = khmer.new_hashbits(6, 1e6, 2)
+    hi = khmer.Hashbits(6, 1e6, 2)
 
     (median, average, stddev) = hi.get_median_count("AAAAAA")
     print median, average, stddev
