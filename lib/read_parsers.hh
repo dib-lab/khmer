@@ -543,7 +543,7 @@ struct FastqParser : public IParser
 
 };
 
-static PartitionID _parse_partition_id(std::string name)
+inline PartitionID _parse_partition_id(std::string name)
 {
   PartitionID p = 0;
   const char * s = name.c_str() + name.length() - 1;
