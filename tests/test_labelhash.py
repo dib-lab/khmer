@@ -87,13 +87,24 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     labels = set()
     for record in screed.open(filename):
         seq = record.sequence
-        labels.update(lb.sweep_label_neighborhood(seq, False, False))
+        labels.update(lb.sweep_label_neighborhood(seq, 0, False, False))
     # print lb.n_labels()
     # print labels
     assert len(labels) == 1
     assert labels.pop() == 2L
     assert lb.n_labels() == 1
 
+def test_consume_sequence_and_tag_with_labels():
+    lb = LabelHash(20, 1e6, 4)
+    label = 0L
+    sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
+    
+    n_consumed = lb.consume_sequence_and_tag_with_labels(sequence, label)
+    labels = set()
+    labels.update(lb.sweep_label_neighborhood(sequence))
+
+    assert label in labels
+    assert len(labels) == 1
 
 def test_sweep_tag_neighborhood():
     lb = LabelHash(20, 1e7, 4)

@@ -295,39 +295,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
       if (found_tags) { found_tags->insert(kmer); }
     }
   printdbg(done with low-level consume)
-  }
-/*
- * Find all labels associated with the sequence
- * For now, check /every/ k-mer with find_all_tags
- */
-unsigned int LabelHash::sweep_sequence_for_labels(const std::string& seq,
-					LabelPtrSet& found_labels,
-					bool break_on_stoptags,
-					bool stop_big_traversals) {
-					
-    SeenSet tagged_kmers;
-    //LabelPtrSet found_labels;
-    
-    HashIntoType kmer_f, kmer_r, kmer;
-    
-    KMerIterator kmers(seq.c_str(), _ksize);
-    std::string kmer_s;
-    // keep a list of kmers which have already been traversed
-    SeenSet traversed_kmers;
-    while (!kmers.done()) {
-      kmer = kmers.next();
-      kmer_s = _revhash(kmer, _ksize);
-      _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
-      
-      // don't even try traversing from k-mers not in the hashtable
-      //traversed_kmers.clear();
-      if (get_count(uniqify_rc(kmer_f,kmer_r))) {
-        partition->find_all_tags(kmer_f, kmer_r, tagged_kmers,
-                   all_tags, break_on_stoptags, stop_big_traversals);
-        traverse_labels_and_resolve(tagged_kmers, found_labels);
-      }
-    }
-    return traversed_kmers.size();
 }
 
 unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
