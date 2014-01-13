@@ -8,7 +8,7 @@
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
-% python scripts/normalize-by-median.py -r <range> -i <contigs fastp> \
+% sweep-reads-by-partition.py -r <range> -i <contigs fastp> \
 <reads1> <reads2> ... <readsN>
 
 This script is very lenient on IO errors, due to the large number of file
@@ -146,7 +146,8 @@ class ReadBufferManager:
 
 def main():
 
-    parser = build_construct_args()
+    parser = build_construct_args('Takes a partitioned reference file and a list of reads, \
+                                  and sorts reads by which partition they connect to')
     parser.add_argument('-i', '--input_fastp', dest='input_fastp')
     parser.add_argument(
         '-r', '--traversal_range', type=int, dest='traversal_range',
