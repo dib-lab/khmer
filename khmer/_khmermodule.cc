@@ -4119,7 +4119,6 @@ static PyObject * subset_partition_sizes(PyObject * self,
 	if (tup != NULL) {
 	    PyList_SET_ITEM(x, i, tup);
 	}
-	Py_XDECREF(tup);
       i++;
     }
   }
@@ -4161,7 +4160,6 @@ static PyObject * subset_partition_average_coverages(PyObject * self,
       if (tup != NULL) {
 	PyList_SET_ITEM(x, i, tup);
       }
-      Py_XDECREF(tup);
   }
 
   return x;
@@ -4279,13 +4277,13 @@ static PyObject * labelhash_get_label_dict(PyObject * self, PyObject * args) {
   khmer::LabelPtrMap::iterator it;
   
   for (it = hb->label_ptrs.begin(); it!=hb->label_ptrs.end(); ++it) {
-    PyObject * key = Py_BuildValue("K", it->first);
-    Py_XDECREF(key);
+    PyObject * key = Py_BuildValue("K", it->first);    
     PyObject * val = Py_BuildValue("K", it->second);
-    Py_XDECREF(val);
     if (key != NULL && val != NULL) {
-	PyDict_SetItem(d, key, val);
+	    PyDict_SetItem(d, key, val);
     }
+    Py_XDECREF(key);
+    Py_XDECREF(val);
   }
 
   return d;
@@ -4375,7 +4373,7 @@ static PyObject * labelhash_sweep_label_neighborhood(PyObject * self, PyObject *
   khmer::LabelHash * hb = me->labelhash;
   
   const char * seq = NULL;
-  int r = -1;
+  int r = 0;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
@@ -4442,7 +4440,7 @@ static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self, PyObject *ar
   khmer::LabelHash * labelhash = me->labelhash;
 
   const char * seq = NULL;
-  int r = -1;
+  int r = 0;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
 
