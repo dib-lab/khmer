@@ -8,7 +8,7 @@
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
-% sweep-reads-by-partition.py -r <range> -i <contigs fastp> \
+% sweep-reads-by-partition.py -r <range> <contigs fastp> \
 <reads1> <reads2> ... <readsN>
 
 This script is very lenient on IO errors, due to the large number of file
@@ -22,11 +22,9 @@ opening.
 import screed
 import sys
 import os
-import argparse
 import time
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
-from collections import namedtuple as nt
 
 
 DEFAULT_NUM_BUFFERS = 50000
@@ -146,9 +144,9 @@ class ReadBufferManager:
 
 def main():
 
-    parser = build_construct_args('Takes a partitioned reference file and a list of reads, \
-                                  and sorts reads by which partition they connect to')
-    parser.add_argument('-i', '--input_fastp', dest='input_fastp')
+    parser = build_construct_args('Takes a partitioned reference file \
+                                  and a list of reads, and sorts reads \
+                                  by which partition they connect to')
     parser.add_argument(
         '-r', '--traversal_range', type=int, dest='traversal_range',
         default=DEFAULT_RANGE)
@@ -160,6 +158,7 @@ def main():
                         default=DEFAULT_OUT_PREF)
     parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int,
                         default=DEFAULT_NUM_BUFFERS)
+    parser.add_argument(dest='input_fastp')
     parser.add_argument('input_files', nargs='+')
     args = parser.parse_args()
 
@@ -205,7 +204,7 @@ def main():
     output_buffer = ReadBufferManager(
         max_buffers, max_reads, buf_size, output_pref, outdir)
 
-        # consume the partitioned fasta with which to label the graph
+    # consume the partitioned fasta with which to label the graph
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
     print >>sys.stderr, 'consuming fastp...'
     ht.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
