@@ -10,6 +10,13 @@ Find all reads connected to the given contigs on a per-partition basis.
 
 % sweep-reads-by-partition.py -r <range> <contigs fastp> \
 <reads1> <reads2> ... <readsN>
+"""
+
+epilog = """
+Output will be a collection of files corresponding to the partitions;
+each partition gets a file (prefixed with the output prefix option), 
+which means this could output many tens or hundreds of thousands of files. 
+Users should plan accordingly.
 
 This script is very lenient on IO errors, due to the large number of file
 operations needed. Thus, errors opening a file for buffer flush or writing
@@ -148,19 +155,25 @@ def main():
     parser = build_construct_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
+    parser.epilog = epilog
     parser.add_argument(
         '-r', '--traversal_range', type=int, dest='traversal_range',
         default=DEFAULT_RANGE)
     parser.add_argument('-b', '--buffer_size', dest='max_reads', type=int,
-                        default=DEFAULT_MAX_READS)
+                        default=DEFAULT_MAX_READS,
+                        help='Max total reads to buffer before flushing')
     parser.add_argument('-l', '--buffer_length', dest='buffer_size', type=int,
-                        default=DEFAULT_BUFFER_SIZE)
+                        default=DEFAULT_BUFFER_SIZE,
+                        help='Max length of an individual label buffer \
+                              before flushing')
     parser.add_argument('-o', '--output_prefix', dest='output_prefix',
-                        default=DEFAULT_OUT_PREF)
+                        default=DEFAULT_OUT_PREF,
+                        help='Prefix for sorted read files')
     parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int,
-                        default=DEFAULT_NUM_BUFFERS)
-    parser.add_argument(dest='input_fastp')
-    parser.add_argument('input_files', nargs='+')
+                        default=DEFAULT_NUM_BUFFERS,
+                        help='Max individual label buffers before flushing')
+    parser.add_argument(dest='input_fastp', help='Partitioned reference fasta')
+    parser.add_argument('input_files', nargs='+', help='Reads to be swept/sorted')
     args = parser.parse_args()
 
     K = args.ksize
