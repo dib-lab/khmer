@@ -128,12 +128,7 @@ namespace khmer {
         TagPtrSet get_label_tags(const Label& label);
 
         void link_tag_and_label(HashIntoType& kmer, Label& label);
-        
-        unsigned int sweep_sequence_for_labels(const std::string& seq,
-                        LabelPtrSet& found_labels,
-                        bool break_on_stoptags,
-                        bool stop_big_traversals);
-                        
+                               
         unsigned int sweep_label_neighborhood(const std::string & seq,
                                                       LabelPtrSet& found_labels,
                                                       unsigned int range,
