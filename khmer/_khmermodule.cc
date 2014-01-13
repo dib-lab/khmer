@@ -2121,7 +2121,9 @@ static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self, PyOb
     return NULL;
   }
 
-  if (strlen(kmer_s) < counting->ksize()) { // @@
+  if (strlen(kmer_s) < counting->ksize()) {
+    PyErr_SetString(PyExc_ValueError,
+	    "kmer_s must be less than the k-mer size of the counting hash");
     return NULL;
   }
 
