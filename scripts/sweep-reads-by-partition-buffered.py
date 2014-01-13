@@ -12,7 +12,7 @@ Find all reads connected to the given contigs on a per-partition basis.
 <reads1> <reads2> ... <readsN>
 
 This script is very lenient on IO errors, due to the large number of file
-operations needed. Thus, errors opening a file for buffer flush or writeing
+operations needed. Thus, errors opening a file for buffer flush or writing
 a read to a file will not crash the program; instead, if there were errors,
 the user will be warned at the end of execution. Errors with opening read files
 are also handled -- we move on to the next read file if there is an error opening.
@@ -53,13 +53,6 @@ def write_seq(fp, name, seq, labels=[]):
         return 1
     else:
         return 0
-
-# stores reads in memory and flushes them to their appropriate files
-# when certain criteria are met
-# Basic idea is to buffer some number of reads in memory, then dump them all at once
-# Hope that each file acrues, on average, BUFFER_SIZE / NUM_PARTS reads
-# ie, if we buffer 1000000 reads, and we have 100000 partitions or labels,
-# we should expect the mean buffer size to be 10 reads
 
 
 class ReadBuffer:
