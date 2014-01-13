@@ -106,7 +106,8 @@ class ReadBufferManager:
             outfp = open(fpath, 'a')
         except IOError as e:
             print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
-            print >>sys.stderr, '*** Failed to open {fn} for buffer flush'.format(fn=fpath)
+            print >>sys.stderr, '*** Failed to open {fn} for \
+                                buffer flush'.format(fn=fpath)
             self.num_file_errors += 1
         else:
             buf = self.buffers[buf_id]
@@ -187,7 +188,8 @@ def main():
         print >>sys.stderr, ''
         print >>sys.stderr, \
             'Estimated memory usage is {prod:.2g} bytes \
-            (n_hashes x min_hashsize / 8)'.format(prod=args.n_hashes * HT_SIZE / 8)
+            (n_hashes x min_hashsize / 8)'.format(
+                            prod=args.n_hashes * HT_SIZE / 8)
         print >>sys.stderr, '-' * 8
 
     traversal_range = args.traversal_range
