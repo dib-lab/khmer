@@ -1,4 +1,4 @@
-#! /w/khmer_dev/bin/python
+#! /usr/bin/env python
 
 import khmer
 import screed
@@ -8,7 +8,7 @@ import time
 R = int(sys.argv[1])
 print R
 K = 20
-test_file = '/w/khmer/tests/test-data/biglump-random-20-a.fa'
+test_file = '../tests/test-data/biglump-random-20-a.fa'
 
 ht = khmer.new_hashbits(K, 1e9, 4)
 ht.consume_fasta_and_tag_with_colors(test_file)
