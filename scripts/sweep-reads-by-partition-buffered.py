@@ -15,8 +15,8 @@ This script is very lenient on IO errors, due to the large number of file
 operations needed. Thus, errors opening a file for buffer flush or writing
 a read to a file will not crash the program; instead, if there were errors,
 the user will be warned at the end of execution. Errors with opening read files
-are also handled -- we move on to the next read file if there is an error opening.
-
+are also handled -- we move on to the next read file if there is an error
+opening.
 """
 
 import screed
@@ -41,7 +41,7 @@ MIN_KSIZE = 21
 
 def fmt_fasta(name, seq, labels=[]):
     return '>{name}\t{labels}\n{seq}\n'.format(name=name,
-                                               labels='\t'.join([str(l) for l in labels]), seq=seq)
+            labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
 def write_seq(fp, name, seq, labels=[]):
