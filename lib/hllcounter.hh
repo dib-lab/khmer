@@ -16,9 +16,15 @@ namespace khmer {
    public:
     HLLCounter(double error_rate);
 
-    void add(const std::string &s);
+    void add(const std::string &);
     HashIntoType estimate_cardinality();
     virtual ~HLLCounter() {}
+   private:
+    double _Ep();
+    double alpha;
+    int p;
+    int m;
+    std::vector<int> M;
   };
 };
 

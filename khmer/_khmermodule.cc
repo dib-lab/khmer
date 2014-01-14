@@ -4249,9 +4249,9 @@ static PyTypeObject khmer_KHLLCounterType = {
 
 static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
 {
-  unsigned int bits = 0;
+  double error_rate = 0;
 
-  if (!PyArg_ParseTuple(args, "I", &bits)) {
+  if (!PyArg_ParseTuple(args, "d", &error_rate)) {
     return NULL;
   }
 
@@ -4262,7 +4262,7 @@ static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
       return NULL;
   }
 
-  khllcounter_obj->hllcounter = new khmer::HLLCounter(bits);
+  khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate);
 
   return (PyObject *) khllcounter_obj;
 }
