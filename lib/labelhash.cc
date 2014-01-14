@@ -220,10 +220,10 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
     while(!kmers.done()) {
       kmer = kmers.next();
 
-      if ((is_new_kmer = test_and_set_bits( kmer )))
+      if ((is_new_kmer = test_and_set_bits( kmer ))) {
         ++n_consumed;
         printdbg(test_and_set_bits)
-
+      }
   #if (1)
       if (is_new_kmer) {
         printdbg(new kmer...)
