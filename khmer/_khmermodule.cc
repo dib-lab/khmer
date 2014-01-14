@@ -549,7 +549,9 @@ _init_Read_Type( )
 //
 
 
-static PyTypeObject ReadParser_Type = { PyObject_HEAD_INIT( NULL ) };
+static PyTypeObject ReadParser_Type
+  CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("ReadParser_Object")
+  = { PyObject_HEAD_INIT( NULL ) };
 static PyTypeObject ReadPairIterator_Type = { PyObject_HEAD_INIT( NULL ) };
 
 
@@ -815,34 +817,42 @@ _init_ReadParser_Type( )
     ReadParser_Type.tp_methods	    = (PyMethodDef *)_ReadParser_methods;
     
     PyObject * cls_attrs_DICT = PyDict_New( );
-
+    if (cls_attrs_DICT == NULL) {
+	return;
+    }
 
     // Place pair mode constants into class dictionary.
     int result;
 
-    result = PyDict_SetItemString(
-	cls_attrs_DICT,
-	"PAIR_MODE_ALLOW_UNPAIRED",
-	PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED )
-    );
-    assert(!result);
+    PyObject * value = PyInt_FromLong( IParser:: PAIR_MODE_ALLOW_UNPAIRED );
+    result = PyDict_SetItemString(cls_attrs_DICT,
+	"PAIR_MODE_ALLOW_UNPAIRED", value);     
+    Py_XDECREF(value);
+    if (!result) {
+	Py_DECREF(cls_attrs_DICT);
+	return;
+    }	
 
-    result = PyDict_SetItemString(
-	cls_attrs_DICT,
-	"PAIR_MODE_IGNORE_UNPAIRED",
-	PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED )
-    );
-    assert(!result);
+    value = PyInt_FromLong( IParser:: PAIR_MODE_IGNORE_UNPAIRED );
+    result = PyDict_SetItemString(cls_attrs_DICT,
+	"PAIR_MODE_IGNORE_UNPAIRED", value );
+    Py_XDECREF(value);
+    if (!result) {
+	Py_DECREF(cls_attrs_DICT);
+	return;
+    }
 
-    result = PyDict_SetItemString(
-	cls_attrs_DICT,
-	"PAIR_MODE_ERROR_ON_UNPAIRED",
-	PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED )
-    );
-    assert(!result);
+    value = PyInt_FromLong( IParser:: PAIR_MODE_ERROR_ON_UNPAIRED );
+    result = PyDict_SetItemString(cls_attrs_DICT,
+	"PAIR_MODE_ERROR_ON_UNPAIRED", value);
+    Py_XDECREF(value);
+    if (!result) {
+	Py_DECREF(cls_attrs_DICT);
+	return;
+    }
 
     ReadParser_Type.tp_dict	    = cls_attrs_DICT;
-
+    Py_DECREF(cls_attrs_DICT);
     _debug_class_attrs( ReadParser_Type );
 
 } // _init_ReadParser_Type
@@ -1196,7 +1206,9 @@ static PySequenceMethods khmer_KTable_SequenceMethods = {
   0
 };
 
-static PyTypeObject khmer_KTableType = {
+static PyTypeObject khmer_KTableType
+  CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KTableObject")
+    = {
     PyObject_HEAD_INIT(NULL)
     0,
     "KTable", sizeof(khmer_KTableObject),
@@ -1261,15 +1273,13 @@ static PyObject * ktable_update(PyObject * self, PyObject * args)
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
 
-  PyObject * other_o;
+  khmer_KTableObject * other_o;
 
-  if(!PyArg_ParseTuple(args, "O", &other_o)) {
+  if(!PyArg_ParseTuple(args, "O!", &khmer_KTableType, &other_o)) {
       return NULL;
   }
 
-  assert(is_ktable_obj(other_o));
-
-  khmer::KTable * other = ((khmer_KTableObject*) other_o)->ktable;
+  khmer::KTable * other = other_o->ktable;
 
   ktable->update(*other);
 
@@ -1281,15 +1291,13 @@ static PyObject * ktable_intersect(PyObject * self, PyObject * args)
   khmer_KTableObject * me = (khmer_KTableObject *) self;
   khmer::KTable * ktable = me->ktable;
 
-  PyObject * other_o;
+  khmer_KTableObject * other_o;
 
-  if (!PyArg_ParseTuple(args, "O", &other_o)) {
+  if (!PyArg_ParseTuple(args, "O!", &khmer_KTableType, &other_o)) {
       return NULL;
   }
 
-  assert(is_ktable_obj(other_o));
-
-  khmer::KTable * other = ((khmer_KTableObject*) other_o)->ktable;
+  khmer::KTable * other = other_o->ktable;
 
   khmer::KTable * intersection = ktable->intersect(*other);
 
@@ -1375,6 +1383,10 @@ typedef struct {
 } khmer_ReadAlignerObject;
 
 static void khmer_counting_dealloc(PyObject *);
+
+static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args);
+
+static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args);
 
 static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
 {
@@ -1825,82 +1837,6 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
   return ret;
 }
 
-static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  const char * filename = NULL;
-  PyObject * tracking_obj = NULL;
-  if (!PyArg_ParseTuple(args, "sO", &filename, &tracking_obj)) {
-    return NULL;
-  }
-
-  //assert(is_hashbits_obj(tracking_obj));
-
-  khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
-  khmer::Hashbits * hashbits = tracking_o->hashbits;
-
-
-  khmer::HashIntoType * dist;
-
-  Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(filename, hashbits);
-  Py_END_ALLOW_THREADS
-  
-  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-  if (x == NULL) {
-      delete[] dist;
-      return NULL;
-  }
-  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-  }
-
-  delete[] dist;
-
-  return x;
-}
-
-static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  PyObject * rparser_obj = NULL;
-  PyObject * tracking_obj = NULL;
-  if (!PyArg_ParseTuple(args, "OO", &rparser_obj, &tracking_obj)) {
-    return NULL;
-  }
-
-  khmer:: read_parsers:: IParser * rparser = 
-    _PyObject_to_khmer_ReadParser(rparser_obj);
-
-  //assert(is_hashbits_obj(tracking_obj));
-
-  khmer_KHashbitsObject * tracking_o = (khmer_KHashbitsObject *) tracking_obj;
-  khmer::Hashbits * hashbits = tracking_o->hashbits;
-
-
-  khmer::HashIntoType * dist;
-
-  Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(rparser, hashbits);
-  Py_END_ALLOW_THREADS
-  
-  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
-  if (x == NULL) {
-      delete[] dist;
-      return NULL;
-  }
-  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
-    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
-  }
-
-  delete[] dist;
-  return x;
-}
-
 static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject * args)
 {
   khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -2251,7 +2187,9 @@ khmer_counting_getattr(PyObject * obj, char * name)
 
 #define is_counting_obj(v)  ((v)->ob_type == &khmer_KCountingHashType)
 
-static PyTypeObject khmer_KCountingHashType = {
+static PyTypeObject khmer_KCountingHashType
+    CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHashObject")
+    = {
     PyObject_HEAD_INIT(NULL)
     0,
     "KCountingHash", sizeof(khmer_KCountingHashObject),
@@ -2307,15 +2245,16 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
 static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
 {
   unsigned int k = 0;
-  PyObject* sizes_list_o = NULL;
+  PyListObject * sizes_list_o = NULL;
   unsigned int n_threads = 1;
 
-  if (!PyArg_ParseTuple(args, "IO|I", &k, &sizes_list_o, &n_threads)) {
+  if (!PyArg_ParseTuple(args, "IO!|I", &k, &PyList_Type, &sizes_list_o,
+	      &n_threads)) {
     return NULL;
   }
 
   std::vector<khmer::HashIntoType> sizes;
-  Py_ssize_t sizes_list_o_length = PyObject_Length(sizes_list_o);
+  Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
   if (sizes_list_o_length == -1) {
       PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
       return NULL;
@@ -2346,7 +2285,9 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
 static int khmer_hashbits_init(khmer_KHashbitsObject * self, PyObject * args, PyObject * kwds); 
 static PyObject * khmer_hashbits_getattr(PyObject * obj, char * name);
 
-static PyTypeObject khmer_KHashbitsType = {
+static PyTypeObject khmer_KHashbitsType
+    CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbitsObject")
+    = {
     PyObject_HEAD_INIT(NULL)
     0,
     "Hashbits", sizeof(khmer_KHashbitsObject),
@@ -2384,7 +2325,74 @@ static PyTypeObject khmer_KHashbitsType = {
     0,                       /* tp_dictoffset */
     (initproc)khmer_hashbits_init,   /* tp_init */
     0,                       /* tp_alloc */
-} ;
+};
+
+static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  khmer :: python :: ReadParser_Object * rparser_obj = NULL;
+  khmer_KHashbitsObject *tracking_obj = NULL;
+
+  if (!PyArg_ParseTuple(args, "O!O!", &khmer::python::ReadParser_Type,
+	      &rparser_obj, &khmer_KHashbitsType, &tracking_obj)) {
+    return NULL;
+  }
+
+  khmer:: read_parsers:: IParser * rparser = rparser_obj->parser;
+  khmer::Hashbits * hashbits = tracking_obj->hashbits;
+
+  khmer::HashIntoType * dist;
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(rparser, hashbits);
+  Py_END_ALLOW_THREADS
+  
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  if (x == NULL) {
+      delete[] dist;
+      return NULL;
+  }
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+  }
+
+  delete[] dist;
+  return x;
+}
+
+static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  const char * filename = NULL;
+  khmer_KHashbitsObject * tracking_obj = NULL;
+  if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KHashbitsType, &tracking_obj)) {
+    return NULL;
+  }
+
+  khmer::Hashbits * hashbits = tracking_obj->hashbits;
+  khmer::HashIntoType * dist;
+
+  Py_BEGIN_ALLOW_THREADS
+    dist = counting->abundance_distribution(filename, hashbits);
+  Py_END_ALLOW_THREADS
+  
+  PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
+  if (x == NULL) {
+      delete[] dist;
+      return NULL;
+  }
+  for (int i = 0; i < MAX_BIGCOUNT + 1; i++) {
+    PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(dist[i]));
+  }
+
+  delete[] dist;
+
+  return x;
+}
 
 static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
 {
@@ -2595,16 +2603,16 @@ static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
-  PyObject * counting_o = NULL;
+  khmer_KCountingHashObject * counting_o = NULL;
   unsigned int distance, threshold, frequency;
 
-  if (!PyArg_ParseTuple(args, "OIII", &counting_o, &distance, &threshold, &frequency)) {
+  if (!PyArg_ParseTuple(args, "O!III", &khmer_KCountingHashType, &counting_o,
+	      &distance, &threshold, &frequency)) {
     return NULL;
   }
 
-  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
-
-  hashbits->traverse_from_tags(distance, threshold, frequency, *counting);
+  hashbits->traverse_from_tags(distance, threshold, frequency,
+	  * counting_o->counting);
 
   Py_RETURN_NONE;
 }
@@ -2614,11 +2622,12 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
-  PyObject * counting_o = NULL;
+  khmer_KCountingHashObject * counting_o = NULL;
   PyObject * subset_o = NULL;
   unsigned int distance, threshold, frequency;
 
-  if (!PyArg_ParseTuple(args, "OOIII", &subset_o, &counting_o, &distance, &threshold, &frequency)) {
+  if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHashType,
+	      &counting_o, &distance, &threshold, &frequency)) {
     return NULL;
   }
 
@@ -2629,9 +2638,10 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
     subset_p = hashbits->partition;
   }
 
-  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+  khmer::CountingHash * counting = counting_o->counting;
 
-  unsigned int next_largest = subset_p->repartition_largest_partition(distance, threshold, frequency, *counting);
+  unsigned int next_largest = subset_p->repartition_largest_partition(distance,
+	  threshold, frequency, *counting);
 
   return PyInt_FromLong(next_largest);
 }
@@ -2655,6 +2665,9 @@ static PyObject * hashbits_get(PyObject * self, PyObject * args)
   } else if (PyString_Check(arg)) {
     std::string s = PyString_AsString(arg);
     count = hashbits->get_count(s.c_str());
+  } else {
+      PyErr_SetString(PyExc_ValueError, "must pass in an int or string");
+      return NULL;
   }
 
   return PyInt_FromLong(count);
@@ -2694,9 +2707,8 @@ static PyObject * hashbits_kmer_degree(PyObject * self, PyObject * args)
   khmer::Hashbits * hashbits = me->hashbits;
 
   const char * kmer_s = NULL;
-  PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple(args, "s|O", &kmer_s, &callback_obj)) {
+  if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
     return NULL;
   }
 
@@ -2921,15 +2933,15 @@ static PyObject * hashbits_consume_fasta_and_traverse(PyObject * self, PyObject 
 
   const char * filename;
   unsigned int radius, big_threshold, transfer_threshold;
-  PyObject * counting_o = NULL;
+  khmer_KCountingHashObject * counting_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "sIIIO", &filename,
+  if (!PyArg_ParseTuple(args, "sIIIO!", &filename,
 			&radius, &big_threshold, &transfer_threshold,
-			&counting_o)) {
+			&khmer_KCountingHashType, &counting_o)) {
     return NULL;
   }
 
-  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
+  khmer::CountingHash * counting = counting_o->counting;
 
   hashbits->consume_fasta_and_traverse(filename, radius, big_threshold,
 				       transfer_threshold, *counting);
@@ -2977,14 +2989,15 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
   khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
   khmer::Hashbits * hashbits = me->hashbits;
 
-  PyObject * rparser_obj = NULL;
+  khmer::python::ReadParser_Object * rparser_obj = NULL;
   PyObject * callback_obj = NULL;
 
-  if (!PyArg_ParseTuple( args, "O|O", &rparser_obj, &callback_obj ))
+  if (!PyArg_ParseTuple( args, "O!|O", &khmer::python::ReadParser_Type,
+	      &rparser_obj, &callback_obj )) {
     return NULL;
+  }
 
-  khmer:: read_parsers:: IParser * rparser =
-  _PyObject_to_khmer_ReadParser( rparser_obj );
+  khmer:: read_parsers:: IParser * rparser = rparser_obj-> parser;
 
   // call the C++ function, and trap signals => Python
   unsigned long long  n_consumed  = 0;
@@ -3969,15 +3982,15 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
 
     if (self != NULL) {
         unsigned int k = 0;
-        PyObject* sizes_list_o = NULL;
+        PyListObject* sizes_list_o = NULL;
 
-        if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
             Py_DECREF(self);
 	    return NULL;
         }
 
         std::vector<khmer::HashIntoType> sizes;
-        for (int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+        for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
             sizes.push_back(PyLong_AsLongLong(size_o));
         }
@@ -4138,16 +4151,14 @@ static PyObject * subset_partition_average_coverages(PyObject * self,
   khmer_KSubsetPartitionObject * me = (khmer_KSubsetPartitionObject *) self;
   khmer::SubsetPartition * subset_p = me->subset;
 
-  PyObject * counting_o;
+  khmer_KCountingHashObject * counting_o;
 
-  if (!PyArg_ParseTuple(args, "O", &counting_o)) {
+  if (!PyArg_ParseTuple(args, "O!", &khmer_KCountingHashType, &counting_o)) {
     return NULL;
   }
   
-  khmer::CountingHash * counting = ((khmer_KCountingHashObject *) counting_o)->counting;
-  
   khmer::PartitionCountMap cm;
-  subset_p->partition_average_coverages(cm, counting);
+  subset_p->partition_average_coverages(cm, counting_o -> counting);
 
   unsigned int i;
   khmer::PartitionCountMap::iterator mi;
@@ -4226,15 +4237,15 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
   
     if (self!=NULL) {
         unsigned int k = 0;
-        PyObject* sizes_list_o = NULL;
+        PyListObject * sizes_list_o = NULL;
 
-        if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
         std::vector<khmer::HashIntoType> sizes;
-        for (int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+        for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
             sizes.push_back(PyLong_AsLongLong(size_o));
         }
@@ -4698,17 +4709,15 @@ static PyTypeObject khmer_ReadAlignerType = {
 //
 static PyObject* new_readaligner(PyObject * self, PyObject * args)
 {
-  PyObject * py_obj;
+  khmer_KCountingHashObject * ch;
   double lambdaOne = 0.0;
   double lambdaTwo = 0.0;
   unsigned int maxErrorRegion = UINT_MAX;
 
-  if(!PyArg_ParseTuple(args, "O|ddI", &py_obj, 
+  if(!PyArg_ParseTuple(args, "O!|ddI", &khmer_KCountingHashType, &ch, 
                        &lambdaOne, &lambdaTwo, &maxErrorRegion)) {
     return NULL;
   }
-
-  khmer_KCountingHashObject * ch = (khmer_KCountingHashObject *) py_obj;
 
   khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
     PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
@@ -4740,14 +4749,14 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
 static PyObject* _new_hashbits(PyObject * self, PyObject * args)
 {
   unsigned int k = 0;
-  PyObject* sizes_list_o = NULL;
+  PyListObject * sizes_list_o = NULL;
 
-  if (!PyArg_ParseTuple(args, "IO", &k, &sizes_list_o)) {
+  if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
     return NULL;
   }
 
   std::vector<khmer::HashIntoType> sizes;
-  for (int i = 0; i < PyObject_Length(sizes_list_o); i++) {
+  for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
     PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
     sizes.push_back(PyLong_AsLongLong(size_o));
   }
