@@ -2194,7 +2194,8 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self, PyObj
     PyObject_New(khmer_KSubsetPartitionObject, &khmer_KSubsetPartitionType);
 
   if (subset_obj == NULL) {
-      return NULL;
+    delete subset_p;  
+    return NULL;
   }
 
   subset_obj->subset = subset_p;

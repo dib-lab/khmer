@@ -40,8 +40,6 @@ namespace khmer {
       }
     }
             
-    uint32_t _all_tags_spin_lock;
-
   public:
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
     : khmer::Hashtable(ksize),
