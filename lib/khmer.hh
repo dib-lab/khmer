@@ -22,6 +22,17 @@ extern "C"
 #   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
 #endif
 
+/* The checker automatically defines this preprocessor name when creating
+   the custom attribute: */
+#if defined(WITH_CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF_ATTRIBUTE)
+  #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename) \
+__attribute__((cpychecker_type_object_for_typedef(typename)))
+#else
+  /* This handles the case where we're compiling with a "vanilla"
+     compiler that doesn't supply this attribute: */
+  #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
+#endif
+
 // C++ standard exceptions are subclassed almost ubiquitously.
 #include <exception>
 #include <set>
