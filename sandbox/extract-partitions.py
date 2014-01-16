@@ -7,6 +7,8 @@
 import sys
 import os.path
 import screed
+import argparse
+from khmer.counting_args import build_construct_args
 
 MAX_SIZE = int(1e6)
 THRESHOLD = 1
@@ -29,15 +31,16 @@ def read_partition_file(filename):
         yield n, name, int(partition_id), record.sequence
 
 ###
-
-filename = sys.argv[1]
-
+parser = build_construct_args("Extract partitions")
+parser.add_argument('filename')
+parser.add_argument('-p','--prefix',dest='prefix',help='Prefix to group names')
+args=parser.parse_args()
+filename = args.filename
 # If prefix is given as second arg, pick it up.
 # Else, use filename-sans-path as prefix
+prefix=args.prefix if args.prefix else os.path.basename(filename) 
 
-prefix = os.path.basename(filename)
-if len(sys.argv) > 2:
-    prefix = sys.argv[2]
+
 
 # Create dist file and open to write
 distfilename = prefix + '.dist'
