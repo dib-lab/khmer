@@ -55,7 +55,7 @@ Latest stable release
 
 2) Use pip to download, build, and install khmer and its dependencies::
 
-      pip install khmer
+      pip install --allow-external argparse khmer
 
 3) The scripts are now in the ``env/bin`` directory and ready for your
    use. You can directly use them by name, see :doc:`scripts`.
@@ -70,7 +70,7 @@ Latest development branch
 
 Repeat the above but modify the pip install line::
 
-   pip install -e git+https://github.com/ged-lab/khmer.git@master#egg=khmer
+   pip install --allow-external argparse --editable git+https://github.com/ged-lab/khmer.git@master#egg=khmer
 
 Run the tests
 ^^^^^^^^^^^^^
