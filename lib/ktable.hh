@@ -21,8 +21,8 @@
 #   define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
 			    (toupper(ch)) == 'G' || (toupper(ch)) == 'T')
 #else
-    // NOTE: Assumes data is already sanitized as it should be by parsers.
-    //	     This assumption eliminates 4 function calls.
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
 #   define is_valid_dna(ch) ((ch) == 'A' || (ch) == 'C' || \
 			     (ch) == 'G' || (ch) == 'T')
 #endif
@@ -33,8 +33,8 @@
 			    (toupper(ch)) == 'T' ? 1LL : \
 			    (toupper(ch)) == 'C' ? 2LL : 3LL)
 #else
-    // NOTE: Assumes data is already sanitized as it should be by parsers.
-    //	     This assumption eliminates 4 function calls.
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
 #   define twobit_repr(ch) ((ch) == 'A' ? 0LL : \
 			    (ch) == 'T' ? 1LL : \
 			    (ch) == 'C' ? 2LL : 3LL)
@@ -49,8 +49,8 @@
 			    (toupper(ch)) == 'T' ? 0LL : \
 			    (toupper(ch)) == 'C' ? 3LL : 2LL)
 #else
-    // NOTE: Assumes data is already sanitized as it should be by parsers.
-    //	     This assumption eliminates 4 function calls.
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
 #   define twobit_comp(ch) ((ch) == 'A' ? 1LL : \
 			    (ch) == 'T' ? 0LL : \
 			    (ch) == 'C' ? 3LL : 2LL)
@@ -64,23 +64,25 @@
 #endif
 
 
-namespace khmer {
-  // two-way hash functions.
-  HashIntoType _hash(const char * kmer, const WordLength k);
-  HashIntoType _hash(const char * kmer, const WordLength k,
-		     HashIntoType& h, HashIntoType& r);
-  HashIntoType _hash_forward(const char * kmer, WordLength k);
+namespace khmer
+{
+// two-way hash functions.
+HashIntoType _hash(const char * kmer, const WordLength k);
+HashIntoType _hash(const char * kmer, const WordLength k,
+                   HashIntoType& h, HashIntoType& r);
+HashIntoType _hash_forward(const char * kmer, WordLength k);
 
-  std::string _revhash(HashIntoType hash, WordLength k);
+std::string _revhash(HashIntoType hash, WordLength k);
 
-  //
-  // KTable class: keep track of k-mer prevalences.
-  //
-  // the main (so far only...) class in khmer.
-  //
+//
+// KTable class: keep track of k-mer prevalences.
+//
+// the main (so far only...) class in khmer.
+//
 
-  class KTable {
-  protected:
+class KTable
+{
+protected:
     WordLength _ksize;	// 'k'
     HashIntoType _max_hash;	// 4**k
 
@@ -88,54 +90,61 @@ namespace khmer {
 
     // allocate the counts table.
     void _allocate_counters() {
-      // allocate.
-      _counts = new ExactCounterType[n_entries()];
-      memset(_counts, 0, n_entries() * sizeof(ExactCounterType));
+        // allocate.
+        _counts = new ExactCounterType[n_entries()];
+        memset(_counts, 0, n_entries() * sizeof(ExactCounterType));
     }
-  public:
+public:
 
     // Constructor: initialize stuff.
     KTable(WordLength ksize) : _ksize(ksize) {
-      _max_hash = (unsigned int) pow(4, _ksize) - 1;
-      _allocate_counters();
+        _max_hash = (unsigned int) pow(4, _ksize) - 1;
+        _allocate_counters();
     }
 
     // destructor: free.
     ~KTable() {
-      delete _counts; _counts = NULL;
+        delete _counts;
+        _counts = NULL;
     }
 
     // accessor to get 'k'
-    const WordLength ksize() const { return _ksize; }
+    const WordLength ksize() const {
+        return _ksize;
+    }
 
     // accessors to get table info
-    const HashIntoType max_hash() const { return _max_hash; }
-    const HashIntoType n_entries() const { return _max_hash + 1; }
+    const HashIntoType max_hash() const {
+        return _max_hash;
+    }
+    const HashIntoType n_entries() const {
+        return _max_hash + 1;
+    }
 
     // add the given k-mer into the counts table.
     void count(const char * kmer) {
-      _counts[_hash(kmer, _ksize)]++;
+        _counts[_hash(kmer, _ksize)]++;
     }
 
     // get the count for the given k-mer.
     const ExactCounterType get_count(const char * kmer) const {
-      return _counts[_hash(kmer, _ksize)];
+        return _counts[_hash(kmer, _ksize)];
     }
 
     // get the count for the given k-mer hash.
     const ExactCounterType get_count(HashIntoType i) const {
-      return _counts[i];
+        return _counts[i];
     }
 
     // set the count for the given k-mer.
     void set_count(const char * kmer, ExactCounterType c) {
-      _counts[_hash(kmer, _ksize)] = c;
+        _counts[_hash(kmer, _ksize)] = c;
     }
 
     // set the count for the given k-mer hash.
     void set_count(HashIntoType i, ExactCounterType c) {
-      assert(i <= max_hash());
-      _counts[i] = c;
+        assert(i <= max_hash());
+        _counts[i] = c;
     }
 
     // count every k-mer in the string.
@@ -143,14 +152,14 @@ namespace khmer {
 
     // reset the table.
     void clear() {
-      delete _counts;
-      _allocate_counters();
+        delete _counts;
+        _allocate_counters();
     }
 
     // set operations
     void update(const KTable &other);
     KTable * intersect(const KTable &other) const;
-  };
+};
 };
 
 #endif // KTABLE_HH
