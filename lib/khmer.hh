@@ -25,12 +25,12 @@ extern "C"
 /* The checker automatically defines this preprocessor name when creating
    the custom attribute: */
 #if defined(WITH_CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF_ATTRIBUTE)
-  #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename) \
+#define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename) \
 __attribute__((cpychecker_type_object_for_typedef(typename)))
 #else
-  /* This handles the case where we're compiling with a "vanilla"
-     compiler that doesn't supply this attribute: */
-  #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
+/* This handles the case where we're compiling with a "vanilla"
+   compiler that doesn't supply this attribute: */
+#define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
 #endif
 
 // C++ standard exceptions are subclassed almost ubiquitously.
@@ -59,58 +59,61 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #   define MIN( a, b )	(((a) > (b)) ? (b) : (a))
 #   define MAX( a, b )	(((a) < (b)) ? (b) : (a))
 
-namespace khmer {
-  // largest number we can count up to, exactly. (8 bytes)
-  typedef unsigned long long int ExactCounterType;
+namespace khmer
+{
+// largest number we can count up to, exactly. (8 bytes)
+typedef unsigned long long int ExactCounterType;
 
-  // largest number we're going to hash into. (8 bytes/64 bits/32 nt)
-  typedef unsigned long long int HashIntoType;
+// largest number we're going to hash into. (8 bytes/64 bits/32 nt)
+typedef unsigned long long int HashIntoType;
 
-  // largest size 'k' value for k-mer calculations.  (1 byte/255)
-  typedef unsigned char WordLength;
+// largest size 'k' value for k-mer calculations.  (1 byte/255)
+typedef unsigned char WordLength;
 
-  typedef unsigned short int BoundedCounterType;
+typedef unsigned short int BoundedCounterType;
 
-  // A single-byte type.
-  typedef unsigned char Byte;
+// A single-byte type.
+typedef unsigned char Byte;
 
-  typedef void (*CallbackFn)(const char * info, void * callback_data,
-			     unsigned long long n_reads,
-			     unsigned long long other);
+typedef void (*CallbackFn)(const char * info, void * callback_data,
+                           unsigned long long n_reads,
+                           unsigned long long other);
 
-  struct InvalidStreamBuffer : public std:: exception
-  { };
+struct InvalidStreamBuffer : public std:: exception
+    { };
 
 
-  typedef unsigned int PartitionID;
-  typedef std::set<HashIntoType> SeenSet;
-  typedef std::set<PartitionID> PartitionSet;
-  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
-  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
-  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
-  typedef std::set<PartitionID *> PartitionPtrSet;
-  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
-  typedef std::queue<HashIntoType> NodeQueue;
-  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
-  typedef std::map<HashIntoType, unsigned int> TagCountMap;
-  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
-  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+typedef unsigned int PartitionID;
+typedef std::set<HashIntoType> SeenSet;
+typedef std::set<PartitionID> PartitionSet;
+typedef std::map<HashIntoType, PartitionID*> PartitionMap;
+typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
+typedef std::set<PartitionID *> PartitionPtrSet;
+typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
+typedef std::queue<HashIntoType> NodeQueue;
+typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+typedef std::map<HashIntoType, unsigned int> TagCountMap;
+typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
 
-  // types used in @camillescott's sparse labeling extension  
-  typedef unsigned long long int Label;
-  typedef std::multimap<HashIntoType, Label*> TagLabelPtrMap;
-  typedef std::multimap<Label, HashIntoType*> LabelTagPtrMap;
-  typedef std::pair<HashIntoType, Label*> TagLabelPtrPair;
-  typedef std::pair<Label, HashIntoType*> LabelTagPtrPair;
-  typedef std::set<Label*> LabelPtrSet;
-  typedef std::set<HashIntoType*> TagPtrSet;
-  typedef std::map<Label, Label*> LabelPtrMap;
+// types used in @camillescott's sparse labeling extension
+typedef unsigned long long int Label;
+typedef std::multimap<HashIntoType, Label*> TagLabelPtrMap;
+typedef std::multimap<Label, HashIntoType*> LabelTagPtrMap;
+typedef std::pair<HashIntoType, Label*> TagLabelPtrPair;
+typedef std::pair<Label, HashIntoType*> LabelTagPtrPair;
+typedef std::set<Label*> LabelPtrSet;
+typedef std::set<HashIntoType*> TagPtrSet;
+typedef std::map<Label, Label*> LabelPtrMap;
 
-  template <typename T>
-  void deallocate_ptr_set(T& s) {
-    for (typename T::iterator i = s.begin(); i != s.end(); ++i)
-      delete *i;
-  }
+template <typename T>
+void deallocate_ptr_set(T& s)
+{
+    for (typename T::iterator i = s.begin(); i != s.end(); ++i) {
+        delete *i;
+    }
+}
 }
 
 #endif // KHMER_HH

@@ -6,7 +6,8 @@
 
 using namespace khmer;
 
-int main() {
+int main()
+{
     HashIntoType sizes[] = { 100000003, 100000004, 100000007, 10000000011};
     std::vector<HashIntoType> sizes_vec (sizes, sizes + sizeof(sizes) / sizeof(HashIntoType) );
 
@@ -15,6 +16,6 @@ int main() {
 
     std::cout << "lh_pointer n_tags: " << lh_pointer->n_tags() << std::endl;
     std::cout << "hb_pointer n_tags: " << hb_pointer->n_tags() << std::endl;
-    
+
     return 0;
 }

@@ -15,8 +15,9 @@ void error( int status, int errnum, char const * format, ... )
     va_list posargs;
 
     fflush( stdout );
-    if (errnum)
+    if (errnum) {
         fprintf( stderr, "\n%s: ", strerror( errnum ) );
+    }
     va_start( posargs, format );
     vfprintf( stderr, format, posargs );
     va_end( posargs );
