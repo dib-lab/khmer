@@ -10,7 +10,7 @@
 
 #include <cassert>
 #include <cstdarg>
-
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -27,7 +27,6 @@ extern "C"
 #include "thread_id_map.hh"
 #include "trace_logger.hh"
 #include "perf_metrics.hh"
-
 
 namespace khmer
 {
@@ -543,6 +542,27 @@ struct FastqParser : public IParser
     virtual void    _parse_read( ParserState &, Read &);
 
 };
+
+inline PartitionID _parse_partition_id(std::string name)
+{
+  PartitionID p = 0;
+  const char * s = name.c_str() + name.length() - 1;
+  assert(*(s + 1) == (unsigned int) NULL);
+
+  while(*s != '\t' && s >= name.c_str()) {
+    s--;
+  }
+
+  if (*s == '\t') {
+    p = (PartitionID) atoi(s + 1);
+  } else {
+    std::cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
+    assert(0);
+  }
+
+  return p;
+}
+
 
 
 } // namespace read_parsers

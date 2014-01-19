@@ -9,8 +9,6 @@
 
 #include <vector>
 #include "khmer_config.hh"
-#include "hashtable.hh"
-#include "hashbits.hh"
 
 namespace khmer {
   typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
@@ -86,6 +84,18 @@ namespace khmer {
 
 	_n_tables = 0;
       }
+    }
+
+    virtual BoundedCounterType test_and_set_bits(const char * kmer) {
+      BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
+      count(kmer);
+      return !x;
+    }
+
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) {
+      BoundedCounterType x = get_count(khash);
+      count(khash);
+      return !x;
     }
 
     std::vector<HashIntoType> get_tablesizes() const {
@@ -177,21 +187,12 @@ namespace khmer {
       return min_count;
     }
 
-    MinMaxTable * fasta_file_to_minmax(const std::string &inputfile,
-				      unsigned long long total_reads,
-				      CallbackFn callback = NULL,
-				      void * callback_data = NULL);
-
     void output_fasta_kmer_pos_freq(const std::string &inputfile,
                                     const std::string &outputfile);
 
-    BoundedCounterType get_min_count(const std::string &s,
-				     HashIntoType lower_bound = 0,
-				     HashIntoType upper_bound = 0);
+    BoundedCounterType get_min_count(const std::string &s);
 				     
-    BoundedCounterType get_max_count(const std::string &s,
-				     HashIntoType lower_bound = 0,
-				     HashIntoType upper_bound = 0);
+    BoundedCounterType get_max_count(const std::string &s);
 
     void get_kadian_count(const std::string &s,
 			  BoundedCounterType &kadian,

@@ -2,48 +2,81 @@
 Installing and running khmer
 ============================
 
-You'll need git, Python and `virtualenv
-<http://pypi.python.org/pypi/virtualenv>`__.
+You'll need Python 2.7+ and internet access.
 
-Note: The python development environment needs to be installed, too; on
-Debian, this can be done with:
+The khmer project currently works with Python 2.6 but we target Python 2.7+. 
 
-  apt-get install python-dev
+Build requirements
+------------------
 
-On OS X, you'll need XCode installed, I believe.
+OS X
+^^^^
 
-Then, check out screed and khmer::
+1) Install Xcode from the `Mac App Store (requires root)
+   <https://developer.apple.com/xcode/>`_
 
-  git clone git://github.com/ged-lab/screed.git
-  git clone git://github.com/ged-lab/khmer.git
+2) `Register as an Apple Developer <https://developer.apple.com/register>`_
 
-Create and activate a virtualenv working environment::
+3) Install the Xcode command-line tools: Xcode -> preferences ->
+   Downloads -> Command Line Tools (requires root)
 
- python -m virtualenv env
- . env/bin/activate
+4) From a terminal install virtualenv/pip::
 
-Install 'screed' (note, the argument to 'easy_install' here is the directory
-containing screed)::
+      curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+      python get-pip.py --user
+      #add the python user binaries to your path if needed
+      echo "PATH=\$PATH:`python2.7 -c "import site; print site.getuserbase()"`/bin; export PATH" >> ~/.bash_profile
+      source ~/.bash_profile
+      pip install --user virtualenv
 
- easy_install screed
 
-Build khmer::
+Linux
+^^^^^
 
- cd khmer
- make clean all
+Install the python development environment, virtualenv, pip, and
+gcc.
 
-Run the tests::
+On Debian and Ubuntu this can be done with::
 
- easy_install nose
- make test
+   sudo apt-get install python2.7-dev python-virtualenv python-pip gcc
 
-To run khmer scripts, you will need to either install the Python
-package by running::
+For RHEL6::
 
- easy_install /path/to/khmer
+   sudo yum install -y python-devel python-pip git gcc gcc-c++ make
+   sudo pip install virtualenv
 
-OR by setting the PYTHONPATH::
+Latest stable release
+---------------------
 
- export PYTHONPATH=/path/to/khmer/python
+1) Create a virtualenv and activate it::
 
-The scripts are all located in khmer/scripts and khmer/sandbox.
+      virtualenv env
+      source env/bin/activate
+
+2) Use pip to download, build, and install khmer and its dependencies::
+
+      pip install --allow-external argparse khmer
+
+3) The scripts are now in the ``env/bin`` directory and ready for your
+   use. You can directly use them by name, see :doc:`scripts`.
+
+4) When returning to khmer after installing it you will need to
+   reactivate the virtualenv first::
+
+      source env/bin/activate
+
+Latest development branch
+-------------------------
+
+Repeat the above but modify the pip install line::
+
+   pip install --allow-external argparse --editable git+https://github.com/ged-lab/khmer.git@master#egg=khmer
+
+Run the tests
+^^^^^^^^^^^^^
+
+From within your activated virtualenv you will find the source in
+env/src/khmer::
+
+   cd env/src/khmer
+   make test

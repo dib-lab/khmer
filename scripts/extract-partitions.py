@@ -28,11 +28,17 @@ DEFAULT_THRESHOLD = 5
 
 def read_partition_file(filename):
     for n, record in enumerate(screed.open(filename, parse_description=False)):
-        name = record.name
-        name, partition_id = name.rsplit('\t', 1)
-        yield n, name, int(partition_id), record.sequence
+        name, partition_id = record.name.rsplit('\t', 1)
+        yield n, record, int(partition_id)
 
-###
+
+def output_single(r):
+    if hasattr(r, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+    else:
+        return ">%s\n%s\n" % (r.name, r.sequence)
+
+#
 
 
 def main():
@@ -63,6 +69,8 @@ def main():
     prefix = args.prefix
     distfilename = prefix + '.dist'
 
+    n_unassigned = 0
+
     print '---'
     print 'reading partitioned files:', repr(args.part_filenames)
     if output_groups:
@@ -78,21 +86,43 @@ def main():
     print 'partition size distribution will go to %s' % distfilename
     print '---'
 
-    ###
+    #
+
+    SUFFIX = 'fa'
+    is_fastq = False
+
+    for n, r, pid in read_partition_file(args.part_filenames[0]):
+        if hasattr(r, 'accuracy'):
+            SUFFIX = 'fq'
+            is_fastq = True
+        break
+
+    for filename in args.part_filenames:
+        for n, r, pid in read_partition_file(filename):
+            if is_fastq:
+                assert hasattr(r, 'accuracy'), \
+                    "all input files must be FASTQ if the first one is"
+            else:
+                assert not hasattr(r, 'accuracy'), \
+                    "all input files must be FASTA if the first one is"
+
+            break
 
     if output_unassigned:
-        unassigned_fp = open('%s.unassigned.fa' % prefix, 'w')
+        unassigned_fp = open('%s.unassigned.%s' % (prefix, SUFFIX), 'w')
 
     count = {}
     for filename in args.part_filenames:
-        for n, name, pid, seq in read_partition_file(filename):
+        for n, r, pid in read_partition_file(filename):
             if n % 100000 == 0:
                 print '...', n
 
             count[pid] = count.get(pid, 0) + 1
 
-            if pid == 0 and output_unassigned:
-                print >>unassigned_fp, '>%s\n%s' % (name, seq)
+            if pid == 0:
+                n_unassigned += 1
+                if output_unassigned:
+                    print >>unassigned_fp, output_single(r)
 
     if output_unassigned:
         unassigned_fp.close()
@@ -123,8 +153,8 @@ def main():
     divvy = sorted(count.items(), key=lambda y: y[1])
     divvy = filter(lambda y: y[1] > THRESHOLD, divvy)
 
-    ## divvy up into different groups, based on having MAX_SIZE sequences
-    ## in each group.
+    # divvy up into different groups, based on having MAX_SIZE sequences
+    # in each group.
     total = 0
     group = set()
     group_n = 0
@@ -153,16 +183,20 @@ def main():
         print 'nothing to output; exiting!'
         return
 
-    ## open a bunch of output files for the different groups
+    # open a bunch of output files for the different groups
     group_fps = {}
     for n in range(group_n):
-        fp = open('%s.group%04d.fa' % (prefix, n), 'w')
+        fp = open('%s.group%04d.%s' % (prefix, n, SUFFIX), 'w')
         group_fps[n] = fp
 
-    ## write 'em all out!
+    # write 'em all out!
 
+    total_seqs = 0
+    part_seqs = 0
+    toosmall_parts = 0
     for filename in args.part_filenames:
-        for n, name, partition_id, seq in read_partition_file(filename):
+        for n, r, partition_id in read_partition_file(filename):
+            total_seqs += 1
             if n % 100000 == 0:
                 print '...x2', n
 
@@ -173,11 +207,24 @@ def main():
                 group_n = group_d[partition_id]
             except KeyError:
                 assert count[partition_id] <= THRESHOLD
+                toosmall_parts += 1
                 continue
 
             outfp = group_fps[group_n]
 
-            outfp.write('>%s\t%s\n%s\n' % (name, partition_id, seq))
+            outfp.write(output_single(r))
+            part_seqs += 1
+
+    print '---'
+    print 'Of %d total seqs,' % total_seqs
+    print 'extracted %d partitioned seqs into group files,' % part_seqs
+    print 'discarded %d sequences from small partitions (see -X),' % \
+        toosmall_parts
+    print 'and found %d unpartitioned sequences (see -U).' % n_unassigned
+    print ''
+    print 'Created %d group files named %s.groupXXXX.%s' % (len(group_fps),
+                                                            prefix,
+                                                            SUFFIX)
 
 if __name__ == '__main__':
     main()
