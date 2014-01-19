@@ -21,43 +21,45 @@ extern bool isCorrectKmer(unsigned int kCov, double lambOne, double lambTwo);
 
 class Node;
 
-class Node {
+class Node
+{
 public:
-   Node *parent;
-   Kmer kmer;
-   char emission; // change to enum
-   unsigned int stateNo;
-   char state; //change to enum
-   double fval;
-   double hval;
-   double gval;
+    Node *parent;
+    Kmer kmer;
+    char emission; // change to enum
+    unsigned int stateNo;
+    char state; //change to enum
+    double fval;
+    double hval;
+    double gval;
 
-   unsigned int diff;
+    unsigned int diff;
 
-   HashIntoType bitmask;
+    HashIntoType bitmask;
 
-   bool operator== (const Node &param) const;
-   bool operator< (const Node &param) const;
+    bool operator== (const Node &param) const;
+    bool operator< (const Node &param) const;
 
-   Node(Node* _parent, char _emission, 
-        unsigned int _stateNo, char _state, Kmer _kmer);
+    Node(Node* _parent, char _emission,
+         unsigned int _stateNo, char _state, Kmer _kmer);
 
-   Kmer makeNextKmer(unsigned char forward, char b);
+    Kmer makeNextKmer(unsigned char forward, char b);
 
-   std::queue<Node*> enumerate(CountingHash *, ScoringMatrix * sm, 
-                            unsigned char forward, const std::string&,
-                            double lambdaOne=0, double lambdaTwo=0);
+    std::queue<Node*> enumerate(CountingHash *, ScoringMatrix * sm,
+                                unsigned char forward, const std::string&,
+                                double lambdaOne=0, double lambdaTwo=0);
 };
 
-class NodeCompare {
+class NodeCompare
+{
 public:
-   bool operator()(Node* o1, Node* o2) {
-      if (o1->fval > o2->fval) {
-         return true;
-      } else {
-         return false;
-      }
-   }
+    bool operator()(Node* o1, Node* o2) {
+        if (o1->fval > o2->fval) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 };
 
 #endif //FILE_HH

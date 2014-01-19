@@ -15,84 +15,86 @@ using namespace khmer:: read_parsers;
 
 void Hashbits::save(std::string outfilename)
 {
-  assert(_counts[0]);
+    assert(_counts[0]);
 
-  unsigned int save_ksize = _ksize;
-  unsigned char save_n_tables = _n_tables;
-  unsigned long long save_tablesize;
+    unsigned int save_ksize = _ksize;
+    unsigned char save_n_tables = _n_tables;
+    unsigned long long save_tablesize;
 
-  ofstream outfile(outfilename.c_str(), ios::binary);
+    ofstream outfile(outfilename.c_str(), ios::binary);
 
-  unsigned char version = SAVED_FORMAT_VERSION;
-  outfile.write((const char *) &version, 1);
+    unsigned char version = SAVED_FORMAT_VERSION;
+    outfile.write((const char *) &version, 1);
 
-  unsigned char ht_type = SAVED_HASHBITS;
-  outfile.write((const char *) &ht_type, 1);
+    unsigned char ht_type = SAVED_HASHBITS;
+    outfile.write((const char *) &ht_type, 1);
 
-  outfile.write((const char *) &save_ksize, sizeof(save_ksize));
-  outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
+    outfile.write((const char *) &save_ksize, sizeof(save_ksize));
+    outfile.write((const char *) &save_n_tables, sizeof(save_n_tables));
 
-  for (unsigned int i = 0; i < _n_tables; i++) {
-    save_tablesize = _tablesizes[i];
-    unsigned long long tablebytes = save_tablesize / 8 + 1;
+    for (unsigned int i = 0; i < _n_tables; i++) {
+        save_tablesize = _tablesizes[i];
+        unsigned long long tablebytes = save_tablesize / 8 + 1;
 
-    outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
+        outfile.write((const char *) &save_tablesize, sizeof(save_tablesize));
 
-    outfile.write((const char *) _counts[i], tablebytes);
-  }
-  outfile.close();
+        outfile.write((const char *) _counts[i], tablebytes);
+    }
+    outfile.close();
 }
 
 void Hashbits::load(std::string infilename)
 {
-  if (_counts) {
+    if (_counts) {
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            delete _counts[i];
+            _counts[i] = NULL;
+        }
+        delete _counts;
+        _counts = NULL;
+    }
+    _tablesizes.clear();
+
+    unsigned int save_ksize = 0;
+    unsigned char save_n_tables = 0;
+    unsigned long long save_tablesize = 0;
+    unsigned char version, ht_type;
+
+    ifstream infile(infilename.c_str(), ios::binary);
+    assert(infile.is_open());
+
+    infile.read((char *) &version, 1);
+    infile.read((char *) &ht_type, 1);
+    assert(version == SAVED_FORMAT_VERSION);
+    assert(ht_type == SAVED_HASHBITS);
+
+    infile.read((char *) &save_ksize, sizeof(save_ksize));
+    infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+
+    _ksize = (WordLength) save_ksize;
+    _n_tables = (unsigned int) save_n_tables;
+    _init_bitstuff();
+
+    _counts = new Byte*[_n_tables];
     for (unsigned int i = 0; i < _n_tables; i++) {
-      delete _counts[i]; _counts[i] = NULL;
+        HashIntoType tablesize;
+        unsigned long long tablebytes;
+
+        infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+
+        tablesize = (HashIntoType) save_tablesize;
+        _tablesizes.push_back(tablesize);
+
+        tablebytes = tablesize / 8 + 1;
+        _counts[i] = new Byte[tablebytes];
+
+        unsigned long long loaded = 0;
+        while (loaded != tablebytes) {
+            infile.read((char *) _counts[i], tablebytes - loaded);
+            loaded += infile.gcount();	// do I need to do this loop?
+        }
     }
-    delete _counts; _counts = NULL;
-  }
-  _tablesizes.clear();
-  
-  unsigned int save_ksize = 0;
-  unsigned char save_n_tables = 0;
-  unsigned long long save_tablesize = 0;
-  unsigned char version, ht_type;
-
-  ifstream infile(infilename.c_str(), ios::binary);
-  assert(infile.is_open());
-
-  infile.read((char *) &version, 1);
-  infile.read((char *) &ht_type, 1);
-  assert(version == SAVED_FORMAT_VERSION);
-  assert(ht_type == SAVED_HASHBITS);
-
-  infile.read((char *) &save_ksize, sizeof(save_ksize));
-  infile.read((char *) &save_n_tables, sizeof(save_n_tables));
-
-  _ksize = (WordLength) save_ksize;
-  _n_tables = (unsigned int) save_n_tables;
-  _init_bitstuff();
-
-  _counts = new Byte*[_n_tables];
-  for (unsigned int i = 0; i < _n_tables; i++) {
-    HashIntoType tablesize;
-    unsigned long long tablebytes;
-
-    infile.read((char *) &save_tablesize, sizeof(save_tablesize));
-
-    tablesize = (HashIntoType) save_tablesize;
-    _tablesizes.push_back(tablesize);
-
-    tablebytes = tablesize / 8 + 1;
-    _counts[i] = new Byte[tablebytes];
-
-    unsigned long long loaded = 0;
-    while (loaded != tablebytes) {
-      infile.read((char *) _counts[i], tablebytes - loaded);
-      loaded += infile.gcount();	// do I need to do this loop?
-    }
-  }
-  infile.close();
+    infile.close();
 }
 
 // for counting overlap k-mers specifically!!
@@ -102,14 +104,16 @@ void Hashbits::load(std::string infilename)
 //
 
 unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
-					    bool &is_valid,
-                                            Hashbits &ht2)
+        bool &is_valid,
+        Hashbits &ht2)
 {
-   is_valid = check_and_normalize_read(read);
+    is_valid = check_and_normalize_read(read);
 
-   if (!is_valid) { return 0; }
+    if (!is_valid) {
+        return 0;
+    }
 
-   return consume_string_overlap(read, ht2);
+    return consume_string_overlap(read, ht2);
 }
 
 //
@@ -117,74 +121,74 @@ unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
 //
 
 void Hashbits::consume_fasta_overlap(const std::string &filename,
-                              HashIntoType curve[2][100],Hashbits &ht2,
-			      unsigned int &total_reads,
-			      unsigned long long &n_consumed,
-			      CallbackFn callback,
-			      void * callback_data)
+                                     HashIntoType curve[2][100],Hashbits &ht2,
+                                     unsigned int &total_reads,
+                                     unsigned long long &n_consumed,
+                                     CallbackFn callback,
+                                     void * callback_data)
 {
-  total_reads = 0;
-  n_consumed = 0;
-  Read read;
+    total_reads = 0;
+    n_consumed = 0;
+    Read read;
 
 //get total number of reads in dataset
 
-  IParser* parser = IParser::get_parser(filename.c_str());
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    total_reads++;
-  }
+    IParser* parser = IParser::get_parser(filename.c_str());
+    while(!parser->is_complete())  {
+        read = parser->get_next_read();
+        total_reads++;
+    }
 //block size for curve
-  int block_size = total_reads/100;
-  
-  total_reads = 0;
-  khmer::HashIntoType start = 0, stop = 0;
-  
-  delete parser;
-  parser = IParser::get_parser(filename.c_str());
+    int block_size = total_reads/100;
+
+    total_reads = 0;
+    khmer::HashIntoType start = 0, stop = 0;
+
+    delete parser;
+    parser = IParser::get_parser(filename.c_str());
 
 
 
-  string currName = "";
-  string currSeq = "";
+    string currName = "";
+    string currSeq = "";
 
-  //
-  // iterate through the FASTA file & consume the reads.
-  //
+    //
+    // iterate through the FASTA file & consume the reads.
+    //
 
-  while(!parser->is_complete())  {
-    read = parser->get_next_read();
-    currSeq = read.sequence;
-    currName = read.name; 
+    while(!parser->is_complete())  {
+        read = parser->get_next_read();
+        currSeq = read.sequence;
+        currName = read.name;
 
-      unsigned int this_n_consumed;
-      bool is_valid;
+        unsigned int this_n_consumed;
+        bool is_valid;
 
-      this_n_consumed = check_and_process_read_overlap(currSeq,
-					       is_valid, ht2);
+        this_n_consumed = check_and_process_read_overlap(currSeq,
+                          is_valid, ht2);
 
         n_consumed += this_n_consumed;
-	       
-    // reset the sequence info, increment read number
 
-    total_reads++;
+        // reset the sequence info, increment read number
 
-    if (total_reads%block_size == 0) {
-        curve[0][total_reads/block_size-1] = n_overlap_kmers(start,stop);
-        curve[1][total_reads/block_size-1] = n_kmers(start,stop);
-    }
-    // run callback, if specified
-    if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-      try {
-        callback("consume_fasta", callback_data, total_reads, n_consumed);
-      } catch (...) {
-        throw;
-      }
-    }
+        total_reads++;
 
-  } // while
-  
-  delete parser;
+        if (total_reads%block_size == 0) {
+            curve[0][total_reads/block_size-1] = n_overlap_kmers(start,stop);
+            curve[1][total_reads/block_size-1] = n_kmers(start,stop);
+        }
+        // run callback, if specified
+        if (total_reads % CALLBACK_PERIOD == 0 && callback) {
+            try {
+                callback("consume_fasta", callback_data, total_reads, n_consumed);
+            } catch (...) {
+                throw;
+            }
+        }
+
+    } // while
+
+    delete parser;
 }
 
 //
@@ -192,22 +196,22 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 //
 
 unsigned int Hashbits::consume_string_overlap(const std::string &s,
-					      Hashbits &ht2)
+        Hashbits &ht2)
 {
-  const char * sp = s.c_str();
-  unsigned int n_consumed = 0;
+    const char * sp = s.c_str();
+    unsigned int n_consumed = 0;
 
-  KMerIterator kmers(sp, _ksize);
-  HashIntoType kmer;
+    KMerIterator kmers(sp, _ksize);
+    HashIntoType kmer;
 
-  while(!kmers.done()) {
-    kmer = kmers.next();
-  
-    count_overlap(kmer,ht2);
-    n_consumed++;
-  }
+    while(!kmers.done()) {
+        kmer = kmers.next();
 
-  return n_consumed;
+        count_overlap(kmer,ht2);
+        n_consumed++;
+    }
+
+    return n_consumed;
 }
 
 // vim: set sts=2 sw=2:

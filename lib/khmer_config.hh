@@ -12,13 +12,12 @@
 namespace khmer
 {
 
-// Special class for holding configuration values 
+// Special class for holding configuration values
 // and providing accessors to them.
 // There is no need for there to be a singleton.
-// Objects of this class can be produced by a factory, 
+// Objects of this class can be produced by a factory,
 // allowing multiple extant configurations, should they ever be needed.
-struct Config
-{
+struct Config {
 
     Config( );
 
@@ -36,7 +35,7 @@ struct Config
     void set_reads_parser_trace_level( uint8_t const );
 
 private:
-    
+
     bool	_has_extra_sanity_checks;
 
     uint32_t	_number_of_threads;
