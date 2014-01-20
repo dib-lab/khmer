@@ -50,6 +50,7 @@ Latest stable release
 
 1) Create a virtualenv and activate it::
 
+      cd a/writeable/directory/
       virtualenv env
       source env/bin/activate
 
