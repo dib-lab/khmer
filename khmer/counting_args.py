@@ -16,7 +16,9 @@ def build_construct_args(descr=None):
     if descr is None:
         descr = 'Build & load a counting Bloom filter.'
 
-    parser = argparse.ArgumentParser(description=descr)
+    parser = argparse.ArgumentParser(
+        description=descr,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
@@ -38,8 +40,9 @@ def build_construct_args(descr=None):
 
 
 def build_counting_multifile_args():
-    parser = argparse.ArgumentParser(description=
-                                     'Use a counting Bloom filter.')
+    parser = argparse.ArgumentParser(
+        description='Use a counting Bloom filter.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('input_table')
     parser.add_argument('input_filenames', nargs='+')
