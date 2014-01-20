@@ -31,13 +31,14 @@ namespace khmer
 
 
 struct InvalidNumberOfThreadsRequested : public std:: exception
-    { };
+{ };
 
 struct TooManyThreads : public std:: exception
-    { };
+{ };
 
 
-struct ThreadIDMap {
+struct ThreadIDMap
+{
 
     ThreadIDMap( uint32_t number_of_threads );
     ~ThreadIDMap( );
