@@ -12,37 +12,36 @@
 #define INS 2
 #define DEL 3
 
-class ScoringMatrix
-{
-    //double sm[5][5];
-    double scores[4];
+class ScoringMatrix {
+   //double sm[5][5];
+   double scores[4]; 
 
 private:
-    int assign(char);
+   int assign(char);
 
 public:
-    ScoringMatrix() {
-        /*
-        scores[MAT] = .96;
-        scores[SNP] = .02;
-        scores[INS] = .01;
-        scores[DEL] = .01;
-        */
-        scores[MAT] = 0.0;
-        scores[SNP] = 7.0;
-        scores[INS] = 4.0;
-        scores[DEL] = 4.0;
-        /*
-        sm =
-        {
-        {0, 9, 9, 9, 7},
-        {9, 0, 9, 9, 7},
-        {9, 9, 0, 9, 7},
-        {9, 9, 9, 0, 7},
-        {7, 7, 7, 7, 6}
-        };
-        */
-//      sm =
+   ScoringMatrix() {
+      /*
+      scores[MAT] = .96;
+      scores[SNP] = .02;
+      scores[INS] = .01;
+      scores[DEL] = .01;
+      */
+      scores[MAT] = 0.0;
+      scores[SNP] = 7.0;
+      scores[INS] = 4.0;
+      scores[DEL] = 4.0;
+      /*
+      sm =
+      {
+      {0, 9, 9, 9, 7},
+      {9, 0, 9, 9, 7},
+      {9, 9, 0, 9, 7},
+      {9, 9, 9, 0, 7},
+      {7, 7, 7, 7, 6}
+      };
+      */
+//      sm = 
 //      {
 //      {0.03, 6.64, 6.64, 6.64, 8.23},
 //      {6.64, 0.03, 6.64, 6.64, 8.23},
@@ -50,9 +49,9 @@ public:
 //      {6.64, 6.64, 6.64, 0.03, 8.23},
 //      {8.23, 8.23, 8.23, 8.23, 10.0}
 //      };
-    }
-
-    double score(char, char);
+   }
+   
+   double score(char, char);
 };
 
 #endif // SCORINGMATRIX_HH
