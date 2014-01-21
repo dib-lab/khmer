@@ -60,9 +60,13 @@ then
 fi
 
 
-pip install --quiet nosexcover
-python setup.py nosetests --with-xcoverage --with-xunit \
-	--cover-erase --attr=\!known_failing #--cover-package=khmer 
+pip install --quiet coverage
+coverage run --source=scripts,khmer -m nose --with-xunit \
+	--attr=\!known_failing #--cover-package=khmer 
+coverage xml
+# we need to get coverage to look at our scripts. Since they aren't in a
+# python module we can't tell nosetests to look for them (via an import
+# statement). So we run nose inside of coverage.
 
 make doc
 
