@@ -61,6 +61,7 @@ fi
 
 
 pip install --quiet nose coverage
+python setup.py develop
 coverage run --source=scripts,khmer -m nose --with-xunit \
 	--attr=\!known_failing #--cover-package=khmer 
 coverage xml
