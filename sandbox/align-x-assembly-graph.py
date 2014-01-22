@@ -45,7 +45,7 @@ def index_db(dbfile):
     return screed_db_name
 
 def align_sequences(qseq, dseq):
-    alignments = pairwis2.localdx(qseq, dseq, ALN_MAT, GAP_OPEN, GAP_EXTEND)
+    alignments = pairwise2.align.localdx(qseq, dseq, ALN_MAT)
     if alignments:
         top = alignments[0]
         aln_qseq, aln_dseq, score, begin, end = top
@@ -77,6 +77,8 @@ def main():
         print e
         sys.exit()
 
+    outfp.write('qname,sname,slabel,score,length,begin,end\n')
+
     screed_db_name = index_db(args.database)
     db = ScreedDB(screed_db_name)
     
@@ -85,15 +87,14 @@ def main():
     print >>sys.stderr, 'consuming and labeling database...'
     for n, key in enumerate(db.keys()):
         record = db[key]
-        sid = long(record.id)
         seq = str(record.sequence)
         
         if n % 25000 == 0:
             print >>sys.stderr, '...consumed and labeled {} sequences'.format(n)
-            print >>sys.stderr, '......label: {}'.format(sid)
+            print >>sys.stderr, '......label: {}'.format(n)
             #print seq, sid, type(seq), type(sid)
 
-        lh.consume_sequence_and_tag_with_labels(seq, sid)
+        lh.consume_sequence_and_tag_with_labels(seq, n)
 
     print >>sys.stderr, 'beginning query sequence alignment...'
     for n, record in enumerate(screed.open(args.query)):
@@ -106,7 +107,7 @@ def main():
         labels = lh.sweep_label_neighborhood(seq, TRAVERSE)
         if labels:
             for label in labels:
-                dbrecord = db[label]
+                dbrecord = db.loadRecordByIndex(label)
                 dbseq = str(dbrecord.sequence)
                 aln = align_sequences(seq, dbseq)
                 if aln:
@@ -114,7 +115,7 @@ def main():
                     length = max(end-begin, begin-end)
 
                     dbname = str(dbrecord.name)
-                    outfp.write('{q},{d},{id},{s},{l},{b},{e}'.format(q=name, d=dbname, id=label,
+                    outfp.write('{q},{d},{id},{s},{l},{b},{e}\n'.format(q=name, d=dbname, id=label,
                                                                       s=score, l=length, b=begin, e=end))
 
 if __name__ == '__main__':
