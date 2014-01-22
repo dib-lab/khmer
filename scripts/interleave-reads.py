@@ -35,7 +35,8 @@ def output_pair(r1, r2):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Produce interleaved files from R1/R2 paired files')
+        description='Produce interleaved files from R1/R2 paired files',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infiles', nargs='+')
     parser.add_argument('-o', '--output',

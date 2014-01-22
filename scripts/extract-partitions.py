@@ -42,7 +42,9 @@ def output_single(r):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract partitioned seqs.")
+    parser = argparse.ArgumentParser(
+        description="Extract partitioned seqs.", 
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('prefix')
     parser.add_argument('part_filenames', nargs='+')
