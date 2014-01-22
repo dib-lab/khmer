@@ -32,7 +32,8 @@ DEFAULT_HASHSIZE = 1e6
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Use bloom filter to count overlap k-mers')
+        description='Use bloom filter to count overlap k-mers',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
     env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_HASHSIZE)
