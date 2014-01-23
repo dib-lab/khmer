@@ -1,3 +1,4 @@
+#! /usr/bin/python
 '''
 
 necessary components:
@@ -55,8 +56,8 @@ def align_sequences(qseq, dseq):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-k', '--ksize', dest='ksize', default=DEFAULT_K)
-    parser.add_argument('-x', '--htize', dest='htsize', default=DEFAULT_HTSIZE)
+    parser.add_argument('-k', '--ksize', dest='ksize', type=int, default=DEFAULT_K)
+    parser.add_argument('-x', '--htize', dest='htsize', type=float, default=DEFAULT_HTSIZE)
     parser.add_argument('-q', '--query', dest='query')
     parser.add_argument('-d', '--db', dest='database')
     parser.add_argument('-o', '--output_name', dest='output_name')
@@ -77,7 +78,7 @@ def main():
         print e
         sys.exit()
 
-    outfp.write('qname,sname,slabel,score,length,begin,end\n')
+    outfp.write('qname,sname,slabel,minident,ntags\n')
 
     screed_db_name = index_db(args.database)
     db = ScreedDB(screed_db_name)
@@ -103,7 +104,31 @@ def main():
         
         name = record.name
         seq = record.sequence
+       
+        tags = lh.sweep_tag_neighborhood(seq, args.ksize)
+
+        labels_by_tag = {}
+        tags_by_label = {}
+        labels = set()
+        for tag in tags:
+            tmp = lh.get_tag_labels(tag)
+            labels.update(tmp) 
+            labels_by_tag[tag] = tmp
+            for label in tmp:
+                if label not in tags_by_label:
+                    tags_by_label[label] = set()
+                tags_by_label[label].add(tag)
         
+        for label in tags_by_label:
+            tags = tags_by_label[label]
+            dbrecord = db.loadRecordByIndex(label)
+            dbseq_name = str(dbrecord.name)
+            mident = float(args.ksize * len(tags)) / len(seq)
+            nkmers = len(tags)
+            outfp.write('{q},{d},{id},{s},{k}\n'.format(q=name, d=dbseq_name, id=label,
+                                                        s=mident, k=nkmers))
+             
+        ''' 
         labels = lh.sweep_label_neighborhood(seq, TRAVERSE)
         if labels:
             for label in labels:
@@ -117,6 +142,7 @@ def main():
                     dbname = str(dbrecord.name)
                     outfp.write('{q},{d},{id},{s},{l},{b},{e}\n'.format(q=name, d=dbname, id=label,
                                                                       s=score, l=length, b=begin, e=end))
+        '''
 
 if __name__ == '__main__':
     main() 
