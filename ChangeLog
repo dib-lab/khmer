@@ -57,6 +57,15 @@
 
 2014-03-13  Ram RS  <ramrs@nyu.edu>
 
+    * added: khmer/file.py - script to check disk space, check input file
+    status and check space before hashtable writing
+    * modified: scripts/*.py - all scripts now use khmer.file for above-mentioned
+    functionality.
+    * modified: scripts/*.py - pylint violations addressed in all scripts
+    under scripts/
+
+2014-03-13  Ram RS  <ramrs@nyu.edu>
+
     * Bug fix: tests.test_normalize_by_median_no_bigcount() now runs within
     temp directory
 

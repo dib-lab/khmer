@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Take a list of files containing sequences, and subsample 100,000 sequences (-N)
@@ -14,21 +15,21 @@ Reads FASTQ and FASTA input, retains format for output.
 """
 
 import argparse
-import khmer
 import screed
 import os.path
 import random
+from khmer.file import check_file_status, check_space
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
 DEBUG = True
 
 
-def output_single(r):
-    if hasattr(r, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+def output_single(read):
+    if hasattr(read, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
     else:
-        return ">%s\n%s\n" % (r.name, r.sequence)
+        return ">%s\n%s\n" % (read.name, read.sequence)
 
 
 def main():
@@ -46,6 +47,11 @@ def main():
                         type=argparse.FileType('w'), default=None)
 
     args = parser.parse_args()
+
+    for _ in args.filenames:
+        check_file_status(_)
+
+    check_space(args.filenames)
 
     # seed the random number generator?
     if args.random_seed:
