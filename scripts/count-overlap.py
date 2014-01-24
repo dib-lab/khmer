@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2012-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Count the overlap k-mers, which are the k-mers appearing in two sequence
@@ -17,8 +18,8 @@ Use '-h' for parameter help.
 
 """
 import khmer
+from khmer.file import check_file_status, check_space
 from khmer.khmer_args import build_hashbits_args, report_on_config
-
 #
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -26,7 +27,6 @@ DEFAULT_HASHSIZE = 1e6
 
 
 def main():
-    """main function"""
     parser = build_hashbits_args()
     parser.add_argument('htfile')
     parser.add_argument('fafile')
@@ -34,12 +34,19 @@ def main():
     args = parser.parse_args()
     report_on_config(args, hashtype='hashbits')
 
+    for infile in [args.htfile, args.fafile]:
+        check_file_status(infile)
+
+    check_space([args.htfile, args.fafile])
+
     print 'loading hashbits from', args.htfile
     ht1 = khmer.load_hashbits(args.htfile)
-    ht2 = khmer.new_hashbits(args.ksize, args.min_hashsize, args.n_hashes)
+    kmer_size = ht1.ksize()
 
     output = open(args.report_filename, 'w')
     f_curve_obj = open(args.report_filename + '.curve', 'w')
+
+    ht2 = khmer.new_hashbits(kmer_size, args.min_hashsize, args.n_hashes)
 
     (n_unique, n_overlap, list_curve) = ht2.count_overlap(args.fafile, ht1)
 

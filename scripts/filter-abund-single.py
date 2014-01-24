@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Trim sequences at k-mers of the given abundance for the given file,
@@ -13,7 +14,6 @@ placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-import sys
 import os
 import khmer
 import threading
@@ -21,8 +21,8 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
-from khmer.counting_args import build_counting_multifile_args
-
+from khmer.file import check_file_status, check_space
+from khmer.file import check_space_for_hashtable
 #
 
 DEFAULT_CUTOFF = 2
@@ -42,37 +42,42 @@ def main():
     args = parser.parse_args()
     report_on_config(args)
 
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    ksize = args.ksize
+    min_hashsize = args.min_hashsize
+    n_hashes = args.n_hashes
     n_threads = int(args.n_threads)
+    filename = args.datafile
+
+    check_file_status(filename)
+    infiles = [filename]
+    check_space(infiles)
+    if args.savehash:
+        check_space_for_hashtable(ksize * min_hashsize)
 
     config = khmer.get_config()
     bufsz = config.get_reads_input_buffer_size()
     config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     print 'making hashtable'
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
-
-    filename = args.datafile
+    htable = khmer.new_counting_hash(ksize, min_hashsize, n_hashes, n_threads)
 
     # first, load reads into hash table
     rparser = khmer.ReadParser(filename, n_threads)
     threads = []
     print 'consuming input, round 1 --', filename
     for tnum in xrange(n_threads):
-        t = \
+        cur_thread = \
             threading.Thread(
-                target=ht.consume_fasta_with_reads_parser,
+                target=htable.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
-        threads.append(t)
-        t.start()
+        threads.append(cur_thread)
+        cur_thread.start()
 
-    for t in threads:
-        t.join()
+    for _ in threads:
+        _.join()
 
-    fp_rate = khmer.calc_expected_collisions(ht)
+    fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
 
     # now, trim.
@@ -84,9 +89,9 @@ def main():
         if 'N' in seq:
             return None, None
 
-        trim_seq, trim_at = ht.trim_on_abundance(seq, args.cutoff)
+        trim_seq, trim_at = htable.trim_on_abundance(seq, args.cutoff)
 
-        if trim_at >= K:
+        if trim_at >= ksize:
             return name, trim_seq
 
         return None, None
@@ -104,7 +109,7 @@ def main():
     if args.savehash:
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
-        ht.save(args.savehash)
+        htable.save(args.savehash)
 
 if __name__ == '__main__':
     main()
