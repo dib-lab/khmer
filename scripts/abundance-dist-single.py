@@ -20,6 +20,17 @@ import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
+# Add sandbox to path - when fileApi is moved to 
+# scripts/, this can be removed
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+import datetime
+import time
 
 def main():
     parser = build_construct_args(
@@ -50,6 +61,7 @@ def main():
 
     datafile = args.datafile
     histout = args.histout
+    squash = args.squash
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
@@ -120,7 +132,19 @@ def main():
         print >>sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(-1)
 
-    fp = open(histout, 'w')
+    # Check if out-file exists
+    if fileApi.checkFileStatus(histout) != fileApi.FileStatus.FileNonExistent:
+        if squash:
+            fp = open(histout, 'w')
+        else:
+            # Create unique file-name
+            timeStampStr = str(datetime.datetime\
+                               .fromtimestamp(time.time())\
+                               .strftime('%Y%m%d%H%M%S'))
+            newFileName = "%s%s" % (histout, timeStampStr)
+            fp = open(newFileName, 'w')
+    else:
+        fp = open(histout, 'w')
 
     sofar = 0
     for n, i in sorted(z.items()):
