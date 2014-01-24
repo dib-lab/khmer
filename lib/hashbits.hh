@@ -1,27 +1,23 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #ifndef HASHBITS_HH
 #define HASHBITS_HH
 
 #include <vector>
 #include "hashtable.hh"
-#include "subset.hh"
-
-#define next_f(kmer_f, ch) ((((kmer_f) << 2) & bitmask) | (twobit_repr(ch)))
-#define next_r(kmer_r, ch) (((kmer_r) >> 2) | (twobit_comp(ch) << rc_left_shift))
-
-#define prev_f(kmer_f, ch) ((kmer_f) >> 2 | twobit_repr(ch) << rc_left_shift)
-#define prev_r(kmer_r, ch) ((((kmer_r) << 2) & bitmask) | (twobit_comp(ch)))
-
-#define set_contains(s, e) ((s).find(e) != (s).end())
 
 namespace khmer {
   class CountingHash;
+  class LabelHash;
 
   class Hashbits : public khmer::Hashtable {
-    friend class SubsetPartition;
   protected:
     std::vector<HashIntoType> _tablesizes;
     unsigned int _n_tables;
-    unsigned int _tag_density;
     HashIntoType _occupied_bins;
     HashIntoType _n_unique_kmers;
 	HashIntoType _n_overlap_kmers;
@@ -44,32 +40,11 @@ namespace khmer {
       }
     }
             
-    void _clear_all_partitions() {
-      if (partition != NULL) {
-	partition->_clear_all_partitions();
-      }
-    }
-
-    uint32_t _all_tags_spin_lock;
-
   public:
-    SubsetPartition * partition;
-    SeenSet all_tags;
-    SeenSet stop_tags;
-    SeenSet repart_small_tags;
-
-    void _validate_pmap() {
-      if (partition) { partition->_validate_pmap(); }
-    }
-
     Hashbits(WordLength ksize, std::vector<HashIntoType>& tablesizes)
     : khmer::Hashtable(ksize),
-      _tablesizes(tablesizes),
-      _all_tags_spin_lock( 0 )
+      _tablesizes(tablesizes) 
     {
-      _tag_density = DEFAULT_TAG_DENSITY;
-      assert(_tag_density % 2 == 0);
-      partition = new SubsetPartition(this);
       _occupied_bins = 0;
       _n_unique_kmers = 0;
       _n_overlap_kmers = 0;
@@ -89,7 +64,7 @@ namespace khmer {
 	_n_tables = 0;
       }
 
-      _clear_all_partitions();
+     delete partition;
     }
 
     std::vector<HashIntoType> get_tablesizes() const {
@@ -98,104 +73,12 @@ namespace khmer {
 
     virtual void save(std::string);
     virtual void load(std::string);
-    virtual void save_tagset(std::string);
-    virtual void load_tagset(std::string, bool clear_tags=true);
-
-    // for debugging/testing purposes only!
-    void _set_tag_density(unsigned int d) {
-      assert(d % 2 == 0);	// must be even
-      assert(all_tags.size() == 0); // no tags exist!
-      _tag_density = d;
-    }
-
-    unsigned int _get_tag_density() const {
-      return _tag_density;
-    }
-
-    void add_tag(HashIntoType tag) { all_tags.insert(tag); }
-    void add_stop_tag(HashIntoType tag) { stop_tags.insert(tag); }
-
-    void calc_connected_graph_size(const char * kmer,
-				   unsigned long long& count,
-				   SeenSet& keeper,
-				   const unsigned long long threshold=0,
-				   bool break_on_circum=false) const{
-      HashIntoType r, f;
-      _hash(kmer, _ksize, f, r);
-      calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
-    }
-
-    void calc_connected_graph_size(const HashIntoType kmer_f,
-				   const HashIntoType kmer_r,
-				   unsigned long long& count,
-				   SeenSet& keeper,
-				   const unsigned long long threshold=0,
-				   bool break_on_circum=false) const;
-
-    typedef void (*kmer_cb)(const char * k, unsigned int n_reads, void *data);
-
-    // Partitioning stuff.
-
-    unsigned int n_tags() const { return all_tags.size(); }
-
-    void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
-
-    void add_kmer_to_tags(HashIntoType kmer) {
-      all_tags.insert(kmer);
-    }
-
-    void clear_tags() { all_tags.clear(); }
-
-    // Count every k-mer in a FASTA or FASTQ file.
-    // Tag certain ones on the connectivity graph.
-    void consume_fasta_and_tag(
-      std::string const	  &filename,
-      unsigned int	  &total_reads,
-      unsigned long long  &n_consumed,
-      CallbackFn	  callback	  = NULL,
-      void *		  callback_data	  = NULL
-    );
-    // Count every k-mer from a stream of FASTA or FASTQ reads, 
-    // using the supplied parser.
-    // Tag certain ones on the connectivity graph.
-    void consume_fasta_and_tag(
-	read_parsers:: IParser *	    parser,
-	unsigned int	    &total_reads,
-	unsigned long long  &n_consumed,
-	CallbackFn	    callback	    = NULL,
-	void *		    callback_data   = NULL
-    );
-
-    void consume_sequence_and_tag(const std::string& seq,
-				  unsigned long long& n_consumed,
-				  SeenSet * new_tags = 0);
-
-
-    void consume_fasta_and_tag_with_stoptags(const std::string &filename,
-					     unsigned int &total_reads,
-					     unsigned long long &n_consumed,
-					     CallbackFn callback = 0,
-					     void * callback_data = 0);
-
-    void consume_fasta_and_traverse(const std::string &filename,
-				    unsigned int distance,
-				    unsigned int big_threshold,
-				    unsigned int transfer_threshold,
-				    CountingHash &counting);
-
-    void consume_partitioned_fasta(const std::string &filename,
-				   unsigned int &total_reads,
-				   unsigned long long &n_consumed,
-				   CallbackFn callback = 0,
-				   void * callback_data = 0);
-
+    
     // for overlap k-mer counting
     void consume_fasta_overlap(const std::string &filename,HashIntoType curve[2][100],
                               khmer::Hashbits &ht2,
 			      unsigned int &total_reads,
 			      unsigned long long &n_consumed,
-			      HashIntoType lower_bound,
-			      HashIntoType upper_bound,
 			      CallbackFn callback,
 			      void * callback_data);
 
@@ -203,24 +86,11 @@ namespace khmer {
 
     // just for overlap k-mer counting!
     unsigned int check_and_process_read_overlap(std::string &read,
-					    bool &is_valid,HashIntoType lower_bound,
-                                            HashIntoType upper_bound,
+					    bool &is_valid,
                                             khmer::Hashbits &ht2);
     // for overlap k-mer counting!
     unsigned int consume_string_overlap(const std::string &s,
-				       HashIntoType lower_bound,
-				       HashIntoType upper_bound,khmer::Hashbits &ht2);
-
-
-
-
-    unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
-    unsigned int kmer_degree(const char * kmer_s) const {
-      HashIntoType kmer_f, kmer_r;
-      _hash(kmer_s, _ksize, kmer_f, kmer_r);
-
-      return kmer_degree(kmer_f, kmer_r);
-    }
+					khmer::Hashbits &ht2);
 
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
@@ -237,7 +107,6 @@ namespace khmer {
     // Get and set the hashbits for the given kmer.
     inline
     virtual
-    const
     BoundedCounterType
     test_and_set_bits(const char * kmer)
     {
@@ -252,8 +121,7 @@ namespace khmer {
     // software engineering wisdom.
     inline
     virtual
-    const
-    bool
+    BoundedCounterType
     test_and_set_bits( HashIntoType khash ) 
     {
       bool is_new_kmer = false;
@@ -275,10 +143,10 @@ namespace khmer {
       if (is_new_kmer)
       {
 	__sync_add_and_fetch( &_n_unique_kmers, 1 );
-	return true; // kmer not seen before
+	return 1; // kmer not seen before
       }
 
-      return false; // kmer already seen
+      return 0; // kmer already seen
     } // test_and_set_bits
 
     virtual const HashIntoType n_overlap_kmers(HashIntoType start=0,
@@ -367,92 +235,11 @@ namespace khmer {
       }
       return 1;
     }
-
-    void filter_if_present(const std::string infilename,
-			   const std::string outputfilename,
-			   CallbackFn callback=0,
-			   void * callback_data=0);
-
-    unsigned int count_kmers_within_radius(HashIntoType kmer_f,
-					   HashIntoType kmer_r,
-					   unsigned int radius,
-					   unsigned int max_count,
-					   const SeenSet * seen=0) const;
-    unsigned int count_kmers_within_depth(HashIntoType kmer_f,
-					  HashIntoType kmer_r,
-					  unsigned int depth,
-					  unsigned int max_count,
-					  SeenSet * seen) const;
-
-    unsigned int find_radius_for_volume(HashIntoType kmer_f,
-					HashIntoType kmer_r,
-					unsigned int max_count,
-					unsigned int max_radius) const;
-
-    unsigned int count_kmers_on_radius(HashIntoType kmer_f,
-				       HashIntoType kmer_r,
-				       unsigned int radius,
-				       unsigned int max_volume) const;
-
-    unsigned int trim_on_degree(std::string sequence, unsigned int max_degree)
-      const;
-    unsigned int trim_on_sodd(std::string sequence, unsigned int max_degree)
-      const;
-
-    unsigned int trim_on_density_explosion(std::string sequence, unsigned int radius, unsigned int max_volume)
-      const;
-
-    unsigned int trim_on_stoptags(std::string sequence) const;
-
-    void traverse_from_tags(unsigned int distance,
-			    unsigned int threshold,
-			    unsigned int num_high_todo,
-			    CountingHash &counting);
-
-    unsigned int traverse_from_kmer(HashIntoType start,
-				    unsigned int radius,
-				    SeenSet &keeper) const;
-
-    unsigned int count_and_transfer_to_stoptags(SeenSet &keeper,
-						unsigned int threshold,
-						CountingHash &counting);
-
-    void traverse_from_reads(std::string filename,
-			     unsigned int radius,
-			     unsigned int big_threshold,
-			     unsigned int transfer_threshold,
-			     CountingHash &counting);
-
-    void hitraverse_to_stoptags(std::string filename,
-				CountingHash &counting,
-				unsigned int cutoff);
-
-    virtual void print_tagset(std::string);
-    virtual void print_stop_tags(std::string);
-    virtual void save_stop_tags(std::string);
-    void load_stop_tags(std::string filename, bool clear_tags=true);
-
-    void identify_stop_tags_by_position(std::string sequence,
-					std::vector<unsigned int> &posns)
-      const;
-
-    void extract_unique_paths(std::string seq,
-			      unsigned int min_length,
-			      float min_unique_f,
-			      std::vector<std::string> &results);
   };
 };
 
-
-#define ACQUIRE_ALL_TAGS_SPIN_LOCK \
-  while (!__sync_bool_compare_and_swap( &_all_tags_spin_lock, 0, 1 ));
-
-#define RELEASE_ALL_TAGS_SPIN_LOCK \
-  __sync_bool_compare_and_swap( &_all_tags_spin_lock, 1, 0 );
-
-
 #include "counting.hh"
-
+#include "labelhash.hh"
 #endif // HASHBITS_HH
 
 // vim: set sts=2 sw=2:

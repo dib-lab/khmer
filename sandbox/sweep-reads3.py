@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Use a set of query reads to sweep out overlapping reads from multiple files.
 
@@ -15,6 +20,11 @@ import screed
 import khmer
 from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
+def output_single(r):
+    if hasattr(r, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+    else:
+        return ">%s\n%s\n" % (r.name, r.sequence)
 
 def main():
     parser = build_construct_args()
@@ -77,7 +87,7 @@ def main():
         for ht, outfp in query_list:
             count = ht.get_median_count(record.sequence)[0]
             if count:
-                outfp.write('>%s\n%s\n' % (record.name, record.sequence))
+                outfp.write(output_single(record))
 
 if __name__ == '__main__':
     main()

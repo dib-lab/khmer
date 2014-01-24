@@ -3,7 +3,7 @@
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-# 
+#
 """
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
@@ -17,13 +17,15 @@ import sys
 import os.path
 import argparse
 
+
 def main():
-    parser = argparse.ArgumentParser(\
-        description='Split interleaved reads into two files, left and right.')
+    parser = argparse.ArgumentParser(
+        description='Split interleaved reads into two files, left and right.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infile')
     args = parser.parse_args()
-    
+
     infile = args.infile
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'
@@ -66,4 +68,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

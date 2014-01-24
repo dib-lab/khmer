@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Find highly-connected k-mers and output them in a .stoptags file, for use
 in partitioning.
@@ -27,18 +32,19 @@ DEFAULT_COUNTING_HT_N = 4                     # number of counting hash tables
 # k-mer has been visited more than EXCURSION_KMER_COUNT_THRESHOLD times,
 # we will mark it as BAD and make it a stop tag for traversal.
 
-## don't change these!
+# don't change these!
 EXCURSION_DISTANCE = 40
 EXCURSION_KMER_THRESHOLD = 200
 EXCURSION_KMER_COUNT_THRESHOLD = 2
 # EXCURSION_KMER_COUNT_THRESHOLD=5 # -- works ok for non-diginormed data
 
-###
+#
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Find all highly connected k-mers.")
+        description="Find all highly connected k-mers.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
                         default=DEFAULT_COUNTING_HT_N,

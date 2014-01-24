@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Build a graph from the given sequences, save in <htname>.
 
@@ -45,7 +50,7 @@ def main():
     else:
         print 'We WILL build the tagset (for partitioning/traversal).'
 
-    ###
+    #
 
     print 'making hashtable'
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -60,7 +65,7 @@ def main():
     config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
     for n, filename in enumerate(filenames):
-        
+
         rparser = khmer.ReadParser(filename, n_threads)
         threads = []
         print 'consuming input', filename

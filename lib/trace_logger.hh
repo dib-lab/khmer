@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #ifndef TRACE_LOGGER_HH
 #define TRACE_LOGGER_HH
 
@@ -57,8 +63,9 @@ private:
     
     uint8_t	    _level;
     bool	    _shared_stream;
+#ifdef WITH_INTERNAL_TRACING
     FILE *	    _stream_handle;
-
+#endif
 };
 
 

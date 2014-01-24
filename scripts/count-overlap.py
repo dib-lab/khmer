@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Count the overlap k-mers, which are the k-mers apperaring in two sequence
 datasets.
@@ -19,7 +24,7 @@ import os
 import math
 
 
-###
+#
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
 DEFAULT_HASHSIZE = 1e6
@@ -27,7 +32,8 @@ DEFAULT_HASHSIZE = 1e6
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Use bloom filter to count overlap k-mers')
+        description='Use bloom filter to count overlap k-mers',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
     env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_HASHSIZE)

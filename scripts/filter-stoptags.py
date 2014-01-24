@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Trim sequences at k-mers in the given stoptags file.  Output sequences
 will be placed in 'infile.stopfilt'.
@@ -17,11 +22,12 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
 
-###
+#
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('-k', default=DEFAULT_K, type=int, help='k-mer size',
                         dest='ksize')
@@ -51,7 +57,7 @@ def main():
 
         return None, None
 
-    ### the filtering loop
+    # the filtering loop
     for infile in infiles:
         print 'filtering', infile
         outfile = os.path.basename(infile) + '.stopfilt'

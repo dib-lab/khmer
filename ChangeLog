@@ -1,0 +1,100 @@
+2014-01-13  Camille Scott <camille.scott.w@gmail.com>
+
+* Added support for sparse graph labeling
+
+* Added script to reinflate partitions from read files using the 
+  labeling system, called sweep-reads-by-partition-buffered.py
+
+* Implemented __new__ methods for Hashbits, enforced inheritance
+  hierarchy between it and the new LabelHash class both in C++
+  and CPython API
+  
+2013-12-20  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+* Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
+  to retain FASTQ format in output.
+
+2013-12-18  Titus Brown  <titus@idyll.org>
+
+* Added a test to ensure that normalize-by-median.py has bigcount set to
+  False.
+
+2013-12-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* doc/install.txt Add setup instructions for RHEL6 & fix invocation to get
+master branch to work for non-developers
+
+2013-11-22  Camille Scott  <camille.scott.w@gmail.com>
+
+* Makefile: Added debug target for profiling.
+
+2013-11-22  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Documented release process
+
+2013-10-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.7
+
+* New script: sample-reads-randomly.py which does a single pass random
+subsample using reservoir sampling.
+
+* the version number is now only stored in one place
+
+* Makefile: new dist, cppcheck, pep8, and autopep8 targets for developers.
+VERSION is now set by versioneer and exported to C/C++ code.
+
+* README switched from MarkDown to ReStructuredText format to clean up PyPI
+listing. Install count badge added.
+
+* doc/: updates to how the scripts are called. Sphinx now pulls version
+number from versioneer. C/Python integration is now partially documented.
+Reference to bleeding-edge has been removed. Release instructions have been
+clarified and simplified.
+
+* all python code in khmer/, scripts/, and tests/ should be PEP8 compliant now.
+
+* khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
+were eliminated and the error checking has improved.
+
+* Several fixes motivated by the results of a Coverity C/C++ scan. 
+
+* Tests that require greater than 0.5 gigabytes of memory are now annotated as
+being 'highmem' and be skipped by changing two lines in setup.cfg
+
+* warnings about -Wstrict-prototypes will no longer appear
+
+* contributors to this release are: ctb, mr-c and cswelcher. 
+
+2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.6.1
+
+* No code changes, just build fixes
+
+2013-10-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.6
+
+* Switch to setuptools to run the entire build
+
+* The various Makefiles have been merged into one inside lib for posterity
+
+* A new top-level Makefile wraps "python setup.py"
+
+* argparse.py has been removed and is installed automatically by setuptools/pip
+
+* setup.py and the python/khmer directory have been moved to the root of the
+project to conform to the standard layout
+
+* The project contact address is now khmer-project@idyll.org
+
+* Due to the new build system the project now easily builds under OS X + XCode
+
+* In light of the above the installation instructions have been rewritten
+
+* Sphinx now builds the documentation without warnings or errors
+
+* It is now easy to calculate code coverage.
+
+* setup.py is now PEP8 compliant
