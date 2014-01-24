@@ -1,9 +1,15 @@
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 import sys
 import khmer
 import string
 from array import array
 
 __complementTranslation = string.maketrans('ACTG', 'TGAC')
+
 
 def complement(s):
     """
@@ -16,6 +22,7 @@ def complement(s):
 # reverse
 #
 
+
 def reverse(s):
     """
     Return reverse of 's'.
@@ -26,17 +33,21 @@ def reverse(s):
 
     return r
 
+
 def rc(s):
     return reverse(complement(s))
+
 
 def test_rc():
     assert rc("ACTG") == "CAGT"
 
-### build a k-table of length L, and test it.
+# build a k-table of length L, and test it.
 
 L = 4
 
+
 class Test_KTable:
+
     def setup(self):
         # make a new ktable.
         self.kt = khmer.new_ktable(L)
@@ -45,14 +56,14 @@ class Test_KTable:
         kt = self.kt
         # check to make sure sizes are what we expect.
         assert kt.ksize() == L
-        assert kt.max_hash() == 4**L - 1
-        assert kt.n_entries() == 4**L
-        assert len(kt) == 4**L
-    
+        assert kt.max_hash() == 4 ** L - 1
+        assert kt.n_entries() == 4 ** L
+        assert len(kt) == 4 ** L
+
     def test_hash(self):
         kt = self.kt
-        
-        ### make sure forward/reverse hash work minimally.
+
+        # make sure forward/reverse hash work minimally.
         s = 'ATCG'
         assert kt.reverse_hash(kt.forward_hash('ATCG')) == s
 
@@ -60,16 +71,17 @@ class Test_KTable:
         return                          # @CTB
         kt = self.kt
 
-        ### make sure hashes populate the table completely, too!
+        # make sure hashes populate the table completely, too!
 
         alphabet = ('A', 'C', 'G', 'T')
+
         def rN(L, d={}, *args):
             if L == 0:
                 d["".join(args)] = 1
                 return
 
             for letter in alphabet:
-                rN(L-1, d, letter, *args)
+                rN(L - 1, d, letter, *args)
 
             return d.keys()
 
@@ -83,7 +95,7 @@ class Test_KTable:
         occupy_l.sort()
         assert occupy_l == range(0, kt.n_entries())
 
-        ### check to make sure that fwd --> rev --> fwd works.
+        # check to make sure that fwd --> rev --> fwd works.
 
         for i in range(0, kt.n_entries()):
             assert kt.forward_hash(kt.reverse_hash(i)) == i
@@ -92,14 +104,14 @@ class Test_KTable:
         return                          # @CTB
         kt = self.kt
 
-        ### consume a test string, and verify that consume works.
+        # consume a test string, and verify that consume works.
         s = "ATGAGAGACACAGGGAGAGACCCAATTAGAGAATTGGACC"
         kt.consume(s)
 
         kt2 = khmer.new_ktable(L)
 
         for start in range(0, len(s) - L + 1):
-            word = s[start:start+L]
+            word = s[start:start + L]
 
             kt2.count(word)
 
@@ -113,31 +125,31 @@ class Test_KTable:
 
         for i in range(0, kt.n_entries()):
             assert(kt.get(i) == 1)
-    
-    def test_operator_in( self ):
+
+    def test_operator_in(self):
         kt = self.kt
 
         s = "ATGAGAGACACAGGGAGAGACCCAATTAGAGAATTGGACC"
         kt.consume(s)
 
-	assert "CCCAA" in kt
-	assert not "GGGGG" in kt
+        assert "CCCAA" in kt
+        assert not "GGGGG" in kt
 
     def test_intersection(self):
         kt = self.kt
 
-        ### intersection
-        for i in range(0, 4**L / 4):
-            kt.set(i*4, 1)
+        # intersection
+        for i in range(0, 4 ** L / 4):
+            kt.set(i * 4, 1)
 
         kt2 = khmer.new_ktable(L)
-        for i in range(0, 4**L / 5):
-            kt2.set(i*5, 1)
+        for i in range(0, 4 ** L / 5):
+            kt2.set(i * 5, 1)
 
         kt3 = kt.intersect(kt2)
 
         assert kt3.get(20) == 2
-        for i in range(0, 4**L):
+        for i in range(0, 4 ** L):
             if kt3.get(i):
                 assert i % 4 == 0
                 assert i % 5 == 0
@@ -145,33 +157,34 @@ class Test_KTable:
     def test_update(self):
         kt = self.kt
 
-        ### intersection
-        for i in range(0, 4**L / 4):
-            kt.set(i*4, 1)
+        # intersection
+        for i in range(0, 4 ** L / 4):
+            kt.set(i * 4, 1)
 
         kt2 = khmer.new_ktable(L)
-        for i in range(0, 4**L / 5):
-            kt2.set(i*5, 1)
+        for i in range(0, 4 ** L / 5):
+            kt2.set(i * 5, 1)
 
         kt.update(kt2)
-        for i in range(0, 4**L):
+        for i in range(0, 4 ** L):
             if kt.get(i):
                 assert i % 4 == 0 or i % 5 == 0
 
     def test_clear(self):
         kt = self.kt
-        
-        ### test clear()
-        for i in range(0, 4**L / 4):
-            kt.set(i*4, 1)
-            
+
+        # test clear()
+        for i in range(0, 4 ** L / 4):
+            kt.set(i * 4, 1)
+
         kt.clear()
-        for i in range(0, 4**L):
+        for i in range(0, 4 ** L):
             assert kt.get(i) == 0
             assert kt[i] == 0
 
+
 def test_KmerCount():
-    ### test KmerCount class
+    # test KmerCount class
 
     km = khmer.KmerCount(4)
     km.consume('AAAAAC')
@@ -199,16 +212,16 @@ def test_KmerCount():
 
     assert i == 2
 
-    ### test capital letters vs lowercase
-    config = khmer.get_config( )
-    if config.has_extra_sanity_checks( ):
-	km = khmer.KmerCount(4, report_zero=True)
-	km.consume('AAAAAC'.lower())
-	expected = (('AAAA', 2), ('AAAC', 1))
+    # test capital letters vs lowercase
+    config = khmer.get_config()
+    if config.has_extra_sanity_checks():
+        km = khmer.KmerCount(4, report_zero=True)
+        km.consume('AAAAAC'.lower())
+        expected = (('AAAA', 2), ('AAAC', 1))
 
-	assert km['AAAA'] == 2
-	assert km['AAAC'] == 1
+        assert km['AAAA'] == 2
+        assert km['AAAC'] == 1
 
-    ### hooray, done!
+    # hooray, done!
 
     print 'SUCCESS, all tests passed.'

@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Produce the k-mer abundance distribution for the given file, without
 loading a prebuilt counting hash.
@@ -14,6 +19,7 @@ import os
 import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
+
 
 def main():
     parser = build_construct_args(
@@ -41,7 +47,7 @@ def main():
     HT_SIZE = args.min_hashsize
     N_HT = args.n_hashes
     n_threads = int(args.n_threads)
-    
+
     datafile = args.datafile
     histout = args.histout
 
@@ -78,6 +84,7 @@ def main():
         t.join()
 
     z_list = []
+
     def do_abundance_dist(r):
         z = ht.abundance_distribution_with_reads_parser(r, tracking)
         z_list.append(z)

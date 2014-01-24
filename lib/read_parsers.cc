@@ -1,3 +1,9 @@
+//
+// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+//
+
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
@@ -1211,6 +1217,7 @@ get_parser(
 
     int		    ifile_handle    = -1;
     int		    ifile_flags	    = O_RDONLY;
+    int             retval = 0;
 
     if (0 < ext_pos)
     {
@@ -1223,9 +1230,10 @@ get_parser(
 	ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
 	if (-1 == ifile_handle) throw InvalidStreamHandle( );
 #ifdef __linux__
-	posix_fadvise(
+	retval = posix_fadvise(
 	    ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
 	);
+        if (0 != retval) throw InvalidStreamHandle( );
 #endif
 	stream_reader	= new GzStreamReader( ifile_handle );
 	rechop		= true;
@@ -1235,9 +1243,10 @@ get_parser(
 	ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
 	if (-1 == ifile_handle) throw InvalidStreamHandle( );
 #ifdef __linux__
-	posix_fadvise(
+	retval = posix_fadvise(
 	    ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
 	);
+	if (0 != retval) throw InvalidStreamHandle( );
 #endif
 	stream_reader	= new Bz2StreamReader( ifile_handle );
 	rechop		= true;
@@ -1267,9 +1276,10 @@ get_parser(
 	}
 #ifdef __linux__
 	if (!alignment) // Lawful Evil
-	    posix_fadvise(
+	    retval = posix_fadvise(
 		ifile_handle, 0, 0, POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED
 	    );
+	if (0 != retval) throw InvalidStreamHandle( );
 #endif
 	stream_reader	= new RawStreamReader( ifile_handle, alignment );
     } // uncompressed
@@ -1925,7 +1935,6 @@ _is_valid_read_pair(
 	    &&	(	the_read_pair.first.name.substr( 0, match_1.rm_so )
 		    ==	the_read_pair.second.name.substr( 0, match_1.rm_so ));
 }
-
 
 } // namespace read_parsers
 

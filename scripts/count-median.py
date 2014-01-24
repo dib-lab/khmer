@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Count the median/avg k-mer abundance for each sequence in the input file,
 based on the k-mer counts in the given counting hash.  Can be used to
@@ -18,7 +23,7 @@ import os
 import khmer
 import argparse
 
-###
+#
 
 
 def main():

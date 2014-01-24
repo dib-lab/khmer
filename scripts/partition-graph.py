@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Partition a graph.
 
@@ -33,7 +38,7 @@ import khmer
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 
-###
+#
 
 
 def worker(q, basename, stop_big_traversals):
@@ -62,7 +67,9 @@ def worker(q, basename, stop_big_traversals):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Partition a graph.")
+    parser = argparse.ArgumentParser(
+        description="Partition a graph.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('basename')
     parser.add_argument('--stoptags', '-S', dest='stoptags', default='',

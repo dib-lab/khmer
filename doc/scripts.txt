@@ -48,28 +48,28 @@ k-mer counting and abundance filtering
 
    Example::
 
-	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+	load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
    Multiple threads can be used to accelerate the process, if you have extra
    cores to spare.
 
    Example::
 	
-	scripts/load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+	load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
 
 **abundance-dist.py**: calculate the abundance distribution.
 
    Usage::
 	
-	scripts/abundance-dist.py [ options ] <input.kh> <datafile> <histout>
+	abundance-dist.py [ options ] <input.kh> <datafile> <histout>
 
    Use a counting hash table to count the k-mer abundance distribution in
    <datafile>; output distribution to <histout>.
 
    Example::
 
-	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
-	scripts/abundance-dist.py -z out.kh data/100k-filtered.fa out.hist
+	load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+	abundance-dist.py -z out.kh data/100k-filtered.fa out.hist
 
    The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
    are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
@@ -79,7 +79,7 @@ k-mer counting and abundance filtering
 
    Usage::
 	
-	scripts/abundance-dist-single.py [ options ] <datafile> <histout>
+	abundance-dist-single.py [ options ] <datafile> <histout>
 
    Count the k-mer abundance distribution in <datafile>; output
    distribution to <histout>.  (This is a single-step/in-memory
@@ -96,7 +96,7 @@ k-mer counting and abundance filtering
 
    Example::
 
-	scripts/abundance-dist-single.py -k 20 -x 5e7 data/100k-filtered.fa out.hist
+	abundance-dist-single.py -k 20 -x 5e7 data/100k-filtered.fa out.hist
 
    The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
    are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
@@ -119,8 +119,8 @@ k-mer counting and abundance filtering
 
    Example::
 
-	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
-	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
+	load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
+	filter-abund.py -C 2 table.kh data/100k-filtered.fa
 
 **filter-abund-single.py**: trim sequences at a min k-mer abundance.
 
@@ -140,7 +140,7 @@ k-mer counting and abundance filtering
 
    Example::
 
-	scripts/filter-abund-single.py -k 20 -x 5e7 -C 2 data/100k-filtered.fa
+	filter-abund-single.py -k 20 -x 5e7 -C 2 data/100k-filtered.fa
 
 **count-median.py**: count median, average, and stddev of k-mer abundance in sequences.
 
@@ -165,7 +165,7 @@ k-mer counting and abundance filtering
    generate a report of the increase of overlap k-mers as the number of
    sequences in the second dataset increases. The report can be used to generate
    a curve to show that trend easily.The report file contains the numbers of
-   unique k-mers in the two datasets seperately and the number of overlap k-mers
+   unique k-mers in the two datasets separately and the number of overlap k-mers
    appearing in both datasets..
 
 .. _scripts-partitioning:
@@ -203,10 +203,10 @@ Partitioning
 
 	partition-graph.py [ options ] <graphbase>
 
-   Partition the given graph (ht + tagset) into disconnected subgraphs,
-   and save the resulting partitionmap(s) as *.pmap files.
+Partition the given graph (ht + tagset) into disconnected subgraphs, and save
+the resulting partitionmap(s) as ``*.pmap`` files.
 
-   See 'Artifact removal' to understand the stoptags argument.
+See 'Artifact removal' to understand the stoptags argument.
 
 **merge-partitions.py**: merge pmap files into a single merged pmap file.
 
@@ -231,10 +231,10 @@ Partitioning
 
    Example (results will be in ``random-20-a.fa.part``)::
 
-	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
-	scripts/partition-graph.py example
-	scripts/merge-partitions.py -k 20 example
-	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
+	load-graph.py -k 20 example tests/test-data/random-20-a.fa
+	partition-graph.py example
+	merge-partitions.py -k 20 example
+	annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
 
 **extract-partitions.py**: separate sequences annotated with partitions into group files
 
@@ -244,11 +244,11 @@ Partitioning
 
    Example (results will be in ``example.group0000.fa``)::
 
-	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
-	scripts/partition-graph.py example
-	scripts/merge-partitions.py -k 20 example
-	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
-	scripts/extract-partitions.py example random-20-a.fa.part
+	load-graph.py -k 20 example tests/test-data/random-20-a.fa
+	partition-graph.py example
+	merge-partitions.py -k 20 example
+	annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
+	extract-partitions.py example random-20-a.fa.part
 
 
 Artifact removal
@@ -340,19 +340,19 @@ redundant sequences)
 
    Example::
 
-	scripts/normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
+	normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
 
    Example::
 
-	scripts/normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
+	normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
 
    Example::
         
-        scripts/normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq
+        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq
 
    Example::
 
-        scripts/normalize-by-median.py -k 17 -d 2 -s test.ht tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads.fq
+        normalize-by-median.py -k 17 -d 2 -s test.ht tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads.fq
 
 .. _scripts-read-handling:
 
@@ -380,7 +380,7 @@ and separate paired from orphans.
 
    Example::
 
-      scripts/extract-paired-reads.py tests/test-data/paired.fq
+      extract-paired-reads.py tests/test-data/paired.fq
 
 **interleave-reads.py:** take left (/1) and right (/2) reads, and interleave them.
 
@@ -398,7 +398,7 @@ and separate paired from orphans.
 
    Example::
 
-      scripts/interleave-reads.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq
+      interleave-reads.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq
 
 **split-paired-reads.py:** split interleaved read files into two files, one left and one right.
 
@@ -415,4 +415,4 @@ and separate paired from orphans.
 
    Example::
 
-      scripts/split-paired-reads.py tests/test-data/paired.fq
+      split-paired-reads.py tests/test-data/paired.fq

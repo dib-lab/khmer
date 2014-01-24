@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Do all the partition steps in one script.
 
@@ -119,7 +124,7 @@ def main():
     print 'N THREADS', args.n_threads
     print '--'
 
-    ### load-graph
+    # load-graph
 
     print 'making hashtable'
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -137,7 +142,7 @@ def main():
         print >>sys.stderr, "**"
         sys.exit(-1)
 
-    ### partition-graph
+    # partition-graph
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
@@ -191,7 +196,7 @@ def main():
     print '---'
     print 'done making subsets! see %s.subset.*.pmap' % (base,)
 
-    ### merge-partitions
+    # merge-partitions
 
     output_file = args.graphbase + '.pmap.merged'
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
@@ -210,7 +215,7 @@ def main():
         for pmap_file in pmap_files:
             os.unlink(pmap_file)
 
-    ### annotate-partitions
+    # annotate-partitions
 
     for infile in args.input_filenames:
         print 'outputting partitions for', infile

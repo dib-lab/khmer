@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Trim sequences at k-mers of the given abundance for the given file,
 without loading a prebuilt counting hash.  Output sequences will be
@@ -18,9 +23,10 @@ from khmer.threading_args import add_threading_args
 
 from khmer.counting_args import build_counting_multifile_args
 
-###
+#
 
 DEFAULT_CUTOFF = 2
+
 
 def main():
     parser = build_construct_args(
@@ -32,7 +38,7 @@ def main():
                         help="Trim at k-mers below this abundance.")
     parser.add_argument('--savehash', dest='savehash', default='')
     parser.add_argument('datafile')
-    
+
     args = parser.parse_args()
     report_on_config(args)
 
@@ -50,7 +56,7 @@ def main():
 
     filename = args.datafile
 
-    ### first, load reads into hash table
+    # first, load reads into hash table
     rparser = khmer.ReadParser(filename, n_threads)
     threads = []
     print 'consuming input, round 1 --', filename
@@ -69,9 +75,9 @@ def main():
     fp_rate = khmer.calc_expected_collisions(ht)
     print 'fp rate estimated to be %1.3f' % fp_rate
 
-    ### now, trim.
+    # now, trim.
 
-    ### the filtering function.
+    # the filtering function.
     def process_fn(record):
         name = record['name']
         seq = record['sequence']
@@ -85,7 +91,7 @@ def main():
 
         return None, None
 
-    ### the filtering loop
+    # the filtering loop
     print 'filtering', filename
     outfile = os.path.basename(filename) + '.abundfilt'
     outfp = open(outfile, 'w')

@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+#
 """
 Build a counting Bloom filter from the given sequences, save in <htname>.
 
@@ -13,7 +18,7 @@ import khmer
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
-###
+#
 
 
 def main():
@@ -39,7 +44,7 @@ def main():
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
 
-    ###
+    #
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
