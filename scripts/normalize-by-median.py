@@ -127,8 +127,6 @@ def main():
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
-    parser.add_argument('-l', '--loadhash', dest='loadhash',
-                        default='')
     parser.add_argument('-R', '--report-to-file', dest='report_file',
                         type=argparse.FileType('w'))
     parser.add_argument('-f', '--force-processing', dest='force',

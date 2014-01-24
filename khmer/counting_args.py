@@ -11,6 +11,11 @@ DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
 
+def add_loadhash(arg_group):
+    arg_group.add_argument('-l', '--loadhash', dest='loadhash',
+                        default='')
+    return arg_group
+ 
 def build_construct_args(descr=None):
 
     if descr is None:
@@ -26,15 +31,23 @@ def build_construct_args(descr=None):
 
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-    parser.add_argument('--ksize', '-k', type=int, dest='ksize',
+    #subs = parser.add_subparsers(help='
+    k_group = parser.add_mutually_exclusive_group()
+    n_group = parser.add_mutually_exclusive_group()
+    x_group = parser.add_mutually_exclusive_group()
+    
+    k_group.add_argument('--ksize', '-k', type=int, dest='ksize',
                         default=env_ksize,
                         help='k-mer size to use')
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
+    k_group = add_loadhash(k_group)
+    n_group.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
                         default=env_n_hashes,
                         help='number of hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
+    n_group = add_loadhash(n_group)
+    x_group.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
                         default=env_hashsize,
                         help='lower bound on hashsize to use')
+    x_group = add_loadhash(x_group)    
 
     return parser
 
