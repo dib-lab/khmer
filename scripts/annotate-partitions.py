@@ -19,6 +19,15 @@ import argparse
 
 import khmer
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+
 DEFAULT_K = 32
 
 
@@ -41,6 +50,13 @@ def main():
     print 'loading partition map from:', partitionmap_file
     ht.load_partitionmap(partitionmap_file)
 
+    # Check space availability
+    freeSpace = fileApi.check_space(args.input_filenames)
+    if freeSpace != 0:
+        print >>sys.stderr, 'ERROR: Not enough free space on disk, \
+        need at least %s more,' % str(freeSpace)
+        sys.exit(-1)
+    
     for infile in args.input_filenames:
         print 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
