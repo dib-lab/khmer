@@ -47,15 +47,20 @@ def main():
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    print 'loading partition map from:', partitionmap_file
-    ht.load_partitionmap(partitionmap_file)
-
+    # Check if input files exist
+    fileApi.check_file_status(partitionmap_file)
+    for f in args.input_filenames:
+        fileApi.check_file_status(f)
+        
     # Check space availability
     freeSpace = fileApi.check_space(args.input_filenames)
     if freeSpace != 0:
         print >>sys.stderr, 'ERROR: Not enough free space on disk, \
         need at least %s more,' % str(freeSpace)
         sys.exit(-1)
+
+    print 'loading partition map from:', partitionmap_file
+    ht.load_partitionmap(partitionmap_file)
     
     for infile in args.input_filenames:
         print 'outputting partitions for', infile
