@@ -7,20 +7,20 @@
 
 import os
 
-# Enum to list possible File statuses
-class FileStatus:
-    FileExistsNonEmpty, FileNonExistent, FileEmpty = range(3)
-
 def check_file_status(filePath):
     ''' Check status of file - return if file exists,
     is empty, or neither '''
     if not os.path.exists(filePath):
-        return FileStatus.FileNonExistent
+        print >>sys.stderr, 'ERROR: Input file %s does not exist,\
+         exiting' % filePath
+        sys.exit(-1)
     else:
         if os.stat(filePath).st_size==0:
-            return FileStatus.FileEmpty
+            print >>sys.stderr, 'ERROR: Input file %s is empty,\
+                     exiting' % f
+            sys.exit(-1)
         else:
-            return FileStatus.FileExistsNonEmpty
+            return True
         
 def check_space(inFiles):
     ''' Estimate size of inFiles passed, then calculate
