@@ -132,17 +132,10 @@ def main():
         print >>sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(-1)
 
-    # Check if out-file exists
-    if fileApi.checkFileStatus(histout) != fileApi.FileStatus.FileNonExistent:
-        if squash:
-            fp = open(histout, 'w')
-        else:
-            # Create unique file-name
-            timeStampStr = str(datetime.datetime\
-                               .fromtimestamp(time.time())\
-                               .strftime('%Y%m%d%H%M%S'))
-            newFileName = "%s%s" % (histout, timeStampStr)
-            fp = open(newFileName, 'w')
+    # If histfile exists (even if empty), check if squash is allowed
+    if (fileApi.checkFileStatus(histout) != fileApi.FileStatus.FileNonExistent) and (not squash):
+        print >>sys.stderr, 'ERROR: %s exists; not squashing.' % histout
+        sys.exit(-1)
     else:
         fp = open(histout, 'w')
 
