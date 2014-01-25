@@ -22,22 +22,24 @@ def check_file_status(filePath):
         else:
             return FileStatus.FileExistsNonEmpty
         
-def check_space(obj,inFile):
-    ''' Estimate size of obj passed, then calculate
+def check_space(inFiles):
+    ''' Estimate size of inFiles passed, then calculate
     disk space and return extra space needed to store
     file or 0 if sufficient space'''
     
-    # Get disk free space in Bytes assuming non SU
-    dirPath = os.dirname(inFile)
+    # Get disk free space in Bytes assuming non superuser
+    # and assuming all inFiles are in same disk
+    dirPath = os.dirname(inFiles[0])
     target=os.statvfs(dirPath)
     freeSpace = target.f_bsize * target.f_bavail 
     #<TODO>: If SU, use target.f_bfree
     
     # Get input file size as worst case estimate of 
     # output file size
-    fileSize = os.stat(inFile).st_size
+    fileSizes = map(lambda f: os.stat(f).st_size, inFiles)
+    totalSize = reduce(lambda f1, f2: f1+f2, fileSizes)
     
-    sizeDiff = fileSize-freeSpace
+    sizeDiff = totalSize-freeSpace
     if sizeDiff > 0:
         return sizeDiff
     else:
