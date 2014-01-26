@@ -41,6 +41,8 @@ def check_space(inFiles):
     
     sizeDiff = totalSize-freeSpace
     if sizeDiff > 0:
-        return sizeDiff
+        print >>sys.stderr, 'ERROR: Not enough free space on disk, \
+        need at least %s more,' % str(freeSpace)
+        sys.exit(-1)
     else:
-        return 0
+        return True
