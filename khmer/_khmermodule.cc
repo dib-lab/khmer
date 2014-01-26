@@ -4599,7 +4599,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
 {
     HashIntoType val;
     WordLength ksize;
-
+  
     if (!PyArg_ParseTuple(args, "Kb", &val, &ksize)) {
         return NULL;
     }
