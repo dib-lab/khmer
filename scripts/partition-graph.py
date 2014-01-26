@@ -21,6 +21,15 @@ import gc
 import os.path
 import argparse
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+
 # Debugging Support
 import re
 import platform
@@ -86,6 +95,14 @@ def main():
 
     args = parser.parse_args()
     basename = args.basename
+    
+    # Check input files exist
+    filenames=[basename+'.ht',basename+'.tagset']
+    for f in filenames:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(filenames)
 
     print '--'
     print 'SUBSET SIZE', args.subset_size

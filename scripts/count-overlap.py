@@ -23,7 +23,14 @@ import argparse
 import os
 import math
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
 
+import fileApi
 #
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -75,6 +82,14 @@ def main():
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
 
+    # Check if input files exist
+    infiles = [htfile, fafile]
+    for infile in infiles:
+        fileApi.check_file_status(infile)
+    
+    # Check free space
+    fileApi.check_space(infiles)
+    
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
     K = ht1.ksize()

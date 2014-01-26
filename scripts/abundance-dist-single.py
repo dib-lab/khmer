@@ -61,6 +61,14 @@ def main():
     histout = args.histout
     squash = args.squash
 
+    # Check if input files exist
+    infiles = [datafile]
+    for infile in infiles:
+        fileApi.check_file_status(infile)
+    
+    # Check free space
+    fileApi.check_space(infiles)
+
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
     ht.set_use_bigcount(args.bigcount)

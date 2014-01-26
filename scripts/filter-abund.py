@@ -18,6 +18,14 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer import threading_args as targs
 from khmer.counting_args import build_counting_multifile_args
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
 #
 
 DEFAULT_NORMALIZE_LIMIT = 20
@@ -43,6 +51,13 @@ def main():
     counting_ht = args.input_table
     infiles = args.input_filenames
     n_threads = int(args.n_threads)
+    
+    # Check input files exist
+    for f in infiles:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(infiles)
 
     print 'file with ht: %s' % counting_ht
 

@@ -21,6 +21,15 @@ from itertools import izip
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 import argparse
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
@@ -171,6 +180,13 @@ def main():
     filenames = args.input_filenames
     force = args.force
     dump_frequency = args.dump_frequency
+    
+    # Check input files exist
+    for f in filenames:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(filenames)
 
     # list to save error files along with throwing exceptions
     if force is True:
@@ -185,7 +201,7 @@ def main():
 
     total = 0
     discarded = 0
-
+    
     for n, input_filename in enumerate(filenames):
         output_name = os.path.basename(input_filename) + '.keep'
         outfp = open(output_name, 'w')

@@ -23,6 +23,14 @@ from khmer.threading_args import add_threading_args
 
 from khmer.counting_args import build_counting_multifile_args
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
 #
 
 DEFAULT_CUTOFF = 2
@@ -46,6 +54,15 @@ def main():
     HT_SIZE = args.min_hashsize
     N_HT = args.n_hashes
     n_threads = int(args.n_threads)
+    filename = args.datafile
+
+    # Check input files exist
+    infiles=[filename]
+    for f in infiles:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(infiles)
 
     config = khmer.get_config()
     bufsz = config.get_reads_input_buffer_size()
@@ -53,8 +70,6 @@ def main():
 
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
-
-    filename = args.datafile
 
     # first, load reads into hash table
     rparser = khmer.ReadParser(filename, n_threads)

@@ -22,6 +22,14 @@ import itertools
 import os
 import argparse
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
 
 def output_pair(r1, r2):
     if hasattr(r1, 'accuracy'):
@@ -42,6 +50,13 @@ def main():
                         dest='output', type=argparse.FileType('w'),
                         default=sys.stdout)
     args = parser.parse_args()
+    
+    # Check input files exist
+    for f in args.infiles:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(args.infiles)
 
     s1_file = args.infiles[0]
     if len(args.infiles) == 2:
