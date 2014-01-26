@@ -89,6 +89,13 @@ quantitative reference transcriptome for Nematostella vectensis".  The
 data is on snapshot 'snap-f5a9dea7', so go create a volume from that
 and mount it as '/data' to get started.
 
+Additional information
+----------------------
+
+For ihe duration of this protocol we will be using commandline interfaces.  I
+have created a short document explaining the notations use with than this
+tutorial, (see :doc:`../docs/command-line`).
+
 ----
 
 Next: :doc:`1-quality`

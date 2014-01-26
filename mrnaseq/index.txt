@@ -23,3 +23,7 @@ The tutorial:
 ..   de-novo-assembly
 ..   rsem
 
+ Reference material
+ ------------------
+ :doc:`../docs/command-line`
+ :doc:`../amazon/index`
