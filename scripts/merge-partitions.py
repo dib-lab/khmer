@@ -20,6 +20,15 @@ import os
 
 import khmer
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+
 DEFAULT_K = 32
 
 
@@ -42,6 +51,13 @@ def main():
 
     K = args.ksize
     ht = khmer.new_hashbits(K, 1, 1)
+    
+    # Check input files exist
+    for f in pmap_files:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(pmap_files)
 
     for pmap_file in pmap_files:
         print 'merging', pmap_file

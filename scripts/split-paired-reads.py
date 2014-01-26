@@ -17,6 +17,14 @@ import sys
 import os.path
 import argparse
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
 
 def main():
     parser = argparse.ArgumentParser(
@@ -27,6 +35,15 @@ def main():
     args = parser.parse_args()
 
     infile = args.infile
+    
+    # Check input files exist
+    filenames = [infile]
+    for f in filenames:
+        fileApi.check_file_status(f)
+
+    # Check disk space availability
+    freeSpace = fileApi.check_space(filenames)
+    
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'
     fp1 = open(out1, 'w')

@@ -23,6 +23,15 @@ from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import report_on_config
 import glob
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
 DEFAULT_K = 32
@@ -96,6 +105,13 @@ def main():
 
     base = args.graphbase
     filenames = args.input_filenames
+
+    # Check if input files exist
+    for infile in filenames:
+        fileApi.check_file_status(infile)
+    
+    # Check free space
+    fileApi.check_space(filenames)
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)

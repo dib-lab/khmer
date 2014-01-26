@@ -22,7 +22,7 @@ from screed.fasta import fasta_iter
 import argparse
 import os
 import math
-from khmer.khmer_args import build_hasbits_args, report_on_config
+
 
 #
 DEFAULT_K = 32

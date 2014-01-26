@@ -44,26 +44,23 @@ def main():
     args = parser.parse_args()
 
     K = args.ksize
+    filenames = args.input_filenames
     ht = khmer.new_hashbits(K, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
     # Check if input files exist
     fileApi.check_file_status(partitionmap_file)
-    for f in args.input_filenames:
+    for f in filenames:
         fileApi.check_file_status(f)
         
     # Check space availability
-    freeSpace = fileApi.check_space(args.input_filenames)
-    if freeSpace != 0:
-        print >>sys.stderr, 'ERROR: Not enough free space on disk, \
-        need at least %s more,' % str(freeSpace)
-        sys.exit(-1)
-
+    fileApi.check_space(filenames)
+    
     print 'loading partition map from:', partitionmap_file
     ht.load_partitionmap(partitionmap_file)
     
-    for infile in args.input_filenames:
+    for infile in filenames:
         print 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
         n = ht.output_partitions(infile, outfile)

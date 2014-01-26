@@ -11,8 +11,6 @@ Produce the k-mer abundance distribution for the given file.
 
 Use '-h' for parameter help.
 """
-from __future__ import print_function
-
 import sys
 import khmer
 import argparse
@@ -21,8 +19,7 @@ import os
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Output k-mer abundance distribution.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        description="Output k-mer abundance distribution.")
 
     parser.add_argument('hashname')
     parser.add_argument('datafile')
