@@ -34,7 +34,7 @@ public:
 
    unsigned int diff;
 
-   HashIntoType bitmask;
+   khmer::HashIntoType bitmask;
 
    bool operator== (const Node &param) const;
    bool operator< (const Node &param) const;
@@ -44,7 +44,7 @@ public:
 
    Kmer makeNextKmer(unsigned char forward, char b);
 
-   std::queue<Node*> enumerate(CountingHash *, ScoringMatrix * sm, 
+   std::queue<Node*> enumerate(khmer::CountingHash *, ScoringMatrix * sm, 
                             unsigned char forward, const std::string&,
                             double lambdaOne=0, double lambdaTwo=0);
 };
