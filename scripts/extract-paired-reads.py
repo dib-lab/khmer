@@ -17,6 +17,14 @@ import sys
 import os.path
 import argparse
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
 
 def is_pair(name1, name2):
     if name1.endswith('/1') and name2.endswith('/2'):
@@ -55,6 +63,15 @@ def main():
     args = parser.parse_args()
 
     infile = args.infile
+    
+    # Check if input files exist
+    infiles = [infile]
+    for infile in infiles:
+        fileApi.check_file_status(infile)
+    
+    # Check free space
+    fileApi.check_space(infiles)    
+    
     outfile = os.path.basename(infile)
     if len(sys.argv) > 2:
         outfile = sys.argv[2]
