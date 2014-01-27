@@ -92,7 +92,7 @@ and mount it as '/data' to get started.
 Additional information
 ----------------------
 
-For ihe duration of this protocol we will be using commandline interfaces. There
+For the duration of this protocol we will be using commandline interfaces. There
 is a short document explaining the notations used here. (see :doc:../docs/command-line)
 
 ----
