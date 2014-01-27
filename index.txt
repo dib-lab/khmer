@@ -15,7 +15,7 @@ at:
 .. You are reading v0.8.5; please use the following URL in citations and
 .. discussions:
 
-..    https://khmer-protocols.readthedocs.org/en/v0.8.4/
+..    https://khmer-protocols.readthedocs.org/en/v0.8.5/
 
 If you need to reference these protocols, please cite::
 
@@ -26,8 +26,8 @@ If you need to reference these protocols, please cite::
 Helpful instructions:
 ---------------------
 
-See :doc:`amazon/index`.
-See :doc:`../docs/command-line`.
+See :doc:`amazon/index` for information on Amazon instances,
+and :doc:`../docs/command-line` for notes on command-line conventions.
 
 Protocols:
 ----------
