@@ -26,7 +26,7 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-# OS generated files #
+# OS X generated files #
 ######################
 .DS_Store
 .DS_Store?

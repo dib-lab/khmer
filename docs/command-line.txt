@@ -2,29 +2,9 @@
 Commandline conventions
 =======================
 
- Throughout this documentation code is surrounded by green boxes, within each
- box says common commandline code conventions are used. Here we will explain a
- number of the use so that you will not get lost.
+Throughout this documentation code is surrounded by green boxes. We use certain
+conventions in presenting command lines and their arguments.
 
- The most common example of this is the use of "<variablename>", when you see
- this in code you should replace both the words and the brackets.
-
-You will also see "*".  This represents a universal wildcard, meaning that
-it can reference in any  number, letter, or symbol. When this issues within
-commandline code all results will show. For example::
-		ls *
-
-Will list all files within the current directory. On the other hand, typing::
-		ls *.txt
-
-Will display all the text files in the directory.
-
-The vertical bar "|" means that the output of one command is passed directly
-into another command.
-
-The less than symbol ">" indicates that the output will be saved to  the
-filename that directly follows it.
-
-There are many other commandline conventions not covered in this document, in
-fact many books have been written on these. However, this should be enough to
-get you through the basic tutorials.
+The most common example of this is the use of "<variablename>", when you see
+this in code you should replace both the words and the brackets  with the
+appropriate contents as suggested by the name we used.
