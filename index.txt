@@ -1,26 +1,87 @@
-===============================
-Getting started with Amazon EC2
-===============================
+===============
+khmer protocols
+===============
 
-.. toctree::
-   :maxdepth: 2
+:version: 0.8.5 (unreleased)
 
-   start-up-an-ec2-instance
-   log-in-with-ssh-win
-   log-in-with-ssh-mac
+This is a set of protocols for doing genomic data analysis -- specifically,
+de novo mRNAseq assembly and de novo metagenome assembly -- in the cloud.
 
-   installing-dropbox
+The latest released version of these protocols can always be found
+at:
 
-A final checklist:
+  http://khmer-protocols.readthedocs.org/
 
-- EC2 instance is running;
-- used AMI ami-c17ec8a8;
-- NOT micro instance (m1.large, or bigger);
-- SSH, HTTP, HTTPS are enabled on the security group;
+.. You are reading v0.8.5; please use the following URL in citations and
+.. discussions:
 
-Amazon Web Services reference material
---------------------------------------
+..    https://khmer-protocols.readthedocs.org/en/v0.8.4/
 
-`Instance types <http://aws.amazon.com/ec2/instance-types/>`__
+If you need to reference these protocols, please cite::
 
-`Instance costs <http://aws.amazon.com/ec2/pricing/>`__
+   Brown, C. Titus; Scott, Camille; Crusoe, Michael; Sheneman, Leigh;
+   Rosenthal, Josh; Adina Howe (2013): khmer-protocols documentation.
+   figshare. http://dx.doi.org/10.6084/m9.figshare.878460
+
+Helpful instructions:
+---------------------
+
+See :doc:`amazon/index`.
+
+Protocols:
+----------
+
+mRNAseq assembly: the Eel Pond Protocol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:doc:`mrnaseq/index`
+
+This is a lightweight protocol for assembling up to a few hundred
+million mRNAseq reads, annotating the resulting assembly, and doing
+differential expression with RSEM.
+
+Metagenome assembly: the Kalamazoo Protocol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:doc:`metagenomics/index`
+
+This is a protocol for assembling low- and medium-diversity metagenomes.
+Marine sediment and soil data sets may not be assemblable in the cloud
+just yet.
+
+Additional information
+----------------------
+
+Need help? Either post comments on the bottom of each page, OR
+`sign up for the mailing list <http://lists.idyll.org/listinfo/protocols>`__.
+
+Have you used these protocols in a scientific publication?  We'll have
+citation instructions up soon.
+
+Funding
+-------
+
+khmer-protocols development has largely been supported by AFRI
+Competitive Grant no.  `2010-65205-20361
+<http://ged.msu.edu/downloads/2009-usda-vertex.pdf>`__ from the USDA
+NIFA, and Award Number `R25HG006243
+<http://ged.msu.edu/downloads/2010-ngs-course-nih-r25.pdf>`__ from the
+National Institutes of Health, both to C. Titus Brown.
+We now have continuing support from
+the National Human Genome Research
+Institute of the National Institutes of Health under Award Number
+`R01HG007513 <http://ged.msu.edu/downloads/2012-bigdata-nsf.pdf>`__,
+also to C. Titus Brown.
+
+CTB's work on the Eel Pond mRNAseq tutorial was enabled by his 2013 summer
+research work at `the Marine Biological Laboratory
+<http://www.mbl.edu>`__, funded by the Burr and Susie Steinbach Award
+and the Laura and Arthur Colwin Endowed Summer Research Fellowship
+Fund
+
+TODO:
+-----
+
+* remove/transition stuff from the angus site.
+* add sfg/stanford: http://sfg.stanford.edu/
+* send to biostar-ninjas
