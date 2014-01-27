@@ -93,6 +93,12 @@ and mount it as '/data' to get started; to mount it read-only, do::
 
 after attaching the volume as 'sdf'.
 
+Additional information
+----------------------
+
+For the duration of this protocol we will be using commandline interfaces. There
+is a short document explaining the notations used here. (see :doc:../docs/command-line)
+
 ----
 
 Next: :doc:`1-quality`

@@ -27,6 +27,7 @@ Helpful instructions:
 ---------------------
 
 See :doc:`amazon/index`.
+See :doc:`../docs/command-line`.
 
 Protocols:
 ----------

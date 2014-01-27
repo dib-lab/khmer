@@ -21,3 +21,8 @@ for the latest released version.
    5-mapping-and-quantitation
    6-annotating
    installing-blastkit
+
+Reference material
+------------------
+:doc:`../docs/command-line`
+:doc:`../amazon/index`

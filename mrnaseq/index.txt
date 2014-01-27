@@ -31,3 +31,8 @@ The tutorial:
    6-annotating-transcript-families
    7-expression-analysis
    8-differential-expression
+
+Reference material
+------------------
+:doc:`../docs/command-line`
+:doc:`../amazon/index`
