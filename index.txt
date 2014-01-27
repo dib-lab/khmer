@@ -15,7 +15,7 @@ at:
 .. You are reading v0.8.5; please use the following URL in citations and
 .. discussions:
 
-..    https://khmer-protocols.readthedocs.org/en/v0.8.4/
+..    https://khmer-protocols.readthedocs.org/en/v0.8.5/
 
 If you need to reference these protocols, please cite::
 
@@ -85,3 +85,4 @@ TODO:
 * remove/transition stuff from the angus site.
 * add sfg/stanford: http://sfg.stanford.edu/
 * send to biostar-ninjas
+ 
