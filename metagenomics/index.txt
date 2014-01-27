@@ -11,3 +11,8 @@ The Kalamazoo Metagenome Assembly Tutorial
    3-partition
    4-assemble
 ..   5-mapping-and-quantitation
+
+ Reference material
+ ------------------
+ :doc:`../docs/command-line`
+ :doc:`../amazon/index`
