@@ -5,6 +5,7 @@
 #
 import os
 import argparse
+from khmer import extract_countinghash_info, extract_hashbits_info
 
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -42,6 +43,7 @@ def build_counting_args(descr=None):
         descr = 'Build & load a counting Bloom filter.'
 
     parser = build_hash_args(descr=descr)
+    parser.hashtype = 'counting'
 
     return parser
 
@@ -52,6 +54,7 @@ def build_hashbits_args(descr=None):
         descr = 'Build & load a Bloom filter.'
 
     parser = build_hash_args(descr=descr)
+    parser.hashtype = 'hashbits'
 
     return parser
 
@@ -78,6 +81,8 @@ def add_loadhash_args(parser):
 
             from khmer.utils import print_error
 
+            setattr(namespace, self.dest, values)
+
             if getattr(namespace, 'ksize') != env_ksize or \
             getattr(namespace, 'n_hashes') != env_n_hashes or \
             getattr(namespace, 'min_hashsize') != env_hashsize:
@@ -87,8 +92,22 @@ def add_loadhash_args(parser):
 {hash}, but have set hashtable parameters. 
 Your values for ksize, n_hashes, and hashsize \
 will be ignored.'''.format(hash=values))
-
-            setattr(namespace, self.dest, values)
+            
+            if hasattr(parser, 'hashtype'):
+                info = None
+                if parser.hashtype == 'hashbits':
+                    info = extract_hashbits_info(
+                        getattr(namespace, self.dest))
+                elif parser.hashtype == 'counting':
+                    info = extract_countinghash_info(
+                        getattr(namespace, self.dest))
+                if info:
+                    K = info[0]
+                    x = info[1]
+                    n = info[2]
+                    setattr(namespace, 'ksize', K)
+                    setattr(namespace, 'n_hashes', n)
+                    setattr(namespace, 'min_hashsize', x)
 
  
 
