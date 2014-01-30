@@ -22,7 +22,8 @@ import os
 import argparse
 import screed
 import khmer
-from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_hashbits_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import report_on_config
 import glob
 
 DEFAULT_SUBSET_SIZE = int(1e5)
@@ -68,7 +69,7 @@ def worker(q, basename, stop_big_traversals):
 
 
 def main():
-    parser = build_construct_args()
+    parser = build_hashbits_args()
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (usually 1e5-1e6 is good)')
@@ -90,24 +91,7 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print >>sys.stderr, \
-                "** WARNING: hashsize is default!  " \
-                "You absodefly want to increase this!\n** " \
-                "Please read the docs!"
-
-        print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print >>sys.stderr, \
-            ' - min hashsize = %-5.2g \t(-x)' % args.min_hashsize
-        print >>sys.stderr, ''
-        print >>sys.stderr, \
-            'Estimated memory usage is %.2g bytes ' \
-            '(n_hashes x min_hashsize / 8)' \
-            % (args.n_hashes * args.min_hashsize / 8.)
-        print >>sys.stderr, '-' * 8
+    report_on_config(args, hashtype='hashbits')
 
     K = args.ksize
     HT_SIZE = args.min_hashsize
