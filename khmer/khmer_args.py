@@ -80,7 +80,7 @@ def add_loadhash_args(parser):
 
             if getattr(namespace, 'ksize') != env_ksize or \
             getattr(namespace, 'n_hashes') != env_n_hashes or \
-            getattr(namespace, 'hashsize') != env_hashsize:
+            getattr(namespace, 'min_hashsize') != env_hashsize:
                 if values:
                     print_error('''
 ** WARNING: You are loading a saved hashtable from
@@ -127,7 +127,8 @@ def report_on_config(args, hashtype='counting'):
     
     print_error("-" * 8)
  
-    if DEFAULT_MIN_HASHSIZE == args.min_hashsize:
+    if DEFAULT_MIN_HASHSIZE == args.min_hashsize and \
+    not hasattr(args, 'loadhash'):
         print_error(
             "** WARNING: hashsize is default!  "
             "You absodefly want to increase this!\n** "
