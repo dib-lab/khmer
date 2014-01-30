@@ -10,10 +10,7 @@ DEFAULT_K = 32
 DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
-def build_construct_args(descr=None):
-
-    if descr is None:
-        descr = 'Build & load a counting Bloom filter.'
+def build_hash_args(descr=None):
 
     parser = argparse.ArgumentParser(
         description=descr,
@@ -39,6 +36,26 @@ def build_construct_args(descr=None):
     return parser
 
 
+def build_counting_args(descr=None):
+
+    if descr is None:
+        descr = 'Build & load a counting Bloom filter.'
+
+    parser = build_hash_args(descr=descr)
+
+    return parser
+
+
+def build_hashbits_args(descr=None):
+
+    if descr is None:
+        descr = 'Build & load a Bloom filter.'
+
+    parser = build_hash_args(descr=descr)
+
+    return parser
+
+# deprecated, should use add_loadhash_args for input table
 def build_counting_multifile_args():
     parser = argparse.ArgumentParser(
         description='Use a counting Bloom filter.',
@@ -49,8 +66,37 @@ def build_counting_multifile_args():
 
     return parser
 
+# add an argument for loadhash with warning about parameters
+def add_loadhash_args(parser):
 
-def report_on_config(args):
+    class LoadAction(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
+            env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
+            env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', 
+                                           DEFAULT_MIN_HASHSIZE)
+
+            from khmer.utils import print_error
+
+            if getattr(namespace, 'ksize') != env_ksize or \
+            getattr(namespace, 'n_hashes') != env_n_hashes or \
+            getattr(namespace, 'hashsize') != env_hashsize:
+                if values:
+                    print_error('''
+** WARNING: You are loading a saved hashtable from
+{hash}, but have set hashtable parameters. 
+Your values for ksize, n_hashes, and hashsize \
+will be ignored.'''.format(hash=values))
+
+            setattr(namespace, self.dest, values)
+
+ 
+
+    parser.add_argument('-l', '--loadhash', dest='loadhash', default=None,
+                        help='load a precomputed hashtable from disk',
+                        action=LoadAction)
+
+def report_on_config(args, hashtype='counting'):
     """
         Summarizes the configuration produced by the command-line arguments
         made available by this module.
@@ -68,17 +114,24 @@ def report_on_config(args):
         " - min hashsize = {0:5.2g} \t(-x)".format(args.min_hashsize)
     )
     print_error("")
-    print_error(
-        "Estimated memory usage is {0:.2g} bytes "
-        "(n_hashes x min_hashsize)".format(args.n_hashes * args.min_hashsize)
-    )
+    if hashtype == 'counting':
+        print_error(
+            "Estimated memory usage is {0:.2g} bytes "
+            "(n_hashes x min_hashsize)".format(args.n_hashes * args.min_hashsize)
+        )
+    elif hashtype == 'hashbits':
+        print_error(
+            "Estimated memory usage is {0:.2g} bytes "
+            "(n_hashes x min_hashsize / 8)".format(args.n_hashes * args.min_hashsize / 8)
+        )
+    
     print_error("-" * 8)
-
+ 
     if DEFAULT_MIN_HASHSIZE == args.min_hashsize:
         print_error(
             "** WARNING: hashsize is default!  "
             "You absodefly want to increase this!\n** "
-            "Please read the docs!"
+            "Please read the docs!\n"
         )
 
 
