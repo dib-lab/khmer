@@ -64,7 +64,7 @@ being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and cswelcher. 
+* contributors to this release are: ctb, mr-c and camillescott. 
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
