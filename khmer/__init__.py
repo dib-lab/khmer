@@ -80,7 +80,7 @@ def extract_hashbits_info(filename):
         n_tables, = unpack('B', f.read(uchar_size))
         table_size, = unpack('Q', f.read(ulonglong_size))
 
-    return ksize, table_size, n_tables, version, ht_type
+    return ksize, round(table_size, -2), n_tables, version, ht_type
 
 def extract_countinghash_info(filename):
     ksize = None
@@ -102,7 +102,7 @@ def extract_countinghash_info(filename):
         n_tables, = unpack('B', f.read(1))
         table_size, = unpack('Q', f.read(ulonglong_size))    
 
-    return ksize, table_size, n_tables, use_bigcount, version, ht_type
+    return ksize, round(table_size, -2), n_tables, use_bigcount, version, ht_type
         
 
 def calc_expected_collisions(ht):
