@@ -46,7 +46,7 @@ MIN_KSIZE = 21
 
 def fmt_fasta(name, seq, labels=[]):
     return '>{name}\t{labels}\n{seq}\n'.format(name=name,
-            labels='\t'.join([str(l) for l in labels]), seq=seq)
+                                               labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
 def write_seq(fp, name, seq, labels=[]):
@@ -173,7 +173,8 @@ def main():
                         default=DEFAULT_NUM_BUFFERS,
                         help='Max individual label buffers before flushing')
     parser.add_argument(dest='input_fastp', help='Partitioned reference fasta')
-    parser.add_argument('input_files', nargs='+', help='Reads to be swept/sorted')
+    parser.add_argument('input_files', nargs='+',
+                        help='Reads to be swept/sorted')
     args = parser.parse_args()
 
     if args.min_hashsize < MIN_HSIZE:
@@ -216,14 +217,14 @@ def main():
     start_t = time.clock()
     for read_file in input_files:
         print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
-                                                        read_file=read_file)
+            read_file=read_file)
         file_t = 0.0
         try:
             read_fp = screed.open(read_file)
         except IOError as e:
             print >>sys.stderr, '!! ERROR: !!', e
             print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(
-                                                                 fn=read_file)
+                fn=read_file)
         else:
             for n, record in enumerate(read_fp):
                 if n % 50000 == 0:
@@ -233,8 +234,8 @@ def main():
                     print >>sys.stderr, '\tswept {n} reads [{nc} labeled, \
                                          {no} orphaned] \
                                         ** {sec}s ({sect}s total)' \
-                                        .format(n=n, nc=n_labeled, 
-                                                no=n_orphaned, 
+                                        .format(n=n, nc=n_labeled,
+                                                no=n_orphaned,
                                                 sec=batch_t, sect=file_t)
                     start_t = time.clock()
                 seq = record.sequence

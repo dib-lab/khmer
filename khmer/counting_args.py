@@ -10,6 +10,7 @@ DEFAULT_K = 32
 DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
+
 def build_construct_args(descr=None):
 
     if descr is None:
@@ -25,7 +26,7 @@ def build_construct_args(descr=None):
 
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
-   
+
     parser.add_argument('--ksize', '-k', type=int, dest='ksize',
                         default=env_ksize,
                         help='k-mer size to use')

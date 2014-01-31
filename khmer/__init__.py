@@ -62,13 +62,14 @@ def reset_reporting_callback():
 
 reset_reporting_callback()
 
+
 def extract_hashbits_info(filename):
     ksize = None
     n_tables = None
     table_size = None
     version = None
     ht_type = None
-    
+
     uint_size = len(pack('I', 0))
     uchar_size = len(pack('B', 0))
     ulonglong_size = len(pack('Q', 0))
@@ -82,6 +83,7 @@ def extract_hashbits_info(filename):
 
     return ksize, round(table_size, -2), n_tables, version, ht_type
 
+
 def extract_countinghash_info(filename):
     ksize = None
     n_tables = None
@@ -89,7 +91,7 @@ def extract_countinghash_info(filename):
     version = None
     ht_type = None
     use_bigcount = None
-    
+
     uint_size = len(pack('I', 0))
     uchar_size = len(pack('B', 0))
     ulonglong_size = len(pack('Q', 0))
@@ -100,10 +102,10 @@ def extract_countinghash_info(filename):
         use_bigcount, = unpack('B', f.read(1))
         ksize, = unpack('I', f.read(uint_size))
         n_tables, = unpack('B', f.read(1))
-        table_size, = unpack('Q', f.read(ulonglong_size))    
+        table_size, = unpack('Q', f.read(ulonglong_size))
 
     return ksize, round(table_size, -2), n_tables, use_bigcount, version, ht_type
-        
+
 
 def calc_expected_collisions(ht):
     """
