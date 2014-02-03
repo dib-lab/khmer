@@ -5,4 +5,7 @@ Some users have reported that normalize-by-median.py will utilize more
 memory than it was configured for. This is being investigated in
 https://github.com/ged-lab/khmer/issues/266
 
-
+Some FASTQ files confuse our parser when running with more than one thread.
+For example, while using load-into-counting.py. If you experience this then
+add "--threads=1" to your command line. This issue is being tracked in
+https://github.com/ged-lab/khmer/issues/249
