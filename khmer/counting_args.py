@@ -5,6 +5,7 @@
 #
 import os
 import argparse
+import khmer
 
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
