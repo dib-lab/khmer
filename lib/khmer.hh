@@ -22,8 +22,22 @@ extern "C"
 #   define SSIZE_MAX	((ssize_t)(SIZE_MAX / 2))
 #endif
 
+/* The checker automatically defines this preprocessor name when creating
+   the custom attribute: */
+#if defined(WITH_CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF_ATTRIBUTE)
+  #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename) \
+__attribute__((cpychecker_type_object_for_typedef(typename)))
+#else
+  /* This handles the case where we're compiling with a "vanilla"
+     compiler that doesn't supply this attribute: */
+  #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
+#endif
+
 // C++ standard exceptions are subclassed almost ubiquitously.
 #include <exception>
+#include <set>
+#include <map>
+#include <queue>
 
 #   define MAX_COUNT 255
 #   define MAX_BIGCOUNT 65535
@@ -67,6 +81,36 @@ namespace khmer {
   struct InvalidStreamBuffer : public std:: exception
   { };
 
+
+  typedef unsigned int PartitionID;
+  typedef std::set<HashIntoType> SeenSet;
+  typedef std::set<PartitionID> PartitionSet;
+  typedef std::map<HashIntoType, PartitionID*> PartitionMap;
+  typedef std::map<PartitionID, PartitionID*> PartitionPtrMap;
+  typedef std::map<PartitionID, SeenSet*> PartitionsToTagsMap;
+  typedef std::set<PartitionID *> PartitionPtrSet;
+  typedef std::map<PartitionID, PartitionPtrSet*> ReversePartitionMap;
+  typedef std::queue<HashIntoType> NodeQueue;
+  typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
+  typedef std::map<HashIntoType, unsigned int> TagCountMap;
+  typedef std::map<PartitionID, unsigned int> PartitionCountMap;
+  typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+
+  // types used in @camillescott's sparse labeling extension  
+  typedef unsigned long long int Label;
+  typedef std::multimap<HashIntoType, Label*> TagLabelPtrMap;
+  typedef std::multimap<Label, HashIntoType*> LabelTagPtrMap;
+  typedef std::pair<HashIntoType, Label*> TagLabelPtrPair;
+  typedef std::pair<Label, HashIntoType*> LabelTagPtrPair;
+  typedef std::set<Label*> LabelPtrSet;
+  typedef std::set<HashIntoType*> TagPtrSet;
+  typedef std::map<Label, Label*> LabelPtrMap;
+
+  template <typename T>
+  void deallocate_ptr_set(T& s) {
+    for (typename T::iterator i = s.begin(); i != s.end(); ++i)
+      delete *i;
+  }
 }
 
 #endif // KHMER_HH

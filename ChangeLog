@@ -1,12 +1,18 @@
+2014-01-13  Camille Scott <camille.scott.w@gmail.com>
+
+* Added support for sparse graph labeling
+
+* Added script to reinflate partitions from read files using the 
+  labeling system, called sweep-reads-by-partition-buffered.py
+
+* Implemented __new__ methods for Hashbits, enforced inheritance
+  hierarchy between it and the new LabelHash class both in C++
+  and CPython API
+  
 2013-12-20  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
 * Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
   to retain FASTQ format in output.
-
-2013-12-18  Titus Brown  <titus@idyll.org>
-
-* Added a test to ensure that normalize-by-median.py has bigcount set to
-  False.
 
 2013-12-11  Michael R. Crusoe <mcrusoe@msu.edu>
 
@@ -21,7 +27,18 @@ interleave-reads.py, load-graph.py, load-into-counting.py
 normalize-by-median.py now exit with return code 1 instead of 255 as is
 standard.
 
-2013-11-22  CS Welcher  <cs.welcher@gmail.com>
+2013-12-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* doc/install.txt Add setup instructions for RHEL6 & fix invocation to get
+master branch to work for non-developers
+
+2013-12-18  Titus Brown  <titus@idyll.org>
+
+* Added a test to ensure that normalize-by-median.py has bigcount set to
+  False.
+
+
+2013-11-22  Camille Scott  <camille.scott.w@gmail.com>
 
 * Makefile: Added debug target for profiling.
 

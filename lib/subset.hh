@@ -7,10 +7,9 @@
 #ifndef SUBSET_HH
 #define SUBSET_HH
 
-#include "hashtable.hh"
-
 namespace khmer {
   class CountingHash;
+  class Hashtable;
   class Hashbits;
 
   struct pre_partition_info {
@@ -21,10 +20,10 @@ namespace khmer {
   };
 
   class SubsetPartition {
-    friend class Hashbits;
+    friend class Hashtable;
   protected:
     unsigned int next_partition_id;
-    Hashbits * _ht;
+    Hashtable * _ht;
     PartitionMap partition_map;
     ReversePartitionMap reverse_pmap;
 
@@ -36,7 +35,7 @@ namespace khmer {
 					   const HashIntoType kmer);
 
   public:
-    SubsetPartition(Hashbits * ht) : next_partition_id(2), _ht(ht) {
+    SubsetPartition(Hashtable * ht) : next_partition_id(2), _ht(ht) {
       ;
     };
 
@@ -64,11 +63,34 @@ namespace khmer {
     void load_partitionmap(std::string infile);
     void _validate_pmap();
 
+    void queue_neighbors(HashIntoType kmer_f,
+                                    HashIntoType kmer_r,
+                                    unsigned int breadth,
+                                    SeenSet& traversed_kmers,
+                                    NodeQueue& node_q,
+                                    std::queue<unsigned int>& breadth_q);
+
     void find_all_tags(HashIntoType kmer_f, HashIntoType kmer_r,
 		       SeenSet& tagged_kmers,
 		       const SeenSet& all_tags,
 		       bool break_on_stop_tags=false,
 		       bool stop_big_traversals=false);
+
+    unsigned int sweep_for_tags(const std::string& seq,
+				    SeenSet& tagged_kmers,
+				    const SeenSet& all_tags,
+				    unsigned int range,
+				    bool break_on_stop_tags,
+				    bool stop_big_traversals);
+				    
+    void find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
+					     HashIntoType kmer_r,
+					     SeenSet& tagged_kmers,
+					     const SeenSet& all_tags,
+					     BoundedCounterType min_count,
+					     BoundedCounterType max_count,
+					     bool break_on_stop_tags=false,
+					     bool stop_big_traversals=false);
 
     void do_partition(HashIntoType first_kmer,
 		      HashIntoType last_kmer,
@@ -76,6 +98,15 @@ namespace khmer {
 		      bool stop_big_traversals=false,
 		      CallbackFn callback=0,
 		      void * callback_data=0);
+
+    void do_partition_with_abundance(HashIntoType first_kmer,
+				     HashIntoType last_kmer,
+				     BoundedCounterType min_count,
+				     BoundedCounterType max_count,
+				     bool break_on_stop_tags=false,
+				     bool stop_big_traversals=false,
+				     CallbackFn callback=0,
+				     void * callback_data=0);
 
     void count_partitions(unsigned int& n_partitions,
 			  unsigned int& n_unassigned);
@@ -96,8 +127,14 @@ namespace khmer {
 
     void join_partitions_by_path(std::string sequence);
 
+    void partition_sizes(PartitionCountMap &cm,
+			 unsigned int& n_unassigned) const;
+
     void partition_size_distribution(PartitionCountDistribution &d,
 				    unsigned int& n_unassigned) const;
+
+    void partition_average_coverages(PartitionCountMap &cm,
+				     CountingHash * ht) const;
 
     unsigned int repartition_largest_partition(unsigned int, unsigned int,
 					       unsigned int, CountingHash&);
@@ -108,6 +145,13 @@ namespace khmer {
     void _merge_other(HashIntoType tag,
 		      PartitionID other_partition,
 		      PartitionPtrMap& diskp_to_pp);
+
+    void report_on_partitions();
+
+    void compare_to_partition(PartitionID, SubsetPartition *, PartitionID,
+			      unsigned int &n_only1,
+			      unsigned int &n_only2,
+			      unsigned int &n_shared);
   };
 }
 

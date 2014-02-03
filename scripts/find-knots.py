@@ -43,7 +43,8 @@ EXCURSION_KMER_COUNT_THRESHOLD = 2
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Find all highly connected k-mers.")
+        description="Find all highly connected k-mers.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
                         default=DEFAULT_COUNTING_HT_N,
