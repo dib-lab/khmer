@@ -16,5 +16,9 @@ def print_error(msg):
 
     print >>sys.stderr, msg
 
+def iter_kmers(seq, k):
+    n = (len(seq) - k) + 1
+    for i in xrange(n):
+        yield seq[i:i+k]
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

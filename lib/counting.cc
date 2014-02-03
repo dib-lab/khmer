@@ -501,8 +501,27 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
 
   return seq.length();
 }
+/*
+unsigned long * CountingHash::find_kmers_below_abund(std::string seq,
+                                          
+                                          unsigned int start_pos,
+                                          BoundedCounterType max_abund) {
+    
+    unsigned int counts_len = seq.length() - start_pos - ksize() + 1
+    if (counts_len < 1) {
+        return NULL;
+    }
+    unsigned long * counts = new unsigned long[counts_len];
 
+    if (!check_and_normalize_read(seq)) {
+        return NULL;
+    }
 
+    for (int i=0, j=start_pos; i, j<seq.length(); i++, j++) {
+        
+    }
+}
+*/
 void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
 {
    std::string filename(infilename);
