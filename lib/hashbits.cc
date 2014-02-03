@@ -138,7 +138,7 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
   int block_size = total_reads/100;
   
   total_reads = 0;
-  khmer::HashIntoType start = 0, stop = 0;
+  HashIntoType start = 0, stop = 0;
   
   delete parser;
   parser = IParser::get_parser(filename.c_str());

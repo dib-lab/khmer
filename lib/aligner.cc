@@ -6,6 +6,8 @@
 
 #include "aligner.hh"
 
+namespace khmer {
+
 // http://www.wesleysteiner.com/professional/del_fun.html
 template<class T>
 struct del_fun_t {
@@ -131,7 +133,7 @@ std::string Aligner::extractString(Node* goal,
    return ret;
 }
 
-CandidateAlignment Aligner::align(khmer::CountingHash * ch,
+CandidateAlignment Aligner::align(CountingHash * ch,
                                     const std::string& seq,
                                     const std::string& kmer,
                                     int index) {
@@ -347,3 +349,4 @@ CandidateAlignment Aligner::alignRead(const std::string& read) {
    CandidateAlignment retAln = CandidateAlignment(readDels, graphAlign);
    return retAln;
 }
+};

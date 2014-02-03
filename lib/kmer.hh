@@ -14,7 +14,7 @@
 #include <set>
 #include <string>
 
-using namespace khmer;
+namespace khmer {
 
 class Kmer;
 
@@ -48,6 +48,8 @@ public:
 
    bool operator== (const Kmer& b) const;
    bool operator< (const Kmer& b) const;
+};
+
 };
 
 #endif // KMER_HH

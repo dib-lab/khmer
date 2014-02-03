@@ -14,13 +14,14 @@
 #include "ktable.hh"
 
 using namespace std;
-using namespace khmer;
 
 //
 // _hash: hash a k-length DNA sequence into a 64-bit number.
 //
 
-HashIntoType khmer::_hash(const char * kmer, const WordLength k, 
+namespace khmer {
+
+HashIntoType _hash(const char * kmer, const WordLength k, 
 			  HashIntoType& _h, HashIntoType& _r)
 {
   // sizeof(HashIntoType) * 8 bits / 2 bits/base  
@@ -48,23 +49,23 @@ HashIntoType khmer::_hash(const char * kmer, const WordLength k,
 
 // _hash: return the maximum of the forward and reverse hash.
 
-HashIntoType khmer::_hash(const char * kmer, const WordLength k)
+HashIntoType _hash(const char * kmer, const WordLength k)
 {
   HashIntoType h = 0;
   HashIntoType r = 0;
 
-  return _hash(kmer, k, h, r);
+  return khmer::_hash(kmer, k, h, r);
 }
 
 // _hash_forward: return the hash from the forward direction only.
 
-HashIntoType khmer::_hash_forward(const char * kmer, WordLength k)
+HashIntoType _hash_forward(const char * kmer, WordLength k)
 {
   HashIntoType h = 0;
   HashIntoType r = 0;
 
   
-  _hash(kmer, k, h, r);
+  khmer::_hash(kmer, k, h, r);
   return h;			// return forward only
 }
 
@@ -72,7 +73,7 @@ HashIntoType khmer::_hash_forward(const char * kmer, WordLength k)
 // _revhash: given an unsigned int, return the associated k-mer.
 //
 
-std::string khmer::_revhash(HashIntoType hash, WordLength k)
+std::string _revhash(HashIntoType hash, WordLength k)
 {
   std::string s = "";
 
@@ -115,7 +116,7 @@ void KTable::consume_string(const std::string &s)
   HashIntoType h;
   HashIntoType r;
 
-  _hash(sp, _ksize, h, r);
+  khmer::_hash(sp, _ksize, h, r);
   
   _counts[uniqify_rc(h, r)]++;
 
@@ -161,3 +162,4 @@ KTable * KTable::intersect(const KTable &other) const
   }
   return intersection;
 }
+};

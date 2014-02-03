@@ -9,6 +9,7 @@
 #include <iostream>
 using namespace std;
 
+namespace khmer {
 
 Kmer::Kmer(std::string kmer) {
    _hash(kmer.c_str(), kmer.size(), h, r);   
@@ -76,18 +77,4 @@ bool Kmer::operator< (const Kmer &b) const {
       return 0;
    }
 }
-
-/*
-int main() {
-   Kmer a = Kmer("AAAACCCC");
-   Kmer b = Kmer("GGGGTTTT");   
-
-   cout << a.toString() << endl;
-   cout << a.toStringH() << endl;
-   cout << a.toStringR() << endl;
-   cout << (a == b) << endl;
-   cout << (a < b) << endl;
-
-   return 0;
-}
-*/
+};

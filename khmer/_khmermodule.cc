@@ -23,6 +23,8 @@
 #include "aligner.hh"
 #include "labelhash.hh"
 
+using namespace khmer;
+
 //
 // Function necessary for Python loading:
 //
