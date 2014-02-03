@@ -5,7 +5,7 @@
 //
 
 #include "node.hh"
-
+namespace khmer {
 enum { A, C, G, T };
 
 unsigned int factorial(unsigned int n) {
@@ -231,3 +231,4 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 
    return ret;
 }
+};

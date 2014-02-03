@@ -14,6 +14,8 @@
 #include <set>
 #include <vector>
 
+namespace khmer {
+
 class CandidateAlignment {
 public:
    std::map<int,int> readDeletions;
@@ -107,6 +109,8 @@ public:
 
    void printErrorFootprint(const std::string& read);
    CandidateAlignment alignRead(const std::string&);
+};
+
 };
 
 #endif // ALIGNER_HH

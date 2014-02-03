@@ -14,6 +14,8 @@
 
 #include <cmath>
 
+namespace khmer {
+
 extern unsigned int factorial(unsigned int n);
 extern double pois(double l, unsigned int k);
 extern double weight_nonerror(unsigned int kCov, double lambOne, double lambTwo);
@@ -60,4 +62,5 @@ public:
    }
 };
 
+};
 #endif //FILE_HH
