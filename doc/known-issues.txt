@@ -1,8 +1,0 @@
-Known Issues
-============
-
-Some users have reported that normalize-by-median.py will utilize more
-memory than it was configured for. This is being investigated in
-https://github.com/ged-lab/khmer/issues/266
-
-
