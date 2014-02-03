@@ -1042,10 +1042,10 @@ static PyObject * ktable_get(PyObject * self, PyObject * args)
     return NULL;
   }
 
-  ExactCounterType count = 0;
+  khmer::ExactCounterType count = 0;
 
   if(PyLong_Check(arg)) {
-    HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
+    khmer::HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
     count = ktable->get_count(pos);
   } else if (PyInt_Check(arg)) {
     long pos = PyInt_AsLong(arg);
@@ -1598,7 +1598,7 @@ static PyObject * hash_consume_high_abund_kmers(PyObject * self,
 
   unsigned int n_consumed;
   n_consumed = counting->consume_high_abund_kmers(long_str,
-					     (BoundedCounterType) min_count);
+						  (khmer::BoundedCounterType) min_count);
 
   return PyInt_FromLong(n_consumed);
 }
@@ -2051,7 +2051,7 @@ static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self, PyOb
   khmer::CountingHash * counting = me->counting;
 
   const char * kmer_s = NULL;
-  BoundedCounterType min_count, max_count;
+  khmer::BoundedCounterType min_count, max_count;
 
   if (!PyArg_ParseTuple(args, "sHH", &kmer_s, &min_count, &max_count)) {
     return NULL;
@@ -2092,7 +2092,7 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self, PyObj
   khmer::HashIntoType start_kmer = 0, end_kmer = 0;
   PyObject * break_on_stop_tags_o = NULL;
   PyObject * stop_big_traversals_o = NULL;
-  BoundedCounterType min_count, max_count;
+  khmer::BoundedCounterType min_count, max_count;
 
   if (!PyArg_ParseTuple(args, "HH|KKOOO",
 			&min_count, &max_count,
@@ -4048,7 +4048,7 @@ static PyObject * subset_compare_partitions(PyObject * self,
   khmer::SubsetPartition * subset1_p = me->subset;
 
   PyObject * subset2_obj = NULL;
-  PartitionID pid1, pid2;	// @CTB ensure that these are unsigned?
+  khmer::PartitionID pid1, pid2;	// @CTB ensure that these are unsigned?
 
   if (!PyArg_ParseTuple(args, "IOI",
 			&pid1, &subset2_obj, &pid2)) {
@@ -4407,7 +4407,7 @@ static PyObject * labelhash_sweep_label_neighborhood(PyObject * self, PyObject *
   }
   
   //std::pair<TagLabelPtrPair::iterator, TagLabelPtrPair::iterator> ret;
-  LabelPtrSet found_labels;
+  khmer::LabelPtrSet found_labels;
   
   bool exc_raised = false;
   //unsigned int num_traversed = 0;
@@ -4864,7 +4864,7 @@ static void khmer_subset_dealloc(PyObject* self)
 static PyObject * forward_hash(PyObject * self, PyObject * args)
 {
   const char * kmer;
-  WordLength ksize;
+  khmer::WordLength ksize;
 
   if (!PyArg_ParseTuple(args, "sb", &kmer, &ksize)) {
     return NULL;
@@ -4881,7 +4881,7 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
 static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 {
   const char * kmer;
-  WordLength ksize;
+  khmer::WordLength ksize;
 
   if (!PyArg_ParseTuple(args, "sb", &kmer, &ksize)) {
     return NULL;
@@ -4904,7 +4904,7 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 static PyObject * reverse_hash(PyObject * self, PyObject * args)
 {
   khmer::HashIntoType val;
-  WordLength ksize;
+  khmer::WordLength ksize;
   
   if (!PyArg_ParseTuple(args, "Kb", &val, &ksize)) {
     return NULL;

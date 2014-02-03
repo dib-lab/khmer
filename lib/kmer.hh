@@ -14,27 +14,25 @@
 #include <set>
 #include <string>
 
-using namespace khmer;
-
 class Kmer;
 
 class Kmer {
 private:
-   HashIntoType h;
-   HashIntoType r;
+   khmer::HashIntoType h;
+   khmer::HashIntoType r;
    unsigned int k;
    unsigned char direction; // 1 if h is forward
 
 public:
    Kmer(std::string kmer);
-   Kmer(HashIntoType, HashIntoType, unsigned char, unsigned int);
+   Kmer(khmer::HashIntoType, khmer::HashIntoType, unsigned char, unsigned int);
    Kmer() { }
 
-   HashIntoType getUniqueHash() const;
+   khmer::HashIntoType getUniqueHash() const;
 
    unsigned int getK();
-   HashIntoType getH();
-   HashIntoType getR();
+   khmer::HashIntoType getH();
+   khmer::HashIntoType getR();
    unsigned char getDir();
 
    std::string toString();
@@ -43,8 +41,8 @@ public:
    std::set<Kmer> getNeighbors();
    std::set<Kmer> getForwardNeighbors();
    std::set<Kmer> getBackwardNeighbors();
-   std::set<Kmer> getForwardStates(CountingHash*);
-   std::set<Kmer> getBackwardStates(CountingHash*);
+   std::set<Kmer> getForwardStates(khmer::CountingHash*);
+   std::set<Kmer> getBackwardStates(khmer::CountingHash*);
 
    bool operator== (const Kmer& b) const;
    bool operator< (const Kmer& b) const;

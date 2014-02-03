@@ -78,8 +78,8 @@ bool Node::operator< (const Node &param) const {
 }
 
 Kmer Node::makeNextKmer(unsigned char forward, char b) {
-   HashIntoType ret_h;
-   HashIntoType ret_r;
+   khmer::HashIntoType ret_h;
+   khmer::HashIntoType ret_r;
 
    const unsigned int rc_left_shift = kmer.getK()*2 - 2;
 
@@ -117,7 +117,7 @@ Node::Node(Node* _parent,
    }
 }
 
-std::queue<Node*> Node::enumerate(CountingHash* ch,
+std::queue<Node*> Node::enumerate(khmer::CountingHash* ch,
                          ScoringMatrix* sm,
                          unsigned char forward,
                          const std::string& seq,
