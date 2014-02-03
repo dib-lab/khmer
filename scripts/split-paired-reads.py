@@ -20,7 +20,8 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Split interleaved reads into two files, left and right.')
+        description='Split interleaved reads into two files, left and right.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infile')
     args = parser.parse_args()

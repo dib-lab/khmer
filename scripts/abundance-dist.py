@@ -19,7 +19,8 @@ import os
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Output k-mer abundance distribution.")
+        description="Output k-mer abundance distribution.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('hashname')
     parser.add_argument('datafile')

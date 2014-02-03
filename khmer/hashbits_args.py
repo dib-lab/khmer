@@ -13,8 +13,9 @@ DEFAULT_MIN_HASHSIZE = 1e6
 
 def build_construct_args():
 
-    parser = argparse.ArgumentParser(description=
-                                     'Build & load a Bloom filter.')
+    parser = argparse.ArgumentParser(
+        description='Build & load a Bloom filter.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)

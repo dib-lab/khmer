@@ -61,7 +61,7 @@ build_depends = list(extra_objs)
 build_depends.extend(map(
     lambda bn: path_join("lib", bn + ".hh"),
     [
-        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting",
+        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting", "hashbits", "labelhash",
     ]
 ))
 
@@ -70,7 +70,7 @@ sources.extend(map(
     lambda bn: path_join("lib", bn + ".cc"),
     [
         "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
-        "read_parsers", "ktable", "hashtable", "hashbits", "counting",
+        "read_parsers", "ktable", "hashtable", "hashbits", "labelhash", "counting",
         "subset", "aligner", "scoringmatrix", "node", "kmer",
     ]
 ))
@@ -103,21 +103,21 @@ setup_metadata = \
         "long_description": open("README.rst").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
         ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
-        ' Jason Pell, Jared Simpson, C. S. Welcher,'
+        ' Jason Pell, Jared Simpson, Camille Scott,'
         ' Qingpeng Zhang, and C. Titus Brown',
         "author_email": 'khmer-project@idyll.org',
-        #"maintainer": 'Michael R. Crusoe', # this overrides the author field
-        #"maintainer_email": 'mcrusoe@msu.edu', # so don't include it
-        #http://docs.python.org/2/distutils/setupscript.html
-        # #additiona-meta-data note #3
+        # "maintainer": 'Michael R. Crusoe', # this overrides the author field
+        # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
+        # http://docs.python.org/2/distutils/setupscript.html
+        # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
         "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
         "setup_requires": ['nose >= 1.0', 'sphinx', ],
         "scripts": scripts,
         "ext_modules": [extension_mod, ],
-        #"platforms": '', # empty as is conveyed by the classifiers below
-        #"license": '', # empty as is conveyed by the classifier below
+        # "platforms": '', # empty as is conveyed by the classifiers below
+        # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
         "classifiers":  [
             "Development Status :: 4 - Beta",
@@ -132,7 +132,7 @@ setup_metadata = \
             "Programming Language :: C++",
             "Programming Language :: Python :: 2.7",
             "Topic :: Scientific/Engineering :: Bio-Informatics",
-            ],
+        ],
     }
 
 # Only run lib setup when needed, not on every invocation
@@ -140,6 +140,7 @@ from distutils.command.build_ext import build_ext as _build_ext
 
 
 class build_ext(_build_ext):
+
         """Specialized Python extension builder."""
 
         def run(self):

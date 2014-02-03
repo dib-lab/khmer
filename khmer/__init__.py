@@ -15,6 +15,8 @@ from _khmer import forward_hash_no_rc
 from _khmer import reverse_hash
 from _khmer import get_config
 from _khmer import ReadParser
+from _khmer import _LabelHash
+from _khmer import _Hashbits
 
 from ._version import get_versions
 __version__ = get_versions()['version']
@@ -148,4 +150,27 @@ def get_n_primes_above_x(n, x):
         i += 2
     return primes
 
+'''
+Expose the cpython objects with __new__ implementations.
+These constructors add the functionality provided by the existing
+factory methods to the constructors defined over in cpython land.
+Additional functionality can be added to these classes as appropriate.
+'''
 
+
+class LabelHash(_LabelHash):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_above_x(n_tables, starting_size)
+        c = _LabelHash.__new__(cls, k, primes)
+        c.primes = primes
+        return c
+
+
+class Hashbits(_Hashbits):
+
+    def __new__(cls, k, starting_size, n_tables):
+        primes = get_n_primes_above_x(n_tables, starting_size)
+        c = _Hashbits.__new__(cls, k, primes)
+        c.primes = primes
+        return c

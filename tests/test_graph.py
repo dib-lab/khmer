@@ -241,7 +241,7 @@ class Test_Partitioning(object):
 
         print open(output_file).read()
 
-        x = set([ r.accuracy for r in screed.open(output_file) ])
+        x = set([r.accuracy for r in screed.open(output_file)])
         assert x, x
 
     @attr('highmem')
