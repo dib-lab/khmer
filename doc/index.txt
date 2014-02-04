@@ -54,6 +54,7 @@ Contents:
    details
    development
    galaxy
+   known-issues
    sequence-access-patterns
    release
    crazy-ideas
