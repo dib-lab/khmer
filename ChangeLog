@@ -2,6 +2,7 @@
 
 * Updated install instructions. We recommend OS X users and those Linux
 users without root access to install virtualenv instead of pip.
+* New documentation: doc/known-issues.txt
 
 2014-01-13  Camille Scott <camille.scott.w@gmail.com>
 
