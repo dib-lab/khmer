@@ -1,3 +1,7 @@
+2014-02-03 Camille Scott <camille.scott.w@gmail.com>
+
+* Standardized command line arguments in khmer_args; added version flag
+
 2014-01-13  Camille Scott <camille.scott.w@gmail.com>
 
 * Added support for sparse graph labeling
