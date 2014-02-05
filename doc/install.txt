@@ -105,4 +105,4 @@ Repeat the appropriate installation procedure from above but add "--no-clean"
 to the ``pip`` invocation.
 
 The source will be in the ``khmerEnv/build/khmer`` directory. Run
-``make tests`` there.
+``make test`` there.
