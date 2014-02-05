@@ -107,7 +107,8 @@ class ReadBufferManager:
                     buf_flush=self.buffer_flush)
 
     def flush_buffer(self, buf_id):
-        fn = '{}_{}.fa'.format(self.output_pref, buf_id)
+        fn = '{prefix}_{buffer_id}.fa'.format(prefix=self.output_pref,
+                                              buffer_id=buf_id)
         fpath = os.path.join(self.outdir, fn)
         try:
             outfp = open(fpath, 'a')
