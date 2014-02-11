@@ -18,13 +18,13 @@ import Queue
 import os.path
 
 import khmer
-from khmer.hashbits_args import build_construct_args
-from khmer.counting_args import report_on_config
+from khmer.khmer_args import build_hashbits_args
+from khmer.khmer_args import report_on_config
 from khmer.threading_args import add_threading_args
 
 
 def main():
-    parser = build_construct_args()
+    parser = build_hashbits_args()
     add_threading_args(parser)
     parser.add_argument('--no-build-tagset', '-n', default=False,
                         action='store_true', dest='no_build_tagset',
@@ -33,7 +33,7 @@ def main():
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
-    report_on_config(args)
+    report_on_config(args, hashtype='hashbits')
 
     K = args.ksize
     HT_SIZE = args.min_hashsize

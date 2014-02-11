@@ -17,7 +17,7 @@ Authors
 ~~~~~~~
 
 This handbook distills the cumulative expertise of Adina Howe, Titus
-Brown, Erich Schwarz, Jason Pell, Chris Welcher, Elijah Lowe, Kanchan
+Brown, Erich Schwarz, Jason Pell, Camille Scott, Elijah Lowe, Kanchan
 Pavangadkar, Likit Preeyanon, and others.
 
 Introduction

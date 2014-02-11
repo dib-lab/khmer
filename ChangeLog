@@ -1,8 +1,6 @@
-2014-01-03  Michael R. Crusoe <mcrusoe@msu.edu>
+2014-02-03 Camille Scott <camille.scott.w@gmail.com>
 
-* Updated install instructions. We recommend OS X users and those Linux
-users without root access to install virtualenv instead of pip.
-* New documentation: doc/known-issues.txt
+* Standardized command line arguments in khmer_args; added version flag
 
 2014-01-13  Camille Scott <camille.scott.w@gmail.com>
 
@@ -14,7 +12,13 @@ users without root access to install virtualenv instead of pip.
 * Implemented __new__ methods for Hashbits, enforced inheritance
   hierarchy between it and the new LabelHash class both in C++
   and CPython API
-  
+
+2014-01-03  Michael R. Crusoe <mcrusoe@msu.edu>
+
+* Updated install instructions. We recommend OS X users and those Linux
+users without root access to install virtualenv instead of pip.
+* New documentation: doc/known-issues.txt
+ 
 2013-12-20  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
 * Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
@@ -42,7 +46,6 @@ master branch to work for non-developers
 
 * Added a test to ensure that normalize-by-median.py has bigcount set to
   False.
-
 
 2013-11-22  Camille Scott  <camille.scott.w@gmail.com>
 
@@ -84,7 +87,7 @@ being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and cswelcher. 
+* contributors to this release are: ctb, mr-c and camillescott. 
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 
