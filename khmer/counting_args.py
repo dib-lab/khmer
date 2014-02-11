@@ -13,6 +13,11 @@ DEFAULT_MIN_HASHSIZE = 1e6
 
 
 def build_construct_args(descr=None):
+    """ Build common options for counting hash scripts.
+
+    Returns an argparse.ArgumentParser.
+
+    """
 
     if descr is None:
         descr = 'Build & load a counting Bloom filter.'
@@ -36,12 +41,18 @@ def build_construct_args(descr=None):
     parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
                         default=env_hashsize,
                         help='lower bound on hashsize to use')
-    parser.add_argument('--version', action='version', version='%(prog)s ' + khmer.__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
 
     return parser
 
 
 def build_counting_multifile_args():
+    """Build common options for multi-file counting hash scripts.
+
+    Returns an argparse.ArgumentParser.
+
+    """
     parser = argparse.ArgumentParser(
         description='Use a counting Bloom filter.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
