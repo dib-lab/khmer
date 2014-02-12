@@ -55,4 +55,6 @@ khmer is under the BSD license; see doc/LICENSE.txt. Distribution,
 modification and redistribution, incorporation into other software, and
 pretty much everything else is allowed.
 
-MRC 2013-10-22
+khmer project contributors also edit documents collaboratively at `our wiki <https://github.com/ged-lab/khmer/wiki/_pages>`__.
+
+MRC 2014-02-12
