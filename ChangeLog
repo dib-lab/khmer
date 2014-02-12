@@ -1,5 +1,6 @@
-2014-01-03  Michael R. Crusoe <mcrusoe@msu.edu>
+2014-02-03  Michael R. Crusoe <mcrusoe@msu.edu>
 
+* Normalized C++ namespace usage to fix CID 1054792
 * Updated install instructions. We recommend OS X users and those Linux
 users without root access to install virtualenv instead of pip.
 * New documentation: doc/known-issues.txt
@@ -15,7 +16,7 @@ users without root access to install virtualenv instead of pip.
   hierarchy between it and the new LabelHash class both in C++
   and CPython API
   
-2013-12-20  Titus Brown  <t@Titus-MacBook-Air-2.local>
+2013-12-20  Titus Brown  <titus@idyll.org>
 
 * Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
   to retain FASTQ format in output.
