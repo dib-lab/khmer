@@ -24,7 +24,7 @@ skip to step 4).
    Downloads -> Command Line Tools (requires root)
 
 #) From a terminal install virtualenv. You'll need the URL of the `latest
-``virtualenv`` release<https://pypi.python.org/packages/source/v/virtualenv/>`__.
+virtualenv release <https://pypi.python.org/packages/source/v/virtualenv/>`__.
 
 ::
 
