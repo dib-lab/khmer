@@ -18,7 +18,9 @@ import screed
 import os
 import khmer
 from itertools import izip
-from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_counting_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import add_loadhash_args
+from khmer.khmer_args import report_on_config
 import argparse
 
 DEFAULT_DESIRED_COVERAGE = 10
@@ -122,13 +124,11 @@ def handle_error(error, output_name, input_name, ht):
 
 
 def main():
-    parser = build_construct_args()
+    parser = build_counting_args()
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
-    parser.add_argument('-l', '--loadhash', dest='loadhash',
-                        default='')
     parser.add_argument('-R', '--report-to-file', dest='report_file',
                         type=argparse.FileType('w'))
     parser.add_argument('-f', '--force-processing', dest='force',
@@ -138,30 +138,11 @@ def main():
                         type=int, help='dump hashtable every d files',
                         default=-1)
     parser.add_argument('input_filenames', nargs='+')
+    add_loadhash_args(parser)
 
     args = parser.parse_args()
 
-    if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE and not args.loadhash:
-            print >>sys.stderr, \
-                "** WARNING: hashsize is default!  " \
-                "You absodefly want to increase this!\n** " \
-                "Please read the docs!"
-
-        print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, \
-            ' - kmer size =    {ksize:d} \t\t(-k)'.format(ksize=args.ksize)
-        print >>sys.stderr, \
-            ' - n hashes =     {nhash:d} \t\t(-N)'.format(nhash=args.n_hashes)
-        print >>sys.stderr, \
-            ' - min hashsize = {mh:-5.2g} \t(-x)'.format(mh=args.min_hashsize)
-        print >>sys.stderr, ' - paired = {pr} \t\t(-p)'.format(pr=args.paired)
-        print >>sys.stderr, ''
-        print >>sys.stderr, \
-            'Estimated memory usage is {prod:.2g} bytes \
-            (n_hashes x min_hashsize)'.format(prod=args.n_hashes
-                                              * args.min_hashsize)
-        print >>sys.stderr, '-' * 8
+    report_on_config(args)
 
     K = args.ksize
     HT_SIZE = args.min_hashsize

@@ -31,7 +31,7 @@ import sys
 import os
 import time
 import khmer
-from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_hashbits_args, report_on_config
 
 
 DEFAULT_NUM_BUFFERS = 50000
@@ -46,7 +46,7 @@ MIN_KSIZE = 21
 
 def fmt_fasta(name, seq, labels=[]):
     return '>{name}\t{labels}\n{seq}\n'.format(name=name,
-            labels='\t'.join([str(l) for l in labels]), seq=seq)
+                                               labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
 def write_seq(fp, name, seq, labels=[]):
@@ -152,7 +152,7 @@ class ReadBufferManager:
 
 def main():
 
-    parser = build_construct_args('Takes a partitioned reference file \
+    parser = build_hashbits_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
     parser.epilog = epilog
@@ -173,37 +173,20 @@ def main():
                         default=DEFAULT_NUM_BUFFERS,
                         help='Max individual label buffers before flushing')
     parser.add_argument(dest='input_fastp', help='Partitioned reference fasta')
-    parser.add_argument('input_files', nargs='+', help='Reads to be swept/sorted')
+    parser.add_argument('input_files', nargs='+',
+                        help='Reads to be swept/sorted')
     args = parser.parse_args()
+
+    if args.min_hashsize < MIN_HSIZE:
+        args.min_hashsize = MIN_HSIZE
+    if args.ksize < MIN_KSIZE:
+        args.ksize = MIN_KSIZE
+
+    report_on_config(args, hashtype='hashbits')
 
     K = args.ksize
     HT_SIZE = args.min_hashsize
-    if HT_SIZE < MIN_HSIZE:
-        HT_SIZE = MIN_HSIZE
-    if K < MIN_KSIZE:
-        K = MIN_KSIZE
     N_HT = args.n_hashes
-
-    if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print >>sys.stderr, \
-                "** WARNING: hashsize is default!  " \
-                "You absodefly want to increase this!\n** " \
-                "Please read the docs!"
-
-        print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, \
-            ' - kmer size =    {ksize:d} \t\t(-k)'.format(ksize=K)
-        print >>sys.stderr, \
-            ' - n hashes =     {nhash:d} \t\t(-N)'.format(nhash=args.n_hashes)
-        print >>sys.stderr, \
-            ' - min hashsize = {mh:-5.2g} \t(-x)'.format(mh=HT_SIZE)
-        print >>sys.stderr, ''
-        print >>sys.stderr, \
-            'Estimated memory usage is {prod:.2g} bytes \
-            (n_hashes x min_hashsize / 8)'.format(
-                            prod=args.n_hashes * HT_SIZE / 8)
-        print >>sys.stderr, '-' * 8
 
     traversal_range = args.traversal_range
     input_fastp = args.input_fastp
@@ -234,14 +217,14 @@ def main():
     start_t = time.clock()
     for read_file in input_files:
         print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
-                                                        read_file=read_file)
+            read_file=read_file)
         file_t = 0.0
         try:
             read_fp = screed.open(read_file)
         except IOError as e:
             print >>sys.stderr, '!! ERROR: !!', e
             print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(
-                                                                 fn=read_file)
+                fn=read_file)
         else:
             for n, record in enumerate(read_fp):
                 if n % 50000 == 0:
@@ -251,8 +234,8 @@ def main():
                     print >>sys.stderr, '\tswept {n} reads [{nc} labeled, \
                                          {no} orphaned] \
                                         ** {sec}s ({sect}s total)' \
-                                        .format(n=n, nc=n_labeled, 
-                                                no=n_orphaned, 
+                                        .format(n=n, nc=n_labeled,
+                                                no=n_orphaned,
                                                 sec=batch_t, sect=file_t)
                     start_t = time.clock()
                 seq = record.sequence
