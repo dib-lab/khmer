@@ -1,9 +1,10 @@
-2014-02-03  Michael R. Crusoe <mcrusoe@msu.edu>
+2014-02-18  Michael R. Crusoe <mcrusoe@msu.edu>
 
 * Normalized C++ namespace usage to fix CID 1054792
 * Updated install instructions. We recommend OS X users and those Linux
 users without root access to install virtualenv instead of pip.
 * New documentation: doc/known-issues.txt
+* Added code review checklist: doc/development.txt
 
 2014-01-13  Camille Scott <camille.scott.w@gmail.com>
 
