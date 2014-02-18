@@ -54,27 +54,17 @@ If you want your code integrated then it needs to be mergable
 
 Example pull request update using the command line:
 
-1. Clone the source of the pull request (if needed)
-```git clone git@github.com:mr-c/khmer.git```
-2. Checkout the source branch of the pull request
-```git checkout my-pull-request```
-3. Pull in the destination of the pull request and resolve any conflicts.
-```git pull git@github.com:ged-lab/khmer.git master```
-4. Push your update to the source of the pull request
-```git push```
-5. Jenkins will automatically attempt to build and test your pull requests
-
-
-
-#changes need to be documented in the Changelog
+ #. Clone the source of the pull request (if needed) ``git clone git@github.com:mr-c/khmer.git``
+ #. Checkout the source branch of the pull request ``git checkout my-pull-request``
+ #. Pull in the destination of the pull request and resolve any conflicts ``git pull git@github.com:ged-lab/khmer.git master``
+ #. Push your update to the source of the pull request ``git push``
+ #. Jenkins will automatically attempt to build and test your pull requests.
 
 Testing
 -------
 
-setup.py nosetest is the canonical way to run the tests.  This is what
-'make test' does.
-
-# this is configured via setup.cfg in the nosetest stanza
+``./setup.py nosetest`` is the canonical way to run the tests.  This is what
+``make test`` does.
 
 Code coverage
 -------------
