@@ -19,8 +19,18 @@ For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ seems
 like a good standard to default to, and there are tools to check it,
 too.
 
-Code Review Checklist
----------------------
+Code Review
+-----------
+
+Please read `11 Best Practices for Peer Code Review
+<http://smartbear.com/SmartBear/media/pdfs/WP-CC-11-Best-Practices-of-Peer-Code-Review.pdf>`__.
+
+See also `Code reviews: the lab meeting for code
+<http://fperez.org/py4science/code_reviews.html>`__ and `the PyCogent coding guidelines
+<http://pycogent.org/coding_guidelines.html>`__.
+
+Checklist
+=========
 
 Copy and paste the following into a pull-request when it is ready for review::
    
