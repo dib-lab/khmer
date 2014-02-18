@@ -25,6 +25,19 @@ and running ```:%!astyle``` to reformat. The four space indentation can be set w
 For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ is our
 standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful. 
 
+Code Review Checklist
+---------------------
+
+Copy and paste the following into a pull-request when it is ready for review::
+   
+   - [ ] Is it mergable
+   - [ ] Did it pass the tests?
+   - [ ] If it introduce new functionality in scripts/ is it tested?
+     Check for code coverage.
+   - [ ] Is it well formatted? Look at `pep8`/`pylint`, `cppcheck`, and
+     `make doc` output. Use `autopep8` and `astyle -A10` if needed. 
+   - [ ] Is it documented in the Changelog?
+
 git and github strategies
 -------------------------
 

@@ -1,3 +1,11 @@
+2014-02-18  Michael R. Crusoe <mcrusoe@msu.edu>
+
+* Normalized C++ namespace usage to fix CID 1054792
+* Updated install instructions. We recommend OS X users and those Linux
+users without root access to install virtualenv instead of pip.
+* New documentation: doc/known-issues.txt
+* Added code review checklist: doc/development.txt
+
 2014-01-13  Camille Scott <camille.scott.w@gmail.com>
 
 * Added support for sparse graph labeling
@@ -9,7 +17,7 @@
   hierarchy between it and the new LabelHash class both in C++
   and CPython API
   
-2013-12-20  Titus Brown  <t@Titus-MacBook-Air-2.local>
+2013-12-20  Titus Brown  <titus@idyll.org>
 
 * Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
   to retain FASTQ format in output.
