@@ -390,7 +390,7 @@ def test_normalize_by_median_version():
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
     status, out, err = popenscript(script, args)
-    assert err.startswith('normalize-by-median.py ')
+    assert err.startswith('khmer ')
 
 
 def test_normalize_by_median_2():
