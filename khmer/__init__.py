@@ -11,6 +11,28 @@ from khmer._khmer import _new_hashbits
 from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
+from khmer._khmer import new_readaligner # sandbox/{ec,error-correct-pass2}.py
+
+from khmer._khmer import forward_hash # figuregen/*.py
+# tests/test_{functions,counting_hash,ktable,labelhash,counting_single}.py
+
+from khmer._khmer import new_hashtable
+# sandbox/{occupy,ctb-iterative-bench{-2-old}}.py
+# tests/{test_c_wrapper,test_counting_single}.py
+
+from khmer._khmer import forward_hash_no_rc # tests/test_functions.py
+
+from khmer._khmer import reverse_hash # tests/test_{functions,ktable}.py
+# tests/counting_single.py
+
+from khmer._khmer import get_config # tests/test_{read_parsers,khmer_config}.py
+# tests/test_ktable.py,scripts/{filter-abund-single,load-graph}.py
+# scripts/{abundance-dist-single,load-into-counting}.py
+
+from khmer._khmer import ReadParser # sandbox/to-casava-1.8-fastq.py
+# tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
+# scripts/{abundance-dist-single,load-into-counting}.py
+
 
 from struct import pack, unpack
 
