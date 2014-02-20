@@ -6,6 +6,7 @@
 import os
 import argparse
 from khmer import extract_countinghash_info, extract_hashbits_info
+from khmer import __version__
 
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -22,6 +23,8 @@ def build_hash_args(descr=None):
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
     env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_MIN_HASHSIZE)
 
+    parser.add_argument('--version', action='version', 
+                        version='khmer {v}'.format(v=__version__))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
@@ -119,7 +122,7 @@ will be ignored.'''.format(hash=values))
                         help='load a precomputed hashtable from disk',
                         action=LoadAction)
 
-
+# this should probably be using type()
 def report_on_config(args, hashtype='counting'):
     """
         Summarizes the configuration produced by the command-line arguments
