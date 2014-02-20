@@ -122,7 +122,6 @@ will be ignored.'''.format(hash=values))
                         help='load a precomputed hashtable from disk',
                         action=LoadAction)
 
-# this should probably be using type()
 def report_on_config(args, hashtype='counting'):
     """
         Summarizes the configuration produced by the command-line arguments
