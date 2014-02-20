@@ -14,8 +14,8 @@ Find all reads connected to the given contigs on a per-partition basis.
 
 epilog = """
 Output will be a collection of files corresponding to the partitions;
-each partition gets a file (prefixed with the output prefix option), 
-which means this could output many tens or hundreds of thousands of files. 
+each partition gets a file (prefixed with the output prefix option),
+which means this could output many tens or hundreds of thousands of files.
 Users should plan accordingly.
 
 This script is very lenient on IO errors, due to the large number of file
@@ -46,7 +46,7 @@ MIN_KSIZE = 21
 
 def fmt_fasta(name, seq, labels=[]):
     return '>{name}\t{labels}\n{seq}\n'.format(name=name,
-                                               labels='\t'.join([str(l) for l in labels]), seq=seq)
+            labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
 def write_seq(fp, name, seq, labels=[]):

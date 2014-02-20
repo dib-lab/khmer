@@ -116,7 +116,8 @@ def handle_error(error, output_name, input_name, fail_save, ht):
     print >>sys.stderr, '** Failed on {name}: '.format(name=input_name)
     if fail_save:
         hashname = os.path.basename(input_name) + '.ht.failed'
-        print >>sys.stderr, '** ...dumping hashtable to {ht}'.format(ht=hashname)
+        print >>sys.stderr,\
+                '** ...dumping hashtable to {ht}'.format(ht=hashname)
         ht.save(hashname)
     try:
         os.remove(output_name)
@@ -135,8 +136,8 @@ def main():
     parser.add_argument('-f', '--fault-tolerant', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
-    parser.add_argument('--save-on-failure', dest='fail_save', 
-                        action='store_false', default=True, 
+    parser.add_argument('--save-on-failure', dest='fail_save',
+                        action='store_false', default=True,
                         help='Save hashtable when an error occurs')
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump hashtable every d files',
