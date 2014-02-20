@@ -23,7 +23,7 @@ def build_hash_args(descr=None):
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
     env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_MIN_HASHSIZE)
 
-    parser.add_argument('--version', action='version', 
+    parser.add_argument('--version', action='version',
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
@@ -98,8 +98,8 @@ def add_loadhash_args(parser):
                 if values:
                     print_error('''
 ** WARNING: You are loading a saved hashtable from
-{hash}, but have set hashtable parameters. 
-Your values for ksize, n_hashes, and hashsize \
+{hash}, but have set hashtable parameters.
+Your values for ksize, n_hashes, and hashsize
 will be ignored.'''.format(hash=values))
 
             if hasattr(parser, 'hashtype'):
@@ -121,6 +121,7 @@ will be ignored.'''.format(hash=values))
     parser.add_argument('-l', '--loadhash', dest='loadhash', default=None,
                         help='load a precomputed hashtable from disk',
                         action=LoadAction)
+
 
 def report_on_config(args, hashtype='counting'):
     """
