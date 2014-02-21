@@ -60,24 +60,14 @@ def build_counting_args(descr=None):
 
 
 def build_hashbits_args(descr=None):
-
+    """Build an argparse.ArgumentParser with arguments for hashbits based
+    scripts and return it.
+    """
     if descr is None:
         descr = 'Build & load a Bloom filter.'
 
     parser = build_hash_args(descr=descr)
     parser.hashtype = 'hashbits'
-
-    return parser
-
-
-# deprecated, should use add_loadhash_args for input table
-def build_counting_multifile_args():
-    parser = argparse.ArgumentParser(
-        description='Use a counting Bloom filter.',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('input_table')
-    parser.add_argument('input_filenames', nargs='+')
 
     return parser
 
