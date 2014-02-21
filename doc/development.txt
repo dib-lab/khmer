@@ -9,15 +9,44 @@ Build framework
 Coding standards
 ----------------
 
-For C++, let's use `Todd Hoff's coding standard
+For C++, we use `Todd Hoff's coding standard
 <http://www.possibility.com/Cpp/CppCodingStandard.html>`__, and
 `astyle -A10 / "One True Brace Style"
 <http://astyle.sourceforge.net/astyle.html>`__ indentation and
-bracing.  Note: we need to find vi and emacs settings that work for this!
+bracing.  Note: @CTB needs emacs settings that work for this.
 
-For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ seems
-like a good standard to default to, and there are tools to check it,
-too.
+Vim users may want to set the ARTISTIC_STYLE_OPTIONS shell variable to "-A10"
+and running ```:%!astyle``` to reformat. The four space indentation can be set with::
+
+	set expandtab
+	set shiftwidth=4
+	set softtabstop=4
+
+For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ is our
+standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful. 
+
+Code Review
+-----------
+
+Please read `11 Best Practices for Peer Code Review
+<http://smartbear.com/SmartBear/media/pdfs/WP-CC-11-Best-Practices-of-Peer-Code-Review.pdf>`__.
+
+See also `Code reviews: the lab meeting for code
+<http://fperez.org/py4science/code_reviews.html>`__ and `the PyCogent coding guidelines
+<http://pycogent.org/coding_guidelines.html>`__.
+
+Checklist
+=========
+
+Copy and paste the following into a pull-request when it is ready for review::
+   
+   - [ ] Is it mergable
+   - [ ] Did it pass the tests?
+   - [ ] If it introduce new functionality in scripts/ is it tested?
+     Check for code coverage.
+   - [ ] Is it well formatted? Look at `pep8`/`pylint`, `cppcheck`, and
+     `make doc` output. Use `autopep8` and `astyle -A10` if needed. 
+   - [ ] Is it documented in the Changelog?
 
 git and github strategies
 -------------------------
@@ -25,11 +54,35 @@ git and github strategies
 Still in the works, but read `this
 <http://scottchacon.com/2011/08/31/github-flow.html>`__.
 
+Make a branch on ged-lab (preferred so others can contribute) or fork the
+repository and make a branch there.
+
+Each piece or fix you are working on should have its own branch; make a pull-
+request to ged-lab/master to aid in code review, testing, and feedback.
+
+If you want your code integrated then it needs to be mergable
+
+Example pull request update using the command line:
+
+ #. Clone the source of the pull request (if needed) ``git clone git@github.com:mr-c/khmer.git``
+ #. Checkout the source branch of the pull request ``git checkout my-pull-request``
+ #. Pull in the destination of the pull request and resolve any conflicts ``git pull git@github.com:ged-lab/khmer.git master``
+ #. Push your update to the source of the pull request ``git push``
+ #. Jenkins will automatically attempt to build and test your pull requests.
+
 Testing
 -------
 
-'nosetests' is the canonical way to run the tests.  This is what 'make test'
-does.
+``./setup.py nosetest`` is the canonical way to run the tests.  This is what
+``make test`` does.
+
+Code coverage
+-------------
+
+Jenkins calculates code coverage for every build. Navigate to the results from
+the master node first to view the coverage information.
+
+Code coverage should never go down and new functionality needs to be tested.
 
 Pipelines
 ---------
@@ -101,10 +154,10 @@ https://gcc-python-plugin.readthedocs.org/en/latest/cpychecker.html
 
 Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev package
 
-Example usage:
+Example usage: ::
 
-  CC="/home/mcrusoe/src/gcc-plugin-python/gcc-python-plugin/gcc-with-cpychecker
---maxtrans=512" python setup.py build_ext 2>&1 | less
+	CC="/home/mcrusoe/src/gcc-plugin-python/gcc-python-plugin/gcc-with-cpychecker
+	--maxtrans=512" python setup.py build_ext 2>&1 | less
 
 False positives abound: ignore errors about the C++ standard library. This tool
 is primarily useful for reference count checking, error-handling checking, and
@@ -113,20 +166,20 @@ format string checking.
 Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 "AttributeError: 'NoneType' object has no attribute 'file'"
 
-Warnings to address: 
+Warnings to address: ::
 
-"khmer/_khmermodule.cc:3109:1: note: this function is too complicated for the
-reference-count checker to fully analyze: not all paths were analyze"
+	khmer/_khmermodule.cc:3109:1: note: this function is too complicated for the
+	reference-count checker to fully analyze: not all paths were analyze
 
-Adjust --maxtrans and re-run.
+Adjust --maxtrans and re-run. ::
 
-khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
-Py_BuildValue with format code "i" [enabled by default]
-  argument 2 ("D.68937") had type
-    "long long unsigned int"
-  but was expecting
-    "int"
-  for format code "i"
+	khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
+	Py_BuildValue with format code "i" [enabled by default]
+	  argument 2 ("D.68937") had type
+	    "long long unsigned int"
+	  but was expecting
+	    "int"
+	  for format code "i"
 
 See below for a format string cheatsheet One also benefits by matching C type
 with the function signature used later. 

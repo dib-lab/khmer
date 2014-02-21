@@ -4,13 +4,13 @@ How to make a khmer release
 
 Michael R. Crusoe is the current release maker. This is his checklist.
 
-0. The below should be done in a clean checkout.
+#. The below should be done in a clean checkout.
 
   cd `mktemp -d`
   git clone git@github.com:ged-lab/khmer.git
   cd khmer
 
-1. (Optional) Check for updates to ez_setup.py and versioneer.
+#. (Optional) Check for updates to ez_setup.py and versioneer.
 
   wget -N https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
   wget -N https://raw.github.com/warner/python-versioneer/master/versioneer.py
@@ -28,72 +28,82 @@ Michael R. Crusoe is the current release maker. This is his checklist.
   # or
   git checkout -- versioneer.py
 
-2. Review the git logs since the last release and diffs (if needed) and ensure
-that the Changelog is up to date.
+#. Review the git logs since the last release and diffs (if needed) and ensure
+that the ``Changelog`` is up to date.
 
   git log --minimal --patch `git describe --tags --always --abbrev=0`..HEAD
 
-3. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-multi/
+#. Review the issue list for any new bugs that will not be fixed in this
+release. Add them to ``doc/known-issues.txt``
 
-4. Tag the branch with the release candidate version number prefixed by the
-letter 'v',
+#. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-multi/
+
+#. Tag the branch with the release candidate version number prefixed by the
+letter 'v',::
 
   new_version=0.8
   git tag v${new_version}-rc1
 
-5. Test the release candidate. Bonus: repeat on Mac OS X.
+#. Test the release candidate. Bonus: repeat on Mac OS X::
 
-  virtualenv testenv1
-  virtualenv testenv2
-  virtualenv testenv3
+	virtualenv testenv1
+	virtualenv testenv2
+	virtualenv testenv3
   
-  # Does the tag work?
+	# Does the tag work?
   
-  cd testenv1
-  source bin/activate
-  git init git+https://github.com/ged-lab/khmer.git
-  git checkout v${new_version}-rc1
-  make test
+	cd testenv1
+	source bin/activate
+	git init git+https://github.com/ged-lab/khmer.git
+	git checkout v${new_version}-rc1
+	make test
   
-  # What about from pip?
+	# What about from pip?
   
-  cd testenv2
-  source bin/activate
-  pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
-  cd khmer* 
-  make dist
-  cp dist/khmer* ../../testenv3
+	cd testenv2
+	source bin/activate
+	pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
+	cd khmer* 
+	make dist
+	cp dist/khmer* ../../testenv3
  
-  # Is the distribution in testenv2 complete enough to build another
-  # functional distribution?
+	# Is the distribution in testenv2 complete enough to build another
+	# functional distribution?
 
-  cd ../../testenv3
-  source bin/activate
-  pip install khmer*
-  tar xzf khmer*
-  cd khmer*
-  make dist
-  make test
+	cd ../../testenv3
+	source bin/activate
+	pip install khmer*
+	tar xzf khmer*
+	cd khmer*
+	make dist
+	make test
   
-  cd ..
+	cd ..
 
-6. Publish the new release on the testing PyPI server.
-  python setup.py register --repository https://testpypi.python.org/pypi
+#. Publish the new release on the testing PyPI server::
+
+	python setup.py register --repository https://testpypi.python.org/pypi
+
 Change your PyPI credentials as documented in
-https://wiki.python.org/moin/TestPyPI
-  python setup.py sdist upload -r https://testpypi.python.org/pypi
-Test the PyPI release in a new virtualenv
-  pip install -i https://testpypi.python.org/pypi khmer
+https://wiki.python.org/moin/TestPyPI::
 
-7. Publish the new release on PyPI (requires an authorized account)
-  python setup.py register sdist upload
+	python setup.py sdist upload -r https://testpypi.python.org/pypi
 
-8. Create the final tag and publish it to github
-  git tag v${new_version}
-  git push git@github.com:ged-lab/khmer.git
-  git push --tags git@github.com:ged-lab/khmer.git
+Test the PyPI release in a new virtualenv::
 
-9. Tweet about the new release. Optionally send email including the contents of
+	pip install -i https://testpypi.python.org/pypi khmer
+
+#. Publish the new release on PyPI (requires an authorized account).::
+
+	python setup.py register sdist upload
+
+#. Create the final tag and publish it to github.::
+
+	git tag v${new_version}
+	git push git@github.com:ged-lab/khmer.git
+	git push --tags git@github.com:ged-lab/khmer.git
+
+#. Tweet about the new release. Optionally send email including the contents of
 the Changelog to khmer@lists.idyll.org and khmer-announce@lists.idyll.org
 
 Upstream sources
@@ -130,8 +140,8 @@ of khmer/_version.py via the `$Format:%d$` and `$Format:%H$` placeholders enable
 the "export-subst" entry in .gitattributes
 
 Non source distributions will have a customized khmer/_version.py that contains
-hard-coded version strings. (see build/*/khmer/_version.py after a
-`python setup.py build` for an example)
+hard-coded version strings. (see build/\*/khmer/_version.py after a
+``python setup.py build`` for an example)
 
 ez_setup.py bootstraps setuptools (if needed) by downloading and installing an
 appropriate version
