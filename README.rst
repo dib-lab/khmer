@@ -40,7 +40,7 @@ INSTALL INSTRUCTIONS:
 ---------------------
 
 khmer requires Python 2.7+. Linux users will need the python development
-libraries and gcc. OS X users will need XCode installed. For more
+libraries and gcc. OS X users may need XCode installed. For more
 details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/install.html>`_
 
 In short:
@@ -55,4 +55,7 @@ khmer is under the BSD license; see doc/LICENSE.txt. Distribution,
 modification and redistribution, incorporation into other software, and
 pretty much everything else is allowed.
 
-MRC 2013-10-22
+khmer project contributors also edit documents collaboratively at `our wiki 
+<https://github.com/ged-lab/khmer/wiki/_pages>`__.
+
+MRC 2014-02-16

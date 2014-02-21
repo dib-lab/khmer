@@ -53,6 +53,7 @@ Contents:
    design
    details
    development
+   known-issues
    sequence-access-patterns
    release
    crazy-ideas
