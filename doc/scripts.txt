@@ -393,7 +393,7 @@ and separate paired from orphans.
    '-o' is specified.
 
    As a "bonus", this file ensures that read names are formatted in a
-   consistent way, such that they look like the latest Casava format
+   consistent way, such that they look like the pre-1.8 Casava format
    (@name/1, @name/2).
 
    Example::
