@@ -32,7 +32,7 @@ cppcheck: FORCE
 		-i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS lib 
 
 pep8: FORCE
-	pep8 setup.py khmer/ scripts/ tests/
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/
 
 autopep8: FORCE
 	autopep8 setup.py khmer/ scripts/ tests/ --recursive --in-place --pep8-passes 2000 --verbose
