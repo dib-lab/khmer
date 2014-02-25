@@ -7,6 +7,7 @@ import sys
 import os
 import shutil
 from cStringIO import StringIO
+import subprocess
 import traceback
 
 import khmer_tst_utils as utils
@@ -103,6 +104,37 @@ def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
     return status, "", ""
 
 #
+
+
+# When testing argparse related options execfile does not work
+# TODO: figure out why replacing runscript with popenscript uses more memory
+def popenscript(scriptname, args, in_directory=None, fail_ok=False):
+    """
+    Run the given Python script, with the given args, in the given directory,
+    using 'Popen'.
+    """
+
+    out, err = None, None
+
+    try:
+        print 'running:', scriptname, 'in:', in_directory
+        print 'arguments', args
+        complete_args = [scriptname]
+        complete_args.extend(args)
+        process = subprocess.Popen(complete_args,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   cwd=in_directory)
+        out, err = process.communicate()
+        status = process.returncode
+    except:
+        traceback.print_exc(file=sys.stderr)
+        status = -1
+
+    if status != 0 and not fail_ok:
+        raise Exception(status, out, err)
+
+    return status, out, err
 
 
 def test_load_into_counting():
@@ -351,6 +383,14 @@ def test_normalize_by_median():
     seqs = [r.sequence for r in screed.open(outfile)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+
+
+def test_normalize_by_median_version():
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['--version']
+    status, out, err = popenscript(script, args)
+    assert err.startswith('khmer ')
 
 
 def test_normalize_by_median_2():
