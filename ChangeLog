@@ -6,7 +6,7 @@ users without root access to install virtualenv instead of pip.
 * New documentation: doc/known-issues.txt
 * Added code review checklist & other guidance: doc/development.txt
 
-2014-01-13  Camille Scott <camille.scott.w@gmail.com>
+2014-02-03  Camille Scott <camille.scott.w@gmail.com>
 
 * Added support for sparse graph labeling
 
@@ -16,7 +16,9 @@ users without root access to install virtualenv instead of pip.
 * Implemented __new__ methods for Hashbits, enforced inheritance
   hierarchy between it and the new LabelHash class both in C++
   and CPython API
-  
+
+ * Standardized command line arguments in khmer_args; added version flag
+ 
 2013-12-20  Titus Brown  <titus@idyll.org>
 
 * Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
@@ -72,7 +74,7 @@ being 'highmem' and be skipped by changing two lines in setup.cfg
 
 * warnings about -Wstrict-prototypes will no longer appear
 
-* contributors to this release are: ctb, mr-c and cswelcher. 
+* contributors to this release are: ctb, mr-c and camillescott. 
 
 2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
 

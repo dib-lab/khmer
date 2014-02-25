@@ -18,6 +18,8 @@ from _khmer import ReadParser
 from _khmer import _LabelHash
 from _khmer import _Hashbits
 
+from struct import pack, unpack
+
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
@@ -59,6 +61,51 @@ def reset_reporting_callback():
     set_reporting_callback(_default_reporting_callback)
 
 reset_reporting_callback()
+
+
+def extract_hashbits_info(filename):
+    ksize = None
+    n_tables = None
+    table_size = None
+    version = None
+    ht_type = None
+
+    uint_size = len(pack('I', 0))
+    uchar_size = len(pack('B', 0))
+    ulonglong_size = len(pack('Q', 0))
+
+    with open(filename, 'rb') as f:
+        version, = unpack('B', f.read(1))
+        ht_type, = unpack('B', f.read(1))
+        ksize, = unpack('I', f.read(uint_size))
+        n_tables, = unpack('B', f.read(uchar_size))
+        table_size, = unpack('Q', f.read(ulonglong_size))
+
+    return ksize, round(table_size, -2), n_tables, version, ht_type
+
+
+def extract_countinghash_info(filename):
+    ksize = None
+    n_tables = None
+    table_size = None
+    version = None
+    ht_type = None
+    use_bigcount = None
+
+    uint_size = len(pack('I', 0))
+    uchar_size = len(pack('B', 0))
+    ulonglong_size = len(pack('Q', 0))
+
+    with open(filename, 'rb') as f:
+        version, = unpack('B', f.read(1))
+        ht_type, = unpack('B', f.read(1))
+        use_bigcount, = unpack('B', f.read(1))
+        ksize, = unpack('I', f.read(uint_size))
+        n_tables, = unpack('B', f.read(1))
+        table_size, = unpack('Q', f.read(ulonglong_size))
+
+    return ksize, round(table_size, -2), n_tables, \
+        use_bigcount, version, ht_type
 
 
 def calc_expected_collisions(ht):

@@ -26,6 +26,7 @@ def build_construct_args(descr=None):
 
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+
     parser.add_argument('--ksize', '-k', type=int, dest='ksize',
                         default=env_ksize,
                         help='k-mer size to use')
