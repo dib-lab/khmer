@@ -15,3 +15,4 @@ doc/_build
 *ENV
 /.project
 /.pydevproject
+/.Rhistory
