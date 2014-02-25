@@ -41,7 +41,7 @@ project = u'khmer'
 
 copyright = u'''2010-2013, Michael R. Crusoe, Greg Edvenson, Jordan
 Fish, Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason
-Pell, Jared Simpson, C. S. Welcher, Qingpeng Zhamg, and C. Titus
+Pell, Jared Simpson, Camille Scott, Qingpeng Zhamg, and C. Titus
 Brown'''
 
 # The version info for the project you're documenting, acts as replacement for
