@@ -53,7 +53,7 @@ def parse_args(parser):
     args = parser.parse_args()
 
     if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
+        if args.min_hashsize == DEFAULT_MIN_HASHSIZE and not args.loadhash:
             print >>sys.stderr, \
                 "** WARNING: hashsize is default!  ", \
                 "You absodefly want to increase this!\n** " \
