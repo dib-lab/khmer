@@ -45,6 +45,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
         new_version=0.8
         git tag v${new_version}-rc1
+        git push --tags git@github.com:ged-lab/khmer.git
 
 #. Test the release candidate. Bonus: repeat on Mac OS X::
 
