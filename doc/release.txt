@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 ===========================
 How to make a khmer release
 ===========================
@@ -23,6 +25,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         git diff versioneer.py
         
         git add versioneer.py
+        ./setup.py update_files
         git commit -m "new version of versioneer.py"
         # or
         git checkout -- versioneer.py
