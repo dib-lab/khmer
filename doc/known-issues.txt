@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 Known Issues
 ============
 
@@ -13,3 +15,12 @@ https://github.com/ged-lab/khmer/issues/249
 If your hashfile gets truncated, perhaps from a full filesystem, then our
 tools currently will get stuck. This is being tracked in 
 https://github.com/ged-lab/khmer/issues/247
+
+Paired-end reads from Casava 1.8 currently require renaming for use in
+normalize-by-median and abund-filter when used in paired mode. The
+integration of a fix for this is being tracked in
+https://github.com/ged-lab/khmer/issues/23
+
+A user has reported a floating point exception when running
+count-overlap.py. There is no workaround at this time.
+https://github.com/ged-lab/khmer/issues/282
