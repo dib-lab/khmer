@@ -13,10 +13,9 @@ Install the tools & tool description
 If your installation uses a virtualenv be sure to activate it in your terminal
 before continuing.
 
-Checkout and install the branch of the Git repository where development of
-this feature is ongoing.::
+::
 
-  pip install -e git+https://github.com/ged-lab/khmer.git@output_naming1#khmer
+  pip install --no-clean khmer
 
 
 Move to the `tools` directory in your Galaxy installation and copy in the
@@ -24,7 +23,7 @@ tool definition file.::
 
   cd tools
   mkdir khmer
-  ln -s ../src/khmer/scripts/normalize-by-median.xml .
+  ln -s build/khmer/scripts/normalize-by-median.xml .
 
 
 Add the following to your tool_conf.xml inside the <toolbox> tag::
