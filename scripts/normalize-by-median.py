@@ -117,7 +117,7 @@ def handle_error(error, output_name, input_name, fail_save, ht):
     if fail_save:
         hashname = os.path.basename(input_name) + '.ht.failed'
         print >>sys.stderr,\
-                '** ...dumping hashtable to {ht}'.format(ht=hashname)
+            '** ...dumping hashtable to {ht}'.format(ht=hashname)
         ht.save(hashname)
     try:
         os.remove(output_name)
