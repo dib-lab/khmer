@@ -7,6 +7,7 @@ import khmer
 from nose.plugins.attrib import attr
 import os
 
+
 def test_forward_hash():
     assert khmer.forward_hash('AAAA', 4) == 0
     assert khmer.forward_hash('TTTT', 4) == 0
@@ -47,6 +48,7 @@ def test_get_primes():
 
     assert primes == [19, 17, 13, 11, 7, 5, 3]
 
+
 def test_extract_countinghash_info():
     fn = 'test_extract_counting.ht'
     for size in [1e6, 2e6, 5e6, 1e7]:
@@ -66,13 +68,14 @@ def test_extract_countinghash_info():
         except OSError as e:
             print >>sys.stder, '...failed to remove {fn}'.format(fn)
 
+
 def test_extract_hashbits_info():
     fn = 'test_extract_hashbits.ht'
     for size in [1e6, 2e6, 5e6, 1e7]:
         ht = khmer.Hashbits(25, size, 4)
         ht.save(fn)
-        
-        info = khmer.extract_hashbits_info(fn) 
+
+        info = khmer.extract_hashbits_info(fn)
         ksize, table_size, n_tables, _, _ = info
         print ksize, table_size, n_tables
 
