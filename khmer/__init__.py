@@ -182,31 +182,6 @@ def calc_expected_collisions(hashtable):
     return fp_all
 
 
-class KmerCount(object):
-
-    def __init__(self, size, report_zero=False):
-        self._kt = new_ktable(size)
-        self.report_zero = report_zero
-
-    def consume(self, seq):
-        self._kt.consume(seq)
-
-    def _get_pairs(self):
-        ktable = self._kt
-        size = ktable.n_entries()
-
-        for i in range(0, size):
-            count = ktable.get(i)
-            if count or self.report_zero:
-                kmer = ktable.reverse_hash(i)
-                yield kmer, ktable.get(i)
-
-    pairs = property(_get_pairs)
-
-    def __getitem__(self, k):
-        return self._kt.get(k)
-
-
 def is_prime(number):
     '''Checks if a number is prime.'''
     if number < 2:

@@ -71,11 +71,13 @@ def build_hashbits_args(descr=None):
 
     return parser
 
-
 # add an argument for loadhash with warning about parameters
+
+
 def add_loadhash_args(parser):
 
     class LoadAction(argparse.Action):
+
         def __call__(self, parser, namespace, values, option_string=None):
             env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
             env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
@@ -117,7 +119,6 @@ will be ignored.'''.format(hash=values))
                         action=LoadAction)
 
 
-# this should probably be using type()
 def report_on_config(args, hashtype='counting'):
     """
         Summarizes the configuration produced by the command-line arguments
@@ -139,14 +140,13 @@ def report_on_config(args, hashtype='counting'):
     if hashtype == 'counting':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_hashes x min_hashsize)".
-            format(args.n_hashes * args.min_hashsize)
-        )
+            "(n_hashes x min_hashsize)".format(
+                args.n_hashes * args.min_hashsize))
     elif hashtype == 'hashbits':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_hashes x min_hashsize / 8)".
-            format(args.n_hashes * args.min_hashsize / 8)
+            "(n_hashes x min_hashsize / 8)".format(args.n_hashes *
+                                                   args.min_hashsize / 8)
         )
 
     print_error("-" * 8)

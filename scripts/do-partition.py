@@ -19,10 +19,7 @@ import Queue
 import gc
 import os.path
 import os
-import argparse
-import screed
-import khmer
-from khmer.khmer_args import build_hashbits_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import report_on_config
 import glob
 
@@ -182,7 +179,6 @@ def main():
 
     # merge-partitions
 
-    output_file = args.graphbase + '.pmap.merged'
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
     print 'loading %d pmap files (first one: %s)' % (len(pmap_files),
