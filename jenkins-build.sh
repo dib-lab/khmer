@@ -59,7 +59,6 @@ then
 		http://scan5.coverity.com/cgi-bin/upload.py
 fi
 
-
 pip install --quiet nose coverage
 python setup.py develop
 coverage run --source=scripts,khmer -m nose --with-xunit \

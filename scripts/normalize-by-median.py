@@ -122,7 +122,7 @@ def handle_error(error, output_name, input_name, fail_save, ht):
     try:
         os.remove(output_name)
     except:
-        print >>sys.stderr, '** ERROR: problem removing erroneous .keep file'
+        print >>sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
 def main():
@@ -142,6 +142,9 @@ def main():
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump hashtable every d files',
                         default=-1)
+    parser.add_argument('-o', '--out', dest='single_output_filename',
+                        default='', help='only output a single'
+                        ' file with the specified filename')
     parser.add_argument('input_filenames', nargs='+')
     add_loadhash_args(parser)
 
@@ -174,8 +177,12 @@ def main():
     discarded = 0
 
     for n, input_filename in enumerate(filenames):
-        output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w')
+        if args.single_output_filename != '':
+            output_name = args.single_output_filename
+            outfp = open(args.single_output_filename, 'a')
+        else:
+            output_name = os.path.basename(input_filename) + '.keep'
+            outfp = open(output_name, 'w')
 
         total_acc = 0
         discarded_acc = 0
@@ -188,7 +195,7 @@ def main():
             handle_error(e, output_name, input_filename, fail_save, ht)
             if not force:
                 print >>sys.stderr, '** Exiting!'
-                sys.exit(-1)
+                sys.exit(1)
             else:
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
@@ -235,7 +242,7 @@ def main():
         print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
         print >>sys.stderr, "**"
         print >>sys.stderr, "** Do not use these results!!"
-        sys.exit(-1)
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

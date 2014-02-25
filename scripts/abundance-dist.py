@@ -11,6 +11,8 @@ Produce the k-mer abundance distribution for the given file.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
+
 import sys
 import khmer
 import argparse
@@ -34,50 +36,48 @@ def main():
                         help='Overwrite output file if it exists')
 
     args = parser.parse_args()
-    hashfile = args.hashname
-    datafile = args.datafile
-    histout = args.histout
 
-    print 'hashtable from', hashfile
-    ht = khmer.load_counting_hash(hashfile)
+    print('hashtable from', args.hashname)
+    counting_hash = khmer.load_counting_hash(args.hashname)
 
-    K = ht.ksize()
-    sizes = ht.hashsizes()
-    tracking = khmer._new_hashbits(K, sizes)
+    kmer_size = counting_hash.ksize()
+    hashsizes = counting_hash.hashsizes()
+    tracking = khmer._new_hashbits(kmer_size, hashsizes)
 
-    print 'K:', K
-    print 'HT sizes:', sizes
-    print 'outputting to', histout
+    print('K:', kmer_size)
+    print('HT sizes:', hashsizes)
+    print('outputting to', args.histout)
 
-    if os.path.exists(histout):
+    if os.path.exists(args.histout):
         if not args.squash_output:
-            print >>sys.stderr, 'ERROR: %s exists; not squashing.' % histout
-            sys.exit(-1)
+            print('ERROR: %s exists; not squashing.' % args.histout,
+                  file=sys.stderr)
+            sys.exit(1)
 
-        print '** squashing existing file %s' % histout
+        print('** squashing existing file %s' % args.histout)
 
-    print 'preparing hist...'
-    z = ht.abundance_distribution(datafile, tracking)
-    total = sum(z)
+    print('preparing hist...')
+    abundances = counting_hash.abundance_distribution(args.datafile, tracking)
+    total = sum(abundances)
 
     if 0 == total:
-        print >>sys.stderr, \
-            "ERROR: abundance distribution is uniformly zero; " \
-            "nothing to report."
-        print >>sys.stderr, "\tPlease verify that the input files are valid."
-        sys.exit(-1)
-
-    fp = open(histout, 'w')
+        print("ERROR: abundance distribution is uniformly zero; "
+              "nothing to report.", file=sys.stderr)
+        print("\tPlease verify that the input files are valid.",
+              file=sys.stderr)
+        sys.exit(1)
+    histout = args.histout
+    hash_fp = open(histout, 'w')
 
     sofar = 0
-    for n, i in enumerate(z):
+    for _, i in enumerate(abundances):
         if i == 0 and not args.output_zero:
             continue
 
         sofar += i
         frac = sofar / float(total)
 
-        print >>fp, n, i, sofar, round(frac, 3)
+        print(_, i, sofar, round(frac, 3), file=hash_fp)
 
         if sofar == total:
             break

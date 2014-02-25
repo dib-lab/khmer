@@ -131,6 +131,10 @@ CTB: should we squash output files (overwrite them if they exist), or not?
 So far, leaning towards 'not', as that way no one is surprised and loses
 their data.
 
+A general error should be signaled by exit code `1` and success by `0`. Linux
+supports exit codes from `0` to `255` where the value `1` means a general
+error. An exit code of `-1` will get converted to `255`.
+
 ----
 
 CLI reading:
