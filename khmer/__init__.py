@@ -105,7 +105,7 @@ def extract_countinghash_info(filename):
         table_size, = unpack('Q', f.read(ulonglong_size))
 
     return ksize, round(table_size, -2), n_tables, \
-           use_bigcount, version, ht_type
+        use_bigcount, version, ht_type
 
 
 def calc_expected_collisions(ht):
