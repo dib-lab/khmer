@@ -118,6 +118,16 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         git push git@github.com:ged-lab/khmer.git
         git push --tags git@github.com:ged-lab/khmer.git
 
+#. Make a binary wheel on OS X.::
+
+        virtualenv build
+        cd build
+        source bin/activate
+        pip install --allow-external argparse khmer==${new_version}
+        pip install wheel
+        cd build/khmer
+        ./setup.py bdist_wheel upload
+
 #. Tweet about the new release. Optionally send email including the contents of
    the Changelog to khmer@lists.idyll.org and khmer-announce@lists.idyll.org
 
