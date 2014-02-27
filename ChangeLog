@@ -1,5 +1,6 @@
 2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
 
+    * tagged: version 0.8
     * setup.py: Specify a known working version of setuptools so we don't
     force an unneeded and awkward upgrade.
     * setup.py: We aren't zipsafe, mark as such
