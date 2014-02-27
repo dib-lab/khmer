@@ -49,6 +49,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
 #. Test the release candidate. Bonus: repeat on Mac OS X::
 
+        cd ..
         virtualenv testenv1
         virtualenv testenv2
         virtualenv testenv3
@@ -56,26 +57,29 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         
         cd testenv1
         source bin/activate
-        git init git+https://github.com/ged-lab/khmer.git
-        git checkout v${new_version}-rc1
+        git clone -b v${new_version}-rc1 https://github.com/ged-lab/khmer.git
+        cd khmer
+        make install
         make test
         
         # What about from pip?
         
-        cd testenv2
+        cd ../../testenv2
         source bin/activate
-        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
-        cd khmer* 
+        pip install --allow-external argparse -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
+        cd src/khmer
         make dist
-        cp dist/khmer* ../../testenv3
+        make install
+        make test
+        cp dist/khmer*tar.gz ../../../testenv3/
         
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
         
-        cd ../../testenv3
+        cd ../../../testenv3/
         source bin/activate
-        pip install khmer*
-        tar xzf khmer*
+        pip install --allow-external argparse khmer*tar.gz
+        tar xzf khmer*tar.gz
         cd khmer*
         make dist
         make test
