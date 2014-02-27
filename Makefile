@@ -37,6 +37,17 @@ pep8: FORCE
 autopep8: FORCE
 	autopep8 setup.py khmer/ scripts/ tests/ --recursive --in-place --pep8-passes 2000 --verbose
 
+pylint: all FORCE
+	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests | tee ../pylint.out
+
+coverage: FORCE
+	coverage run --source=scripts,khmer -m nose --with-xunit --attr=\!known_failing
+	coverage xml
+
+doxygen: FORCE
+	mkdir -p doc/doxygen
+	doxygen
+
 lib:
 	cd lib && \
 	$(MAKE)
