@@ -4,7 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 import ez_setup
-ez_setup.use_setuptools()
+ez_setup.use_setuptools(version="0.6c11")
 
 from setuptools import setup
 from setuptools import Extension
