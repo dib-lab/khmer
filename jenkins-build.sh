@@ -60,10 +60,8 @@ then
 fi
 
 pip install --quiet nose coverage
-python setup.py develop
-coverage run --source=scripts,khmer -m nose --with-xunit \
-	--attr=\!known_failing #--cover-package=khmer 
-coverage xml
+./setup.py develop
+make coverage
 # we need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
@@ -71,7 +69,7 @@ coverage xml
 make doc
 
 pip install --quiet pylint
-pylint -f parseable khmer/*.py scripts/*.py tests khmer | tee ../pylint.out
+make pylint
 
 if [[ -n "${coverage_post}" ]]
 	# was -v coverage_post but OS X bash not new enough
@@ -84,6 +82,5 @@ then
 
 	make cppcheck
 
-	mkdir -p doc/doxygen
-	doxygen
+	make doxygen
 fi

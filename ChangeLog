@@ -1,3 +1,9 @@
+2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * setup.py: Specify a known working version of setuptools so we don't
+    force an unneeded and awkward upgrade.
+    * setup.py: We aren't zipsafe, mark as such
+
 2014-02-18  Michael R. Crusoe <mcrusoe@msu.edu>
 
 * Normalized C++ namespace usage to fix CID 1054792
