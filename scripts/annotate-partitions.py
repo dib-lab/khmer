@@ -18,15 +18,7 @@ import os
 import argparse
 
 import khmer
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 
 DEFAULT_K = 32
 
@@ -50,12 +42,12 @@ def main():
     partitionmap_file = args.graphbase + '.pmap.merged'
 
     # Check if input files exist
-    fileApi.check_file_status(partitionmap_file)
+    check_file_status(partitionmap_file)
     for f in filenames:
         fileApi.check_file_status(f)
         
     # Check space availability
-    fileApi.check_space(filenames)
+    check_space(filenames)
     
     print 'loading partition map from:', partitionmap_file
     ht.load_partitionmap(partitionmap_file)

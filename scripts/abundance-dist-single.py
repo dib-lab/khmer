@@ -52,6 +52,23 @@ def main():
     args = parser.parse_args()
     report_on_config(args)
 
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
+    n_threads = int(args.n_threads)
+
+    datafile = args.datafile
+    histout = args.histout
+    squash = args.squash
+
+    # Check if input files exist
+    infiles = [datafile]
+    for infile in infiles:
+        fileApi.check_file_status(infile)
+    
+    # Check free space
+    fileApi.check_space(infiles)
+
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
                                             args.n_hashes,
