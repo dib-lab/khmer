@@ -24,6 +24,15 @@ from khmer.khmer_args import report_on_config
 import argparse
 from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
 
+#  Import fileapi from sandbox - temporary arrangement
+current_file_path = os.path.realpath(__file__)
+current_folder = os.path.dirname(current_file_path)
+parent_folder = os.path.dirname(current_folder)
+sandbox_folder = os.path.join(parent_folder, 'sandbox')
+sys.path.append(sandbox_folder)
+
+import fileApi
+
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches

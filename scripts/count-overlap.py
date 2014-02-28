@@ -47,6 +47,14 @@ def main():
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
 
+    # Check if input files exist
+    infiles = [htfile, fafile]
+    for infile in infiles:
+        fileApi.check_file_status(infile)
+    
+    # Check free space
+    fileApi.check_space(infiles)
+    
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
     K = ht1.ksize()
