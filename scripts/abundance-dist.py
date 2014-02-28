@@ -15,7 +15,7 @@ import sys
 import khmer
 import argparse
 import os
-
+from khmer.file_api import check_file_status, check_space
 
 def main():
     parser = argparse.ArgumentParser(
@@ -33,6 +33,17 @@ def main():
                         help='Overwrite output file if it exists')
 
     args = parser.parse_args()
+    hashfile = args.hashname
+    datafile = args.datafile
+    histout = args.histout
+    
+    # Check if input files exist
+    infiles = [hashfile, datafile]
+    for infile in infiles:
+        check_file_status(infile)
+    
+    # Check free space
+    check_space(infiles)
 
     print('hashtable from', args.hashname)
     counting_hash = khmer.load_counting_hash(args.hashname)

@@ -17,7 +17,7 @@ import khmer
 import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
-
+from khmer.file_api import check_file_status, check_space
 
 def main():
     parser = build_construct_args(
@@ -40,6 +40,23 @@ def main():
 
     args = parser.parse_args()
     report_on_config(args)
+
+    K = args.ksize
+    HT_SIZE = args.min_hashsize
+    N_HT = args.n_hashes
+    n_threads = int(args.n_threads)
+
+    datafile = args.datafile
+    histout = args.histout
+    squash = args.squash
+
+    # Check if input files exist
+    infiles = [datafile]
+    for infile in infiles:
+        check_file_status(infile)
+    
+    # Check free space
+    check_space(infiles)
 
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,

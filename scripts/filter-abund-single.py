@@ -22,15 +22,7 @@ from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
 from khmer.counting_args import build_counting_multifile_args
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 #
 
 DEFAULT_CUTOFF = 2
@@ -59,10 +51,10 @@ def main():
     # Check input files exist
     infiles=[filename]
     for f in infiles:
-        fileApi.check_file_status(f)
+        check_file_status(f)
 
     # Check disk space availability
-    freeSpace = fileApi.check_space(infiles)
+    freeSpace = check_space(infiles)
 
     config = khmer.get_config()
     bufsz = config.get_reads_input_buffer_size()

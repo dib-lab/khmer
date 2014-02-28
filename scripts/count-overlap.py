@@ -22,8 +22,7 @@ from screed.fasta import fasta_iter
 import argparse
 import os
 import math
-
-
+from khmer.file_api import check_file_status, check_space
 #
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -47,6 +46,14 @@ def main():
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
 
+    # Check if input files exist
+    infiles = [htfile, fafile]
+    for infile in infiles:
+        check_file_status(infile)
+    
+    # Check free space
+    check_space(infiles)
+    
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
     K = ht1.ksize()
