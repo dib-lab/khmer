@@ -21,15 +21,7 @@ import khmer
 from khmer.hashbits_args import build_construct_args
 from khmer.counting_args import report_on_config
 from khmer.threading_args import add_threading_args
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 
 def main():
     parser = build_construct_args()
@@ -53,10 +45,10 @@ def main():
     
     # Check input files exist
     for f in args.input_filenames:
-        fileApi.check_file_status(f)
+        check_file_status(f)
 
     # Check disk space availability
-    freeSpace = fileApi.check_space(args.input_filenames)    
+    check_space(args.input_filenames)    
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)

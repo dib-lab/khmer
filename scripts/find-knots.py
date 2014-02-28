@@ -17,15 +17,8 @@ import glob
 import os
 
 import khmer
+from khmer.file_api import check_file_status, check_space
 
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
 DEFAULT_COUNTING_HT_N = 4                     # number of counting hash tables
@@ -68,10 +61,10 @@ def main():
     # Check input files exist
     infiles=[graphbase + '.ht', graphbase + '.tagset'] # @RamRS: This might need some more work
     for f in infiles:
-        fileApi.check_file_status(f)
+        check_file_status(f)
 
     # Check disk space availability
-    freeSpace = fileApi.check_space(infiles)
+    check_space(infiles)
 
     print 'loading ht %s.ht' % graphbase
     ht = khmer.load_hashbits(graphbase + '.ht')

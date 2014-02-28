@@ -18,15 +18,7 @@ import khmer
 import screed
 import os.path
 import random
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -57,10 +49,10 @@ def main():
 
     # Check input files exist
     for f in args.filenames:
-        fileApi.check_file_status(f)
+        check_file_status(f)
 
     # Check disk space availability
-    freeSpace = fileApi.check_space(args.filenames)
+    check_space(args.filenames)
 
     # seed the random number generator?
     if args.random_seed:

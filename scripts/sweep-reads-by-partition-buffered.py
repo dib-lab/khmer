@@ -32,15 +32,7 @@ import os
 import time
 import khmer
 from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
@@ -227,10 +219,10 @@ def main():
     filenames=[input_files, input_fastp]
     # Check input files exist
     for f in filenames:
-        fileApi.check_file_status(f)
+        check_file_status(f)
 
     # Check disk space availability
-    freeSpace = fileApi.check_space(filenames)
+    check_space(filenames)
     
     output_buffer = ReadBufferManager(
         max_buffers, max_reads, buf_size, output_pref, outdir)

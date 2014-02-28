@@ -20,15 +20,7 @@ import Queue
 import gc
 import os.path
 import argparse
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 
 # Debugging Support
 import re
@@ -99,10 +91,10 @@ def main():
     # Check input files exist
     filenames=[basename+'.ht',basename+'.tagset']
     for f in filenames:
-        fileApi.check_file_status(f)
+        check_file_status(f)
 
     # Check disk space availability
-    freeSpace = fileApi.check_space(filenames)
+    check_space(filenames)
 
     print '--'
     print 'SUBSET SIZE', args.subset_size

@@ -21,15 +21,7 @@ import sys
 import os.path
 import screed
 import argparse
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
 
 DEFAULT_MAX_SIZE = int(1e6)
 DEFAULT_THRESHOLD = 5
@@ -82,10 +74,10 @@ def main():
 
     # Check if input files exist
     for infile in args.part_filenames:
-        fileApi.check_file_status(infile)
+        check_file_status(infile)
     
     # Check free space
-    fileApi.check_space(args.part_filenames)
+    check_space(args.part_filenames)
 
     print '---'
     print 'reading partitioned files:', repr(args.part_filenames)
