@@ -8,11 +8,14 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
     :target: http://badge.fury.io/py/khmer
 .. image:: https://pypip.in/d/khmer/badge.png
     :target: https://crate.io/packages/khmer
+.. image:: https://pypip.in/license/khmer/badge.png
+    :target: https://pypi.python.org/pypi/khmer/
+    :alt: License
 .. image:: http://ci.ged.msu.edu/job/khmer-multi/badge/icon
     :target: http://ci.ged.msu.edu/job/khmer-multi/
 .. image:: https://landscape.io/github/ged-lab/khmer/master/landscape.png
    :target: https://landscape.io/github/ged-lab/khmer/master
-      :alt: Python Code Health
+   :alt: Python Code Health
 
 The official repository is at
 
