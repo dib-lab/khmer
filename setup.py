@@ -10,6 +10,7 @@ ez_setup.use_setuptools(version="0.6c11")
 
 from setuptools import setup
 from setuptools import Extension
+from Cython.Build import cythonize
 
 import versioneer
 versioneer.versionfile_source = 'khmer/_version.py'
@@ -62,7 +63,8 @@ BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in
                          "hashtable", "counting", "hashbits", "labelhash",
                      ])
 
-SOURCES = ["khmer/_khmermodule.cc"]
+#SOURCES = ["khmer/_khmermodule.cc"]
+SOURCES = ["khmer/_khmer.pyx"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in
                [
                    "khmer_config", "thread_id_map", "trace_logger",
@@ -111,7 +113,7 @@ SETUP_METADATA = \
         "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
         "setup_requires": ['nose >= 1.0', 'sphinx', ],
         "scripts": SCRIPTS,
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": cythonize([EXTENSION_MOD, ]),
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
