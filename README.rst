@@ -1,3 +1,4 @@
+
 khmer
 =====
 
@@ -9,6 +10,9 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
     :target: https://crate.io/packages/khmer
 .. image:: http://ci.ged.msu.edu/job/khmer-multi/badge/icon
     :target: http://ci.ged.msu.edu/job/khmer-multi/
+.. image:: https://landscape.io/github/ged-lab/khmer/master/landscape.png
+   :target: https://landscape.io/github/ged-lab/khmer/master
+      :alt: Python Code Health
 
 The official repository is at
 
@@ -59,3 +63,6 @@ khmer project contributors also edit documents collaboratively at `our wiki
 <https://github.com/ged-lab/khmer/wiki/_pages>`__.
 
 MRC 2014-02-16
+
+.. vim: set filetype=rst
+
