@@ -139,7 +139,7 @@ export CXX
 export CXXFLAGS
 export LIBS
 
-VERSION = $(shell python getVersion.py)
+VERSION = $(shell get_version.py)
 
 export VERSION
 
