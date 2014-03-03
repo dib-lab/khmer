@@ -47,7 +47,7 @@ else
 	echo "Not the main build so skipping the coverity scan"
 fi
 
-${coverity} python setup.py build_ext ${coverage_post}
+${coverity} python setup.py build_ext --build-temp $PWD ${coverage_post}
 
 if [[ -n "$coverity" ]]
 	# was -v coverity but OS X bash not new enough
@@ -78,7 +78,7 @@ then
 	# work around a bug in 3.1 ?
 	# pip install -e  git+git@github.com:nschum/gcovr.git@fix-argument-type#egg=gcovr
 	# gcovr -r $PWD --xml > coverage-gcovr.xml
-	gcovr --xml > coverage-gcovr.xml
+	gcovr --root=. --xml > coverage-gcovr.xml
 
 	make cppcheck
 
