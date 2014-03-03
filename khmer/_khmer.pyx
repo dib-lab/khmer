@@ -6,38 +6,18 @@ Contact: khmer-project@idyll.org
 '''
 
 from cython.operator cimport dereference as deref
-from libcpp.string cimport string
 
 
-cdef extern from "khmer.hh" namespace "khmer":
-  ctypedef unsigned long long int ExactCounterType
-  ctypedef unsigned long long int HashIntoType
-  ctypedef unsigned char WordLength
+cdef class _LabelHash:
+    pass
 
 
-cdef extern from "ktable.hh" namespace "khmer":
-    cdef cppclass KTable:
-        KTable(long)
-        ExactCounterType get_count(const char *)
-        ExactCounterType get_count(HashIntoType)
-        void count(const char *)
-        void set_count(const char *, ExactCounterType c)
-        void set_count(HashIntoType, ExactCounterType c)
+cdef class _Hashbits:
+    pass
 
-        HashIntoType n_entries()
-        const WordLength ksize() const
-        const HashIntoType max_hash() const
 
-        void consume_string(const string &)
-        void clear()
-        void update(const KTable &)
-        KTable * intersect(const KTable &) const
-
-    cdef HashIntoType _hash(const char*, const WordLength)
-    cdef HashIntoType _hash(const char *, const WordLength,
-                            HashIntoType&, HashIntoType&)
-    cdef HashIntoType _hash_forward(const char *, WordLength)
-    cdef string _revhash(HashIntoType, WordLength)
+cdef class ReadParser:
+    pass
 
 
 cdef class PyKTable:
@@ -77,7 +57,7 @@ cdef class PyKTable:
             raise ValueError("k-mer length must be the same as the hashtable k-size")
         return _hash_forward(kmer, self.thisptr.ksize())
 
-    def reverse_hash(self, long val):
+    def reverse_hash(self, HashIntoType val):
         """Convert int to string"""
         return _revhash(val, self.thisptr.ksize())
 
@@ -143,6 +123,61 @@ cdef class PyKTable:
         self.thisptr.clear()
 
 
+
 def new_ktable(size):
     """ Create an empty ktable """
     return PyKTable(size)
+
+
+def get_config():
+    """Get active khmer configuration object"""
+    pass
+
+
+def new_hashtable():
+    """Create an empty single-table counting hash"""
+    pass
+
+
+def _new_counting_hash():
+    """Create an empty counting hash"""
+    pass
+
+
+def _new_hashbits():
+    """Create an empty hashbits table"""
+    pass
+
+
+def new_readaligner():
+    """Create a read aligner object"""
+    pass
+
+
+def forward_hash(const char* kmer, WordLength size):
+    max_size = 2 ** (sizeof(WordLength) * 7)
+    if size >= max_size:
+        raise ValueError("k-mer size must be < %s" % max_size)
+    if len(kmer) < size:
+        raise ValueError("k-mer size must be >= %s" % size)
+    return _hash(kmer, size)
+
+
+def forward_hash_no_rc(const char* kmer, WordLength size):
+    max_size = 2 ** (sizeof(WordLength) * 7)
+    if size >= max_size:
+        raise ValueError("k-mer size must be < %s" % max_size)
+    if len(kmer) < size:
+        raise ValueError("k-mer size must be >= %s" % size)
+    return _hash_forward(kmer, size)
+
+
+def reverse_hash(HashIntoType val, WordLength size):
+    max_size = 2 ** (sizeof(WordLength) * 7)
+    if size >= max_size:
+        raise ValueError("k-mer size must be < %s" % max_size)
+    return _revhash(val, size)
+
+
+def set_reporting_callback(cb):
+    pass
