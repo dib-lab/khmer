@@ -34,7 +34,8 @@ def output_single(r):
 
 def main():
     parser = argparse.ArgumentParser(
-        "Uniformly subsample sequences from a collection of files")
+        "Uniformly subsample sequences from a collection of files",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',

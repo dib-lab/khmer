@@ -59,15 +59,17 @@ then
 		http://scan5.coverity.com/cgi-bin/upload.py
 fi
 
-
-pip install --quiet nosexcover
-python setup.py nosetests --with-xcoverage --with-xunit --cover-package=khmer \
-	--cover-erase --attr=\!known_failing
+pip install --quiet nose coverage
+./setup.py develop
+make coverage
+# we need to get coverage to look at our scripts. Since they aren't in a
+# python module we can't tell nosetests to look for them (via an import
+# statement). So we run nose inside of coverage.
 
 make doc
 
 pip install --quiet pylint
-pylint -f parseable khmer/*.py scripts/*.py tests khmer | tee ../pylint.out
+make pylint
 
 if [[ -n "${coverage_post}" ]]
 	# was -v coverage_post but OS X bash not new enough
@@ -80,6 +82,5 @@ then
 
 	make cppcheck
 
-	mkdir -p doc/doxygen
-	doxygen
+	make doxygen
 fi

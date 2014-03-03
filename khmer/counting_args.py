@@ -1,10 +1,13 @@
-#
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-#
+'''Shared ArgumentParser methods.
+
+This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+Copyright (C) Michigan State University, 2009-2014. It is licensed under
+the three-clause BSD license; see doc/LICENSE.txt.
+Contact: khmer-project@idyll.org
+'''
 import os
 import argparse
+import khmer
 
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -12,11 +15,17 @@ DEFAULT_MIN_HASHSIZE = 1e6
 
 
 def build_construct_args(descr=None):
+    """Build common options for counting hash scripts.
+
+    Returns an argparse.ArgumentParser.
+    """
 
     if descr is None:
         descr = 'Build & load a counting Bloom filter.'
 
-    parser = argparse.ArgumentParser(description=descr)
+    parser = argparse.ArgumentParser(
+        description=descr,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
@@ -24,6 +33,7 @@ def build_construct_args(descr=None):
 
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
+
     parser.add_argument('--ksize', '-k', type=int, dest='ksize',
                         default=env_ksize,
                         help='k-mer size to use')
@@ -33,13 +43,22 @@ def build_construct_args(descr=None):
     parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
                         default=env_hashsize,
                         help='lower bound on hashsize to use')
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
 
     return parser
 
 
 def build_counting_multifile_args():
-    parser = argparse.ArgumentParser(description=
-                                     'Use a counting Bloom filter.')
+    """Build common options for multi-file counting hash scripts.
+
+    Returns an argparse.ArgumentParser.
+    """
+    parser = argparse.ArgumentParser(
+        description='Use a counting Bloom filter.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--version', action='version', version='%(prog)s ' +
+                        khmer.__version__)
 
     parser.add_argument('input_table')
     parser.add_argument('input_filenames', nargs='+')
@@ -48,9 +67,8 @@ def build_counting_multifile_args():
 
 
 def report_on_config(args):
-    """
-        Summarizes the configuration produced by the command-line arguments
-        made available by this module.
+    """Summarize the configuration produced by the command-line arguments
+    made available by this module.
     """
 
     from khmer.utils import print_error

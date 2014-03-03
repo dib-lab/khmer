@@ -23,6 +23,7 @@ import argparse
 import os
 import math
 from khmer.file_api import check_file_status, check_space
+from khmer.khmer_args import build_hasbits_args, report_on_config
 #
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -30,41 +31,13 @@ DEFAULT_HASHSIZE = 1e6
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Use bloom filter to count overlap k-mers')
-    env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
-    env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_HASHSIZE)
-    parser.add_argument('-q', '--quiet', dest='quiet', default=False,
-                        action='store_true')
-    parser.add_argument('--ksize', '-k', type=int, dest='ksize',
-                        default=env_ksize,
-                        help='k-mer size to use '
-                             '(should be the same as in htfile)')
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
-                        default=env_n_hashes,
-                        help='number of hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='hashsize',
-                        default=env_hashsize,
-                        help='hashsize to use')
+    parser = build_hashbits_args()
     parser.add_argument('htfile')
     parser.add_argument('fafile')
     parser.add_argument('report_filename')
     args = parser.parse_args()
-    if not args.quiet:
-        if args.hashsize == DEFAULT_HASHSIZE:
-            print >>sys.stderr, \
-                "** WARNING: hashsize is default!  " \
-                "You absodefly want to increase this!\n** " \
-                "Please read the docs!"
-        print >>sys.stderr, '\nPARAMETERS:'
-        print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
-        print >>sys.stderr, ' - hashsize = %-5.2g \t(-x)' % args.hashsize
-        print >>sys.stderr, \
-            'Estimated memory usage is %.2g bytes (n_hashes x hashsize / 8)' \
-            % (args.n_hashes * args.hashsize / 8.)
-        print >>sys.stderr, '-' * 8
+
+    report_on_config(args, hashtype='hashbits')
 
     K = args.ksize
     HT_SIZE = args.hashsize
@@ -74,14 +47,6 @@ def main():
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
 
-    # Check if input files exist
-    infiles = [htfile, fafile]
-    for infile in infiles:
-        check_file_status(infile)
-    
-    # Check free space
-    check_space(infiles)
-    
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
     K = ht1.ksize()

@@ -68,7 +68,9 @@ def worker(q, basename, stop_big_traversals):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Partition a graph.")
+    parser = argparse.ArgumentParser(
+        description="Partition a graph.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('basename')
     parser.add_argument('--stoptags', '-S', dest='stoptags', default='',

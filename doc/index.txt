@@ -8,7 +8,7 @@ khmer -- k-mer counting & filtering FTW
 
 :Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe, 
           Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason Pell, Jared Simpson,
-          C. S. Welcher, Qingpeng Zhang, and C. Titus Brown
+          Camille Scott, Qingpeng Zhang, and C. Titus Brown
 
 :Contact: khmer-project@idyll.org
 :License: BSD
@@ -53,6 +53,8 @@ Contents:
    design
    details
    development
+   galaxy
+   known-issues
    sequence-access-patterns
    release
    crazy-ideas

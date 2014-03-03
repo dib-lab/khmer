@@ -1,0 +1,86 @@
+<tool	id="gedlab-khmer-filter-abund"
+	name="Filter by abundance"
+	version="0.7.1"
+	force_history_refresh="true">
+	
+	<description>
+		Trims fastq/fasta sequences at k-mers of a given abundance
+		based on a provided hash table.
+	</description>
+
+	<requirements>
+		<requirement
+			type="python-module"
+			version="0.7">
+				khmer
+		</requirement>
+    	</requirements>
+	
+	<version_command>
+		filter-abund.py --version
+    	</version_command>
+
+   	<command>
+		filter-abund.py
+		$variable_coverage
+		$hashtable_to_load
+		--out=$output
+		#for input in $inputs
+			$input
+		#end for
+	</command>
+
+	<inputs>
+		<param	name="inputs"
+			multiple="true"
+			type="data"
+			format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
+			label="FAST[AQ] file(s)"
+			help="Put in order of precedence such as longest reads first." />
+
+		<param	name="variable_coverage"
+			type="boolean"
+			checked="false"
+			truevalue="--variable-coverage"
+			falsevalue=""
+			label="Variable coverage"
+			help="Only trim when a sequence has high enough coverage (median abundance > 20)" />
+
+		<param	name="hashtable_to_load"
+			type="data"
+			optional="false"
+			label="the khmer abundance table to load"
+			help="The inputs file(s) will be processed using the kmer counts in the specified hashtable file." />
+	</inputs>
+	<outputs>
+		<data	name="output"
+			format="input"
+		       	label="${tool.name} processed reads from #echo ', '.join(map(str, $inputs ))#"	/>
+	</outputs>
+ 	<stdio>
+        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
+		<exit_code	range="1:"
+				level="fatal" />
+	</stdio>
+    
+    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
+    <tests>
+        <!-- [HELP] Test files have to be in the ~/test-data directory
+        <test>
+            <param name="input" value="input_test.tab" />
+            <param name="int"   value="10" />
+            <output name="output" file="output_test.txt" />
+	</test> -->
+        <!-- [HELP] Multiple tests can be defined with different parameters -->
+<!--
+        <test>
+        </test>
+-->
+    </tests>
+    
+    <!-- [OPTIONAL] Help displayed in Galaxy -->
+    <!--
+	<help>
+	</help>
+    -->    
+</tool>

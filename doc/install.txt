@@ -9,74 +9,100 @@ The khmer project currently works with Python 2.6 but we target Python 2.7+.
 Build requirements
 ------------------
 
-OS X
+OS X 
 ^^^^
 
-1) Install Xcode from the `Mac App Store (requires root)
+#) If you just what to use the khmer project tools and not develop them then
+skip to step 4).
+
+#) Install Xcode from the `Mac App Store (requires root)
    <https://developer.apple.com/xcode/>`_
 
-2) `Register as an Apple Developer <https://developer.apple.com/register>`_
+#) `Register as an Apple Developer <https://developer.apple.com/register>`__.
 
-3) Install the Xcode command-line tools: Xcode -> preferences ->
+#) Install the Xcode command-line tools: Xcode -> preferences ->
    Downloads -> Command Line Tools (requires root)
 
-4) From a terminal install virtualenv/pip::
+#) From a terminal install virtualenv. You'll need the URL of the `latest
+virtualenv release <https://pypi.python.org/packages/source/v/virtualenv/>`__.
 
-      curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
-      python get-pip.py --user
-      #add the python user binaries to your path if needed
-      echo "PATH=\$PATH:`python2.7 -c "import site; print site.getuserbase()"`/bin; export PATH" >> ~/.bash_profile
-      source ~/.bash_profile
-      pip install --user virtualenv
+::
 
+      curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.x.y.tar.gz
+      tar xzf virtualenv*
+      cd virtualenv-*; python virtualenv.py ../khmerEnv; cd ..
+      source khmerEnv/bin/activate
 
 Linux
 ^^^^^
 
-Install the python development environment, virtualenv, pip, and
+#) Install the python development environment, virtualenv, pip, and
 gcc.
 
-On Debian and Ubuntu this can be done with::
+On recent Debian and Ubuntu this can be done with::
 
    sudo apt-get install python2.7-dev python-virtualenv python-pip gcc
 
 For RHEL6::
 
    sudo yum install -y python-devel python-pip git gcc gcc-c++ make
-   sudo pip install virtualenv
+   sudo pip install virtualenv   
+
+#) Create a virtualenv and activate it::
+
+      cd a/writeable/directory/
+      virtualenv khmerEnv
+      source khmerEnv/bin/activate
+
+Linux users without root access can try step 4) from the OS X instructions above
 
 Latest stable release
 ---------------------
 
-1) Create a virtualenv and activate it::
+#) Check your pip version::
 
-      virtualenv env
-      source env/bin/activate
+	pip --version
 
-2) Use pip to download, build, and install khmer and its dependencies::
+#) Use pip to download, build, and install khmer and its dependencies.
 
-      pip install --allow-external argparse khmer
+If you're running version 1.5 or greater of pip::
+        pip install --allow-external argparse khmer
+For pip version 1.4.1 and earlier::
+	pip install khmer
 
-3) The scripts are now in the ``env/bin`` directory and ready for your
+#) The scripts are now in the ``env/bin`` directory and ready for your
    use. You can directly use them by name, see :doc:`scripts`.
 
 4) When returning to khmer after installing it you will need to
    reactivate the virtualenv first::
 
-      source env/bin/activate
+      source khmerEnv/bin/activate
 
 Latest development branch
 -------------------------
 
-Repeat the above but modify the pip install line::
+Repeat the above but modify the pip install line.
 
-   pip install --allow-external argparse --editable git+https://github.com/ged-lab/khmer.git@master#egg=khmer
+If you're running version 1.5 or greater of ``pip`` then::
+
+	pip install --allow-external argparse git+https://github.com/ged-lab/khmer.git@master#egg=khmer
+
+For ``pip`` version 1.4.1 and earlier::
+
+   pip install git+https://github.com/ged-lab/khmer.git@master#egg=khmer
+
+You can change ``master`` in the above command to the name of another branch.
 
 Run the tests
 ^^^^^^^^^^^^^
 
-From within your activated virtualenv you will find the source in
-env/src/khmer::
+If you're running a version of ``pip`` less than 1.4 and you want to run the
+tests then you should upgrade ``pip``::
 
-   cd env/src/khmer
-   make test
+	pip install --user --upgrade pip
+
+Repeat the appropriate installation procedure from above but add "--no-clean"
+to the ``pip`` invocation.
+
+The source will be in the ``khmerEnv/build/khmer`` directory. Run
+``make test`` there.

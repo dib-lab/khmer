@@ -20,7 +20,8 @@ from khmer.file_api import check_file_status, check_space
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Split interleaved reads into two files, left and right.')
+        description='Split interleaved reads into two files, left and right.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infile')
     args = parser.parse_args()

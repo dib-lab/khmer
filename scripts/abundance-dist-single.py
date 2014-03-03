@@ -14,8 +14,6 @@ Use '-h' for parameter help.
 """
 import sys
 import khmer
-import argparse
-import os
 import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
@@ -43,13 +41,6 @@ def main():
     args = parser.parse_args()
     report_on_config(args)
 
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
-    n_threads = int(args.n_threads)
-
-    datafile = args.datafile
-    histout = args.histout
     squash = args.squash
 
     # Check if input files exist
@@ -59,92 +50,92 @@ def main():
     
     # Check free space
     check_space(infiles)
-
     print 'making hashtable'
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT, n_threads)
-    ht.set_use_bigcount(args.bigcount)
+    counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
+                                            args.n_hashes,
+                                            args.n_threads)
+    counting_hash.set_use_bigcount(args.bigcount)
 
     print 'building tracking ht'
-    K = ht.ksize()
-    sizes = ht.hashsizes()
-    tracking = khmer._new_hashbits(K, sizes)
+    tracking = khmer.new_hashbits(counting_hash.ksize(), args.min_hashsize,
+                                  args.n_hashes)
 
-    print 'K:', K
-    print 'HT sizes:', sizes
-    print 'outputting to', histout
+    print 'kmer_size:', counting_hash.ksize()
+    print 'counting hash sizes:', counting_hash.hashsizes()
+    print 'outputting to', args.histout
 
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
+    khmer.get_config().set_reads_input_buffer_size(args.n_threads * 64 * 1024)
 
     # start loading
-    rparser = khmer.ReadParser(datafile, n_threads)
+    rparser = khmer.ReadParser(args.datafile, args.n_threads)
     threads = []
-    print 'consuming input, round 1 --', datafile
-    for tnum in xrange(n_threads):
-        t = \
+    print 'consuming input, round 1 --', args.datafile
+    for _ in xrange(args.n_threads):
+        thread = \
             threading.Thread(
-                target=ht.consume_fasta_with_reads_parser,
+                target=counting_hash.consume_fasta_with_reads_parser,
                 args=(rparser, )
             )
-        threads.append(t)
-        t.start()
+        threads.append(thread)
+        thread.start()
 
-    for t in threads:
-        t.join()
+    for thread in threads:
+        thread.join()
 
-    z_list = []
+    abundance_lists = []
 
-    def do_abundance_dist(r):
-        z = ht.abundance_distribution_with_reads_parser(r, tracking)
-        z_list.append(z)
+    def __do_abundance_dist__(read_parser):
+        abundances = counting_hash.abundance_distribution_with_reads_parser(
+            read_parser, tracking)
+        abundance_lists.append(abundances)
 
-    print 'preparing hist from %s...' % datafile
-    rparser = khmer.ReadParser(datafile, n_threads)
+    print 'preparing hist from %s...' % args.datafile
+    rparser = khmer.ReadParser(args.datafile, args.n_threads)
     threads = []
-    print 'consuming input, round 2 --', datafile
-    for tnum in xrange(n_threads):
-        t = \
+    print 'consuming input, round 2 --', args.datafile
+    for _ in xrange(args.n_threads):
+        thread = \
             threading.Thread(
-                target=do_abundance_dist,
+                target=__do_abundance_dist__,
                 args=(rparser,)
             )
-        threads.append(t)
-        t.start()
+        threads.append(thread)
+        thread.start()
 
-    for t in threads:
-        t.join()
+    for thread in threads:
+        thread.join()
 
-    assert len(z_list) == n_threads, len(z_list)
-    z = {}
-    for zz in z_list:
-        for i, count in enumerate(zz):
-            z[i] = z.get(i, 0) + count
+    assert len(abundance_lists) == args.n_threads, len(abundance_lists)
+    abundance = {}
+    for abundance_list in abundance_lists:
+        for i, count in enumerate(abundance_list):
+            abundance[i] = abundance.get(i, 0) + count
 
-    total = sum(z.values())
+    total = sum(abundance.values())
 
     if 0 == total:
         print >>sys.stderr, \
             "ERROR: abundance distribution is uniformly zero; " \
             "nothing to report."
         print >>sys.stderr, "\tPlease verify that the input files are valid."
-        sys.exit(-1)
+        sys.exit(1)
 
     # If histfile exists (even if empty), check if squash is allowed
     if (fileApi.checkFileStatus(histout) != fileApi.FileStatus.FileNonExistent) and (not squash):
         print >>sys.stderr, 'ERROR: %s exists; not squashing.' % histout
         sys.exit(-1)
     else:
-        fp = open(histout, 'w')
+    fp = open(histout, 'w')
 
     sofar = 0
-    for n, i in sorted(z.items()):
+    for _, i in sorted(abundance.items()):
         if i == 0 and not args.output_zero:
             continue
 
         sofar += i
         frac = sofar / float(total)
 
-        print >>fp, n, i, sofar, round(frac, 3)
+        print >>hist_fp, _, i, sofar, round(frac, 3)
 
         if sofar == total:
             break
@@ -152,7 +143,7 @@ def main():
     if args.savehash:
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
-        ht.save(args.savehash)
+        counting_hash.save(args.savehash)
 
 if __name__ == '__main__':
     main()

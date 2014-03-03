@@ -35,7 +35,8 @@ def output_pair(r1, r2):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Produce interleaved files from R1/R2 paired files')
+        description='Produce interleaved files from R1/R2 paired files',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infiles', nargs='+')
     parser.add_argument('-o', '--output',
@@ -68,7 +69,7 @@ def main():
         fail = True
 
     if fail:
-        sys.exit(-1)
+        sys.exit(1)
 
     print >>sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
 
