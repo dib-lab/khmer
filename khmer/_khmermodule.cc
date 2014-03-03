@@ -4944,7 +4944,7 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((char)ksize != ksize) {
+    if ((unsigned char)ksize != ksize) {
         PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
         return NULL;
     }
@@ -4966,12 +4966,6 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if (strlen(kmer) != ksize) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashtable k-size");
-        return NULL;
-    }
-
     return PyLong_FromUnsignedLongLong(_hash_forward(kmer, ksize));
 }
 
@@ -4984,7 +4978,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((char)ksize != ksize) {
+    if ((unsigned char)ksize != ksize) {
         PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
         return NULL;
     }
