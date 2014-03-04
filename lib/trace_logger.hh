@@ -32,8 +32,9 @@ struct TraceLogger
 	TLVL_CRITICAL	= 50,
 	TLVL_NONE	= 255
     };
-    
+#ifdef WITH_INTERNAL_TRACING    
     TraceLogger( uint8_t const level, FILE * stream_handle );
+#endif
     TraceLogger(
 	uint8_t const level, char const * const file_name_format, ...
     );
