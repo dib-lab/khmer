@@ -98,7 +98,7 @@ struct UnknownPairReadingMode : public std:: exception
 struct InvalidReadPair : public std:: exception
 { };
 
-
+#ifdef WITH_INTERNAL_METRICS
 struct StreamReaderPerformanceMetrics : public IPerformanceMetrics
 {
     
@@ -117,13 +117,13 @@ struct StreamReaderPerformanceMetrics : public IPerformanceMetrics
     virtual void    accumulate_timer_deltas( uint32_t metrics_key );
 
 };
-
+#endif
 
 struct IStreamReader
 {
-
+#ifdef WITH_INTERNAL_METRICS
     StreamReaderPerformanceMetrics  pmetrics;
-    
+#endif
 	    IStreamReader( );
     virtual ~IStreamReader( );
 
@@ -198,7 +198,7 @@ private:
 
 };
 
-
+#ifdef WITH_INTERNAL_METRICS
 struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics
 {
     
@@ -240,7 +240,7 @@ protected:
     uint32_t	    _accumulated_count;
 
 };
-
+#endif
 
 struct CacheManager
 {
@@ -285,7 +285,9 @@ private:
 	std:: string			ca_buffer;
 	uint64_t			fill_id;
 	bool				found_EOS;
+#ifdef WITH_INTERNAL_METRICS
 	CacheSegmentPerformanceMetrics	pmetrics;
+#endif
 	TraceLogger			trace_logger;
 	
 	CacheSegment(
@@ -360,7 +362,7 @@ struct Read
 
 typedef std:: pair< Read, Read >	ReadPair;
 
-
+#ifdef WITH_INTERNAL_METRICS
 struct ParserPerformanceMetrics: public IPerformanceMetrics
 {
     
@@ -374,6 +376,7 @@ struct ParserPerformanceMetrics: public IPerformanceMetrics
     virtual void    accumulate_timer_deltas( uint32_t metrics_key );
 
 };
+#endif
 
 
 struct IParser
@@ -446,8 +449,9 @@ protected:
 	uint8_t			    buffer[ BUFFER_SIZE + 1 ];
 	uint64_t		    buffer_pos;
 	uint64_t		    buffer_rem;
-
+#ifdef WITH_INTERNAL_METRICS
 	ParserPerformanceMetrics    pmetrics;
+#endif
 	TraceLogger		    trace_logger;
 	
 	ParserState( uint32_t const thread_id, uint8_t const trace_level );

@@ -35,6 +35,12 @@ flags = [
     '/usr/include',
     '-isystem',
     '/usr/local/include',
+    '-system',
+    '/usr/include/c++/4.8',
+    '-I',
+    '/usr/include/python2.7',
+    '-I',
+    'lib'
 ]
 
 

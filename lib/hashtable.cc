@@ -15,7 +15,7 @@ using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
 
-
+#ifdef WITH_INTERNAL_METRICS
 HashTablePerformanceMetrics::
 HashTablePerformanceMetrics( )
 : IPerformanceMetrics( ),
@@ -62,7 +62,7 @@ accumulate_timer_deltas( uint32_t metrics_key )
   }
 
 }
-
+#endif
 
 Hashtable:: Hasher::
 Hasher(
@@ -72,7 +72,9 @@ Hasher(
 )
 : pool_id( pool_id ),
   thread_id( thread_id ),
+#ifdef WITH_INTERNAL_METRICS
   pmetrics( HashTablePerformanceMetrics( ) ),
+#endif
   trace_logger(
     TraceLogger(
       trace_level, "hashtable-%lu-%lu.log",

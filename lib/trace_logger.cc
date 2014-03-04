@@ -27,8 +27,8 @@ TraceLogger( uint8_t const level, FILE * stream_handle )
 
 TraceLogger::
 TraceLogger( uint8_t const level, char const * const file_name_format, ... )
-    : _level( level ), _shared_stream( false )
 #ifdef WITH_INTERNAL_TRACING
+    : _level( level ), _shared_stream( false )
 {
     char	tfile_name[ FILENAME_MAX + 1 ];
     va_list	varargs;

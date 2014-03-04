@@ -4,9 +4,11 @@
     scalar field (UNINIT_CTOR) 
     * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
     (UNINIT_CTOR)
-
     * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
     (CTOR_DTOR_LEAK)
+    * lib/{perf_metrics.{cc,hh},hashtable.{cc,hh}
+    ,read_parsers.{cc,hh},trace_logger.{cc,hh}}: ifndef WITH_INTERNAL_METRICS
+    then lets not + astyle -A10
 
 2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
 
