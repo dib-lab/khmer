@@ -149,7 +149,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 
 
 
-    string currName = "";
     string currSeq = "";
 
     //
@@ -159,7 +158,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     while(!parser->is_complete())  {
         read = parser->get_next_read();
         currSeq = read.sequence;
-        currName = read.name;
 
         unsigned int this_n_consumed;
         bool is_valid;
@@ -202,10 +200,9 @@ unsigned int Hashbits::consume_string_overlap(const std::string &s,
     unsigned int n_consumed = 0;
 
     KMerIterator kmers(sp, _ksize);
-    HashIntoType kmer;
 
     while(!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
         count_overlap(kmer,ht2);
         n_consumed++;
