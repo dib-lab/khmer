@@ -36,7 +36,7 @@
 #define CALLBACK_PERIOD 100000
 
 namespace khmer {
-
+#ifdef WITH_INTERNAL_METRICS
   struct HashTablePerformanceMetrics : public IPerformanceMetrics
   {
 	
@@ -60,7 +60,7 @@ namespace khmer {
 	virtual void	accumulate_timer_deltas( uint32_t metrics_key );
 
   };
-
+#endif
   //
   // Sequence iterator class, test.  Not really a C++ iterator yet.
   //
@@ -152,7 +152,9 @@ namespace khmer {
 
 	uint32_t			pool_id;
 	uint32_t			thread_id;
+#ifdef WITH_INTERNAL_METRICS
 	HashTablePerformanceMetrics	pmetrics;
+#endif
 	TraceLogger			trace_logger;
 
 	Hasher(

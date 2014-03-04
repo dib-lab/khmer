@@ -63,7 +63,7 @@ InvalidFASTQFileFormat( char const * reason, char const * evidence )
 : InvalidReadFileFormat( "InvalidFASTQFileFormat", reason, evidence )
 { }
 
-
+#ifdef WITH_INTERNAL_METRICS
 StreamReaderPerformanceMetrics::
 StreamReaderPerformanceMetrics( )
 :   IPerformanceMetrics( ),
@@ -95,11 +95,14 @@ accumulate_timer_deltas( uint32_t metrics_key )
     }
 
 }
-
+#endif
 
 IStreamReader::
 IStreamReader( )
-:   pmetrics( StreamReaderPerformanceMetrics( ) ),
+:
+#ifdef WITH_INTERNAL_METRICS
+    pmetrics( StreamReaderPerformanceMetrics( ) ),
+#endif
     _alignment( 0 ),
     _max_aligned( SSIZE_MAX ),
     _at_eos( false )
@@ -374,7 +377,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     return nbread_total;
 }
 
-
+#ifdef WITH_INTERNAL_METRICS
 CacheSegmentPerformanceMetrics::
 CacheSegmentPerformanceMetrics( )
 :   IPerformanceMetrics( ),
@@ -481,7 +484,7 @@ accumulate_metrics( CacheSegmentPerformanceMetrics &source )
     source._accumulated_count;
 
 }
-
+#endif
 
 CacheManager::
 CacheManager(
@@ -548,7 +551,9 @@ CacheSegment(
     cursor_in_ca_buffer( false ),
     fill_id( 0 ),
     found_EOS( false ),
+#ifdef WITH_INTERNAL_METRICS
     pmetrics( CacheSegmentPerformanceMetrics( ) ),
+#endif
     trace_logger(
 	TraceLogger(
 	    trace_level, "cmgr-%lu.log", (unsigned long int)thread_id
@@ -1176,7 +1181,7 @@ _get_segment_ref_count_ATOMIC( )
     return __sync_and_and_fetch( &_segment_ref_count, (uint32_t)0xffffffff );
 }
 
-
+#ifdef WITH_INTERNAL_METRICS
 ParserPerformanceMetrics::
 ParserPerformanceMetrics( )
 :   numlines_copied( 0 ),
@@ -1194,7 +1199,7 @@ void
 ParserPerformanceMetrics::
 accumulate_timer_deltas( uint32_t metrics_key )
 { }
-
+#endif
 
 IParser * const
 IParser::
@@ -1374,7 +1379,9 @@ ParserState( uint32_t const thread_id, uint8_t const trace_level )
     need_new_line( true ),
     buffer_pos( 0 ),
     buffer_rem( 0 ), 
+#ifdef WITH_INTERNAL_METRICS
     pmetrics( ParserPerformanceMetrics( ) ),
+#endif
     trace_logger(
 	TraceLogger(
 	    trace_level, "parser-%lu.log", (unsigned long int)thread_id
