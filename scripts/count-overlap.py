@@ -23,7 +23,7 @@ import argparse
 import os
 import math
 from khmer.file_api import check_file_status, check_space
-from khmer.khmer_args import build_hasbits_args, report_on_config
+from khmer.khmer_args import build_hashbits_args, report_on_config
 #
 DEFAULT_K = 32
 DEFAULT_N_HT = 4

@@ -12,6 +12,7 @@ loading a prebuilt counting hash.
 
 Use '-h' for parameter help.
 """
+import os
 import sys
 import khmer
 import threading
@@ -44,7 +45,7 @@ def main():
     squash = args.squash
 
     # Check if input files exist
-    infiles = [datafile]
+    infiles = [args.datafile]
     for infile in infiles:
         check_file_status(infile)
     
@@ -120,12 +121,12 @@ def main():
         print >>sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(1)
 
-    # If histfile exists (even if empty), check if squash is allowed
-    if (fileApi.checkFileStatus(histout) != fileApi.FileStatus.FileNonExistent) and (not squash):
-        print >>sys.stderr, 'ERROR: %s exists; not squashing.' % histout
+    # If histfile exists, check if squash is allowed
+    if (not squash and os.path.exists(args.histout)):
+        print >>sys.stderr, 'ERROR: %s exists; not squashing.' % args.histout
         sys.exit(-1)
     else:
-    fp = open(histout, 'w')
+        hist_fp = open(args.histout, 'w')
 
     sofar = 0
     for _, i in sorted(abundance.items()):

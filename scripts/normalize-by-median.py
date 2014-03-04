@@ -112,7 +112,7 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
     return total, discarded
 
 
-def handle_error(error, output_name, input_name, ht):
+def handle_error(error, output_name, input_name, fail_save, ht):
     print >>sys.stderr, '** ERROR:', error
     print >>sys.stderr, '** Failed on {name}: '.format(name=input_name)
     if fail_save:

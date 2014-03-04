@@ -38,7 +38,7 @@ def main():
     args = parser.parse_args()
     
     # Check if input files exist
-    infiles = [hashfile, datafile]
+    infiles = [args.hashname, args.datafile]
     for infile in infiles:
         check_file_status(infile)
     

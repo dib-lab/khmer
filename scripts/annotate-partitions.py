@@ -44,7 +44,7 @@ def main():
     # Check if input files exist
     check_file_status(partitionmap_file)
     for f in filenames:
-        fileApi.check_file_status(f)
+        check_file_status(f)
         
     # Check space availability
     check_space(filenames)
