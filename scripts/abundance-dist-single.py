@@ -12,23 +12,13 @@ loading a prebuilt counting hash.
 
 Use '-h' for parameter help.
 """
+import os
 import sys
 import khmer
 import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
-
-# Add sandbox to path - when fileApi is moved to 
-# scripts/, this can be removed
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
-import datetime
-import time
+from khmer.file_api import check_file_status, check_space
 
 def main():
     parser = build_construct_args(
@@ -52,23 +42,15 @@ def main():
     args = parser.parse_args()
     report_on_config(args)
 
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
-    n_threads = int(args.n_threads)
-
-    datafile = args.datafile
-    histout = args.histout
     squash = args.squash
 
     # Check if input files exist
-    infiles = [datafile]
+    infiles = [args.datafile]
     for infile in infiles:
-        fileApi.check_file_status(infile)
+        check_file_status(infile)
     
     # Check free space
-    fileApi.check_space(infiles)
-
+    check_space(infiles)
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
                                             args.n_hashes,
@@ -139,7 +121,12 @@ def main():
         print >>sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(1)
 
-    hist_fp = open(args.histout, 'w')
+    # If histfile exists, check if squash is allowed
+    if (not squash and os.path.exists(args.histout)):
+        print >>sys.stderr, 'ERROR: %s exists; not squashing.' % args.histout
+        sys.exit(-1)
+    else:
+        hist_fp = open(args.histout, 'w')
 
     sofar = 0
     for _, i in sorted(abundance.items()):

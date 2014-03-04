@@ -49,7 +49,7 @@ def main():
     histout = args.histout
     
     # Check if input files exist
-    infiles = [hashfile, datafile]
+    infiles = [args.hashname, args.datafile]
     for infile in infiles:
         fileApi.check_file_status(infile)
     
