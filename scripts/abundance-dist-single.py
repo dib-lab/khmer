@@ -50,7 +50,6 @@ def main():
     
     # Check free space
     check_space(infiles)
-    
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
                                             args.n_hashes,
