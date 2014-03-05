@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 ============================
 Installing and running khmer
 ============================
@@ -15,7 +17,7 @@ OS X
 If you just want to use the khmer project tools and not develop them then
 skip to step 4.
 
-1) Install Xcode from the `Mac App Store (requires root)
+#) Install Xcode from the `Mac App Store (requires root)
    <https://developer.apple.com/xcode/>`_.
 
 #) `Register as an Apple Developer <https://developer.apple.com/register>`__.
