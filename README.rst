@@ -16,6 +16,9 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 .. image:: https://landscape.io/github/ged-lab/khmer/master/landscape.png
    :target: https://landscape.io/github/ged-lab/khmer/master
    :alt: Python Code Health
+.. image:: https://scan.coverity.com/projects/621/badge.svg
+   :target: https://scan.coverity.com/projects/621
+   :alt: Coverity Scan Build Status
 
 The official repository is at
 
