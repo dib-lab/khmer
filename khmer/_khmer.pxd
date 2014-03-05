@@ -8,8 +8,8 @@ cdef extern from "khmer.hh" namespace "khmer":
 
 
 cdef extern from "ktable.hh" namespace "khmer":
-    cdef cppclass KTable:
-        KTable(long)
+    cdef cppclass CppKTable "khmer::KTable":
+        CppKTable(long)
         ExactCounterType get_count(const char *)
         ExactCounterType get_count(HashIntoType)
         void count(const char *)
@@ -22,8 +22,8 @@ cdef extern from "ktable.hh" namespace "khmer":
 
         void consume_string(const string &)
         void clear()
-        void update(const KTable &)
-        KTable * intersect(const KTable &) const
+        void update(const CppKTable &)
+        CppKTable * intersect(const CppKTable &) const
 
     cdef HashIntoType _hash(const char*, const WordLength)
     cdef HashIntoType _hash(const char *, const WordLength,

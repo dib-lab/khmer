@@ -20,13 +20,13 @@ cdef class ReadParser:
     pass
 
 
-cdef class PyKTable:
-    cdef KTable *thisptr
+cdef class KTable:
+    cdef CppKTable *thisptr
 
     def __cinit__(self, long size):
-        self.thisptr = new KTable(size)
+        self.thisptr = new CppKTable(size)
 
-    cdef __update_ktable__(self, KTable *new):
+    cdef __update_ktable__(self, CppKTable *new):
         # FIXME: only used by intersect, there must be a better way
         del self.thisptr
         self.thisptr = new
@@ -102,19 +102,19 @@ cdef class PyKTable:
         else:
             self.thisptr.set_count(<char *>val, c);
 
-    def update(self, PyKTable other):
+    def update(self, KTable other):
         """Combine another ktable with this one"""
         self.thisptr.update(deref(other.thisptr))
 
-    def intersect(self, PyKTable other):
+    def intersect(self, KTable other):
         """
         Create another ktable containing the intersection of two ktables:
         where both ktables have an entry, the counts will be summed.
         """
         # FIXME: there must be a better way
-        cdef KTable *intersection
+        cdef CppKTable *intersection
         intersection = self.thisptr.intersect(deref(other.thisptr))
-        ktable = PyKTable(1)
+        ktable = KTable(1)
         ktable.__update_ktable__(intersection)
         return ktable
 
@@ -126,7 +126,7 @@ cdef class PyKTable:
 
 def new_ktable(size):
     """ Create an empty ktable """
-    return PyKTable(size)
+    return KTable(size)
 
 
 def get_config():
