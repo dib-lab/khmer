@@ -6,6 +6,7 @@ Contact: khmer-project@idyll.org
 '''
 
 from cython.operator cimport dereference as deref
+from libc.limits cimport UINT_MAX
 
 
 cdef class _LabelHash:
@@ -18,6 +19,86 @@ cdef class _Hashbits:
 
 cdef class ReadParser:
     pass
+
+
+cdef class KCountingHash:
+    cdef CountingHash *thisptr
+
+    def __cinit__(self, WordLength ksize, vector[unsigned long long int]& tablesizes,
+                  uint32_t number_of_threads):
+        self.thisptr = new CountingHash(ksize, tablesizes, number_of_threads)
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def consume(self, const string& long_str):
+        return self.thisptr.consume_string(long_str)
+
+    def get(self, val):
+        if isinstance(val, int) or isinstance(val, long):
+            return self.thisptr.get_count(<HashIntoType>val);
+        else:
+            return self.thisptr.get_count(<char *>val);
+
+    def get_median_count(self, const string kmer):
+        if len(kmer) < self.thisptr.ksize():
+            raise ValueError("k-mer length must be >= the hashtable k-size")
+
+        cdef BoundedCounterType med = 0
+        cdef float average = 0, stddev = 0
+
+        self.thisptr.get_median_count(kmer, med, average, stddev)
+
+        return med, average, stddev
+
+    def get_kadian_count(self, const string kmer, unsigned int nk=1):
+        if len(kmer) < self.thisptr.ksize():
+            raise ValueError("k-mer length must be >= the hashtable k-size")
+
+        cdef BoundedCounterType kad = 0
+        self.thisptr.get_kadian_count(kmer, kad, nk)
+
+        return kad
+
+    def consume_fasta(self, const string filename, callback_obj=None):
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        cdef CallbackFn _report_fn = NULL
+
+#        try {
+        self.thisptr.consume_fasta(filename, total_reads, n_consumed,
+                                   _report_fn, <void*>callback_obj)
+#        } catch (_khmer_signal &e) {
+#            return NULL;
+#        }
+
+        return total_reads, n_consumed
+
+    def save(self, const string filename):
+        self.thisptr.save(filename)
+
+    def load(self, const string filename):
+        self.thisptr.load(filename)
+
+
+cdef class ReadAligner:
+    cdef Aligner *thisptr
+
+    def __cinit__(self, KCountingHash ch, lambdaOne=0.0, lambdaTwo=0.0,
+                  unsigned int maxErrorRegion=UINT_MAX):
+        self.thisptr= new Aligner(ch.thisptr, lambdaOne, lambdaTwo, maxErrorRegion)
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def align(self, string read):
+        cdef CandidateAlignment aln
+        cdef string rA
+
+        aln = self.thisptr.alignRead(read)
+        rA = aln.getReadAlignment(read)
+
+        return aln.alignment, rA
 
 
 cdef class KTable:
@@ -139,9 +220,9 @@ def new_hashtable():
     pass
 
 
-def _new_counting_hash():
+def _new_counting_hash(k, sizes, n_threads=1):
     """Create an empty counting hash"""
-    pass
+    return KCountingHash(k, sizes, n_threads)
 
 
 def _new_hashbits():
@@ -149,9 +230,9 @@ def _new_hashbits():
     pass
 
 
-def new_readaligner():
+def new_readaligner(KCountingHash ch, lambdaOne=0.0, lambdaTwo=0.0, unsigned int maxErrorRegion=UINT_MAX):
     """Create a read aligner object"""
-    pass
+    return ReadAligner(ch, lambdaOne, lambdaTwo, maxErrorRegion)
 
 
 def forward_hash(const char* kmer, WordLength size):
