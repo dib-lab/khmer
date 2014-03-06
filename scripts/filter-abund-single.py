@@ -110,7 +110,7 @@ def main():
 
     if args.savehash:
         # Check free space before hash file save
-        check_space_for_hashtable(args.ksize*args.min_hashsize)
+        check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
         ht.save(args.savehash)

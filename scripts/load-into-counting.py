@@ -81,7 +81,7 @@ def main():
 
         if n > 0 and n % 10 == 0:
             # Check free space before hash file save
-            check_space_for_hashtable(args.ksize*args.min_hashsize)
+            check_space_for_hashtable(K*HT_SIZE)
             print 'mid-save', base
             ht.save(base)
             open(base + '.info', 'w').write('through %s' % filename)
