@@ -22,7 +22,7 @@ from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
 from khmer.counting_args import build_counting_multifile_args
-from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
 #
 
 DEFAULT_CUTOFF = 2
@@ -109,6 +109,8 @@ def main():
     print 'output in', outfile
 
     if args.savehash:
+        # Check free space before hash file save
+        check_space_for_hashtable(args.ksize*args.min_hashsize)
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
         ht.save(args.savehash)
