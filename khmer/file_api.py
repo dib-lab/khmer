@@ -47,7 +47,7 @@ def check_space(inFiles):
     else:
         return True
 
-def check_space(hashSize):
+def check_space_for_hashtable(hashSize):
     """
     Check we have enough size to write a hash table
     and return appropriate values
