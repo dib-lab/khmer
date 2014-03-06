@@ -65,6 +65,12 @@ cdef extern from "counting.hh" namespace "khmer":
                            void *)
         void save(string)
         void load(string)
+        HashIntoType * abundance_distribution(string, CppHashbits *)
+
+
+cdef extern from "hashbits.hh" namespace "khmer":
+    cdef cppclass CppHashbits "khmer::Hashbits":
+        CppHashbits(WordLength, vector[unsigned long long int]&)
 
 
 cdef extern from "aligner.hh" namespace "khmer":

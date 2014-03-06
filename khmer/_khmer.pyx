@@ -8,13 +8,25 @@ Contact: khmer-project@idyll.org
 from cython.operator cimport dereference as deref
 from libc.limits cimport UINT_MAX
 
+# FIXME: ugly, but Cython has no way to check #define macros
+cdef int MAX_BIGCOUNT_C = 65535
+
 
 cdef class _LabelHash:
     pass
 
 
-cdef class _Hashbits:
-    pass
+cdef class Hashbits:
+    cdef CppHashbits *thisptr
+
+    def __cinit__(self, WordLength k, vector[unsigned long long int]& sizes):
+        self.thisptr = new CppHashbits(k, sizes)
+
+    def __dealloc__(self):
+        del self.thisptr
+
+
+_Hashbits = Hashbits
 
 
 cdef class ReadParser:
@@ -79,6 +91,11 @@ cdef class KCountingHash:
 
     def load(self, const string filename):
         self.thisptr.load(filename)
+
+    def abundance_distribution(self, string filename, Hashbits tracking):
+        cdef HashIntoType *dist
+        dist = self.thisptr.abundance_distribution(filename, tracking.thisptr)
+        return [dist[i] for i in range(0, MAX_BIGCOUNT_C)]
 
 
 cdef class ReadAligner:
@@ -225,9 +242,9 @@ def _new_counting_hash(k, sizes, n_threads=1):
     return KCountingHash(k, sizes, n_threads)
 
 
-def _new_hashbits():
+def _new_hashbits(k, sizes):
     """Create an empty hashbits table"""
-    pass
+    return Hashbits(k, sizes)
 
 
 def new_readaligner(KCountingHash ch, lambdaOne=0.0, lambdaTwo=0.0, unsigned int maxErrorRegion=UINT_MAX):
