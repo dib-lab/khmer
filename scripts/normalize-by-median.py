@@ -22,7 +22,7 @@ from khmer.khmer_args import build_counting_args, DEFAULT_MIN_HASHSIZE
 from khmer.khmer_args import add_loadhash_args
 from khmer.khmer_args import report_on_config
 import argparse
-from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
 
 DEFAULT_DESIRED_COVERAGE = 10
 
@@ -233,6 +233,8 @@ def main():
             ht.save(hashname)
 
     if args.savehash:
+        # Check space before hash file save
+        check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash
         ht.save(args.savehash)

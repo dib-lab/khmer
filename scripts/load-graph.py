@@ -21,7 +21,7 @@ import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import report_on_config
 from khmer.threading_args import add_threading_args
-from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
 
 def main():
     parser = build_hashbits_args()
@@ -84,6 +84,8 @@ def main():
         for t in threads:
             t.join()
 
+    # Check free space before hash file save
+    check_space_for_hashtable(args.ksize*args.min_hashsize)
     print 'saving hashtable in', base + '.ht'
     ht.save(base + '.ht')
 
