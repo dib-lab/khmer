@@ -24,14 +24,14 @@ def check_file_status(filePath):
         
 def check_space(inFiles):
     ''' Estimate size of inFiles passed, then calculate
-    disk space and return extra space needed to store
-    file or 0 if sufficient space'''
+    disk space available. Exit if insufficient disk space,
+    return True otherwise.'''
     
     # Get disk free space in Bytes assuming non superuser
     # and assuming all inFiles are in same disk
     dirPath = os.dirname(inFiles[0])
     target=os.statvfs(dirPath)
-    freeSpace = target.f_bsize * target.f_bavail 
+    freeSpace = target.f_frsize * target.f_bavail 
     #<TODO>: If SU, use target.f_bfree
     
     # Get input file size as worst case estimate of 
@@ -42,7 +42,24 @@ def check_space(inFiles):
     sizeDiff = totalSize-freeSpace
     if sizeDiff > 0:
         print >>sys.stderr, 'ERROR: Not enough free space on disk, \
-        need at least %s more,' % str(freeSpace)
+        need at least %s more,' % str(sizeDiff)
+        sys.exit(-1)
+    else:
+        return True
+
+def check_space(hashSize):
+    """
+    Check we have enough size to write a hash table
+    and return appropriate values
+    """
+    dirPath = os.path.dirname(os.path.realpath(__file__))
+    target=os.statvfs(dirPath)
+    freeSpace = target.f_frsize * target.f_bavail
+    
+    sizeDiff = hashSize-freeSpace
+    if sizeDiff > 0:
+        print >>sys.stderr, 'ERROR: Not enough free space on disk, \
+        need at least %s more,' % str(sizeDiff)
         sys.exit(-1)
     else:
         return True
