@@ -85,7 +85,7 @@ def main():
             t.join()
 
     # Check free space before hash file save
-    check_space_for_hashtable(args.ksize*args.min_hashsize)
+    check_space_for_hashtable(K*HT_SIZE)
     print 'saving hashtable in', base + '.ht'
     ht.save(base + '.ht')
 
