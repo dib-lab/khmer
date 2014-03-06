@@ -22,15 +22,7 @@ from khmer.khmer_args import build_counting_args, DEFAULT_MIN_HASHSIZE
 from khmer.khmer_args import add_loadhash_args
 from khmer.khmer_args import report_on_config
 import argparse
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
 
 DEFAULT_DESIRED_COVERAGE = 10
 
@@ -140,6 +132,8 @@ def main():
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
+    parser.add_argument('-l', '--loadhash', dest='loadhash',
+                        default='')
     parser.add_argument('-R', '--report-to-file', dest='report_file',
                         type=argparse.FileType('w'))
     parser.add_argument('-f', '--fault-tolerant', dest='force',
@@ -170,6 +164,13 @@ def main():
     force = args.force
     dump_frequency = args.dump_frequency
     fail_save = args.fail_save
+    
+    # Check input files exist
+    for f in filenames:
+        check_file_status(f)
+
+    # Check disk space availability
+    check_space(filenames)
 
     # list to save error files along with throwing exceptions
     if force is True:
@@ -232,6 +233,8 @@ def main():
             ht.save(hashname)
 
     if args.savehash:
+        # Check space before hash file save
+        check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash
         ht.save(args.savehash)
