@@ -24,15 +24,6 @@ from khmer.khmer_args import report_on_config
 import argparse
 from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
 
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
-
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
@@ -141,8 +132,6 @@ def main():
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
-    parser.add_argument('-l', '--loadhash', dest='loadhash',
-                        default='')
     parser.add_argument('-R', '--report-to-file', dest='report_file',
                         type=argparse.FileType('w'))
     parser.add_argument('-f', '--fault-tolerant', dest='force',

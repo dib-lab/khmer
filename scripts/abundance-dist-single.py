@@ -51,9 +51,6 @@ def main():
     # Check free space
     check_space(infiles)
     
-    # Check free space before hash table creation
-    check_space_for_hashtable(args.ksize*args.min_hashsize)
-    
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
                                             args.n_hashes,
