@@ -66,20 +66,22 @@ then
 		http://scan5.coverity.com/cgi-bin/upload.py
 fi
 ./setup.py install
-make coverage.xml
-make doc
-
-make pylint 2>&1 > pylint.out
-
-make pep8 2>&1 > pep8.out
 
 if [[ -n "${coverage_post}" ]]
-	# was -v coverage_post but OS X bash not new enough
 then
+	make coverage.xml
+	make doc
+
+	make pylint 2>&1 > pylint.out
+
+	make pep8 2>&1 > pep8.out
+
 	pip install --quiet -U gcovr
 	make coverage-gcovr.xml
 
 	make cppcheck-result.xml
 
 	make doxygen 2>&1 > doxygen.out
+else
+	make test
 fi
