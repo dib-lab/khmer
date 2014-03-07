@@ -54,7 +54,10 @@ else
 	echo "Not the main build so skipping the coverity scan"
 fi
 
-${coverity} python setup.py build_ext --build-temp $PWD ${coverage_post}
+if [[ -n "${coverage_post}" ]]
+then
+	${coverity} python setup.py build_ext --build-temp $PWD ${coverage_post}
+fi
 
 if [[ -n "$coverity" ]]
 	# was -v coverity but OS X bash not new enough
