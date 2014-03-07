@@ -86,5 +86,5 @@ then
 
 	make doxygen 2>&1 > doxygen.out
 else
-	make test
+	make nosetest.xml
 fi
