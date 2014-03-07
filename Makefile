@@ -38,14 +38,14 @@ autopep8: FORCE
 	autopep8 setup.py khmer/ scripts/ tests/ --recursive --in-place --pep8-passes 2000 --verbose
 
 pylint: all FORCE
-	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests | tee ../pylint.out
+	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests
 
 coverage.xml: FORCE
 	coverage run --branch --source=scripts,khmer -m nose --with-xunit --attr=\!known_failing
 	coverage xml
 
 coverage-gcovr.xml: FORCE
-	gcovr --root=. --xml --branches> coverage-gcovr.xml
+	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml --output=coverage-gcovr.xml
 
 doxygen: FORCE
 	mkdir -p doc/doxygen
