@@ -38,7 +38,7 @@ autopep8: FORCE
 	autopep8 setup.py khmer/ scripts/ tests/ --recursive --in-place --pep8-passes 2000 --verbose
 
 pylint: all FORCE
-	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests
+	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests || /bin/true
 
 coverage.xml: FORCE
 	coverage run --branch --source=scripts,khmer -m nose --with-xunit --attr=\!known_failing
