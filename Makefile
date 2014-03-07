@@ -45,7 +45,7 @@ pylint: all FORCE
 
 coverage.xml: FORCE
 	coverage run --branch --source=scripts,khmer -m nose --with-xunit \
-		--attr=\!known_failing ---processes=-1
+		--attr=\!known_failing --processes=-1
 	coverage xml
 
 coverage-gcovr.xml: FORCE
