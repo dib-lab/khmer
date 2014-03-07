@@ -70,6 +70,8 @@ then
 fi
 ./setup.py install
 
+./setup.py develop --build-directory .
+
 pip install --quiet nose coverage
 make coverage
 make doc
