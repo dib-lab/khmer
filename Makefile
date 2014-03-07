@@ -40,9 +40,12 @@ autopep8: FORCE
 pylint: all FORCE
 	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests | tee ../pylint.out
 
-coverage: FORCE
-	coverage run --source=scripts,khmer -m nose --with-xunit --attr=\!known_failing
+coverage.xml: FORCE
+	coverage run --branch --source=scripts,khmer -m nose --with-xunit --attr=\!known_failing
 	coverage xml
+
+coverage-gcovr.xml: FORCE
+	gcovr --root=. --xml --branches> coverage-gcovr.xml
 
 doxygen: FORCE
 	mkdir -p doc/doxygen

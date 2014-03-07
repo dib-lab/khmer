@@ -60,12 +60,7 @@ then
 fi
 
 pip install --quiet nose coverage
-./setup.py develop
 make coverage
-# we need to get coverage to look at our scripts. Since they aren't in a
-# python module we can't tell nosetests to look for them (via an import
-# statement). So we run nose inside of coverage.
-
 make doc
 
 pip install --quiet pylint
@@ -77,11 +72,8 @@ make pep8 2>&1 > pep8.out
 if [[ -n "${coverage_post}" ]]
 	# was -v coverage_post but OS X bash not new enough
 then
-	pip install -U gcovr
-	# work around a bug in 3.1 ?
-	# pip install -e  git+git@github.com:nschum/gcovr.git@fix-argument-type#egg=gcovr
-	# gcovr -r $PWD --xml > coverage-gcovr.xml
-	gcovr --root=. --xml > coverage-gcovr.xml
+	pip install --quiet -U gcovr
+	make coverage-gcovr.xml
 
 	make cppcheck-result.xml
 
