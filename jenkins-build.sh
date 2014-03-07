@@ -70,10 +70,9 @@ then
 fi
 ./setup.py install
 
-if [[ -n "${coverage_post}" ]]
-then
-	make coverage.xml
-	make doc
+pip install --quiet nose coverage
+make coverage
+make doc
 
 	make pylint 2>&1 > pylint.out
 
