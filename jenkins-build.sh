@@ -69,7 +69,10 @@ make coverage
 make doc
 
 pip install --quiet pylint
-make pylint
+make pylint 2>&1 > pylint.out
+
+pip install --quiet pep8
+make pep8 2>&1 > pep8.out
 
 if [[ -n "${coverage_post}" ]]
 	# was -v coverage_post but OS X bash not new enough
@@ -80,7 +83,7 @@ then
 	# gcovr -r $PWD --xml > coverage-gcovr.xml
 	gcovr --root=. --xml > coverage-gcovr.xml
 
-	make cppcheck
+	make cppcheck-result.xml
 
-	make doxygen
+	make doxygen 2>&1 > doxygen.out
 fi
