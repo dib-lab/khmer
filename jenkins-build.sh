@@ -8,6 +8,7 @@ rm -Rf .env build dist khmer/_khmermodule.so cov-int
 virtualenv .env
 
 . .env/bin/activate
+pip install --quiet nose coverage pylint pep8 screed
 
 make clean
 
@@ -15,6 +16,12 @@ unset coverage_pre coverage_post coverity
 
 if [[ "${NODE_LABELS}" == *linux* ]]
 then
+        if type ccache >/dev/null 2>&1
+        then
+                echo Enabling ccache
+                ccache --max-files=0 --max-size=500G
+                export PATH="/usr/lib/ccache:${PATH}"
+        fi
 	if type gcov >/dev/null 2>&1
 	then
 		export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
@@ -58,17 +65,12 @@ then
 		version=`git describe --tags | sed s/v//` \
 		http://scan5.coverity.com/cgi-bin/upload.py
 fi
-
-./setup.py develop --build-directory .
-
-pip install --quiet nose coverage
+./setup.py install
 make coverage.xml
 make doc
 
-pip install --quiet pylint
 make pylint 2>&1 > pylint.out
 
-pip install --quiet pep8
 make pep8 2>&1 > pep8.out
 
 if [[ -n "${coverage_post}" ]]
