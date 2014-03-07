@@ -27,7 +27,7 @@ else
 		
 fi
 
-if [[ "${JOB_NAME}" == khmer-multi/* ]]
+if [[ "${JOB_NAME}" == khmer/* ]]
 then
 	if [[ -x ${cov_analysis_dir}/${cov_analysis_bin} ]]
 	then
@@ -60,7 +60,7 @@ then
 fi
 
 pip install --quiet nose coverage
-make coverage
+make coverage.xml
 make doc
 
 pip install --quiet pylint
