@@ -1,7 +1,8 @@
 %
 % This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-% Copyright (C) Michigan State University, 2009-2013. It is licensed under
-% the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+% Copyright (C) Michigan State University, 2009-2014. It is licensed under
+% the three-clause BSD license; see doc/LICENSE.txt. 
+% Contact: khmer-project@idyll.org
 %
 function [Ps] = findAllP()
 fileExt={'_P1.0_K12_','_P0.8_K12_','_P0.6_K12_','_P0.4_K12_','_P0.2_K12_','_P0.1_K12_','_P0.05_K12_','_P0.01_K12_'};

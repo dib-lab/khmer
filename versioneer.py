@@ -1,5 +1,4 @@
-#! /usr/bin/python
-
+#!/usr/bin/env python
 """versioneer.py
 
 (like a rocketeer, but for versions)
