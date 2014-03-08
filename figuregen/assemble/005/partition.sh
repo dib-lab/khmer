@@ -2,7 +2,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt. 
+# Contact: khmer-project@idyll.org
 #
 
 python ../graph-size.py 31 2104388177 4 1 200 ../../data/msb2.fq msb2.fa

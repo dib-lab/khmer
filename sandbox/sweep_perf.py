@@ -18,11 +18,11 @@ for n, record in enumerate(screed.open(test_file)):
     if n > N:
         break
     print '*' * 40
-    print '{} k-mers in sequence'.format(len(record.sequence)-K+1)
-    
+    print '{} k-mers in sequence'.format(len(record.sequence) - K + 1)
+
     stime = time.clock()
     colors = ht.sweep_color_neighborhood(record.sequence, R)
     etime = time.clock()
-    
-    print 'traversal took {} seconds'.format(etime-stime)
+
+    print 'traversal took {} seconds'.format(etime - stime)
     print 'found {} colors'.format(len(colors))
