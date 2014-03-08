@@ -23,6 +23,7 @@ import os
 import argparse
 from khmer.file_api import check_file_status, check_space
 
+
 def output_pair(r1, r2):
     if hasattr(r1, 'accuracy'):
         return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
@@ -43,12 +44,10 @@ def main():
                         dest='output', type=argparse.FileType('w'),
                         default=sys.stdout)
     args = parser.parse_args()
-    
-    # Check input files exist
+
     for f in args.infiles:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(args.infiles)
 
     s1_file = args.infiles[0]

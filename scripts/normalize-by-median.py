@@ -18,11 +18,11 @@ import screed
 import os
 import khmer
 from itertools import izip
-from khmer.khmer_args import build_counting_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_counting_args
 from khmer.khmer_args import add_loadhash_args
 from khmer.khmer_args import report_on_config
 import argparse
-from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_space
 from khmer.file_api import check_space_for_hashtable, check_valid_file_exists
 DEFAULT_DESIRED_COVERAGE = 10
 
@@ -162,11 +162,9 @@ def main():
     force = args.force
     dump_frequency = args.dump_frequency
     fail_save = args.fail_save
-    
-    # Check at least one valid input file exists
+
     check_valid_file_exists(filenames)
 
-    # Check disk space availability
     check_space(filenames)
 
     # list to save error files along with throwing exceptions
@@ -230,7 +228,6 @@ def main():
             ht.save(hashname)
 
     if args.savehash:
-        # Check space before hash file save
         check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash

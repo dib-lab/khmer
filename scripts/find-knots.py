@@ -11,7 +11,6 @@ in partitioning.
 % python scripts/find-knots.py <base>
 """
 
-import sys
 import argparse
 import glob
 import os
@@ -58,13 +57,12 @@ def main():
     args = parser.parse_args()
 
     graphbase = args.graphbase
-    
-    # Check input files exist
-    infiles=[graphbase + '.ht', graphbase + '.tagset'] # @RamRS: This might need some more work
+
+    # @RamRS: This might need some more work
+    infiles = [graphbase + '.ht', graphbase + '.tagset']
     for f in infiles:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(infiles)
 
     print 'loading ht %s.ht' % graphbase

@@ -18,7 +18,6 @@ by output_unassigned...
 """
 
 import sys
-import os.path
 import screed
 import argparse
 from khmer.file_api import check_file_status, check_space
@@ -74,11 +73,9 @@ def main():
 
     n_unassigned = 0
 
-    # Check if input files exist
     for infile in args.part_filenames:
         check_file_status(infile)
-    
-    # Check free space
+
     check_space(args.part_filenames)
 
     print '---'

@@ -10,9 +10,7 @@ Find an initial set of highly connected k-mers, to save on repartitioning time.
 % python scripts/make-initial-stoptags.py <base>
 """
 
-import sys
 import argparse
-import os
 import khmer
 from khmer.file_api import check_file_status, check_space
 
@@ -60,13 +58,12 @@ def main():
     args = parser.parse_args()
 
     graphbase = args.graphbase
-    
-    # Check input files exist
-    infiles=[graphbase + '.ht', graphbase + '.tagset'] # @RamRS: This might need some more work
+
+    # @RamRS: This might need some more work
+    infiles = [graphbase + '.ht', graphbase + '.tagset']
     for f in infiles:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(infiles)
 
     print 'loading ht %s.ht' % graphbase

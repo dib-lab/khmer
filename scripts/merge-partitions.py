@@ -13,7 +13,6 @@ Load <base>.subset.*.pmap and merge into a single pmap file.  Final
 merged pmap file will be in <base>.pmap.merged.
 """
 
-import sys
 import argparse
 import glob
 import os
@@ -43,12 +42,10 @@ def main():
 
     K = args.ksize
     ht = khmer.new_hashbits(K, 1, 1)
-    
-    # Check input files exist
+
     for f in pmap_files:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(pmap_files)
 
     for pmap_file in pmap_files:

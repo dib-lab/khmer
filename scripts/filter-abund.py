@@ -45,12 +45,10 @@ def main():
     counting_ht = args.input_table
     infiles = args.input_filenames
     n_threads = int(args.n_threads)
-    
-    # Check input files exist
+
     for f in infiles:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(infiles)
 
     print 'file with ht: %s' % counting_ht

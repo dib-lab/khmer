@@ -14,7 +14,6 @@ This will output many <base>.subset.N.pmap files.
 Use '-h' for parameter help.
 """
 
-import sys
 import threading
 import Queue
 import gc
@@ -89,13 +88,11 @@ def main():
 
     args = parser.parse_args()
     basename = args.basename
-    
-    # Check input files exist
-    filenames=[basename+'.ht',basename+'.tagset']
+
+    filenames = [basename+'.ht', basename+'.tagset']
     for f in filenames:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(filenames)
 
     print '--'

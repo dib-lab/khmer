@@ -17,9 +17,7 @@ The output file contains sequence id, median, average, stddev, and seq length.
 
 NOTE: All 'N's in the input sequences are converted to 'G's.
 """
-import sys
 import screed
-import os
 import khmer
 import argparse
 from khmer.file_api import check_file_status, check_space
@@ -40,12 +38,10 @@ def main():
     input_filename = args.input
     output_filename = args.output
 
-    # Check if input files exist
     infiles = [htfile, input_filename]
     for infile in infiles:
         check_file_status(infile)
-    
-    # Check free space
+
     check_space(infiles)
 
     print 'loading counting hash from', htfile

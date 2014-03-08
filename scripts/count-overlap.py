@@ -16,12 +16,6 @@ Use '-h' for parameter help.
 
 """
 import khmer
-import sys
-import screed
-from screed.fasta import fasta_iter
-import argparse
-import os
-import math
 from khmer.file_api import check_file_status, check_space
 from khmer.khmer_args import build_hashbits_args, report_on_config
 #
@@ -47,14 +41,12 @@ def main():
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
 
-    # Check if input files exist
     infiles = [htfile, fafile]
     for infile in infiles:
-        fileApi.check_file_status(infile)
-    
-    # Check free space
-    fileApi.check_space(infiles)
-    
+        check_file_status(infile)
+
+    check_space(infiles)
+
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)
     K = ht1.ksize()

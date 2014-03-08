@@ -19,6 +19,7 @@ import argparse
 import os
 from khmer.file_api import check_file_status, check_space
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Output k-mer abundance distribution.",
@@ -36,13 +37,11 @@ def main():
                         help='Overwrite output file if it exists')
 
     args = parser.parse_args()
-    
-    # Check if input files exist
+
     infiles = [args.hashname, args.datafile]
     for infile in infiles:
         check_file_status(infile)
-    
-    # Check free space
+
     check_space(infiles)
 
     print('hashtable from', args.hashname)

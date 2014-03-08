@@ -14,7 +14,6 @@ Reads FASTQ and FASTA input, retains format for output.
 """
 
 import argparse
-import khmer
 import screed
 import os.path
 import random
@@ -48,11 +47,9 @@ def main():
 
     args = parser.parse_args()
 
-    # Check input files exist
     for f in args.filenames:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(args.filenames)
 
     # seed the random number generator?
