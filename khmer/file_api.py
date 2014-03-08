@@ -8,45 +8,48 @@
 import os
 import sys
 
+
 def check_file_status(filePath):
     ''' Check status of file - return if file exists,
     is empty, or neither '''
     if not os.path.exists(filePath):
         print >>sys.stderr, 'ERROR: Input file %s does not exist,\
          exiting' % filePath
-        sys.exit(-1)
+        sys.exit(1)
     else:
-        if os.stat(filePath).st_size==0:
+        if os.stat(filePath).st_size == 0:
             print >>sys.stderr, 'ERROR: Input file %s is empty,\
                      exiting' % filePath
-            sys.exit(-1)
+            sys.exit(1)
         else:
             return True
-        
+
+
 def check_space(inFiles):
     ''' Estimate size of inFiles passed, then calculate
     disk space available. Exit if insufficient disk space,
     return True otherwise.'''
-    
+
     # Get disk free space in Bytes assuming non superuser
     # and assuming all inFiles are in same disk
     dirPath = os.path.dirname(inFiles[0])
-    target=os.statvfs(dirPath)
-    freeSpace = target.f_frsize * target.f_bavail 
+    target = os.statvfs(dirPath)
+    freeSpace = target.f_frsize * target.f_bavail
     #<TODO>: If SU, use target.f_bfree
-    
-    # Get input file size as worst case estimate of 
+
+    # Get input file size as worst case estimate of
     # output file size
     fileSizes = map(lambda f: os.stat(f).st_size, inFiles)
     totalSize = reduce(lambda f1, f2: f1+f2, fileSizes)
-    
+
     sizeDiff = totalSize-freeSpace
     if sizeDiff > 0:
         print >>sys.stderr, 'ERROR: Not enough free space on disk, \
         need at least %s more,' % str(sizeDiff)
-        sys.exit(-1)
+        sys.exit(1)
     else:
         return True
+
 
 def check_space_for_hashtable(hashSize):
     """
@@ -54,13 +57,13 @@ def check_space_for_hashtable(hashSize):
     and return appropriate values
     """
     dirPath = os.path.dirname(os.path.realpath(__file__))
-    target=os.statvfs(dirPath)
+    target = os.statvfs(dirPath)
     freeSpace = target.f_frsize * target.f_bavail
-    
+
     sizeDiff = hashSize-freeSpace
     if sizeDiff > 0:
         print >>sys.stderr, 'ERROR: Not enough free space on disk, \
         need at least %s more,' % str(sizeDiff)
-        sys.exit(-1)
+        sys.exit(1)
     else:
         return True
