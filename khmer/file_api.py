@@ -6,6 +6,7 @@
 #
 
 import os
+import sys
 
 def check_file_status(filePath):
     ''' Check status of file - return if file exists,
@@ -17,7 +18,7 @@ def check_file_status(filePath):
     else:
         if os.stat(filePath).st_size==0:
             print >>sys.stderr, 'ERROR: Input file %s is empty,\
-                     exiting' % f
+                     exiting' % filePath
             sys.exit(-1)
         else:
             return True
