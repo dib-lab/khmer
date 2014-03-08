@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. Contact: khmer-project@idyll.org
 #
 
 import os
@@ -10,8 +10,8 @@ import sys
 
 
 def check_file_status(filePath):
-    ''' Check status of file - return if file exists,
-    is empty, or neither '''
+    """ Check status of file - return if file exists,
+    is empty, or neither """
     if not os.path.exists(filePath):
         print >>sys.stderr, 'ERROR: Input file %s does not exist,\
          exiting' % filePath
@@ -21,14 +21,12 @@ def check_file_status(filePath):
             print >>sys.stderr, 'ERROR: Input file %s is empty,\
                      exiting' % filePath
             sys.exit(1)
-        else:
-            return True
 
 
 def check_space(inFiles):
-    ''' Estimate size of inFiles passed, then calculate
+    """ Estimate size of inFiles passed, then calculate
     disk space available. Exit if insufficient disk space,
-    return True otherwise.'''
+    """
 
     # Get disk free space in Bytes assuming non superuser
     # and assuming all inFiles are in same disk
@@ -47,14 +45,11 @@ def check_space(inFiles):
         print >>sys.stderr, 'ERROR: Not enough free space on disk, \
         need at least %s more,' % str(sizeDiff)
         sys.exit(1)
-    else:
-        return True
 
 
 def check_space_for_hashtable(hashSize):
     """
     Check we have enough size to write a hash table
-    and return appropriate values
     """
     dirPath = os.path.dirname(os.path.realpath(__file__))
     target = os.statvfs(dirPath)
@@ -65,5 +60,3 @@ def check_space_for_hashtable(hashSize):
         print >>sys.stderr, 'ERROR: Not enough free space on disk, \
         need at least %s more,' % str(sizeDiff)
         sys.exit(1)
-    else:
-        return True
