@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 import sys
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     partition_sizes = {}
 
-    ### first, read in all the cluster sizes
+    # first, read in all the cluster sizes
 
     fp = open(filename)
     for n, x in enumerate(read_partition_file(fp)):
@@ -45,11 +45,11 @@ if __name__ == '__main__':
         if not surrendered:
             partition_sizes[partition_id] = readcount
 
-    ### sort by # of reads in each cluster
+    # sort by # of reads in each cluster
     divvy = sorted(partition_sizes.items(), key=lambda y: y[1])
 
-    ## divvy up into different groups, based on having MAX_SIZE sequences
-    ## in each group.
+    # divvy up into different groups, based on having MAX_SIZE sequences
+    # in each group.
     total = 0
     group = set()
     group_n = 0
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     print '%d groups' % group_n
 
-    ## open a bunch of output files for the different groups
+    # open a bunch of output files for the different groups
     group_fps = {}
     for n in range(group_n):
         fp = open('%s.group%d.fa' % (prefix, n), 'w')
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     surrendered_fp = open('%s.surrender.fa' % prefix, 'w')
 
-    ## write 'em all out!
+    # write 'em all out!
     fp = open(filename)
     for n, x in enumerate(read_partition_file(fp)):
         if n % 100000 == 0:

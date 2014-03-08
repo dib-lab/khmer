@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -21,11 +21,13 @@ import screed
 import khmer
 from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
 
+
 def output_single(r):
     if hasattr(r, 'accuracy'):
         return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
     else:
         return ">%s\n%s\n" % (r.name, r.sequence)
+
 
 def main():
     parser = build_construct_args()
@@ -48,8 +50,8 @@ def main():
         print >>sys.stderr, ''
         print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize / 8)' % (
-            args.n_hashes * args.min_hashsize * len(args.input_filenames) / 8.)
-        print >>sys.stderr, '-'*8
+                args.n_hashes * args.min_hashsize * len(args.input_filenames) / 8.)
+        print >>sys.stderr, '-' * 8
 
     K = args.ksize
     HT_SIZE = args.min_hashsize

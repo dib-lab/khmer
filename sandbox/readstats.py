@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 import sys
@@ -35,5 +35,5 @@ print '---------------'
 print "\n".join(output)
 print '---------------'
 print '%d bp / %d seqs; %.1f average length -- total' % (total_bp,
-                                                total_seqs,
-                                                total_bp / float(total_seqs))
+                                                         total_seqs,
+                                                         total_bp / float(total_seqs))

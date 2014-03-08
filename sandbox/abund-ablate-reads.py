@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 import sys
@@ -17,13 +17,13 @@ N_HT = 4
 
 ABUND_THRESHOLD = 65
 
-parser=argparse.ArgumentParser(
+parser = argparse.ArgumentParser(
     description="abund-ablate-reads",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument("infile")
 parser.add_argument("outfile")
-args=parser.parse_args()
+args = parser.parse_args()
 
 infile = args.infile
 outfile = args.outfile

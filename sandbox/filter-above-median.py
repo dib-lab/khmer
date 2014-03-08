@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -44,7 +44,7 @@ def main():
 
     print "K:", K
 
-    ### the filtering function.
+    # the filtering function.
     def process_fn(record):
         name = record['name']
         seq = record['sequence']
@@ -56,7 +56,7 @@ def main():
 
         return None, None
 
-    ### the filtering loop
+    # the filtering loop
     for infile in infiles:
         print 'filtering', infile
         outfile = os.path.basename(infile) + '.himed'

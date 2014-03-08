@@ -2,8 +2,10 @@
 import khmer
 import sys
 import argparse
-import os, os.path
+import os
+import os.path
 import screed
+
 
 def main():
     parser = argparse.ArgumentParser()

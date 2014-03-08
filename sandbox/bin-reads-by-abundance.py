@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -16,20 +16,22 @@ import khmer
 import argparse
 import screed
 
-K=20
-N=4
-X=1e8
+K = 20
+N = 4
+X = 1e8
 
-DEFAULT_MIN=20
-DEFAULT_MAX=100
-PCNT=50
-DEFAULT_BINSIZE=1000
+DEFAULT_MIN = 20
+DEFAULT_MAX = 100
+PCNT = 50
+DEFAULT_BINSIZE = 1000
+
 
 def output_single(r):
     if hasattr(r, 'accuracy'):
         return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
     else:
         return ">%s\n%s\n" % (r.name, r.sequence)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -57,11 +59,11 @@ def main():
         n_med = 0
         n_high = 0
         n_elim = 0
-        
+
         for n, record in enumerate(screed.open(filename)):
             if n % 25000 == 0:
                 print '...', n
-                
+
             seq = record.sequence.upper()
             if 'N' in seq:
                 seq = seq.replace('N', 'G')
@@ -71,7 +73,7 @@ def main():
                 if do_elim:
                     n_elim += 1
                     continue
-                
+
                 a, _, _ = kh.get_median_count(seq)
 
                 if a < args.mincov:              # low coverage? keep.
@@ -90,13 +92,12 @@ def main():
             if do_output:
                 outp_count += 1
 
-         
                 fp.write(output_single(record))
 
                 if outp_count == args.binsize:
                     outp_index += 1
                     outputfilename = os.path.basename(filename) + \
-                                     '.bink.%d' % outp_index
+                        '.bink.%d' % outp_index
                     fp = open(outputfilename, 'w')
                     outp_count = 0
 

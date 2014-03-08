@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 import khmer
@@ -69,7 +69,7 @@ def main():
     inqueue = Queue.Queue(50)
     outqueue = Queue.Queue(50)
 
-    ## worker and writer threads
+    # worker and writer threads
     for i in range(WORKER_THREADS):
         t = threading.Thread(target=process, args=(inqueue, outqueue, ht))
         worker_count += 1
@@ -77,7 +77,7 @@ def main():
 
     threading.Thread(target=write, args=(outqueue, outfp)).start()
 
-    ### main thread
+    # main thread
     x = []
     i = 0
     for n, record in enumerate(screed.fasta.fasta_iter(open(infile))):
