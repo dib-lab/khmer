@@ -29,7 +29,7 @@ def check_space(inFiles):
     
     # Get disk free space in Bytes assuming non superuser
     # and assuming all inFiles are in same disk
-    dirPath = os.dirname(inFiles[0])
+    dirPath = os.path.dirname(inFiles[0])
     target=os.statvfs(dirPath)
     freeSpace = target.f_frsize * target.f_bavail 
     #<TODO>: If SU, use target.f_bfree
