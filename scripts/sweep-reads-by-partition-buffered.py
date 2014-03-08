@@ -201,15 +201,13 @@ def main():
     max_reads = args.max_reads
 
     input_files = args.input_files
-    
-    filenames=[input_files, input_fastp]
-    # Check input files exist
-    for f in filenames:
-        fileApi.check_file_status(f)
 
-    # Check disk space availability
-    freeSpace = fileApi.check_space(filenames)
-    
+    filenames = [input_files, input_fastp]
+    for f in filenames:
+        check_file_status(f)
+
+    check_space(filenames)
+
     output_buffer = ReadBufferManager(
         max_buffers, max_reads, buf_size, output_pref, outdir)
 

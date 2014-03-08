@@ -13,7 +13,6 @@ will be placed in 'infile.stopfilt'.
 Use '-h' for parameter help.
 """
 
-import sys
 import os
 import khmer
 import argparse
@@ -40,12 +39,10 @@ def main():
 
     stoptags = args.stoptags_file
     infiles = args.input_filenames
-    
-    # Check input files exist
+
     for f in infiles:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(infiles)
 
     print 'loading stop tags, with K', K

@@ -18,6 +18,7 @@ import os.path
 import argparse
 from khmer.file_api import check_file_status, check_space
 
+
 def is_pair(name1, name2):
     if name1.endswith('/1') and name2.endswith('/2'):
         s1 = name1.split('/')[0]
@@ -54,16 +55,12 @@ def main():
     parser.add_argument('infile')
     args = parser.parse_args()
 
-    infile = args.infile
-    
-    # Check if input files exist
-    infiles = [infile]
+    infiles = [args.infile]
     for infile in infiles:
         check_file_status(infile)
-    
-    # Check free space
-    check_space(infiles)    
-    
+
+    check_space(infiles)
+
     outfile = os.path.basename(infile)
     if len(sys.argv) > 2:
         outfile = sys.argv[2]

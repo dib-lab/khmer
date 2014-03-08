@@ -17,8 +17,8 @@ import threading
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config
 from khmer.threading_args import add_threading_args
-from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
-
+from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_space_for_hashtable
 #
 
 
@@ -41,12 +41,10 @@ def main():
     base = args.output_filename
     filenames = args.input_filenames
     n_threads = int(args.n_threads)
-    
-    # Check input files exist
+
     for f in args.input_filenames:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(args.input_filenames)
 
     print 'Saving hashtable to %s' % base
@@ -80,13 +78,11 @@ def main():
             t.join()
 
         if n > 0 and n % 10 == 0:
-            # Check free space before hash file save
             check_space_for_hashtable(K*HT_SIZE)
             print 'mid-save', base
             ht.save(base)
             open(base + '.info', 'w').write('through %s' % filename)
 
-    # Check free space before hash file save
     check_space_for_hashtable(args.ksize*args.min_hashsize)
     print 'saving', base
     ht.save(base)

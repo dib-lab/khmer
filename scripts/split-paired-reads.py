@@ -18,6 +18,7 @@ import os.path
 import argparse
 from khmer.file_api import check_file_status, check_space
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
@@ -27,15 +28,13 @@ def main():
     args = parser.parse_args()
 
     infile = args.infile
-    
-    # Check input files exist
+
     filenames = [infile]
     for f in filenames:
         check_file_status(f)
 
-    # Check disk space availability
     check_space(filenames)
-    
+
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'
     fp1 = open(out1, 'w')

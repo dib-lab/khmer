@@ -98,11 +98,9 @@ def main():
     base = args.graphbase
     filenames = args.input_filenames
 
-    # Check if input files exist
     for infile in filenames:
         check_file_status(infile)
-    
-    # Check free space
+
     check_space(filenames)
 
     print 'Saving hashtable to %s' % base

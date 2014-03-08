@@ -14,14 +14,14 @@ Use '-h' for parameter help.
 
 import sys
 import threading
-import Queue
-import os.path
 
 import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import report_on_config
 from khmer.threading_args import add_threading_args
-from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
+from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_space_for_hashtable
+
 
 def main():
     parser = build_hashbits_args()
@@ -42,13 +42,11 @@ def main():
     base = args.output_filename
     filenames = args.input_filenames
     n_threads = int(args.n_threads)
-    
-    # Check input files exist
+
     for f in args.input_filenames:
         check_file_status(f)
 
-    # Check disk space availability
-    check_space(args.input_filenames)    
+    check_space(args.input_filenames)
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
@@ -84,7 +82,6 @@ def main():
         for t in threads:
             t.join()
 
-    # Check free space before hash file save
     check_space_for_hashtable(K*HT_SIZE)
     print 'saving hashtable in', base + '.ht'
     ht.save(base + '.ht')

@@ -13,7 +13,6 @@ placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
-import sys
 import os
 import khmer
 import threading
@@ -21,8 +20,8 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 
-from khmer.counting_args import build_counting_multifile_args
-from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
+from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_space_for_hashtable
 #
 
 DEFAULT_CUTOFF = 2
@@ -48,13 +47,11 @@ def main():
     n_threads = int(args.n_threads)
     filename = args.datafile
 
-    # Check input files exist
-    infiles=[filename]
+    infiles = [filename]
     for f in infiles:
         check_file_status(f)
 
-    # Check disk space availability
-    freeSpace = check_space(infiles)
+    check_space(infiles)
 
     config = khmer.get_config()
     bufsz = config.get_reads_input_buffer_size()
@@ -109,7 +106,6 @@ def main():
     print 'output in', outfile
 
     if args.savehash:
-        # Check free space before hash file save
         check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash

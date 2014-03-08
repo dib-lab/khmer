@@ -18,7 +18,9 @@ import khmer
 import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
-from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
+from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_space_for_hashtable
+
 
 def main():
     parser = build_construct_args(
@@ -44,14 +46,12 @@ def main():
 
     squash = args.squash
 
-    # Check if input files exist
     infiles = [args.datafile]
     for infile in infiles:
         check_file_status(infile)
-    
-    # Check free space
+
     check_space(infiles)
-    
+
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
                                             args.n_hashes,
@@ -122,7 +122,6 @@ def main():
         print >>sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(1)
 
-    # If histfile exists, check if squash is allowed
     if (not squash and os.path.exists(args.histout)):
         print >>sys.stderr, 'ERROR: %s exists; not squashing.' % args.histout
         sys.exit(-1)
@@ -143,7 +142,6 @@ def main():
             break
 
     if args.savehash:
-        # Check free space before hash file save
         check_space_for_hashtable(args.ksize*args.min_hashsize)
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
