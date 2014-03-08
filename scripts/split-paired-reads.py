@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt. 
+# Contact: khmer-project@idyll.org
 #
 """
 Take an interleaved set of reads (/1 and /2), and extract them into separate
