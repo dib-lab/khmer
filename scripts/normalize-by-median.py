@@ -22,8 +22,8 @@ from khmer.khmer_args import build_counting_args, DEFAULT_MIN_HASHSIZE
 from khmer.khmer_args import add_loadhash_args
 from khmer.khmer_args import report_on_config
 import argparse
-from khmer.file_api import check_file_status, check_space, check_space_for_hashtable
-
+from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_space_for_hashtable, check_valid_file_exists
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
@@ -163,9 +163,8 @@ def main():
     dump_frequency = args.dump_frequency
     fail_save = args.fail_save
     
-    # Check input files exist
-    for f in filenames:
-        check_file_status(f)
+    # Check at least one valid input file exists
+    check_valid_file_exists(filenames)
 
     # Check disk space availability
     check_space(filenames)
