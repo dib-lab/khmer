@@ -34,6 +34,7 @@ import time
 import khmer
 from khmer.khmer_args import build_hashbits_args, report_on_config
 from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_valid_file_exists
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
@@ -202,11 +203,13 @@ def main():
     max_reads = args.max_reads
 
     input_files = args.input_files
+    
+    check_file_status(input_fastp)
+    check_valid_file_exists(input_files)
 
-    filenames = [input_files, input_fastp]
-    for f in filenames:
-        check_file_status(f)
-
+    filenames = []
+    filenames.extend(input_files)
+    filenames.append(input_fastp)
     check_space(filenames)
 
     output_buffer = ReadBufferManager(

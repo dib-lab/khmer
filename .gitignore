@@ -18,3 +18,4 @@ doc/_build
 /.Rhistory
 /.coverage
 /nosetests.xml
+/test.fa.keep
