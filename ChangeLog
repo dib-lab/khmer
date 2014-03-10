@@ -1,3 +1,8 @@
+2014-03-03  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
+    scalar field (UNINIT_CTOR) 
+
 2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * tagged: version 0.8
