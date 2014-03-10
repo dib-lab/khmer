@@ -45,7 +45,7 @@ def main():
     args = parser.parse_args()
     report_on_config(args)
 
-    squash = args.squash
+    squash = args.squash_output
 
     check_file_status(args.datafile)
     infiles = [args.datafile]
