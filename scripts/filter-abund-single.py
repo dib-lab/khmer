@@ -2,7 +2,7 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -48,11 +48,11 @@ def main():
     n_threads = int(args.n_threads)
     filename = args.datafile
 
+    check_file_status(filename)
     infiles = [filename]
-    for f in infiles:
-        check_file_status(f)
-
     check_space(infiles)
+    if args.savehash:
+        check_space_for_hashtable(K * HT_SIZE)
 
     config = khmer.get_config()
     bufsz = config.get_reads_input_buffer_size()
@@ -107,7 +107,6 @@ def main():
     print 'output in', outfile
 
     if args.savehash:
-        check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
         ht.save(args.savehash)

@@ -2,7 +2,7 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -48,6 +48,8 @@ def main():
         check_file_status(f)
 
     check_space(args.input_filenames)
+    if args.savehash:
+        check_space_for_hashtable(K * HT_SIZE)
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
@@ -83,7 +85,6 @@ def main():
         for t in threads:
             t.join()
 
-    check_space_for_hashtable(K*HT_SIZE)
     print 'saving hashtable in', base + '.ht'
     ht.save(base + '.ht')
 
