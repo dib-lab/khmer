@@ -58,10 +58,9 @@ struct TraceLogger {
 #endif	// !WITH_INTERNAL_TRACING
 
 private:
-
-    uint8_t	    _level;
-    bool	    _shared_stream;
 #ifdef WITH_INTERNAL_TRACING
+    bool	    _shared_stream;
+    uint8_t	    _level;
     FILE *	    _stream_handle;
 #endif
 };
