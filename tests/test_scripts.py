@@ -1256,7 +1256,7 @@ def test_sample_reads_randomly():
     script = scriptpath('sample-reads-randomly.py')
     # fix random number seed for reproducibility
     args = ['-N', '10', '-R', '1']
-    args.append('test.fq')
+    args.append(infile)
     runscript(script, args, in_dir)
 
     outfile = infile + '.subset'
