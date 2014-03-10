@@ -2,7 +2,7 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -46,11 +46,11 @@ def main():
 
     squash = args.squash
 
+    check_file_status(args.datafile)
     infiles = [args.datafile]
-    for infile in infiles:
-        check_file_status(infile)
-
     check_space(infiles)
+    if args.savehash:
+        check_space_for_hashtable(args.ksize * args.min_hashsize)
 
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
@@ -142,7 +142,6 @@ def main():
             break
 
     if args.savehash:
-        check_space_for_hashtable(args.ksize*args.min_hashsize)
         print 'Saving hashfile', args.savehash
         print '...saving to', args.savehash
         counting_hash.save(args.savehash)

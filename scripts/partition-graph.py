@@ -2,7 +2,7 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -90,7 +90,7 @@ def main():
     args = parser.parse_args()
     basename = args.basename
 
-    filenames = [basename+'.ht', basename+'.tagset']
+    filenames = [basename + '.ht', basename + '.tagset']
     for f in filenames:
         check_file_status(f)
 

@@ -2,7 +2,7 @@
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -30,10 +30,8 @@ def main():
 
     infile = args.infile
 
+    check_file_status(infile)
     filenames = [infile]
-    for f in filenames:
-        check_file_status(f)
-
     check_space(filenames)
 
     out1 = os.path.basename(infile) + '.1'

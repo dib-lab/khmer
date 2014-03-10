@@ -2,7 +2,7 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -167,6 +167,8 @@ def main():
     check_valid_file_exists(filenames)
 
     check_space(filenames)
+    if args.savehash:
+        check_space_for_hashtable(K * HT_SIZE)
 
     # list to save error files along with throwing exceptions
     if force is True:
@@ -229,7 +231,6 @@ def main():
             ht.save(hashname)
 
     if args.savehash:
-        check_space_for_hashtable(K*HT_SIZE)
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash
         ht.save(args.savehash)

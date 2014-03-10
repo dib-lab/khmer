@@ -2,7 +2,7 @@
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2014. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. 
+# the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
 """
@@ -56,20 +56,18 @@ def main():
     parser.add_argument('infile')
     args = parser.parse_args()
 
+    check_file_status(args.infile)
     infiles = [args.infile]
-    for infile in infiles:
-        check_file_status(infile)
-
     check_space(infiles)
 
-    outfile = os.path.basename(infile)
+    outfile = os.path.basename(args.infile)
     if len(sys.argv) > 2:
         outfile = sys.argv[2]
 
     single_fp = open(outfile + '.se', 'w')
     paired_fp = open(outfile + '.pe', 'w')
 
-    print 'reading file "%s"' % infile
+    print 'reading file "%s"' % args.infile
     print 'outputting interleaved pairs to "%s.pe"' % outfile
     print 'outputting orphans to "%s.se"' % outfile
 
