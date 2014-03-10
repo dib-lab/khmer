@@ -231,6 +231,8 @@ namespace khmer {
 	    delete [ ] hashers;
 	    _hashers_map[ thread_pool_id ] = NULL;
 	}
+
+	delete partition;
     }
 
     void _init_bitstuff() {

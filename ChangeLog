@@ -5,6 +5,9 @@
     * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
     (UNINIT_CTOR)
 
+    * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
+    (CTOR_DTOR_LEAK)
+
 2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * tagged: version 0.8
