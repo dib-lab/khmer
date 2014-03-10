@@ -16,3 +16,5 @@ doc/_build
 /.project
 /.pydevproject
 /.Rhistory
+/.coverage
+/nosetests.xml

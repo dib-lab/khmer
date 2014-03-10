@@ -79,6 +79,3 @@ def check_valid_file_exists(in_files):
         else:
             print >>sys.stderr, 'WARNING: Input file %s not found,\
                      ' % in_file
-    print >>sys.stderr, 'ERROR: No valid input file found,\
-                     exiting'
-    sys.exit(1)
