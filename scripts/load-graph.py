@@ -48,8 +48,7 @@ def main():
         check_file_status(f)
 
     check_space(args.input_filenames)
-    if args.savehash:
-        check_space_for_hashtable(K * HT_SIZE)
+    check_space_for_hashtable(K * HT_SIZE)
 
     print 'Saving hashtable to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
