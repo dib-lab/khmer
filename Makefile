@@ -57,6 +57,7 @@ nosetests.xml: all
 
 doxygen: FORCE
 	mkdir -p doc/doxygen
+	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > Doxyfile
 	doxygen
 
 lib:
