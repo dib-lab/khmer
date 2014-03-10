@@ -32,86 +32,81 @@ namespace khmer
 {
 
 
-struct InvalidStreamHandle : public std:: exception
-{ };
+struct InvalidStreamHandle : public std:: exception {
+};
 
-struct StreamReadError : public std:: exception
-{ };
+struct StreamReadError : public std:: exception {
+};
 
 
 namespace read_parsers
 {
 
 
-struct InvalidReadFileFormat: public std:: exception
-{
-    
-			    InvalidReadFileFormat(
-	char const * exc_name,
-	char const * reason	= NULL,
-	char const * evidence	= NULL
+struct InvalidReadFileFormat: public std:: exception {
+
+    InvalidReadFileFormat(
+        char const * exc_name,
+        char const * reason	= NULL,
+        char const * evidence	= NULL
     );
 
     virtual char const *    what( ) const throw( );
 
 protected:
-    
+
     char		    _reason[ CHAR_MAX ];
 
 };
 
-struct InvalidFASTAFileFormat: public InvalidReadFileFormat
-{
-    
+struct InvalidFASTAFileFormat: public InvalidReadFileFormat {
+
     InvalidFASTAFileFormat(
-	char const * reason	= NULL,
-	char const * evidence	= NULL
+        char const * reason	= NULL,
+        char const * evidence	= NULL
     );
 
 };
 
-struct InvalidFASTQFileFormat: public InvalidReadFileFormat
-{
-    
+struct InvalidFASTQFileFormat: public InvalidReadFileFormat {
+
     InvalidFASTQFileFormat(
-	char const * reason	= NULL,
-	char const * evidence	= NULL
+        char const * reason	= NULL,
+        char const * evidence	= NULL
     );
 
 };
 
-struct CacheSegmentUnavailable : public std:: exception
-{ };
+struct CacheSegmentUnavailable : public std:: exception {
+};
 
-struct CacheSegmentBoundaryViolation : public std:: exception
-{ };
+struct CacheSegmentBoundaryViolation : public std:: exception {
+};
 
-struct InvalidCacheSizeRequested : public std:: exception
-{ };
+struct InvalidCacheSizeRequested : public std:: exception {
+};
 
-struct NoMoreReadsAvailable : public std:: exception
-{ };
+struct NoMoreReadsAvailable : public std:: exception {
+};
 
-struct UnknownPairReadingMode : public std:: exception
-{ };
+struct UnknownPairReadingMode : public std:: exception {
+};
 
-struct InvalidReadPair : public std:: exception
-{ };
+struct InvalidReadPair : public std:: exception {
+};
 
 #ifdef WITH_INTERNAL_METRICS
-struct StreamReaderPerformanceMetrics : public IPerformanceMetrics
-{
-    
-    enum
-    {
-	MKEY_TIME_READING
+struct StreamReaderPerformanceMetrics : public IPerformanceMetrics {
+
+    enum {
+        MKEY_TIME_READING
     };
-    
+
     uint64_t	    numbytes_read;
     uint64_t	    clock_nsecs_reading;
     uint64_t	    cpu_nsecs_reading;
-    
-	    StreamReaderPerformanceMetrics( );
+
+    StreamReaderPerformanceMetrics( );
     virtual ~StreamReaderPerformanceMetrics( );
 
     virtual void    accumulate_timer_deltas( uint32_t metrics_key );
@@ -119,12 +114,11 @@ struct StreamReaderPerformanceMetrics : public IPerformanceMetrics
 };
 #endif
 
-struct IStreamReader
-{
+struct IStreamReader {
 #ifdef WITH_INTERNAL_METRICS
     StreamReaderPerformanceMetrics  pmetrics;
 #endif
-	    IStreamReader( );
+    IStreamReader( );
     virtual ~IStreamReader( );
 
     size_t const		    get_memory_alignment( ) const;
@@ -132,14 +126,14 @@ struct IStreamReader
     bool const			    is_at_EOS_ATOMIC( );
 
     virtual uint64_t const	    read_into_cache(
-	uint8_t * const cache, uint64_t const cache_size
+        uint8_t * const cache, uint64_t const cache_size
     ) = 0;
 
 protected:
 
     size_t			    _alignment;
     size_t			    _max_aligned;
-    
+
     bool			    _at_eos;
 
     void			    _set_EOS_ATOMIC( );
@@ -147,70 +141,65 @@ protected:
 };
 
 
-struct RawStreamReader : public IStreamReader
-{
-    
-	    RawStreamReader( int const fd, size_t const alignment = 0 );
+struct RawStreamReader : public IStreamReader {
+
+    RawStreamReader( int const fd, size_t const alignment = 0 );
     virtual ~RawStreamReader( );
 
     virtual uint64_t const  read_into_cache(
-	uint8_t * const cache, uint64_t const cache_size
+        uint8_t * const cache, uint64_t const cache_size
     );
 
 protected:
-    
+
     int			    _stream_handle;
 
 };
 
 
-struct GzStreamReader : public IStreamReader
-{
-    
-	    GzStreamReader( int const fd );
+struct GzStreamReader : public IStreamReader {
+
+    GzStreamReader( int const fd );
     virtual ~GzStreamReader( );
 
     virtual uint64_t const  read_into_cache(
-	uint8_t * const cache, uint64_t const cache_size
+        uint8_t * const cache, uint64_t const cache_size
     );
 
 private:
-    
+
     gzFile		    _stream_handle;
 
 };
 
 
-struct Bz2StreamReader : public IStreamReader
-{
-    
-	    Bz2StreamReader( int const fd );
+struct Bz2StreamReader : public IStreamReader {
+
+    Bz2StreamReader( int const fd );
     virtual ~Bz2StreamReader( );
 
     virtual uint64_t const  read_into_cache(
-	uint8_t * const cache, uint64_t const cache_size
+        uint8_t * const cache, uint64_t const cache_size
     );
 
 private:
-    
+
     FILE *		    _stream_handle;
     BZFILE *		    _block_handle;
 
 };
 
 #ifdef WITH_INTERNAL_METRICS
-struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics
-{
-    
-    enum
-    {
-	MKEY_TIME_WAITING_TO_SET_SA_BUFFER,
-	MKEY_TIME_WAITING_TO_GET_SA_BUFFER,
-	MKEY_TIME_WAITING_TO_FILL_FROM_STREAM,
-	MKEY_TIME_FILLING_FROM_STREAM,
-	MKEY_TIME_IN_SYNC_BARRIER
+struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics {
+
+    enum {
+        MKEY_TIME_WAITING_TO_SET_SA_BUFFER,
+        MKEY_TIME_WAITING_TO_GET_SA_BUFFER,
+        MKEY_TIME_WAITING_TO_FILL_FROM_STREAM,
+        MKEY_TIME_FILLING_FROM_STREAM,
+        MKEY_TIME_IN_SYNC_BARRIER
     };
-    
+
     uint64_t	    numbytes_filled_from_stream;
     uint64_t	    numbytes_copied_from_ca_buffer;
     uint64_t	    numbytes_reserved_as_ca_buffer;
@@ -226,42 +215,41 @@ struct CacheSegmentPerformanceMetrics : public IPerformanceMetrics
     uint64_t	    clock_nsecs_in_sync_barrier;
     uint64_t	    cpu_nsecs_in_sync_barrier;
 
-	    CacheSegmentPerformanceMetrics( );
+    CacheSegmentPerformanceMetrics( );
     virtual ~CacheSegmentPerformanceMetrics( );
 
     virtual void    accumulate_timer_deltas( uint32_t metrics_key );
 
     virtual void    accumulate_metrics(
-	CacheSegmentPerformanceMetrics &source
+        CacheSegmentPerformanceMetrics &source
     );
 
 protected:
-    
+
     uint32_t	    _accumulated_count;
 
 };
 #endif
 
-struct CacheManager
-{
-    
+struct CacheManager {
+
     CacheManager(
-	IStreamReader &	stream_reader,
-	uint32_t const	number_of_threads,
-	uint64_t const	cache_size,
-	uint8_t const	trace_level =
-	khmer:: get_active_config( ).get_input_buffer_trace_level( )
+        IStreamReader &	stream_reader,
+        uint32_t const	number_of_threads,
+        uint64_t const	cache_size,
+        uint8_t const	trace_level =
+            khmer:: get_active_config( ).get_input_buffer_trace_level( )
     );
     ~CacheManager( );
 
     // Returns true, if current thread has more bytes to consume.
-    // Blocks, if current thread has no more bytes to consume, 
+    // Blocks, if current thread has no more bytes to consume,
     //   but other threads still do. (Synchronization barrier.)
     // Returns false, if no threads have more bytes to consume.
     bool const		has_more_data( );
 
     uint64_t const	get_bytes(
-	uint8_t * const buffer, uint64_t buffer_len
+        uint8_t * const buffer, uint64_t buffer_len
     );
 
     uint64_t const	whereis_cursor( void );
@@ -271,33 +259,32 @@ struct CacheManager
     uint64_t const	get_fill_id( );
 
 private:
-    
-    struct CacheSegment
-    {
 
-	bool				avail;
-	uint32_t			thread_id;
-	uint64_t			size;
-	size_t				alignment;
-	uint8_t *			memory;
-	uint64_t			cursor;
-	bool				cursor_in_ca_buffer;
-	std:: string			ca_buffer;
-	uint64_t			fill_id;
-	bool				found_EOS;
+    struct CacheSegment {
+
+        bool				avail;
+        uint32_t			thread_id;
+        uint64_t			size;
+        size_t				alignment;
+        uint8_t *			memory;
+        uint64_t			cursor;
+        bool				cursor_in_ca_buffer;
+        std:: string			ca_buffer;
+        uint64_t			fill_id;
+        bool				found_EOS;
 #ifdef WITH_INTERNAL_METRICS
-	CacheSegmentPerformanceMetrics	pmetrics;
+        CacheSegmentPerformanceMetrics	pmetrics;
 #endif
-	TraceLogger			trace_logger;
-	
-	CacheSegment(
-	    uint32_t const  thread_id,
-	    uint64_t const  size,
-	    size_t const    alignment = 0,
-	    uint8_t const   trace_level = 
-	    khmer:: get_active_config( ).get_input_buffer_trace_level( )
-	);
-	~CacheSegment( );
+        TraceLogger			trace_logger;
+
+        CacheSegment(
+            uint32_t const  thread_id,
+            uint64_t const  size,
+            size_t const    alignment = 0,
+            uint8_t const   trace_level =
+                khmer:: get_active_config( ).get_input_buffer_trace_level( )
+        );
+        ~CacheSegment( );
 
     }; // struct CacheSegment
 
@@ -321,28 +308,27 @@ private:
 
     // Extends or refills segment for current thread, as needed.
     void		_perform_segment_maintenance(
-	CacheSegment & segment
+        CacheSegment & segment
     );
 
     uint64_t		_get_fill_counter_ATOMIC( );
     void		_increment_fill_counter_ATOMIC( );
     bool const		_check_segment_to_fill_ATOMIC(
-	uint32_t const thread_id
+        uint32_t const thread_id
     );
     void		_select_segment_to_fill_ATOMIC( );
     CacheSegment &	_get_segment( bool const higher = false );
     void		_fill_segment_from_stream(
-	CacheSegment & segment
+        CacheSegment & segment
     );
     void		_increment_segment_ref_count_ATOMIC( );
     void		_decrement_segment_ref_count_ATOMIC( );
     uint32_t const	_get_segment_ref_count_ATOMIC( );
-    
+
 }; // struct CacheManager
 
 
-struct Read
-{
+struct Read {
     std:: string    name;
     std:: string    annotations;
     std:: string    sequence;
@@ -350,27 +336,25 @@ struct Read
     // TODO? Add description field.
     uint64_t	    bytes_consumed;
 
-    inline void reset ( )
-    {
-	name.clear( );
-	annotations.clear( );
-	sequence.clear( );
-	accuracy.clear( );
-	bytes_consumed = 0;
+    inline void reset ( ) {
+        name.clear( );
+        annotations.clear( );
+        sequence.clear( );
+        accuracy.clear( );
+        bytes_consumed = 0;
     }
 };
 
 typedef std:: pair< Read, Read >	ReadPair;
 
 #ifdef WITH_INTERNAL_METRICS
-struct ParserPerformanceMetrics: public IPerformanceMetrics
-{
-    
+struct ParserPerformanceMetrics: public IPerformanceMetrics {
+
     uint64_t	    numlines_copied;
     uint64_t	    numreads_parsed_total;
     uint64_t	    numreads_parsed_valid;
 
-	    ParserPerformanceMetrics( );
+    ParserPerformanceMetrics( );
     virtual ~ParserPerformanceMetrics( );
 
     virtual void    accumulate_timer_deltas( uint32_t metrics_key );
@@ -379,89 +363,91 @@ struct ParserPerformanceMetrics: public IPerformanceMetrics
 #endif
 
 
-struct IParser
-{
-    
-    enum
-    {
-	PAIR_MODE_ALLOW_UNPAIRED = 0,
-	PAIR_MODE_IGNORE_UNPAIRED,
-	PAIR_MODE_ERROR_ON_UNPAIRED
+struct IParser {
+
+    enum {
+        PAIR_MODE_ALLOW_UNPAIRED = 0,
+        PAIR_MODE_IGNORE_UNPAIRED,
+        PAIR_MODE_ERROR_ON_UNPAIRED
     };
 
     static IParser * const  get_parser(
-	std:: string const 	&ifile_name,
-	uint32_t const		number_of_threads   =
-	khmer:: get_active_config( ).get_number_of_threads( ),
-	uint64_t const		cache_size	    =
-	khmer:: get_active_config( ).get_reads_input_buffer_size( ),
-	uint8_t const		trace_level	    =
-	khmer:: get_active_config( ).get_reads_parser_trace_level( )
+        std:: string const 	&ifile_name,
+        uint32_t const		number_of_threads   =
+            khmer:: get_active_config( ).get_number_of_threads( ),
+        uint64_t const		cache_size	    =
+            khmer:: get_active_config( ).get_reads_input_buffer_size( ),
+        uint8_t const		trace_level	    =
+            khmer:: get_active_config( ).get_reads_parser_trace_level( )
     );
-    
-	    IParser(
-	IStreamReader	&stream_reader,
-	uint32_t const	number_of_threads   =
-	khmer:: get_active_config( ).get_number_of_threads( ),
-	uint64_t const	cache_size	    =
-	khmer:: get_active_config( ).get_reads_input_buffer_size( ),
-	uint8_t const	trace_level	    = 
-	khmer:: get_active_config( ).get_reads_parser_trace_level( )
+
+    IParser(
+        IStreamReader	&stream_reader,
+        uint32_t const	number_of_threads   =
+            khmer:: get_active_config( ).get_number_of_threads( ),
+        uint64_t const	cache_size	    =
+            khmer:: get_active_config( ).get_reads_input_buffer_size( ),
+        uint8_t const	trace_level	    =
+            khmer:: get_active_config( ).get_reads_parser_trace_level( )
     );
     virtual ~IParser( );
 
-    inline int		uuid( )
-    { return _uuid; }
+    inline int		uuid( ) {
+        return _uuid;
+    }
 
-    inline bool		is_complete( )
-    { return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem; }
+    inline bool		is_complete( ) {
+        return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem;
+    }
 
     // Note: 'get_next_read' exists for legacy reasons.
     //	     In the long term, it should be eliminated in favor of direct use of
     //	     'imprint_next_read'. A potentially costly copy-by-value happens
     //	     upon return.
     // TODO: Eliminate all calls to 'get_next_read'.
-    inline Read		get_next_read( )
-    { Read the_read; imprint_next_read( the_read ); return the_read; }
+    inline Read		get_next_read( ) {
+        Read the_read;
+        imprint_next_read( the_read );
+        return the_read;
+    }
     virtual void	imprint_next_read( Read &the_read );
 
     virtual void	imprint_next_read_pair(
-	ReadPair &the_read_pair,
-	uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
+        ReadPair &the_read_pair,
+        uint8_t mode = PAIR_MODE_ERROR_ON_UNPAIRED
     );
 
 protected:
-    
-    struct ParserState
-    {
 
-	// TODO: Set buffer size from Config.
-	static uint64_t const	    BUFFER_SIZE		= 127;
+    struct ParserState {
 
-	uint32_t		    thread_id;
-	
-	bool			    at_start;
-	uint64_t		    fill_id;
+        // TODO: Set buffer size from Config.
+        static uint64_t const	    BUFFER_SIZE		= 127;
 
-	std:: string		    line;
-	bool			    need_new_line;
+        uint32_t		    thread_id;
 
-	uint8_t			    buffer[ BUFFER_SIZE + 1 ];
-	uint64_t		    buffer_pos;
-	uint64_t		    buffer_rem;
+        bool			    at_start;
+        uint64_t		    fill_id;
+
+        std:: string		    line;
+        bool			    need_new_line;
+
+        uint8_t			    buffer[ BUFFER_SIZE + 1 ];
+        uint64_t		    buffer_pos;
+        uint64_t		    buffer_rem;
 #ifdef WITH_INTERNAL_METRICS
-	ParserPerformanceMetrics    pmetrics;
+        ParserPerformanceMetrics    pmetrics;
 #endif
-	TraceLogger		    trace_logger;
-	
-	ParserState( uint32_t const thread_id, uint8_t const trace_level );
-	~ParserState( );
+        TraceLogger		    trace_logger;
+
+        ParserState( uint32_t const thread_id, uint8_t const trace_level );
+        ~ParserState( );
 
     }; // struct ParserState
 
     // TODO: Use a 16-octet IETF RFC 4122 UUID or equivalent.
     int			_uuid;
-    
+
     uint8_t		_trace_level;
 
     CacheManager	_cache_manager;
@@ -482,48 +468,45 @@ protected:
 
 #if (0)
     void		_imprint_next_read_pair_in_allow_mode(
-	ReadPair &the_read_pair
+        ReadPair &the_read_pair
     );
 #endif
     void		_imprint_next_read_pair_in_ignore_mode(
-	ReadPair &the_read_pair
+        ReadPair &the_read_pair
     );
     void		_imprint_next_read_pair_in_error_mode(
-	ReadPair &the_read_pair
+        ReadPair &the_read_pair
     );
     bool		_is_valid_read_pair(
-	ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
+        ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
     );
 
-    inline ParserState	&_get_state( )
-    {
-	uint32_t	thread_id	= _thread_id_map.get_thread_id( );
-	ParserState *	state_PTR	= NULL;
+    inline ParserState	&_get_state( ) {
+        uint32_t	thread_id	= _thread_id_map.get_thread_id( );
+        ParserState *	state_PTR	= NULL;
 
-	assert( NULL != _states );
+        assert( NULL != _states );
 
-	state_PTR = _states[ thread_id ];
-	if (NULL == state_PTR)
-	{
-	    _states[ thread_id ]    =
-	    new ParserState( thread_id, _trace_level );
-	    state_PTR		    = _states[ thread_id ];
-	}
+        state_PTR = _states[ thread_id ];
+        if (NULL == state_PTR) {
+            _states[ thread_id ]    =
+                new ParserState( thread_id, _trace_level );
+            state_PTR		    = _states[ thread_id ];
+        }
 
-	return *state_PTR;
+        return *state_PTR;
     }
 
 }; // struct IParser
 
 
-struct FastaParser : public IParser
-{
-    
-	    FastaParser(
-	IStreamReader &	stream_reader,
-	uint32_t const	number_of_threads,
-	uint64_t const	cache_size,
-	uint8_t const	trace_level
+struct FastaParser : public IParser {
+
+    FastaParser(
+        IStreamReader &	stream_reader,
+        uint32_t const	number_of_threads,
+        uint64_t const	cache_size,
+        uint8_t const	trace_level
     );
     virtual ~FastaParser( );
 
@@ -532,14 +515,13 @@ struct FastaParser : public IParser
 };
 
 
-struct FastqParser : public IParser
-{
+struct FastqParser : public IParser {
 
-	    FastqParser(
-	IStreamReader &	stream_reader,
-	uint32_t const	number_of_threads,
-	uint64_t const	cache_size,
-	uint8_t const	trace_level
+    FastqParser(
+        IStreamReader &	stream_reader,
+        uint32_t const	number_of_threads,
+        uint64_t const	cache_size,
+        uint8_t const	trace_level
     );
     virtual ~FastqParser( );
 
@@ -549,22 +531,22 @@ struct FastqParser : public IParser
 
 inline PartitionID _parse_partition_id(std::string name)
 {
-  PartitionID p = 0;
-  const char * s = name.c_str() + name.length() - 1;
-  assert(*(s + 1) == (unsigned int) NULL);
+    PartitionID p = 0;
+    const char * s = name.c_str() + name.length() - 1;
+    assert(*(s + 1) == (unsigned int) NULL);
 
-  while(*s != '\t' && s >= name.c_str()) {
-    s--;
-  }
+    while(*s != '\t' && s >= name.c_str()) {
+        s--;
+    }
 
-  if (*s == '\t') {
-    p = (PartitionID) atoi(s + 1);
-  } else {
-    std::cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
-    assert(0);
-  }
+    if (*s == '\t') {
+        p = (PartitionID) atoi(s + 1);
+    } else {
+        std::cerr << "consume_partitioned_fasta barfed on read "  << name << "\n";
+        assert(0);
+    }
 
-  return p;
+    return p;
 }
 
 
