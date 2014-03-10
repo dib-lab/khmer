@@ -36,9 +36,12 @@ def check_space(in_files):
     free_space = target.f_frsize * target.f_bavail
     #<TODO>: If SU, use target.f_bfree
 
+    # Check input file array, remove corrupt files
+    valid_files = [f for f in in_files if os.path.isfile(f)]
+
     # Get input file size as worst case estimate of
     # output file size
-    file_sizes = map(lambda f: os.stat(f).st_size, in_files)
+    file_sizes = map(lambda f: os.stat(f).st_size, valid_files)
     total_size = reduce(lambda f1, f2: f1+f2, file_sizes)
 
     size_diff = total_size-free_space

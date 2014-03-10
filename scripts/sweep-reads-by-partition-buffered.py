@@ -33,15 +33,8 @@ import os
 import time
 import khmer
 from khmer.khmer_args import build_hashbits_args, report_on_config
-
-#  Import fileapi from sandbox - temporary arrangement
-current_file_path = os.path.realpath(__file__)
-current_folder = os.path.dirname(current_file_path)
-parent_folder = os.path.dirname(current_folder)
-sandbox_folder = os.path.join(parent_folder, 'sandbox')
-sys.path.append(sandbox_folder)
-
-import fileApi
+from khmer.file_api import check_file_status, check_space
+from khmer.file_api import check_valid_file_exists
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
@@ -210,11 +203,13 @@ def main():
     max_reads = args.max_reads
 
     input_files = args.input_files
+    
+    check_file_status(input_fastp)
+    check_valid_file_exists(input_files)
 
-    filenames = [input_files, input_fastp]
-    for f in filenames:
-        check_file_status(f)
-
+    filenames = []
+    filenames.extend(input_files)
+    filenames.append(input_fastp)
     check_space(filenames)
 
     output_buffer = ReadBufferManager(
