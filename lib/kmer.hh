@@ -30,7 +30,6 @@ private:
 public:
     Kmer(std::string kmer);
     Kmer(HashIntoType, HashIntoType, unsigned char, unsigned int);
-    Kmer() { }
 
     HashIntoType getUniqueHash() const;
 
