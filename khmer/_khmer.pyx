@@ -10,6 +10,7 @@ from libc.limits cimport UINT_MAX
 
 # FIXME: ugly, but Cython has no way to check #define macros
 cdef int MAX_BIGCOUNT_C = 65535
+cdef int MAX_COUNT_C = 255
 
 
 cdef class _LabelHash:
@@ -25,8 +26,304 @@ cdef class Hashbits:
     def __dealloc__(self):
         del self.thisptr
 
+    def save(self, string filename):
+        self.thisptr.save(filename)
+
+    def consume_fasta(self, const string filename, callback_obj=None):
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        cdef CallbackFn _report_fn = NULL
+
+#        try {
+        self.thisptr.consume_fasta(filename, total_reads, n_consumed,
+                                   _report_fn, <void*>callback_obj)
+#        } catch (_khmer_signal &e) {
+#            return NULL;
+#        }
+
+        return total_reads, n_consumed
+
+    def calc_connected_graph_size(self, const char *_kmer, unsigned int max_size=0,
+                                        bool break_on_circum=False):
+        cdef unsigned long long size = 0
+        cdef SeenSet keeper
+        self.thisptr.calc_connected_graph_size(_kmer, size, keeper, max_size,
+                                                break_on_circum)
+        return size
+
+    def consume(self, const string& long_str):
+        return self.thisptr.consume_string(long_str)
+
+    def consume_fasta_and_tag(self, const string filename, callback_obj=None):
+        cdef unsigned long long n_consumed = 0
+        cdef unsigned int total_reads = 0
+        cdef CallbackFn _report_fn = NULL
+
+#        try {
+        self.thisptr.consume_fasta_and_tag(filename, total_reads,
+                                           n_consumed, _report_fn,
+                                           <void*>callback_obj)
+#        } catch (_khmer_signal &e) {
+#            return NULL;
+#        }
+
+        return total_reads, n_consumed
+
+    def do_subset_partition(self, HashIntoType start_kmer=0,
+                            HashIntoType end_kmer=0,
+                            bool break_on_stop_tags=False,
+                            bool stop_big_traversals=False,
+                            callback_obj=None):
+        cdef CallbackFn _report_fn = NULL
+        #try {
+        cdef SubsetPartition *subset_p = new SubsetPartition(self.thisptr)
+        subset_p.do_partition(start_kmer, end_kmer, break_on_stop_tags,
+                               stop_big_traversals,
+                               _report_fn, <void*>callback_obj)
+        #} catch (_khmer_signal &e) {
+        #    return NULL;
+        #}
+
+        return spi_factory(subset_p)
+
+    def subset_count_partitions(self, SubsetPartitionInfo subset_p):
+        cdef unsigned int n_partitions = 0, n_unassigned = 0
+        subset_p.thisptr.count_partitions(n_partitions, n_unassigned)
+
+        return n_partitions, n_unassigned
+
+    def output_partitions(self, const string filename,
+                          const string output_file,
+                          bool output_unassigned=False,
+                          callback_obj=None):
+        cdef unsigned int n_partitions = 0
+        cdef CallbackFn _report_fn = NULL
+
+        #try {
+        cdef SubsetPartition * subset_p = self.thisptr.partition
+        n_partitions = subset_p.output_partitioned_file(filename,
+                            output_file,
+                            output_unassigned,
+                            _report_fn,
+                            <void*>callback_obj)
+        #} catch (_khmer_signal &e) {
+        #    return NULL;
+        #}
+
+        return n_partitions
+
+    def merge_subset(self, SubsetPartitionInfo subset_p):
+        self.thisptr.partition.merge(subset_p.thisptr)
+
+    def find_all_tags(self, const char *kmer_s):
+        if len(kmer_s) < self.thisptr.ksize():
+            raise ValueError("starting kmer is smaller than the K size of the hashbits")
+
+        cdef pre_partition_info * ppi
+
+        cdef HashIntoType kmer, kmer_f, kmer_r
+        kmer = _hash(kmer_s, self.thisptr.ksize(), kmer_f, kmer_r)
+
+        ppi = new pre_partition_info(kmer)
+        self.thisptr.partition.find_all_tags(kmer_f, kmer_r, ppi.tagged_kmers,
+                                             self.thisptr.all_tags, False, False)
+        self.thisptr.add_kmer_to_tags(kmer)
+
+        return ppi_factory(ppi)
+
+    def assign_partition_id(self, PrePartitionInfo ppi):
+        return self.thisptr.partition.assign_partition_id(
+                    ppi.thisptr.kmer, ppi.thisptr.tagged_kmers)
+
+    def _get_tag_density(self):
+        return self.thisptr._get_tag_density()
+
+    def _set_tag_density(self, unsigned int d):
+        self.thisptr._set_tag_density(d)
+
+    def n_occupied(self, HashIntoType start=0, HashIntoType stop=0):
+        return self.thisptr.n_occupied(start, stop)
+
+    def get(self, val):
+        if isinstance(val, int) or isinstance(val, long):
+            return self.thisptr.get_count(<HashIntoType>val);
+        else:
+            return self.thisptr.get_count(<char *>val);
+
+    def n_unique_kmers(self,  HashIntoType start=0, HashIntoType stop=0):
+        return self.thisptr.n_kmers(start, stop)
+
+    def count(self, const char* kmer):
+        """Count the given kmer"""
+        if len(kmer) != self.thisptr.ksize():
+            raise ValueError("k-mer length must be the same as the hashtable k-size")
+        self.thisptr.count(kmer)
+        return 1
+
+    def filter_if_present(self, const string filename, const string output,
+                                callback_obj=None):
+        cdef CallbackFn _report_fn = NULL
+        #try {
+        self.thisptr.filter_if_present(filename, output, _report_fn, <void*>callback_obj)
+        #} catch (_khmer_signal &e) {
+        #    return NULL;
+        #}
+
+
+    def consume_partitioned_fasta(self, const string filename, callback_obj=None):
+        cdef unsigned long long n_consumed
+        cdef unsigned int total_reads
+        cdef CallbackFn _report_fn = NULL
+
+        #try {
+        self.thisptr.consume_partitioned_fasta(filename, total_reads, n_consumed,
+                                                _report_fn, <void*>callback_obj)
+        #} catch (_khmer_signal) {
+        #    return NULL;
+        #}
+
+        return total_reads, n_consumed
+
+    def count_partitions(self):
+        cdef unsigned int n_partitions = 0, n_unassigned = 0
+        self.thisptr.partition.count_partitions(n_partitions, n_unassigned)
+
+        return n_partitions, n_unassigned
+
+    def get_partition_id(self, string kmer):
+        return self.thisptr.partition.get_partition_id(kmer)
+
+    def join_partitions(self, PartitionID p1, PartitionID p2):
+        return self.thisptr.partition.join_partitions(p1, p2)
+
+
+    def count_kmers_within_radius(self, const char *kmer, unsigned int radius,
+                                        unsigned int max_count=0):
+        cdef HashIntoType kmer_f, kmer_r
+
+        _hash(kmer, self.thisptr.ksize(), kmer_f, kmer_r)
+        return self.thisptr.count_kmers_within_radius(kmer_f, kmer_r, radius,
+                                                      max_count, NULL)
+
+    def kmer_degree(self, const char* kmer_s):
+        return self.thisptr.kmer_degree(kmer_s)
+
+    def find_radius_for_volume(self, const char *kmer, unsigned int max_count,
+                                     unsigned int max_radius):
+        cdef HashIntoType kmer_f, kmer_r
+        _hash(kmer, self.thisptr.ksize(), kmer_f, kmer_r)
+        return self.thisptr.find_radius_for_volume(kmer_f, kmer_r, max_count,
+                                                   max_radius)
+
+    def count_kmers_on_radius(self, const char *kmer, unsigned int radius,
+                                    unsigned int max_volume=0):
+        cdef HashIntoType kmer_f, kmer_r
+
+        _hash(kmer, self.thisptr.ksize(), kmer_f, kmer_r)
+        return self.thisptr.count_kmers_on_radius(kmer_f, kmer_r, radius,
+                                                  max_volume)
+
+    def add_tag(self, const char *kmer_s):
+        cdef HashIntoType kmer = _hash(kmer_s, self.thisptr.ksize())
+        self.thisptr.add_tag(kmer)
+
+    def add_stop_tag(self, const char *kmer_s):
+        cdef HashIntoType kmer = _hash(kmer_s, self.thisptr.ksize())
+        self.thisptr.add_stop_tag(kmer)
+
+    def save_tagset(self, string filename):
+        self.thisptr.save_tagset(filename)
+
+    def load_tagset(self, string filename, bool clear_tags=True):
+        self.thisptr.load_tagset(filename, clear_tags)
+
+    def consume_fasta_and_tag_with_stoptags(self, const string filename, callback_obj=None):
+        cdef unsigned long long n_consumed
+        cdef unsigned int total_reads
+        cdef CallbackFn _report_fn = NULL
+
+        #try {
+        self.thisptr.consume_fasta_and_tag_with_stoptags(filename,
+                        total_reads, n_consumed,
+                        _report_fn, <void*>callback_obj)
+        #} catch (_khmer_signal &e) {
+        #    return NULL;
+        #}
+
+        return total_reads, n_consumed
+
+    def identify_stoptags_by_position(self, const string seq):
+        cdef vector[unsigned int] posns
+        self.thisptr.identify_stop_tags_by_position(seq, posns)
+        return posns
+
+    def ksize(self):
+        return self.thisptr.ksize()
+
+    def hashsizes(self):
+        return self.thisptr.get_tablesizes()
+
+    def extract_unique_paths(self, string seq, unsigned int min_length,
+                                   float min_unique):
+        cdef vector[string] results
+        self.thisptr.extract_unique_paths(seq, min_length, min_unique, results)
+        return results
+
+    def find_unpart(self, const string filename, bool traverse,
+                          bool stop_big_traversals, callback_obj=None):
+        cdef unsigned int n_singletons = 0
+        cdef CallbackFn _report_fn = NULL
+
+        #try {
+        n_singletons = self.thisptr.partition.find_unpart(
+                                filename, traverse,
+                                stop_big_traversals,
+                                _report_fn,<void*>callback_obj)
+        #} catch (_khmer_signal &e) {
+        #    return NULL;
+        #}
+
+        return n_singletons
+
+    def get_median_count(self, const string kmer):
+        if len(kmer) < self.thisptr.ksize():
+            raise ValueError("k-mer length must be >= the hashtable k-size")
+
+        cdef BoundedCounterType med = 0
+        cdef float average = 0, stddev = 0
+
+        self.thisptr.get_median_count(kmer, med, average, stddev)
+
+        return med, average, stddev
+
 
 _Hashbits = Hashbits
+
+
+cdef class PrePartitionInfo:
+    cdef pre_partition_info *thisptr
+
+    def __dealloc__(self):
+        del self.thisptr
+
+
+cdef PrePartitionInfo ppi_factory(pre_partition_info *o):
+    cdef PrePartitionInfo obj = PrePartitionInfo.__new__(PrePartitionInfo)
+    obj.thisptr = o
+    return obj
+
+
+cdef class SubsetPartitionInfo:
+    cdef SubsetPartition *thisptr
+
+    def __dealloc__(self):
+        del self.thisptr
+
+
+cdef SubsetPartitionInfo spi_factory(SubsetPartition *o):
+    cdef SubsetPartitionInfo obj = SubsetPartitionInfo.__new__(SubsetPartitionInfo)
+    obj.thisptr = o
+    return obj
 
 
 cdef class ReadParser:
@@ -36,9 +333,16 @@ cdef class ReadParser:
 cdef class KCountingHash:
     cdef CountingHash *thisptr
 
-    def __cinit__(self, WordLength ksize, vector[unsigned long long int]& tablesizes,
-                  uint32_t number_of_threads):
-        self.thisptr = new CountingHash(ksize, tablesizes, number_of_threads)
+    # FIXME: number_of_threads should be based in khmer_config!
+    def __cinit__(self, WordLength ksize, tablesizes, uint32_t number_of_threads=1):
+        try:
+            self.thisptr = new CountingHash(ksize,
+                    <vector[unsigned long long int]&>tablesizes,
+                    number_of_threads)
+        except TypeError:
+            self.thisptr = new CountingHash(ksize,
+                    <HashIntoType>tablesizes,
+                    number_of_threads)
 
     def __dealloc__(self):
         del self.thisptr
@@ -96,6 +400,69 @@ cdef class KCountingHash:
         cdef HashIntoType *dist
         dist = self.thisptr.abundance_distribution(filename, tracking.thisptr)
         return [dist[i] for i in range(0, MAX_BIGCOUNT_C)]
+
+    def trim_on_abundance(self, string seq, BoundedCounterType min_count):
+        cdef unsigned int trim_at
+        trim_at = self.thisptr.trim_on_abundance(seq, min_count)
+        return seq.substr(0, trim_at), trim_at
+
+    def set_use_bigcount(self, bool choice):
+        self.thisptr.set_use_bigcount(choice)
+
+    def count(self, const char* kmer):
+        """Count the given kmer"""
+        if len(kmer) != self.thisptr.ksize():
+            raise ValueError("k-mer length must be the same as the hashtable k-size")
+        self.thisptr.count(kmer)
+        return 1
+
+    def ksize(self):
+        return self.thisptr.ksize()
+
+    def hashsizes(self):
+        return self.thisptr.get_tablesizes()
+
+    def consume_high_abund_kmers(self, string long_str,
+                                       BoundedCounterType min_count):
+        if len(long_str) < self.thisptr.ksize():
+            raise ValueError("string length must >= the hashtable k-mer size")
+
+        if min_count > MAX_COUNT_C:
+            raise ValueError("min count specified is > maximum possible count")
+
+        return self.thisptr.consume_high_abund_kmers(long_str, min_count)
+
+    def fasta_count_kmers_by_position(self, string inputfile,
+                                            int max_read_len,
+                                            int limit_by=0,
+                                            callback_obj=None):
+        cdef unsigned long long * counts
+        cdef CallbackFn _report_fn = NULL
+
+        counts = self.thisptr.fasta_count_kmers_by_position(
+                    inputfile,
+                    max_read_len,
+                    limit_by,
+                    _report_fn, <void*>callback_obj)
+
+        return [counts[i] for i in range(0, max_read_len)]
+
+    def get_max_count(self, string long_str):
+        if len(long_str) < self.thisptr.ksize():
+            raise ValueError("string length must >= the hashtable k-mer size")
+        return self.thisptr.get_max_count(long_str)
+
+    def get_min_count(self, string long_str):
+        if len(long_str) < self.thisptr.ksize():
+            raise ValueError("string length must >= the hashtable k-mer size")
+        return self.thisptr.get_min_count(long_str)
+
+    def n_occupied(self, HashIntoType start=0, HashIntoType stop=0):
+        return self.thisptr.n_occupied(start, stop)
+
+    def output_fasta_kmer_pos_freq(self, string infile, string outfile):
+        self.thisptr.output_fasta_kmer_pos_freq(infile, outfile)
+        return 0
 
 
 cdef class ReadAligner:
@@ -232,9 +599,9 @@ def get_config():
     pass
 
 
-def new_hashtable():
+def new_hashtable(k, size):
     """Create an empty single-table counting hash"""
-    pass
+    return KCountingHash(k, size)
 
 
 def _new_counting_hash(k, sizes, n_threads=1):
