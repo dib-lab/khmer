@@ -178,34 +178,6 @@ cdef extern from "labelhash.hh" namespace "khmer":
                                                   SeenSet *)
         Label * check_and_allocate_label(Label)
 
-        # FIXME: this is from hashtable, how to avoid redeclaring
-        # all inherited methods?
-        SubsetPartition * partition
-        SeenSet all_tags
-        const WordLength ksize() const
-        const BoundedCounterType get_count(const char *) const
-        const BoundedCounterType get_count(HashIntoType) const
-        const HashIntoType n_occupied(HashIntoType, HashIntoType)
-        unsigned int consume_string(const string &)
-        void consume_fasta(const string &,
-                           unsigned int &,
-                           unsigned long long &,
-                           CallbackFn,
-                           void *)
-        void consume_fasta_and_tag(string &,
-                                   unsigned int &,
-                                   unsigned long long &,
-                                   CallbackFn,
-                                   void *)
-        unsigned int _get_tag_density() const
-        void _set_tag_density(unsigned int)
-        void count(const char *)
-        void count(HashIntoType)
-
-        # FIXME: this is from hashbits, how to avoid redeclaring
-        # all inherited methods?
-        const HashIntoType n_kmers(HashIntoType, HashIntoType) const
-
 
 cdef extern from "aligner.hh" namespace "khmer":
     cdef cppclass CandidateAlignment:

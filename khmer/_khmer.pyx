@@ -290,6 +290,17 @@ cdef class Hashtable:
 
         return n_singletons
 
+    def get_tagset(self):
+        cdef WordLength k = self.thisptr.ksize()
+        cdef string s
+        out = []
+
+        for tag in self.thisptr.all_tags:
+            s = _revhash(tag, k)
+            out.append(s)
+
+        return out
+
 
 cdef class KCountingHash(Hashtable):
 
@@ -388,11 +399,15 @@ cdef class Hashbits(Hashtable):
 _Hashbits = Hashbits
 
 
-cdef class LabelHash:
-    cdef CppLabelHash *thisptr
+cdef class LabelHash(Hashbits):
 
     def __cinit__(self, WordLength k, vector[unsigned long long int]& sizes):
-        self.thisptr = new CppLabelHash(k, sizes)
+        self.thisptr = <CppHashtable*> new CppLabelHash(k, sizes)
+
+# FIXME: Hashbits __dealloc__ is being called
+#    def __dealloc__(self):
+#        cdef CppLabelHash *ptr = <CppLabelHash*>self.thisptr
+#        del ptr
 
     def consume_fasta_and_tag_with_labels(self, string filename, callback_obj=None):
         cdef unsigned long long n_consumed
@@ -400,7 +415,7 @@ cdef class LabelHash:
         cdef CallbackFn _report_fn = NULL
 
         #try {
-        self.thisptr.consume_fasta_and_tag_with_labels(
+        (<CppLabelHash*>self.thisptr).consume_fasta_and_tag_with_labels(
                                 filename,
                                 total_reads, n_consumed,
                                 _report_fn, <void*>callback_obj)
@@ -417,7 +432,7 @@ cdef class LabelHash:
         cdef CallbackFn _report_fn = NULL
 
         #try {
-        self.thisptr.consume_partitioned_fasta_and_tag_with_labels(
+        (<CppLabelHash*>self.thisptr).consume_partitioned_fasta_and_tag_with_labels(
                                 filename,
                                 total_reads, n_consumed,
                                 _report_fn, <void*>callback_obj)
@@ -427,67 +442,35 @@ cdef class LabelHash:
 
         return total_reads, n_consumed
 
-    def consume_fasta_and_tag(self, const string filename, callback_obj=None):
-        cdef unsigned long long n_consumed = 0
-        cdef unsigned int total_reads = 0
-        cdef CallbackFn _report_fn = NULL
-
-#        try {
-        self.thisptr.consume_fasta_and_tag(filename, total_reads,
-                                           n_consumed, _report_fn,
-                                           <void*>callback_obj)
-#        } catch (_khmer_signal &e) {
-#            return NULL;
-#        }
-
-        return total_reads, n_consumed
-
     def n_labels(self):
-        return self.thisptr.n_labels()
+        return (<CppLabelHash*>self.thisptr).n_labels()
 
     def get_label_dict(self):
         out = {}
-        for pair in self.thisptr.label_ptrs:
+        for pair in (<CppLabelHash*>self.thisptr).label_ptrs:
             out[pair.first] = deref(pair.second)
         return out
 
     def get_tag_labels(self, HashIntoType tag):
-        cdef LabelPtrSet labels = self.thisptr.get_tag_labels(tag)
+        cdef LabelPtrSet labels = (<CppLabelHash*>self.thisptr).get_tag_labels(tag)
         out = []
         for label in labels:
             out.append(deref(label))
         return out
 
-    def get(self, val):
-        if isinstance(val, int) or isinstance(val, long):
-            return self.thisptr.get_count(<HashIntoType>val);
-        else:
-            return self.thisptr.get_count(<char *>val);
-
-    def get_tagset(self):
-        cdef WordLength k = self.thisptr.ksize()
-        cdef string s
-        out = []
-
-        for tag in self.thisptr.all_tags:
-            s = _revhash(tag, k)
-            out.append(s)
-
-        return out
-
     def sweep_tag_neighborhood(self, const string& seq, int r=0,
                                      bool break_on_stop_tags=False,
                                      bool stop_big_traversals=False):
-        cdef unsigned int rrange = (2 * self.thisptr._get_tag_density()) + 1
+        cdef unsigned int rrange = (2 * self._get_tag_density()) + 1
         if r >= 0:
             rrange = r
 
-        if len(seq) < self.thisptr.ksize():
+        if len(seq) < self.ksize():
             raise ValueError("string length must >= the hashtable k-mer size")
 
         cdef SeenSet tagged_kmers
-        self.thisptr.partition.sweep_for_tags(seq, tagged_kmers,
-                              self.thisptr.all_tags, rrange,
+        (<CppHashtable*>self.thisptr).partition.sweep_for_tags(seq, tagged_kmers,
+                              (<CppHashtable*>self.thisptr).all_tags, rrange,
                               break_on_stop_tags, stop_big_traversals)
         out = []
         for kmer in tagged_kmers:
@@ -508,7 +491,7 @@ cdef class LabelHash:
         cdef LabelPtrSet found_labels
 
         #try {
-        self.thisptr.sweep_label_neighborhood(seq, found_labels, rrange,
+        (<CppLabelHash*>self.thisptr).sweep_label_neighborhood(seq, found_labels, rrange,
                                 break_on_stop_tags, stop_big_traversals)
         #} catch (_khmer_signal &e) {
         #    return NULL;
@@ -522,52 +505,16 @@ cdef class LabelHash:
     def consume_sequence_and_tag_with_labels(self, const string& seq,
                                                    unsigned long long c):
         cdef unsigned long long n_consumed = 0
-        cdef Label * the_label = self.thisptr.check_and_allocate_label(c)
+        cdef Label * the_label = (<CppLabelHash*>self.thisptr).check_and_allocate_label(c)
 
         #try {
-        self.thisptr.consume_sequence_and_tag_with_labels(seq, n_consumed,
+        (<CppLabelHash*>self.thisptr).consume_sequence_and_tag_with_labels(seq, n_consumed,
                                                           deref(the_label),
                                                           NULL)
         #} catch (_khmer_signal &e) {
         #    return NULL;
         #}
         return n_consumed
-
-    def _get_tag_density(self):
-        return self.thisptr._get_tag_density()
-
-    def _set_tag_density(self, unsigned int d):
-        self.thisptr._set_tag_density(d)
-
-    def consume(self, const string& long_str):
-        return self.thisptr.consume_string(long_str)
-
-    def n_occupied(self, HashIntoType start=0, HashIntoType stop=0):
-        return self.thisptr.n_occupied(start, stop)
-
-    def count(self, const char* kmer):
-        """Count the given kmer"""
-        if len(kmer) != self.thisptr.ksize():
-            raise ValueError("k-mer length must be the same as the hashtable k-size")
-        self.thisptr.count(kmer)
-        return 1
-
-    def n_unique_kmers(self,  HashIntoType start=0, HashIntoType stop=0):
-        return self.thisptr.n_kmers(start, stop)
-
-    def consume_fasta(self, const string filename, callback_obj=None):
-        cdef unsigned long long n_consumed = 0
-        cdef unsigned int total_reads = 0
-        cdef CallbackFn _report_fn = NULL
-
-#        try {
-        self.thisptr.consume_fasta(filename, total_reads, n_consumed,
-                                   _report_fn, <void*>callback_obj)
-#        } catch (_khmer_signal &e) {
-#            return NULL;
-#        }
-
-        return total_reads, n_consumed
 
 
 _LabelHash = LabelHash
