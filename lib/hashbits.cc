@@ -141,6 +141,16 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 //block size for curve
     int block_size = total_reads/100;
 
+// reads number <100, block size =1
+    if (block_size == 0) {
+        block_size = 1;
+    }
+// set the remaining as 0
+    for (int n=total_reads; n<100; n++){
+            curve[0][n] = 0;
+            curve[1][n] = 0;
+    }
+
     total_reads = 0;
     HashIntoType start = 0, stop = 0;
 
