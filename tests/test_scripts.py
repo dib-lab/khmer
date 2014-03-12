@@ -954,7 +954,7 @@ def test_extract_partitions_output_unassigned():
 
     # ok, now run extract-partitions.
     script = scriptpath('extract-partitions.py')
-    args = ['-U','extracted', partfile]
+    args = ['-U', 'extracted', partfile]
 
     runscript(script, args, in_dir)
 
@@ -972,7 +972,7 @@ def test_extract_partitions_output_unassigned():
     assert len(parts) == 99, len(parts)
     parts = set(parts)
     assert len(parts) == 1, len(parts)
-    
+
 
 def test_extract_partitions_no_output_groups():
     seqfile = utils.get_test_data('random-20-a.fa')
@@ -985,22 +985,16 @@ def test_extract_partitions_no_output_groups():
 
     # ok, now run extract-partitions.
     script = scriptpath('extract-partitions.py')
-    args = ['-n','extracted', partfile]
+    args = ['-n', 'extracted', partfile]
 
-    runscript(script, args, in_dir)
+    # We expect a sys.exit -> we need the test to be tolerant
+    runscript(script, args, in_dir, fail_ok=True)
 
-    distfile = os.path.join(in_dir, 'extracted.dist')
+    # Group files are created after output_groups is
+    # checked. They should not exist in this scenario
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
-    assert os.path.exists(distfile)
     assert not os.path.exists(groupfile)
 
-    dist = open(distfile).readline()
-    assert dist.strip() == '99 1 1 99'
-
-    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
-    assert len(parts) == 99, len(parts)
-    parts = set(parts)
-    assert len(parts) == 1, len(parts)
 
 def test_abundance_dist():
     infile = utils.get_temp_filename('test.fa')
