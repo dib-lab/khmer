@@ -2683,7 +2683,7 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
     PyObject * subset_o = NULL;
     unsigned int distance, threshold, frequency;
 
-    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHashType,
+    if (!PyArg_ParseTuple(args, "OOIII", &subset_o, &khmer_KCountingHashType,
                           &counting_o, &distance, &threshold, &frequency)) {
         return NULL;
     }
