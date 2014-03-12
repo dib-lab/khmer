@@ -5,6 +5,7 @@ the three-clause BSD license; see doc/LICENSE.txt.
 Contact: khmer-project@idyll.org
 '''
 
+import cython
 from cython.operator cimport dereference as deref
 from libc.limits cimport UINT_MAX
 
@@ -511,51 +512,55 @@ cdef class ReadParser:
     pass
 
 
-cdef class KCountingHash:
-    cdef CountingHash *thisptr
-
-    # FIXME: number_of_threads should be based in khmer_config!
-    def __cinit__(self, WordLength ksize, tablesizes, uint32_t number_of_threads=1):
-        try:
-            self.thisptr = new CountingHash(ksize,
-                    <vector[unsigned long long int]&>tablesizes,
-                    number_of_threads)
-        except TypeError:
-            self.thisptr = new CountingHash(ksize,
-                    <HashIntoType>tablesizes,
-                    number_of_threads)
-
-    def __dealloc__(self):
-        del self.thisptr
+@cython.internal
+cdef class Hashtable:
+    cdef CppHashtable *thisptr
 
     def consume(self, const string& long_str):
         return self.thisptr.consume_string(long_str)
 
     def get(self, val):
         if isinstance(val, int) or isinstance(val, long):
-            return self.thisptr.get_count(<HashIntoType>val);
+            return self.thisptr.get_count(<HashIntoType>val)
         else:
-            return self.thisptr.get_count(<char *>val);
+            return self.thisptr.get_count(<char *>val)
 
     def get_median_count(self, const string kmer):
-        if len(kmer) < self.thisptr.ksize():
+        if len(kmer) < (self.thisptr).ksize():
             raise ValueError("k-mer length must be >= the hashtable k-size")
 
         cdef BoundedCounterType med = 0
         cdef float average = 0, stddev = 0
 
-        self.thisptr.get_median_count(kmer, med, average, stddev)
+        (self.thisptr).get_median_count(kmer, med, average, stddev)
 
         return med, average, stddev
 
-    def get_kadian_count(self, const string kmer, unsigned int nk=1):
-        if len(kmer) < self.thisptr.ksize():
-            raise ValueError("k-mer length must be >= the hashtable k-size")
+    def save(self, const string filename):
+        self.thisptr.save(filename)
 
-        cdef BoundedCounterType kad = 0
-        self.thisptr.get_kadian_count(kmer, kad, nk)
+    def load(self, const string filename):
+        self.thisptr.load(filename)
 
-        return kad
+    def count(self, const char* kmer):
+        """Count the given kmer"""
+        if len(kmer) != (self.thisptr).ksize():
+            raise ValueError("k-mer length must be the same as the hashtable k-size")
+        (self.thisptr).count(kmer)
+        return 1
+
+    def ksize(self):
+        return (self.thisptr).ksize()
+
+    def consume_high_abund_kmers(self, string long_str,
+                                       BoundedCounterType min_count):
+        if len(long_str) < (self.thisptr).ksize():
+            raise ValueError("string length must >= the hashtable k-mer size")
+
+        if min_count > MAX_COUNT_C:
+            raise ValueError("min count specified is > maximum possible count")
+
+        return (self.thisptr).consume_high_abund_kmers(long_str, min_count)
 
     def consume_fasta(self, const string filename, callback_obj=None):
         cdef unsigned long long n_consumed = 0
@@ -571,47 +576,32 @@ cdef class KCountingHash:
 
         return total_reads, n_consumed
 
-    def save(self, const string filename):
-        self.thisptr.save(filename)
 
-    def load(self, const string filename):
-        self.thisptr.load(filename)
+cdef class KCountingHash(Hashtable):
 
-    def abundance_distribution(self, string filename, Hashbits tracking):
-        cdef HashIntoType *dist
-        dist = self.thisptr.abundance_distribution(filename, tracking.thisptr)
-        return [dist[i] for i in range(0, MAX_BIGCOUNT_C)]
+    # FIXME: number_of_threads should be based in khmer_config!
+    def __cinit__(self, WordLength ksize, tablesizes, uint32_t number_of_threads=1):
+        try:
+            self.thisptr = <CppHashtable*> new CountingHash(ksize,
+                    <vector[unsigned long long int]&>tablesizes,
+                    number_of_threads)
+        except TypeError:
+            self.thisptr = <CppHashtable*> new CountingHash(ksize,
+                    <HashIntoType>tablesizes,
+                    number_of_threads)
 
-    def trim_on_abundance(self, string seq, BoundedCounterType min_count):
-        cdef unsigned int trim_at
-        trim_at = self.thisptr.trim_on_abundance(seq, min_count)
-        return seq.substr(0, trim_at), trim_at
+    def __dealloc__(self):
+        cdef CountingHash* ptr = <CountingHash*>self.thisptr
+        del ptr
 
-    def set_use_bigcount(self, bool choice):
-        self.thisptr.set_use_bigcount(choice)
+    def get_kadian_count(self, const string kmer, unsigned int nk=1):
+        if len(kmer) < self.ksize():
+            raise ValueError("k-mer length must be >= the hashtable k-size")
 
-    def count(self, const char* kmer):
-        """Count the given kmer"""
-        if len(kmer) != self.thisptr.ksize():
-            raise ValueError("k-mer length must be the same as the hashtable k-size")
-        self.thisptr.count(kmer)
-        return 1
+        cdef BoundedCounterType kad = 0
+        (<CountingHash*>self.thisptr).get_kadian_count(kmer, kad, nk)
 
-    def ksize(self):
-        return self.thisptr.ksize()
-
-    def hashsizes(self):
-        return self.thisptr.get_tablesizes()
-
-    def consume_high_abund_kmers(self, string long_str,
-                                       BoundedCounterType min_count):
-        if len(long_str) < self.thisptr.ksize():
-            raise ValueError("string length must >= the hashtable k-mer size")
-
-        if min_count > MAX_COUNT_C:
-            raise ValueError("min count specified is > maximum possible count")
-
-        return self.thisptr.consume_high_abund_kmers(long_str, min_count)
+        return kad
 
     def fasta_count_kmers_by_position(self, string inputfile,
                                             int max_read_len,
@@ -620,7 +610,7 @@ cdef class KCountingHash:
         cdef unsigned long long * counts
         cdef CallbackFn _report_fn = NULL
 
-        counts = self.thisptr.fasta_count_kmers_by_position(
+        counts = (<CountingHash*>self.thisptr).fasta_count_kmers_by_position(
                     inputfile,
                     max_read_len,
                     limit_by,
@@ -629,21 +619,37 @@ cdef class KCountingHash:
         return [counts[i] for i in range(0, max_read_len)]
 
     def get_max_count(self, string long_str):
-        if len(long_str) < self.thisptr.ksize():
+        if len(long_str) < self.ksize():
             raise ValueError("string length must >= the hashtable k-mer size")
-        return self.thisptr.get_max_count(long_str)
+        return (<CountingHash*>self.thisptr).get_max_count(long_str)
 
     def get_min_count(self, string long_str):
-        if len(long_str) < self.thisptr.ksize():
+        if len(long_str) < self.ksize():
             raise ValueError("string length must >= the hashtable k-mer size")
-        return self.thisptr.get_min_count(long_str)
-
-    def n_occupied(self, HashIntoType start=0, HashIntoType stop=0):
-        return self.thisptr.n_occupied(start, stop)
+        return (<CountingHash*>self.thisptr).get_min_count(long_str)
 
     def output_fasta_kmer_pos_freq(self, string infile, string outfile):
-        self.thisptr.output_fasta_kmer_pos_freq(infile, outfile)
+        (<CountingHash*>self.thisptr).output_fasta_kmer_pos_freq(infile, outfile)
         return 0
+
+    def abundance_distribution(self, string filename, Hashbits tracking):
+        cdef HashIntoType *dist
+        dist = (<CountingHash*>self.thisptr).abundance_distribution(filename, tracking.thisptr)
+        return [dist[i] for i in range(0, MAX_BIGCOUNT_C)]
+
+    def trim_on_abundance(self, string seq, BoundedCounterType min_count):
+        cdef unsigned int trim_at
+        trim_at = (<CountingHash*>self.thisptr).trim_on_abundance(seq, min_count)
+        return seq.substr(0, trim_at), trim_at
+
+    def set_use_bigcount(self, bool choice):
+        (<CountingHash*>self.thisptr).set_use_bigcount(choice)
+
+    def hashsizes(self):
+        return (<CountingHash*>self.thisptr).get_tablesizes()
+
+    def n_occupied(self, HashIntoType start=0, HashIntoType stop=0):
+        return (<CountingHash*>self.thisptr).n_occupied(start, stop)
 
 
 cdef class ReadAligner:
@@ -651,7 +657,7 @@ cdef class ReadAligner:
 
     def __cinit__(self, KCountingHash ch, lambdaOne=0.0, lambdaTwo=0.0,
                   unsigned int maxErrorRegion=UINT_MAX):
-        self.thisptr= new Aligner(ch.thisptr, lambdaOne, lambdaTwo, maxErrorRegion)
+        self.thisptr= new Aligner((<CountingHash*>ch.thisptr), lambdaOne, lambdaTwo, maxErrorRegion)
 
     def __dealloc__(self):
         del self.thisptr

@@ -49,10 +49,27 @@ cdef extern from "ktable.hh" namespace "khmer":
 
 
 cdef extern from "hashtable.hh" namespace "khmer":
-    cdef cppclass Hashtable:
-        Hashtable(WordLength, uint32_t const, uint8_t const)
+    cdef cppclass CppHashtable "khmer::Hashtable":
+        CppHashtable(WordLength, uint32_t const, uint8_t const)
         SubsetPartition * partition
+        const WordLength ksize() const
+
         unsigned int consume_string(const string &)
+        const BoundedCounterType get_count(const char *) const
+        const BoundedCounterType get_count(HashIntoType) const
+        void get_median_count(const string &, BoundedCounterType &, float &, float &)
+        void consume_fasta(const string &,
+                           unsigned int &,
+                           unsigned long long &,
+                           CallbackFn,
+                           void *)
+        void save(string)
+        void load(string)
+        unsigned int consume_high_abund_kmers(const string &, BoundedCounterType)
+        const HashIntoType n_occupied(HashIntoType, HashIntoType)
+
+        void count(const char *)
+        void count(HashIntoType)
 
 
 cdef extern from "counting.hh" namespace "khmer":
@@ -68,44 +85,26 @@ cdef extern from "counting.hh" namespace "khmer":
         BoundedCounterType get_max_count(const string &s)
         BoundedCounterType get_min_count(const string &s)
         void output_fasta_kmer_pos_freq(const string &, const string &)
-
-        # FIXME: this is from hashtable, how to avoid redeclaring
-        # all inherited methods?
-        const WordLength ksize() const
-        unsigned int consume_string(const string &)
-        const BoundedCounterType get_count(const char *) const
-        const BoundedCounterType get_count(HashIntoType) const
-        void get_median_count(const string &, BoundedCounterType &, float &, float &)
-        void consume_fasta(const string &,
-                           unsigned int &,
-                           unsigned long long &,
-                           CallbackFn,
-                           void *)
-        void save(string)
-        void load(string)
-        unsigned int consume_high_abund_kmers(const string &, BoundedCounterType)
-        const HashIntoType n_occupied(HashIntoType, HashIntoType)
-
         HashIntoType * abundance_distribution(string, CppHashbits *)
         unsigned int trim_on_abundance(string, BoundedCounterType) const
         unsigned int trim_below_abundance(string, BoundedCounterType) const
         void set_use_bigcount(bool)
-        void count(const char *)
-        void count(HashIntoType)
         vector[HashIntoType] get_tablesizes() const
+        const HashIntoType n_occupied(HashIntoType, HashIntoType)
 
 
 cdef extern from "hashbits.hh" namespace "khmer":
     cdef cppclass CppHashbits "khmer::Hashbits":
         CppHashbits(WordLength, vector[unsigned long long int]&)
         const HashIntoType n_kmers(HashIntoType, HashIntoType) const
+        vector[HashIntoType] get_tablesizes() const
+        const HashIntoType n_occupied(HashIntoType, HashIntoType)
 
         # FIXME: this is from hashtable, how to avoid redeclaring
         # all inherited methods?
         SubsetPartition * partition
         SeenSet all_tags
         const WordLength ksize() const
-        vector[HashIntoType] get_tablesizes() const
         void get_median_count(const string &, BoundedCounterType &, float &, float &)
         void save(string)
         void consume_fasta(const string &,
@@ -132,7 +131,6 @@ cdef extern from "hashbits.hh" namespace "khmer":
         void add_kmer_to_tags(HashIntoType)
         unsigned int _get_tag_density() const
         void _set_tag_density(unsigned int)
-        const HashIntoType n_occupied(HashIntoType, HashIntoType)
         const BoundedCounterType get_count(const char *) const
         const BoundedCounterType get_count(HashIntoType) const
         void count(const char *)
