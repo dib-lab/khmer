@@ -66,52 +66,12 @@ cdef extern from "hashtable.hh" namespace "khmer":
         void save(string)
         void load(string)
         unsigned int consume_high_abund_kmers(const string &, BoundedCounterType)
-        const HashIntoType n_occupied(HashIntoType, HashIntoType)
 
         void count(const char *)
         void count(HashIntoType)
 
-
-cdef extern from "counting.hh" namespace "khmer":
-    cdef cppclass CountingHash:
-        CountingHash(WordLength, HashIntoType, uint32_t)
-        CountingHash(WordLength, vector[unsigned long long int]&, uint32_t)
-        void get_kadian_count(const string &, BoundedCounterType &, unsigned int)
-        HashIntoType * fasta_count_kmers_by_position(string &,
-                        const unsigned int,
-                        BoundedCounterType,
-                        CallbackFn,
-                        void *)
-        BoundedCounterType get_max_count(const string &s)
-        BoundedCounterType get_min_count(const string &s)
-        void output_fasta_kmer_pos_freq(const string &, const string &)
-        HashIntoType * abundance_distribution(string, CppHashbits *)
-        unsigned int trim_on_abundance(string, BoundedCounterType) const
-        unsigned int trim_below_abundance(string, BoundedCounterType) const
-        void set_use_bigcount(bool)
-        vector[HashIntoType] get_tablesizes() const
-        const HashIntoType n_occupied(HashIntoType, HashIntoType)
-
-
-cdef extern from "hashbits.hh" namespace "khmer":
-    cdef cppclass CppHashbits "khmer::Hashbits":
-        CppHashbits(WordLength, vector[unsigned long long int]&)
-        const HashIntoType n_kmers(HashIntoType, HashIntoType) const
-        vector[HashIntoType] get_tablesizes() const
-        const HashIntoType n_occupied(HashIntoType, HashIntoType)
-
-        # FIXME: this is from hashtable, how to avoid redeclaring
-        # all inherited methods?
         SubsetPartition * partition
         SeenSet all_tags
-        const WordLength ksize() const
-        void get_median_count(const string &, BoundedCounterType &, float &, float &)
-        void save(string)
-        void consume_fasta(const string &,
-                           unsigned int &,
-                           unsigned long long &,
-                           CallbackFn,
-                           void *)
         void consume_fasta_and_tag(string &,
                                    unsigned int &,
                                    unsigned long long &,
@@ -127,14 +87,9 @@ cdef extern from "hashbits.hh" namespace "khmer":
                                        SeenSet&,
                                        const unsigned long long,
                                        bool) const
-        unsigned int consume_string(const string &)
         void add_kmer_to_tags(HashIntoType)
         unsigned int _get_tag_density() const
         void _set_tag_density(unsigned int)
-        const BoundedCounterType get_count(const char *) const
-        const BoundedCounterType get_count(HashIntoType) const
-        void count(const char *)
-        void count(HashIntoType)
         void filter_if_present(const string,
                                const string,
                                CallbackFn,
@@ -165,6 +120,35 @@ cdef extern from "hashbits.hh" namespace "khmer":
         void load_tagset(string, bool)
         void identify_stop_tags_by_position(string, vector[unsigned int] &) const
         void extract_unique_paths(string, unsigned int, float, vector[string]&)
+
+
+cdef extern from "counting.hh" namespace "khmer":
+    cdef cppclass CountingHash:
+        CountingHash(WordLength, HashIntoType, uint32_t)
+        CountingHash(WordLength, vector[unsigned long long int]&, uint32_t)
+        void get_kadian_count(const string &, BoundedCounterType &, unsigned int)
+        HashIntoType * fasta_count_kmers_by_position(string &,
+                        const unsigned int,
+                        BoundedCounterType,
+                        CallbackFn,
+                        void *)
+        BoundedCounterType get_max_count(const string &s)
+        BoundedCounterType get_min_count(const string &s)
+        void output_fasta_kmer_pos_freq(const string &, const string &)
+        HashIntoType * abundance_distribution(string, CppHashbits *)
+        unsigned int trim_on_abundance(string, BoundedCounterType) const
+        unsigned int trim_below_abundance(string, BoundedCounterType) const
+        void set_use_bigcount(bool)
+        vector[HashIntoType] get_tablesizes() const
+        const HashIntoType n_occupied(HashIntoType, HashIntoType)
+
+
+cdef extern from "hashbits.hh" namespace "khmer":
+    cdef cppclass CppHashbits "khmer::Hashbits":
+        CppHashbits(WordLength, vector[unsigned long long int]&)
+        const HashIntoType n_kmers(HashIntoType, HashIntoType) const
+        vector[HashIntoType] get_tablesizes() const
+        const HashIntoType n_occupied(HashIntoType, HashIntoType)
 
 
 cdef extern from "labelhash.hh" namespace "khmer":
@@ -239,7 +223,7 @@ cdef extern from "aligner.hh" namespace "khmer":
 
 cdef extern from "subset.hh" namespace "khmer":
     cdef cppclass SubsetPartition:
-        SubsetPartition(CppHashbits *)
+        SubsetPartition(CppHashtable *)
         void do_partition(HashIntoType, HashIntoType,
                           bool, bool,
                           CallbackFn, void *)
