@@ -3,7 +3,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.map cimport map
 from libcpp.set cimport set
-from libc.stdint cimport uint32_t, uint8_t
+from libc.stdint cimport uint32_t, uint8_t, uint64_t
 
 
 cdef extern from "khmer.hh" namespace "khmer":
@@ -17,6 +17,10 @@ cdef extern from "khmer.hh" namespace "khmer":
   #ctypedef set[HashIntoType] SeenSet
   ctypedef set[unsigned long long int] SeenSet
   ctypedef unsigned int PartitionID
+
+  ctypedef unsigned long long int Label
+  ctypedef map[Label, Label*] LabelPtrMap
+  ctypedef set[Label*] LabelPtrSet
 
 
 cdef extern from "ktable.hh" namespace "khmer":
@@ -165,6 +169,62 @@ cdef extern from "hashbits.hh" namespace "khmer":
         void extract_unique_paths(string, unsigned int, float, vector[string]&)
 
 
+cdef extern from "labelhash.hh" namespace "khmer":
+    cdef cppclass CppLabelHash "khmer::LabelHash":
+        CppLabelHash(WordLength, vector[unsigned long long int]&)
+        LabelPtrMap label_ptrs
+        unsigned int n_labels() const
+        void consume_fasta_and_tag_with_labels(string &filename,
+                                               unsigned int &,
+                                               unsigned long long &,
+                                               CallbackFn,
+                                               void *)
+        void consume_partitioned_fasta_and_tag_with_labels(string &filename,
+                                                           unsigned int &,
+                                                           unsigned long long &,
+                                                           CallbackFn,
+                                                           void *)
+        LabelPtrSet get_tag_labels(const HashIntoType&)
+        unsigned int sweep_label_neighborhood(const string &,
+                                              LabelPtrSet&,
+                                              unsigned int,
+                                              bool,
+                                              bool)
+        void consume_sequence_and_tag_with_labels(const string&,
+                                                  unsigned long long&,
+                                                  Label&,
+                                                  SeenSet *)
+        Label * check_and_allocate_label(Label)
+
+        # FIXME: this is from hashtable, how to avoid redeclaring
+        # all inherited methods?
+        SubsetPartition * partition
+        SeenSet all_tags
+        const WordLength ksize() const
+        const BoundedCounterType get_count(const char *) const
+        const BoundedCounterType get_count(HashIntoType) const
+        const HashIntoType n_occupied(HashIntoType, HashIntoType)
+        unsigned int consume_string(const string &)
+        void consume_fasta(const string &,
+                           unsigned int &,
+                           unsigned long long &,
+                           CallbackFn,
+                           void *)
+        void consume_fasta_and_tag(string &,
+                                   unsigned int &,
+                                   unsigned long long &,
+                                   CallbackFn,
+                                   void *)
+        unsigned int _get_tag_density() const
+        void _set_tag_density(unsigned int)
+        void count(const char *)
+        void count(HashIntoType)
+
+        # FIXME: this is from hashbits, how to avoid redeclaring
+        # all inherited methods?
+        const HashIntoType n_kmers(HashIntoType, HashIntoType) const
+
+
 cdef extern from "aligner.hh" namespace "khmer":
     cdef cppclass CandidateAlignment:
         CandidateAlignment(map[int,int], string)
@@ -199,6 +259,12 @@ cdef extern from "subset.hh" namespace "khmer":
         PartitionID get_partition_id(HashIntoType)
         PartitionID join_partitions(PartitionID, PartitionID)
         unsigned int find_unpart(const string, bool, bool, CallbackFn, void *)
+        unsigned int sweep_for_tags(const string&,
+                        SeenSet& tagged_kmers,
+                        const SeenSet& all_tags,
+                        unsigned int range,
+                        bool break_on_stop_tags,
+                        bool stop_big_traversals)
 
     cdef cppclass pre_partition_info:
         HashIntoType kmer
@@ -206,3 +272,21 @@ cdef extern from "subset.hh" namespace "khmer":
 
         pre_partition_info(HashIntoType)
         void count_partitions(unsigned int&, unsigned int&)
+
+
+cdef extern from "khmer_config.hh" namespace "khmer":
+    cdef cppclass CppConfig "khmer::Config":
+        CppConfig()
+        bool has_extra_sanity_checks() const
+
+        uint32_t get_number_of_threads() const
+        void set_number_of_threads(uint32_t)
+
+        uint64_t get_reads_input_buffer_size() const
+        void set_reads_input_buffer_size(uint64_t)
+
+        uint8_t get_input_buffer_trace_level() const
+        void set_input_buffer_trace_level(uint8_t const)
+        uint8_t get_reads_parser_trace_level() const
+        void set_reads_parser_trace_level(uint8_t const)
+    cdef CppConfig & get_active_config()
