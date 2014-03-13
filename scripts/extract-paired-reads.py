@@ -22,30 +22,30 @@ from khmer.file_api import check_file_status, check_space
 
 def is_pair(name1, name2):
     if name1.endswith('/1') and name2.endswith('/2'):
-        s1 = name1.split('/')[0]
-        s2 = name2.split('/')[0]
-        if s1 == s2:
-            assert(s1)
+        subpart1 = name1.split('/')[0]
+        subpart2 = name2.split('/')[0]
+        if subpart1 == subpart2:
+            assert(subpart1)
             return True
 
     return False
 
 
-def output_pair(r1, r2):
-    if hasattr(r1, 'accuracy'):
+def output_pair(read1, read2):
+    if hasattr(read1, 'accuracy'):
         return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
-            (r1.name, r1.sequence, r1.accuracy,
-             r2.name, r2.sequence, r2.accuracy)
+            (read1.name, read1.sequence, read1.accuracy,
+             read2.name, read2.sequence, read2.accuracy)
     else:
-        return ">%s\n%s\n>%s\n%s\n" % (r1.name, r1.sequence, r2.name,
-                                       r2.sequence)
+        return ">%s\n%s\n>%s\n%s\n" % (read1.name, read1.sequence, read2.name,
+                                       read2.sequence)
 
 
-def output_single(r):
-    if hasattr(r, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+def output_single(read):
+    if hasattr(read, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
     else:
-        return ">%s\n%s\n" % (r.name, r.sequence)
+        return ">%s\n%s\n" % (read.name, read.sequence)
 
 
 def main():
@@ -78,9 +78,9 @@ def main():
     n_se = 0
 
     record = None
-    for n, record in enumerate(screed.open(sys.argv[1])):
-        if n % 100000 == 0 and n > 0:
-            print '...', n
+    for index, record in enumerate(screed.open(sys.argv[1])):
+        if index % 100000 == 0 and index > 0:
+            print '...', index
         name = record['name'].split()[0]
 
         if last_record:
@@ -116,7 +116,7 @@ def main():
         raise Exception("no paired reads!? check file formats...")
 
     print 'DONE; read %d sequences, %d pairs and %d singletons' % \
-          (n + 1, n_pe, n_se)
+          (index + 1, n_pe, n_se)
 
 if __name__ == '__main__':
     main()

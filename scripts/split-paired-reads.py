@@ -36,8 +36,8 @@ def main():
 
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'
-    fp1 = open(out1, 'w')
-    fp2 = open(out2, 'w')
+    fp_out1 = open(out1, 'w')
+    fp_out2 = open(out2, 'w')
 
     # is input file FASTQ or FASTA? Determine.
     is_fastq = False
@@ -46,32 +46,34 @@ def main():
     if hasattr(record, 'accuracy'):
         is_fastq = True
 
-    n1 = 0
-    n2 = 0
-    for n, record in enumerate(screed.open(infile)):
-        if n % 100000 == 0:
-            print >>sys.stderr, '...', n
+    counter1 = 0
+    counter2 = 0
+    for index, record in enumerate(screed.open(infile)):
+        if index % 100000 == 0:
+            print >> sys.stderr, '...', index
 
         name = record.name
         if name.endswith('/1'):
             if is_fastq:
-                print >>fp1, '@%s\n%s\n+\n%s' % (record.name, record.sequence,
-                                                 record.accuracy)
+                print >> fp_out1, '@%s\n%s\n+\n%s' % (record.name,
+                                                      record.sequence,
+                                                      record.accuracy)
             else:
-                print >>fp1, '>%s\n%s' % (record.name, record.sequence,)
-            n1 += 1
+                print >> fp_out1, '>%s\n%s' % (record.name, record.sequence,)
+            counter1 += 1
         elif name.endswith('/2'):
             if is_fastq:
-                print >>fp2, '@%s\n%s\n+\n%s' % (record.name, record.sequence,
-                                                 record.accuracy)
+                print >> fp_out2, '@%s\n%s\n+\n%s' % (record.name,
+                                                      record.sequence,
+                                                      record.accuracy)
             else:
-                print >>fp2, '>%s\n%s' % (record.name, record.sequence,)
-            n2 += 1
+                print >> fp_out2, '>%s\n%s' % (record.name, record.sequence,)
+            counter2 += 1
 
-    print >>sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
-        (n + 1, n1, n2)
-    print >>sys.stderr, "/1 reads in %s" % out1
-    print >>sys.stderr, "/2 reads in %s" % out2
+    print >> sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
+        (index + 1, counter1, counter2)
+    print >> sys.stderr, "/1 reads in %s" % out1
+    print >> sys.stderr, "/2 reads in %s" % out2
 
 if __name__ == '__main__':
     main()

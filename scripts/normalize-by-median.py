@@ -31,42 +31,42 @@ DEFAULT_DESIRED_COVERAGE = 10
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list
 
 
-def batchwise(t, size):
-    it = iter(t)
-    return izip(*[it] * size)
+def batchwise(coll, size):
+    iter_coll = iter(coll)
+    return izip(*[iter_coll] * size)
 
 # Returns true if the pair of records are properly pairs
 
 
-def validpair(r0, r1):
-    return r0.name[-1] == "1" and \
-        r1.name[-1] == "2" and \
-        r0.name[0:-1] == r1.name[0:-1]
+def validpair(read0, read1):
+    return read0.name[-1] == "1" and \
+        read1.name[-1] == "2" and \
+        read0.name[0:-1] == read1.name[0:-1]
 
 
-def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
+def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
 
-    DESIRED_COVERAGE = args.cutoff
-    K = ht.ksize()
+    desired_coverage = args.cutoff
+    ksize = htable.ksize()
 
     # In paired mode we read two records at a time
     batch_size = 1
     if args.paired:
         batch_size = 2
 
-    n = -1
+    index = -1
     total = 0
     discarded = 0
-    for n, batch in enumerate(batchwise(screed.open(
+    for index, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
-        if n > 0 and n % 100000 == 0:
+        if index > 0 and index % 100000 == 0:
             print '... kept {kept} of {total} or {perc:2}%'.format(
                 kept=total - discarded, total=total,
                 perc=int(100. - discarded / float(total) * 100.))
             print '... in file', input_filename
 
             if report_fp:
-                print>>report_fp, total, total - discarded, \
+                print >> report_fp, total, total - discarded, \
                     1. - (discarded / float(total))
                 report_fp.flush()
 
@@ -83,15 +83,15 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
         passed_filter = False
         passed_length = True
         for record in batch:
-            if len(record.sequence) < K:
+            if len(record.sequence) < ksize:
                 passed_length = False
                 continue
 
             seq = record.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
+            med, _, _ = htable.get_median_count(seq)
 
-            if med < DESIRED_COVERAGE:
-                ht.consume(seq)
+            if med < desired_coverage:
+                htable.consume(seq)
                 passed_filter = True
 
         # Emit records if any passed
@@ -113,18 +113,18 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
     return total, discarded
 
 
-def handle_error(error, output_name, input_name, fail_save, ht):
-    print >>sys.stderr, '** ERROR:', error
-    print >>sys.stderr, '** Failed on {name}: '.format(name=input_name)
+def handle_error(error, output_name, input_name, fail_save, htable):
+    print >> sys.stderr, '** ERROR:', error
+    print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
     if fail_save:
         hashname = os.path.basename(input_name) + '.ht.failed'
-        print >>sys.stderr,\
+        print >> sys.stderr, \
             '** ...dumping hashtable to {ht}'.format(ht=hashname)
-        ht.save(hashname)
+        htable.save(hashname)
     try:
         os.remove(output_name)
     except:
-        print >>sys.stderr, '** ERROR: problem removing corrupt filtered file'
+        print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
 def main():
@@ -154,9 +154,9 @@ def main():
 
     report_on_config(args)
 
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    ksize = args.ksize
+    htable = args.min_hashsize
+    n_hashes = args.n_hashes
 
     report_fp = args.report_file
     filenames = args.input_filenames
@@ -168,23 +168,23 @@ def main():
 
     check_space(filenames)
     if args.savehash:
-        check_space_for_hashtable(K * HT_SIZE)
+        check_space_for_hashtable(ksize * htable)
 
     # list to save error files along with throwing exceptions
-    if force is True:
+    if force:
         corrupt_files = []
 
     if args.loadhash:
         print 'loading hashtable from', args.loadhash
-        ht = khmer.load_counting_hash(args.loadhash)
+        htable = khmer.load_counting_hash(args.loadhash)
     else:
         print 'making hashtable'
-        ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+        htable = khmer.new_counting_hash(ksize, htable, n_hashes)
 
     total = 0
     discarded = 0
 
-    for n, input_filename in enumerate(filenames):
+    for index, input_filename in enumerate(filenames):
         if args.single_output_filename != '':
             output_name = args.single_output_filename
             outfp = open(args.single_output_filename, 'a')
@@ -197,15 +197,15 @@ def main():
 
         try:
             total_acc, discarded_acc = normalize_by_median(input_filename,
-                                                           outfp, ht, args,
+                                                           outfp, htable, args,
                                                            report_fp)
-        except IOError as e:
-            handle_error(e, output_name, input_filename, fail_save, ht)
+        except IOError as err:
+            handle_error(err, output_name, input_filename, fail_save, htable)
             if not force:
-                print >>sys.stderr, '** Exiting!'
+                print >> sys.stderr, '** Exiting!'
                 sys.exit(1)
             else:
-                print >>sys.stderr, '*** Skipping error file, moving on...'
+                print >> sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
                 pass
         else:
@@ -220,7 +220,7 @@ def main():
                             perc=int(100. - discarded / float(total) * 100.))
                 print 'output in', output_name
 
-        if dump_frequency > 0 and n > 0 and n % dump_frequency == 0:
+        if dump_frequency > 0 and index > 0 and index % dump_frequency == 0:
             print 'Backup: Saving hashfile through', input_filename
             if args.savehash:
                 hashname = args.savehash
@@ -228,28 +228,28 @@ def main():
             else:
                 hashname = 'backup.ht'
                 print 'Nothing given for savehash, saving to', hashname
-            ht.save(hashname)
+            htable.save(hashname)
 
     if args.savehash:
         print 'Saving hashfile through', input_filename
         print '...saving to', args.savehash
-        ht.save(args.savehash)
+        htable.save(args.savehash)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(ht)
+    fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
     if force and len(corrupt_files) > 0:
-        print >>sys.stderr, "** WARNING: Finished with errors!"
-        print >>sys.stderr, "** IOErrors occurred in the following files:"
-        print >>sys.stderr, "\t", " ".join(corrupt_files)
+        print >> sys.stderr, "** WARNING: Finished with errors!"
+        print >> sys.stderr, "** IOErrors occurred in the following files:"
+        print >> sys.stderr, "\t", " ".join(corrupt_files)
 
     if fp_rate > 0.20:
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** ERROR: the counting hash is too small for"
-        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** Do not use these results!!"
+        print >> sys.stderr, "**"
+        print >> sys.stderr, "** ERROR: the counting hash is too small for"
+        print >> sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >> sys.stderr, "**"
+        print >> sys.stderr, "** Do not use these results!!"
         sys.exit(1)
 
 if __name__ == '__main__':

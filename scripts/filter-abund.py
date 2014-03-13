@@ -47,18 +47,18 @@ def main():
     infiles = args.input_filenames
     n_threads = int(args.n_threads)
 
-    for f in infiles:
-        check_file_status(f)
+    for _ in infiles:
+        check_file_status(_)
 
     check_space(infiles)
 
     print 'file with ht: %s' % counting_ht
 
     print 'loading hashtable'
-    ht = khmer.load_counting_hash(counting_ht)
-    K = ht.ksize()
+    htable = khmer.load_counting_hash(counting_ht)
+    ksize = htable.ksize()
 
-    print "K:", K
+    print "K:", ksize
 
     # the filtering function.
     def process_fn(record):
@@ -68,13 +68,13 @@ def main():
             return None, None
 
         if args.variable_coverage:  # only trim when sequence has high enough C
-            med, _, _ = ht.get_median_count(seq)
+            med, _, _ = htable.get_median_count(seq)
             if med < args.normalize_to:
                 return name, seq
 
-        trim_seq, trim_at = ht.trim_on_abundance(seq, args.cutoff)
+        trim_seq, trim_at = htable.trim_on_abundance(seq, args.cutoff)
 
-        if trim_at >= K:
+        if trim_at >= ksize:
             return name, trim_seq
 
         return None, None

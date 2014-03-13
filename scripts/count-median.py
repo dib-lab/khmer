@@ -46,8 +46,8 @@ def main():
     check_space(infiles)
 
     print 'loading counting hash from', htfile
-    ht = khmer.load_counting_hash(htfile)
-    K = ht.ksize()
+    htable = khmer.load_counting_hash(htfile)
+    ksize = htable.ksize()
 
     print 'writing to', output_filename
     output = open(output_filename, 'w')
@@ -57,9 +57,9 @@ def main():
         if 'N' in seq:
             seq = seq.replace('N', 'G')
 
-        if K <= len(seq):
-            a, b, c = ht.get_median_count(seq)
-            print >>output, record.name, a, b, c, len(seq)
+        if ksize <= len(seq):
+            medn, ave, stdev = htable.get_median_count(seq)
+            print >> output, record.name, medn, ave, stdev, len(seq)
 
 if __name__ == '__main__':
     main()

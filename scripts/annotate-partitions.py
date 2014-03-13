@@ -36,26 +36,26 @@ def main():
 
     args = parser.parse_args()
 
-    K = args.ksize
+    ksize = args.ksize
     filenames = args.input_filenames
-    ht = khmer.new_hashbits(K, 1, 1)
+    htable = khmer.new_hashbits(ksize, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
     check_file_status(partitionmap_file)
-    for f in filenames:
-        check_file_status(f)
+    for _ in filenames:
+        check_file_status(_)
 
     check_space(filenames)
 
     print 'loading partition map from:', partitionmap_file
-    ht.load_partitionmap(partitionmap_file)
+    htable.load_partitionmap(partitionmap_file)
 
     for infile in filenames:
         print 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
-        n = ht.output_partitions(infile, outfile)
-        print 'output %d partitions for %s' % (n, infile)
+        part_count = htable.output_partitions(infile, outfile)
+        print 'output %d partitions for %s' % (part_count, infile)
         print 'partitions are in', outfile
 
 if __name__ == '__main__':

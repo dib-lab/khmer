@@ -41,20 +41,20 @@ def main():
     print 'loading %d pmap files (first one: %s)' % (len(pmap_files),
                                                      pmap_files[0])
 
-    K = args.ksize
-    ht = khmer.new_hashbits(K, 1, 1)
+    ksize = args.ksize
+    htable = khmer.new_hashbits(ksize, 1, 1)
 
-    for f in pmap_files:
-        check_file_status(f)
+    for _ in pmap_files:
+        check_file_status(_)
 
     check_space(pmap_files)
 
     for pmap_file in pmap_files:
         print 'merging', pmap_file
-        ht.merge_subset_from_disk(pmap_file)
+        htable.merge_subset_from_disk(pmap_file)
 
     print 'saving merged to', output_file
-    ht.save_partitionmap(output_file)
+    htable.save_partitionmap(output_file)
 
     if args.remove_subsets:
         print 'removing pmap files'
