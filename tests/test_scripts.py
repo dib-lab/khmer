@@ -480,6 +480,7 @@ def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
     hashfile = utils.get_temp_filename('test-out.kh')
     outfile = infile + '.keep'
+    in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     counting_ht = _make_counting(infile, K=8)
@@ -487,7 +488,7 @@ def test_normalize_by_median_no_bigcount():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', '1000', '-k 8', '--savehash', hashfile, infile]
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = runscript(script, args, in_dir)
     assert status == 0, (out, err)
     print (out, err)
 
