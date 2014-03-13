@@ -1,3 +1,8 @@
+2014-03-13  Ram RS  <ramrs@nyu.edu>
+
+	* Bug fix: tests.test_normalize_by_median_no_bigcount() now runs
+	within temp directory
+
 2014-03-11  Michael R. Crusoe  <mcrusoe@athyra>
 
     * lib/read_parsers.hh: fix for Coverity CID 1054789: Uninitialized scalar
