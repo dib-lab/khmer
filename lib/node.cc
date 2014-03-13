@@ -108,10 +108,9 @@ Node::Node(Node* _parent,
            char _emission,
            unsigned int _stateNo,
            char _state,
-           Kmer _kmer)
+           Kmer _kmer) : kmer( _kmer)
 {
     parent = _parent;
-    kmer = _kmer;
     emission = _emission;
     stateNo = _stateNo;
     state = _state;
