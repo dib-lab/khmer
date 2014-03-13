@@ -62,27 +62,29 @@ def main():
 
     # @RamRS: This might need some more work
     infiles = [graphbase + '.ht', graphbase + '.tagset']
-    for f in infiles:
-        check_file_status(f)
+    if args.stoptags:
+        infiles.append(args.stoptags)
+    for _ in infiles:
+        check_file_status(_)
 
     check_space(infiles)
 
-    print 'loading ht %s.ht' % graphbase
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    print 'loading htable %s.ht' % graphbase
+    htable = khmer.load_hashbits(graphbase + '.ht')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print 'loading stoptags from', args.stoptags
-        ht.load_stop_tags(args.stoptags)
+        htable.load_stop_tags(args.stoptags)
 
     print 'loading tagset %s.tagset...' % graphbase
-    ht.load_tagset(graphbase + '.tagset')
+    htable.load_tagset(graphbase + '.tagset')
 
-    K = ht.ksize()
-    counting = khmer.new_counting_hash(K, args.min_hashsize, args.n_hashes)
+    ksize = htable.ksize()
+    counting = khmer.new_counting_hash(ksize, args.min_hashsize, args.n_hashes)
 
     # divide up into SUBSET_SIZE fragments
-    divvy = ht.divide_tags_into_subsets(args.subset_size)
+    divvy = htable.divide_tags_into_subsets(args.subset_size)
 
     # pick off the first one
     if len(divvy) == 1:
@@ -92,17 +94,17 @@ def main():
 
     # partition!
     print 'doing pre-partitioning from', start, 'to', end
-    subset = ht.do_subset_partition(start, end)
+    subset = htable.do_subset_partition(start, end)
 
     # now, repartition...
     print 'repartitioning to find HCKs.'
-    ht.repartition_largest_partition(subset, counting,
-                                     EXCURSION_DISTANCE,
-                                     EXCURSION_KMER_THRESHOLD,
-                                     EXCURSION_KMER_COUNT_THRESHOLD)
+    htable.repartition_largest_partition(subset, counting,
+                                         EXCURSION_DISTANCE,
+                                         EXCURSION_KMER_THRESHOLD,
+                                         EXCURSION_KMER_COUNT_THRESHOLD)
 
     print 'saving stop tags'
-    ht.save_stop_tags(graphbase + '.stoptags')
+    htable.save_stop_tags(graphbase + '.stoptags')
 
 if __name__ == '__main__':
     main()

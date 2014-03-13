@@ -117,14 +117,14 @@ def main():
     total = sum(abundance.values())
 
     if 0 == total:
-        print >>sys.stderr, \
+        print >> sys.stderr, \
             "ERROR: abundance distribution is uniformly zero; " \
             "nothing to report."
-        print >>sys.stderr, "\tPlease verify that the input files are valid."
+        print >> sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(1)
 
     if (not squash and os.path.exists(args.histout)):
-        print >>sys.stderr, 'ERROR: %s exists; not squashing.' % args.histout
+        print >> sys.stderr, 'ERROR: %s exists; not squashing.' % args.histout
         sys.exit(-1)
     else:
         hist_fp = open(args.histout, 'w')
@@ -137,7 +137,7 @@ def main():
         sofar += i
         frac = sofar / float(total)
 
-        print >>hist_fp, _, i, sofar, round(frac, 3)
+        print >> hist_fp, _, i, sofar, round(frac, 3)
 
         if sofar == total:
             break

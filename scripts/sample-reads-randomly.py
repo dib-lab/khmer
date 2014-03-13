@@ -25,11 +25,11 @@ DEFAULT_MAX_READS = int(1e8)
 DEBUG = True
 
 
-def output_single(r):
-    if hasattr(r, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
+def output_single(read):
+    if hasattr(read, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
     else:
-        return ">%s\n%s\n" % (r.name, r.sequence)
+        return ">%s\n%s\n" % (read.name, read.sequence)
 
 
 def main():
@@ -48,8 +48,8 @@ def main():
 
     args = parser.parse_args()
 
-    for f in args.filenames:
-        check_file_status(f)
+    for _ in args.filenames:
+        check_file_status(_)
 
     check_space(args.filenames)
 

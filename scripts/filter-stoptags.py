@@ -36,19 +36,19 @@ def main():
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
-    K = args.ksize
+    ksize = args.ksize
 
     stoptags = args.stoptags_file
     infiles = args.input_filenames
 
-    for f in infiles:
-        check_file_status(f)
+    for _ in infiles:
+        check_file_status(_)
 
     check_space(infiles)
 
-    print 'loading stop tags, with K', K
-    ht = khmer.new_hashbits(K, 1, 1)
-    ht.load_stop_tags(stoptags)
+    print 'loading stop tags, with K', ksize
+    htable = khmer.new_hashbits(ksize, 1, 1)
+    htable.load_stop_tags(stoptags)
 
     def process_fn(record):
         name = record['name']
@@ -56,9 +56,9 @@ def main():
         if 'N' in seq:
             return None, None
 
-        trim_seq, trim_at = ht.trim_on_stoptags(seq)
+        trim_seq, trim_at = htable.trim_on_stoptags(seq)
 
-        if trim_at >= K:
+        if trim_at >= ksize:
             return name, trim_seq
 
         return None, None

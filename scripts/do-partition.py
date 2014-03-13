@@ -42,27 +42,28 @@ else:
         pass
 
 
-def worker(q, basename, stop_big_traversals):
+def worker(queue, basename, stop_big_traversals):
     while 1:
         try:
-            (ht, n, start, stop) = q.get(False)
+            (htable, index, start, stop) = queue.get(False)
         except Queue.Empty:
             print 'exiting'
             return
 
-        outfile = basename + '.subset.%d.pmap' % (n,)
+        outfile = basename + '.subset.%d.pmap' % (index,)
         if os.path.exists(outfile):
             print 'SKIPPING', outfile, ' -- already exists'
             continue
 
-        print 'starting:', basename, n
+        print 'starting:', basename, index
 
         # pay attention to stoptags when partitioning; take command line
         # direction on whether or not to exhaustively traverse.
-        subset = ht.do_subset_partition(start, stop, True, stop_big_traversals)
+        subset = htable.do_subset_partition(start, stop, True,
+                                            stop_big_traversals)
 
-        print 'saving:', basename, n
-        ht.save_subset_partitionmap(subset, outfile)
+        print 'saving:', basename, index
+        htable.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
 
@@ -92,9 +93,9 @@ def main():
 
     report_on_config(args, hashtype='hashbits')
 
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    ksize = args.ksize
+    min_hashsize = args.min_hashsize
+    n_hashes = args.n_hashes
 
     base = args.graphbase
     filenames = args.input_filenames
@@ -115,19 +116,19 @@ def main():
     # load-graph
 
     print 'making hashtable'
-    ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
+    htable = khmer.new_hashbits(ksize, min_hashsize, n_hashes)
 
-    for n, filename in enumerate(filenames):
+    for index, filename in enumerate(filenames):
         print 'consuming input', filename
-        ht.consume_fasta_and_tag(filename)
+        htable.consume_fasta_and_tag(filename)
 
-    fp_rate = khmer.calc_expected_collisions(ht)
+    fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print >>sys.stderr, "**"
-        print >>sys.stderr, "** ERROR: the graph structure is too small for"
-        print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
-        print >>sys.stderr, "**"
+        print >> sys.stderr, "**"
+        print >> sys.stderr, "** ERROR: the graph structure is too small for"
+        print >> sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >> sys.stderr, "**"
         sys.exit(1)
 
     # partition-graph
@@ -144,7 +145,7 @@ def main():
     #
 
     # divide the tags up into subsets
-    divvy = ht.divide_tags_into_subsets(int(args.subset_size))
+    divvy = htable.divide_tags_into_subsets(int(args.subset_size))
     n_subsets = len(divvy)
     divvy.append(0)
 
@@ -152,10 +153,10 @@ def main():
     worker_q = Queue.Queue()
 
     # break up the subsets into a list of worker tasks
-    for i in range(0, n_subsets):
-        start = divvy[i]
-        end = divvy[i + 1]
-        worker_q.put((ht, i, start, end))
+    for _ in range(0, n_subsets):
+        start = divvy[_]
+        end = divvy[_ + 1]
+        worker_q.put((htable, _, start, end))
 
     print 'enqueued %d subset tasks' % n_subsets
     open('%s.info' % base, 'w').write('%d subsets total\n' % (n_subsets))
@@ -169,17 +170,18 @@ def main():
     print '---'
 
     threads = []
-    for n in range(n_threads):
-        t = threading.Thread(target=worker, args=(worker_q, base,
-                                                  stop_big_traversals))
-        threads.append(t)
-        t.start()
+    for _ in range(n_threads):
+        cur_thread = threading.Thread(target=worker, args=(worker_q, base,
+                                                           stop_big_traversals)
+                                      )
+        threads.append(cur_thread)
+        cur_thread.start()
 
     print 'done starting threads'
 
     # wait for threads
-    for t in threads:
-        t.join()
+    for _ in threads:
+        _.join()
 
     print '---'
     print 'done making subsets! see %s.subset.*.pmap' % (base,)
@@ -191,11 +193,11 @@ def main():
     print 'loading %d pmap files (first one: %s)' % (len(pmap_files),
                                                      pmap_files[0])
 
-    ht = khmer.new_hashbits(K, 1, 1)
+    htable = khmer.new_hashbits(ksize, 1, 1)
 
     for pmap_file in pmap_files:
         print 'merging', pmap_file
-        ht.merge_subset_from_disk(pmap_file)
+        htable.merge_subset_from_disk(pmap_file)
 
     if args.remove_subsets:
         print 'removing pmap files'
@@ -207,8 +209,8 @@ def main():
     for infile in args.input_filenames:
         print 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
-        n = ht.output_partitions(infile, outfile)
-        print 'output %d partitions for %s' % (n, infile)
+        part_count = htable.output_partitions(infile, outfile)
+        print 'output %d partitions for %s' % (part_count, infile)
         print 'partitions are in', outfile
 
 if __name__ == '__main__':

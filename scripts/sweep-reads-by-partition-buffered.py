@@ -51,11 +51,11 @@ def fmt_fasta(name, seq, labels=[]):
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
-def write_seq(fp, name, seq, labels=[]):
+def write_seq(fptr, name, seq, labels=[]):
     try:
-        fp.write(fmt_fasta(name, seq, labels=labels))
+        fptr.write(fmt_fasta(name, seq, labels=labels))
     except IOError:
-        print >>sys.stderr, 'Error writing {read}'.format(
+        print >> sys.stderr, 'Error writing {read}'.format(
             read=fmt_fasta(name, seq, labels=labels))
         return 1
     else:
@@ -101,7 +101,7 @@ class ReadBufferManager:
         self.num_write_errors = 0
         self.num_file_errors = 0
 
-        print >>sys.stderr, '''Init new ReadBuffer [
+        print >> sys.stderr, '''Init new ReadBuffer [
         Max Buffers: {num_bufs}
         Max Reads: {max_reads}
         Buffer flush: {buf_flush}
@@ -109,14 +109,14 @@ class ReadBufferManager:
                     buf_flush=self.buffer_flush)
 
     def flush_buffer(self, buf_id):
-        fn = '{prefix}_{buffer_id}.fa'.format(prefix=self.output_pref,
-                                              buffer_id=buf_id)
-        fpath = os.path.join(self.outdir, fn)
+        fname = '{prefix}_{buffer_id}.fa'.format(prefix=self.output_pref,
+                                                 buffer_id=buf_id)
+        fpath = os.path.join(self.outdir, fname)
         try:
             outfp = open(fpath, 'a')
         except IOError as _:
-            print >>sys.stderr, '!! ERROR: {_} !!'.format(_=_)
-            print >>sys.stderr, '*** Failed to open {fn} for \
+            print >> sys.stderr, '!! ERROR: {_} !!'.format(_=_)
+            print >> sys.stderr, '*** Failed to open {fn} for \
                                 buffer flush'.format(fn=fpath)
             self.num_file_errors += 1
         else:
@@ -138,15 +138,15 @@ class ReadBufferManager:
 
         self.cur_reads += 1
         if self.cur_reads > self.max_reads:
-            print >>sys.stderr, '** Reached max num reads...'
+            print >> sys.stderr, '** Reached max num reads...'
             self.flush_all()
         if len(self.buffers) > self.max_buffers:
             # self.clean_buffers(2)
-            print >>sys.stderr, '** Reached max num buffers...'
+            print >> sys.stderr, '** Reached max num buffers...'
             self.flush_all()
 
     def flush_all(self):
-        print >>sys.stderr, '*** Flushing all to files...'
+        print >> sys.stderr, '*** Flushing all to files...'
         buf_ids = self.buffers.keys()
         for buf_id in buf_ids:
             self.flush_buffer(buf_id)
@@ -189,9 +189,9 @@ def main():
 
     report_on_config(args, hashtype='hashbits')
 
-    K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    ksize = args.ksize
+    min_hashsize = args.min_hashsize
+    n_hashes = args.n_hashes
 
     traversal_range = args.traversal_range
     input_fastp = args.input_fastp
@@ -203,7 +203,7 @@ def main():
     max_reads = args.max_reads
 
     input_files = args.input_files
-    
+
     check_file_status(input_fastp)
     check_valid_file_exists(input_files)
 
@@ -216,9 +216,9 @@ def main():
         max_buffers, max_reads, buf_size, output_pref, outdir)
 
     # consume the partitioned fasta with which to label the graph
-    ht = khmer.LabelHash(K, HT_SIZE, N_HT)
-    print >>sys.stderr, 'consuming fastp...'
-    ht.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
+    htable = khmer.LabelHash(ksize, min_hashsize, n_hashes)
+    print >> sys.stderr, 'consuming fastp...'
+    htable.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
 
     label_number_dist = []
 
@@ -229,14 +229,14 @@ def main():
     total_t = time.clock()
     start_t = time.clock()
     for read_file in input_files:
-        print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
+        print >> sys.stderr, '** sweeping {read_file} for labels...'.format(
             read_file=read_file)
         file_t = 0.0
         try:
             read_fp = screed.open(read_file)
         except IOError as error:
-            print >>sys.stderr, '!! ERROR: !!', error
-            print >>sys.stderr, '*** Could not open {fn}, skipping...'.format(
+            print >> sys.stderr, '!! ERROR: !!', error
+            print >> sys.stderr, '*** Could not open {fn}, skipping...'.format(
                 fn=read_file)
         else:
             for _, record in enumerate(read_fp):
@@ -244,7 +244,7 @@ def main():
                     end_t = time.clock()
                     batch_t = end_t - start_t
                     file_t += batch_t
-                    print >>sys.stderr, '\tswept {n} reads [{nc} labeled, \
+                    print >> sys.stderr, '\tswept {n} reads [{nc} labeled, \
                                          {no} orphaned] \
                                         ** {sec}s ({sect}s total)' \
                                         .format(n=_, nc=n_labeled,
@@ -254,10 +254,11 @@ def main():
                 seq = record.sequence
                 name = record.name
                 try:
-                    labels = ht.sweep_label_neighborhood(seq, traversal_range)
-                except ValueError as e:
-                    print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
-                    print >>sys.stderr, 'Read length less than k-mer size'
+                    labels = htable.sweep_label_neighborhood(seq,
+                                                             traversal_range)
+                except ValueError as err:
+                    print >> sys.stderr, '!! ERROR: {e} !!'.format(e=err)
+                    print >> sys.stderr, 'Read length less than k-mer size'
                 else:
                     seq_str = fmt_fasta(name, seq, labels)
                     label_number_dist.append(len(labels))
@@ -271,32 +272,32 @@ def main():
                     else:
                         n_orphaned += 1
                         output_buffer.queue(seq_str, 'orphaned')
-            print >>sys.stderr, '** End of file {fn}...'.format(fn=read_file)
+            print >> sys.stderr, '** End of file {fn}...'.format(fn=read_file)
             output_buffer.flush_all()
             read_fp.close()
 
     # gotta output anything left in the buffers at the end!
-    print >>sys.stderr, '** End of run...'
+    print >> sys.stderr, '** End of run...'
     output_buffer.flush_all()
     total_t = time.clock() - total_t
 
     if output_buffer.num_write_errors > 0 or output_buffer.num_file_errors > 0:
-        print >>sys.stderr, '! WARNING: Sweep finished with errors !'
-        print >>sys.stderr, '** {writee} reads not written'.format(
+        print >> sys.stderr, '! WARNING: Sweep finished with errors !'
+        print >> sys.stderr, '** {writee} reads not written'.format(
             writee=output_buffer.num_write_errors)
-        print >>sys.stderr, '** {filee} errors opening files'.format(
+        print >> sys.stderr, '** {filee} errors opening files'.format(
             filee=output_buffer.num_file_errors)
 
-    print >>sys.stderr, 'swept {n_reads} for labels...'.format(
+    print >> sys.stderr, 'swept {n_reads} for labels...'.format(
         n_reads=n_labeled + n_mlabeled + n_orphaned)
-    print >>sys.stderr, '...with {nc} labeled and {no} orphaned'.format(
+    print >> sys.stderr, '...with {nc} labeled and {no} orphaned'.format(
         nc=n_labeled, no=n_orphaned)
-    print >>sys.stderr, '...and {nmc} multilabeled'.format(nmc=n_mlabeled)
+    print >> sys.stderr, '...and {nmc} multilabeled'.format(nmc=n_mlabeled)
 
-    print >>sys.stderr, '** outputting label number distribution...'
+    print >> sys.stderr, '** outputting label number distribution...'
     with open('label_dist.txt', 'wb') as outfp:
-        for nc in label_number_dist:
-            outfp.write('{nc}\n'.format(nc=nc))
+        for _ in label_number_dist:
+            outfp.write('{nc}\n'.format(nc=_))
 
 if __name__ == '__main__':
     main()
