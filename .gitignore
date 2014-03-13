@@ -28,3 +28,4 @@ pylint.out
 doxygen.out
 doc/doxygen
 .settings
+/.pre-push-test.sh
