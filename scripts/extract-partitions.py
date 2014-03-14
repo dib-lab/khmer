@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Extract partitioned sequences into files grouped by partition size.
@@ -18,9 +19,9 @@ by output_unassigned...
 """
 
 import sys
-import os.path
 import screed
 import argparse
+from khmer.file_api import check_file_status, check_space
 
 DEFAULT_MAX_SIZE = int(1e6)
 DEFAULT_THRESHOLD = 5
@@ -72,6 +73,11 @@ def main():
     distfilename = prefix + '.dist'
 
     n_unassigned = 0
+
+    for infile in args.part_filenames:
+        check_file_status(infile)
+
+    check_space(args.part_filenames)
 
     print '---'
     print 'reading partitioned files:', repr(args.part_filenames)

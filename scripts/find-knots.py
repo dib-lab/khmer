@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Find highly-connected k-mers and output them in a .stoptags file, for use
@@ -11,12 +12,12 @@ in partitioning.
 % python scripts/find-knots.py <base>
 """
 
-import sys
 import argparse
 import glob
 import os
 
 import khmer
+from khmer.file_api import check_file_status, check_space
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -58,16 +59,25 @@ def main():
 
     graphbase = args.graphbase
 
+    # @RamRS: This might need some more work
+    infiles = [graphbase + '.ht', graphbase + '.tagset']
+    if os.path.exists(graphbase + '.stoptags'):
+        infiles.append(graphbase + '.stoptags')
+    for _ in infiles:
+        check_file_status(_)
+
+    check_space(infiles)
+
     print 'loading ht %s.ht' % graphbase
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    htable = khmer.load_hashbits(graphbase + '.ht')
 
     print 'loading tagset %s.tagset...' % graphbase
-    ht.load_tagset(graphbase + '.tagset')
+    htable.load_tagset(graphbase + '.tagset')
 
     initial_stoptags = False    # @CTB regularize with make-initial
     if os.path.exists(graphbase + '.stoptags'):
         print 'loading stoptags %s.stoptags' % graphbase
-        ht.load_stop_tags(graphbase + '.stoptags')
+        htable.load_stop_tags(graphbase + '.stoptags')
         initial_stoptags = True
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
@@ -81,35 +91,34 @@ def main():
     print '---'
 
     # create counting hash
-    K = ht.ksize()
-    counting = khmer.new_counting_hash(K, args.min_hashsize, args.n_hashes)
+    ksize = htable.ksize()
+    counting = khmer.new_counting_hash(ksize, args.min_hashsize, args.n_hashes)
 
     # load & merge
-    for n, subset_file in enumerate(pmap_files):
+    for index, subset_file in enumerate(pmap_files):
         print '<-', subset_file
-        subset = ht.load_subset_partitionmap(subset_file)
+        subset = htable.load_subset_partitionmap(subset_file)
 
         print '** repartitioning subset... %s' % subset_file
-        ht.repartition_largest_partition(subset, counting,
-                                         EXCURSION_DISTANCE,
-                                         EXCURSION_KMER_THRESHOLD,
-                                         EXCURSION_KMER_COUNT_THRESHOLD)
+        htable.repartition_largest_partition(subset, counting,
+                                             EXCURSION_DISTANCE,
+                                             EXCURSION_KMER_THRESHOLD,
+                                             EXCURSION_KMER_COUNT_THRESHOLD)
 
         print '** merging subset... %s' % subset_file
-        ht.merge_subset(subset)
+        htable.merge_subset(subset)
 
         print '** repartitioning, round 2... %s' % subset_file
-        size = ht.repartition_largest_partition(None, counting,
-                                                EXCURSION_DISTANCE,
-                                                EXCURSION_KMER_THRESHOLD,
-                                                EXCURSION_KMER_COUNT_THRESHOLD)
+        size = htable.repartition_largest_partition
+        (None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
+         EXCURSION_KMER_COUNT_THRESHOLD)
 
         print '** repartitioned size:', size
 
         print 'saving stoptags binary'
-        ht.save_stop_tags(graphbase + '.stoptags')
+        htable.save_stop_tags(graphbase + '.stoptags')
         os.rename(subset_file, subset_file + '.processed')
-        print '(%d of %d)\n' % (n, len(pmap_files))
+        print '(%d of %d)\n' % (index, len(pmap_files))
 
     print 'done!'
 

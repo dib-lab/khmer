@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Partition a graph.
@@ -14,12 +15,12 @@ This will output many <base>.subset.N.pmap files.
 Use '-h' for parameter help.
 """
 
-import sys
 import threading
 import Queue
 import gc
 import os.path
 import argparse
+from khmer.file_api import check_file_status, check_space
 
 # Debugging Support
 import re
@@ -41,27 +42,28 @@ DEFAULT_N_THREADS = 4
 #
 
 
-def worker(q, basename, stop_big_traversals):
+def worker(queue, basename, stop_big_traversals):
     while 1:
         try:
-            (ht, n, start, stop) = q.get(False)
+            (htable, index, start, stop) = queue.get(False)
         except Queue.Empty:
             print 'exiting'
             return
 
-        outfile = basename + '.subset.%d.pmap' % (n,)
+        outfile = basename + '.subset.%d.pmap' % (index,)
         if os.path.exists(outfile):
             print 'SKIPPING', outfile, ' -- already exists'
             continue
 
-        print 'starting:', basename, n
+        print 'starting:', basename, index
 
         # pay attention to stoptags when partitioning; take command line
         # direction on whether or not to exhaustively traverse.
-        subset = ht.do_subset_partition(start, stop, True, stop_big_traversals)
+        subset = htable.do_subset_partition(start, stop, True,
+                                            stop_big_traversals)
 
-        print 'saving:', basename, n
-        ht.save_subset_partitionmap(subset, outfile)
+        print 'saving:', basename, index
+        htable.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
 
@@ -89,6 +91,12 @@ def main():
     args = parser.parse_args()
     basename = args.basename
 
+    filenames = [basename + '.ht', basename + '.tagset']
+    for _ in filenames:
+        check_file_status(_)
+
+    check_space(filenames)
+
     print '--'
     print 'SUBSET SIZE', args.subset_size
     print 'N THREADS', args.n_threads
@@ -97,16 +105,16 @@ def main():
     print '--'
 
     print 'loading ht %s.ht' % basename
-    ht = khmer.load_hashbits(basename + '.ht')
-    ht.load_tagset(basename + '.tagset')
+    htable = khmer.load_hashbits(basename + '.ht')
+    htable.load_tagset(basename + '.tagset')
 
     # retrieve K
-    K = ht.ksize()
+    ksize = htable.ksize()
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
         print 'loading stoptags from', args.stoptags
-        ht.load_stop_tags(args.stoptags)
+        htable.load_stop_tags(args.stoptags)
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
@@ -120,7 +128,7 @@ def main():
     #
 
     # divide the tags up into subsets
-    divvy = ht.divide_tags_into_subsets(int(args.subset_size))
+    divvy = htable.divide_tags_into_subsets(int(args.subset_size))
     n_subsets = len(divvy)
     divvy.append(0)
 
@@ -128,10 +136,10 @@ def main():
     worker_q = Queue.Queue()
 
     # break up the subsets into a list of worker tasks
-    for i in range(0, n_subsets):
-        start = divvy[i]
-        end = divvy[i + 1]
-        worker_q.put((ht, i, start, end))
+    for _ in range(0, n_subsets):
+        start = divvy[_]
+        end = divvy[_ + 1]
+        worker_q.put((htable, _, start, end))
 
     print 'enqueued %d subset tasks' % n_subsets
     open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
@@ -145,17 +153,17 @@ def main():
     print '---'
 
     threads = []
-    for n in range(n_threads):
-        t = threading.Thread(target=worker, args=(worker_q, basename,
-                                                  stop_big_traversals))
-        threads.append(t)
-        t.start()
+    for _ in range(n_threads):
+        cur_thrd = threading.Thread(target=worker, args=(worker_q, basename,
+                                                         stop_big_traversals))
+        threads.append(cur_thrd)
+        cur_thrd.start()
 
     print 'done starting threads'
 
     # wait for threads
-    for t in threads:
-        t.join()
+    for _ in threads:
+        _.join()
 
     print '---'
     print 'done making subsets! see %s.subset.*.pmap' % (basename,)

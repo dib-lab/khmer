@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Trim sequences at k-mers in the given stoptags file.  Output sequences
@@ -13,11 +14,11 @@ will be placed in 'infile.stopfilt'.
 Use '-h' for parameter help.
 """
 
-import sys
 import os
 import khmer
 import argparse
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+from khmer.file_api import check_file_status, check_space
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
@@ -35,14 +36,19 @@ def main():
     parser.add_argument('input_filenames', nargs='+')
 
     args = parser.parse_args()
-    K = args.ksize
+    ksize = args.ksize
 
     stoptags = args.stoptags_file
     infiles = args.input_filenames
 
-    print 'loading stop tags, with K', K
-    ht = khmer.new_hashbits(K, 1, 1)
-    ht.load_stop_tags(stoptags)
+    for _ in infiles:
+        check_file_status(_)
+
+    check_space(infiles)
+
+    print 'loading stop tags, with K', ksize
+    htable = khmer.new_hashbits(ksize, 1, 1)
+    htable.load_stop_tags(stoptags)
 
     def process_fn(record):
         name = record['name']
@@ -50,9 +56,9 @@ def main():
         if 'N' in seq:
             return None, None
 
-        trim_seq, trim_at = ht.trim_on_stoptags(seq)
+        trim_seq, trim_at = htable.trim_on_stoptags(seq)
 
-        if trim_at >= K:
+        if trim_at >= ksize:
             return name, trim_seq
 
         return None, None

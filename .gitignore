@@ -1,7 +1,7 @@
 *.pyc
 *.o
 *.so
-*.gc??
+*.gcno
 *.swp
 *.egg-info
 *.egg
@@ -27,3 +27,7 @@ pylint.out
 .coverage
 doxygen.out
 doc/doxygen
+/.coverage
+/nosetests.xml
+/test.fa.keep
+/.pre-push-test.sh

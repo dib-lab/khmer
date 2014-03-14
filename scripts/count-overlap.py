@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Count the overlap k-mers, which are the k-mers apperaring in two sequence
@@ -16,14 +17,8 @@ Use '-h' for parameter help.
 
 """
 import khmer
-import sys
-import screed
-from screed.fasta import fasta_iter
-import argparse
-import os
-import math
-from khmer.khmer_args import build_hasbits_args, report_on_config
-
+from khmer.file_api import check_file_status, check_space
+from khmer.khmer_args import build_hashbits_args, report_on_config
 #
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -46,6 +41,12 @@ def main():
     fafile = args.fafile
     output_filename = args.report_filename
     curve_filename = output_filename + '.curve'
+
+    infiles = [htfile, fafile]
+    for infile in infiles:
+        check_file_status(infile)
+
+    check_space(infiles)
 
     print 'loading hashbits from', htfile
     ht1 = khmer.load_hashbits(htfile)

@@ -1,3 +1,12 @@
+2014-03-13 Ram RS <ramrs@nyu.edu>
+
+	* added: khmer/file_api.py - script to check disk space, check input file
+	status and check space before hashtable writing
+	* modified: scripts/*.py - all scripts now use file_api for above-mentioned
+	functionality.
+	* modified: scripts/*.py - pylint violations addressed in all scripts under
+	scripts/
+
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized

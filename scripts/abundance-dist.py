@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Produce the k-mer abundance distribution for the given file.
@@ -17,6 +18,7 @@ import sys
 import khmer
 import argparse
 import os
+from khmer.file_api import check_file_status, check_space
 
 
 def main():
@@ -36,6 +38,12 @@ def main():
                         help='Overwrite output file if it exists')
 
     args = parser.parse_args()
+
+    infiles = [args.hashname, args.datafile]
+    for infile in infiles:
+        check_file_status(infile)
+
+    check_space(infiles)
 
     print('hashtable from', args.hashname)
     counting_hash = khmer.load_counting_hash(args.hashname)
