@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -11,8 +11,10 @@ import sys
 
 
 def check_file_status(file_path):
-    """ Check status of file - return if file exists,
-    is empty, or neither """
+    """ 
+    Check status of file - return if file exists; warn and exit
+    if empty, or does not exist 
+    """
     if not os.path.exists(file_path):
         print >>sys.stderr, 'ERROR: Input file %s does not exist,\
          exiting' % file_path
@@ -25,7 +27,8 @@ def check_file_status(file_path):
 
 
 def check_space(in_files):
-    """ Estimate size of input files passed, then calculate
+    """ 
+    Estimate size of input files passed, then calculate
     disk space available. Exit if insufficient disk space,
     """
 
@@ -34,7 +37,6 @@ def check_space(in_files):
     dir_path = os.path.dirname(in_files[0])
     target = os.statvfs(dir_path)
     free_space = target.f_frsize * target.f_bavail
-    #<TODO>: If SU, use target.f_bfree
 
     # Check input file array, remove corrupt files
     valid_files = [f for f in in_files if os.path.isfile(f)]
@@ -70,7 +72,8 @@ def check_valid_file_exists(in_files):
     """
     In a scenario where we expect multiple input files and
     are OK with some of them being empty or non-existent,
-    this check ensures there is at least one valid file
+    this check warns to stderr if any input file is empty
+    or non-existent
     """
     for in_file in in_files:
         if os.path.exists(in_file):
