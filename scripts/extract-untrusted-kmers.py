@@ -72,7 +72,7 @@ def main():
         k_bad_outfp = open(outbadkmers, 'wb')
         k_good_outfp = open(outgoodkmers, 'wb')
         for n, record in enumerate(screed.open(infile)):
-            if n % 250000 == 0:
+            if n % 250000 == 0 and not args.quiet:
                 print >>sys.stderr, 'processed {n} of {f}...'.format(n=n, f=infile)
             name = record['name']
             seq = record['sequence']

@@ -1268,3 +1268,7 @@ def test_sweep_reads_by_partition_buffered():
     assert (seqsm == set(['read4_multi\t0\t1']) or
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
+
+
+def test_extract_untrusted_kmers():
+    pass
