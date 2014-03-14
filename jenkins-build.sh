@@ -70,11 +70,10 @@ then
 fi
 ./setup.py install
 
-./setup.py develop --build-directory .
-
-pip install --quiet nose coverage
-make coverage
-make doc
+if [[ -n "${coverage_post}" ]]
+then
+	make coverage.xml
+	make doc
 
 	make pylint 2>&1 > pylint.out
 

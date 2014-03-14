@@ -13,6 +13,7 @@ loading a prebuilt counting hash.
 
 Use '-h' for parameter help.
 """
+import os
 import sys
 import khmer
 import threading
