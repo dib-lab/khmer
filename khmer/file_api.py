@@ -11,9 +11,9 @@ import sys
 
 
 def check_file_status(file_path):
-    """ 
+    """
     Check status of file - return if file exists; warn and exit
-    if empty, or does not exist 
+    if empty, or does not exist
     """
     if not os.path.exists(file_path):
         print >>sys.stderr, 'ERROR: Input file %s does not exist,\
@@ -27,7 +27,7 @@ def check_file_status(file_path):
 
 
 def check_space(in_files):
-    """ 
+    """
     Estimate size of input files passed, then calculate
     disk space available. Exit if insufficient disk space,
     """
