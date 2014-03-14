@@ -424,8 +424,6 @@ protected:
         // TODO: Set buffer size from Config.
         static uint64_t const	    BUFFER_SIZE		= 127;
 
-        uint32_t		    thread_id;
-
         bool			    at_start;
         uint64_t		    fill_id;
 
