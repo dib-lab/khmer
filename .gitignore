@@ -27,4 +27,3 @@ pylint.out
 .coverage
 doxygen.out
 doc/doxygen
-/.pre-push-test.sh
