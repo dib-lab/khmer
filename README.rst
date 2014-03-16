@@ -1,4 +1,3 @@
-
 khmer
 =====
 
@@ -11,8 +10,8 @@ Welcome to khmer: k-mer counting, filtering and graph traversal FTW!
 .. image:: https://pypip.in/license/khmer/badge.png
     :target: https://pypi.python.org/pypi/khmer/
     :alt: License
-.. image:: http://ci.ged.msu.edu/job/khmer-multi/badge/icon
-    :target: http://ci.ged.msu.edu/job/khmer-multi/
+.. image:: http://ci.ged.msu.edu/job/khmer/badge/icon
+    :target: http://ci.ged.msu.edu/job/khmer/
 .. image:: https://landscape.io/github/ged-lab/khmer/master/landscape.png
    :target: https://landscape.io/github/ged-lab/khmer/master
    :alt: Python Code Health
