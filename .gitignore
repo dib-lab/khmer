@@ -27,5 +27,3 @@ pylint.out
 .coverage
 doxygen.out
 doc/doxygen
-htmlcov
-/test.fa.keep
