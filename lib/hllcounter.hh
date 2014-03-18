@@ -11,21 +11,36 @@
 #include <string>
 #include "khmer_config.hh"
 
-namespace khmer {
-  class HLLCounter {
-   public:
+/*
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern const int THRESHOLD_DATA[] = {
+  10, 20, 40, 80, 220, 400, 900, 1800, 3100,
+  6500, 11500, 20000, 50000, 120000, 350000 };
+
+#ifdef __cplusplus
+}
+#endif
+*/
+
+namespace khmer
+{
+class HLLCounter
+{
+public:
     HLLCounter(double error_rate);
 
     void add(const std::string &);
     HashIntoType estimate_cardinality();
     virtual ~HLLCounter() {}
-   private:
+private:
     double _Ep();
     double alpha;
     int p;
     int m;
     std::vector<int> M;
-  };
+};
 };
 
 #endif // HLLCOUNTER_HH
