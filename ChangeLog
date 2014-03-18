@@ -1,3 +1,7 @@
+2014-03-16  Ram RS  <ramrs@nyu.edu>
+
+	* Project email in copyright headers updated
+
 2014-03-13  Ram RS  <ramrs@nyu.edu>
 
 	* Bug fix: tests.test_normalize_by_median_no_bigcount() now runs

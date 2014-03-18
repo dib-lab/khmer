@@ -2,7 +2,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Accept or discard sequences XXX, based on the given counting
@@ -12,7 +13,9 @@ hash table.  Output sequences will be placed in 'infile.medfilt'.
 
 Use '-h' for parameter help.
 """
-import sys, screed.fasta, os
+import sys
+import screed.fasta
+import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
@@ -22,7 +25,8 @@ import random
 
 ###
 
-DEFAULT_COVERAGE=20
+DEFAULT_COVERAGE = 20
+
 
 def main():
     parser = build_counting_multifile_args()
@@ -41,7 +45,7 @@ def main():
 
     print "K:", K
 
-    ### the filtering function.
+    # the filtering function.
     def process_fn(record):
         name = record['name']
         seq = record['sequence']
@@ -53,16 +57,16 @@ def main():
 
         return name, seq
 
-    ### the filtering loop
+    # the filtering loop
     for infile in infiles:
-       print 'filtering', infile
-       outfile = os.path.basename(infile) + '.medfilt'
-       outfp = open(outfile, 'w')
+        print 'filtering', infile
+        outfile = os.path.basename(infile) + '.medfilt'
+        outfp = open(outfile, 'w')
 
-       tsp = ThreadedSequenceProcessor(process_fn)
-       tsp.start(verbose_loader(infile), outfp)
+        tsp = ThreadedSequenceProcessor(process_fn)
+        tsp.start(verbose_loader(infile), outfp)
 
-       print 'output in', outfile
+        print 'output in', outfile
 
 if __name__ == '__main__':
     main()

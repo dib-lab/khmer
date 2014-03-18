@@ -2,7 +2,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import sys
 import tempfile
@@ -48,7 +49,7 @@ def assemble_sequences(records, k, length_cutoff=1000):
         assemble_dir = os.path.join(dirname, 'assemble')
         p = subprocess.Popen(
             'velveth %s %d -shortPaired %s.pe -short %s.se' % (
-            assemble_dir, k, seqfile, seqfile),
+                assemble_dir, k, seqfile, seqfile),
             shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = p.communicate()
         assert p.returncode == 0, (stdout, stderr)
