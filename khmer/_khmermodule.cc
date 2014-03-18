@@ -4210,8 +4210,8 @@ static void khmer_subset_dealloc(PyObject* self)
 //
 
 typedef struct {
-  PyObject_HEAD
-  khmer::HLLCounter * hllcounter;
+    PyObject_HEAD
+    khmer::HLLCounter * hllcounter;
 } khmer_KHLLCounterObject;
 
 static void khmer_hllcounter_dealloc(PyObject *);
@@ -4249,22 +4249,22 @@ static PyTypeObject khmer_KHLLCounterType = {
 
 static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
 {
-  double error_rate = 0;
+    double error_rate = 0;
 
-  if (!PyArg_ParseTuple(args, "d", &error_rate)) {
-    return NULL;
-  }
+    if (!PyArg_ParseTuple(args, "d", &error_rate)) {
+        return NULL;
+    }
 
-  khmer_KHLLCounterObject * khllcounter_obj = (khmer_KHLLCounterObject *) \
-    PyObject_New(khmer_KHLLCounterObject, &khmer_KHLLCounterType);
+    khmer_KHLLCounterObject * khllcounter_obj = (khmer_KHLLCounterObject *) \
+            PyObject_New(khmer_KHLLCounterObject, &khmer_KHLLCounterType);
 
-  if (khllcounter_obj == NULL) {
-      return NULL;
-  }
+    if (khllcounter_obj == NULL) {
+        return NULL;
+    }
 
-  khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate);
+    khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate);
 
-  return (PyObject *) khllcounter_obj;
+    return (PyObject *) khllcounter_obj;
 }
 
 //
@@ -4273,54 +4273,56 @@ static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
 
 static void khmer_hllcounter_dealloc(PyObject* self)
 {
-  khmer_KHLLCounterObject * obj = (khmer_KHLLCounterObject *) self;
-  delete obj->hllcounter;
-  obj->hllcounter = NULL;
+    khmer_KHLLCounterObject * obj = (khmer_KHLLCounterObject *) self;
+    delete obj->hllcounter;
+    obj->hllcounter = NULL;
 
-  PyObject_Del((PyObject *) obj);
+    PyObject_Del((PyObject *) obj);
 }
 
 static
 PyObject *
 hllcounter_add( PyObject * self, PyObject * args )
 {
-  khmer_KHLLCounterObject * me = (khmer_KHLLCounterObject *) self;
-  khmer::HLLCounter * hllcounter = me->hllcounter;
+    khmer_KHLLCounterObject * me = (khmer_KHLLCounterObject *) self;
+    khmer::HLLCounter * hllcounter = me->hllcounter;
 
-  const char * kmer_str;
+    const char * kmer_str;
 
-  if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
-    return NULL;
-  }
+    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
+        return NULL;
+    }
 
-  /* TODO: handle errors */
-  hllcounter->add(kmer_str);
+    /* TODO: handle errors */
+    hllcounter->add(kmer_str);
 
-  Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hllcounter_estimate_cardinality( PyObject * self, PyObject * args )
 {
-  khmer_KHLLCounterObject * me = (khmer_KHLLCounterObject *) self;
-  khmer::HLLCounter * hllcounter = me->hllcounter;
+    khmer_KHLLCounterObject * me = (khmer_KHLLCounterObject *) self;
+    khmer::HLLCounter * hllcounter = me->hllcounter;
 
-  if (!PyArg_ParseTuple( args, "" )) return NULL;
+    if (!PyArg_ParseTuple( args, "" )) {
+        return NULL;
+    }
 
-  return PyLong_FromLong(hllcounter->estimate_cardinality());
+    return PyLong_FromLong(hllcounter->estimate_cardinality());
 }
 
 static PyMethodDef khmer_hllcounter_methods[] = {
-  {"add", hllcounter_add, METH_VARARGS, ""},
-  {"estimate_cardinality", hllcounter_estimate_cardinality, METH_VARARGS, ""},
-  {NULL, NULL, 0, NULL}
+    {"add", hllcounter_add, METH_VARARGS, ""},
+    {"estimate_cardinality", hllcounter_estimate_cardinality, METH_VARARGS, ""},
+    {NULL, NULL, 0, NULL}
 };
 
 static PyObject *
 khmer_hllcounter_getattr(PyObject * obj, char * name)
 {
-  return Py_FindMethod(khmer_hllcounter_methods, obj, name);
+    return Py_FindMethod(khmer_hllcounter_methods, obj, name);
 }
 
 //////////////////////////////
