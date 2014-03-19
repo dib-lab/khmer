@@ -116,7 +116,7 @@ SETUP_METADATA = \
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
         "zip_safe": False,
-        "classifiers":  [
+        "classifiers": [
             "Development Status :: 4 - Beta",
             "Environment :: Console",
             "Environment :: MacOS X",
