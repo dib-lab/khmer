@@ -6,7 +6,7 @@
 //
 
 #include <iostream>
-#include "ktable.hh"
+#include "kmer_hash.hh"
 
 using namespace std;
 
