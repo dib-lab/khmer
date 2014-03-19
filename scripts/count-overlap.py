@@ -17,12 +17,6 @@ Use '-h' for parameter help.
 
 """
 import khmer
-import sys
-import screed
-from screed.fasta import fasta_iter
-import argparse
-import os
-import math
 from khmer.khmer_args import build_hashbits_args, report_on_config
 
 #
