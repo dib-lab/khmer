@@ -46,6 +46,11 @@
     "Added LFS (Large File Summit) support for 64-bit file offsets"
     "Fix serious but very rare decompression bug"
 
+2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/counting.hh: include hashtable.hh
+    * lib/counting.{cc,hh},khmer/_khmermodule.cc: many downcasts removed
+
 2014-03-19  Titus Brown  <t@idyll.org>
 
     * Makefile: update documentation on targets at top; clean autopep8 output.
@@ -76,6 +81,12 @@
 2014-03-16  Ram RS  <ramrs@nyu.edu>
 
     * Project email in copyright headers updated
+
+2014-03-14  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc, lib/{khmer.hh, hashtable.{cc,hh}},
+    tests/test_{hashbits,hashbits_obj,labelhash}.py: don't implicitly downcast
+    tagset_size(). Changes fileformat version for saved tagsets.
 
 2014-03-13  Ram RS  <ramrs@nyu.edu>
 

@@ -350,7 +350,7 @@ void Hashtable::get_median_count(const std::string &s,
 void Hashtable::save_tagset(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
-    const unsigned int tagset_size = all_tags.size();
+    const unsigned long tagset_size = all_tags.size();
     unsigned int save_ksize = _ksize;
 
     HashIntoType * buf = new HashIntoType[tagset_size];
@@ -389,7 +389,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     unsigned char version, ht_type;
     unsigned int save_ksize = 0;
 
-    unsigned int tagset_size = 0;
+    unsigned long tagset_size = 0;
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
@@ -1564,7 +1564,7 @@ const
     return count;
 }
 
-unsigned int Hashtable::trim_on_stoptags(std::string seq) const
+unsigned long Hashtable::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {
         return 0;
@@ -1789,7 +1789,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     unsigned char version, ht_type;
     unsigned int save_ksize = 0;
 
-    unsigned int tagset_size = 0;
+    unsigned long tagset_size = 0;
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
@@ -1814,7 +1814,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 void Hashtable::save_stop_tags(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
-    const unsigned int tagset_size = stop_tags.size();
+    const unsigned long tagset_size = stop_tags.size();
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 

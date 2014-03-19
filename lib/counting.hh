@@ -10,8 +10,10 @@
 
 #include <vector>
 #include "khmer_config.hh"
+#include "hashtable.hh"
 
-namespace khmer {
+namespace khmer
+{
   typedef std::map<HashIntoType, BoundedCounterType> KmerCountMap;
 
   class CountingHashIntersect;
@@ -225,9 +227,9 @@ namespace khmer {
 
     unsigned int max_hamming1_count(const std::string kmer);
 
-    unsigned int trim_on_abundance(std::string seq,
+    unsigned long trim_on_abundance(std::string seq,
 				   BoundedCounterType min_abund) const;
-    unsigned int trim_below_abundance(std::string seq,
+    unsigned long trim_below_abundance(std::string seq,
 				      BoundedCounterType max_abund) const;
 
     void collect_high_abundance_kmers(const std::string &infilename,
