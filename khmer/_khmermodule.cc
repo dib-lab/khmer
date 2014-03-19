@@ -1423,7 +1423,7 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned int trim_at;
+    unsigned long trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     BoundedCounterType min_count = min_count_i;
@@ -1436,7 +1436,7 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("OI", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
 
     return ret;
@@ -1447,13 +1447,13 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     CountingHash * counting = me->counting;
 
     const char * seq = NULL;
-    unsigned int max_count_i = 0;
+    unsigned long max_count_i = 0;
 
     if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
         return NULL;
     }
 
-    unsigned int trim_at;
+    unsigned long trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     BoundedCounterType max_count = max_count_i;
@@ -1466,7 +1466,7 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("OI", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
 
     return ret;
@@ -2365,7 +2365,7 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned int trim_at;
+    unsigned long trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     trim_at = hashbits->trim_on_stoptags(seq);
@@ -2376,7 +2376,7 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("OI", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
 
     return ret;

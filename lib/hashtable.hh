@@ -495,7 +495,7 @@ public:
                                        unsigned int radius,
                                        unsigned int max_volume) const;
 
-    unsigned int trim_on_stoptags(std::string sequence) const;
+    unsigned long trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
                             unsigned int threshold,

@@ -35,9 +35,9 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
       read = parser->get_next_read();
       seq = read.sequence;
 
-      int numPos = seq.length() - _ksize + 1;
+        long numPos = seq.length() - _ksize + 1;
 
-      for (int i = 0; i < numPos; i++)  {
+        for (long i = 0; i < numPos; i++)  {
          string kmer = seq.substr(i, _ksize);
          outfile << (int)get_count(kmer.c_str()) << " ";
       }
@@ -416,25 +416,33 @@ unsigned int CountingHash::max_hamming1_count(const std::string kmer_s)
     ksub = kmer_s;
     ksub[i] = 'A';
     the_count = get_count(ksub.c_str());
-    if (the_count > max_count) { max_count = the_count; }
+        if (the_count > max_count) {
+            max_count = the_count;
+        }
 
     ksub[i] = 'C';
     the_count = get_count(ksub.c_str());
-    if (the_count > max_count) { max_count = the_count; }
+        if (the_count > max_count) {
+            max_count = the_count;
+        }
 
     ksub[i] = 'G';
     the_count = get_count(ksub.c_str());
-    if (the_count > max_count) { max_count = the_count; }
+        if (the_count > max_count) {
+            max_count = the_count;
+        }
 
     ksub[i] = 'T';
     the_count = get_count(ksub.c_str());
-    if (the_count > max_count) { max_count = the_count; }
+        if (the_count > max_count) {
+            max_count = the_count;
+        }
   }
 
   return max_count;
 }
 
-unsigned int CountingHash::trim_on_abundance(std::string seq,
+unsigned long CountingHash::trim_on_abundance(std::string seq,
 					     BoundedCounterType min_abund)
   const
 {
@@ -448,14 +456,16 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 
   HashIntoType kmer;
 
-  if (kmers.done()) { return 0; }
+    if (kmers.done()) {
+        return 0;
+    }
   kmer = kmers.next();
 
   if (kmers.done() || get_count(kmer) < min_abund) {
     return 0;
   }
 
-  unsigned int i = _ksize;
+    unsigned long i = _ksize;
   while (!kmers.done()) {
     kmer = kmers.next();
 
@@ -469,7 +479,7 @@ unsigned int CountingHash::trim_on_abundance(std::string seq,
 }
 
 
-unsigned int CountingHash::trim_below_abundance(std::string seq,
+unsigned long CountingHash::trim_below_abundance(std::string seq,
 						BoundedCounterType max_abund)
   const
 {
@@ -483,14 +493,16 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
 
   HashIntoType kmer;
 
-  if (kmers.done()) { return 0; }
+    if (kmers.done()) {
+        return 0;
+    }
   kmer = kmers.next();
 
   if (kmers.done() || get_count(kmer) > max_abund) {
     return 0;
   }
 
-  unsigned int i = _ksize;
+    unsigned long i = _ksize;
   while (!kmers.done()) {
     kmer = kmers.next();
 
@@ -507,22 +519,28 @@ unsigned int CountingHash::trim_below_abundance(std::string seq,
 void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
 {
    std::string filename(infilename);
-   int found = filename.find_last_of(".");
+    size_t found = filename.find_last_of(".");
    std::string type = filename.substr(found+1);
 
-   if (type == "gz") { CountingHashGzFileReader(filename, ht); }
-   else { CountingHashFileReader(filename, ht); }
+    if (type == "gz") {
+        CountingHashGzFileReader(filename, ht);
+    } else {
+        CountingHashFileReader(filename, ht);
+    }
 }
 
 
 void CountingHashFile::save(const std::string &outfilename, const CountingHash &ht)
 {
    std::string filename(outfilename);
-   int found = filename.find_last_of(".");
+    size_t found = filename.find_last_of(".");
    std::string type = filename.substr(found+1);
 
-   if (type == "gz") { CountingHashGzFileWriter(filename, ht); }
-   else { CountingHashFileWriter(filename, ht); }
+    if (type == "gz") {
+        CountingHashGzFileWriter(filename, ht);
+    } else {
+        CountingHashFileWriter(filename, ht);
+    }
 }
 
 
@@ -639,9 +657,9 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
 
     ht._counts[i] = new Byte[tablesize];
 
-    unsigned long long loaded = 0;
+        HashIntoType loaded = 0;
     while (loaded != tablesize) {
-      loaded += gzread(infile, (char *) ht._counts[i], tablesize - loaded);
+            loaded += gzread(infile, (char *) ht._counts[i], (unsigned) tablesize - loaded);
     }
   }
 
@@ -740,7 +758,10 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
     save_tablesize = ht._tablesizes[i];
 
     gzwrite(outfile, (const char *) &save_tablesize, sizeof(save_tablesize));
-    gzwrite(outfile, (const char *) ht._counts[i], save_tablesize);
+        unsigned long long written = 0;
+        while (written != save_tablesize) {
+            written += gzwrite(outfile, (const char *) ht._counts[i], (int) save_tablesize - written);
+        }
   }
 
   HashIntoType n_counts = ht._bigcounts.size();
