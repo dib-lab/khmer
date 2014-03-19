@@ -3,11 +3,13 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
+
+# pylint: disable=C0111,C0103,E1103,W0612
+
 import sys
 import os
 import shutil
 from cStringIO import StringIO
-import subprocess
 import traceback
 
 import tests.khmer_tst_utils as utils
@@ -359,6 +361,7 @@ def test_normalize_by_median_version():
     args = ['--version']
     status, out, err = runscript(script, args)
     assert err.startswith('khmer ')
+
 
 def test_normalize_by_median_2():
     CUTOFF = '2'

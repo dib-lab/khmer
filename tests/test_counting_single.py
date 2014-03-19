@@ -51,7 +51,7 @@ def test_complete_no_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == kt.n_entries(),  n_rc_filled
+    assert n_rc_filled == kt.n_entries(), n_rc_filled
     assert n_palindromes == 16, n_palindromes  # @CTB check this
     assert n_fwd_filled == kt.n_entries() / 2 + n_palindromes / 2, \
         n_fwd_filled
@@ -75,7 +75,7 @@ def test_complete_2_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == 128,  n_rc_filled
+    assert n_rc_filled == 128, n_rc_filled
     # @CTB assert n_fwd_filled == 100 # kt.n_entries() / 2, n_fwd_filled
 
 
@@ -97,7 +97,7 @@ def test_complete_4_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == 64,  n_rc_filled
+    assert n_rc_filled == 64, n_rc_filled
     # @CTB assert n_fwd_filled == kt.n_entries() / 2, n_fwd_filled
 
 
