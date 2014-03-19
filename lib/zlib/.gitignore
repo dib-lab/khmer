@@ -2,3 +2,4 @@ libz.so.*
 libz.*dylib
 libz.a
 Makefile
+zconf.h
