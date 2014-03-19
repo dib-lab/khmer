@@ -1,3 +1,8 @@
+# make pep8 to check for basic Python code compliance
+# make autopep8 to fix most pep8 errors
+# make pylint to check Python code for enhanced compliance including naming
+#  and documentation
+
 all:
 	./setup.py build_ext --inplace
 
@@ -36,8 +41,8 @@ pep8: FORCE
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/
 
 autopep8: FORCE
-	autopep8 setup.py khmer/ scripts/ tests/ --recursive --in-place \
-		--pep8-passes 2000 --verbose
+	autopep8 --recursive --in-place --exclude _version.py --ignore E309 setup.py \
+		khmer/ scripts/ tests/
 
 pylint: all FORCE
 	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
