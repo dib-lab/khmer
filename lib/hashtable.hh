@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <iostream>
+#include <exception>
 #include <list>
 #include <queue>
 
@@ -60,6 +61,19 @@ struct HashTablePerformanceMetrics : public IPerformanceMetrics {
 
 };
 #endif
+
+class hashtable_file_exception : public std::exception
+{
+public:
+    hashtable_file_exception(const char * msg) : _msg(msg) { };
+
+    virtual const char* what() const throw() {
+        return _msg;
+    }
+protected:
+    const char * _msg;
+};
+
 //
 // Sequence iterator class, test.  Not really a C++ iterator yet.
 //

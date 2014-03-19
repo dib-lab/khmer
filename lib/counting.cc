@@ -540,7 +540,16 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
   unsigned long long save_tablesize = 0;
   unsigned char version, ht_type, use_bigcount;
 
-  ifstream infile(infilename.c_str(), ios::binary);
+  ifstream infile;
+  infile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+
+  try {
+    infile.open(infilename.c_str(), ios::binary);
+  } catch (std::ifstream::failure e) {
+    if (!infile.is_open()) {
+      throw hashtable_file_exception("Cannot open file.");
+    }
+  }
   assert(infile.is_open());
 
   infile.read((char *) &version, 1);
