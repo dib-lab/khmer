@@ -49,7 +49,6 @@ Contents:
    blog-posts
    choosing-hash-sizes
    partitioning-big-data
-   ktable
    design
    details
    development

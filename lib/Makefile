@@ -161,11 +161,11 @@ BZIP2_OBJS_BASE= \
 	decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
 
-#DRV_PROGS=bittest ktable_test # test-StreamReader test-CacheManager test-Parser test-HashTables
+#DRV_PROGS=bittest # test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=#ht-diff
 
-CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o ktable.o
+CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o kmer_hash.o
 PARSERS_OBJS= read_parsers.o
 
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
@@ -203,19 +203,16 @@ test-HashTables: $(DRV_TEST_HASHTABLES_OBJS)
 ht-diff: $(HT_DIFF_OBJS)
 	$(CXX) -o $@ $(HT_DIFF_OBJS) $(LIBS)
 
-bittest: bittest.o ktable.o
-	$(CXX) $(CXXFLAGS) -o $@ bittest.o ktable.o
-
-ktable_test: ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS)
-	$(CXX) -o $@ ktable_test.o hashtable.o subset.o $(PARSERS_OBJS) $(CORE_OBJS) $(ZLIB_OBJS) $(BZIP2_OBJS) $(LIBS)
+bittest: bittest.o kmer_hash.o
+	$(CXX) $(CXXFLAGS) -o $@ bittest.o kmer_hash.o
 
 # NOTE: Disabled due to broken constructor call.
-#graphtest: graphtest.o ktable.o hashtable.o
-#	$(CXX) -o $@ graphtest.o ktable.o hashtable.o
+#graphtest: graphtest.o kmer_hash.o hashtable.o
+#	$(CXX) -o $@ graphtest.o kmer_hash.o hashtable.o
 
 # NOTE: Disabled due to broken constructor call.
-#consume_prof: consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS)
-#	$(CXX) -o $@ consume_prof.o hashtable.o ktable.o $(PARSERS_OBJS) $(LIBS)
+#consume_prof: consume_prof.o hashtable.o kmer_hash.o $(PARSERS_OBJS)
+#	$(CXX) -o $@ consume_prof.o hashtable.o kmer_hash.o $(PARSERS_OBJS) $(LIBS)
 
 $(ZLIB_OBJS):
 	(cd $(ZLIB_DIR) && ./configure --shared && make libz.a)
@@ -235,11 +232,11 @@ perf_metrics.o: perf_metrics.cc perf_metrics.hh
 
 read_parsers.o: read_parsers.cc read_parsers.hh
 
-aligntest: aligntest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
-	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+aligntest: aligntest.o zlib parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o
 
-bugtest: bugtest.o zlib parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
-	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o ktable.o hashtable.o hashbits.o subset.o counting.o
+bugtest: bugtest.o zlib parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
+	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o
 
 kmer.o: kmer.cc kmer.hh
 
@@ -251,15 +248,15 @@ scoringmatrix.o: scoringmatrix.cc scoringmatrix.hh
 
 parsers.o: parsers.cc parsers.hh
 
-ktable.o: ktable.cc ktable.hh
+kmer_hash.o: kmer_hash.cc kmer_hash.hh
 
-hashtable.o: hashtable.cc hashtable.hh ktable.hh khmer.hh
+hashtable.o: hashtable.cc hashtable.hh kmer_hash.hh khmer.hh
 
-hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh ktable.hh khmer.hh counting.hh
+hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh kmer_hash.hh khmer.hh counting.hh
 
-subset.o: subset.cc subset.hh hashbits.hh ktable.hh khmer.hh
+subset.o: subset.cc subset.hh hashbits.hh kmer_hash.hh khmer.hh
 
-counting.o: counting.cc counting.hh hashtable.hh ktable.hh khmer.hh
+counting.o: counting.cc counting.hh hashtable.hh kmer_hash.hh khmer.hh
 
 test-StreamReader.o: test-StreamReader.cc read_parsers.hh
 
@@ -272,5 +269,5 @@ test-Parser.o: test-Parser.cc read_parsers.hh
 test-HashTables.o: test-HashTables.cc read_parsers.hh primes.hh
 	$(CXX) $(CXXFLAGS) -c -o $@ test-HashTables.cc -fopenmp
 
-ht-diff.o: counting.hh hashtable.hh ktable.hh khmer.hh
+ht-diff.o: counting.hh hashtable.hh kmer_hash.hh khmer.hh
 

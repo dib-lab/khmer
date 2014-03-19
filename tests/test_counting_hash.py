@@ -4,7 +4,6 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-import os
 import gzip
 
 import khmer
@@ -37,7 +36,6 @@ class Test_CountingHash(object):
         self.hi = khmer._new_counting_hash(12, PRIMES_1m)
 
     def test_collision_1(self):
-        kt = khmer.new_ktable(12)
 
         GG = 'G' * 12                   # forward_hash: 11184810
         assert khmer.forward_hash(GG, 12) == 11184810
@@ -58,7 +56,6 @@ class Test_CountingHash(object):
         assert hi.get(GG) == 1
 
     def test_collision_2(self):
-        kt = khmer.new_ktable(12)
 
         GG = 'G' * 12                   # forward_hash: 11184810
         assert khmer.forward_hash(GG, 12) == 11184810
@@ -79,7 +76,6 @@ class Test_CountingHash(object):
         assert hi.get(GG) == 1
 
     def test_collision_3(self):
-        kt = khmer.new_ktable(12)
 
         GG = 'G' * 12                   # forward_hash: 11184810
         assert khmer.forward_hash(GG, 12) == 11184810
@@ -417,7 +413,6 @@ def test_maxcount_with_bigcount_save():
     kh = khmer.new_counting_hash(4, 4 ** 4, 4)
     kh.set_use_bigcount(True)
 
-    last_count = None
     for i in range(0, 1000):
         kh.count('AAAA')
         c = kh.get('AAAA')
@@ -446,7 +441,6 @@ def test_bigcount_save():
 
     # set_use_bigcount should still be True after load (i.e. should be saved)
 
-    last_count = None
     assert kh.get('AAAA') == 0
 
     for i in range(0, 1000):
@@ -468,7 +462,6 @@ def test_nobigcount_save():
 
     # set_use_bigcount should still be True after load (i.e. should be saved)
 
-    last_count = None
     assert kh.get('AAAA') == 0
 
     for i in range(0, 1000):

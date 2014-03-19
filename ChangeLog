@@ -26,6 +26,16 @@
     * test_scripts.py: eliminate popenscript in favor of proper SystemExit
 	handling in runscript; fix pep8 violations.
 
+2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu> and Luiz Irber
+<luiz.irber@gmail.com>
+
+    * lib/ktable.{cc,hh},khmer/{__init__.py},{_khmermodule.cc}, tests/
+    test_{counting_{hash,single},ktable}.py: remove the unused KTable object
+    * doc/{index,ktable}.txt: remove references to KTable
+    * lib/{ktable.{hh,cc} → kmer_hash.{hh,cc}}: rename remaining ktable files
+    to kmer_hash
+    * lib/{hashtable,kmer}.hh: replace ktable headers with kmer_hash
+
 2014-03-17  Ram RS  <ramrs@nyu.edu>
 
     * extract-partitions.py: pylint warnings addressed
