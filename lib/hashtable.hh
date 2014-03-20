@@ -20,9 +20,9 @@
 #include <queue>
 
 #include "khmer.hh"
-#include "storage.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
+#include "ktable.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
