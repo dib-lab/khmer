@@ -188,7 +188,6 @@ consume_fasta(
 {
     Hasher		  &hasher		=
         _get_hasher( parser->uuid( ) );
-    unsigned int		  total_reads_LOCAL	= 0;
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
 #endif
@@ -216,7 +215,7 @@ consume_fasta(
 #else
         __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #endif
-        total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+        unsigned int total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
 #ifdef WITH_INTERNAL_METRICS
         hasher.pmetrics.stop_timers( );
         hasher.pmetrics.accumulate_timer_deltas(
@@ -261,10 +260,9 @@ unsigned int Hashtable::consume_string(const std::string &s)
     unsigned int n_consumed = 0;
 
     KMerIterator kmers(sp, _ksize);
-    HashIntoType kmer;
 
     while(!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
         count(kmer);
         n_consumed++;
@@ -286,10 +284,9 @@ unsigned int Hashtable::consume_high_abund_kmers(const std::string &s,
     unsigned int n_consumed = 0;
 
     KMerIterator kmers(sp, _ksize);
-    HashIntoType kmer;
 
     while(!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
         if (get_count(kmer) >= min_count) {
             count(kmer);
@@ -308,13 +305,12 @@ void Hashtable::get_median_count(const std::string &s,
                                  float &average,
                                  float &stddev)
 {
-    BoundedCounterType count;
     std::vector<BoundedCounterType> counts;
     KMerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
-        count = this->get_count(kmer);
+        BoundedCounterType count = this->get_count(kmer);
         counts.push_back(count);
     }
 
@@ -330,14 +326,14 @@ void Hashtable::get_median_count(const std::string &s,
 
     average = 0;
     for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-            i != counts.end(); i++) {
+            i != counts.end(); ++i) {
         average += *i;
     }
     average /= float(counts.size());
 
     stddev = 0;
     for (std::vector<BoundedCounterType>::const_iterator i = counts.begin();
-            i != counts.end(); i++) {
+            i != counts.end(); ++i) {
         stddev += (float(*i) - average) * (float(*i) - average);
     }
     stddev /= float(counts.size());
@@ -350,7 +346,7 @@ void Hashtable::get_median_count(const std::string &s,
 void Hashtable::save_tagset(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
-    const unsigned long tagset_size = all_tags.size();
+    const size_t tagset_size = n_tags();
     unsigned int save_ksize = _ksize;
 
     HashIntoType * buf = new HashIntoType[tagset_size];
@@ -367,7 +363,7 @@ void Hashtable::save_tagset(std::string outfilename)
 
     unsigned int i = 0;
     for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
-            pi++, i++) {
+            ++pi, i++) {
         buf[i] = *pi;
     }
 
@@ -389,7 +385,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     unsigned char version, ht_type;
     unsigned int save_ksize = 0;
 
-    unsigned long tagset_size = 0;
+    size_t tagset_size = 0;
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
@@ -417,7 +413,6 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
         unsigned long long& n_consumed,
         SeenSet * found_tags)
 {
-    bool is_new_kmer;
     bool kmer_tagged;
 
     KMerIterator kmers(seq.c_str(), _ksize);
@@ -427,6 +422,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 
     while(!kmers.done()) {
         kmer = kmers.next();
+	bool is_new_kmer;
 
         // Set the bits for the kmer in the various hashtables,
         // and report on whether or not they had already been set.
@@ -546,11 +542,11 @@ consume_fasta_and_tag(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-        unsigned long long this_n_consumed   = 0;
 
         read = parser->get_next_read( );
 
         if (check_and_normalize_read( read.sequence )) {
+	  unsigned long long this_n_consumed = 0;
             consume_sequence_and_tag( read.sequence, this_n_consumed );
 
 #ifdef WITH_INTERNAL_METRICS
@@ -663,7 +659,7 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
                     }
                 } else {		// stop tag!  do not insert, but connect.
                     // before first tag insertion; insert last kmer.
-                    if (!is_first_kmer && read_tags.size() == 0) {
+                    if (!is_first_kmer && read_tags.empty()) {
                         read_tags.insert(last_kmer);
                         all_tags.insert(last_kmer);
                     }
@@ -722,7 +718,7 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
     unsigned int i = 0;
 
     for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
-            si++) {
+            ++si) {
         if (i % subset_size == 0) {
             divvy.insert(*si);
             i = 0;
@@ -1021,7 +1017,6 @@ void Hashtable::filter_if_present(const std::string infilename,
     Read read;
     string seq;
 
-    std::string first_kmer;
     HashIntoType kmer;
 
     while(!parser->is_complete()) {
@@ -1080,7 +1075,6 @@ const
     NodeQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
-    unsigned int breadth = 0;
 
     const unsigned int rc_left_shift = _ksize*2 - 2;
     unsigned int total = 0;
@@ -1101,7 +1095,7 @@ const
         node_q.pop();
         kmer_r = node_q.front();
         node_q.pop();
-        breadth = breadth_q.front();
+        unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
         if (breadth > radius) {
@@ -1442,7 +1436,6 @@ const
     NodeQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
-    unsigned int breadth = 0;
     unsigned int count = 0;
 
     const unsigned int rc_left_shift = _ksize*2 - 2;
@@ -1461,7 +1454,7 @@ const
         node_q.pop();
         kmer_r = node_q.front();
         node_q.pop();
-        breadth = breadth_q.front();
+        unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
         if (breadth > radius) {
@@ -1564,20 +1557,17 @@ const
     return count;
 }
 
-unsigned long Hashtable::trim_on_stoptags(std::string seq) const
+size_t Hashtable::trim_on_stoptags(std::string seq) const
 {
     if (!check_and_normalize_read(seq)) {
         return 0;
     }
 
-    SeenSet path;
-    HashIntoType kmer;
-
     KMerIterator kmers(seq.c_str(), _ksize);
 
-    unsigned int i = _ksize - 2;
+    size_t i = _ksize - 2;
     while (!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
         if (set_contains(stop_tags, kmer)) {
             return i;
         }
@@ -1594,24 +1584,23 @@ void Hashtable::traverse_from_tags(unsigned int distance,
 {
     unsigned int i = 0;
     unsigned int n = 0;
-    unsigned int count;
     unsigned int n_big = 0;
     SeenSet keeper;
 
 #if VERBOSE_REPARTITION
     std::cout << all_tags.size() << " tags...\n";
 #endif // 0
-    SeenSet::const_iterator si = all_tags.begin();
 
-    for (; si != all_tags.end(); si++, i++) {
+    for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
+	++si, i++) {
         n++;
-        count = traverse_from_kmer(*si, distance, keeper);
+        unsigned int count = traverse_from_kmer(*si, distance, keeper);
 
         if (count >= threshold) {
             n_big++;
 
             SeenSet::const_iterator ti;
-            for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+            for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
                 if (counting.get_count(*ti) > frequency) {
                     stop_tags.insert(*ti);
                 } else {
@@ -1640,14 +1629,13 @@ unsigned int Hashtable::traverse_from_kmer(HashIntoType start,
 const
 {
     std::string kmer_s = _revhash(start, _ksize);
-    HashIntoType kmer, kmer_f, kmer_r;
+    HashIntoType kmer_f, kmer_r;
     _hash(kmer_s.c_str(), _ksize, kmer_f, kmer_r);
 
     HashIntoType f, r;
     NodeQueue node_q;
     std::queue<unsigned int> breadth_q;
     unsigned int cur_breadth = 0;
-    unsigned int breadth = 0;
     bool is_first_kmer = true;
 
     const unsigned int rc_left_shift = _ksize*2 - 2;
@@ -1664,7 +1652,7 @@ const
         node_q.pop();
         kmer_r = node_q.front();
         node_q.pop();
-        breadth = breadth_q.front();
+        unsigned int breadth = breadth_q.front();
         breadth_q.pop();
 
         if (breadth > radius) {
@@ -1675,7 +1663,7 @@ const
             break;
         }
 
-        kmer = uniqify_rc(kmer_f, kmer_r);
+        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
         if (set_contains(keeper, kmer)) {
             continue;
         }
@@ -1704,7 +1692,7 @@ const
 
         // NEXT.
         f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
+        //r = next_r(kmer_r, 'A');
 
         // f = ((kmer_f << 2) & bitmask) | twobit_repr('A');
         r = next_r(kmer_r, 'A');
@@ -1789,7 +1777,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     unsigned char version, ht_type;
     unsigned int save_ksize = 0;
 
-    unsigned long tagset_size = 0;
+    size_t tagset_size = 0;
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
@@ -1814,7 +1802,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 void Hashtable::save_stop_tags(std::string outfilename)
 {
     ofstream outfile(outfilename.c_str(), ios::binary);
-    const unsigned long tagset_size = stop_tags.size();
+    size_t tagset_size = stop_tags.size();
 
     HashIntoType * buf = new HashIntoType[tagset_size];
 
@@ -1830,7 +1818,7 @@ void Hashtable::save_stop_tags(std::string outfilename)
 
     unsigned int i = 0;
     for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
-            pi++, i++) {
+            ++pi, i++) {
         buf[i] = *pi;
     }
 
@@ -1846,7 +1834,7 @@ void Hashtable::print_stop_tags(std::string infilename)
 
     unsigned int i = 0;
     for (SeenSet::iterator pi = stop_tags.begin(); pi != stop_tags.end();
-            pi++, i++) {
+            ++pi, i++) {
         std::string kmer = _revhash(*pi, _ksize);
         printfile << kmer << "\n";
     }
@@ -1860,7 +1848,7 @@ void Hashtable::print_tagset(std::string infilename)
 
     unsigned int i = 0;
     for (SeenSet::iterator pi = all_tags.begin(); pi != all_tags.end();
-            pi++, i++) {
+            ++pi, i++) {
         std::string kmer = _revhash(*pi, _ksize);
         printfile << kmer << "\n";
     }
@@ -1875,7 +1863,7 @@ unsigned int Hashtable::count_and_transfer_to_stoptags(SeenSet &keeper,
     unsigned int n_inserted = 0;
 
     SeenSet::const_iterator ti;
-    for (ti = keeper.begin(); ti != keeper.end(); ti++) {
+    for (ti = keeper.begin(); ti != keeper.end(); ++ti) {
         if (counting.get_count(*ti) >= threshold) {
             stop_tags.insert(*ti);
             n_inserted++;
@@ -1895,14 +1883,11 @@ const
         return;
     }
 
-    SeenSet path;
-    HashIntoType kmer;
-
     KMerIterator kmers(seq.c_str(), _ksize);
 
     unsigned int i = 0;
     while(!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
         if (set_contains(stop_tags, kmer)) {
             posns.push_back(i);
@@ -1927,7 +1912,6 @@ void Hashtable::extract_unique_paths(std::string seq,
     min_length = min_length - _ksize + 1; // adjust for k-mer size.
 
     KMerIterator kmers(seq.c_str(), _ksize);
-    HashIntoType kmer;
 
     std::deque<bool> seen_queue;
     unsigned int n_already_seen = 0;
@@ -1936,7 +1920,7 @@ void Hashtable::extract_unique_paths(std::string seq,
     // first, put together an array for presence/absence of the k-mer
     // at each given position.
     while (!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
         if (get_count(kmer)) {
             seen_queue.push_back(true);

@@ -54,7 +54,7 @@ std::vector<Node*>::iterator node_vector_find(std::vector<Node*>& a,
 }
 
 Node * Aligner::subalign(Node * startVert,
-                         unsigned int seqLen,
+                         unsigned long seqLen,
                          unsigned char forward,
                          std::set<Node*>& closed,
                          std::vector<Node*>& open,
@@ -106,7 +106,7 @@ Node * Aligner::subalign(Node * startVert,
 
 std::string Aligner::extractString(Node* goal,
                                    unsigned char forward,
-                                   std::map<int,int>* readDeletions)
+                                   std::map<unsigned long,unsigned long>* readDeletions)
 {
     std::string ret;
 
@@ -131,7 +131,7 @@ std::string Aligner::extractString(Node* goal,
     if (forward) {
         std::string tmp;
 
-        for (int i = ret.length()-1; i >= 0; i--) {
+        for (long long i = ret.length()-1; i >= 0; i--) {
             tmp += ret[i];
         }
 
@@ -181,7 +181,7 @@ CandidateAlignment Aligner::align(CountingHash * ch,
         return CandidateAlignment();
     }
 
-    std::map<int,int> readDels;
+    std::map<unsigned long,unsigned long> readDels;
 
     std::string align = extractString(leftGoal, 0, &readDels) +
                         kmer +
@@ -225,7 +225,7 @@ void Aligner::printErrorFootprint(const std::string& read)
 
         assert(kmer.length() == k);
 
-        int kCov = ch->get_count(kmer.c_str());
+        BoundedCounterType kCov = ch->get_count(kmer.c_str());
 
         bool isCorrect = isCorrectKmer(kCov, lambdaOne, lambdaTwo);
 
@@ -243,7 +243,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read)
     unsigned int longestErrorRegion = 0;
     unsigned int currentErrorRegion = 0;
 
-    unsigned int k = ch->ksize();
+    WordLength k = ch->ksize();
 
     std::set<CandidateAlignment> alignments;
     CandidateAlignment best = CandidateAlignment();
@@ -255,7 +255,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read)
 
         assert(kmer.length() == k);
 
-        int kCov = ch->get_count(kmer.c_str());
+        BoundedCounterType kCov = ch->get_count(kmer.c_str());
 
         bool isCorrect = isCorrectKmer(kCov, lambdaOne, lambdaTwo);
 
@@ -297,7 +297,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read)
 
     // read appears to be error free
     if (markers.size() == 1 && markers[0] == 0) {
-        std::map<int,int> readDels;
+        std::map<unsigned long,unsigned long> readDels;
         CandidateAlignment retAln = CandidateAlignment(readDels, read);
         return retAln;
     }
@@ -355,7 +355,7 @@ CandidateAlignment Aligner::alignRead(const std::string& read)
         }
     }
 
-    std::map<int,int> readDels;
+    std::map<unsigned long,unsigned long> readDels;
     CandidateAlignment retAln = CandidateAlignment(readDels, graphAlign);
     return retAln;
 }

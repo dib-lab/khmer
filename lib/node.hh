@@ -31,7 +31,7 @@ public:
     Node *parent;
     Kmer kmer;
     char emission; // change to enum
-    unsigned int stateNo;
+    unsigned long stateNo;
     char state; //change to enum
     double fval;
     double hval;
@@ -45,7 +45,7 @@ public:
     bool operator< (const Node &param) const;
 
     Node(Node* _parent, char _emission,
-         unsigned int _stateNo, char _state, Kmer _kmer);
+         unsigned long _stateNo, char _state, Kmer _kmer);
 
     Kmer makeNextKmer(unsigned char forward, char b);
 

@@ -34,7 +34,7 @@ def test_readalign():
     graphAlign, readAlign = aligner.align(read)
 
     assert readAlign == 'ACCTAGGTTCGACATGTACC'
-    assert graphAlign == 'AGCTAGGTTCGACAAGT-CC'
+    assert graphAlign == 'AGCTAGGTTCGACAAGT-CC', graphAlign
     #                                   ^  ^
 
 

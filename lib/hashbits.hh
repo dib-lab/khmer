@@ -20,7 +20,7 @@ class Hashbits : public khmer::Hashtable
 {
 protected:
     std::vector<HashIntoType> _tablesizes;
-    unsigned int _n_tables;
+    size_t _n_tables;
     HashIntoType _occupied_bins;
     HashIntoType _n_unique_kmers;
     HashIntoType _n_overlap_kmers;
@@ -31,7 +31,7 @@ protected:
 
         _counts = new Byte*[_n_tables];
 
-        for (unsigned int i = 0; i < _n_tables; i++) {
+        for (size_t i = 0; i < _n_tables; i++) {
             HashIntoType tablesize = _tablesizes[i];
             HashIntoType tablebytes = tablesize / 8 + 1;
 
@@ -53,7 +53,7 @@ public:
 
     ~Hashbits() {
         if (_counts) {
-            for (unsigned int i = 0; i < _n_tables; i++) {
+            for (size_t i = 0; i < _n_tables; i++) {
                 delete _counts[i];
                 _counts[i] = NULL;
             }
@@ -122,7 +122,7 @@ public:
     test_and_set_bits( HashIntoType khash ) {
         bool is_new_kmer = false;
 
-        for (unsigned int i = 0; i < _n_tables; i++) {
+        for (size_t i = 0; i < _n_tables; i++) {
             HashIntoType bin = khash % _tablesizes[i];
             HashIntoType byte = bin / 8;
             unsigned char bit = (unsigned char)(1 << (bin % 8));
@@ -155,7 +155,7 @@ public:
     virtual void count(HashIntoType khash) {
         bool is_new_kmer = false;
 
-        for (unsigned int i = 0; i < _n_tables; i++) {
+        for (size_t i = 0; i < _n_tables; i++) {
             HashIntoType bin = khash % _tablesizes[i];
             HashIntoType byte = bin / 8;
             unsigned char bit = bin % 8;
@@ -172,7 +172,7 @@ public:
 
     virtual bool check_overlap(HashIntoType khash, Hashbits &ht2) {
 
-        for (unsigned int i = 0; i < ht2._n_tables; i++) {
+        for (size_t i = 0; i < ht2._n_tables; i++) {
             HashIntoType bin = khash % ht2._tablesizes[i];
             HashIntoType byte = bin / 8;
             unsigned char bit = bin % 8;
@@ -191,7 +191,7 @@ public:
     virtual void count_overlap(HashIntoType khash, Hashbits &ht2) {
         bool is_new_kmer = false;
 
-        for (unsigned int i = 0; i < _n_tables; i++) {
+        for (size_t i = 0; i < _n_tables; i++) {
             HashIntoType bin = khash % _tablesizes[i];
             HashIntoType byte = bin / 8;
             unsigned char bit = bin % 8;
@@ -217,7 +217,7 @@ public:
 
     // get the count for the given k-mer hash.
     virtual const BoundedCounterType get_count(HashIntoType khash) const {
-        for (unsigned int i = 0; i < _n_tables; i++) {
+        for (size_t i = 0; i < _n_tables; i++) {
             HashIntoType bin = khash % _tablesizes[i];
             HashIntoType byte = bin / 8;
             unsigned char bit = bin % 8;

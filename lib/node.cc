@@ -107,7 +107,7 @@ Kmer Node::makeNextKmer(unsigned char forward, char b)
 
 Node::Node(Node* _parent,
            char _emission,
-           unsigned int _stateNo,
+           unsigned long _stateNo,
            char _state,
            Kmer _kmer) : kmer( _kmer)
 {
@@ -137,8 +137,8 @@ std::queue<Node*> Node::enumerate(CountingHash* ch,
 {
     std::queue<Node*> ret;
 
-    int index;
-    int remaining;
+    size_t index;
+    size_t remaining;
     double bestMatch = sm->score('A','A');
     double errorOffset = 20.0;
 

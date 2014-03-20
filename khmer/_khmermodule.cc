@@ -1619,7 +1619,7 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
     std::vector<HashIntoType> ts = counting->get_tablesizes();
 
     PyObject * x = PyList_New(ts.size());
-    for (unsigned int i = 0; i < ts.size(); i++) {
+    for (size_t i = 0; i < ts.size(); i++) {
         PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(ts[i]));
     }
 
@@ -1883,11 +1883,11 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
 
 static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
 {
-    unsigned int k = 0;
+    WordLength k = 0;
     PyListObject * sizes_list_o = NULL;
     unsigned int n_threads = 1;
 
-    if (!PyArg_ParseTuple(args, "IO!|I", &k, &PyList_Type, &sizes_list_o,
+    if (!PyArg_ParseTuple(args, "bO!|I", &k, &PyList_Type, &sizes_list_o,
                           &n_threads)) {
         return NULL;
     }
@@ -1898,9 +1898,17 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
         return NULL;
     }
-    for (int i = 0; i < sizes_list_o_length; i++) {
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
         PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-        sizes.push_back(PyLong_AsLongLong(size_o));
+        if (PyInt_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+        } else if (PyLong_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+        } else {
+            return NULL;
+        }
     }
 
     khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
@@ -2120,7 +2128,7 @@ static PyObject * hashbits_n_tags(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyInt_FromLong(hashbits->n_tags());
+    return PyInt_FromSize_t(hashbits->n_tags());
 }
 
 static PyObject * hashbits_count(PyObject * self, PyObject * args)
@@ -2365,7 +2373,7 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned long trim_at;
+    size_t trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     trim_at = hashbits->trim_on_stoptags(seq);
@@ -2376,7 +2384,7 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, (unsigned long) trim_at);
     Py_DECREF(trim_seq);
 
     return ret;
@@ -2872,7 +2880,7 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
         output_unassigned = true;
     }
 
-    unsigned int n_partitions = 0;
+    size_t n_partitions = 0;
 
     try {
         SubsetPartition * subset_p = hashbits->partition;
@@ -2999,10 +3007,10 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned int n_partitions = 0, n_unassigned = 0;
+    size_t n_partitions = 0, n_unassigned = 0;
     hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("II", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -3017,10 +3025,10 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
     SubsetPartition * subset_p;
     subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
 
-    unsigned int n_partitions = 0, n_unassigned = 0;
+    size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("II", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
@@ -3477,7 +3485,7 @@ static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
     std::vector<HashIntoType> ts = hashbits->get_tablesizes();
 
     PyObject * x = PyList_New(ts.size());
-    for (unsigned int i = 0; i < ts.size(); i++) {
+    for (size_t i = 0; i < ts.size(); i++) {
         PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(ts[i]));
     }
 
@@ -3625,18 +3633,27 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
     self = (khmer_KHashbitsObject *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        unsigned int k = 0;
+        WordLength k = 0;
         PyListObject* sizes_list_o = NULL;
 
-        if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
         std::vector<HashIntoType> sizes;
-        for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
+        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            sizes.push_back(PyLong_AsLongLong(size_o));
+            if (PyInt_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+            } else if (PyLong_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+            } else if (PyFloat_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+            } else {
+                return NULL;
+            }
         }
 
         self->hashbits = new Hashbits(k, sizes);
@@ -3664,10 +3681,10 @@ static PyObject * subset_count_partitions(PyObject * self,
         return NULL;
     }
 
-    unsigned int n_partitions = 0, n_unassigned = 0;
+    size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("II", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", n_partitions, n_unassigned);
 }
 
 static PyObject * subset_report_on_partitions(PyObject * self,
@@ -3883,19 +3900,29 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
     self = (khmer_KLabelHashObject*)type->tp_alloc(type, 0);
 
     if (self!=NULL) {
-        unsigned int k = 0;
+        WordLength k = 0;
         PyListObject * sizes_list_o = NULL;
 
-        if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
         std::vector<HashIntoType> sizes;
-        for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
+        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            sizes.push_back(PyLong_AsLongLong(size_o));
+            if (PyInt_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+            } else if (PyLong_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+            } else if (PyFloat_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+            } else {
+                return NULL;
+            }
         }
+
 
         // We want the hashbits pointer in the base class to point to our labelhash,
         // so that the KHashbits methods are called on the correct object (a LabelHash)
@@ -4191,7 +4218,7 @@ static PyObject * labelhash_n_labels(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyInt_FromLong(labelhash->n_labels());
+    return PyInt_FromSize_t(labelhash->n_labels());
 }
 
 static PyMethodDef khmer_labelhash_methods[] = {
@@ -4404,18 +4431,28 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
 
 static PyObject* _new_hashbits(PyObject * self, PyObject * args)
 {
-    unsigned int k = 0;
+    WordLength k = 0;
     PyListObject * sizes_list_o = NULL;
 
-    if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
+    if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
         return NULL;
     }
 
     std::vector<HashIntoType> sizes;
-    for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
+    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
         PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-        sizes.push_back(PyLong_AsLongLong(size_o));
+        if (PyInt_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+        } else if (PyLong_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+        } else {
+            return NULL;
+        }
     }
+
 
     khmer_KHashbitsObject * khashbits_obj = (khmer_KHashbitsObject *) \
                                             PyObject_New(khmer_KHashbitsObject, &khmer_KHashbitsType);

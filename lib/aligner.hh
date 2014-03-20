@@ -21,10 +21,10 @@ namespace khmer
 class CandidateAlignment
 {
 public:
-    std::map<int,int> readDeletions;
+    std::map<unsigned long,unsigned long> readDeletions;
     std::string alignment;
 
-    CandidateAlignment(std::map<int,int> _readDel, std::string _aln) {
+    CandidateAlignment(std::map<unsigned long,unsigned long> _readDel, std::string _aln) {
         readDeletions = _readDel;
         alignment = _aln;
     }
@@ -66,7 +66,7 @@ public:
     }
 
     void outputReadDels() {
-        std::map<int, int>::iterator it;
+        std::map<unsigned long, unsigned long>::iterator it;
 
         for (it = readDeletions.begin(); it != readDeletions.end(); it++) {
             std::cout << "Key: " << (*it).first << " Value: " <<
@@ -79,15 +79,15 @@ class Aligner
 {
     khmer::CountingHash * ch;
     ScoringMatrix * sm;
-    int k;
+    WordLength k;
     double lambdaOne; // error distribution parameter
     double lambdaTwo; // non-error distribution parameter
     unsigned int maxErrorRegion;
 
 public:
-    Node * subalign(Node *, unsigned int, unsigned char, std::set<Node*>&,
+    Node * subalign(Node *, unsigned long, unsigned char, std::set<Node*>&,
                     std::vector<Node*>&, const std::string&);
-    std::string extractString(Node*, unsigned char, std::map<int,int>*);
+    std::string extractString(Node*, unsigned char, std::map<unsigned long,unsigned long>*);
     CandidateAlignment align(khmer::CountingHash*, const std::string&,
                              const std::string&, int);
 
@@ -102,7 +102,7 @@ public:
         maxErrorRegion = maxErrorReg;
     }
 
-    int ksize() {
+    WordLength ksize() {
         return k;
     }
 
