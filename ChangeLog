@@ -1,3 +1,10 @@
+2014-03-19  Titus Brown  <t@idyll.org>
+
+    * Makefile: update documentation on targets at top; clean autopep8 output.
+    * test_counting_single.py: fixed pep8 violations in spacing
+    * test_scripts.py: eliminate popenscript in favor of proper SystemExit
+	handling in runscript; fix pep8 violations.
+
 2014-03-17  Ram RS  <ramrs@nyu.edu>
 
     * extract-partitions.py: pylint warnings addressed
