@@ -3,11 +3,13 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
+
+# pylint: disable=C0111,C0103,E1103,W0612
+
 import sys
 import os
 import shutil
 from cStringIO import StringIO
-import subprocess
 import traceback
 
 import tests.khmer_tst_utils as utils
@@ -51,6 +53,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
             print 'arguments', sysargs
             execfile(scriptname, {'__name__': '__main__'})
             status = 0
+        except SystemExit, e:
+            status = e.code
         except:
             traceback.print_exc(file=sys.stderr)
             status = -1
@@ -62,6 +66,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
         os.chdir(cwd)
 
     if status != 0 and not fail_ok:
+        print out
+        print err
         raise Exception(status, out, err)
 
     return status, out, err
@@ -103,39 +109,6 @@ def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
 
     return status, "", ""
 
-#
-
-
-# When testing argparse related options execfile does not work
-# TODO: figure out why replacing runscript with popenscript uses more memory
-def popenscript(scriptname, args, in_directory=None, fail_ok=False):
-    """
-    Run the given Python script, with the given args, in the given directory,
-    using 'Popen'.
-    """
-
-    out, err = None, None
-
-    try:
-        print 'running:', scriptname, 'in:', in_directory
-        print 'arguments', args
-        complete_args = [scriptname]
-        complete_args.extend(args)
-        process = subprocess.Popen(complete_args,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   cwd=in_directory)
-        out, err = process.communicate()
-        status = process.returncode
-    except:
-        traceback.print_exc(file=sys.stderr)
-        status = -1
-
-    if status != 0 and not fail_ok:
-        raise Exception(status, out, err)
-
-    return status, out, err
-
 
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
@@ -160,9 +133,7 @@ def test_load_into_counting_fail():
     args.extend([outfile, infile])
 
     (status, out, err) = runscript(script, args, fail_ok=True)
-    print out
-    print err
-    assert status == -1
+    assert status == 1, status
     assert "ERROR:" in err
 
 
@@ -386,10 +357,9 @@ def test_normalize_by_median():
 
 
 def test_normalize_by_median_version():
-
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
-    status, out, err = popenscript(script, args)
+    status, out, err = runscript(script, args)
     assert err.startswith('khmer ')
 
 
@@ -626,7 +596,7 @@ def test_load_graph_fail():
     args.extend([outfile, infile])
 
     (status, out, err) = runscript(script, args, fail_ok=True)
-    assert status == -1
+    assert status == 1, status
     assert "ERROR:" in err
 
 
