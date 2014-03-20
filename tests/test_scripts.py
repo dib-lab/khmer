@@ -1408,7 +1408,7 @@ def test_count_overlap():
     curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
     shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
-    htfile = _make_graph(seqfile1, K=20)
+    htfile = _make_graph(seqfile1, ksize=20)
     ht_dir = os.path.dirname(htfile)
     script = scriptpath('count-overlap.py')
     args = ['--ksize', '20', '--n_hashes', '2', '--hashsize', '10000000',
