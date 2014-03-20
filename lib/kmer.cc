@@ -16,7 +16,7 @@ namespace khmer
 Kmer::Kmer(std::string kmer)
 {
     _hash(kmer.c_str(), kmer.size(), h, r);
-    k = kmer.size();
+    k = (unsigned int) kmer.size();
 
     if (kmer == _revhash(h, k)) {
         direction = 1;

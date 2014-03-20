@@ -40,8 +40,8 @@ static void print_tag_set(SeenSet& p)
 
 #endif //0
 
-void SubsetPartition::count_partitions(unsigned int& n_partitions,
-				       unsigned int& n_unassigned)
+void SubsetPartition::count_partitions(size_t& n_partitions,
+				       size_t& n_unassigned)
 {
   n_partitions = 0;
   n_unassigned = 0;
@@ -66,7 +66,7 @@ void SubsetPartition::count_partitions(unsigned int& n_partitions,
 }
 
 
-unsigned int SubsetPartition::output_partitioned_file(const std::string infilename,
+size_t SubsetPartition::output_partitioned_file(const std::string infilename,
 						      const std::string outputfile,
 						      bool output_unassigned,
 						      CallbackFn callback,
@@ -77,7 +77,7 @@ unsigned int SubsetPartition::output_partitioned_file(const std::string infilena
 
   unsigned int total_reads = 0;
   unsigned int reads_kept = 0;
-  unsigned int n_singletons = 0;
+  size_t n_singletons = 0;
 
   PartitionSet partitions;
 
@@ -575,8 +575,8 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
     breadth_q.push(0);
   }
 
-  unsigned int seq_length = node_q.size() / 2;
-  unsigned int BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
+  size_t seq_length = node_q.size() / 2;
+  size_t BIG_PERIMETER_TRAVERSALS = BIG_TRAVERSALS_ARE * seq_length;
 
   //unsigned int cur_it = 0;
   while(!node_q.empty()) {
@@ -1186,9 +1186,9 @@ void SubsetPartition::merge_from_disk(string other_filename)
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
 
-  unsigned int n_bytes = 0;
+  long n_bytes = 0;
   unsigned int loaded = 0;
-  unsigned int remainder;
+  long remainder;
 
   assert(infile.is_open());
 
@@ -1312,8 +1312,9 @@ void SubsetPartition::_validate_pmap()
     PartitionID * pp_id = (*pi).second;
 
     if (pp_id != NULL) {
-      assert(*pp_id >= 1);
-      assert(*pp_id < next_partition_id);
+      if (!(*pp_id >= 1) || !(*pp_id < next_partition_id)) {
+	      throw std::exception();
+      }
     }
   }
 
@@ -1322,14 +1323,18 @@ void SubsetPartition::_validate_pmap()
     PartitionID p = (*ri).first;
     PartitionPtrSet *s = (*ri).second;
 
-    assert(s != NULL);
+    if (!(s != NULL)) {
+	    throw std::exception();
+    }
 
     for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
 	 si++) {
       PartitionID * pp;
       pp = *si;
 
-      assert (p == *pp);
+      if (!(p == *pp)) {
+	      throw std::exception();
+      }
     }
   }
 }
@@ -1452,7 +1457,7 @@ void SubsetPartition::partition_average_coverages(PartitionCountMap& cm,
   }
 }
 
-unsigned int SubsetPartition::repartition_largest_partition(unsigned int distance,
+unsigned long long SubsetPartition::repartition_largest_partition(unsigned int distance,
 						    unsigned int threshold,
 						    unsigned int frequency,
 						    CountingHash &counting)
@@ -1460,7 +1465,7 @@ unsigned int SubsetPartition::repartition_largest_partition(unsigned int distanc
   PartitionCountMap cm;
   unsigned int n_unassigned = 0;
   PartitionID biggest_p = 0;
-  unsigned int next_largest = 0;
+  unsigned long long next_largest = 0;
 
 #if VERBOSE_REPARTITION
   std::cout << "calculating partition size distribution.\n";

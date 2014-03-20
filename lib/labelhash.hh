@@ -87,7 +87,7 @@ namespace khmer {
         LabelTagPtrMap label_tag_ptrs;
         LabelPtrMap label_ptrs;
 
-        unsigned int n_labels() const { return label_ptrs.size(); }
+        size_t n_labels() const { return label_ptrs.size(); }
  
     
         Label * check_and_allocate_label(Label new_label) {

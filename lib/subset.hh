@@ -109,10 +109,10 @@ namespace khmer {
 				     CallbackFn callback=0,
 				     void * callback_data=0);
 
-    void count_partitions(unsigned int& n_partitions,
-			  unsigned int& n_unassigned);
+    void count_partitions(size_t& n_partitions,
+			  size_t& n_unassigned);
 
-    unsigned int output_partitioned_file(const std::string infilename,
+    size_t output_partitioned_file(const std::string infilename,
 					 const std::string outputfilename,
 					 bool output_unassigned=false,
 					 CallbackFn callback=0,
@@ -137,7 +137,7 @@ namespace khmer {
     void partition_average_coverages(PartitionCountMap &cm,
 				     CountingHash * ht) const;
 
-    unsigned int repartition_largest_partition(unsigned int, unsigned int,
+    unsigned long long repartition_largest_partition(unsigned int, unsigned int,
 					       unsigned int, CountingHash&);
 
     void repartition_a_partition(const SeenSet& partition_tags);

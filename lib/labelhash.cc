@@ -75,13 +75,12 @@ LabelHash::consume_fasta_and_tag_with_labels(
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( ))
     {
-      unsigned long long this_n_consumed   = 0;
-
       read = parser->get_next_read( );
 
       if (check_and_normalize_read( read.sequence ))
       {
         // TODO: make threadsafe!
+	unsigned long long this_n_consumed = 0;
         the_label = check_and_allocate_label(_tag_label);
         consume_sequence_and_tag_with_labels( read.sequence,
 					      this_n_consumed,
@@ -209,7 +208,6 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
 
     printdbg(inside low-level labelhash consume sequence function)
 
-    bool is_new_kmer;
     bool kmer_tagged;
 
     KMerIterator kmers(seq.c_str(), _ksize);
@@ -220,6 +218,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
     printdbg(entering while loop)
     while(!kmers.done()) {
       kmer = kmers.next();
+      bool is_new_kmer;
 
       if ((is_new_kmer = test_and_set_bits( kmer ))) {
         ++n_consumed;
@@ -335,11 +334,10 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
                                               LabelPtrSet& found_labels) {
   
   SeenSet::const_iterator si;
-  unsigned int num_labels = 0;
   for (si=tagged_kmers.begin(); si!=tagged_kmers.end(); ++si) {
     HashIntoType tag = *si;
     // get the labels associated with this tag
-    num_labels = _get_tag_labels(tag, tag_labels, found_labels);
+    unsigned int num_labels = _get_tag_labels(tag, tag_labels, found_labels);
     if (num_labels > 1) {
       // reconcile labels
       // for now do nothing ha

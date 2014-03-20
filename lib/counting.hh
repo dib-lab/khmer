@@ -36,7 +36,7 @@ protected:
     bool _use_bigcount;		// keep track of counts > Bloom filter hash count threshold?
     uint32_t _bigcount_spin_lock;
     std::vector<HashIntoType> _tablesizes;
-    unsigned int _n_tables;
+    size_t _n_tables;
 
     Byte ** _counts;
 
@@ -44,7 +44,7 @@ protected:
         _n_tables = _tablesizes.size();
 
         _counts = new Byte*[_n_tables];
-        for (unsigned int i = 0; i < _n_tables; i++) {
+        for (size_t i = 0; i < _n_tables; i++) {
             _counts[i] = new Byte[_tablesizes[i]];
             memset(_counts[i], 0, _tablesizes[i]);
         }
@@ -78,7 +78,7 @@ public:
 
     virtual ~CountingHash() {
         if (_counts) {
-            for (unsigned int i = 0; i < _n_tables; i++) {
+            for (size_t i = 0; i < _n_tables; i++) {
                 delete _counts[i];
                 _counts[i] = NULL;
             }
@@ -145,7 +145,6 @@ public:
 
         unsigned int  n_full	  = 0;
 
-        // TODO: Time how long this loop takes with PerformanceMetrics.
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
             // NOTE: Technically, multiple threads can cause the bin to spill

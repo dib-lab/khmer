@@ -52,16 +52,15 @@ void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KMerIterator kmers(s.c_str(), _ksize);
-    HashIntoType kmer;
 
-    BoundedCounterType min_count = MAX_COUNT, count;
+    BoundedCounterType min_count = MAX_COUNT;
 
     while(!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
-        count = this->get_count(kmer);
+        BoundedCounterType count = this->get_count(kmer);
 
-        if (count < min_count) {
+        if (this->get_count(kmer) < min_count) {
             min_count = count;
         }
     }
@@ -72,13 +71,12 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
 {
     KMerIterator kmers(s.c_str(), _ksize);
 
-    BoundedCounterType max_count = 0, count;
+    BoundedCounterType max_count = 0;
 
-    HashIntoType kmer;
     while(!kmers.done()) {
-        kmer = kmers.next();
+        HashIntoType kmer = kmers.next();
 
-        count = this->get_count(kmer);
+        BoundedCounterType count = this->get_count(kmer);
 
         if (count > max_count) {
             max_count = count;
@@ -102,7 +100,6 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
 
     string name;
     string seq;
-    unsigned long long read_num = 0;
 
     // if not, could lead to overflow.
     assert(sizeof(BoundedCounterType) == 2);
@@ -112,11 +109,10 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
         seq = read.sequence;
 
         if (check_and_normalize_read(seq)) {
-            HashIntoType kmer;
             KMerIterator kmers(seq.c_str(), _ksize);
 
             while(!kmers.done()) {
-                kmer = kmers.next();
+                HashIntoType kmer = kmers.next();
 
                 if (!tracking->get_count(kmer)) {
                     tracking->count(kmer);
@@ -130,7 +126,6 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
             seq.clear();
         }
 
-        read_num += 1;
     }
     return dist;
 }
@@ -166,9 +161,7 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
         read = parser->get_next_read();
 
         seq = read.sequence;
-        bool valid_read = true;
-
-        valid_read = check_and_normalize_read(seq);
+        bool valid_read = check_and_normalize_read(seq);
 
         if (valid_read) {
             for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -216,10 +209,8 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
 
     while(!parser->is_complete()) {
         read = parser->get_next_read();
-        bool valid_read = true;
+        bool valid_read = check_and_normalize_read(seq);
         seq = read.sequence;
-
-        valid_read = check_and_normalize_read(seq);
 
         if (valid_read) {
             for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
@@ -267,13 +258,12 @@ void CountingHash::get_kadian_count(const std::string &s,
                                     BoundedCounterType &kadian,
                                     unsigned int nk)
 {
-    BoundedCounterType count;
     std::vector<BoundedCounterType> counts;
     KMerIterator kmers(s.c_str(), _ksize);
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
-        count = this->get_count(kmer);
+        BoundedCounterType count = this->get_count(kmer);
         counts.push_back(count);
     }
 
@@ -312,7 +302,6 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
     IParser* parser = IParser::get_parser(filename.c_str());
     string name;
     string seq;
-    unsigned long long read_num = 0;
 
     while(!parser->is_complete()) {
         read = parser->get_next_read();
@@ -331,18 +320,6 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
             seq.clear();
         }
 
-        read_num += 1;
-
-#if 0
-        // run callback, if specified
-        if (read_num % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("abundance_distribution", callback_data, read_num, 0);
-            } catch (...) {
-                throw;
-            }
-        }
-#endif // 0
     }
 
     delete parser;
@@ -365,7 +342,6 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
     IParser* parser = IParser::get_parser(filename.c_str());
     string name;
     string seq;
-    unsigned long long read_num = 0;
 
     while(!parser->is_complete()) {
         read = parser->get_next_read();
@@ -388,18 +364,6 @@ void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
             seq.clear();
         }
 
-        read_num += 1;
-
-#if 0
-        // run callback, if specified
-        if (read_num % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("abundance_distribution", callback_data, read_num, 0);
-            } catch (...) {
-                throw;
-            }
-        }
-#endif // 0
     }
 
     delete parser;
@@ -458,8 +422,6 @@ const
 
     KMerIterator kmers(seq.c_str(), _ksize);
 
-    SeenSet path;
-
     HashIntoType kmer;
 
     if (kmers.done()) {
@@ -494,8 +456,6 @@ const
     }
 
     KMerIterator kmers(seq.c_str(), _ksize);
-
-    SeenSet path;
 
     HashIntoType kmer;
 
@@ -669,7 +629,8 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
 
         HashIntoType loaded = 0;
         while (loaded != tablesize) {
-            loaded += gzread(infile, (char *) ht._counts[i], (unsigned) tablesize - loaded);
+            loaded += gzread(infile, (char *) ht._counts[i],
+			    (unsigned) (tablesize - loaded));
         }
     }
 
@@ -730,7 +691,7 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
     if (n_counts) {
         KmerCountMap::const_iterator it = ht._bigcounts.begin();
 
-        for (; it != ht._bigcounts.end(); it++) {
+        for (; it != ht._bigcounts.end(); ++it) {
             outfile.write((const char *) &it->first, sizeof(it->first));
             outfile.write((const char *) &it->second, sizeof(it->second));
         }
@@ -770,7 +731,8 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
         gzwrite(outfile, (const char *) &save_tablesize, sizeof(save_tablesize));
         unsigned long long written = 0;
         while (written != save_tablesize) {
-            written += gzwrite(outfile, (const char *) ht._counts[i], (int) save_tablesize - written);
+            written += gzwrite(outfile, (const char *) ht._counts[i],
+			    (int) (save_tablesize - written));
         }
     }
 
@@ -780,7 +742,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
     if (n_counts) {
         KmerCountMap::const_iterator it = ht._bigcounts.begin();
 
-        for (; it != ht._bigcounts.end(); it++) {
+        for (; it != ht._bigcounts.end(); ++it) {
             gzwrite(outfile, (const char *) &it->first, sizeof(it->first));
             gzwrite(outfile, (const char *) &it->second, sizeof(it->second));
         }
@@ -799,7 +761,6 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
     IParser* parser = IParser::get_parser(filename.c_str());
     Read read;
 
-    string currName = "";
     string currSeq = "";
 
     //
@@ -811,17 +772,15 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
     while(!parser->is_complete() && !done)  {
         read = parser->get_next_read();
         currSeq = read.sequence;
-        currName = read.name;
 
         // do we want to process it?
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
             KMerIterator kmers(sp, _ksize);
-            HashIntoType kmer;
 
             while(!kmers.done()) {
-                kmer = kmers.next();
+                HashIntoType kmer = kmers.next();
 
                 count(kmer);
                 if (get_count(kmer) >= upper_count) {
@@ -839,7 +798,6 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
     }
 
     delete parser;
-    parser = NULL;
 
     unsigned long long stop_at_read = total_reads;
 
@@ -853,17 +811,15 @@ void CountingHash::collect_high_abundance_kmers(const std::string &filename,
     while(!parser->is_complete() && total_reads != stop_at_read)  {
         read = parser->get_next_read();
         currSeq = read.sequence;
-        currName = read.name;
 
         // do we want to process it?
         if (check_and_normalize_read(currSeq)) {
             const char * sp = currSeq.c_str();
 
             KMerIterator kmers(sp, _ksize);
-            HashIntoType kmer;
 
             while(!kmers.done()) {
-                kmer = kmers.next();
+                HashIntoType kmer = kmers.next();
 
                 if (get_count(kmer) >= lower_count) {
                     found_kmers.insert(kmer);
