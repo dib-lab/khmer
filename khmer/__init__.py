@@ -20,6 +20,8 @@ from _khmer import _Hashbits
 
 from struct import pack, unpack
 
+import utils
+
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
