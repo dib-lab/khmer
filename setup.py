@@ -43,9 +43,9 @@ ZLIBDIR = 'lib/zlib'
 BZIP2DIR = 'lib/bzip2'
 
 EXTRA_OBJS = []
-EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".o") for bn in
+EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".lo") for bn in
                   [
-                      "adler32", "compress", "crc32", "deflate", "gzio",
+                      "adler32", "compress", "crc32", "deflate",
                       "infback", "inffast", "inflate", "inftrees", "trees",
                       "uncompr", "zutil"
                   ])
@@ -141,8 +141,8 @@ class BuildExt(_build_ext):  # pylint: disable=R0904
     Only run the library setup when needed, not on every invocation."""
 
     def run(self):
-        call('cd ' + ZLIBDIR + ' && ( test -f Makefile || bash'
-             ' ./configure --shared ) && make libz.a',
+        call('cd ' + ZLIBDIR + ' && ( test Makefile -nt configure || bash'
+             ' ./configure --static ) && make -f Makefile.pic PIC',
              shell=True)
         call('cd ' + BZIP2DIR + ' && make -f Makefile-libbz2_so all',
              shell=True)
