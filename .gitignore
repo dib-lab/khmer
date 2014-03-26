@@ -1,3 +1,4 @@
+*.lo
 *.pyc
 *.o
 *.so
@@ -27,3 +28,4 @@ pylint.out
 .coverage
 doxygen.out
 doc/doxygen
+lib/zlib/zconf.h

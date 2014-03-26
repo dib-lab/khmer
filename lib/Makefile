@@ -173,7 +173,7 @@ all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbit
 clean:
 	-(cd $(ZLIB_DIR) && make clean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
-	rm -f *.o $(DRV_PROGS) $(AUX_PROGS)
+	rm -f *.o $(DRV_PROGS) $(AUX_PROGS) zlib/Makefile
 
 test: $(DRV_PROGS) $(AUX_PROGS)
 
