@@ -134,7 +134,7 @@ class Test_KTable:
         kt.consume(s)
 
         assert "CCCAA" in kt
-        assert not "GGGGG" in kt
+        assert "GGGGG" not in kt
 
     def test_intersection(self):
         kt = self.kt

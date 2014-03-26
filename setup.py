@@ -43,33 +43,23 @@ ZLIBDIR = 'lib/zlib'
 BZIP2DIR = 'lib/bzip2'
 
 EXTRA_OBJS = []
-EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".lo") for bn in
-                  [
-                      "adler32", "compress", "crc32", "deflate",
-                      "infback", "inffast", "inflate", "inftrees", "trees",
-                      "uncompr", "zutil"
-                  ])
-EXTRA_OBJS.extend(path_join("lib", "bzip2", bn + ".o") for bn in
-                  [
-                      "blocksort", "huffman", "crctable", "randtable",
-                      "compress", "decompress", "bzlib",
-                  ])
+EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".lo") for bn in [
+    "adler32", "compress", "crc32", "deflate", "infback", "inffast", "inflate",
+    "inftrees", "trees", "uncompr", "zutil"])
+EXTRA_OBJS.extend(path_join("lib", "bzip2", bn + ".o") for bn in [
+    "blocksort", "huffman", "crctable", "randtable", "compress", "decompress",
+    "bzlib"])
 
 BUILD_DEPENDS = list(EXTRA_OBJS)
-BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in
-                     [
-                         "storage", "khmer", "khmer_config", "ktable",
-                         "hashtable", "counting", "hashbits", "labelhash",
-                     ])
+BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
+    "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting",
+    "hashbits", "labelhash"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
-SOURCES.extend(path_join("lib", bn + ".cc") for bn in
-               [
-                   "khmer_config", "thread_id_map", "trace_logger",
-                   "perf_metrics", "read_parsers", "ktable", "hashtable",
-                   "hashbits", "labelhash", "counting", "subset", "aligner",
-                   "scoringmatrix", "node", "kmer",
-               ])
+SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
+    "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
+    "read_parsers", "ktable", "hashtable", "hashbits", "labelhash", "counting",
+    "subset", "aligner", "scoringmatrix", "node", "kmer"])
 
 EXTENSION_MOD_DICT = \
     {
