@@ -1,23 +1,29 @@
+# make pep8 to check for basic Python code compliance
+# make autopep8 to fix most pep8 errors
+# make pylint to check Python code for enhanced compliance including naming
+#  and documentation
+
 all:
-	python setup.py build_ext --inplace
+	./setup.py build_ext --inplace
 
 install: FORCE
-	python setup.py install
+	./setup.py install
 
 dist: FORCE
-	python setup.py sdist
+	./setup.py sdist
 
 clean: FORCE
-	python setup.py clean --all
-	cd lib && make clean
+	./setup.py clean --all
+	cd lib && ${MAKE} clean
 	cd tests && rm -rf khmertest_*
 	rm -f khmer/_khmermodule.so
 
 debug:
-	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug --inplace
+	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
+		--inplace
 
 doc: FORCE
-	python setup.py build_sphinx --fresh-env
+	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
@@ -32,16 +38,38 @@ cppcheck: FORCE
 		-i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS lib 
 
 pep8: FORCE
-	pep8 setup.py khmer/ scripts/ tests/
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/
 
 autopep8: FORCE
-	autopep8 setup.py khmer/ scripts/ tests/ --recursive --in-place --pep8-passes 2000 --verbose
+	autopep8 --recursive --in-place --exclude _version.py --ignore E309 setup.py \
+		khmer/ scripts/ tests/
+
+pylint: all FORCE
+	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
+		|| true
+
+coverage.xml: FORCE
+	coverage run --branch --source=scripts,khmer -m nose --with-xunit \
+		--attr=\!known_failing --processes=0
+	coverage xml
+
+coverage-gcovr.xml: FORCE
+	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
+		--output=coverage-gcovr.xml
+
+nosetests.xml: all
+	./setup.py nosetests --with-xunit
+
+doxygen: FORCE
+	mkdir -p doc/doxygen
+	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > Doxyfile
+	doxygen
 
 lib:
 	cd lib && \
 	$(MAKE)
 
 test: all
-	python setup.py nosetests
+	./setup.py nosetests
 
 FORCE:

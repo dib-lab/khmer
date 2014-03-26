@@ -111,16 +111,18 @@ def normalize_by_median(input_filename, outfp, ht, args, report_fp=None):
     return total, discarded
 
 
-def handle_error(error, output_name, input_name, ht):
+def handle_error(error, output_name, input_name, fail_save, ht):
     print >>sys.stderr, '** ERROR:', error
     print >>sys.stderr, '** Failed on {name}: '.format(name=input_name)
-    hashname = os.path.basename(input_name) + '.ht.failed'
-    print >>sys.stderr, '** ...dumping hashtable to {ht}'.format(ht=hashname)
-    ht.save(hashname)
+    if fail_save:
+        hashname = os.path.basename(input_name) + '.ht.failed'
+        print >>sys.stderr,\
+            '** ...dumping hashtable to {ht}'.format(ht=hashname)
+        ht.save(hashname)
     try:
         os.remove(output_name)
     except:
-        print >>sys.stderr, '** ERROR: problem removing erroneous .keep file'
+        print >>sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
 def main():
@@ -131,12 +133,18 @@ def main():
     parser.add_argument('-s', '--savehash', dest='savehash', default='')
     parser.add_argument('-R', '--report-to-file', dest='report_file',
                         type=argparse.FileType('w'))
-    parser.add_argument('-f', '--force-processing', dest='force',
+    parser.add_argument('-f', '--fault-tolerant', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
+    parser.add_argument('--save-on-failure', dest='fail_save',
+                        action='store_false', default=True,
+                        help='Save hashtable when an error occurs')
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump hashtable every d files',
                         default=-1)
+    parser.add_argument('-o', '--out', dest='single_output_filename',
+                        default='', help='only output a single'
+                        ' file with the specified filename')
     parser.add_argument('input_filenames', nargs='+')
     add_loadhash_args(parser)
 
@@ -152,6 +160,7 @@ def main():
     filenames = args.input_filenames
     force = args.force
     dump_frequency = args.dump_frequency
+    fail_save = args.fail_save
 
     # list to save error files along with throwing exceptions
     if force is True:
@@ -168,8 +177,12 @@ def main():
     discarded = 0
 
     for n, input_filename in enumerate(filenames):
-        output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w')
+        if args.single_output_filename != '':
+            output_name = args.single_output_filename
+            outfp = open(args.single_output_filename, 'a')
+        else:
+            output_name = os.path.basename(input_filename) + '.keep'
+            outfp = open(output_name, 'w')
 
         total_acc = 0
         discarded_acc = 0
@@ -179,10 +192,10 @@ def main():
                                                            outfp, ht, args,
                                                            report_fp)
         except IOError as e:
-            handle_error(e, output_name, input_filename, ht)
+            handle_error(e, output_name, input_filename, fail_save, ht)
             if not force:
                 print >>sys.stderr, '** Exiting!'
-                sys.exit(-1)
+                sys.exit(1)
             else:
                 print >>sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
@@ -229,7 +242,7 @@ def main():
         print >>sys.stderr, "** this data set.  Increase hashsize/num ht."
         print >>sys.stderr, "**"
         print >>sys.stderr, "** Do not use these results!!"
-        sys.exit(-1)
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import khmer
 import khmer_tst_utils as utils
@@ -51,7 +52,7 @@ def test_complete_no_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == kt.n_entries(),  n_rc_filled
+    assert n_rc_filled == kt.n_entries(), n_rc_filled
     assert n_palindromes == 16, n_palindromes  # @CTB check this
     assert n_fwd_filled == kt.n_entries() / 2 + n_palindromes / 2, \
         n_fwd_filled
@@ -75,7 +76,7 @@ def test_complete_2_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == 128,  n_rc_filled
+    assert n_rc_filled == 128, n_rc_filled
     # @CTB assert n_fwd_filled == 100 # kt.n_entries() / 2, n_fwd_filled
 
 
@@ -97,7 +98,7 @@ def test_complete_4_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == 64,  n_rc_filled
+    assert n_rc_filled == 64, n_rc_filled
     # @CTB assert n_fwd_filled == kt.n_entries() / 2, n_fwd_filled
 
 

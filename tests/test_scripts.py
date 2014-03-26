@@ -1,15 +1,19 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
+
+# pylint: disable=C0111,C0103,E1103,W0612
+
 import sys
 import os
 import shutil
 from cStringIO import StringIO
 import traceback
 
-import khmer_tst_utils as utils
+import tests.khmer_tst_utils as utils
 import khmer
 import screed
 
@@ -50,6 +54,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
             print 'arguments', sysargs
             execfile(scriptname, {'__name__': '__main__'})
             status = 0
+        except SystemExit, e:
+            status = e.code
         except:
             traceback.print_exc(file=sys.stderr)
             status = -1
@@ -61,6 +67,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
         os.chdir(cwd)
 
     if status != 0 and not fail_ok:
+        print out
+        print err
         raise Exception(status, out, err)
 
     return status, out, err
@@ -102,8 +110,6 @@ def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
 
     return status, "", ""
 
-#
-
 
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
@@ -128,9 +134,7 @@ def test_load_into_counting_fail():
     args.extend([outfile, infile])
 
     (status, out, err) = runscript(script, args, fail_ok=True)
-    print out
-    print err
-    assert status == -1
+    assert status == 1, status
     assert "ERROR:" in err
 
 
@@ -353,6 +357,13 @@ def test_normalize_by_median():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
 
+def test_normalize_by_median_version():
+    script = scriptpath('normalize-by-median.py')
+    args = ['--version']
+    status, out, err = runscript(script, args)
+    assert err.startswith('khmer ')
+
+
 def test_normalize_by_median_2():
     CUTOFF = '2'
 
@@ -440,6 +451,7 @@ def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
     hashfile = utils.get_temp_filename('test-out.kh')
     outfile = infile + '.keep'
+    in_dir = os.path.dirname(infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
     counting_ht = _make_counting(infile, K=8)
@@ -447,7 +459,7 @@ def test_normalize_by_median_no_bigcount():
     script = scriptpath('normalize-by-median.py')
     args = ['-C', '1000', '-k 8', '--savehash', hashfile, infile]
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = runscript(script, args, in_dir)
     assert status == 0, (out, err)
     print (out, err)
 
@@ -585,16 +597,16 @@ def test_load_graph_fail():
     args.extend([outfile, infile])
 
     (status, out, err) = runscript(script, args, fail_ok=True)
-    assert status == -1
+    assert status == 1, status
     assert "ERROR:" in err
 
 
-def _make_graph(infilename, SIZE=1e7, N=2, K=20,
+def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 do_partition=False,
                 annotate_partitions=False,
                 stop_big_traverse=False):
     script = scriptpath('load-graph.py')
-    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data(infilename)
@@ -617,7 +629,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
         runscript(script, args)
 
         script = scriptpath('merge-partitions.py')
-        args = [outfile, '-k', str(K)]
+        args = [outfile, '-k', str(ksize)]
         runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
@@ -625,7 +637,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
 
         if annotate_partitions:
             script = scriptpath('annotate-partitions.py')
-            args = ["-k", str(K), outfile, infilename]
+            args = ["-k", str(ksize), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
             runscript(script, args, in_dir)
@@ -636,12 +648,12 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
     return outfile
 
 
-def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
+def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                       do_partition=False,
                       annotate_partitions=False,
                       stop_big_traverse=False):
     script = scriptpath('load-graph.py')
-    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data(infilename)
@@ -666,7 +678,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
 
         print ">>>> DEBUG: Merging Partitions <<<"
         script = scriptpath('merge-partitions.py')
-        args = [outfile, '-k', str(K)]
+        args = [outfile, '-k', str(ksize)]
         DEBUG_runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
@@ -675,7 +687,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
         if annotate_partitions:
             print ">>>> DEBUG: Annotating Partitions <<<"
             script = scriptpath('annotate-partitions.py')
-            args = ["-k", str(K), outfile, infilename]
+            args = ["-k", str(ksize), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
             DEBUG_runscript(script, args, in_dir)
@@ -711,7 +723,7 @@ def test_partition_graph_1():
 
 def test_partition_graph_nojoin_k21():
     # test with K=21
-    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), K=21)
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=21)
 
     script = scriptpath('partition-graph.py')
     args = [graphbase]
@@ -821,7 +833,7 @@ def test_annotate_partitions_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True,
-                            K=21)
+                            ksize=21)
     in_dir = os.path.dirname(graphbase)
 
     # get the final pmap file
@@ -900,6 +912,124 @@ def test_extract_partitions_fq():
     quals = set([r.accuracy for r in screed.open(partfile)])
     quals = list(quals)
     assert quals[0], quals
+
+
+def test_extract_partitions_output_unassigned():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-U', 'extracted', partfile]
+
+    runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    unassigned_file = os.path.join(in_dir, 'extracted.unassigned.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+    assert os.path.exists(unassigned_file)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+
+def test_extract_partitions_no_output_groups():
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-n', 'extracted', partfile]
+
+    # We expect a sys.exit -> we need the test to be tolerant
+    runscript(script, args, in_dir, fail_ok=True)
+
+    # Group files are created after output_groups is
+    # checked. They should not exist in this scenario
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert not os.path.exists(groupfile)
+
+
+def test_extract_partitions_pid_0():
+    basefile = utils.get_test_data('random-20-a.fa.part')
+    partfile = utils.get_temp_filename('random-20-a.fa.part')
+    shutil.copyfile(basefile, partfile)
+
+    in_dir = os.path.dirname(partfile)
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-U', 'extracted', partfile]
+
+    runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    unassigned_file = os.path.join(in_dir, 'extracted.unassigned.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+    assert os.path.exists(unassigned_file)
+
+    # Assert unassigned file not empty
+    unassigned_content = open(unassigned_file).readline()
+    assert unassigned_content.strip().split('\t')[0] != ''
+
+
+def test_extract_partitions_multi_groups():
+    basefile = utils.get_test_data('random-20-a.fa.part')
+    partfile = utils.get_temp_filename('random-20-a.fa.part')
+    shutil.copyfile(basefile, partfile)
+
+    in_dir = os.path.dirname(partfile)
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-m', '1', '-X', '1', 'extracted', partfile]
+
+    runscript(script, args, in_dir)
+
+    # Multiple group files are created after should be created
+    groupfile1 = os.path.join(in_dir, 'extracted.group0000.fa')
+    groupfile2 = os.path.join(in_dir, 'extracted.group0001.fa')
+    groupfile3 = os.path.join(in_dir, 'extracted.group0002.fa')
+    assert os.path.exists(groupfile1)
+    assert os.path.exists(groupfile2)
+    assert os.path.exists(groupfile3)
+
+
+def test_extract_partitions_no_groups():
+    empty_file = utils.get_temp_filename('empty-file')
+    basefile = utils.get_test_data('empty-file')
+
+    shutil.copyfile(basefile, empty_file)
+    in_dir = os.path.dirname(empty_file)
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', empty_file]
+
+    runscript(script, args, in_dir)
+
+    # No group files should be created
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+
+    assert not os.path.exists(groupfile)
 
 
 def test_abundance_dist():

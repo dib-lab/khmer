@@ -1,4 +1,66 @@
-2014-01-13  Camille Scott <camille.scott.w@gmail.com>
+2014-03-16  Ram RS  <ramrs@nyu.edu>
+
+	* Project email in copyright headers updated
+
+2014-03-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Update bundled zlib version to 1.2.8 from 1.2.3. Changes of note:
+    "Wholesale replacement of gz* functions with faster versions"
+    "Added LFS (Large File Summit) support for 64-bit file offsets"
+    "Fix serious but very rare decompression bug"
+
+2014-03-19  Titus Brown  <t@idyll.org>
+
+    * Makefile: update documentation on targets at top; clean autopep8 output.
+    * test_counting_single.py: fixed pep8 violations in spacing
+    * test_scripts.py: eliminate popenscript in favor of proper SystemExit
+	handling in runscript; fix pep8 violations.
+
+2014-03-17  Ram RS  <ramrs@nyu.edu>
+
+    * extract-partitions.py: pylint warnings addressed
+    * test_scripts.py: tests added to cover extract-partitions completely
+
+2014-03-13  Ram RS  <ramrs@nyu.edu>
+
+    * Bug fix: tests.test_normalize_by_median_no_bigcount() now runs within
+    temp directory
+
+2014-03-11  Michael R. Crusoe  <mcrusoe@athyra>
+
+    * lib/read_parsers.hh: fix for Coverity CID 1054789: Uninitialized scalar
+    field
+
+2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
+    scalar field (UNINIT_CTOR) 
+    * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
+    (UNINIT_CTOR)
+    * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
+    (CTOR_DTOR_LEAK)
+    * lib/{perf_metrics.{cc,hh},hashtable.{cc,hh}
+    ,read_parsers.{cc,hh},trace_logger.{cc,hh}}: ifndef WITH_INTERNAL_METRICS
+    then lets not + astyle -A10
+
+2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * tagged: version 0.8
+    * setup.py: Specify a known working version of setuptools so we don't
+    force an unneeded and awkward upgrade.
+    * setup.py: We aren't zipsafe, mark as such
+
+2014-02-18  Michael R. Crusoe <mcrusoe@msu.edu>
+
+* Normalized C++ namespace usage to fix CID 1054792
+* Updated install instructions. We recommend OS X users and those Linux
+users without root access to install virtualenv instead of pip.
+* New documentation: doc/known-issues.txt
+* Added code review checklist & other guidance: doc/development.txt
+
+2014-02-03  Camille Scott <camille.scott.w@gmail.com>
+
+* Standardized command line arguments in khmer_args; added version flag
 
 * Added support for sparse graph labeling
 
@@ -8,21 +70,34 @@
 * Implemented __new__ methods for Hashbits, enforced inheritance
   hierarchy between it and the new LabelHash class both in C++
   and CPython API
-  
-2013-12-20  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+2013-12-20  Titus Brown  <titus@idyll.org>
 
 * Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
   to retain FASTQ format in output.
 
-2013-12-18  Titus Brown  <titus@idyll.org>
+2013-12-11  Michael R. Crusoe <mcrusoe@msu.edu>
 
-* Added a test to ensure that normalize-by-median.py has bigcount set to
-  False.
+* normalize-by-median.py: new optional argument: --record-filenames to specify
+a path where a list of all the output filenames will be written to. Will
+be used to better integrate with Galaxy.
+
+* All commands that use the counting args now support the --version switch
+
+* abundance-dist-single.py, abundance-dist.py, do-partition.py,
+interleave-reads.py, load-graph.py, load-into-counting.py
+normalize-by-median.py now exit with return code 1 instead of 255 as is
+standard.
 
 2013-12-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
 * doc/install.txt Add setup instructions for RHEL6 & fix invocation to get
 master branch to work for non-developers
+
+2013-12-18  Titus Brown  <titus@idyll.org>
+
+* Added a test to ensure that normalize-by-median.py has bigcount set to
+  False.
 
 2013-11-22  Camille Scott  <camille.scott.w@gmail.com>
 

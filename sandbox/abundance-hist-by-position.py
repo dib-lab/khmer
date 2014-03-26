@@ -2,7 +2,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import sys
 
@@ -25,7 +26,7 @@ for n, line in enumerate(fd):
         countN[i] += 1
 
 print >>sys.stderr, 'summarizing.'
-y = [0.0]*len(countSum)
+y = [0.0] * len(countSum)
 
 for i in range(len(countSum)):
     if countN[i]:

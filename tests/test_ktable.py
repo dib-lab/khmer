@@ -1,7 +1,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import sys
 import khmer
@@ -181,47 +182,3 @@ class Test_KTable:
         for i in range(0, 4 ** L):
             assert kt.get(i) == 0
             assert kt[i] == 0
-
-
-def test_KmerCount():
-    # test KmerCount class
-
-    km = khmer.KmerCount(4)
-    km.consume('AAAAAC')
-    expected = (('AAAA', 2), ('AAAC', 1))
-
-    for i, (kmer, count) in enumerate(km.pairs):
-        e = expected[i]
-        assert kmer == e[0], (kmer, i)
-        assert count == e[1], (count, i)
-
-    assert km['AAAA'] == 2
-    assert km['AAAC'] == 1
-
-    km = khmer.KmerCount(4, report_zero=True)
-    km.consume('AAAAAC')
-    expected = (('AAAA', 2), ('AAAC', 1))
-
-    i = 0
-    for kmer, count in km.pairs:
-        if count:
-            e = expected[i]
-            assert kmer == e[0], (kmer, i)
-            assert count == e[1], (count, i)
-            i += 1
-
-    assert i == 2
-
-    # test capital letters vs lowercase
-    config = khmer.get_config()
-    if config.has_extra_sanity_checks():
-        km = khmer.KmerCount(4, report_zero=True)
-        km.consume('AAAAAC'.lower())
-        expected = (('AAAA', 2), ('AAAC', 1))
-
-        assert km['AAAA'] == 2
-        assert km['AAAC'] == 1
-
-    # hooray, done!
-
-    print 'SUCCESS, all tests passed.'

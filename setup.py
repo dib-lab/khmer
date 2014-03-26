@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-#
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+""" Setup for khmer project. """
+
 import ez_setup
-ez_setup.use_setuptools()
+ez_setup.use_setuptools(version="0.6c11")
 
 from setuptools import setup
 from setuptools import Extension
@@ -32,70 +34,64 @@ from subprocess import call
 # https://github.com/numpy/numpy/blob/master/numpy/distutils/ccompiler.py
 import os
 from distutils.sysconfig import get_config_vars
-(opt,) = get_config_vars('OPT')
+(OPT,) = get_config_vars('OPT')
 os.environ['OPT'] = " ".join(
-    flag for flag in opt.split() if flag != '-Wstrict-prototypes'
+    flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
 )
 
-zlibdir = 'lib/zlib'
-bzip2dir = 'lib/bzip2'
+ZLIBDIR = 'lib/zlib'
+BZIP2DIR = 'lib/bzip2'
 
-extra_objs = []
-extra_objs.extend(map(
-    lambda bn: path_join("lib", "zlib", bn + ".o"),
-    [
-        "adler32", "compress", "crc32", "deflate", "gzio",
-        "infback", "inffast", "inflate", "inftrees", "trees", "uncompr",
-        "zutil"
-    ]
-))
-extra_objs.extend(map(
-    lambda bn: path_join("lib", "bzip2", bn + ".o"),
-    [
-        "blocksort", "huffman", "crctable", "randtable", "compress",
-        "decompress", "bzlib",
-    ]
-))
+EXTRA_OBJS = []
+EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".lo") for bn in
+                  [
+                      "adler32", "compress", "crc32", "deflate",
+                      "infback", "inffast", "inflate", "inftrees", "trees",
+                      "uncompr", "zutil"
+                  ])
+EXTRA_OBJS.extend(path_join("lib", "bzip2", bn + ".o") for bn in
+                  [
+                      "blocksort", "huffman", "crctable", "randtable",
+                      "compress", "decompress", "bzlib",
+                  ])
 
-build_depends = list(extra_objs)
-build_depends.extend(map(
-    lambda bn: path_join("lib", bn + ".hh"),
-    [
-        "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting", "hashbits", "labelhash",
-    ]
-))
+BUILD_DEPENDS = list(EXTRA_OBJS)
+BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in
+                     [
+                         "storage", "khmer", "khmer_config", "ktable",
+                         "hashtable", "counting", "hashbits", "labelhash",
+                     ])
 
-sources = ["khmer/_khmermodule.cc"]
-sources.extend(map(
-    lambda bn: path_join("lib", bn + ".cc"),
-    [
-        "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
-        "read_parsers", "ktable", "hashtable", "hashbits", "labelhash", "counting",
-        "subset", "aligner", "scoringmatrix", "node", "kmer",
-    ]
-))
+SOURCES = ["khmer/_khmermodule.cc"]
+SOURCES.extend(path_join("lib", bn + ".cc") for bn in
+               [
+                   "khmer_config", "thread_id_map", "trace_logger",
+                   "perf_metrics", "read_parsers", "ktable", "hashtable",
+                   "hashbits", "labelhash", "counting", "subset", "aligner",
+                   "scoringmatrix", "node", "kmer",
+               ])
 
-extension_mod_DICT = \
+EXTENSION_MOD_DICT = \
     {
-        "sources": sources,
+        "sources": SOURCES,
         "extra_compile_args": ['-O3', ],
         "include_dirs": ["lib", ],
         "library_dirs": ["lib", ],
-        "extra_objects": extra_objs,
-        "depends": build_depends,
+        "extra_objects": EXTRA_OBJS,
+        "depends": BUILD_DEPENDS,
         "language": "c++",
         "libraries": ["stdc++", ],
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-extension_mod = Extension("khmer._khmermodule", **extension_mod_DICT)
-
-scripts = []
-scripts.extend([path_join("scripts", script)
+EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
+                          **EXTENSION_MOD_DICT)
+SCRIPTS = []
+SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
                 if script.endswith(".py")])
 
-setup_metadata = \
+SETUP_METADATA = \
     {
         "name": "khmer",
         "version": versioneer.get_version(),
@@ -114,12 +110,13 @@ setup_metadata = \
         "packages": ['khmer'],
         "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
         "setup_requires": ['nose >= 1.0', 'sphinx', ],
-        "scripts": scripts,
-        "ext_modules": [extension_mod, ],
+        "scripts": SCRIPTS,
+        "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,
-        "classifiers":  [
+        "zip_safe": False,
+        "classifiers": [
             "Development Status :: 4 - Beta",
             "Environment :: Console",
             "Environment :: MacOS X",
@@ -135,24 +132,25 @@ setup_metadata = \
         ],
     }
 
-# Only run lib setup when needed, not on every invocation
 from distutils.command.build_ext import build_ext as _build_ext
 
 
-class build_ext(_build_ext):
+class BuildExt(_build_ext):  # pylint: disable=R0904
+    """Specialized Python extension builder for khmer project.
 
-        """Specialized Python extension builder."""
+    Only run the library setup when needed, not on every invocation."""
 
-        def run(self):
-                call('cd ' + zlibdir + ' && ( test -f Makefile || bash'
-                     ' ./configure --shared ) && make libz.a',
-                     shell=True)
-                call('cd ' + bzip2dir + ' && make -f Makefile-libbz2_so all',
-                     shell=True)
-                _build_ext.run(self)
+    def run(self):
+        call('cd ' + ZLIBDIR + ' && ( test Makefile -nt configure || bash'
+             ' ./configure --static ) && make -f Makefile.pic PIC',
+             shell=True)
+        call('cd ' + BZIP2DIR + ' && make -f Makefile-libbz2_so all',
+             shell=True)
+        _build_ext.run(self)
 
-_cmdclass = versioneer.get_cmdclass()
-_cmdclass.update({'build_ext': build_ext})
+CMDCLASS = versioneer.get_cmdclass()
+CMDCLASS.update({'build_ext': BuildExt})
 
-setup(cmdclass=_cmdclass,
-      **setup_metadata)
+# pylint: disable=W0142
+setup(cmdclass=CMDCLASS,
+      **SETUP_METADATA)
