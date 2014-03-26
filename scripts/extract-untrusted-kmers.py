@@ -82,28 +82,36 @@ def main():
             else:
                 acc = None
         
+            print 'checking', name, 'length', len(seq)
+
             if 'N' in seq:
                 continue
 
             med, _, _ = ht.get_median_count(seq)
             if med < Z:
+                print 'wrote ', name, 'to reads, med=', med
                 write_seq(r_outfp, name, seq, acc)
                 ht.consume(seq)
             else:
+                print name, '>= Z, med=', med
                 pos = max(0, len(seq) - limit + 1)
                 if len(seq) < K:
+                    print 'passed length filter'
                     continue 
                 trimat = -1
-                while (pos < len(seq) - K + 1):
+                while (pos < (len(seq) - K + 1)):
+                    print 'checking', name, 'pos', pos
                     kmer = seq[pos:pos+K]
                     #print kmer
                     kmer_c = ht.get(kmer)
+                    print kmer, 'at pos', pos, 'C=', kmer_c
                     if kmer_c < C:
+                        print trimat
                         if trimat < 0:
                             trimat = pos
-                        write_seq(k_bad_outfp, '{name}-{pos}'.format(name=name, pos=pos), kmer, None)
+                        write_seq(k_bad_outfp, '{name}-{pos}:{c}'.format(name=name, pos=pos, c=kmer_c), kmer, None)
                     else:
-                        write_seq(k_good_outfp, '{name}-{pos}'.format(name=name, pos=pos), kmer, None)
+                        write_seq(k_good_outfp, '{name}-{pos}:{c}'.format(name=name, pos=pos, c=kmer_c), kmer, None)
                     pos += 1
                 seq = seq[:pos]
                 if acc:
