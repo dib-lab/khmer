@@ -10,8 +10,8 @@
 
 
 # NOTE: Currently the wrapper only supports a config singleton.
-#	In the future, manipulation of multiple configs may be allowed.
-#	The following alias is a hedge against the future.
+#       In the future, manipulation of multiple configs may be allowed.
+#       The following alias is a hedge against the future.
 from khmer import get_config as get_active_config
 
 
@@ -44,24 +44,24 @@ def test_EXISTENCE_OTHERS():
 
 # def test_1_ARGS_set_number_of_threads( ):
 #    """
-#	Verify that the number of threads cannot be set to a negative number.
+#       Verify that the number of threads cannot be set to a negative number.
 #    """
 #    config = get_active_config( )
 #    if config.is_threaded( ):
-#	try: config.set_number_of_threads( -1 );
-#	except: pass
-#	else: assert False, "config.set_number_of_threads( -1 )"
+#       try: config.set_number_of_threads( -1 );
+#       except: pass
+#       else: assert False, "config.set_number_of_threads( -1 )"
 
 
 # def test_2_ARGS_set_number_of_threads( ):
 #    """
-#	Verify that the number of threads cannot be set to zero.
+#       Verify that the number of threads cannot be set to zero.
 #    """
 #    config = get_active_config( )
 #    if config.is_threaded( ):
-#	try: config.set_number_of_threads( 0 );
-#	except: pass
-#	else: assert False, "config.set_number_of_threads( 0 )"
+#       try: config.set_number_of_threads( 0 );
+#       except: pass
+#       else: assert False, "config.set_number_of_threads( 0 )"
 
 
 def test_USE_set_number_of_threads():
