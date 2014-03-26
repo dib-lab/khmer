@@ -3,7 +3,7 @@
 # make pylint to check Python code for enhanced compliance including naming
 #  and documentation
 
-all:
+all: FORCE
 	./setup.py build_ext --inplace
 
 install: FORCE
@@ -16,18 +16,28 @@ clean: FORCE
 	cd lib && ${MAKE} clean
 	cd tests && rm -rf khmertest_*
 	rm -f khmer/_khmermodule.so
+	rm khmer/*.pyc lib/*.pyc
 	./setup.py clean --all
 
 debug:
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
 		--inplace
 
-doc: FORCE
-	pip install --user sphinx || pip install sphinx
+doc: all
+	pip install --user sphinx sphinxcontrib-autoprogram || pip install sphinx \
+		sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
+
+pdf: FORCE
+	pip install --user sphinx sphinxcontrib-autoprogram || pip install sphinx \
+		sphinxcontrib-autoprogram
+	./setup.py build_sphinx --fresh-env --builder latex
+	cd build/sphinx/latex && ${MAKE} all-pdf
+	@echo ''
+	@echo '--> pdf in build/sphinx/latex/khmer.pdf'
 
 cppcheck-result.xml: FORCE
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \

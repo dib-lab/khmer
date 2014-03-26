@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Take a list of files containing sequences, and subsample 100,000 sequences (-N)
 uniformly, using reservoir sampling.  Stop after first 100m sequences (-M).
@@ -18,6 +19,7 @@ import argparse
 import screed
 import os.path
 import random
+import khmer
 from khmer.file import check_file_status, check_space
 
 DEFAULT_NUM_READS = int(1e5)
@@ -25,16 +27,9 @@ DEFAULT_MAX_READS = int(1e8)
 DEBUG = True
 
 
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
-
-
-def main():
+def get_parser():
     parser = argparse.ArgumentParser(
-        "Uniformly subsample sequences from a collection of files",
+        description="Uniformly subsample sequences from a collection of files",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('filenames', nargs='+')
@@ -45,8 +40,20 @@ def main():
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('w'), default=None)
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
 
-    args = parser.parse_args()
+
+def output_single(read):
+    if hasattr(read, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
+    else:
+        return ">%s\n%s\n" % (read.name, read.sequence)
+
+
+def main():
+    args = get_parser().parse_args()
 
     for _ in args.filenames:
         check_file_status(_)

@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Trim sequences at k-mers in the given stoptags file.  Output sequences
 will be placed in 'infile.stopfilt'.
@@ -17,27 +18,35 @@ Use '-h' for parameter help.
 import os
 import khmer
 import argparse
+import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.file import check_file_status, check_space
 
 # @CTB K should be loaded from file...
 DEFAULT_K = 32
 
-#
 
-
-def main():
+def get_parser():
+    epilog = """
+    Load stoptags in from the given .stoptags file and use them to trim
+    or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
+    <fileN>.stopfilt.
+    """
     parser = argparse.ArgumentParser(
+        description="Trim sequences at stoptags.",
+        epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
     parser.add_argument('-k', default=DEFAULT_K, type=int, help='k-mer size',
                         dest='ksize')
     parser.add_argument('stoptags_file')
     parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
 
-    args = parser.parse_args()
-    ksize = args.ksize
 
+def main():
+    args = get_parser().parse_args()
     stoptags = args.stoptags_file
     infiles = args.input_filenames
 
@@ -46,8 +55,8 @@ def main():
 
     check_space(infiles)
 
-    print 'loading stop tags, with K', ksize
-    htable = khmer.new_hashbits(ksize, 1, 1)
+    print 'loading stop tags, with K', args.ksize
+    htable = khmer.new_hashbits(args.ksize, 1, 1)
     htable.load_stop_tags(stoptags)
 
     def process_fn(record):
@@ -58,7 +67,7 @@ def main():
 
         trim_seq, trim_at = htable.trim_on_stoptags(seq)
 
-        if trim_at >= ksize:
+        if trim_at >= args.ksize:
             return name, trim_seq
 
         return None, None

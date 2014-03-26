@@ -103,7 +103,8 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
         "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
-        "extras_require": {'docs': ['sphinx'], 'tests': ['nose >= 1.0']},
+        "extras_require": {'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
+                           'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
