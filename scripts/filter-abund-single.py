@@ -5,9 +5,10 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,invalid-name
 """
 Trim sequences at k-mers of the given abundance for the given file,
-without loading a prebuilt counting hash.  Output sequences will be
+without loading a prebuilt counting table.  Output sequences will be
 placed in 'infile.abundfilt'.
 
 % python scripts/filter-abund-single.py <data>
@@ -17,55 +18,66 @@ Use '-h' for parameter help.
 import os
 import khmer
 import threading
+import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.counting_args import build_construct_args, report_on_config
-from khmer.threading_args import add_threading_args
-
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
+from khmer.khmer_args import (build_counting_args, report_on_config,
+                              add_threading_args)
+from khmer.file import (check_file_status, check_space,
+                        check_space_for_hashtable)
 #
-
 DEFAULT_CUTOFF = 2
 
 
-def main():
-    parser = build_construct_args(
-        "Filter k-mers at the given abundance (inmem version).")
+def get_parser():
+    epilog = """
+    Trimmed sequences will be placed in ${datafile}.abundfilt.
+
+    This script is constant memory.
+
+    To trim reads based on k-mer abundance across multiple files, use
+    :program:`load-into-counting` and :program:`filter-abund`.
+
+    Example::
+
+        filter-abund-single.py -k 20 -x 5e7 -C 2 data/100k-filtered.fa
+    """
+    parser = build_counting_args(
+        descr="Trims sequences at a minimum k-mer abundance "
+        "(in memory version).", epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
 
-    parser.add_argument('--cutoff', '-C', dest='cutoff',
-                        default=DEFAULT_CUTOFF, type=int,
+    parser.add_argument('--cutoff', '-C', default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
-    parser.add_argument('--savehash', dest='savehash', default='')
-    parser.add_argument('datafile')
+    parser.add_argument('--savetable', metavar="filename", default='',
+                        help="If present, the name of the file to save the "
+                        "k-mer counting table to")
+    parser.add_argument('datafile', help="FAST[AQ] sequence file to trim")
 
-    args = parser.parse_args()
+    return parser
+
+
+def main():
+
+    args = get_parser().parse_args()
+    check_file_status(args.datafile)
+    check_space([args.datafile])
+    if args.savetable:
+        check_space_for_hashtable(args.ksize * args.min_tablesize)
     report_on_config(args)
 
-    ksize = args.ksize
-    min_hashsize = args.min_hashsize
-    n_hashes = args.n_hashes
-    n_threads = int(args.n_threads)
-    filename = args.datafile
-
-    check_file_status(filename)
-    infiles = [filename]
-    check_space(infiles)
-    if args.savehash:
-        check_space_for_hashtable(ksize * min_hashsize)
-
     config = khmer.get_config()
-    bufsz = config.get_reads_input_buffer_size()
-    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
+    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
-    print 'making hashtable'
-    htable = khmer.new_counting_hash(ksize, min_hashsize, n_hashes, n_threads)
+    print 'making k-mer counting table'
+    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
+                                     args.n_tables,
+                                     args.threads)
 
     # first, load reads into hash table
-    rparser = khmer.ReadParser(filename, n_threads)
+    rparser = khmer.ReadParser(args.datafile, args.threads)
     threads = []
-    print 'consuming input, round 1 --', filename
-    for tnum in xrange(n_threads):
+    print 'consuming input, round 1 --', args.datafile
+    for _ in xrange(args.threads):
         cur_thread = \
             threading.Thread(
                 target=htable.consume_fasta_with_reads_parser,
@@ -91,25 +103,25 @@ def main():
 
         trim_seq, trim_at = htable.trim_on_abundance(seq, args.cutoff)
 
-        if trim_at >= ksize:
+        if trim_at >= args.ksize:
             return name, trim_seq
 
         return None, None
 
     # the filtering loop
-    print 'filtering', filename
-    outfile = os.path.basename(filename) + '.abundfilt'
+    print 'filtering', args.datafile
+    outfile = os.path.basename(args.datafile) + '.abundfilt'
     outfp = open(outfile, 'w')
 
     tsp = ThreadedSequenceProcessor(process_fn)
-    tsp.start(verbose_loader(filename), outfp)
+    tsp.start(verbose_loader(args.datafile), outfp)
 
     print 'output in', outfile
 
-    if args.savehash:
-        print 'Saving hashfile', args.savehash
-        print '...saving to', args.savehash
-        htable.save(args.savehash)
+    if args.savetable:
+        print 'Saving k-mer counting table filename', args.savetable
+        print '...saving to', args.savetable
+        htable.save(args.savetable)
 
 if __name__ == '__main__':
     main()

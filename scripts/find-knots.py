@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Find highly-connected k-mers and output them in a .stoptags file, for use
 in partitioning.
@@ -15,7 +16,7 @@ in partitioning.
 import argparse
 import glob
 import os
-
+import textwrap
 import khmer
 from khmer.file import check_file_status, check_space
 
@@ -39,28 +40,48 @@ EXCURSION_KMER_THRESHOLD = 200
 EXCURSION_KMER_COUNT_THRESHOLD = 2
 # EXCURSION_KMER_COUNT_THRESHOLD=5 # -- works ok for non-diginormed data
 
-#
+
+def get_parser():
+    epilog = """
+    Load an k-mer presence table/tagset pair created by load-graph, and a set
+    of pmap files created by partition-graph. Go through each pmap file,
+    select the largest partition in each, and do the same kind of traversal as
+    in make-initial-stoptags from each of the waypoints in that partition; this
+    should identify all of the HCKs in that partition. These HCKs are output to
+    <graphbase>.stoptags after each pmap file.
+
+    Parameter choice is reasonably important. See the pipeline in
+    :doc:`partitioning-big-data` for an example run.
+
+    This script is not very scalable and may blow up memory and die horribly.
+    You should be able to use the intermediate stoptags to restart the
+    process, and if you eliminate the already-processed pmap files, you can
+    continue where you left off.
+    """
+    parser = argparse.ArgumentParser(
+        description="Find all highly connected k-mers.",
+        epilog=textwrap.dedent(epilog),
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('--n_tables', '-N', type=int,
+                        default=DEFAULT_COUNTING_HT_N,
+                        help='number of k-mer counting tables to use')
+    parser.add_argument('--min-tablesize', '-x', type=float,
+                        default=DEFAULT_COUNTING_HT_SIZE, help='lower bound on'
+                        ' the size of the k-mer counting table(s)')
+    parser.add_argument('graphbase')
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Find all highly connected k-mers.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
-                        default=DEFAULT_COUNTING_HT_N,
-                        help='number of counting hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
-                        default=DEFAULT_COUNTING_HT_SIZE,
-                        help='lower bound on counting hashsize to use')
-    parser.add_argument('graphbase')
-
-    args = parser.parse_args()
+    args = get_parser().parse_args()
 
     graphbase = args.graphbase
 
     # @RamRS: This might need some more work
-    infiles = [graphbase + '.ht', graphbase + '.tagset']
+    infiles = [graphbase + '.pt', graphbase + '.tagset']
     if os.path.exists(graphbase + '.stoptags'):
         infiles.append(graphbase + '.stoptags')
     for _ in infiles:
@@ -68,8 +89,8 @@ def main():
 
     check_space(infiles)
 
-    print 'loading ht %s.ht' % graphbase
-    htable = khmer.load_hashbits(graphbase + '.ht')
+    print 'loading k-mer presence table %s.pt' % graphbase
+    htable = khmer.load_hashbits(graphbase + '.pt')
 
     print 'loading tagset %s.tagset...' % graphbase
     htable.load_tagset(graphbase + '.tagset')
@@ -92,7 +113,8 @@ def main():
 
     # create counting hash
     ksize = htable.ksize()
-    counting = khmer.new_counting_hash(ksize, args.min_hashsize, args.n_hashes)
+    counting = khmer.new_counting_hash(ksize, args.min_tablesize,
+                                       args.n_tables)
 
     # load & merge
     for index, subset_file in enumerate(pmap_files):
@@ -109,9 +131,9 @@ def main():
         htable.merge_subset(subset)
 
         print '** repartitioning, round 2... %s' % subset_file
-        size = htable.repartition_largest_partition
-        (None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
-         EXCURSION_KMER_COUNT_THRESHOLD)
+        size = htable.repartition_largest_partition(
+            None, counting, EXCURSION_DISTANCE, EXCURSION_KMER_THRESHOLD,
+            EXCURSION_KMER_COUNT_THRESHOLD)
 
         print '** repartitioned size:', size
 

@@ -5,14 +5,16 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Find an initial set of highly connected k-mers, to save on repartitioning time.
 
 % python scripts/make-initial-stoptags.py <base>
 """
 
-import argparse
+import textwrap
 import khmer
+from khmer.khmer_args import build_counting_args
 from khmer.file import check_file_status, check_space
 
 DEFAULT_SUBSET_SIZE = int(1e4)
@@ -34,29 +36,35 @@ EXCURSION_DISTANCE = 40
 EXCURSION_KMER_THRESHOLD = 200
 EXCURSION_KMER_COUNT_THRESHOLD = 5
 
-#
 
+def get_parser():
+    epilog = """
+    Loads a k-mer presence table/tagset pair created by load-graph.py, and does
+    a small set of traversals from graph waypoints; on these traversals, looks
+    for k-mers that are repeatedly traversed in high-density regions of the
+    graph, i.e. are highly connected. Outputs those k-mers as an initial set of
+    stoptags, which can be fed into partition-graph.py, find-knots.py, and
+    filter-stoptags.py.
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Find an initial set of highly connected k-mers.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
-                        default=DEFAULT_COUNTING_HT_N,
-                        help='number of counting hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
-                        default=DEFAULT_COUNTING_HT_SIZE,
-                        help='lower bound on counting hashsize to use')
+    The k-mer counting table size options parameters are for a k-mer counting
+    table to keep track of repeatedly-traversed k-mers. The subset size option
+    specifies the number of waypoints from which to traverse; for highly
+    connected data sets, the default (1000) is probably ok.
+    """
+    parser = build_counting_args(
+        descr="Find an initial set of highly connected k-mers.",
+        epilog=textwrap.dedent(epilog))
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (default 1e4 is prob ok)')
-    parser.add_argument('--stoptags', '-S', dest='stoptags', default='',
+    parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
-
     parser.add_argument('graphbase')
+    return parser
 
-    args = parser.parse_args()
+
+def main():
+    args = get_parser().parse_args()
 
     graphbase = args.graphbase
 
@@ -70,7 +78,7 @@ def main():
     check_space(infiles)
 
     print 'loading htable %s.ht' % graphbase
-    htable = khmer.load_hashbits(graphbase + '.ht')
+    htable = khmer.load_hashbits(graphbase + '.pt')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
@@ -81,7 +89,8 @@ def main():
     htable.load_tagset(graphbase + '.tagset')
 
     ksize = htable.ksize()
-    counting = khmer.new_counting_hash(ksize, args.min_hashsize, args.n_hashes)
+    counting = khmer.new_counting_hash(ksize, args.min_tablesize,
+                                       args.n_tables)
 
     # divide up into SUBSET_SIZE fragments
     divvy = htable.divide_tags_into_subsets(args.subset_size)

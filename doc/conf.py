@@ -12,17 +12,21 @@
 # serve to show the default.
 
 import sys
+import os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.append(os.path.abspath('.'))
+# sys.path.append(os.path.abspath('.'))
+
+sys.path.append(os.path.abspath('../scripts'))
 
 # -- General configuration ----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
+              'sphinxcontrib.autoprogram']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -53,7 +57,7 @@ Brown'''
 
 import pkg_resources
 try:
-        release = pkg_resources.get_distribution('khmer').version
+    release = pkg_resources.get_distribution('khmer').version
 except pkg_resources.DistributionNotFound:
     print 'To build the documentation, The distribution information of khmer' \
         ' has to be available.  Either install the package into your' \
