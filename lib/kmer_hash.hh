@@ -58,7 +58,7 @@
 #endif
 
 // choose wisely between forward and rev comp.
-#if !NO_UNIQUE_RC
+#ifndef NO_UNIQUE_RC
 #define uniqify_rc(f, r) ((f) < (r) ? (f) : (r))
 #else
 #define uniqify_rc(f,r)(f)
