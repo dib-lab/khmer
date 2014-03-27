@@ -52,7 +52,7 @@ EXTRA_OBJS.extend(path_join("lib", "bzip2", bn + ".o") for bn in [
 
 BUILD_DEPENDS = list(EXTRA_OBJS)
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "storage", "khmer", "khmer_config", "ktable", "hashtable", "counting",
+    "khmer", "khmer_config", "ktable", "hashtable", "counting",
     "hashbits", "labelhash"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
