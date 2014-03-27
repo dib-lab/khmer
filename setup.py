@@ -39,6 +39,10 @@ os.environ['OPT'] = " ".join(
     flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
 )
 
+# We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
+# change setup.cfg or use the `--libraries z,bz2` parameter which will make our
+# custom build_ext command strip out the bundled versions.
+
 ZLIBDIR = 'lib/zlib'
 BZIP2DIR = 'lib/bzip2'
 
@@ -65,12 +69,9 @@ EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
         "extra_compile_args": ['-O3', ],
-        "include_dirs": ["lib", ],
-        "library_dirs": ["lib", ],
         "extra_objects": EXTRA_OBJS,
         "depends": BUILD_DEPENDS,
         "language": "c++",
-        "libraries": ["stdc++", ],
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
@@ -122,20 +123,29 @@ SETUP_METADATA = \
         ],
     }
 
-from distutils.command.build_ext import build_ext as _build_ext
+from setuptools.command.build_ext import build_ext as _build_ext
 
 
 class BuildExt(_build_ext):  # pylint: disable=R0904
     """Specialized Python extension builder for khmer project.
 
-    Only run the library setup when needed, not on every invocation."""
+    Only run the library setup when needed, not on every invocation.
+
+    Also strips out the bundled zlib and bzip2 libraries if
+    `--libraries z,bz2` is specified or the equivalent is in setup.cfg
+    """
 
     def run(self):
-        call('cd ' + ZLIBDIR + ' && ( test Makefile -nt configure || bash'
-             ' ./configure --static ) && make -f Makefile.pic PIC',
-             shell=True)
-        call('cd ' + BZIP2DIR + ' && make -f Makefile-libbz2_so all',
-             shell=True)
+        if "z" and "bz2" not in self.libraries:
+            call('cd ' + ZLIBDIR + ' && ( test Makefile -nt configure || bash'
+                 ' ./configure --static ) && make -f Makefile.pic PIC',
+                 shell=True)
+            call('cd ' + BZIP2DIR + ' && make -f Makefile-libbz2_so all',
+                 shell=True)
+        else:
+            for ext in self.extensions:
+                ext.extra_objects = []
+
         _build_ext.run(self)
 
 CMDCLASS = versioneer.get_cmdclass()

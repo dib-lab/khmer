@@ -21,8 +21,8 @@ extern "C"
 #include <regex.h>
 }
 
-#include "zlib/zlib.h"
-#include "bzip2/bzlib.h"
+#include "zlib.h"
+#include "bzlib.h"
 
 #include "khmer.hh"
 #include "khmer_config.hh"
