@@ -20,7 +20,6 @@
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
-#include "storage.hh"
 #include "aligner.hh"
 #include "labelhash.hh"
 
