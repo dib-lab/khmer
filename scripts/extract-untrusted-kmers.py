@@ -129,14 +129,13 @@ def main():
                 if trimat >= K:
                     n_trimmed += 1
                     seq = seq[:trimat]
+                    if acc:
+                        acc = acc[:trimat]
                 elif trimat > 0:
                     n_short += 1
                     continue
 
                 total_out += 1
-
-                if acc:
-                    acc = acc[:trimat]
                 write_seq(r_outfp, name, seq, acc)
         
         print total_out, 'passed with', n_trimmed, 'trimmed,', n_bad, 'failed filter', n_short, 'failed filter after trimming'
