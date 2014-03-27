@@ -22,7 +22,7 @@
 #include "khmer.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
-#include "ktable.hh"
+#include "kmer_hash.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
