@@ -30,12 +30,13 @@ doc: FORCE
 
 cppcheck-result.xml: FORCE
 	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ \
-		-i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS \
+		-I lib/zlib -I lib/bzip2 -i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS \
 		--xml lib 2> cppcheck-result.xml
 
 cppcheck: FORCE
 	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ \
-		-i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS lib 
+		-I lib/zlib -I lib/bzip2 -i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS \
+		lib
 
 pep8: FORCE
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/
