@@ -19,6 +19,10 @@ DEFAULT_CUTOFF = 2
 
 DEBUG = False
 
+def print_dbg(*args):
+    if DEBUG:
+        print >>sys.stderr, ' '.join([str(a) for a in args])
+
 def write_seq(fp, name, seq, acc):
     if acc:
         fp.write('@{name}\n{seq}\n+\n{acc}\n'.format(
@@ -59,6 +63,9 @@ def main():
     else:
         limit = args.trusted_limit
 
+    print >>sys.stderr, 'Using cutoff {c}, filter {z}, on last {l} bases'.format(
+        c=C, z=Z, l=limit)
+
     print >>sys.stderr, 'building hashtable...'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
@@ -72,6 +79,12 @@ def main():
         r_outfp = open(outfile, 'wb')
         k_bad_outfp = open(outbadkmers, 'wb')
         k_good_outfp = open(outgoodkmers, 'wb')
+
+        n_bad = 0
+        n_short = 0
+        n_trimmed = 0
+        total_out = 0
+
         for n, record in enumerate(screed.open(infile)):
             if n % 250000 == 0 and not args.quiet:
                 print >>sys.stderr, 'processed {n} of {f}...'.format(n=n, f=infile)
@@ -82,50 +95,53 @@ def main():
                 acc = record['accuracy']
             else:
                 acc = None
-            if DEBUG:
-                print 'checking', name, 'length', len(seq)
+            print_dbg('checking', name, 'length', len(seq))
 
-            if 'N' in seq:
+            if 'N' in seq or len(seq) < K:
+                n_bad += 1
                 continue
 
             med, _, _ = ht.get_median_count(seq)
             if med < Z:
-                if DEBUG:
-                    print 'wrote ', name, 'to reads, med=', med
+                total_out += 1
+                print_dbg('wrote ', name, 'to reads, med=', med)
                 write_seq(r_outfp, name, seq, acc)
                 ht.consume(seq)
             else:
-                if DEBUG:
-                    print name, '>= Z, med=', med
+                print_dbg(name, '>= Z, med=', med)
                 pos = max(0, len(seq) - limit + 1)
-                if len(seq) < K:
-                    if DEBUG:
-                        print 'passed length filter'
-                    continue 
                 trimat = -1
                 while (pos < (len(seq) - K + 1)):
-                    if DEBUG:
-                        print 'checking', name, 'pos', pos
+                    print_dbg('checking', name, 'pos', pos)
                     kmer = seq[pos:pos+K]
-                    #print kmer
                     kmer_c = ht.get(kmer)
-                    if DEBUG:
-                        print kmer, 'at pos', pos, 'C=', kmer_c
+                    print_dbg(kmer, 'at pos', pos, 'C=', kmer_c)
                     if kmer_c < C:
-                        if DEBUG:
-                            print trimat
+                        print_dbg(trimat)
                         if trimat < 0:
+                            print_dbg(kmer, len(kmer), kmer_c)
+                            #print kmer, len(kmer), kmer_c
                             trimat = pos
                         write_seq(k_bad_outfp, '{name}-{pos}:{c}'.format(name=name, pos=pos, c=kmer_c), kmer, None)
                     else:
                         write_seq(k_good_outfp, '{name}-{pos}:{c}'.format(name=name, pos=pos, c=kmer_c), kmer, None)
                     pos += 1
-                seq = seq[:trimat]
+                if trimat >= K:
+                    n_trimmed += 1
+                    seq = seq[:trimat]
+                elif trimat > 0:
+                    n_short += 1
+                    continue
+
+                total_out += 1
+
                 if acc:
                     acc = acc[:trimat]
                 write_seq(r_outfp, name, seq, acc)
-
+        
+        print total_out, 'passed with', n_trimmed, 'trimmed,', n_bad, 'failed filter', n_short, 'failed filter after trimming'
         print >>sys.stderr, 'output in', outfile
+        
 
 if __name__ == '__main__':
     main()
