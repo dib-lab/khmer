@@ -70,6 +70,7 @@ lib:
 	$(MAKE)
 
 test: all
-	./setup.py nosetests
+	python -m nose # match the coverage command, work around bug in the setuptools
+	# nose command that wipes out the build_ext config
 
 FORCE:
