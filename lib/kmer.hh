@@ -9,7 +9,7 @@
 #define KMER_HH
 
 #include "khmer.hh"
-#include "ktable.hh"
+#include "kmer_hash.hh"
 #include "hashbits.hh"
 
 #include <set>
