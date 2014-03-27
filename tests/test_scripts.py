@@ -1401,4 +1401,27 @@ def test_sweep_reads_by_partition_buffered():
 
 
 def test_extract_untrusted_kmers():
-    pass
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-extract-reads.fa'), infile)
+
+    script = scriptpath('extract-untrusted-kmers.py')
+    # fix random number seed for reproducibility
+    args = ['-C', '2', '-Z', '3', '-k', '25']
+    args.append('test.fa')
+    runscript(script, args, in_dir)
+
+    badout = infile + '.badkmers.fa'
+    goodout = infile + '.goodkmers.fa'
+    readsout = infile + '.kmerfilt'
+    
+    assert os.path.exists(badout), badout
+    assert os.path.exists(goodout), goodout
+    assert os.path.exists(readsout), readsout
+
+    seqs_in = [r.sequence for r in screed.open(infile)]
+    seqs_out = [r.sequence for r in screed.open(readsout)]
+    assert len(set(seqs_in)) == len(set(seqs_out))
+    print len(seqs_out[-1]), seqs_out
+    assert len(seqs_out[-1]) == 65
