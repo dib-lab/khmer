@@ -10,7 +10,7 @@
 #include "hashbits.hh"
 #include "read_parsers.hh"
 
-#include "zlib/zlib.h"
+#include "zlib.h"
 #include <math.h>
 #include <algorithm>
 
