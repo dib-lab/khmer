@@ -4,11 +4,12 @@
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
+# pylint: disable=invalid-name,missing-docstring,no-member
 
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
-% sweep-reads-by-partition.py -r <range> <contigs fastp> \
+% sweep-reads-buffered.py -r <range> <contigs fastp> \
 <reads1> <reads2> ... <readsN>
 """
 
@@ -28,6 +29,7 @@ opening.
 
 import screed
 import sys
+from collections import defaultdict
 import os
 import time
 import khmer
@@ -37,7 +39,7 @@ from khmer.khmer_args import build_hashbits_args, report_on_config
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
 DEFAULT_BUFFER_SIZE = 10
-DEFAULT_OUT_PREF = 'reads_'
+DEFAULT_OUT_PREF = 'reads'
 DEFAULT_RANGE = -1
 
 MIN_HSIZE = 4e7
@@ -49,18 +51,7 @@ def fmt_fasta(name, seq, labels=[]):
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
-def write_seq(fp, name, seq, labels=[]):
-    try:
-        fp.write(fmt_fasta(name, seq, labels=labels))
-    except IOError:
-        print >>sys.stderr, 'Error writing {read}'.format(
-            read=fmt_fasta(name, seq, labels=labels))
-        return 1
-    else:
-        return 0
-
-
-class ReadBuffer:
+class ReadBuffer(object):
 
     def __init__(self):
         self.buf = []
@@ -81,7 +72,7 @@ class ReadBuffer:
         return len(self.buf)
 
 
-class ReadBufferManager:
+class ReadBufferManager(object):
 
     def __init__(self, max_buffers, max_reads, max_size, output_pref, outdir):
         self.buffers = {}
@@ -110,6 +101,7 @@ class ReadBufferManager:
         fn = '{prefix}_{buffer_id}.fa'.format(prefix=self.output_pref,
                                               buffer_id=buf_id)
         fpath = os.path.join(self.outdir, fn)
+        buf = self.buffers[buf_id]
         try:
             outfp = open(fpath, 'a')
         except IOError as _:
@@ -118,10 +110,10 @@ class ReadBufferManager:
                                 buffer flush'.format(fn=fpath)
             self.num_file_errors += 1
         else:
-            buf = self.buffers[buf_id]
             outfp.write(buf.flush())
-            self.cur_reads -= len(buf)
             outfp.close()
+        finally:
+            self.cur_reads -= len(buf)
             del self.buffers[buf_id]
 
     def queue(self, seq_str, buf_id):
@@ -151,17 +143,15 @@ class ReadBufferManager:
         assert self.cur_reads == 0
 
 
-def main():
-    """ Main functionality.
-
-    Wrapped in a function to avoid execution on import. """
+def get_parser():
     parser = build_hashbits_args('Takes a partitioned reference file \
                                   and a list of reads, and sorts reads \
                                   by which partition they connect to')
     parser.epilog = EPILOG
     parser.add_argument(
         '-r', '--traversal_range', type=int, dest='traversal_range',
-        default=DEFAULT_RANGE)
+        default=DEFAULT_RANGE, help='depth of breadth-first search to perform\
+                                    from each read')
     parser.add_argument('-b', '--buffer_size', dest='max_reads', type=int,
                         default=DEFAULT_MAX_READS,
                         help='Max total reads to buffer before flushing')
@@ -169,15 +159,35 @@ def main():
                         default=DEFAULT_BUFFER_SIZE,
                         help='Max length of an individual label buffer \
                               before flushing')
-    parser.add_argument('-o', '--output_prefix', dest='output_prefix',
+    parser.add_argument('--prefix', dest='output_prefix',
                         default=DEFAULT_OUT_PREF,
                         help='Prefix for sorted read files')
+    parser.add_argument('--outdir', dest='outdir',
+                        help='output directory; default is location of \
+                              fastp file')
     parser.add_argument('-m', '--max_buffers', dest='max_buffers', type=int,
                         default=DEFAULT_NUM_BUFFERS,
                         help='Max individual label buffers before flushing')
-    parser.add_argument(dest='input_fastp', help='Partitioned reference fasta')
+    labeling = parser.add_mutually_exclusive_group(required=True)
+    labeling.add_argument('--label-by-pid', dest='label_by_pid',
+                          action='store_true', help='separate reads by\
+                        referece partition id')
+    labeling.add_argument('--label-by-seq', dest='label_by_seq',
+                          action='store_true', help='separate reads by\
+                        reference sequence')
+    labeling.add_argument('--label-by-group', dest='group_size', type=int,
+                          help='separate reads by arbitrary sized groups\
+                        of reference sequences')
+    parser.add_argument(dest='input_fastp', help='Reference fasta or fastp')
     parser.add_argument('input_files', nargs='+',
-                        help='Reads to be swept/sorted')
+                        help='Reads to be swept and sorted')
+
+    return parser
+
+
+def main():
+
+    parser = get_parser()
     args = parser.parse_args()
 
     if args.min_hashsize < MIN_HSIZE:
@@ -193,7 +203,11 @@ def main():
 
     traversal_range = args.traversal_range
     input_fastp = args.input_fastp
-    outdir = os.path.dirname(input_fastp)
+
+    if not args.outdir:
+        outdir = os.path.dirname(input_fastp)
+    else:
+        outdir = args.outdir
 
     max_buffers = args.max_buffers
     output_pref = args.output_prefix
@@ -207,9 +221,56 @@ def main():
 
     # consume the partitioned fasta with which to label the graph
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
-    print >>sys.stderr, 'consuming fastp...'
-    ht.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
+    try:
+        print >>sys.stderr, 'consuming input sequences...'
+        if args.label_by_pid:
+            print >>sys.stderr, '...labeling by partition id (pid)'
+            ht.consume_partitioned_fasta_and_tag_with_labels(input_fastp)
+        elif args.label_by_seq:
+            print >>sys.stderr, '...labeling by sequence'
+            for n, record in enumerate(screed.open(input_fastp)):
+                if n % 50000 == 0:
+                    print >>sys.stderr, \
+                        '...consumed {n} sequences...'.format(n=n)
+                ht.consume_sequence_and_tag_with_labels(record.sequence, n)
+        else:
+            print >>sys.stderr, \
+                '...labeling to create groups of size {s}'.format(
+                    s=args.group_size)
+            label = -1
+            g = 0
+            try:
+                outfp = open('{pref}_base_{g}.fa'.format(pref=output_pref,
+                                                         g=g), 'wb')
+                for n, record in enumerate(screed.open(input_fastp)):
+                    if n % args.group_size == 0:
+                        label += 1
+                        if label > g:
+                            g = label
+                            outfp = open('{pref}_base_{g}.fa'.format(
+                                pref=output_pref, g=g), 'wb')
+                    if n % 50000 == 0:
+                        print >>sys.stderr, \
+                            '...consumed {n} sequences...'.format(n=n)
+                    ht.consume_sequence_and_tag_with_labels(record.sequence,
+                                                            label)
+                    outfp.write('>{name}\n{seq}\n'.format(name=record.name,
+                                                          seq=record.sequence))
 
+            except IOError as e:
+                print >>sys.stderr, '!! ERROR !!', e
+                print >>sys.stderr, '...error splitting input. exiting...'
+
+    except IOError as e:
+        print >>sys.stderr, '!! ERROR: !!', e
+        print >>sys.stderr, '...error consuming \
+                            {i}. exiting...'.format(i=input_fastp)
+
+    print >>sys.stderr, 'done consuming input sequence. \
+                        added {t} tags and {l} \
+                        labels...'.format(t=ht.n_tags(), l=ht.n_labels())
+
+    label_dict = defaultdict(int)
     label_number_dist = []
 
     n_orphaned = 0
@@ -246,8 +307,7 @@ def main():
                 try:
                     labels = ht.sweep_label_neighborhood(seq, traversal_range)
                 except ValueError as e:
-                    print >>sys.stderr, '!! ERROR: {e} !!'.format(e=e)
-                    print >>sys.stderr, 'Read length less than k-mer size'
+                    pass
                 else:
                     seq_str = fmt_fasta(name, seq, labels)
                     label_number_dist.append(len(labels))
@@ -256,11 +316,14 @@ def main():
                         if len(labels) > 1:
                             output_buffer.queue(seq_str, 'multi')
                             n_mlabeled += 1
+                            label_dict['multi'] += 1
                         else:
                             output_buffer.queue(seq_str, labels[0])
+                            label_dict[labels[0]] += 1
                     else:
                         n_orphaned += 1
                         output_buffer.queue(seq_str, 'orphaned')
+                        label_dict['orphaned'] += 1
             print >>sys.stderr, '** End of file {fn}...'.format(fn=read_file)
             output_buffer.flush_all()
             read_fp.close()
@@ -278,15 +341,22 @@ def main():
             filee=output_buffer.num_file_errors)
 
     print >>sys.stderr, 'swept {n_reads} for labels...'.format(
-        n_reads=n_labeled + n_mlabeled + n_orphaned)
+        n_reads=n_labeled + n_orphaned)
     print >>sys.stderr, '...with {nc} labeled and {no} orphaned'.format(
         nc=n_labeled, no=n_orphaned)
     print >>sys.stderr, '...and {nmc} multilabeled'.format(nmc=n_mlabeled)
 
     print >>sys.stderr, '** outputting label number distribution...'
-    with open('label_dist.txt', 'wb') as outfp:
+    fn = os.path.join(outdir, '{pref}.dist.txt'.format(pref=output_pref))
+    with open(fn, 'wb') as outfp:
         for nc in label_number_dist:
             outfp.write('{nc}\n'.format(nc=nc))
+
+    fn = os.path.join(outdir, '{pref}.counts.csv'.format(pref=output_pref))
+    print >>sys.stderr, '** outputting label read counts...'
+    with open(fn, 'wb') as outfp:
+        for k in label_dict:
+            outfp.write('{l},{c}\n'.format(l=k, c=label_dict[k]))
 
 if __name__ == '__main__':
     main()

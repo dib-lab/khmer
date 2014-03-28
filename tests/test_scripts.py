@@ -1360,7 +1360,7 @@ def test_sample_reads_randomly():
                         '895:1:1:1335:19932', '895:1:1:1340:19387'])
 
 
-def test_sweep_reads_by_partition_buffered():
+def test_sweep_reads_buffered():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
     in_dir = os.path.dirname(contigfile)
@@ -1368,8 +1368,8 @@ def test_sweep_reads_by_partition_buffered():
     shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
-    script = scriptpath('sweep-reads-by-partition-buffered.py')
-    args = ['-k', '25', '-o', 'test',
+    script = scriptpath('sweep-reads-buffered.py')
+    args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
     status, out, err = runscript(script, args, in_dir)
 
@@ -1398,6 +1398,63 @@ def test_sweep_reads_by_partition_buffered():
     assert (seqsm == set(['read4_multi\t0\t1']) or
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
+
+    try:
+        os.remove(out1)
+        os.remove(out2)
+        os.remove(mout)
+        os.remove(oout)
+    except (IOError, OSError) as e:
+        print >>sys.stderr, 'error removing test outputs'
+
+
+def test_sweep_reads_buffered_2():
+
+    infile = utils.get_temp_filename('seqs.fa')
+    inref = utils.get_temp_filename('ref.fa')
+    shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
+    wdir = os.path.dirname(inref)
+    script = scriptpath('sweep-reads-buffered.py')
+    args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
+            'test', '--label-by-seq', inref, infile]
+    status, out, err = runscript(script, args, wdir)
+
+    for i in xrange(99):
+        p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
+        print p, err, out
+        assert os.path.exists(p)
+        os.remove(p)
+    assert os.path.exists(os.path.join(wdir, 'test.counts.csv'))
+    assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
+    assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
+
+
+def test_sweep_reads_buffered_3():
+
+    infile = utils.get_temp_filename('seqs.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    wdir = os.path.dirname(infile)
+    script = scriptpath('sweep-reads-buffered.py')
+    args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
+            'test', '--label-by-group', '10', infile, infile]
+    status, out, err = runscript(script, args, wdir)
+
+    for i in xrange(10):
+        p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
+        print p, err, out
+        assert os.path.exists(p)
+        os.remove(p)
+
+    counts_fn = os.path.join(wdir, 'test.counts.csv')
+    with open(counts_fn) as cfp:
+        for line in cfp:
+            _, _, c = line.partition(',')
+            assert int(c) in [9, 10]
+
+    assert os.path.exists(counts_fn)
+    assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
+    assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
 def test_count_overlap():
