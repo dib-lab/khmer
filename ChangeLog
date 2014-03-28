@@ -1,3 +1,8 @@
+2013-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * The system zlib and bzip2 libraries are now used instead of the bundled
+    versions if specified in setup.cfg or the command line.
+
 2013-03-20  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/storage.hh,khmer/_khmermodule.cc,lib/{readtable,read_parsers}.hh:
@@ -43,7 +48,7 @@
 
 2014-03-16  Ram RS  <ramrs@nyu.edu>
 
-	* Project email in copyright headers updated
+    * Project email in copyright headers updated
 
 2014-03-13  Ram RS  <ramrs@nyu.edu>
 
