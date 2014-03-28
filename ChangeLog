@@ -1,3 +1,8 @@
+2014-03-25  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * Makefile: update cppcheck command to match new version of Jenkins
+    plugin. Now ignores the lib/test*.cc files.
+
 2013-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * The system zlib and bzip2 libraries are now used instead of the bundled

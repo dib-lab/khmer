@@ -29,14 +29,14 @@ doc: FORCE
 	@echo ''
 
 cppcheck-result.xml: FORCE
-	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ \
-		-I lib/zlib -I lib/bzip2 -i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS \
-		--xml lib 2> cppcheck-result.xml
+	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all --file-list=- -j8 \
+		--platform=unix64 --std=posix --xml --xml-version=2 2> cppcheck-result.xml
 
 cppcheck: FORCE
-	cppcheck --std=posix --platform=unix64 -j8 --enable=all -I lib/ \
-		-I lib/zlib -I lib/bzip2 -i lib/zlib/ -i lib/bzip2/ -DVALIDATE_PARTITIONS \
-		lib
+	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all --file-list=- -j8 \
+		--platform=unix64 --std=posix --quiet
 
 pep8: FORCE
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/
