@@ -13,10 +13,10 @@ dist: FORCE
 	./setup.py sdist
 
 clean: FORCE
-	./setup.py clean --all
 	cd lib && ${MAKE} clean
 	cd tests && rm -rf khmertest_*
 	rm -f khmer/_khmermodule.so
+	./setup.py clean --all
 
 debug:
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
@@ -76,7 +76,6 @@ lib:
 	$(MAKE)
 
 test: all
-	python -m nose # match the coverage command, work around bug in the setuptools
-	# nose command that wipes out the build_ext config
+	./setup.py nosetests
 
 FORCE:
