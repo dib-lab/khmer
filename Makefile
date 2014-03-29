@@ -23,6 +23,7 @@ debug:
 		--inplace
 
 doc: FORCE
+	pip install --user sphinx || pip install sphinx
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
@@ -39,31 +40,40 @@ cppcheck: FORCE
 		--platform=unix64 --std=posix --quiet
 
 pep8: FORCE
-	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/
+	pip install --user --quiet pep8==1.5 || pip install --quiet pep8==1.5
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
 
 autopep8: FORCE
+	pip install --user autopep8 || pip install autopep8
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 setup.py \
 		khmer/ scripts/ tests/
 
 pylint: all FORCE
+	pip install --user pylint || pip install pylint
 	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		|| true
 
-coverage.xml: FORCE
+# We need to get coverage to look at our scripts. Since they aren't in a
+# python module we can't tell nosetests to look for them (via an import
+# statement). So we run nose inside of coverage.
+.coverage: FORCE
+	pip install --user coverage || pip install coverage
 	coverage run --branch --source=scripts,khmer -m nose --with-xunit \
 		--attr=\!known_failing --processes=0
+
+coverage.xml: .coverage
 	coverage xml
 
-coverage.html: FORCE
-	coverage run --branch --source=scripts,khmer -m nose --with-xunit \
-		--attr=\!known_failing --processes=0
-	coverage html 
+coverage.html: .coverage
+	coverage html
 
 coverage-gcovr.xml: FORCE
+	pip install --user gcovr || pip install gcovr
 	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
 		--output=coverage-gcovr.xml
 
 nosetests.xml: all
+	pip install --user nose || pip install nose
 	./setup.py nosetests --with-xunit
 
 doxygen: FORCE
@@ -76,6 +86,7 @@ lib:
 	$(MAKE)
 
 test: all
+	pip install --user nose || pip install nose
 	./setup.py nosetests
 
 FORCE:
