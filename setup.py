@@ -6,7 +6,7 @@
 """ Setup for khmer project. """
 
 import ez_setup
-ez_setup.use_setuptools(version="0.6c11")
+ez_setup.use_setuptools(version="0.7.2")
 
 import os
 from os import listdir as os_listdir
@@ -98,7 +98,7 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
         "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
-        "setup_requires": ['nose >= 1.0', 'sphinx', ],
+        "extras_require": {'docs': ['sphinx'], 'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
