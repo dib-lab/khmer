@@ -72,10 +72,14 @@
     * Bug fix: tests.test_normalize_by_median_no_bigcount() now runs within
     temp directory
 
-2014-03-11  Michael R. Crusoe  <mcrusoe@athyra>
+2014-03-11  Michael R. Crusoe  <mcrusoe@mcrusoe.edu>
 
     * lib/read_parsers.hh: fix for Coverity CID 1054789: Uninitialized scalar
     field
+
+2014-03-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/development.txt: document fork/tag policy + formatting fixes
 
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 
