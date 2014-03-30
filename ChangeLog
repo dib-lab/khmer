@@ -9,6 +9,11 @@
     * .ycm_extra_conf.py: Update our custom YouCompleteMe configuration to
     query the package configuration for the proper compilation flags.
 
+2014-03-28  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile,setup.py: demote nose & sphinx to extra dependencies.
+    Auto-install Python developer tools as needed.
+
 2013-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * The system zlib and bzip2 libraries are now used instead of the bundled
