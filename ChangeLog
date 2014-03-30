@@ -63,6 +63,11 @@
     * extract-partitions.py: pylint warnings addressed
     * test_scripts.py: tests added to cover extract-partitions completely
 
+2014-03-16  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/read_parsers.cc: fix for Coverity CID 1054789: Unititialized scalar
+    field II: fill_id is never zeroed out.
+
 2014-03-16  Ram RS  <ramrs@nyu.edu>
 
     * Project email in copyright headers updated
