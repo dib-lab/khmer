@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Annotate sequences with partition numbers.
@@ -18,6 +19,7 @@ import os
 import argparse
 
 import khmer
+from khmer.file import check_file_status, check_space
 
 DEFAULT_K = 32
 
@@ -34,19 +36,26 @@ def main():
 
     args = parser.parse_args()
 
-    K = args.ksize
-    ht = khmer.new_hashbits(K, 1, 1)
+    ksize = args.ksize
+    filenames = args.input_filenames
+    htable = khmer.new_hashbits(ksize, 1, 1)
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    print 'loading partition map from:', partitionmap_file
-    ht.load_partitionmap(partitionmap_file)
+    check_file_status(partitionmap_file)
+    for _ in filenames:
+        check_file_status(_)
 
-    for infile in args.input_filenames:
+    check_space(filenames)
+
+    print 'loading partition map from:', partitionmap_file
+    htable.load_partitionmap(partitionmap_file)
+
+    for infile in filenames:
         print 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
-        n = ht.output_partitions(infile, outfile)
-        print 'output %d partitions for %s' % (n, infile)
+        part_count = htable.output_partitions(infile, outfile)
+        print 'output %d partitions for %s' % (part_count, infile)
         print 'partitions are in', outfile
 
 if __name__ == '__main__':

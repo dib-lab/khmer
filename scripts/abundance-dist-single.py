@@ -1,9 +1,11 @@
 #! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Produce the k-mer abundance distribution for the given file, without
 loading a prebuilt counting hash.
@@ -12,14 +14,17 @@ loading a prebuilt counting hash.
 
 Use '-h' for parameter help.
 """
+import os
 import sys
 import khmer
 import threading
 from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
+from khmer.file import check_file_status, check_space
+from khmer.file import check_space_for_hashtable
 
 
-def main():
+def main():  # pylint: disable=too-many-locals,too-many-branches
     parser = build_construct_args(
         "Output k-mer abundance distribution (single file version).")
     add_threading_args(parser)
@@ -40,6 +45,17 @@ def main():
 
     args = parser.parse_args()
     report_on_config(args)
+
+    check_file_status(args.datafile)
+    check_space([args.datafile])
+    if args.savehash:
+        check_space_for_hashtable(args.ksize * args.min_hashsize)
+
+    if not args.squash_output and os.path.exists(args.histout):
+        print >> sys.stderr, 'ERROR: %s exists; not squashing.' % args.histout
+        sys.exit(-1)
+    else:
+        hist_fp = open(args.histout, 'w')
 
     print 'making hashtable'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_hashsize,
@@ -105,13 +121,11 @@ def main():
     total = sum(abundance.values())
 
     if 0 == total:
-        print >>sys.stderr, \
+        print >> sys.stderr, \
             "ERROR: abundance distribution is uniformly zero; " \
             "nothing to report."
-        print >>sys.stderr, "\tPlease verify that the input files are valid."
+        print >> sys.stderr, "\tPlease verify that the input files are valid."
         sys.exit(1)
-
-    hist_fp = open(args.histout, 'w')
 
     sofar = 0
     for _, i in sorted(abundance.items()):
@@ -121,7 +135,7 @@ def main():
         sofar += i
         frac = sofar / float(total)
 
-        print >>hist_fp, _, i, sofar, round(frac, 3)
+        print >> hist_fp, _, i, sofar, round(frac, 3)
 
         if sofar == total:
             break

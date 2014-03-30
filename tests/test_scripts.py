@@ -1024,7 +1024,7 @@ def test_extract_partitions_no_groups():
     script = scriptpath('extract-partitions.py')
     args = ['extracted', empty_file]
 
-    runscript(script, args, in_dir)
+    runscript(script, args, in_dir, fail_ok=True)
 
     # No group files should be created
     groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
@@ -1346,7 +1346,7 @@ def test_sample_reads_randomly():
     script = scriptpath('sample-reads-randomly.py')
     # fix random number seed for reproducibility
     args = ['-N', '10', '-R', '1']
-    args.append('test.fq')
+    args.append(infile)
     runscript(script, args, in_dir)
 
     outfile = infile + '.subset'
@@ -1371,11 +1371,12 @@ def test_sweep_reads_buffered():
     script = scriptpath('sweep-reads-buffered.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
-    status, out, err = runscript(script, args, in_dir)
+
+    status, out, err = runscript(script, args, in_dir, fail_ok=True)
 
     # check if the bad file was skipped without issue
-    assert 'ERROR' in err
-    assert 'skipping' in err
+    assert 'ERROR' in err, err
+    assert 'skipping' in err, err
 
     out1 = os.path.join(in_dir, 'test_0.fa')
     out2 = os.path.join(in_dir, 'test_1.fa')
