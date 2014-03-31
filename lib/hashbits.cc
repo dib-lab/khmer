@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -16,7 +16,9 @@ using namespace khmer:: read_parsers;
 
 void Hashbits::save(std::string outfilename)
 {
-    assert(_counts[0]);
+    if (!_counts[0]) {
+        throw std::exception();
+    }
 
     unsigned int save_ksize = _ksize;
     unsigned char save_n_tables = _n_tables;
@@ -62,12 +64,15 @@ void Hashbits::load(std::string infilename)
     unsigned char version, ht_type;
 
     ifstream infile(infilename.c_str(), ios::binary);
-    assert(infile.is_open());
+    if (!infile.is_open()) {
+        throw new exception();
+    }
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
-    assert(version == SAVED_FORMAT_VERSION);
-    assert(ht_type == SAVED_HASHBITS);
+    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
+        throw std::exception();
+    }
 
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     infile.read((char *) &save_n_tables, sizeof(save_n_tables));

@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -74,12 +74,13 @@ protected:
     HashIntoType _kmer_f, _kmer_r;
     HashIntoType bitmask;
     unsigned int _nbits_sub_1;
-    unsigned int index, length;
+    unsigned int index;
+    size_t length;
     bool initialized;
 public:
     KMerIterator(const char * seq, unsigned char k) : _seq(seq), _ksize(k) {
         bitmask = 0;
-        for (unsigned int i = 0; i < _ksize; i++) {
+        for (unsigned char i = 0; i < _ksize; i++) {
             bitmask = (bitmask << 2) | 3;
         }
         _nbits_sub_1 = (_ksize*2 - 2);
@@ -116,7 +117,9 @@ public:
 
         unsigned char ch = _seq[index];
         index++;
-        assert(index <= length);
+        if (!(index <= length)) {
+            throw std::exception();
+        }
 
         // left-shift the previous hash over
         _kmer_f = _kmer_f << 2;
@@ -205,7 +208,9 @@ protected:
             _max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
             _ksize( ksize ) {
         _tag_density = DEFAULT_TAG_DENSITY;
-        assert(_tag_density % 2 == 0);
+        if (!(_tag_density % 2 == 0)) {
+            throw std::exception();
+        }
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
@@ -215,7 +220,6 @@ protected:
     virtual ~Hashtable( ) {
         std:: map< int, uint32_t >:: iterator it;
         uint32_t thread_pool_id;
-        Hasher ** hashers = NULL;
 
         for (it = _thread_pool_id_map.begin( );
                 it != _thread_pool_id_map.end( );
@@ -225,7 +229,7 @@ protected:
             delete _thread_id_maps[ thread_pool_id ];
             _thread_id_maps[ thread_pool_id ] = NULL;
 
-            hashers = _hashers_map[ thread_pool_id ];
+            Hasher ** hashers = _hashers_map[ thread_pool_id ];
             for (uint32_t i = 0; i < _number_of_threads; ++i) {
                 if (NULL != hashers[ i ]) {
                     delete hashers[ i ];
@@ -391,8 +395,9 @@ public:
 
     // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d) {
-        assert(d % 2 == 0);	// must be even
-        assert(all_tags.size() == 0); // no tags exist!
+        if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
+            throw std::exception();
+        }
         _tag_density = d;
     }
 
@@ -409,7 +414,7 @@ public:
 
     // Partitioning stuff.
 
-    unsigned int n_tags() const {
+    size_t n_tags() const {
         return all_tags.size();
     }
 
@@ -495,7 +500,7 @@ public:
                                        unsigned int radius,
                                        unsigned int max_volume) const;
 
-    unsigned int trim_on_stoptags(std::string sequence) const;
+    size_t trim_on_stoptags(std::string sequence) const;
 
     void traverse_from_tags(unsigned int distance,
                             unsigned int threshold,

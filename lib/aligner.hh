@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -21,10 +21,10 @@ namespace khmer
 class CandidateAlignment
 {
 public:
-    std::map<int,int> readDeletions;
+    std::map<unsigned long,unsigned long> readDeletions;
     std::string alignment;
 
-    CandidateAlignment(std::map<int,int> _readDel, std::string _aln) {
+    CandidateAlignment(std::map<unsigned long,unsigned long> _readDel, std::string _aln) {
         readDeletions = _readDel;
         alignment = _aln;
     }
@@ -38,7 +38,7 @@ public:
     }
 
     std::string getReadAlignment(std::string seq) {
-        int tmpDels = 0;
+        unsigned long tmpDels = 0;
         int readIndex = 0;
         std::string readAlign;
 
@@ -66,7 +66,7 @@ public:
     }
 
     void outputReadDels() {
-        std::map<int, int>::iterator it;
+        std::map<unsigned long, unsigned long>::iterator it;
 
         for (it = readDeletions.begin(); it != readDeletions.end(); it++) {
             std::cout << "Key: " << (*it).first << " Value: " <<
@@ -79,15 +79,15 @@ class Aligner
 {
     khmer::CountingHash * ch;
     ScoringMatrix * sm;
-    int k;
+    WordLength k;
     double lambdaOne; // error distribution parameter
     double lambdaTwo; // non-error distribution parameter
     unsigned int maxErrorRegion;
 
 public:
-    Node * subalign(Node *, unsigned int, unsigned char, std::set<Node*>&,
+    Node * subalign(Node *, unsigned long, unsigned char, std::set<Node*>&,
                     std::vector<Node*>&, const std::string&);
-    std::string extractString(Node*, unsigned char, std::map<int,int>*);
+    std::string extractString(Node*, unsigned char, std::map<unsigned long,unsigned long>*);
     CandidateAlignment align(khmer::CountingHash*, const std::string&,
                              const std::string&, int);
 
@@ -102,7 +102,7 @@ public:
         maxErrorRegion = maxErrorReg;
     }
 
-    int ksize() {
+    WordLength ksize() {
         return k;
     }
 
