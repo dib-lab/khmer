@@ -1275,7 +1275,9 @@ get_parser(
 
     int		    ifile_handle    = -1;
     int		    ifile_flags	    = O_RDONLY;
+#ifdef __linux__
     int             retval = 0;
+#endif
 
     if (0 < ext_pos) {
         ext		    = ifile_name.substr( ext_pos + 1 );
@@ -1406,19 +1408,25 @@ IParser(
             "^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}",
             REG_EXTENDED | REG_NOSUB
         );
-    assert( !regex_rc );
+    if (regex_rc) {
+        throw std::exception();
+    }
     regex_rc =
         regcomp(
             &_re_read_1,
             "^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
-    assert( !regex_rc );
+    if (regex_rc) {
+        throw std::exception();
+    }
     regex_rc =
         regcomp(
             &_re_read_2,
             "^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
-    assert( !regex_rc );
+    if (regex_rc) {
+        throw std::exception();
+    }
 }
 
 
