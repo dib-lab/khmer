@@ -310,7 +310,9 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     traverse_labels_and_resolve(tagged_kmers, found_labels);
     //printf("range=%u ", range);
     if (range == 0) {
-      assert(num_traversed == seq.length()-ksize()+1);
+      if (!(num_traversed == seq.length()-ksize()+1)) {
+	      throw std::exception();
+      }
     }
     tagged_kmers.clear();
     return num_traversed;

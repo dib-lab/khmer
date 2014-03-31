@@ -140,7 +140,9 @@ size_t SubsetPartition::output_partitioned_file(const std::string infilename,
       }
 #ifdef VALIDATE_PARTITIONS
       std::cout << "checking: " << read.name << "\n";
-      assert(is_single_partition(seq));
+      if (!is_single_partition(seq)) {
+	      throw std::exception();
+      }
 #endif // VALIDATE_PARTITIONS
 	       
       total_reads++;
@@ -455,7 +457,9 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
       continue;
     }
 
-    assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+    if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+	    throw std::exception();
+    }
     if (breadth > cur_breadth) { cur_breadth = breadth; }
 
     if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
@@ -719,7 +723,9 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
     }
 
     // @cswelcher Do these lines actually do anything?
-    assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+    if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+	    throw std::exception();
+    }
     if (breadth > cur_breadth) { cur_breadth = breadth; }
 
     if (breadth >= max_breadth) { continue; } // truncate search @CTB exit?
@@ -923,7 +929,9 @@ void SubsetPartition::do_partition_with_abundance(HashIntoType first_kmer,
 void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
 {
   HashIntoType kmer;
-  assert(kmer_s.length() >= _ht->ksize());
+  if (!(kmer_s.length() >= _ht->ksize())) {
+	  throw std::exception();
+  }
   kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
   set_partition_id(kmer, p);
@@ -1015,7 +1023,9 @@ PartitionID * SubsetPartition::_join_partitions_by_tags(
     }
   }
 
-  assert(this_partition_p != NULL);
+  if (!(this_partition_p != NULL)) {
+	  throw std::exception();
+  }
   partition_map[kmer] = this_partition_p;
 
   return this_partition_p;
@@ -1078,7 +1088,9 @@ PartitionID SubsetPartition::join_partitions(PartitionID orig, PartitionID join)
 PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
 {
   HashIntoType kmer;
-  assert(kmer_s.length() >= _ht->ksize());
+  if (!(kmer_s.length() >= _ht->ksize())) {
+	  throw std::exception();
+  }
   kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
   return get_partition_id(kmer);
@@ -1170,18 +1182,23 @@ void SubsetPartition::_merge_other(HashIntoType tag,
 void SubsetPartition::merge_from_disk(string other_filename)
 {
   ifstream infile(other_filename.c_str(), ios::binary);
-  assert(infile.is_open());
+  if (!infile.is_open()) {
+	  throw std::exception();
+  }
 
   unsigned int save_ksize = 0;
   unsigned char version, ht_type;
 
   infile.read((char *) &version, 1);
   infile.read((char *) &ht_type, 1);
-  assert(version == SAVED_FORMAT_VERSION);
-  assert(ht_type == SAVED_SUBSET);
+  if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_SUBSET)) {
+	  throw std::exception();
+  }
 
   infile.read((char *) &save_ksize, sizeof(save_ksize));
-  assert(save_ksize == _ht->ksize());
+  if (!(save_ksize == _ht->ksize())) {
+	  throw std::exception();
+  }
 
   char * buf = NULL;
   buf = new char[IO_BUF_SIZE];
@@ -1190,7 +1207,9 @@ void SubsetPartition::merge_from_disk(string other_filename)
   unsigned int loaded = 0;
   long remainder;
 
-  assert(infile.is_open());
+  if (!(infile.is_open())) {
+	  throw std::exception();
+  }
 
   PartitionPtrMap diskp_to_pp;
 
@@ -1220,13 +1239,17 @@ void SubsetPartition::merge_from_disk(string other_filename)
       diskp = (PartitionID *) (buf + i);
       i += sizeof(PartitionID);
 
-      assert(*diskp != 0);		// sanity check.
+      if (!(*diskp != 0)) {		// sanity check.
+	      throw std::exception();
+      }
 
       _merge_other(*kmer_p, *diskp, diskp_to_pp);
 
       loaded++;
     }
-    assert(i == n_bytes);
+    if (!(i == n_bytes)) {
+	    throw std::exception();
+    }
     memcpy(buf, buf + n_bytes, remainder);
 
     // _merge_from_disk_consolidate(diskp_to_pp);
@@ -1493,7 +1516,9 @@ unsigned long long SubsetPartition::repartition_largest_partition(unsigned int d
   PartitionCountDistribution::const_iterator di = d.end();
   di--;
 
-  assert(d.size());
+  if (!d.size()) {
+	  throw std::exception();
+  }
 
   for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
        cmi++) {
@@ -1501,7 +1526,9 @@ unsigned long long SubsetPartition::repartition_largest_partition(unsigned int d
       biggest_p = cmi->first;	// find PID of largest partition
     }
   }
-  assert(biggest_p != 0);
+  if (!(biggest_p != 0)) {
+	  throw std::exception();
+  }
 
 #if VERBOSE_REPARTITION
   std::cout << "biggest partition: " << di->first << "\n";

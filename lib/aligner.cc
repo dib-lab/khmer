@@ -223,7 +223,9 @@ void Aligner::printErrorFootprint(const std::string& read)
     for (unsigned int i = 0; i < read.length() - k + 1; i++) {
         std::string kmer = read.substr(i, k);
 
-        assert(kmer.length() == k);
+        if (!(kmer.length() == k)) {
+		throw std::exception();
+	}
 
         BoundedCounterType kCov = ch->get_count(kmer.c_str());
 
@@ -253,7 +255,9 @@ CandidateAlignment Aligner::alignRead(const std::string& read)
     for (unsigned int i = 0; i < read.length() - k + 1; i++) {
         std::string kmer = read.substr(i, k);
 
-        assert(kmer.length() == k);
+        if (!(kmer.length() == k)) {
+		throw std::exception();
+	}
 
         BoundedCounterType kCov = ch->get_count(kmer.c_str());
 

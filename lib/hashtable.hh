@@ -117,7 +117,9 @@ public:
 
         unsigned char ch = _seq[index];
         index++;
-        assert(index <= length);
+        if (!(index <= length)) {
+		throw std::exception();
+	}
 
         // left-shift the previous hash over
         _kmer_f = _kmer_f << 2;
@@ -206,7 +208,9 @@ protected:
             _max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
             _ksize( ksize ) {
         _tag_density = DEFAULT_TAG_DENSITY;
-        assert(_tag_density % 2 == 0);
+        if (!(_tag_density % 2 == 0)) {
+		throw std::exception();
+	}
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
@@ -391,8 +395,9 @@ public:
 
     // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d) {
-        assert(d % 2 == 0);	// must be even
-        assert(all_tags.empty()); // no tags exist!
+        if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
+		throw std::exception();
+	}
         _tag_density = d;
     }
 

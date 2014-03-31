@@ -49,7 +49,11 @@
 2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * lib/counting.hh: include hashtable.hh
-    * lib/counting.{cc,hh},khmer/_khmermodule.cc: many downcasts removed
+    * lib/{counting,aligner,hashbits,hashtable,labelhash,node,subset}.{cc,hh},
+    kmer.cc,khmer/_khmermodule.cc: removed downcast, replaced non-functional
+    asserts() with exception throws.
+    * khmer/_khmermodule.cc: fixed parsing of PyLists
+    * setup.py: force 64bit only builds on OS X.
 
 2014-03-19  Titus Brown  <t@idyll.org>
 
