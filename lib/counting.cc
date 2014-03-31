@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -103,7 +103,7 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
 
     // if not, could lead to overflow.
     if (!sizeof(BoundedCounterType) == 2) {
-	    throw std::exception();
+        throw std::exception();
     }
 
     while(!parser->is_complete()) {
@@ -270,7 +270,7 @@ void CountingHash::get_kadian_count(const std::string &s,
     }
 
     if (!counts.size()) {
-	    throw std::exception();
+        throw std::exception();
     }
     unsigned int kpos = nk*_ksize;
 
@@ -533,13 +533,13 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
 
     ifstream infile(infilename.c_str(), ios::binary);
     if (!infile.is_open()) {
-	    throw std::exception();
+        throw std::exception();
     }
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
     if (!(version == SAVED_FORMAT_VERSION) or !(ht_type == SAVED_COUNTING_HT)) {
-	    throw std::exception();
+        throw std::exception();
     }
 
     infile.read((char *) &use_bigcount, 1);
@@ -611,7 +611,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
     gzread(infile, (char *) &version, 1);
     gzread(infile, (char *) &ht_type, 1);
     if (!(version == SAVED_FORMAT_VERSION) or !(ht_type == SAVED_COUNTING_HT)) {
-	    throw std::exception();
+        throw std::exception();
     }
 
     gzread(infile, (char *) &use_bigcount, 1);
@@ -638,7 +638,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
         HashIntoType loaded = 0;
         while (loaded != tablesize) {
             loaded += gzread(infile, (char *) ht._counts[i],
-			    (unsigned) (tablesize - loaded));
+                             (unsigned) (tablesize - loaded));
         }
     }
 
@@ -664,7 +664,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
 CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht)
 {
     if (!ht._counts[0]) {
-	    throw std::exception();
+        throw std::exception();
     }
 
     unsigned int save_ksize = ht._ksize;
@@ -713,7 +713,7 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
 CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht)
 {
     if (!ht._counts[0]) {
-	    throw std::exception();
+        throw std::exception();
     }
 
     unsigned int save_ksize = ht._ksize;
@@ -744,7 +744,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
         unsigned long long written = 0;
         while (written != save_tablesize) {
             written += gzwrite(outfile, (const char *) ht._counts[i],
-			    (int) (save_tablesize - written));
+                               (int) (save_tablesize - written));
         }
     }
 

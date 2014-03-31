@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -118,8 +118,8 @@ public:
         unsigned char ch = _seq[index];
         index++;
         if (!(index <= length)) {
-		throw std::exception();
-	}
+            throw std::exception();
+        }
 
         // left-shift the previous hash over
         _kmer_f = _kmer_f << 2;
@@ -209,8 +209,8 @@ protected:
             _ksize( ksize ) {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
-		throw std::exception();
-	}
+            throw std::exception();
+        }
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
@@ -396,8 +396,8 @@ public:
     // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d) {
         if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
-		throw std::exception();
-	}
+            throw std::exception();
+        }
         _tag_density = d;
     }
 

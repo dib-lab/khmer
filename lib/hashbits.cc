@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -17,7 +17,7 @@ using namespace khmer:: read_parsers;
 void Hashbits::save(std::string outfilename)
 {
     if (!_counts[0]) {
-      throw std::exception();
+        throw std::exception();
     }
 
     unsigned int save_ksize = _ksize;
@@ -65,13 +65,13 @@ void Hashbits::load(std::string infilename)
 
     ifstream infile(infilename.c_str(), ios::binary);
     if (!infile.is_open()) {
-      throw new exception();
+        throw new exception();
     }
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
     if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
-      throw std::exception();
+        throw std::exception();
     }
 
     infile.read((char *) &save_ksize, sizeof(save_ksize));
