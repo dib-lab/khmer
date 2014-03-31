@@ -102,7 +102,9 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
     string seq;
 
     // if not, could lead to overflow.
-    assert(sizeof(BoundedCounterType) == 2);
+    if (!sizeof(BoundedCounterType) == 2) {
+	    throw std::exception();
+    }
 
     while(!parser->is_complete()) {
         read = parser->get_next_read();
@@ -267,7 +269,9 @@ void CountingHash::get_kadian_count(const std::string &s,
         counts.push_back(count);
     }
 
-    assert(counts.size());
+    if (!counts.size()) {
+	    throw std::exception();
+    }
     unsigned int kpos = nk*_ksize;
 
     if (counts.size() < kpos) {
@@ -528,12 +532,15 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
     unsigned char version, ht_type, use_bigcount;
 
     ifstream infile(infilename.c_str(), ios::binary);
-    assert(infile.is_open());
+    if (!infile.is_open()) {
+	    throw std::exception();
+    }
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
-    assert(version == SAVED_FORMAT_VERSION);
-    assert(ht_type == SAVED_COUNTING_HT);
+    if (!(version == SAVED_FORMAT_VERSION) or !(ht_type == SAVED_COUNTING_HT)) {
+	    throw std::exception();
+    }
 
     infile.read((char *) &use_bigcount, 1);
     infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -603,8 +610,9 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
 
     gzread(infile, (char *) &version, 1);
     gzread(infile, (char *) &ht_type, 1);
-    assert(version == SAVED_FORMAT_VERSION);
-    assert(ht_type == SAVED_COUNTING_HT);
+    if (!(version == SAVED_FORMAT_VERSION) or !(ht_type == SAVED_COUNTING_HT)) {
+	    throw std::exception();
+    }
 
     gzread(infile, (char *) &use_bigcount, 1);
     gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
@@ -655,7 +663,9 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
 
 CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht)
 {
-    assert(ht._counts[0]);
+    if (!ht._counts[0]) {
+	    throw std::exception();
+    }
 
     unsigned int save_ksize = ht._ksize;
     unsigned char save_n_tables = ht._n_tables;
@@ -702,7 +712,9 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
 
 CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht)
 {
-    assert(ht._counts[0]);
+    if (!ht._counts[0]) {
+	    throw std::exception();
+    }
 
     unsigned int save_ksize = ht._ksize;
     unsigned char save_n_tables = ht._n_tables;

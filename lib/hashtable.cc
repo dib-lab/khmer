@@ -314,7 +314,9 @@ void Hashtable::get_median_count(const std::string &s,
         counts.push_back(count);
     }
 
-    assert(counts.size());
+    if (!counts.size()) {
+      throw std::exception();
+    }
 
     if (!counts.size()) {
         median = 0;
@@ -376,7 +378,9 @@ void Hashtable::save_tagset(std::string outfilename)
 void Hashtable::load_tagset(std::string infilename, bool clear_tags)
 {
     ifstream infile(infilename.c_str(), ios::binary);
-    assert(infile.is_open());
+    if (!infile.is_open()) {
+      throw std::exception();
+    }
 
     if (clear_tags) {
         all_tags.clear();
@@ -389,11 +393,14 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
-    assert(version == SAVED_FORMAT_VERSION);
-    assert(ht_type == SAVED_TAGS);
+    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_TAGS)) {
+      throw std::exception();
+    }
 
     infile.read((char *) &save_ksize, sizeof(save_ksize));
-    assert(save_ksize == _ksize);
+    if (!(save_ksize == _ksize)) {
+	throw std::exception();
+    }
 
     infile.read((char *) &tagset_size, sizeof(tagset_size));
     infile.read((char *) &_tag_density, sizeof(_tag_density));
@@ -1115,7 +1122,9 @@ const
             break;
         }
 
-        assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+	  throw std::exception();
+	}
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
         }
@@ -1478,7 +1487,9 @@ const
             break;
         }
 
-        assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+	  throw std::exception();
+	}
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
         }
@@ -1681,7 +1692,9 @@ const
             continue;
         }
 
-        assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+	  throw std::exception();
+	}
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
         }
@@ -1768,7 +1781,9 @@ const
 void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 {
     ifstream infile(infilename.c_str(), ios::binary);
-    assert(infile.is_open());
+    if (!(infile.is_open())) {
+      throw std::exception();
+    }
 
     if (clear_tags) {
         stop_tags.clear();
@@ -1781,11 +1796,14 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
-    assert(version == SAVED_FORMAT_VERSION);
-    assert(ht_type == SAVED_STOPTAGS);
+    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_STOPTAGS)) {
+      throw std::exception();
+    }
 
     infile.read((char *) &save_ksize, sizeof(save_ksize));
-    assert(save_ksize == _ksize);
+    if (!(save_ksize == _ksize)) {
+	throw std::exception();
+    }
     infile.read((char *) &tagset_size, sizeof(tagset_size));
 
     HashIntoType * buf = new HashIntoType[tagset_size];
@@ -1951,7 +1969,9 @@ void Hashtable::extract_unique_paths(std::string seq,
         // that this, in fact, a "new" window -- extend until it isn't, and
         // then extract.
 
-        assert(j == min_length);
+        if (!(j == min_length)) {
+	  throw std::exception();
+	}
         if ( ((float)seen_counter / (float) j) <= max_seen) {
             unsigned int start = i;
 

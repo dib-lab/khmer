@@ -48,10 +48,10 @@ autopep8: FORCE
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 setup.py \
 		khmer/ scripts/ tests/
 
-pylint: all FORCE
+pylint: FORCE
 	pip install --user pylint || pip install pylint
-	pylint -f parseable khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
-		|| true
+	pylint -f parseable setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py \
+		tests || true
 
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import

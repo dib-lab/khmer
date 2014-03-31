@@ -27,8 +27,9 @@ HashIntoType _hash(const char * kmer, const WordLength k,
                    HashIntoType& _h, HashIntoType& _r)
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
-    assert(k <= sizeof(HashIntoType)*4);
-    assert(strlen(kmer) >= k);
+    if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
+	    throw std::exception();
+    }
 
     HashIntoType h = 0, r = 0;
 

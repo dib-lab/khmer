@@ -9,6 +9,7 @@ import ez_setup
 ez_setup.use_setuptools(version="0.7.2")
 
 import os
+import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
 
@@ -31,8 +32,7 @@ CMDCLASS = versioneer.get_cmdclass()
 # proper fix coming in http://bugs.python.org/issue1222585
 # numpy has a "nicer" fix:
 # https://github.com/numpy/numpy/blob/master/numpy/distutils/ccompiler.py
-# pylint: disable=unpacking-non-sequence
-(OPT,) = get_config_vars('OPT')  # pylint: disable=unbalanced-tuple-unpacking
+OPT = get_config_vars('OPT')[0]
 os.environ['OPT'] = " ".join(
     flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
 )
@@ -63,10 +63,15 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
     "counting", "subset", "aligner", "scoringmatrix", "node", "kmer"])
 
+EXTRA_COMPILE_ARGS = ['-O3']
+
+if sys.platform == 'darwin':
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
+
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
-        "extra_compile_args": ['-O3', ],
+        "extra_compile_args": EXTRA_COMPILE_ARGS,
         "extra_objects": EXTRA_OBJS,
         "depends": BUILD_DEPENDS,
         "language": "c++",
