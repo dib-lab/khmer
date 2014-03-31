@@ -20,7 +20,7 @@ import khmer
 from itertools import izip
 from khmer.khmer_args import build_counting_args, DEFAULT_MIN_HASHSIZE
 from khmer.khmer_args import add_loadhash_args
-from khmer.khmer_args import report_on_config
+from khmer.khmer_args import report_on_config, info
 import argparse
 
 DEFAULT_DESIRED_COVERAGE = 10
@@ -148,6 +148,7 @@ def main():
     parser.add_argument('input_filenames', nargs='+')
     add_loadhash_args(parser)
 
+    info('normalize-by-median.py', ['diginorm'])
     args = parser.parse_args()
 
     report_on_config(args)

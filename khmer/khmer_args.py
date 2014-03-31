@@ -4,6 +4,7 @@ Copyright (C) Michigan State University, 2009-2014. It is licensed under
 the three-clause BSD license; see doc/LICENSE.txt.
 Contact: khmer-project@idyll.org
 '''
+import sys
 import os
 import argparse
 from khmer import extract_countinghash_info, extract_hashbits_info
@@ -159,5 +160,26 @@ def report_on_config(args, hashtype='counting'):
             "Please read the docs!\n"
         )
 
+_algorithms = {
+    'software': 'Crusoe et al., XXX, 2014.',
+    'diginorm': "Brown CT et al., arXiv:1203.4802 [q-bio.GN]",
+}
+
+def info(scriptname, algorithm_list):
+    import khmer
+
+    sys.stderr.write("\n")
+    sys.stderr.write("|| This is the script '%s' in khmer.\n|| You are running version %s\n" %
+         (scriptname, khmer.__version__,))
+
+    sys.stderr.write("|| If you use this script in a publication, please cite:\n")
+
+    algorithm_list.insert(0, 'software')
+    for alg in algorithm_list:
+        sys.stderr.write("||   * ")
+        sys.stderr.write(_algorithms[alg])
+        sys.stderr.write("\n")
+
+    sys.stderr.write("||\n|| Please see the CITATION file for details.\n\n")
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
