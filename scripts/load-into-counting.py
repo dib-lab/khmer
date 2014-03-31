@@ -15,7 +15,7 @@ Use '-h' for parameter help.
 import sys
 import threading
 import khmer
-from khmer.khmer_args import build_counting_args, report_on_config
+from khmer.khmer_args import build_counting_args, report_on_config, info
 from khmer.threading_args import add_threading_args
 
 #
@@ -30,6 +30,7 @@ def main():
                         action='store_false',
                         help='Do not count k-mers past 255')
 
+    info('load-into-counting.py', ['counting'])
     args = parser.parse_args()
     report_on_config(args)
 

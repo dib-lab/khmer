@@ -161,8 +161,10 @@ def report_on_config(args, hashtype='counting'):
         )
 
 _algorithms = {
-    'software': 'Crusoe et al., XXX, 2014.',
+    'software': 'Crusoe MR et al., XXX, 2014.',
     'diginorm': "Brown CT et al., arXiv:1203.4802 [q-bio.GN]",
+    'graph'   : "Pell J et al., PNAS, 2014 (PMID 22847406)",
+    'counting': "Zhang Q et al., arXiv:1309.2975 [q-bio.GN]",
 }
 
 def info(scriptname, algorithm_list):
@@ -172,7 +174,7 @@ def info(scriptname, algorithm_list):
     sys.stderr.write("|| This is the script '%s' in khmer.\n|| You are running version %s\n" %
          (scriptname, khmer.__version__,))
 
-    sys.stderr.write("|| If you use this script in a publication, please cite:\n")
+    sys.stderr.write("|| If you use this script in a publication, please cite EACH of the following:\n")
 
     algorithm_list.insert(0, 'software')
     for alg in algorithm_list:
