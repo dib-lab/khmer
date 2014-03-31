@@ -174,7 +174,7 @@ def info(scriptname, algorithm_list):
     sys.stderr.write("|| This is the script '%s' in khmer.\n|| You are running version %s\n" %
          (scriptname, khmer.__version__,))
 
-    sys.stderr.write("|| If you use this script in a publication, please cite EACH of the following:\n")
+    sys.stderr.write("|| If you use this script in a publication, please cite EACH of the following:\n||\n")
 
     algorithm_list.insert(0, 'software')
     for alg in algorithm_list:
