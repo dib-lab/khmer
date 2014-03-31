@@ -38,7 +38,7 @@ public:
     }
 
     std::string getReadAlignment(std::string seq) {
-        int tmpDels = 0;
+        unsigned long tmpDels = 0;
         int readIndex = 0;
         std::string readAlign;
 
