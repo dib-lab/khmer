@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -315,7 +315,7 @@ void Hashtable::get_median_count(const std::string &s,
     }
 
     if (!counts.size()) {
-      throw std::exception();
+        throw std::exception();
     }
 
     if (!counts.size()) {
@@ -379,7 +379,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
 {
     ifstream infile(infilename.c_str(), ios::binary);
     if (!infile.is_open()) {
-      throw std::exception();
+        throw std::exception();
     }
 
     if (clear_tags) {
@@ -394,12 +394,12 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
     if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_TAGS)) {
-      throw std::exception();
+        throw std::exception();
     }
 
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     if (!(save_ksize == _ksize)) {
-	throw std::exception();
+        throw std::exception();
     }
 
     infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -429,7 +429,7 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
 
     while(!kmers.done()) {
         kmer = kmers.next();
-	bool is_new_kmer;
+        bool is_new_kmer;
 
         // Set the bits for the kmer in the various hashtables,
         // and report on whether or not they had already been set.
@@ -553,7 +553,7 @@ consume_fasta_and_tag(
         read = parser->get_next_read( );
 
         if (check_and_normalize_read( read.sequence )) {
-	  unsigned long long this_n_consumed = 0;
+            unsigned long long this_n_consumed = 0;
             consume_sequence_and_tag( read.sequence, this_n_consumed );
 
 #ifdef WITH_INTERNAL_METRICS
@@ -1123,8 +1123,8 @@ const
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-	  throw std::exception();
-	}
+            throw std::exception();
+        }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
         }
@@ -1488,8 +1488,8 @@ const
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-	  throw std::exception();
-	}
+            throw std::exception();
+        }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
         }
@@ -1603,7 +1603,7 @@ void Hashtable::traverse_from_tags(unsigned int distance,
 #endif // 0
 
     for (SeenSet::const_iterator si = all_tags.begin(); si != all_tags.end();
-	++si, i++) {
+            ++si, i++) {
         n++;
         unsigned int count = traverse_from_kmer(*si, distance, keeper);
 
@@ -1693,8 +1693,8 @@ const
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-	  throw std::exception();
-	}
+            throw std::exception();
+        }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
         }
@@ -1782,7 +1782,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 {
     ifstream infile(infilename.c_str(), ios::binary);
     if (!(infile.is_open())) {
-      throw std::exception();
+        throw std::exception();
     }
 
     if (clear_tags) {
@@ -1797,12 +1797,12 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
     if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_STOPTAGS)) {
-      throw std::exception();
+        throw std::exception();
     }
 
     infile.read((char *) &save_ksize, sizeof(save_ksize));
     if (!(save_ksize == _ksize)) {
-	throw std::exception();
+        throw std::exception();
     }
     infile.read((char *) &tagset_size, sizeof(tagset_size));
 
@@ -1970,8 +1970,8 @@ void Hashtable::extract_unique_paths(std::string seq,
         // then extract.
 
         if (!(j == min_length)) {
-	  throw std::exception();
-	}
+            throw std::exception();
+        }
         if ( ((float)seen_counter / (float) j) <= max_seen) {
             unsigned int start = i;
 
