@@ -171,6 +171,7 @@ _algorithms = {
     'diginorm': "CT Brown et al., arXiv:1203.4802 [q-bio.GN]",
     'graph': "J Pell et al., PNAS, 2014 (PMID 22847406)",
     'counting': "Q Zhang et al., arXiv:1309.2975 [q-bio.GN]",
+    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished'
 }
 
 

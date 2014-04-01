@@ -26,6 +26,7 @@ import textwrap
 import argparse
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 
 def output_pair(read1, read2):
@@ -66,6 +67,7 @@ def get_parser():
 
 
 def main():
+    info('interleave-reads.py')
     args = get_parser().parse_args()
 
     for _ in args.infiles:

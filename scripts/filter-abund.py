@@ -18,7 +18,7 @@ import os
 import khmer
 import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.khmer_args import build_counting_args, add_threading_args
+from khmer.khmer_args import (build_counting_args, add_threading_args, info)
 from khmer.file import check_file_status, check_space
 #
 
@@ -64,6 +64,7 @@ def get_parser():
 
 
 def main():
+    info('filter-abund.py', ['counting'])
     args = get_parser().parse_args()
 
     counting_ht = args.input_table

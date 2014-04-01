@@ -14,7 +14,7 @@ Find an initial set of highly connected k-mers, to save on repartitioning time.
 
 import textwrap
 import khmer
-from khmer.khmer_args import build_counting_args
+from khmer.khmer_args import (build_counting_args, info)
 from khmer.file import check_file_status, check_space
 
 DEFAULT_SUBSET_SIZE = int(1e4)
@@ -64,6 +64,7 @@ def get_parser():
 
 
 def main():
+    info('make-initial-stoptags.py', ['graph'])
     args = get_parser().parse_args()
 
     graphbase = args.graphbase
