@@ -27,7 +27,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         git diff versioneer.py
         
         git add versioneer.py
-        ./setup.py update_files
+        ./setup.py versioneer
         git commit -m "new version of versioneer.py"
         # or
         git checkout -- versioneer.py

@@ -21,6 +21,7 @@ import textwrap
 import argparse
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 
 def get_parser():
@@ -45,6 +46,7 @@ def get_parser():
 
 
 def main():
+    info('split-paired-reads.py')
     args = get_parser().parse_args()
 
     infile = args.infile

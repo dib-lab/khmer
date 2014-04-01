@@ -1,0 +1,44 @@
+Software Citation
+-----------------
+
+If you use the khmer software, you must cite:
+
+   Crusoe et al., XXX, 2014.
+
+If you use any of our published scientific methods, you should *also*
+cite the relevant paper(s), as directed below.
+
+Graph partitioning and/or compressible graph representation
+-----------------------------------------------------------
+
+The load-graph.py, partition-graph.py, find-knots.py, load-graph.py,
+and partition-graph.py scripts are part of the compressible graph
+representation and partitioning algorithms described in:
+
+   Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT.
+   Proc Natl Acad Sci U S A. 2012 Aug 14;109(33):13272-7.
+   doi: 10.1073/pnas.1121464109.
+   PMID: 22847406
+
+Digital normalization
+----------------------
+
+The normalize-by-median.py and count-median.py scripts are part of
+the digital normalization algorithm, described in:
+
+   A Reference-Free Algorithm for Computational Normalization of
+   Shotgun Sequencing Data
+   Brown CT, Howe AC, Zhang Q, Pyrkosz AB, Brom TH
+   arXiv:1203.4802 [q-bio.GN]
+   http://arxiv.org/abs/1203.4802
+
+K-mer counting
+--------------
+
+The abundance-dist.py, filter-abund.py, and load-into-counting.py scripts
+implement the probabilistic k-mer counting described in:
+
+   These are not the k-mers you are looking for: efficient online k-mer counting using a probabilistic data structure
+   Zhang Q, Pell J, Canino-Koning R, Howe AC, Brown CT.
+   arXiv:1309.2975 [q-bio.GN]
+   http://arxiv.org/abs/1309.2975

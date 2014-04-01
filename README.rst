@@ -37,13 +37,12 @@ them, please visit the following URLs:
 
 You can contact the current maintainers at khmer-project@idyll.org.
 
-IMPORTANT NOTE:
----------------
+IMPORTANT NOTE: CITE US!
+------------------------
 
-khmer is *pre-publication* and *research* software, so please keep in
-mind that (a) the code may have undiscovered bugs in it, (b) you should
-cite us, and (c) you should get in touch if you need to cite us, as we
-are writing up the project.
+khmer is *research software*, so you should cite us when you use it
+in scientific publications!  Please see the CITATION file for
+citation information.
 
 INSTALL INSTRUCTIONS:
 ---------------------
@@ -67,7 +66,7 @@ pretty much everything else is allowed.
 khmer project contributors also edit documents collaboratively at `our wiki 
 <https://github.com/ged-lab/khmer/wiki/_pages>`__.
 
-MRC 2014-02-16
+CTB 2014-03-31
 
 .. vim: set filetype=rst
 

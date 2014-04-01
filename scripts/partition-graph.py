@@ -22,7 +22,7 @@ import gc
 import os.path
 import argparse
 import khmer
-from khmer.khmer_args import add_threading_args
+from khmer.khmer_args import (add_threading_args, info)
 from khmer.file import check_file_status, check_space
 
 # Debugging Support
@@ -94,6 +94,7 @@ def get_parser():
 
 
 def main():
+    info('partition-graph.py', ['graph'])
     args = get_parser().parse_args()
     basename = args.basename
 
