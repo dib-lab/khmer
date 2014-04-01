@@ -1,3 +1,12 @@
+2014-03-31  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+    * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
+    20a433c2.
+
+    * khmer/file.py: Fixed incorrect use of __file__ dirname instead of
+    os.getcwd(); also fixed bug where statvfs would choke on an empty
+    dirname resulting from input files being in the cwd.
+
 2014-03-31  Michael R. Crusoe  <mcrusoe@msu.edu
 
     * versioneer.py,ez_setup.py: updated to version 0.10 and 3.4.1
