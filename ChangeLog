@@ -1,3 +1,10 @@
+2014-03-31  Michael R. Crusoe  <mcrusoe@msu.edu
+
+    * versioneer.py,ez_setup.py: updated to version 0.10 and 3.4.1
+    respectively.
+    * docs/release.txt,khmer/_version.py,MANIFEST.in: update ancillary
+    versioneer files
+
 2014-03-31  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
     * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
