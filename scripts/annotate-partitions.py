@@ -47,8 +47,11 @@ def get_parser():
 
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
-    parser.add_argument('graphbase')
-    parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('graphbase', help='basename for input and output '
+                        'files')
+    parser.add_argument('input_filenames', metavar='input_sequence_filename',
+                        nargs='+', help='input FAST[AQ] sequences to '
+                        'annotate.')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     return parser

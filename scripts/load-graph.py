@@ -32,8 +32,11 @@ def get_parser():
     parser.add_argument('--no-build-tagset', '-n', default=False,
                         action='store_true', dest='no_build_tagset',
                         help='Do NOT construct tagset while loading sequences')
-    parser.add_argument('output_filename')
-    parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('output_filename',
+                        metavar='output_presence_table_filename', help='output'
+                        ' k-mer presence table filename.')
+    parser.add_argument('input_filenames', metavar='input_sequence_filename',
+                        nargs='+', help='input FAST[AQ] sequence filename')
     return parser
 
 

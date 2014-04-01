@@ -191,7 +191,8 @@ def get_parser():
                         dest='single_output_filename',
                         default='', help='only output a single'
                         ' file with the specified filename')
-    parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('input_filenames', metavar='input_sequence_filename',
+                        help='Input FAST[AQ] sequence filename.', nargs='+')
     add_loadhash_args(parser)
     return parser
 

@@ -28,9 +28,9 @@ DEFAULT_CUTOFF = 2
 
 def get_parser():
     epilog = """
-    Trimmed sequences will be placed in ${input_filename}.abundfilt for each
-    input sequence file. If the input sequences are from RNAseq or metagenome
-    sequencing then :option:`--variable-coverage` should be used.
+    Trimmed sequences will be placed in ${input_sequence_filename}.abundfilt
+    for each input sequence file. If the input sequences are from RNAseq or
+    metagenome sequencing then :option:`--variable-coverage` should be used.
 
     Example::
 
@@ -40,14 +40,15 @@ def get_parser():
     parser = build_counting_args(
         descr='Trim sequences at a minimum k-mer abundance.',
         epilog=textwrap.dedent(epilog))
-    parser.add_argument('input_table')
-    parser.add_argument('input_filename', nargs='+')
+    parser.add_argument('input_table', metavar='input_presence_table_filename',
+                        help='The input k-mer presence table filename')
+    parser.add_argument('input_filename', metavar='input_sequence_filename',
+                        help='Input FAST[AQ] sequence filename', nargs='+')
     add_threading_args(parser)
     parser.add_argument('--cutoff', '-C', dest='cutoff',
                         default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
-
-    parser.add_argument('-V', '--variable-coverage', action='store_true',
+    parser.add_argument('--variable-coverage', '-V', action='store_true',
                         dest='variable_coverage', default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
@@ -56,7 +57,7 @@ def get_parser():
                         ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('-o', '--out', dest='single_output_filename',
-                        default='', metavar="optional output filename",
+                        default='', metavar="optional_output_filename",
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')

@@ -59,8 +59,9 @@ def get_parser():
         description="Separate sequences that are annotated with partitions "
         "into grouped files.", epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('prefix')
-    parser.add_argument('part_filenames', nargs='+')
+    parser.add_argument('prefix', metavar='output_filename_prefix')
+    parser.add_argument('part_filenames', metavar='input_partition_filename',
+                        nargs='+')
     parser.add_argument('--max-size', '-X', dest='max_size',
                         default=DEFAULT_MAX_SIZE, type=int,
                         help='Max group size (n sequences)')

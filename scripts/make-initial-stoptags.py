@@ -59,7 +59,8 @@ def get_parser():
                         help='Set subset size (default 1e4 is prob ok)')
     parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
-    parser.add_argument('graphbase')
+    parser.add_argument('graphbase', help='basename for input and output '
+                        'filenames')
     return parser
 
 

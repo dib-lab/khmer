@@ -74,10 +74,10 @@ Most scripts *output* fasta, and some mangle headers.  Sorry.  We're
 working on outputting FASTQ for FASTQ input, and removing any header
 mangling.
 
-Picking hash table sizes and k parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Picking k-mer table sizes and k parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For hash table sizes, read :doc:`choosing-hash-sizes`
+For k-mer table sizes, read :doc:`choosing-table-sizes`
 
 For k-mer sizes, we recommend k=20 for digital normalization and k=32
 for partitioning; then assemble with a variety of k parameters.
@@ -197,16 +197,16 @@ you should load in paired end reads, or longer reads, first.
 Iterative and independent normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use --loadhash and --savehash to do iterative normalizations on
-multiple files in multiple steps. For example, break ::
+You can use :option:`--loadtable` and :option:`--savetable` to do iterative
+normalizations on multiple files in multiple steps. For example, break ::
 
   normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa
 
 into multiple steps like so::
 
-  normalize-by-median.py [ ... ] --savehash file1.kh file1.fa
-  normalize-by-median.py [ ... ] --loadhash file1.kh --savehash file2.kh file2.fa
-  normalize-by-median.py [ ... ] --loadhash file2.kh --savehash file3.kh file3.fa
+  normalize-by-median.py [ ... ] --savetable file1.kh file1.fa
+  normalize-by-median.py [ ... ] --loadtable file1.kh --savetable file2.kh file2.fa
+  normalize-by-median.py [ ... ] --loadtable file2.kh --savetable file3.kh file3.fa
 
 The results should be identical!
 

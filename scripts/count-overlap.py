@@ -30,16 +30,19 @@ DEFAULT_HASHSIZE = 1e6
 
 def get_parser():
     epilog = """
-    An additional report will be written to ${report_filename}.curve containing
-    the increase of overlap k-mers as the number of sequences in the second
-    database increases.
+    An additional report will be written to ${output_report_filename}.curve
+    containing the increase of overlap k-mers as the number of sequences in the
+    second database increases.
     """
     parser = build_hashbits_args(
         descr='Count the overlap k-mers which are the k-mers appearing in two '
         'sequence datasets.', epilog=textwrap.dedent(epilog))
-    parser.add_argument('ptfile', help="input k-mer presence table filename")
-    parser.add_argument('fafile', help="input sequence filename")
-    parser.add_argument('report_filename', help='output report filename')
+    parser.add_argument('ptfile', metavar='input_presence_table_filename',
+                        help="input k-mer presence table filename")
+    parser.add_argument('fafile', metavar='input_sequence_filename',
+                        help="input sequence filename")
+    parser.add_argument('report_filename', metavar='output_report_filename',
+                        help='output report filename')
 
     return parser
 

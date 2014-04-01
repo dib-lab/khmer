@@ -30,7 +30,7 @@ def get_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('input_counting_table_filename', help='The name of the'
-                        ' counting table file.')
+                        ' input k-mer counting table file.')
     parser.add_argument('input_sequence_filename', help='The name of the input'
                         ' FAST[AQ] sequence file.')
     parser.add_argument('output_histogram_filename', help='The columns are: '

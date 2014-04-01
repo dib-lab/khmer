@@ -96,7 +96,8 @@ def get_parser():
                         default=True, action='store_false',
                         help='Keep individual subsets (default: False)')
     parser.add_argument('graphbase', help="base name for output files")
-    parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('input_filenames', metavar='input_sequence_filename',
+                        nargs='+', help='input FAST[AQ] sequence filenames')
     return parser
 
 

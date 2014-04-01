@@ -31,14 +31,16 @@ def get_parser():
     Take the ${graphbase}.subset.#.pmap files and merge them all into a single
     ${graphbase}.pmap.merged file for :program:`annotate-partitions.py` to use.
     """
-    parser = argparse.ArgumentParser(description="Merge pmap files.",
-                                     epilog=textwrap.dedent(epilog))
+    parser = argparse.ArgumentParser(
+        description="Merge partition map '.pmap' files.",
+        epilog=textwrap.dedent(epilog))
     parser.add_argument('--ksize', '-k', type=int, default=DEFAULT_K,
                         help="k-mer size (default: %d)" % DEFAULT_K)
     parser.add_argument('--keep-subsets', dest='remove_subsets',
                         default=True, action='store_false',
                         help='Keep individual subsets (default: False)')
-    parser.add_argument('graphbase')
+    parser.add_argument('graphbase', help='basename for input and output '
+                        'files')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     return parser

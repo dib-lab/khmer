@@ -1,11 +1,11 @@
-=============================
-Choosing hash sizes for khmer
-=============================
+==============================
+Choosing table sizes for khmer
+==============================
 
 If you look at the documentation for the scripts (:doc:`scripts`) you'll
-see two mysterious parameters -- ``-N`` and ``-x``, or, more verbosely,
-``-n_hashes`` and ``--hashsize``.  What are these, and how do you
-specify them?
+see two mysterious parameters -- :option:`-N` and :option:`-x`, or, more
+verbosely, :option:`-n_tables` and :option:`--tablesize`.  What are these, and
+how do you specify them?
 
 The really short version
 ========================
@@ -27,7 +27,7 @@ structure in khmer, which is basically N big hash tables of size x.
 The **product** of the number of hash tables and the size of the hash
 tables specifies the total amount of memory used.
 
-This hash table is used to track k-mers.  If it is too small, khmer
+This table is used to track k-mers.  If it is too small, khmer
 will fail in various ways (and should complain), but there is no harm
 in making it too large. So, **the absolute safest thing to do is to
 specify as much memory as is available**.  Most scripts will inform
@@ -48,8 +48,8 @@ which multiplies out to 128 Gbits of RAM, or 16 Gbytes.
 
 Life is a bit more complicated than this, however, because some scripts --
 load-into-counting and load-graph -- keep ancillary information that will
-consume memory beyond this hash data structure.  So if you run out of
-memory, decrease the hash table size.
+consume memory beyond this table data structure.  So if you run out of
+memory, decrease the table size.
 
 Also see the rules of thumb, below.
 

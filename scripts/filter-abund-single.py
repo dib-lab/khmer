@@ -30,12 +30,12 @@ DEFAULT_CUTOFF = 2
 
 def get_parser():
     epilog = """
-    Trimmed sequences will be placed in ${datafile}.abundfilt.
+    Trimmed sequences will be placed in ${input_sequence_filename}.abundfilt.
 
     This script is constant memory.
 
     To trim reads based on k-mer abundance across multiple files, use
-    :program:`load-into-counting` and :program:`filter-abund`.
+    :program:`load-into-counting.py` and :program:`filter-abund.py`.
 
     Example::
 
@@ -51,7 +51,8 @@ def get_parser():
     parser.add_argument('--savetable', metavar="filename", default='',
                         help="If present, the name of the file to save the "
                         "k-mer counting table to")
-    parser.add_argument('datafile', help="FAST[AQ] sequence file to trim")
+    parser.add_argument('datafile', metavar='input_sequence_filename',
+                        help="FAST[AQ] sequence file to trim")
 
     return parser
 

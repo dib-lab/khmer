@@ -37,10 +37,11 @@ def get_parser():
         description="Trim sequences at stoptags.",
         epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-k', default=DEFAULT_K, type=int, help='k-mer size',
-                        dest='ksize')
-    parser.add_argument('stoptags_file')
-    parser.add_argument('input_filenames', nargs='+')
+    parser.add_argument('--ksize', '-k', default=DEFAULT_K, type=int,
+                        help='k-mer size')
+    parser.add_argument('stoptags_file', metavar='input_stoptags_filename')
+    parser.add_argument('input_filenames', metavar='input_sequence_filename',
+                        nargs='+')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     return parser

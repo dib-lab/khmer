@@ -42,9 +42,12 @@ def get_parser():
         description='Count k-mers summary stats for sequences',
         epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('ctfile', help='input k-mer count table filename')
-    parser.add_argument('input', help='input FAST[AQ] sequence filename')
-    parser.add_argument('output', help='output summary filename')
+    parser.add_argument('ctfile', metavar='input_counting_table_filename',
+                        help='input k-mer count table filename')
+    parser.add_argument('input', metavar='input_sequence_filename',
+                        help='input FAST[AQ] sequence filename')
+    parser.add_argument('output', metavar='output_summary_filename',
+                        help='output summary filename')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     return parser
