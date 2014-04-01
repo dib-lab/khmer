@@ -15,6 +15,7 @@ import traceback
 
 import tests.khmer_tst_utils as utils
 import khmer
+import khmer.file
 import screed
 
 
@@ -109,6 +110,12 @@ def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
         raise Exception(status)
 
     return status, "", ""
+
+
+def test_check_space():
+    # @CTB this probably belongs in a new test file, along with other
+    # tests of the file.py module.
+    khmer.file.check_space(['', utils.get_test_data('test-abund-read-2.fa')])
 
 
 def test_load_into_counting():

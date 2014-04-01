@@ -6,7 +6,7 @@
 # Contact: khmer-project@idyll.org
 #
 '''
-Module docstring
+File handling/checking utilities for command-line scripts.
 '''
 
 import os
@@ -37,7 +37,9 @@ def check_space(in_files):
 
     # Get disk free space in Bytes assuming non superuser
     # and assuming all inFiles are in same disk
-    dir_path = os.path.dirname(in_files[0])
+    in_file = in_files[0]
+
+    dir_path = os.path.dirname(os.path.realpath(in_file))
     target = os.statvfs(dir_path)
     free_space = target.f_frsize * target.f_bavail
 
