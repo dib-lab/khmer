@@ -35,7 +35,7 @@ templates_path = ['_templates']
 source_suffix = '.txt'
 
 # The encoding of source files.
-#source_encoding = 'utf-8'
+# source_encoding = 'utf-8'
 
 # The master toctree document.
 master_doc = 'index'
@@ -43,10 +43,11 @@ master_doc = 'index'
 # General information about the project.
 project = u'khmer'
 
-copyright = u'''2010-2013, Michael R. Crusoe, Greg Edvenson, Jordan
-Fish, Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason
-Pell, Jared Simpson, Camille Scott, Qingpeng Zhamg, and C. Titus
-Brown'''
+# also update setup.py
+copyright = u'''2010-2014 Michael R. Crusoe, Greg Edvenson, Jordan
+Fish, Adina Howe, Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy,
+Humberto Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott, Ramakrishnan
+Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown'''
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -198,7 +199,7 @@ htmlhelp_basename = 'khmerdoc'
 # (source start file, target name, title, author, documentclass [howto/manual])
 latex_documents = [
     ('index', 'khmer.tex', u'khmer Documentation',
-     u'C. Titus Brown and Jason Pell', 'manual'),
+     copyright, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
