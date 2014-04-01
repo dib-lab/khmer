@@ -2288,7 +2288,7 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
     CountingHash * counting = counting_o->counting;
 
     unsigned long next_largest = subset_p->repartition_largest_partition(distance,
-                                threshold, frequency, *counting);
+                                 threshold, frequency, *counting);
 
     return PyInt_FromLong(next_largest);
 }
