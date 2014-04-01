@@ -3,7 +3,8 @@
     * docs/scripts.txt,scripts/*.py,khmer/*.py: overhaul the documentation of the
     scripts. Uses sphinxcontrib.autoprogram to leverage the existing argparse
     objects. Moved the documentation into each script + misc cleanups. All
-    scripts support the --version option.
+    scripts support the --version option. Migrated the last scripts to use
+    khmer_args
     * docs/blog-posts.txt: removed outdated reference to filter-exact.py; its
     replacement filter-abund.py is better documented in the eel-pond protocol
     * figuregen/,novelty/,plots/,templatem/,scripts/do-partition.sh: removed
