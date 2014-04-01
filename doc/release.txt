@@ -45,7 +45,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 #. Tag the branch with the release candidate version number prefixed by the
    letter 'v'::
 
-        new_version=0.8
+        new_version=1.0.1
         git tag v${new_version}-rc1
         git push --tags git@github.com:ged-lab/khmer.git
 
@@ -56,16 +56,17 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         virtualenv testenv2
         virtualenv testenv3
         virtualenv testenv4
-        # Does the tag work?
+        # First we test the tag
         
         cd testenv1
         source bin/activate
-        git clone -b v${new_version}-rc1 https://github.com/ged-lab/khmer.git
+        git clone --depth 1 --branch v${new_version}-rc1 https://github.com/ged-lab/khmer.git
         cd khmer
         make install
         make test
-        
-        # What about from pip?
+        normalize-by-median.py --version # double-check version number
+
+        # Secondly we test via pip
         
         cd ../../testenv2
         source bin/activate
@@ -74,6 +75,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         make dist
         make install
         make test
+        normalize-by-median.py --version # double-check version number
         cp dist/khmer*tar.gz ../../../testenv3/
         
         # Is the distribution in testenv2 complete enough to build another
