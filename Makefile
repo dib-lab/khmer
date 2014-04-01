@@ -68,8 +68,8 @@ pylint: FORCE
 # statement). So we run nose inside of coverage.
 .coverage: FORCE
 	pip install --user coverage || pip install coverage
-	coverage run --branch --source=scripts,khmer -m nose --with-xunit \
-		--attr=\!known_failing --processes=0
+	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
+		-m nose --with-xunit --attr=\!known_failing --processes=0
 
 coverage.xml: .coverage
 	coverage xml
