@@ -1,5 +1,16 @@
+.. vim: set filetype=rst textwidth=80
+
 Development miscellany
 ======================
+
+Third-party use
+---------------
+
+We ask that third parties who build upon the codebase to do so from a
+versioned release. This will help them determine when bug fixes apply and
+generally make it easier to collaborate. If more intesive modifications happen
+then we request that the repository is forked, again preferably from a version
+tag.
 
 Build framework
 ---------------
@@ -9,6 +20,9 @@ Build framework
 Coding standards
 ----------------
 
+All plain-text files should have line widths of 80 characters or less unless
+that is not supported for the particular file format.
+
 For C++, we use `Todd Hoff's coding standard
 <http://www.possibility.com/Cpp/CppCodingStandard.html>`__, and
 `astyle -A10 / "One True Brace Style"
@@ -16,7 +30,8 @@ For C++, we use `Todd Hoff's coding standard
 bracing.  Note: @CTB needs emacs settings that work for this.
 
 Vim users may want to set the ARTISTIC_STYLE_OPTIONS shell variable to "-A10"
-and running ```:%!astyle``` to reformat. The four space indentation can be set with::
+and running ```:%!astyle``` to reformat. The four space indentation can be set
+with::
 
 	set expandtab
 	set shiftwidth=4
@@ -36,7 +51,7 @@ See also `Code reviews: the lab meeting for code
 <http://pycogent.org/coding_guidelines.html>`__.
 
 Checklist
-=========
+---------
 
 Copy and paste the following into a pull-request when it is ready for review::
    
@@ -190,10 +205,3 @@ with the function signature used later.
 
 "I" for unsinged int
 "K" for unsigned long long a.k.a khmer::HashIntoType.
-
-Upstream sources
-----------------
-
-ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
-
-Before major releases it should be examined to see if there is a new version

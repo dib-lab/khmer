@@ -6,35 +6,33 @@
 """ Setup for khmer project. """
 
 import ez_setup
-ez_setup.use_setuptools(version="0.6c11")
+ez_setup.use_setuptools(version="0.7.2")
+
+import os
+import sys
+from os import listdir as os_listdir
+from os.path import join as path_join
 
 from setuptools import setup
 from setuptools import Extension
+from setuptools.command.build_ext import build_ext as _build_ext
+from distutils.spawn import spawn
+from distutils.sysconfig import get_config_vars
+from distutils.dist import Distribution
 
 import versioneer
 versioneer.versionfile_source = 'khmer/_version.py'
 versioneer.versionfile_build = 'khmer/_version.py'
 versioneer.tag_prefix = 'v'  # tags are like v1.2.0
 versioneer.parentdir_prefix = '.'
-
-from os.path import (
-    join as path_join,
-)
-
-from os import (
-    listdir as os_listdir
-)
-
-from subprocess import call
+CMDCLASS = versioneer.get_cmdclass()
 
 # strip out -Wstrict-prototypes; a hack suggested by
 # http://stackoverflow.com/a/9740721
 # proper fix coming in http://bugs.python.org/issue1222585
 # numpy has a "nicer" fix:
 # https://github.com/numpy/numpy/blob/master/numpy/distutils/ccompiler.py
-import os
-from distutils.sysconfig import get_config_vars
-(OPT,) = get_config_vars('OPT')
+OPT = get_config_vars('OPT')[0]
 os.environ['OPT'] = " ".join(
     flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
 )
@@ -65,10 +63,15 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
     "counting", "subset", "aligner", "scoringmatrix", "node", "kmer"])
 
+EXTRA_COMPILE_ARGS = ['-O3']
+
+if sys.platform == 'darwin':
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
+
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
-        "extra_compile_args": ['-O3', ],
+        "extra_compile_args": EXTRA_COMPILE_ARGS,
         "extra_objects": EXTRA_OBJS,
         "depends": BUILD_DEPENDS,
         "language": "c++",
@@ -100,7 +103,8 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
         "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
-        "setup_requires": ['nose >= 1.0', 'sphinx', ],
+        "extras_require": {'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
+                           'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
         "ext_modules": [EXTENSION_MOD, ],
         # "platforms": '', # empty as is conveyed by the classifiers below
@@ -123,10 +127,8 @@ SETUP_METADATA = \
         ],
     }
 
-from setuptools.command.build_ext import build_ext as _build_ext
 
-
-class BuildExt(_build_ext):  # pylint: disable=R0904
+class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.
@@ -137,19 +139,39 @@ class BuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "z" and "bz2" not in self.libraries:
-            call('cd ' + ZLIBDIR + ' && ( test Makefile -nt configure || bash'
-                 ' ./configure --static ) && make -f Makefile.pic PIC',
-                 shell=True)
-            call('cd ' + BZIP2DIR + ' && make -f Makefile-libbz2_so all',
-                 shell=True)
+            spawn(cmd=['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile '
+                       '-nt configure || bash ./configure --static ) && make '
+                       '-f Makefile.pic PIC'],
+                  dry_run=self.dry_run)
+            spawn(cmd=['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
+                       'Makefile-libbz2_so all'],
+                  dry_run=self.dry_run)
         else:
             for ext in self.extensions:
                 ext.extra_objects = []
 
         _build_ext.run(self)
 
-CMDCLASS = versioneer.get_cmdclass()
-CMDCLASS.update({'build_ext': BuildExt})
+CMDCLASS.update({'build_ext': KhmerBuildExt})
+
+_DISTUTILS_REINIT = Distribution.reinitialize_command
+
+
+def reinitialize_command(self, command, reinit_subcommands):
+    '''
+    Monkeypatch distutils.Distribution.reinitialize_command() to match behavior
+    of Distribution.get_command_obj()
+
+    This fixes issues with 'pip install -e' and './setup.py nosetests' not
+    respecting the setup.cfg configuration directives for the build_ext command
+    '''
+    cmd_obj = _DISTUTILS_REINIT(self, command, reinit_subcommands)
+    options = self.command_options.get(command)
+    if options:
+        self._set_command_options(  # pylint: disable=protected-access
+            cmd_obj, options)
+    return cmd_obj
+Distribution.reinitialize_command = reinitialize_command
 
 # pylint: disable=W0142
 setup(cmdclass=CMDCLASS,

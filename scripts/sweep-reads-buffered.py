@@ -34,7 +34,8 @@ import os
 import time
 import khmer
 from khmer.khmer_args import build_hashbits_args, report_on_config
-
+from khmer.file import (check_file_status, check_valid_file_exists,
+                        check_space)
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
@@ -190,16 +191,16 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    if args.min_hashsize < MIN_HSIZE:
-        args.min_hashsize = MIN_HSIZE
+    if args.min_tablesize < MIN_HSIZE:
+        args.min_tablesize = MIN_HSIZE
     if args.ksize < MIN_KSIZE:
         args.ksize = MIN_KSIZE
 
     report_on_config(args, hashtype='hashbits')
 
     K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    HT_SIZE = args.min_tablesize
+    N_HT = args.n_tables
 
     traversal_range = args.traversal_range
     input_fastp = args.input_fastp
@@ -214,7 +215,12 @@ def main():
     buf_size = args.buffer_size
     max_reads = args.max_reads
 
-    input_files = args.input_files
+    check_file_status(args.input_fastp)
+    check_valid_file_exists(args.input_files)
+    all_input_files = [input_fastp]
+    all_input_files.extend(args.input_files)
+    # Check disk space availability
+    check_space(all_input_files)
 
     output_buffer = ReadBufferManager(
         max_buffers, max_reads, buf_size, output_pref, outdir)
@@ -279,7 +285,7 @@ def main():
 
     total_t = time.clock()
     start_t = time.clock()
-    for read_file in input_files:
+    for read_file in args.input_files:
         print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
             read_file=read_file)
         file_t = 0.0
