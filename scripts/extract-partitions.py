@@ -25,6 +25,7 @@ import argparse
 import textwrap
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 DEFAULT_MAX_SIZE = int(1e6)
 DEFAULT_THRESHOLD = 5
@@ -79,6 +80,7 @@ def get_parser():
 
 # pylint: disable=too-many-statements
 def main():  # pylint: disable=too-many-locals,too-many-branches
+    info('extract-partitions.py', ['graph'])
     args = get_parser().parse_args()
 
     distfilename = args.prefix + '.dist'

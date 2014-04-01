@@ -167,14 +167,14 @@ def add_threading_args(parser):
                         help='Number of simultaneous threads to execute')
 
 _algorithms = {
-    'software': 'Crusoe MR et al., XXX, 2014.',
-    'diginorm': "Brown CT et al., arXiv:1203.4802 [q-bio.GN]",
-    'graph': "Pell J et al., PNAS, 2014 (PMID 22847406)",
-    'counting': "Zhang Q et al., arXiv:1309.2975 [q-bio.GN]",
+    'software': 'MR Crusoe et al., XXX, 2014.',
+    'diginorm': "CT Brown et al., arXiv:1203.4802 [q-bio.GN]",
+    'graph': "J Pell et al., PNAS, 2014 (PMID 22847406)",
+    'counting': "Q Zhang et al., arXiv:1309.2975 [q-bio.GN]",
 }
 
 
-def info(scriptname, algorithm_list):
+def info(scriptname, algorithm_list=None):
     import khmer
 
     sys.stderr.write("\n")
@@ -185,7 +185,11 @@ def info(scriptname, algorithm_list):
     sys.stderr.write("|| If you use this script in a publication, please "
                      "cite EACH of the following:\n||\n")
 
+    if algorithm_list is None:
+        algorithm_list = []
+
     algorithm_list.insert(0, 'software')
+
     for alg in algorithm_list:
         sys.stderr.write("||   * ")
         sys.stderr.write(_algorithms[alg])
