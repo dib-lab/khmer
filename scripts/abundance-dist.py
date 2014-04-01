@@ -20,6 +20,7 @@ import khmer
 import argparse
 import os
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 
 def get_parser():
@@ -47,6 +48,7 @@ def get_parser():
 
 
 def main():
+    info('abundance-dist.py', ['counting'])
     args = get_parser().parse_args()
     infiles = [args.input_counting_table_filename,
                args.input_sequence_filename]

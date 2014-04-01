@@ -33,7 +33,7 @@ from collections import defaultdict
 import os
 import time
 import khmer
-from khmer.khmer_args import build_hashbits_args, report_on_config
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 from khmer.file import (check_file_status, check_valid_file_exists,
                         check_space)
 
@@ -187,7 +187,7 @@ def get_parser():
 
 
 def main():
-
+    info('sweep-reads-buffered.py', ['sweep'])
     parser = get_parser()
     args = parser.parse_args()
 

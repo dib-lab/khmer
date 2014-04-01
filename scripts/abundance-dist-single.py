@@ -20,7 +20,7 @@ import khmer
 import threading
 import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
-                              report_on_config)
+                              report_on_config, info)
 from khmer.file import (check_file_status, check_space,
                         check_space_for_hashtable)
 
@@ -62,6 +62,7 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
+    info('abundance-dist-single.py', ['counting'])
     args = get_parser().parse_args()
     report_on_config(args)
 
