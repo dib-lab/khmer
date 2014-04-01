@@ -7,7 +7,7 @@ all: FORCE
 	./setup.py build_ext --inplace
 
 install: FORCE
-	./setup.py install
+	./setup.py build install
 
 dist: FORCE
 	./setup.py sdist
