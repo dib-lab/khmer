@@ -1063,9 +1063,6 @@ PartitionID * SubsetPartition::_join_partitions_by_tags(
         }
     }
 
-    if (!(this_partition_p != NULL)) {
-        throw std::exception();
-    }
     partition_map[kmer] = this_partition_p;
 
     return this_partition_p;
