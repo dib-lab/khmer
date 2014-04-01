@@ -1,3 +1,15 @@
+2013-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt,scripts/*.py,khmer/*.py: overhaul the documentation of the
+    scripts. Uses sphinxcontrib.autoprogram to leverage the existing argparse
+    objects. Moved the documentation into each script + misc cleanups. All
+    scripts support the --version option. Migrated the last scripts to use
+    khmer_args
+    * docs/blog-posts.txt: removed outdated reference to filter-exact.py; its
+    replacement filter-abund.py is better documented in the eel-pond protocol
+    * figuregen/,novelty/,plots/,templatem/,scripts/do-partition.sh: removed
+    outdated code not part of core project
+
 2013-03-30  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * setup.py: monkeypatched distutils.Distribution.reinitialize_command() so

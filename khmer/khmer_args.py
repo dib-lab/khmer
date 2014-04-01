@@ -10,63 +10,63 @@ from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
 
 DEFAULT_K = 32
-DEFAULT_N_HT = 4
-DEFAULT_MIN_HASHSIZE = 1e6
+DEFAULT_N_TABLES = 4
+DEFAULT_MIN_TABLESIZE = 1e6
 
 
-def build_hash_args(descr=None):
+class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
+                     argparse.RawDescriptionHelpFormatter):
+    pass
+
+
+def build_hash_args(descr=None, epilog=None):
     """Build an argparse.ArgumentParser with arguments for hash* based
     scripts and return it.
     """
 
     parser = argparse.ArgumentParser(
-        description=descr,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        description=descr, epilog=epilog,
+        formatter_class=ComboFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
-    env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_MIN_HASHSIZE)
+    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
+    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
+                                   DEFAULT_MIN_TABLESIZE)
 
     parser.add_argument('--version', action='version',
                         version='khmer {v}'.format(v=__version__))
     parser.add_argument('-q', '--quiet', dest='quiet', default=False,
                         action='store_true')
 
-    parser.add_argument('--ksize', '-k', type=int, dest='ksize',
-                        default=env_ksize,
+    parser.add_argument('--ksize', '-k', type=int, default=env_ksize,
                         help='k-mer size to use')
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
-                        default=env_n_hashes,
-                        help='number of hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
-                        default=env_hashsize,
-                        help='lower bound on hashsize to use')
+    parser.add_argument('--n_tables', '-N', type=int,
+                        default=env_n_tables,
+                        help='number of k-mer counting tables to use')
+    parser.add_argument('--min-tablesize', '-x', type=float,
+                        default=env_tablesize,
+                        help='lower bound on tablesize to use')
 
     return parser
 
 
-def build_counting_args(descr=None):
+def build_counting_args(descr=None, epilog=None):
     """Build an argparse.ArgumentParser with arguments for counting_hash
     based scripts and return it.
     """
 
-    if descr is None:
-        descr = 'Build & load a counting Bloom filter.'
-
-    parser = build_hash_args(descr=descr)
+    parser = build_hash_args(descr=descr, epilog=epilog)
     parser.hashtype = 'counting'
 
     return parser
 
 
-def build_hashbits_args(descr=None):
+def build_hashbits_args(descr=None, epilog=None):
     """Build an argparse.ArgumentParser with arguments for hashbits based
     scripts and return it.
     """
-    if descr is None:
-        descr = 'Build & load a Bloom filter.'
 
-    parser = build_hash_args(descr=descr)
+    parser = build_hash_args(descr=descr, epilog=epilog)
     parser.hashtype = 'hashbits'
 
     return parser
@@ -80,23 +80,23 @@ def add_loadhash_args(parser):
 
         def __call__(self, parser, namespace, values, option_string=None):
             env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-            env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
-            env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE',
-                                          DEFAULT_MIN_HASHSIZE)
+            env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
+            env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
+                                           DEFAULT_MIN_TABLESIZE)
 
             from khmer.utils import print_error
 
             setattr(namespace, self.dest, values)
 
             if getattr(namespace, 'ksize') != env_ksize or \
-               getattr(namespace, 'n_hashes') != env_n_hashes or \
-               getattr(namespace, 'min_hashsize') != env_hashsize:
+               getattr(namespace, 'n_tables') != env_n_tables or \
+               getattr(namespace, 'min_tablesize') != env_tablesize:
                 if values:
                     print_error('''
-** WARNING: You are loading a saved hashtable from
-{hash}, but have set hashtable parameters.
-Your values for ksize, n_hashes, and hashsize
-will be ignored.'''.format(hash=values))
+** WARNING: You are loading a saved k-mer table from
+{hashfile}, but have set k-mer table parameters.
+Your values for ksize, n_tables, and tablesize
+will be ignored.'''.format(hashfile=values))
 
             if hasattr(parser, 'hashtype'):
                 info = None
@@ -111,11 +111,11 @@ will be ignored.'''.format(hash=values))
                     x = info[1]
                     n = info[2]
                     setattr(namespace, 'ksize', K)
-                    setattr(namespace, 'n_hashes', n)
-                    setattr(namespace, 'min_hashsize', x)
+                    setattr(namespace, 'n_tables', n)
+                    setattr(namespace, 'min_tablesize', x)
 
-    parser.add_argument('-l', '--loadhash', dest='loadhash', default=None,
-                        help='load a precomputed hashtable from disk',
+    parser.add_argument('-l', '--loadtable', metavar="filename", default=None,
+                        help='load a precomputed k-mer table from disk',
                         action=LoadAction)
 
 
@@ -132,32 +132,38 @@ def report_on_config(args, hashtype='counting'):
 
     print_error("\nPARAMETERS:")
     print_error(" - kmer size =    {0} \t\t(-k)".format(args.ksize))
-    print_error(" - n hashes =     {0} \t\t(-N)".format(args.n_hashes))
+    print_error(" - n tables =     {0} \t\t(-N)".format(args.n_tables))
     print_error(
-        " - min hashsize = {0:5.2g} \t(-x)".format(args.min_hashsize)
+        " - min tablesize = {0:5.2g} \t(-x)".format(args.min_tablesize)
     )
     print_error("")
     if hashtype == 'counting':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_hashes x min_hashsize)".format(
-                args.n_hashes * args.min_hashsize))
+            "(n_tables x min_tablesize)".format(
+                args.n_tables * args.min_tablesize))
     elif hashtype == 'hashbits':
         print_error(
             "Estimated memory usage is {0:.2g} bytes "
-            "(n_hashes x min_hashsize / 8)".format(args.n_hashes *
-                                                   args.min_hashsize / 8)
+            "(n_tables x min_tablesize / 8)".format(args.n_tables *
+                                                    args.min_tablesize / 8)
         )
 
     print_error("-" * 8)
 
-    if DEFAULT_MIN_HASHSIZE == args.min_hashsize and \
-       not hasattr(args, 'loadhash'):
+    if DEFAULT_MIN_TABLESIZE == args.min_tablesize and \
+       not hasattr(args, 'loadtable'):
         print_error(
-            "** WARNING: hashsize is default!  "
+            "** WARNING: tablesize is default!  "
             "You absodefly want to increase this!\n** "
             "Please read the docs!\n"
         )
 
+DEFAULT_N_THREADS = 1
+
+
+def add_threading_args(parser):
+    parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
+                        help='Number of simultaneous threads to execute')
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

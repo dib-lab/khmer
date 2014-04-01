@@ -8,7 +8,7 @@ rm -Rf .env build dist khmer/_khmermodule.so cov-int lib/zlib/Makefile
 virtualenv .env
 
 . .env/bin/activate
-pip install --quiet nose coverage pylint pep8 screed
+pip install --quiet nose coverage pylint pep8==1.5 screed
 
 make clean
 
@@ -73,6 +73,9 @@ fi
 if [[ -n "${coverage_post}" ]]
 then
 	make coverage.xml
+	rm -Rf sphinx-contrib
+	hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
+	pip install --upgrade sphinx-contrib/autoprogram/
 	make doc
 
 	make pylint 2>&1 > pylint.out

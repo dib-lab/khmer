@@ -437,12 +437,12 @@ def test_normalize_by_median_force():
 
     (status, out, err) = runscript(script, args, in_dir)
 
-    test_ht = khmer.load_counting_hash(corrupt_infile + '.ht.failed')
+    test_ht = khmer.load_counting_hash(corrupt_infile + '.ct.failed')
     test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
     test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
     assert test_ht.count(test_good_read[:17]) > 0
     assert test_ht.count(test_good_read2[:17]) > 0
-    assert os.path.exists(corrupt_infile + '.ht.failed')
+    assert os.path.exists(corrupt_infile + '.ct.failed')
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
@@ -457,7 +457,7 @@ def test_normalize_by_median_no_bigcount():
     counting_ht = _make_counting(infile, K=8)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', '1000', '-k 8', '--savehash', hashfile, infile]
+    args = ['-C', '1000', '-k 8', '--savetable', hashfile, infile]
 
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0, (out, err)
@@ -487,13 +487,13 @@ def test_normalize_by_median_dumpfrequency():
 
     (status, out, err) = runscript(script, args, in_dir)
 
-    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ht'))
+    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ct'))
     test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
     test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
     assert test_ht.count(test_good_read[:17]) > 0
     assert test_ht.count(test_good_read2[:17]) > 0
 
-    assert os.path.exists(os.path.join(in_dir, 'backup.ht'))
+    assert os.path.exists(os.path.join(in_dir, 'backup.ct'))
     assert out.count('Backup: Saving') == 2
     assert 'Nothing' in out
 
@@ -547,7 +547,7 @@ def test_load_graph():
 
     runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -575,7 +575,7 @@ def test_load_graph_no_tags():
 
     runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -615,7 +615,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -662,7 +662,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     DEBUG_runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.ct'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -713,7 +713,7 @@ def test_partition_graph_1():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -737,7 +737,7 @@ def test_partition_graph_nojoin_k21():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -750,7 +750,7 @@ def test_partition_graph_nojoin_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
     # add in some stop tags
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
     stoptags_file = graphbase + '.stoptags'
     ht.save_stop_tags(stoptags_file)
@@ -769,7 +769,7 @@ def test_partition_graph_nojoin_stoptags():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -784,7 +784,7 @@ def test_partition_graph_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -800,7 +800,7 @@ def test_partition_graph_no_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -1467,10 +1467,9 @@ def test_count_overlap():
     shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
     shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
     htfile = _make_graph(seqfile1, ksize=20)
-    ht_dir = os.path.dirname(htfile)
     script = scriptpath('count-overlap.py')
-    args = ['--ksize', '20', '--n_hashes', '2', '--hashsize', '10000000',
-            htfile + '.ht', seqfile2, outfile]
+    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+            htfile + '.pt', seqfile2, outfile]
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0
     assert os.path.exists(outfile), outfile

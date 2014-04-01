@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Take two files containing left & right reads from a paired-end sequencing run,
 and interleave them.
@@ -21,7 +22,9 @@ import screed
 import sys
 import itertools
 import os
+import textwrap
 import argparse
+import khmer
 from khmer.file import check_file_status, check_space
 
 
@@ -35,16 +38,35 @@ def output_pair(read1, read2):
                                        read2.sequence)
 
 
-def main():
+def get_parser():
+    epilog = """
+    The output is an interleaved set of reads, with each read in <R1> paired
+    with a read in <R2>. By default, the output goes to stdout unless
+    :option:`-o`/:option:`--output` is specified.
+
+    As a "bonus", this file ensures that read names are formatted in a
+    consistent way, such that they look like the pre-1.8 Casava format
+    (@name/1, @name/2).
+
+    Example::
+
+""" "        interleave-reads.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq"  # noqa
     parser = argparse.ArgumentParser(
         description='Produce interleaved files from R1/R2 paired files',
+        epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infiles', nargs='+')
-    parser.add_argument('-o', '--output',
-                        dest='output', type=argparse.FileType('w'),
+    parser.add_argument('-o', '--output', metavar="filename",
+                        type=argparse.FileType('w'),
                         default=sys.stdout)
-    args = parser.parse_args()
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
+
+
+def main():
+    args = get_parser().parse_args()
 
     for _ in args.infiles:
         check_file_status(_)
@@ -56,8 +78,8 @@ def main():
         s2_file = args.infiles[1]
     else:
         s2_file = s1_file.replace('_R1_', '_R2_')
-        print >> sys.stderr, "given only one file;"
-        " guessing that R2 file is %s" % s2_file
+        print >> sys.stderr, ("given only one file; "
+                              "guessing that R2 file is %s" % s2_file)
 
     fail = False
     if not os.path.exists(s1_file):
@@ -87,9 +109,8 @@ def main():
         if not name2.endswith('/2'):
             name2 += '/2'
 
-        assert name1[:-2] == name2[:-
-                                   2], "This doesn't look like paired data!"
-        " %s %s" % (name1, name2)
+        assert name1[:-2] == name2[:-2], \
+            "This doesn't look like paired data! %s %s" % (name1, name2)
 
         read1.name = name1
         read2.name = name2

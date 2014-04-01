@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Eliminate reads with median k-mer abundance higher than
 DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
@@ -18,13 +19,13 @@ import sys
 import screed
 import os
 import khmer
+import textwrap
 from itertools import izip
-from khmer.khmer_args import build_counting_args
-from khmer.khmer_args import add_loadhash_args
-from khmer.khmer_args import report_on_config
+from khmer.khmer_args import (build_counting_args, add_loadhash_args,
+                              report_on_config)
 import argparse
-from khmer.file import check_space
-from khmer.file import check_space_for_hashtable, check_valid_file_exists
+from khmer.file import (check_space, check_space_for_hashtable,
+                        check_valid_file_exists)
 DEFAULT_DESIRED_COVERAGE = 10
 
 # Iterate a collection in arbitrary batches
@@ -44,6 +45,7 @@ def validpair(read0, read1):
         read0.name[0:-1] == read1.name[0:-1]
 
 
+# pylint: disable=too-many-locals,too-many-branches
 def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
 
     desired_coverage = args.cutoff
@@ -117,74 +119,111 @@ def handle_error(error, output_name, input_name, fail_save, htable):
     print >> sys.stderr, '** ERROR:', error
     print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
     if fail_save:
-        hashname = os.path.basename(input_name) + '.ht.failed'
+        tablename = os.path.basename(input_name) + '.ct.failed'
         print >> sys.stderr, \
-            '** ...dumping hashtable to {ht}'.format(ht=hashname)
-        htable.save(hashname)
+            '** ...dumping k-mer counting table to {tn}'.format(tn=tablename)
+        htable.save(tablename)
     try:
         os.remove(output_name)
-    except:
+    except:  # pylint: disable=bare-except
         print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
 
 
-def main():
-    parser = build_counting_args()
-    parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
+def get_parser():
+    epilog = ("""
+    Discard sequences based on whether or not their median k-mer abundance lies
+    above a specified cutoff. Kept sequences will be placed in <fileN>.keep.
+
+    Paired end reads will be considered together if :option:`-p` is set. If
+    either read will be kept, then both will be kept. This should result in
+    keeping (or discarding) each sequencing fragment. This helps with retention
+    of repeats, especially.
+
+    With :option:`-s`/:option:`--savetable`, the k-mer counting table will be
+    saved to the specified file after all sequences have been processed. With
+    :option:`-d`, the k-mer counting table will be saved every d files for
+    multifile runs; if :option:`-s` is set, the specified name will be used,
+    and if not, the name `backup.ct` will be used.
+    :option:`-l`/:option:`--loadtable` will load the specified k-mer counting
+    table before processsing the specified files.
+
+    :option:`-f`/:option:`--fault-tolerant` will force the program to continue
+    upon encountering a formatting error in a sequence file; the k-mer counting
+    table up to that point will be dumped, and processing will continue on the
+    next file.
+
+    Example::
+
+        normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
+
+    Example::
+
+""" "        normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa"  # noqa
+    """
+
+    Example::
+
+""" "        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq"  # noqa
+    """
+
+    Example::
+
+""" "        normalize-by-median.py -k 17 -d 2 -s test.ct tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads")   # noqa
+    parser = build_counting_args(
+        descr="Do digital normilization (remove mostly redundant sequences)",
+        epilog=textwrap.dedent(epilog))
+    parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-s', '--savehash', dest='savehash', default='')
-    parser.add_argument('-R', '--report-to-file', dest='report_file',
-                        type=argparse.FileType('w'))
+    parser.add_argument('-s', '--savetable', metavar="filename", default='')
+    parser.add_argument('-R', '--report',
+                        metavar='filename', type=argparse.FileType('w'))
     parser.add_argument('-f', '--fault-tolerant', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
     parser.add_argument('--save-on-failure', dest='fail_save',
                         action='store_false', default=True,
-                        help='Save hashtable when an error occurs')
+                        help='Save k-mer counting table when an error occurs')
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
-                        type=int, help='dump hashtable every d files',
-                        default=-1)
-    parser.add_argument('-o', '--out', dest='single_output_filename',
+                        type=int, help='dump k-mer counting table every d '
+                        'files', default=-1)
+    parser.add_argument('-o', '--out', metavar="filename",
+                        dest='single_output_filename',
                         default='', help='only output a single'
                         ' file with the specified filename')
     parser.add_argument('input_filenames', nargs='+')
     add_loadhash_args(parser)
+    return parser
 
-    args = parser.parse_args()
+
+def main():  # pylint: disable=too-many-branches,too-many-statements
+    args = get_parser().parse_args()
 
     report_on_config(args)
 
-    ksize = args.ksize
-    htable = args.min_hashsize
-    n_hashes = args.n_hashes
+    report_fp = args.report
 
-    report_fp = args.report_file
-    filenames = args.input_filenames
-    force = args.force
-    dump_frequency = args.dump_frequency
-    fail_save = args.fail_save
-
-    check_valid_file_exists(filenames)
-
-    check_space(filenames)
-    if args.savehash:
-        check_space_for_hashtable(ksize * htable)
+    check_valid_file_exists(args.input_filenames)
+    check_space(args.input_filenames)
+    if args.savetable:
+        check_space_for_hashtable(args.ksize * args.min_tablesize)
 
     # list to save error files along with throwing exceptions
-    if force:
+    if args.force:
         corrupt_files = []
 
-    if args.loadhash:
-        print 'loading hashtable from', args.loadhash
-        htable = khmer.load_counting_hash(args.loadhash)
+    if args.loadtable:
+        print 'loading k-mer counting table from', args.loadtable
+        htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print 'making hashtable'
-        htable = khmer.new_counting_hash(ksize, htable, n_hashes)
+        print 'making k-mer counting table'
+        htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
+                                         args.n_tables)
 
-    total = 0
+        total = 0
     discarded = 0
 
-    for index, input_filename in enumerate(filenames):
+    for index, input_filename in enumerate(args.input_filenames):
         if args.single_output_filename != '':
             output_name = args.single_output_filename
             outfp = open(args.single_output_filename, 'a')
@@ -200,14 +239,14 @@ def main():
                                                            outfp, htable, args,
                                                            report_fp)
         except IOError as err:
-            handle_error(err, output_name, input_filename, fail_save, htable)
-            if not force:
+            handle_error(err, output_name, input_filename, args.fail_save,
+                         htable)
+            if not args.force:
                 print >> sys.stderr, '** Exiting!'
                 sys.exit(1)
             else:
                 print >> sys.stderr, '*** Skipping error file, moving on...'
                 corrupt_files.append(input_filename)
-                pass
         else:
             if total_acc == 0 and discarded_acc == 0:
                 print 'SKIPPED empty file', input_filename
@@ -220,34 +259,36 @@ def main():
                             perc=int(100. - discarded / float(total) * 100.))
                 print 'output in', output_name
 
-        if dump_frequency > 0 and index > 0 and index % dump_frequency == 0:
-            print 'Backup: Saving hashfile through', input_filename
-            if args.savehash:
-                hashname = args.savehash
+        if (args.dump_frequency > 0 and
+                index > 0 and index % args.dump_frequency == 0):
+            print 'Backup: Saving k-mer counting file through', input_filename
+            if args.savetable:
+                hashname = args.savetable
                 print '...saving to', hashname
             else:
-                hashname = 'backup.ht'
-                print 'Nothing given for savehash, saving to', hashname
+                hashname = 'backup.ct'
+                print 'Nothing given for savetable, saving to', hashname
             htable.save(hashname)
 
-    if args.savehash:
-        print 'Saving hashfile through', input_filename
-        print '...saving to', args.savehash
-        htable.save(args.savehash)
+    if args.savetable:
+        print 'Saving k-mer counting table through', input_filename
+        print '...saving to', args.savetable
+        htable.save(args.savetable)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
-    if force and len(corrupt_files) > 0:
+    if args.force and len(corrupt_files) > 0:
         print >> sys.stderr, "** WARNING: Finished with errors!"
         print >> sys.stderr, "** IOErrors occurred in the following files:"
         print >> sys.stderr, "\t", " ".join(corrupt_files)
 
     if fp_rate > 0.20:
         print >> sys.stderr, "**"
-        print >> sys.stderr, "** ERROR: the counting hash is too small for"
-        print >> sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
+                              " for this data set.  Increase tablesize/# "
+                              "tables.")
         print >> sys.stderr, "**"
         print >> sys.stderr, "** Do not use these results!!"
         sys.exit(1)

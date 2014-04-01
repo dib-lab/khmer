@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Take a file containing a mixture of interleaved and orphaned reads, and
 extract them into separate files (.pe and .se).
@@ -16,7 +17,9 @@ Reads FASTQ and FASTA input, retains format for output.
 import screed
 import sys
 import os.path
+import textwrap
 import argparse
+import khmer
 from khmer.file import check_file_status, check_space
 
 
@@ -25,7 +28,7 @@ def is_pair(name1, name2):
         subpart1 = name1.split('/')[0]
         subpart2 = name2.split('/')[0]
         if subpart1 == subpart2:
-            assert(subpart1)
+            assert subpart1
             return True
 
     return False
@@ -48,13 +51,34 @@ def output_single(read):
         return ">%s\n%s\n" % (read.name, read.sequence)
 
 
-def main():
+def get_parser():
+    epilog = """
+    The output is two files, <input file>.pe and <input file>.se, placed in the
+    current directory. The .pe file contains interleaved and properly paired
+    sequences, while the .se file contains orphan sequences.
+
+    Many assemblers (e.g. Velvet) require that you give them either perfectly
+    interleaved files, or files containing only single reads. This script takes
+    files that were originally interleaved but where reads may have been
+    orphaned via error filtering, application of abundance filtering, digital
+    normalization in non-paired mode, or partitioning.
+
+    Example::
+
+        extract-paired-reads.py tests/test-data/paired.fq
+    """
     parser = argparse.ArgumentParser(
         description=
-        'Take a mixture of reads and split into pairs and orphans.')
-
+        'Take a mixture of reads and split into pairs and orphans.',
+        epilog=textwrap.dedent(epilog))
     parser.add_argument('infile')
-    args = parser.parse_args()
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
+
+
+def main():
+    args = get_parser().parse_args()
 
     check_file_status(args.infile)
     infiles = [args.infile]

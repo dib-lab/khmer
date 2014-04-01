@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Take an interleaved set of reads (/1 and /2), and extract them into separate
 files (.1 and .2).
@@ -16,17 +17,35 @@ Reads FASTQ and FASTA input, retains format for output.
 import screed
 import sys
 import os.path
+import textwrap
 import argparse
+import khmer
 from khmer.file import check_file_status, check_space
 
 
-def main():
+def get_parser():
+    epilog = """
+    Some programs want paired-end read input in the One True Format, which is
+    interleaved; other programs want input in the Insanely Bad Format, with
+    left- and right- reads separated. This reformats the former to the latter.
+
+    Example::
+
+        split-paired-reads.py tests/test-data/paired.fq
+    """
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
+        epilog=textwrap.dedent(epilog),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infile')
-    args = parser.parse_args()
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
+
+
+def main():
+    args = get_parser().parse_args()
 
     infile = args.infile
 

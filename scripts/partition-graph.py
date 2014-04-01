@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name, missing-docstring
 """
 Partition a graph.
 
@@ -20,6 +21,8 @@ import Queue
 import gc
 import os.path
 import argparse
+import khmer
+from khmer.khmer_args import add_threading_args
 from khmer.file import check_file_status, check_space
 
 # Debugging Support
@@ -31,15 +34,11 @@ if "Linux" == platform.system():
         for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
             print vmstat
 else:
-    def __debug_vm_usage(msg):
+    def __debug_vm_usage(msg):  # pylint: disable=unused-argument
         pass
-
-import khmer
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4
-
-#
 
 
 def worker(queue, basename, stop_big_traversals):
@@ -68,30 +67,37 @@ def worker(queue, basename, stop_big_traversals):
         gc.collect()
 
 
-def main():
+def get_parser():
+    epilog = """
+    The resulting partition maps are saved as '${basename}.subset.#.pmap'
+    files.
+    """
     parser = argparse.ArgumentParser(
-        description="Partition a graph.",
+        description="Partition a sequence graph based upon waypoint "
+        "connectivity", epilog=epilog,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('basename')
-    parser.add_argument('--stoptags', '-S', dest='stoptags', default='',
+    parser.add_argument('basename', help="basename of the input k-mer presence"
+                        " table + tagset files")
+    parser.add_argument('--stoptags', '-S', metavar='filename', default='',
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
-                        dest='subset_size', type=float,
-                        help='Set subset size (usually 1e5-1e6 is good)')
+                        type=float, help='Set subset size (usually 1e5-1e6 is '
+                        'good)')
+    parser.add_argument('--no-big-traverse', action='store_true',
+                        default=False, help='Truncate graph joins at big '
+                        'traversals')
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    add_threading_args(parser)
+    return parser
 
-    parser.add_argument('--no-big-traverse', dest='no_big_traverse',
-                        action='store_true', default=False,
-                        help='Truncate graph joins at big traversals')
 
-    parser.add_argument('--threads', '-T', dest='n_threads',
-                        default=DEFAULT_N_THREADS,
-                        help='Number of simultaneous threads to execute')
-
-    args = parser.parse_args()
+def main():
+    args = get_parser().parse_args()
     basename = args.basename
 
-    filenames = [basename + '.ht', basename + '.tagset']
+    filenames = [basename + '.pt', basename + '.tagset']
     for _ in filenames:
         check_file_status(_)
 
@@ -99,17 +105,14 @@ def main():
 
     print '--'
     print 'SUBSET SIZE', args.subset_size
-    print 'N THREADS', args.n_threads
+    print 'N THREADS', args.threads
     if args.stoptags:
         print 'stoptag file:', args.stoptags
     print '--'
 
-    print 'loading ht %s.ht' % basename
-    htable = khmer.load_hashbits(basename + '.ht')
+    print 'loading ht %s.pt' % basename
+    htable = khmer.load_hashbits(basename + '.pt')
     htable.load_tagset(basename + '.tagset')
-
-    # retrieve K
-    ksize = htable.ksize()
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
@@ -144,7 +147,7 @@ def main():
     print 'enqueued %d subset tasks' % n_subsets
     open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
 
-    n_threads = int(args.n_threads)
+    n_threads = args.threads
     if n_subsets < n_threads:
         n_threads = n_subsets
 
