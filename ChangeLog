@@ -1,3 +1,8 @@
+2014-04-01  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+    * CITATION,khmer/khmer_args.py: Updated khmer software citation for
+    release.
+
 2014-03-31  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
     * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
