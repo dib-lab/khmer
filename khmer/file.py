@@ -19,13 +19,13 @@ def check_file_status(file_path):
     if empty, or does not exist
     """
     if not os.path.exists(file_path):
-        print >>sys.stderr, 'ERROR: Input file %s does not exist,\
-         exiting' % file_path
+        print >>sys.stderr, "ERROR: Input file %s does not exist; exiting" % \
+                            file_path
         sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
-            print >>sys.stderr, 'ERROR: Input file %s is empty,\
-                     exiting' % file_path
+            print >>sys.stderr, "ERROR: Input file %s is empty; exiting." % \
+                                file_path
             sys.exit(1)
 
 
@@ -53,8 +53,8 @@ def check_space(in_files):
 
     size_diff = total_size-free_space
     if size_diff > 0:
-        print >>sys.stderr, 'ERROR: Not enough free space on disk, \
-        need at least %s more,' % str(size_diff)
+        print >>sys.stderr, "ERROR: Not enough free space on disk " \
+                            "need at least %s more" % str(size_diff)
         sys.exit(1)
 
 
@@ -62,14 +62,15 @@ def check_space_for_hashtable(hash_size):
     """
     Check we have enough size to write a hash table
     """
-    dir_path = os.path.dirname(os.path.realpath(__file__))
+    cwd = os.getcwd()
+    dir_path = os.path.dirname(os.path.realpath(cwd))
     target = os.statvfs(dir_path)
     free_space = target.f_frsize * target.f_bavail
 
     size_diff = hash_size-free_space
     if size_diff > 0:
-        print >>sys.stderr, 'ERROR: Not enough free space on disk, \
-        need at least %s more,' % str(size_diff)
+        print >>sys.stderr, "ERROR: Not enough free space on disk, " \
+                            "need at least %s more," % str(size_diff)
         sys.exit(1)
 
 
@@ -85,8 +86,8 @@ def check_valid_file_exists(in_files):
             if os.stat(in_file).st_size > 0:
                 return
             else:
-                print >>sys.stderr, 'WARNING: Input file %s is empty,\
-                     ' % in_file
+                print >>sys.stderr, 'WARNING: Input file %s is empty' % \
+                                    in_file
         else:
-            print >>sys.stderr, 'WARNING: Input file %s not found,\
-                     ' % in_file
+            print >>sys.stderr, 'WARNING: Input file %s not found' % \
+                                in_file
