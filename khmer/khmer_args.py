@@ -168,7 +168,7 @@ def add_threading_args(parser):
                         help='Number of simultaneous threads to execute')
 
 _algorithms = {
-    'software': 'MR Crusoe et al., XXX, 2014.',
+    'software': 'MR Crusoe et al., 2014. doi: 10.6084/m9.figshare.979190',
     'diginorm': "CT Brown et al., arXiv:1203.4802 [q-bio.GN]",
     'graph': "J Pell et al., PNAS, 2014 (PMID 22847406)",
     'counting': "Q Zhang et al., arXiv:1309.2975 [q-bio.GN]",

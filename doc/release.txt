@@ -9,7 +9,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
-        git clone git@github.com:ged-lab/khmer.git
+        git clone --depth 1 git@github.com:ged-lab/khmer.git
         cd khmer
 
 #. (Optional) Check for updates to ``ez_setup.py`` and versioneer::
