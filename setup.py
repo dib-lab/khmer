@@ -6,7 +6,7 @@
 """ Setup for khmer project. """
 
 import ez_setup
-ez_setup.use_setuptools(version="0.7.2")
+ez_setup.use_setuptools(version="3.4.1")
 
 import os
 import sys
@@ -139,8 +139,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "z" and "bz2" not in self.libraries:
-            spawn(cmd=['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile '
-                       '-nt configure || bash ./configure --static ) && make '
+            spawn(cmd=['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test configure '
+                       '-nt Makefile || bash ./configure --static ) && make '
                        '-f Makefile.pic PIC'],
                   dry_run=self.dry_run)
             spawn(cmd=['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
