@@ -13,11 +13,11 @@ dist: FORCE
 	./setup.py sdist
 
 clean: FORCE
-	cd lib && ${MAKE} clean
-	cd tests && rm -rf khmertest_*
-	rm -f khmer/_khmermodule.so
-	rm khmer/*.pyc lib/*.pyc
-	./setup.py clean --all
+	cd lib && ${MAKE} clean || true
+	cd tests && rm -rf khmertest_* || true
+	rm -f khmer/_khmermodule.so || true
+	rm khmer/*.pyc lib/*.pyc || true
+	./setup.py clean --all || true
 
 debug:
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
