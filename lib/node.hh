@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -31,7 +31,7 @@ public:
     Node *parent;
     Kmer kmer;
     char emission; // change to enum
-    unsigned int stateNo;
+    unsigned long stateNo;
     char state; //change to enum
     double fval;
     double hval;
@@ -45,7 +45,7 @@ public:
     bool operator< (const Node &param) const;
 
     Node(Node* _parent, char _emission,
-         unsigned int _stateNo, char _state, Kmer _kmer);
+         unsigned long _stateNo, char _state, Kmer _kmer);
 
     Kmer makeNextKmer(unsigned char forward, char b);
 

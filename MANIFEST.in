@@ -1,6 +1,5 @@
 include ChangeLog Doxyfile ez_setup.py IDEAS Makefile README.rst setup.cfg versioneer.py MANIFEST.in
 graft examples
-graft figuregen
 recursive-include lib *.hh *.cc *.1 *.xsl README* sample* words* *.sh *.c
 recursive-include lib manual* [Mm]akefile* *.pl *.dsp CHANGES *.txt *.h *.xsl
 recursive-include lib ChangeLog FAQ INDEX configure 

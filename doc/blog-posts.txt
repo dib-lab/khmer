@@ -14,9 +14,6 @@ A test data set (soil metagenomics, 88m reads, 10gb) is here:
 
    http://angus.ged.msu.edu.s3.amazonaws.com/88m-reads.fa.gz
 
-
-The `filter-exact <http://github.com/ctb/khmer/blob/master/scripts/filter-exact.py>`__ script can be used as a starting point.
-
 Illumina read abundance profiles
 ================================
 
