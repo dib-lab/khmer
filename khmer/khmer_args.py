@@ -9,6 +9,7 @@ import os
 import argparse
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
+import screed
 
 DEFAULT_K = 32
 DEFAULT_N_TABLES = 4
@@ -180,8 +181,10 @@ def info(scriptname, algorithm_list=None):
 
     sys.stderr.write("\n")
     sys.stderr.write("|| This is the script '%s' in khmer.\n"
-                     "|| You are running version %s\n" %
+                     "|| You are running khmer version %s\n" %
                      (scriptname, khmer.__version__,))
+    sys.stderr.write("|| You are also using screed version %s\n||\n"
+                     % screed.__version__)
 
     sys.stderr.write("|| If you use this script in a publication, please "
                      "cite EACH of the following:\n||\n")
