@@ -23,6 +23,7 @@ import screed
 import argparse
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 import textwrap
 
 
@@ -50,6 +51,7 @@ def get_parser():
 
 
 def main():
+    info('count-median.py', ['diginorm'])
     args = get_parser().parse_args()
 
     htfile = args.ctfile

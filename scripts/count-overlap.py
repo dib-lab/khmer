@@ -21,7 +21,7 @@ Use '-h' for parameter help.
 import khmer
 import textwrap
 from khmer.file import check_file_status, check_space
-from khmer.khmer_args import build_hashbits_args, report_on_config
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
@@ -45,6 +45,7 @@ def get_parser():
 
 
 def main():
+    info('count-overlap.py', ['counting'])
     args = get_parser().parse_args()
     report_on_config(args, hashtype='hashbits')
 
