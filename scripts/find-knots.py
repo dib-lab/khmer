@@ -19,6 +19,7 @@ import os
 import textwrap
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 # counting hash parameters.
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -76,6 +77,7 @@ def get_parser():
 
 
 def main():
+    info('find-knots.py', ['graph'])
     args = get_parser().parse_args()
 
     graphbase = args.graphbase

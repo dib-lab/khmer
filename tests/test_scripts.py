@@ -361,6 +361,17 @@ def test_normalize_by_median_version():
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
     status, out, err = runscript(script, args)
+
+    errlines = err.splitlines()
+    for err in errlines:
+        if err.startswith('||') or \
+           not err.strip():
+            continue
+        break
+
+    print errlines
+    print err
+
     assert err.startswith('khmer ')
 
 

@@ -1,9 +1,15 @@
+2014-03-31  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+    * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
+    and added citation information to each script.
+    * CITATION: added basic citation information for khmer functionality.
+
 2013-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-    * docs/scripts.txt,scripts/*.py,khmer/*.py: overhaul the documentation of the
-    scripts. Uses sphinxcontrib.autoprogram to leverage the existing argparse
-    objects. Moved the documentation into each script + misc cleanups. All
-    scripts support the --version option. Migrated the last scripts to use
+    * docs/scripts.txt,scripts/*.py,khmer/*.py: overhaul the documentation of
+    the scripts. Uses sphinxcontrib.autoprogram to leverage the existing
+    argparse objects. Moved the documentation into each script + misc cleanups.
+    All scripts support the --version option. Migrated the last scripts to use
     khmer_args
     * docs/blog-posts.txt: removed outdated reference to filter-exact.py; its
     replacement filter-abund.py is better documented in the eel-pond protocol

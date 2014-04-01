@@ -4,14 +4,17 @@ Copyright (C) Michigan State University, 2009-2014. It is licensed under
 the three-clause BSD license; see doc/LICENSE.txt.
 Contact: khmer-project@idyll.org
 '''
+import sys
 import os
 import argparse
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
+import screed
 
 DEFAULT_K = 32
 DEFAULT_N_TABLES = 4
 DEFAULT_MIN_TABLESIZE = 1e6
+DEFAULT_N_THREADS = 1
 
 
 class ComboFormatter(argparse.ArgumentDefaultsHelpFormatter,
@@ -159,11 +162,43 @@ def report_on_config(args, hashtype='counting'):
             "Please read the docs!\n"
         )
 
-DEFAULT_N_THREADS = 1
-
 
 def add_threading_args(parser):
     parser.add_argument('--threads', '-T', default=DEFAULT_N_THREADS, type=int,
                         help='Number of simultaneous threads to execute')
+
+_algorithms = {
+    'software': 'MR Crusoe et al., XXX, 2014.',
+    'diginorm': "CT Brown et al., arXiv:1203.4802 [q-bio.GN]",
+    'graph': "J Pell et al., PNAS, 2014 (PMID 22847406)",
+    'counting': "Q Zhang et al., arXiv:1309.2975 [q-bio.GN]",
+    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished'
+}
+
+
+def info(scriptname, algorithm_list=None):
+    import khmer
+
+    sys.stderr.write("\n")
+    sys.stderr.write("|| This is the script '%s' in khmer.\n"
+                     "|| You are running khmer version %s\n" %
+                     (scriptname, khmer.__version__,))
+    sys.stderr.write("|| You are also using screed version %s\n||\n"
+                     % screed.__version__)
+
+    sys.stderr.write("|| If you use this script in a publication, please "
+                     "cite EACH of the following:\n||\n")
+
+    if algorithm_list is None:
+        algorithm_list = []
+
+    algorithm_list.insert(0, 'software')
+
+    for alg in algorithm_list:
+        sys.stderr.write("||   * ")
+        sys.stderr.write(_algorithms[alg])
+        sys.stderr.write("\n")
+
+    sys.stderr.write("||\n|| Please see the CITATION file for details.\n\n")
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
