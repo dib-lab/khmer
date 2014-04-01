@@ -92,9 +92,9 @@ SETUP_METADATA = \
         "description": 'khmer k-mer counting library',
         "long_description": open("README.rst").read(),
         "author": 'Michael R. Crusoe, Greg Edvenson, Jordan Fish,'
-        ' Adina Howe, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
-        ' Jason Pell, Jared Simpson, Camille Scott,'
-        ' Qingpeng Zhang, and C. Titus Brown',
+        ' Adina Howe, Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy,'
+        ' Humberto Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott,'
+        ' Ramakrishnan Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown',
         "author_email": 'khmer-project@idyll.org',
         # "maintainer": 'Michael R. Crusoe', # this overrides the author field
         # "maintainer_email": 'mcrusoe@msu.edu', # so don't include it
