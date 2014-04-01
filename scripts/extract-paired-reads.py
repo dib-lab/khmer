@@ -47,9 +47,8 @@ def output_single(r):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description=
-        'Take a mixture of reads and split into pairs and orphans.')
+    parser = argparse.ArgumentParser(description="Take a mixture of reads and"
+                                     "split into pairs and orphans.")
 
     parser.add_argument('infile')
     args = parser.parse_args()

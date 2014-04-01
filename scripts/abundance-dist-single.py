@@ -19,6 +19,7 @@ from khmer.counting_args import build_construct_args, report_on_config
 from khmer.threading_args import add_threading_args
 from khmer.khmer_args import info
 
+
 def main():
     parser = build_construct_args(
         "Output k-mer abundance distribution (single file version).")

@@ -371,7 +371,7 @@ def test_normalize_by_median_version():
 
     print errlines
     print err
-    
+
     assert err.startswith('khmer ')
 
 
