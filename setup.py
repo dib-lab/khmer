@@ -139,13 +139,13 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "z" and "bz2" not in self.libraries:
-            spawn(cmd=['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test configure '
-                       '-nt Makefile || bash ./configure --static ) && make '
-                       '-f Makefile.pic PIC'],
-                  dry_run=self.dry_run)
-            spawn(cmd=['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
-                       'Makefile-libbz2_so all'],
-                  dry_run=self.dry_run)
+            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
+                    ' configure || bash ./configure --static ) && make -f '
+                    'Makefile.pic PIC']
+            spawn(cmd=zcmd, dry_run=self.dry_run)
+            bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
+                      'Makefile-libbz2_so all']
+            spawn(cmd=bz2cmd, dry_run=self.dry_run)
         else:
             for ext in self.extensions:
                 ext.extra_objects = []
