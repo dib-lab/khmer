@@ -205,10 +205,3 @@ with the function signature used later.
 
 "I" for unsinged int
 "K" for unsigned long long a.k.a khmer::HashIntoType.
-
-Upstream sources
-----------------
-
-ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
-
-Before major releases it should be examined to see if there is a new version

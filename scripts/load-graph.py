@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 """
 Build a graph from the given sequences, save in <htname>.
 
@@ -24,21 +25,21 @@ from khmer.file import check_file_status, check_space
 from khmer.file import check_space_for_hashtable
 
 
-def main():
-    parser = build_hashbits_args()
+def get_parser():
+    parser = build_hashbits_args(descr="Load sequences into the compressible "
+                                 "graph format plus optional tagset.")
     add_threading_args(parser)
     parser.add_argument('--no-build-tagset', '-n', default=False,
                         action='store_true', dest='no_build_tagset',
                         help='Do NOT construct tagset while loading sequences')
     parser.add_argument('output_filename')
     parser.add_argument('input_filenames', nargs='+')
+    return parser
 
-    args = parser.parse_args()
+
+def main():
+    args = get_parser().parse_args()
     report_on_config(args, hashtype='hashbits')
-
-    ksize = args.ksize
-    min_hashsize = args.min_hashsize
-    n_hashes = args.n_hashes
 
     base = args.output_filename
     filenames = args.input_filenames
@@ -48,19 +49,17 @@ def main():
         check_file_status(_)
 
     check_space(args.input_filenames)
-    check_space_for_hashtable(ksize * min_hashsize)
+    check_space_for_hashtable(args.ksize * args.min_tablesize)
 
-    print 'Saving hashtable to %s' % base
+    print 'Saving k-mer presence table to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
     if args.no_build_tagset:
         print 'We WILL NOT build the tagset.'
     else:
         print 'We WILL build the tagset (for partitioning/traversal).'
 
-    #
-
-    print 'making hashtable'
-    htable = khmer.new_hashbits(ksize, min_hashsize, n_hashes)
+    print 'making k-mer presence table'
+    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
     if args.no_build_tagset:
         target_method = htable.consume_fasta_with_reads_parser
@@ -68,24 +67,23 @@ def main():
         target_method = htable.consume_fasta_and_tag_with_reads_parser
 
     config = khmer.get_config()
-    bufsz = config.get_reads_input_buffer_size()
     config.set_reads_input_buffer_size(n_threads * 64 * 1024)
 
-    for index, filename in enumerate(filenames):
+    for _, filename in enumerate(filenames):
 
         rparser = khmer.ReadParser(filename, n_threads)
         threads = []
         print 'consuming input', filename
-        for tnum in xrange(n_threads):
+        for _ in xrange(n_threads):
             cur_thrd = threading.Thread(target=target_method, args=(rparser, ))
             threads.append(cur_thrd)
             cur_thrd.start()
 
-        for _ in threads:
-            _.join()
+        for thread in threads:
+            thread.join()
 
-    print 'saving hashtable in', base + '.ht'
-    htable.save(base + '.ht')
+    print 'saving k-mer presence table in', base + '.pt'
+    htable.save(base + '.pt')
 
     if not args.no_build_tagset:
         print 'saving tagset in', base + '.tagset'
@@ -98,8 +96,8 @@ def main():
     print 'fp rate estimated to be %1.3f' % fp_rate
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print >> sys.stderr, "**"
-        print >> sys.stderr, "** ERROR: the graph structure is too small for"
-        print >> sys.stderr, "** this data set.  Increase hashsize/num ht."
+        print >> sys.stderr, ("** ERROR: the graph structure is too small for "
+                              "this data set.  Increase table size/# tables.")
         print >> sys.stderr, "**"
         sys.exit(1)
 

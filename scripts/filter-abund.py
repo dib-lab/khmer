@@ -5,6 +5,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,invalid-name
 """
 Trim sequences at k-mers of the given abundance, based on the given counting
 hash table.  Output sequences will be placed in 'infile.abundfilt'.
@@ -15,9 +16,9 @@ Use '-h' for parameter help.
 """
 import os
 import khmer
+import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer import threading_args as targs
-from khmer.counting_args import build_counting_multifile_args
+from khmer.khmer_args import build_counting_args, add_threading_args
 from khmer.file import check_file_status, check_space
 #
 
@@ -25,34 +26,53 @@ DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
 
 
-def main():
-    parser = build_counting_multifile_args()
-    targs.add_threading_args(parser)
+def get_parser():
+    epilog = """
+    Trimmed sequences will be placed in ${input_filename}.abundfilt for each
+    input sequence file. If the input sequences are from RNAseq or metagenome
+    sequencing then :option:`--variable-coverage` should be used.
+
+    Example::
+
+        load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
+        filter-abund.py -C 2 table.kh data/100k-filtered.fa
+    """
+    parser = build_counting_args(
+        descr='Trim sequences at a minimum k-mer abundance.',
+        epilog=textwrap.dedent(epilog))
+    parser.add_argument('input_table')
+    parser.add_argument('input_filename', nargs='+')
+    add_threading_args(parser)
     parser.add_argument('--cutoff', '-C', dest='cutoff',
                         default=DEFAULT_CUTOFF, type=int,
                         help="Trim at k-mers below this abundance.")
 
     parser.add_argument('-V', '--variable-coverage', action='store_true',
-                        dest='variable_coverage', default=False)
+                        dest='variable_coverage', default=False,
+                        help='Only trim low-abundance k-mers from sequences '
+                        'that have high coverage.')
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
-                        help='base variable-coverage cutoff on this median'
-                        ' k-mer abundance',
+                        help='Base the variable-coverage cutoff on this median'
+                        ' k-mer abundance.',
                         default=DEFAULT_NORMALIZE_LIMIT)
     parser.add_argument('-o', '--out', dest='single_output_filename',
-                        default='', help='only output a single'
-                        ' file with the specified filename')
-    args = parser.parse_args()
+                        default='', metavar="optional output filename",
+                        help='Output the trimmed sequences into a single file '
+                        'with the given filename instead of creating a new '
+                        'file for each input file.')
+    return parser
+
+
+def main():
+    args = get_parser().parse_args()
 
     counting_ht = args.input_table
-    infiles = args.input_filenames
-    n_threads = int(args.n_threads)
+    infiles = args.input_filename
 
     for _ in infiles:
         check_file_status(_)
 
     check_space(infiles)
-
-    print 'file with ht: %s' % counting_ht
 
     print 'loading hashtable'
     htable = khmer.load_counting_hash(counting_ht)
@@ -89,7 +109,7 @@ def main():
             outfile = os.path.basename(infile) + '.abundfilt'
             outfp = open(outfile, 'w')
 
-        tsp = ThreadedSequenceProcessor(process_fn, n_workers=n_threads)
+        tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
         tsp.start(verbose_loader(infile), outfp)
 
         print 'output in', outfile
