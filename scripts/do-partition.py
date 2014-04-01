@@ -22,8 +22,7 @@ import gc
 import os.path
 import os
 import textwrap
-from khmer.khmer_args import build_hashbits_args
-from khmer.khmer_args import report_on_config
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 import glob
 from khmer.file import check_file_status, check_space
 
@@ -103,6 +102,7 @@ def get_parser():
 
 # pylint: disable=too-many-branches
 def main():  # pylint: disable=too-many-locals,too-many-statements
+    info('do-partition.py', ['graph'])
     args = get_parser().parse_args()
 
     report_on_config(args, hashtype='hashbits')

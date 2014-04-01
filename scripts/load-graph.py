@@ -19,7 +19,7 @@ import threading
 
 import khmer
 from khmer.khmer_args import build_hashbits_args
-from khmer.khmer_args import report_on_config
+from khmer.khmer_args import (report_on_config, info)
 from khmer.threading_args import add_threading_args
 from khmer.file import check_file_status, check_space
 from khmer.file import check_space_for_hashtable
@@ -38,6 +38,7 @@ def get_parser():
 
 
 def main():
+    info('load-graph.py', ['graph'])
     args = get_parser().parse_args()
     report_on_config(args, hashtype='hashbits')
 

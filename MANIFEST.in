@@ -9,3 +9,4 @@ graft data
 exclude data/1m-filtered.fa
 graft tests
 
+include khmer/_version.py

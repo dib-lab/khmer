@@ -79,7 +79,7 @@ EXTENSION_MOD_DICT = \
     }
 
 EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          **EXTENSION_MOD_DICT)
+                          ** EXTENSION_MOD_DICT)
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")

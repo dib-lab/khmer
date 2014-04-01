@@ -21,6 +21,7 @@ import os.path
 import random
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -53,6 +54,7 @@ def output_single(read):
 
 
 def main():
+    info('sample-reads-randomly.py')
     args = get_parser().parse_args()
 
     for _ in args.filenames:

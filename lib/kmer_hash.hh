@@ -1,7 +1,7 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. 
+// the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
 
@@ -22,8 +22,8 @@
 #   define is_valid_dna(ch) ((toupper(ch)) == 'A' || (toupper(ch)) == 'C' || \
 			    (toupper(ch)) == 'G' || (toupper(ch)) == 'T')
 #else
-    // NOTE: Assumes data is already sanitized as it should be by parsers.
-    //	     This assumption eliminates 4 function calls.
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
 #   define is_valid_dna(ch) ((ch) == 'A' || (ch) == 'C' || \
 			     (ch) == 'G' || (ch) == 'T')
 #endif
@@ -34,8 +34,8 @@
 			    (toupper(ch)) == 'T' ? 1LL : \
 			    (toupper(ch)) == 'C' ? 2LL : 3LL)
 #else
-    // NOTE: Assumes data is already sanitized as it should be by parsers.
-    //	     This assumption eliminates 4 function calls.
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
 #   define twobit_repr(ch) ((ch) == 'A' ? 0LL : \
 			    (ch) == 'T' ? 1LL : \
 			    (ch) == 'C' ? 2LL : 3LL)
@@ -50,8 +50,8 @@
 			    (toupper(ch)) == 'T' ? 0LL : \
 			    (toupper(ch)) == 'C' ? 3LL : 2LL)
 #else
-    // NOTE: Assumes data is already sanitized as it should be by parsers.
-    //	     This assumption eliminates 4 function calls.
+// NOTE: Assumes data is already sanitized as it should be by parsers.
+//	     This assumption eliminates 4 function calls.
 #   define twobit_comp(ch) ((ch) == 'A' ? 1LL : \
 			    (ch) == 'T' ? 0LL : \
 			    (ch) == 'C' ? 3LL : 2LL)
@@ -65,14 +65,15 @@
 #endif
 
 
-namespace khmer {
-  // two-way hash functions.
-  HashIntoType _hash(const char * kmer, const WordLength k);
-  HashIntoType _hash(const char * kmer, const WordLength k,
-		     HashIntoType& h, HashIntoType& r);
-  HashIntoType _hash_forward(const char * kmer, WordLength k);
+namespace khmer
+{
+// two-way hash functions.
+HashIntoType _hash(const char * kmer, const WordLength k);
+HashIntoType _hash(const char * kmer, const WordLength k,
+                   HashIntoType& h, HashIntoType& r);
+HashIntoType _hash_forward(const char * kmer, WordLength k);
 
-  std::string _revhash(HashIntoType hash, WordLength k);
+std::string _revhash(HashIntoType hash, WordLength k);
 };
 
 #endif // KMER_HASH_HH

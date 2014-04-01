@@ -21,6 +21,7 @@ import argparse
 import textwrap
 import khmer
 from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
 DEFAULT_K = 32
 
@@ -54,6 +55,7 @@ def get_parser():
 
 
 def main():
+    info('annotate-partitions.py', ['graph'])
     args = get_parser().parse_args()
 
     ksize = args.ksize
