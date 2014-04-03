@@ -18,29 +18,31 @@ from hyperloglog.hll import HyperLogLog
 
 filename = sys.argv[1]
 K = int(sys.argv[2])  # size of kmer
-HT_SIZE = int(sys.argv[3])  # size of hashtable
-N_HT = int(sys.argv[4])  # number of hashtables
 
-ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
-hllcpp = khmer.new_hll_counter(0.01)
-hlllib = HyperLogLog(0.01)
+ERROR_RATE = .01
+
+hllcpp = khmer.new_hll_counter(ERROR_RATE)
+hlllib = HyperLogLog(ERROR_RATE)
 counter = Counter()
 
-n_unique = 0
 for n, record in enumerate(fasta_iter(open(filename))):
     sequence = record['sequence']
     seq_len = len(sequence)
     for n in range(0, seq_len + 1 - K):
         kmer = sequence[n:n + K]
-#        if (not ht.get(kmer)):
-#            n_unique += 1
-#        ht.count(kmer)
         counter.update([kmer])
         hllcpp.add(kmer)
         hlllib.add(kmer)
 
-print 'unique:', n_unique
-print 'bloom unique:', ht.n_unique_kmers()
-print 'HLL cpp unique:', hllcpp.estimate_cardinality()
-print 'HLL lib unique:', len(hlllib)
-print 'Python stdlib counter:', len(counter)
+cpp_estimate = hllcpp.estimate_cardinality()
+py_estimate = len(hlllib)
+real_count = len(counter)
+
+print 'Unique:', real_count
+
+print 'HLL cpp unique:', cpp_estimate,
+print ', error:', round(float(abs(cpp_estimate - real_count)) / (real_count or 1), 3)
+
+print 'HLL lib unique:', py_estimate,
+print ', error:', round(float(abs(py_estimate - real_count)) / (real_count or 1), 3)
+print
