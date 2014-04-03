@@ -9,9 +9,14 @@
 #include <math.h>
 #include <algorithm>
 #include <numeric>
+#include <inttypes.h>
+
+#include <CommonCrypto/CommonDigest.h>
 
 #include "khmer.hh"
-#include "ktable.hh"
+#include "kmer_hash.hh"
+
+#define HASHSIZE 20
 
 using namespace std;
 using namespace khmer;
@@ -51,7 +56,7 @@ double ep_sum(double acc, int b)
 
 int get_rho(HashIntoType w, int max_width)
 {
-    int rho = max_width - floor(log2(w)) + 1; /* TODO find last bit set */
+    int rho = max_width - floor(log2(w)); /* TODO find last bit set */
 
     if (rho <= 0) {
         return -1;    // TODO: treat error, w overflow
@@ -91,7 +96,7 @@ HashIntoType HLLCounter::estimate_cardinality()
     int V = std::count(this->M.begin(), this->M.end(), 0);
 
     if (V > 0) {
-        H = this->m * log(this->m / V);
+        H = this->m * log((double)this->m / V);
         if (H <= get_threshold(this->p)) {
             return H;
         }
@@ -100,10 +105,25 @@ HashIntoType HLLCounter::estimate_cardinality()
     return this->_Ep();
 }
 
-void HLLCounter::add(const std::string &value) {
-  HashIntoType j;
-  HashIntoType x = khmer::_hash(value.c_str(), 32);
-  j = x & (this->m - 1);
+void HLLCounter::add(const std::string &value)
+{
+    HashIntoType j;
+    //HashIntoType x = khmer::_hash(value.c_str(), 32);
+    __uint128_t x = 0;
+    uint64_t low = 0;
+    uint64_t high = 0;
+
+    uint8_t digest[HASHSIZE];
+
+    CC_SHA1((uint8_t*)value.c_str(), value.size(), digest);
+
+    x = 0;
+    for (int i=0; i < 8; i++) {
+        __uint128_t buf = digest[i];
+        x |= buf << ((7 - i) * 8);
+    }
+
+    j = x & (this->m - 1);
 
     this->M[j] = max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
