@@ -11,12 +11,8 @@
 #include <numeric>
 #include <inttypes.h>
 
-#include <CommonCrypto/CommonDigest.h>
-
 #include "khmer.hh"
 #include "kmer_hash.hh"
-
-#define HASHSIZE 20
 
 using namespace std;
 using namespace khmer;
@@ -107,23 +103,7 @@ HashIntoType HLLCounter::estimate_cardinality()
 
 void HLLCounter::add(const std::string &value)
 {
-    HashIntoType j;
-    //HashIntoType x = khmer::_hash(value.c_str(), 32);
-    __uint128_t x = 0;
-    uint64_t low = 0;
-    uint64_t high = 0;
-
-    uint8_t digest[HASHSIZE];
-
-    CC_SHA1((uint8_t*)value.c_str(), value.size(), digest);
-
-    x = 0;
-    for (int i=0; i < 8; i++) {
-        __uint128_t buf = digest[i];
-        x |= buf << ((7 - i) * 8);
-    }
-
-    j = x & (this->m - 1);
-
+    HashIntoType x = khmer::_hash(value.c_str(), 32);
+    HashIntoType j = x & (this->m - 1);
     this->M[j] = max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
