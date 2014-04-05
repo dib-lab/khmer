@@ -1,3 +1,29 @@
+2014-04-01  Titus Brown  <titus@idyll.org>
+
+    * CITATION,khmer/khmer_args.py: Updated khmer software citation for
+    release.
+
+2014-03-31  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
+    20a433c2.
+
+    * khmer/file.py: Fixed incorrect use of __file__ dirname instead of
+    os.getcwd(); also fixed bug where statvfs would choke on an empty
+    dirname resulting from input files being in the cwd.
+
+2014-03-31  Titus Brown  <titus@idyll.org>
+
+    * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
+    and added citation information to each script.
+    * CITATION: added basic citation information for khmer functionality.
+
+2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    Version 1.0.1
+    * MANIFEST.in: fix to correct zlib packaging for #365
+    * ChangeLog: fix date for 1.0 release, email addresses
+
 2014-04-17  Ram RS  <ramrs@nyu.edu>
 
     * scripts/make-initial-stoptags.py: fixed bug that threw error on
@@ -8,7 +34,7 @@
     * scripts/*.py: fixed argument to check_space_for_hashtable to rely
     on args.n_tables and not args.ksize.
 
-2014-04-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+2014-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     Version 1.0
     * Makefile: run 'build' command before install; ignore _version.py for
@@ -41,7 +67,7 @@
     os.getcwd(); also fixed bug where statvfs would choke on an empty
     dirname resulting from input files being in the cwd.
 
-2014-03-31  Michael R. Crusoe  <mcrusoe@msu.edu
+2014-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * versioneer.py,ez_setup.py: updated to version 0.10 and 3.4.1
     respectively.
