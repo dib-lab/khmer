@@ -46,8 +46,9 @@ BZIP2DIR = 'lib/bzip2'
 
 EXTRA_OBJS = []
 EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".lo") for bn in [
-    "adler32", "compress", "crc32", "deflate", "infback", "inffast", "inflate",
-    "inftrees", "trees", "uncompr", "zutil"])
+    "adler32", "compress", "crc32", "deflate", "gzclose", "gzlib", "gzread",
+    "gzwrite", "infback", "inffast", "inflate", "inftrees", "trees", "uncompr",
+    "zutil"])
 EXTRA_OBJS.extend(path_join("lib", "bzip2", bn + ".o") for bn in [
     "blocksort", "huffman", "crctable", "randtable", "compress", "decompress",
     "bzlib"])

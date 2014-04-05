@@ -1,7 +1,7 @@
 2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     Version 1.0.1
-    * MANIFEST.in: fix to correct zlib packaging for #365
+    * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
     * ChangeLog: fix date for 1.0 release, email addresses
 
 2014-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
