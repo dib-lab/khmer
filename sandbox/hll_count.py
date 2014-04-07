@@ -8,37 +8,48 @@
 ## comparing results
 
 from collections import Counter
+import string
 
 import khmer
 import sys
 from screed.fasta import fasta_iter
 
 from hyperloglog.hll import HyperLogLog
+from tqdm import tqdm
 
 
 filename = sys.argv[1]
 K = int(sys.argv[2])  # size of kmer
 
 ERROR_RATE = .01
+TT = string.maketrans('ACGT', 'TGCA')
 
 hllcpp = khmer.new_hll_counter(ERROR_RATE)
 hlllib = HyperLogLog(ERROR_RATE)
 counter = Counter()
+counter_norc = Counter()
 
-for n, record in enumerate(fasta_iter(open(filename))):
+for n, record in tqdm(enumerate(fasta_iter(open(filename)))):
     sequence = record['sequence']
     seq_len = len(sequence)
     for n in range(0, seq_len + 1 - K):
         kmer = sequence[n:n + K]
-        counter.update([kmer])
+        rc = kmer[::-1].translate(TT)
+
         hllcpp.add(kmer)
         hlllib.add(kmer)
+        counter_norc.update([kmer])
+
+        if rc in counter:
+            kmer = rc
+        counter.update([kmer])
 
 cpp_estimate = hllcpp.estimate_cardinality()
 py_estimate = len(hlllib)
 real_count = len(counter)
 
 print 'Unique:', real_count
+print 'Unique no rc:', len(counter_norc)
 
 print 'HLL cpp unique:', cpp_estimate,
 print ', error:', round(float(abs(cpp_estimate - real_count)) / (real_count or 1), 3)
