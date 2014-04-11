@@ -69,7 +69,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     check_file_status(args.input_sequence_filename)
     check_space([args.input_sequence_filename])
     if args.savetable:
-        check_space_for_hashtable(args.ksize * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize)
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):

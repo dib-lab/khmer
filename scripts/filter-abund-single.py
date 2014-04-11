@@ -63,7 +63,7 @@ def main():
     check_file_status(args.datafile)
     check_space([args.datafile])
     if args.savetable:
-        check_space_for_hashtable(args.ksize * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize)
     report_on_config(args)
 
     config = khmer.get_config()

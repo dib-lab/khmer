@@ -53,7 +53,7 @@ def main():
         check_file_status(_)
 
     check_space(args.input_filenames)
-    check_space_for_hashtable(args.ksize * args.min_tablesize)
+    check_space_for_hashtable(float(args.n_tables * args.min_tablesize) / 8.)
 
     print 'Saving k-mer presence table to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
