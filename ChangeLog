@@ -1,3 +1,8 @@
+2014-04-11  Titus Brown  <t@idyll.org>
+
+    * scripts/*.py: fixed argument to check_space_for_hashtable to rely
+    on args.n_tables and not args.ksize.
+
 2014-04-10  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     Version 1.0
@@ -17,12 +22,12 @@
     * tests/test-data/test-overlap1.ht,data/MSB2-surrender.fa &
     data/1m-filtered.fa: removed from repository history, .git is now 36M!
 
-2014-04-01  Titus Brown  <t@Titus-MacBook-Air-2.local>
+2014-04-01  Titus Brown  <t@idyll.org>
 
     * CITATION,khmer/khmer_args.py: Updated khmer software citation for
     release.
 
-2014-03-31  Titus Brown  <t@Titus-MacBook-Air-2.local>
+2014-03-31  Titus Brown  <t@idyll.org>
 
     * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
     20a433c2.
@@ -38,7 +43,7 @@
     * docs/release.txt,khmer/_version.py,MANIFEST.in: update ancillary
     versioneer files
 
-2014-03-31  Titus Brown  <t@Titus-MacBook-Air-2.local>
+2014-03-31  Titus Brown  <t@idyll.org>
 
     * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
     and added citation information to each script.

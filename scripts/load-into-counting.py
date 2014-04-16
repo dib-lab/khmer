@@ -70,7 +70,7 @@ def main():
         check_file_status(name)
 
     check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.ksize * args.min_tablesize)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize)
 
     print 'Saving k-mer counting table to %s' % base
     print 'Loading kmers from sequences in %s' % repr(filenames)
@@ -101,7 +101,7 @@ def main():
             _.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args.ksize * args.min_tablesize)
+            check_space_for_hashtable(args.n_tables * args.min_tablesize)
             print 'mid-save', base
             htable.save(base)
             open(base + '.info', 'w').write('through %s' % filename)
