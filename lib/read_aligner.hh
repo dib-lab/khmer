@@ -20,21 +20,23 @@
 
 #define READ_ALIGNER_DEBUG 0
 
-namespace khmer {
+namespace khmer
+{
 
-  enum State { MATCH, INSERT_READ, INSERT_GRAPH };
+enum State { MATCH, INSERT_READ, INSERT_GRAPH };
 
-  // Constants for state transitions
-  enum Transition { MM, MIr, MIg, IrM, IrIr, IgM, IgIg, disallowed };
-  // log probabilities for state transitions
-  static double trans_default[] = { log2(.90), log2(.05), log2(.05),
-				    log2(.95), log2(.05),
-				    log2(.95), log2(.05)};
+// Constants for state transitions
+enum Transition { MM, MIr, MIg, IrM, IrIr, IgM, IgIg, disallowed };
+// log probabilities for state transitions
+static double trans_default[] = { log2(.90), log2(.05), log2(.05),
+                                  log2(.95), log2(.05),
+                                  log2(.95), log2(.05)
+                                };
 
-  enum Nucl {A, C, G, T};
-  static const char nucl_lookup[4] = {'A', 'C', 'G', 'T'};
-  
-  struct AlignmentNode {
+enum Nucl {A, C, G, T};
+static const char nucl_lookup[4] = {'A', 'C', 'G', 'T'};
+
+struct AlignmentNode {
     AlignmentNode* prev;
     Nucl base;
     unsigned int seq_idx;
@@ -49,35 +51,36 @@ namespace khmer {
     bool trusted;
 
     unsigned int length;
-    
+
     AlignmentNode(AlignmentNode* _prev, Nucl _emission, int _seq_idx, State _state, Transition _trans, HashIntoType _fwd_hash, HashIntoType _rc_hash, unsigned int _length)
-      :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), trans(_trans), fwd_hash(_fwd_hash), rc_hash(_rc_hash), length(_length) {}
-    
+        :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), trans(_trans), fwd_hash(_fwd_hash), rc_hash(_rc_hash), length(_length) {}
+
     bool operator== (const AlignmentNode& rhs) const {
-      return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
-	uniqify_rc(fwd_hash, rc_hash) == uniqify_rc(rhs.fwd_hash, rhs.rc_hash) &&
-	trans == rhs.trans;
+        return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
+               uniqify_rc(fwd_hash, rc_hash) == uniqify_rc(rhs.fwd_hash, rhs.rc_hash) &&
+               trans == rhs.trans;
     }
 
     bool operator< (const AlignmentNode& rhs) const {
-      return f_score < rhs.f_score;
+        return f_score < rhs.f_score;
     }
-  };
+};
 
-  class AlignmentNodeCompare {
-  public:
+class AlignmentNodeCompare
+{
+public:
     bool operator()(AlignmentNode* o1, AlignmentNode* o2) {
-      if (o1->f_score < o2->f_score) {
-	return true;
-      } else {
-	return false;
-      }
+        if (o1->f_score < o2->f_score) {
+            return true;
+        } else {
+            return false;
+        }
     }
-  };
-  
-  typedef std::priority_queue<AlignmentNode*, std::vector<AlignmentNode*>, AlignmentNodeCompare> NodeHeap;
+};
 
-  struct ScoringMatrix {
+typedef std::priority_queue<AlignmentNode*, std::vector<AlignmentNode*>, AlignmentNodeCompare> NodeHeap;
+
+struct ScoringMatrix {
     const double trusted_match;
     const double trusted_mismatch;
     const double untrusted_match;
@@ -86,24 +89,25 @@ namespace khmer {
     const double* tsc;
 
     ScoringMatrix(double trusted_match, double trusted_mismatch, double untrusted_match, double untrusted_mismatch, double* trans): trusted_match(trusted_match), trusted_mismatch(trusted_mismatch), untrusted_match(untrusted_match), untrusted_mismatch(untrusted_mismatch), tsc(trans) {}
-  };
+};
 
-    
-  struct Alignment {
+
+struct Alignment {
     std::string graph_alignment;
     std::string read_alignment;
     std::string trusted;
     double score;
     bool truncated;
-  };
+};
 
-  class ReadAligner {
-  private:
+class ReadAligner
+{
+private:
 
     Alignment* ExtractAlignment(AlignmentNode*, bool forward, const std::string&);
     void Enumerate(NodeHeap&, std::vector<AlignmentNode*>& all_nodes, AlignmentNode*, bool, const std::string&);
     Alignment* Subalign(AlignmentNode*, unsigned int, bool, const std::string&);
-    
+
     // These variables are required to use the _revhash and hash macros
     // might as well just compute them once
     const HashIntoType bitmask;
@@ -114,25 +118,25 @@ namespace khmer {
 
     unsigned int m_trusted_cutoff;
     double m_bits_theta;
-    
+
     HashIntoType comp_bitmask(WordLength k) {
-      HashIntoType ret = 0;
-      for (unsigned int i = 0; i < k; i++) {
-	ret = (ret << 2) | 3;
-      }
-      return ret;
+        HashIntoType ret = 0;
+        for (unsigned int i = 0; i < k; i++) {
+            ret = (ret << 2) | 3;
+        }
+        return ret;
     }
-    
-  public:
+
+public:
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch, unsigned int trusted_cutoff, double bits_theta)
-      : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.955), log2(.04), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {
-      #if READ_ALIGNER_DEBUG
-      std::cerr << "Trusted cutoff: " << m_trusted_cutoff << " bits theta: " << bits_theta << " trusted match: " << m_sm.trusted_match << " untrusted match: " << m_sm.untrusted_match << " trusted mismatch: " << m_sm.trusted_mismatch << " untrusted mismatch: " << m_sm.untrusted_mismatch << std::endl;
-      #endif
+        : bitmask(comp_bitmask(ch->ksize())), rc_left_shift(ch->ksize() * 2 - 2), m_ch(ch), m_sm(log2(.955), log2(.04), log2(.004), log2(.001), trans_default), m_trusted_cutoff(trusted_cutoff), m_bits_theta(bits_theta) {
+#if READ_ALIGNER_DEBUG
+        std::cerr << "Trusted cutoff: " << m_trusted_cutoff << " bits theta: " << bits_theta << " trusted match: " << m_sm.trusted_match << " untrusted match: " << m_sm.untrusted_match << " trusted mismatch: " << m_sm.trusted_mismatch << " untrusted mismatch: " << m_sm.untrusted_mismatch << std::endl;
+#endif
     }
-  };
+};
 }
 
 #endif // READ_ALIGNER_HH
