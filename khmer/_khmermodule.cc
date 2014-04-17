@@ -1005,14 +1005,9 @@ static PyTypeObject khmer_KSubsetPartitionType = {
     "subset object",           /* tp_doc */
 };
 
-#define is_subset_obj(v)  ((v)->ob_type == &khmer_KSubsetPartitionType)
-
-// MOVED HASHBITS TYPE TO BELOW METHODS
-
-/* GRAPHALIGN addition */
 typedef struct {
     PyObject_HEAD
-    Aligner * aligner;
+    ReadAligner * aligner;
 } khmer_ReadAlignerObject;
 
 static void khmer_counting_dealloc(PyObject *);
@@ -1235,101 +1230,20 @@ static PyObject * hash_consume_high_abund_kmers(PyObject * self,
     n_consumed = counting->consume_high_abund_kmers(long_str,
                  (BoundedCounterType) min_count);
 
-    /***********************************************************************/
+    return PyInt_FromLong(n_consumed);
+}
+/***********************************************************************/
 
 //
 // KCountingHash object
 //
 
-void free_pre_partition_info(void * p)
-{
-  _pre_partition_info * ppi = (_pre_partition_info *) p;
-  delete ppi;
-}
-
-void free_subset_partition_info(void * p)
-{
-  khmer::SubsetPartition * subset_p = (khmer::SubsetPartition *) p;
-  delete subset_p;
-}
-
-typedef struct {
-  PyObject_HEAD
-  khmer::CountingHash * counting;
-} khmer_KCountingHashObject;
-
-typedef struct {
-  PyObject_HEAD
-  khmer::SubsetPartition * subset;
-} khmer_KSubsetPartitionObject;
-
-typedef struct {
-  PyObject_HEAD
-  khmer::Hashbits * hashbits;
-} khmer_KHashbitsObject;
-
-static void khmer_subset_dealloc(PyObject *);
-static PyObject * khmer_subset_getattr(PyObject * obj, char * name);
-
-static PyTypeObject khmer_KSubsetPartitionType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "KSubset", sizeof(khmer_KSubsetPartitionObject),
-    0,
-    khmer_subset_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_subset_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    0,				/*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "subset object",           /* tp_doc */
-};
-
-#define is_subset_obj(v)  ((v)->ob_type == &khmer_KSubsetPartitionType)
-
 // MOVED HASHBITS TYPE TO BELOW METHODS
-
-/* GRAPHALIGN addition */
-typedef struct {
-  PyObject_HEAD
-  khmer::ReadAligner * aligner;
-} khmer_ReadAlignerObject;
-
 static void khmer_counting_dealloc(PyObject *);
 
 static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args);
 
 static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self, PyObject * args);
-
-static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
-{
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
-
-  PyObject * x;
-  if (!PyArg_ParseTuple(args, "O", &x)) {
-    return NULL;
-  }
-
-  bool setme = PyObject_IsTrue(x);
-  counting->set_use_bigcount(setme);
-
-  Py_RETURN_NONE;
-}
->>>>>>> Working (if threadbare) implementation of aligning reads to the DBG based on Jason Pell's work
-
-    return PyInt_FromLong(n_consumed);
-}
 
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
@@ -4368,19 +4282,10 @@ static PyTypeObject khmer_KLabelHashType = {
     0,                       /* tp_alloc */
 };
 
-//
-// GRAPHALIGN addition
-//
-
-
-//
-// GRAPHALIGN addition
-//
-
 static PyObject * readaligner_align(PyObject * self, PyObject * args)
 {
     khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-    Aligner * aligner = me->aligner;
+    ReadAligner * aligner = me->aligner;
 
     const char * read;
 
@@ -4388,56 +4293,26 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if (strlen(read) < (unsigned int)aligner->ksize()) {
+    /*if (strlen(read) < (unsigned int)aligner->ksize()) {
         PyErr_SetString(PyExc_ValueError,
                         "string length must >= the hashtable k-mer size");
         return NULL;
-    }
+    }*/
 
-    CandidateAlignment aln;
-    std::string rA;
+    Alignment * aln;
+    aln = aligner->Align(read);
 
-    Py_BEGIN_ALLOW_THREADS
+    const char* alignment = aln->graph_alignment.c_str();
+    const char* readAlignment = aln->read_alignment.c_str();
+    PyObject * ret = Py_BuildValue("dssO", aln->score, alignment,
+                                   readAlignment, (aln->truncated)? Py_True : Py_False);
+    delete aln;
 
-    aln = aligner->alignRead(read);
-    rA = aln.getReadAlignment(read);
-
-    Py_END_ALLOW_THREADS
-
-    const char* alignment = aln.alignment.c_str();
-    const char* readAlignment = rA.c_str();
-
-
-    return Py_BuildValue("ss", alignment,
-                         readAlignment);
-}
-
-static PyObject * readaligner_printErrorFootprint(PyObject * self,
-        PyObject * args)
-{
-    khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
-    Aligner * aligner = me->aligner;
-
-    const char * read;
-
-    if (!PyArg_ParseTuple(args, "s", &read)) {
-        return NULL;
-    }
-
-    if (strlen(read) < (unsigned int)aligner->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    aligner->printErrorFootprint(read);
-
-    Py_RETURN_NONE;
+    return ret;
 }
 
 static PyMethodDef khmer_ReadAligner_methods[] = {
     {"align", readaligner_align, METH_VARARGS, ""},
-    {"printErrorFootprint", readaligner_printErrorFootprint, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
@@ -4490,15 +4365,16 @@ static PyTypeObject khmer_ReadAlignerType = {
 //
 static PyObject* new_readaligner(PyObject * self, PyObject * args)
 {
-    khmer_KCountingHashObject * ch;
-    double lambdaOne = 0.0;
-    double lambdaTwo = 0.0;
-    unsigned int maxErrorRegion = UINT_MAX;
+    PyObject * py_obj;
+    unsigned int trusted_cov_cutoff = 2;
+    double bits_theta = 1;
 
-    if(!PyArg_ParseTuple(args, "O!|ddI", &khmer_KCountingHashType, &ch,
-                         &lambdaOne, &lambdaTwo, &maxErrorRegion)) {
+    if(!PyArg_ParseTuple(args, "O|Id", &py_obj, &trusted_cov_cutoff,
+                         &bits_theta)) {
         return NULL;
     }
+
+    khmer_KCountingHashObject * ch = (khmer_KCountingHashObject *) py_obj;
 
     khmer_ReadAlignerObject * readaligner_obj = (khmer_ReadAlignerObject *) \
             PyObject_New(khmer_ReadAlignerObject, &khmer_ReadAlignerType);
@@ -4507,19 +4383,8 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if (lambdaOne == 0.0 && lambdaTwo == 0.0 && maxErrorRegion == UINT_MAX) {
-        readaligner_obj->aligner = new Aligner(ch->counting);
-    } else if
-    (maxErrorRegion == UINT_MAX && !(lambdaOne == 0.0 && lambdaTwo == 0.0)) {
-        readaligner_obj->aligner = new Aligner(ch->counting,
-                                               lambdaOne, lambdaTwo);
-    } else {
-        readaligner_obj->aligner = new Aligner(ch->counting,
-                                               lambdaOne, lambdaTwo,
-                                               maxErrorRegion);
-
-    }
-
+    readaligner_obj->aligner = new ReadAligner(ch->counting,
+            trusted_cov_cutoff, bits_theta);
     return (PyObject *) readaligner_obj;
 }
 
@@ -4696,7 +4561,7 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
 {
     HashIntoType val;
     WordLength ksize;
-  
+
     if (!PyArg_ParseTuple(args, "Kb", &val, &ksize)) {
         return NULL;
     }
