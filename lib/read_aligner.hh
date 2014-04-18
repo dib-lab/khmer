@@ -39,7 +39,7 @@ static const char nucl_lookup[4] = {'A', 'C', 'G', 'T'};
 struct AlignmentNode {
     AlignmentNode* prev;
     Nucl base;
-    unsigned int seq_idx;
+    size_t seq_idx;
     State state;
     Transition trans;
     HashIntoType fwd_hash;
@@ -52,7 +52,7 @@ struct AlignmentNode {
 
     unsigned int length;
 
-    AlignmentNode(AlignmentNode* _prev, Nucl _emission, int _seq_idx, State _state, Transition _trans, HashIntoType _fwd_hash, HashIntoType _rc_hash, unsigned int _length)
+    AlignmentNode(AlignmentNode* _prev, Nucl _emission, size_t _seq_idx, State _state, Transition _trans, HashIntoType _fwd_hash, HashIntoType _rc_hash, unsigned int _length)
         :prev(_prev), base(_emission), seq_idx(_seq_idx), state(_state), trans(_trans), fwd_hash(_fwd_hash), rc_hash(_rc_hash), length(_length) {}
 
     bool operator== (const AlignmentNode& rhs) const {
@@ -106,7 +106,7 @@ private:
 
     Alignment* ExtractAlignment(AlignmentNode*, bool forward, const std::string&);
     void Enumerate(NodeHeap&, std::vector<AlignmentNode*>& all_nodes, AlignmentNode*, bool, const std::string&);
-    Alignment* Subalign(AlignmentNode*, unsigned int, bool, const std::string&);
+    Alignment* Subalign(AlignmentNode*, size_t, bool, const std::string&);
 
     // These variables are required to use the _revhash and hash macros
     // might as well just compute them once

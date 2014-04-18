@@ -4,6 +4,7 @@
 // the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 //
 #include "read_aligner.hh"
+#include <stdlib.h>     /* labs */
 
 namespace khmer
 {
@@ -23,7 +24,7 @@ del_alignment_node_t del_alignment_node()
 /*
   Compute the null model (random sequence) log odds probability for a given length
  */
-double GetNull(int length)
+double GetNull(size_t length)
 {
     return log2(.25) * length + log2(1.0 / (length + 1));
 }
@@ -66,8 +67,8 @@ void ReadAligner::Enumerate(
     const std::string& seq
 )
 {
-    int next_seq_idx;
-    int remaining;
+    size_t next_seq_idx;
+    size_t remaining;
     unsigned int kmerCov;
     double hcost;
     double sc;
@@ -158,7 +159,7 @@ void ReadAligner::Enumerate(
 }
 
 Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
-                                 unsigned int seqLen,
+                                 size_t seqLen,
                                  bool forward,
                                  const std::string& seq)
 {
@@ -290,7 +291,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node, bool forward, cons
 }
 
 struct SearchStart {
-    int kmer_idx;
+    size_t kmer_idx;
     unsigned int k_cov;
     std::string kmer;
 };
@@ -298,18 +299,18 @@ struct SearchStart {
 Alignment* ReadAligner::Align(const std::string& read)
 {
     int k = m_ch->ksize();
-    int num_kmers = read.length() - k + 1;
-    int mid_kmer = num_kmers / 2;
+    size_t num_kmers = read.length() - k + 1;
+    size_t mid_kmer = num_kmers / 2;
 
     SearchStart start;
     start.k_cov = 0;
 
-    for (unsigned int i = 0; i < num_kmers; i++) {
+    for (size_t i = 0; i < num_kmers; i++) {
         std::string kmer = read.substr(i, k);
 
         unsigned int kCov = m_ch->get_count(kmer.c_str());
         if(kCov > 0) {
-            if(start.k_cov < m_trusted_cutoff || abs(mid_kmer - i) < abs(mid_kmer - start.kmer_idx)) {
+            if(start.k_cov < m_trusted_cutoff || labs(mid_kmer - i) < labs(mid_kmer - start.kmer_idx)) {
                 start.kmer_idx = i;
                 start.k_cov = kCov;
                 start.kmer = kmer;
@@ -347,7 +348,7 @@ Alignment* ReadAligner::Align(const std::string& read)
         startingNode.h_score = 0;
         Alignment* forward = NULL;
         Alignment* reverse = NULL;
-        int final_length = 0;
+        size_t final_length = 0;
 
         if(start.k_cov >= m_trusted_cutoff) {
             startingNode.score = k * m_sm.trusted_match + k * m_sm.tsc[MM];
