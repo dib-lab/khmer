@@ -1,3 +1,8 @@
+2014-04-17  Ram RS  <ramrs@nyu.edu>
+
+    * scripts/make-initial-stoptags.py: fixed bug that threw error on
+     missing .ht input file while actual expected input file is .pt
+
 2014-04-11  Titus Brown  <t@idyll.org>
 
     * scripts/*.py: fixed argument to check_space_for_hashtable to rely
