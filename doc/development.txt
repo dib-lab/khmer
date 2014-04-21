@@ -63,6 +63,7 @@ Copy and paste the following into a pull-request when it is ready for review::
      `make doc` output. Use `autopep8` and `astyle -A10 --max-code-length=80`
      if needed. 
    - [ ] Is it documented in the Changelog?
+   - [ ] Was spellcheck run on the source code and documentation after changes were made?
 
 git and github strategies
 -------------------------
