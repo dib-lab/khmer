@@ -86,6 +86,14 @@ SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
                 if script.endswith(".py")])
 
+INSTALL_REQUIRES = ["screed >= 0.7.1"]
+
+try:
+    import argparse
+    del argparse
+except ImportError:
+    INSTALL_REQUIRES.append("argparse >= 1.2.1")
+
 SETUP_METADATA = \
     {
         "name": "khmer",
@@ -103,7 +111,7 @@ SETUP_METADATA = \
         # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer'],
-        "install_requires": ["screed >= 0.7.1", 'argparse >= 1.2.1', ],
+        "install_requires": INSTALL_REQUIRES,
         "extras_require": {'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
