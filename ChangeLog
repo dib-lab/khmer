@@ -5,44 +5,18 @@
 
 2014-04-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-    * *.py: switch to explicit python2 invocation. Fixes #385.
+    *.py: switch to explicit python2 invocation. Fixes #385.
+
+2014-04-21  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: updated FP rate to match latest info from
+      Qingpeng's paper; corrected spelling error.
 
 2014-04-21  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * setup.py,doc/installing.txt: Remove argparse from the requirements
     unless it isn't available. Argparse is bundled with Python 2.7+. This
     simplifies the installation instructions.
-
-2014-04-06  Titus Brown  <titus@idyll.org>
-
-    * scripts/normalize-by-median.py: added comment about table compatibility
-    with abundance-dist.
-
-2014-04-01  Titus Brown  <titus@idyll.org>
-
-    * CITATION,khmer/khmer_args.py: Updated khmer software citation for
-    release.
-
-2014-03-31  Titus Brown  <titus@idyll.org>
-
-    * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
-    20a433c2.
-
-    * khmer/file.py: Fixed incorrect use of __file__ dirname instead of
-    os.getcwd(); also fixed bug where statvfs would choke on an empty
-    dirname resulting from input files being in the cwd.
-
-2014-03-31  Titus Brown  <titus@idyll.org>
-
-    * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
-    and added citation information to each script.
-    * CITATION: added basic citation information for khmer functionality.
-
-2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
-
-    Version 1.0.1
-    * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
-    * ChangeLog: fix date for 1.0 release, email addresses
 
 2014-04-17  Ram RS  <ramrs@nyu.edu>
 
@@ -53,6 +27,17 @@
 
     * scripts/*.py: fixed argument to check_space_for_hashtable to rely
     on args.n_tables and not args.ksize.
+
+2014-04-06  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: added comment about table compatibility
+    with abundance-dist.
+
+2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    Version 1.0.1
+    * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
+    * ChangeLog: fix date for 1.0 release, email addresses
 
 2014-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
 
