@@ -30,13 +30,13 @@ def test_alignnocov():
     eq_(graphAlign, 'ACCTAGGTTCGACATGTACC')
 
 
-    ht_seqs = [
+ht_seqs = [
 "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC",
 "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC",
 "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAACCTCTTTAC",
 "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGAAAAATGTCATCCTGTATTGCAATCTTAACAACCTCTTTAC"]
 
-    queries = [
+queries = [
     {
         "seq"       : "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC",
         "graph_aln" : "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGGGTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTGTTGCAATCTTAACAACCTCTTTAC",
@@ -130,14 +130,19 @@ def test_alignnocov():
     }
     ]
 
+def test_readalign_new():
+    ch = khmer.new_counting_hash(32, 1048576, 1)
+    aligner = khmer.new_readaligner(ch, 2, 1)
+    for seq in ht_seqs:
+        ch.consume(seq)
 
     for query in queries:
-      print query
-      score, graphAlign, readAlign, trunc = aligner.align(query["seq"])
-      print score
-      print graphAlign
-      print readAlign
-      print trunc
+        print query
+        score, graphAlign, readAlign, trunc = aligner.align(query["seq"])
+        print score
+        print graphAlign
+        print readAlign
+        print trunc
 
     for query in queries:
         score, graphAlign, readAlign, trunc = aligner.align(query["seq"])
