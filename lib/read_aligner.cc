@@ -68,7 +68,7 @@ del_alignment_node_t del_alignment_node()
                               const std::string& seq
                               ) {
     size_t next_seq_idx;
-    size_t remaining;
+    int remaining;
     size_t kmerCov;
     double hcost;
     double sc;
@@ -76,7 +76,6 @@ del_alignment_node_t del_alignment_node()
     HashIntoType fwd = curr->fwd_hash;
     HashIntoType rc = curr->rc_hash;
     HashIntoType next_fwd, next_rc, hash;
-    bool isCorrect;
     unsigned char next_nucl;
 
     AlignmentNode* next;
@@ -90,11 +89,6 @@ del_alignment_node_t del_alignment_node()
     } else {
         next_seq_idx = curr->seq_idx - 1;
         remaining = next_seq_idx;
-    }
-
-    if(remaining > 100000) {
-      printf("forward:%d next_seq_idx:%d reamining:%d curr->seqidx:%d\n",
-             forward, next_seq_idx, remaining, curr->seq_idx);
     }
 
     // loop for MATCHes and INSERT_READs
@@ -122,7 +116,9 @@ del_alignment_node_t del_alignment_node()
         State next_state = static_cast<State>(next_state_iter);
         trans = get_trans(curr->state, next_state);
         hcost = m_sm.tsc[get_trans(next_state, MATCH)]
-          + m_sm.tsc[MM] * (remaining - 1);
+          + m_sm.tsc[MM]
+	  * ((remaining == 0) ? 
+	     0 : (remaining - 1));
 
         if(trans == disallowed) {
           continue;
