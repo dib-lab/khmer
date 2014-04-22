@@ -4,7 +4,9 @@
     unless it isn't available. Argparse is bundled with Python 2.7+. This
     simplifies the installation instructions.
 
-2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+2014-04-22  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * *.py: switch to explicit python2 invocation. Fixes #385.
 
 2014-04-01  Titus Brown  <titus@idyll.org>
 
