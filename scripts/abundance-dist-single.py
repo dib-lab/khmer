@@ -36,7 +36,7 @@ def get_parser():
     :program:`abundance_dist.py`.
     '''
     parser = build_counting_args(
-        descr="Caculate the abundance distribution of k-mers from a "
+        descr="Calculate the abundance distribution of k-mers from a "
         "single sequence file.", epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
 
