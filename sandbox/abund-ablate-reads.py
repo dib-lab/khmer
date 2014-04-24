@@ -2,12 +2,14 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import sys
 import math
 from screed.fasta import fasta_iter
 import khmer
+import argparse
 
 K = 32
 HASHTABLE_SIZE = int(1e9)
@@ -15,8 +17,16 @@ N_HT = 4
 
 ABUND_THRESHOLD = 65
 
-infile = sys.argv[1]
-outfile = sys.argv[2]
+parser = argparse.ArgumentParser(
+    description="abund-ablate-reads",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+parser.add_argument("infile")
+parser.add_argument("outfile")
+args = parser.parse_args()
+
+infile = args.infile
+outfile = args.outfile
 outfp = open(outfile, 'w')
 
 print 'making hashtable'

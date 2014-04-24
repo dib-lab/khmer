@@ -1,7 +1,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Utilities for dealing with multithreaded processing of short reads.
@@ -26,6 +27,7 @@ verbose_fasta_iter = verbose_loader
 
 
 class SequenceGroup(object):
+
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
@@ -181,7 +183,7 @@ class ThreadedSequenceProcessor(object):
                 continue
 
             for name, seq, accuracy in g.seqlist:
-                if accuracy: # write FASTQ; CTB hack.
+                if accuracy:  # write FASTQ; CTB hack.
                     outfp.write('@%s\n%s\n+\n%s\n' % (name, seq, accuracy))
                 else:
                     outfp.write('>%s\n%s\n' % (name, seq,))

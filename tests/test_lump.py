@@ -1,16 +1,20 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import khmer
 import screed
 
 import khmer_tst_utils as utils
+from nose.plugins.attrib import attr
 
-## Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
-## which the last 79 bases are common between the 3 sequences.
+# Below, 'fakelump.fa' is an artificial data set of 3x1 kb sequences in
+# which the last 79 bases are common between the 3 sequences.
 
+
+@attr('highmem')
 def test_fakelump_together():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -19,11 +23,14 @@ def test_fakelump_together():
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
-    
+
     (n_partitions, n_singletons) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
 # try loading stop tags from previously saved
+
+
+@attr('highmem')
 def test_fakelump_stop():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_stoptags_txt = utils.get_test_data('fakelump.fa.stoptags.txt')
@@ -36,11 +43,14 @@ def test_fakelump_stop():
 
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
-    
+
     (n_partitions, n_singletons) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # check specific insertion of stop tag
+
+
+@attr('highmem')
 def test_fakelump_stop2():
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -51,11 +61,14 @@ def test_fakelump_stop2():
 
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
-    
+
     (n_partitions, n_singletons) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
 # try repartitioning
+
+
+@attr('highmem')
 def test_fakelump_repartitioning():
     fakelump_fa = utils.get_test_data('fakelump.fa')
     fakelump_fa_foo = utils.get_temp_filename('fakelump.fa.stopfoo')
@@ -65,7 +78,7 @@ def test_fakelump_repartitioning():
 
     subset = ht.do_subset_partition(0, 0)
     ht.merge_subset(subset)
-    
+
     (n_partitions, n_singletons) = ht.count_partitions()
     assert n_partitions == 1, n_partitions
 
@@ -74,9 +87,9 @@ def test_fakelump_repartitioning():
     # that encounter more than 82 k-mers.  This should specifically
     # identify our connected sequences in fakelump...
 
-    EXCURSION_DISTANCE=40
-    EXCURSION_KMER_THRESHOLD=82
-    EXCURSION_KMER_COUNT_THRESHOLD=1
+    EXCURSION_DISTANCE = 40
+    EXCURSION_KMER_THRESHOLD = 82
+    EXCURSION_KMER_COUNT_THRESHOLD = 1
     counting = khmer.new_counting_hash(32, 1e7, 4)
 
     ht.repartition_largest_partition(None, counting,
@@ -94,6 +107,6 @@ def test_fakelump_repartitioning():
 
     subset = ht.do_subset_partition(0, 0, True)
     ht.merge_subset(subset)
-    
+
     (n_partitions, n_singletons) = ht.count_partitions()
     assert n_partitions == 3, n_partitions

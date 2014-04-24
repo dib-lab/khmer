@@ -1,9 +1,11 @@
 #! /usr/bin/env python
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-# 
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+#
+# pylint: disable=invalid-name,missing-docstring
 """
 Take a list of files containing sequences, and subsample 100,000 sequences (-N)
 uniformly, using reservoir sampling.  Stop after first 100m sequences (-M).
@@ -14,24 +16,22 @@ Reads FASTQ and FASTA input, retains format for output.
 """
 
 import argparse
-import khmer
 import screed
 import os.path
 import random
+import khmer
+from khmer.file import check_file_status, check_space
+from khmer.khmer_args import info
 
-DEFAULT_NUM_READS=int(1e5)
-DEFAULT_MAX_READS=int(1e8)
-DEBUG=True
+DEFAULT_NUM_READS = int(1e5)
+DEFAULT_MAX_READS = int(1e8)
+DEBUG = True
 
-def output_single(r):
-    if hasattr(r, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (r.name, r.sequence, r.accuracy)
-    else:
-        return ">%s\n%s\n" % (r.name, r.sequence)
 
-def main():
-    parser = argparse.ArgumentParser(\
-        "Uniformly subsample sequences from a collection of files")
+def get_parser():
+    parser = argparse.ArgumentParser(
+        description="Uniformly subsample sequences from a collection of files",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
@@ -41,8 +41,26 @@ def main():
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('w'), default=None)
-    
-    args = parser.parse_args()
+    parser.add_argument('--version', action='version', version='%(prog)s '
+                        + khmer.__version__)
+    return parser
+
+
+def output_single(read):
+    if hasattr(read, 'accuracy'):
+        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
+    else:
+        return ">%s\n%s\n" % (read.name, read.sequence)
+
+
+def main():
+    info('sample-reads-randomly.py')
+    args = get_parser().parse_args()
+
+    for _ in args.filenames:
+        check_file_status(_)
+
+    check_space(args.filenames)
 
     # seed the random number generator?
     if args.random_seed:

@@ -1,7 +1,8 @@
+*.lo
 *.pyc
 *.o
 *.so
-*.gcno
+*.gc??
 *.swp
 *.egg-info
 *.egg
@@ -15,3 +16,16 @@ doc/_build
 *ENV
 /.project
 /.pydevproject
+/.Rhistory
+coverage.xml
+coverage-gcovr.xml
+cppcheck-result.xml
+MANIFEST
+TAGS
+nosetests.xml
+pep8.out
+pylint.out
+.coverage
+doxygen.out
+doc/doxygen
+lib/zlib/zconf.h

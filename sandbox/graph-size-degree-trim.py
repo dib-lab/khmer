@@ -2,7 +2,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import khmer
 import sys
@@ -28,6 +29,7 @@ GROUPSIZE = 100
 
 
 class SequenceGroup(object):
+
     def __init__(self, order, seqlist):
         self.order = order
         self.seqlist = seqlist
@@ -120,7 +122,7 @@ def main():
     inqueue = Queue.Queue(50)
     outqueue = Queue.Queue(50)
 
-    ## worker and writer threads
+    # worker and writer threads
     for i in range(WORKER_THREADS):
         t = threading.Thread(target=process, args=(inqueue, outqueue, ht))
         worker_count += 1
@@ -128,7 +130,7 @@ def main():
 
     threading.Thread(target=write, args=(outqueue, outfp)).start()
 
-    ### main thread
+    # main thread
     x = []
     i = 0
     group_n = 0

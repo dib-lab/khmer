@@ -17,7 +17,7 @@ Authors
 ~~~~~~~
 
 This handbook distills the cumulative expertise of Adina Howe, Titus
-Brown, Erich Schwarz, Jason Pell, Chris Welcher, Elijah Lowe, Kanchan
+Brown, Erich Schwarz, Jason Pell, Camille Scott, Elijah Lowe, Kanchan
 Pavangadkar, Likit Preeyanon, and others.
 
 Introduction
@@ -74,10 +74,10 @@ Most scripts *output* fasta, and some mangle headers.  Sorry.  We're
 working on outputting FASTQ for FASTQ input, and removing any header
 mangling.
 
-Picking hash table sizes and k parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Picking k-mer table sizes and k parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For hash table sizes, read :doc:`choosing-hash-sizes`
+For k-mer table sizes, read :doc:`choosing-table-sizes`
 
 For k-mer sizes, we recommend k=20 for digital normalization and k=32
 for partitioning; then assemble with a variety of k parameters.
@@ -197,16 +197,16 @@ you should load in paired end reads, or longer reads, first.
 Iterative and independent normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use --loadhash and --savehash to do iterative normalizations on
-multiple files in multiple steps. For example, break ::
+You can use :option:`--loadtable` and :option:`--savetable` to do iterative
+normalizations on multiple files in multiple steps. For example, break ::
 
-  normalize-by-median [ ... ] file1.fa file2.fa file3.fa
+  normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa
 
 into multiple steps like so::
 
-  normalize-by-median [ ... ] --savehash file1.kh file1.fa
-  normalize-by-median [ ... ] --loadhash file1.kh --savehash file2.kh file2.fa
-  normalize-by-median [ ... ] --loadhash file2.kh --savehash file3.kh file3.fa
+  normalize-by-median.py [ ... ] --savetable file1.kh file1.fa
+  normalize-by-median.py [ ... ] --loadtable file1.kh --savetable file2.kh file2.fa
+  normalize-by-median.py [ ... ] --loadtable file2.kh --savetable file3.kh file3.fa
 
 The results should be identical!
 
@@ -214,17 +214,17 @@ If you want to independently normalize multiple files for speed reasons, go
 ahead.  Just remember to do a combined normalization at the end.  For example,
 instead of ::
 
-  normalize-by-median [ ... ] file1.fa file2.fa file3.fa
+  normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa
 
 you could do ::
 
-  normalize-by-median [ ... ] file1.fa
-  normalize-by-median [ ... ] file2.fa
-  normalize-by-median [ ... ] file3.fa
+  normalize-by-median.py [ ... ] file1.fa
+  normalize-by-median.py [ ... ] file2.fa
+  normalize-by-median.py [ ... ] file3.fa
 
 and then do a final ::
 
-  normalize-by-median [ ... ] file1.fa.keep file2.fa.keep file3.fa.keep
+  normalize-by-median.py [ ... ] file1.fa.keep file2.fa.keep file3.fa.keep
 
 The results will not be identical, but should not differ
 significantly.  The multipass approach will take more total time but

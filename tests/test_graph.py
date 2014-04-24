@@ -1,19 +1,27 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import khmer
+import screed
 
 import khmer_tst_utils as utils
+
+from nose.plugins.attrib import attr
+
 
 def teardown():
     utils.cleanup()
 
-class Test_ExactGraphFu(object):
-    def setup(self):
-        self.ht = khmer.new_hashbits(12, 4**12)
 
+class Test_ExactGraphFu(object):
+
+    def setup(self):
+        self.ht = khmer.new_hashbits(12, 4 ** 12)
+
+    @attr('highmem')
     def test_counts(self):
         ht = self.ht
         ht.consume_fasta(utils.get_test_data('test-graph.fa'))
@@ -21,7 +29,7 @@ class Test_ExactGraphFu(object):
         kmer = "TTAGGACTGCAC"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 69, x
-        
+
         kmer = "TGCGTTTCAATC"
         x = ht.calc_connected_graph_size(kmer)
         assert x == 68, x
@@ -65,7 +73,7 @@ class Test_ExactGraphFu(object):
 
         x = ht.calc_connected_graph_size(word)
         assert x == 2
-        
+
     def test_graph_links_prev_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -102,9 +110,11 @@ class Test_ExactGraphFu(object):
         x = ht.calc_connected_graph_size(word)
         assert x == 2
 
+
 class Test_InexactGraphFu(object):
+
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4**8+1)
+        self.ht = khmer.new_hashbits(12, 4 ** 8 + 1)
 
     def test_graph_links_next_a(self):
         ht = self.ht
@@ -141,7 +151,7 @@ class Test_InexactGraphFu(object):
 
         x = ht.calc_connected_graph_size(word)
         assert x == 2
-        
+
     def test_graph_links_prev_a(self):
         ht = self.ht
         word = "TGCGTTTCAATC"
@@ -178,9 +188,12 @@ class Test_InexactGraphFu(object):
         x = ht.calc_connected_graph_size(word)
         assert x == 2
 
-###
+#
+
 
 class Test_Partitioning(object):
+
+    @attr('highmem')
     def test_output_unassigned(self):
         import screed
 
@@ -198,6 +211,7 @@ class Test_Partitioning(object):
         assert len1 > 0
         assert len1 == len2, (len1, len2)
 
+    @attr('highmem')
     def test_not_output_unassigned(self):
         import screed
 
@@ -215,6 +229,23 @@ class Test_Partitioning(object):
         assert len1 > 0
         assert len2 == 0, len2
 
+    def test_output_fq(self):
+        filename = utils.get_test_data('random-20-a.fq')
+
+        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht.consume_fasta_and_tag(filename)
+        subset = ht.do_subset_partition(0, 0)
+        ht.merge_subset(subset)
+
+        output_file = utils.get_temp_filename('parttest')
+        ht.output_partitions(filename, output_file, False)
+
+        print open(output_file).read()
+
+        x = set([r.accuracy for r in screed.open(output_file)])
+        assert x, x
+
+    @attr('highmem')
     def test_disconnected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -225,6 +256,7 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (99, 0), x             # disconnected @ 21
 
+    @attr('highmem')
     def test_connected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -235,6 +267,7 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ 20
 
+    @attr('highmem')
     def test_disconnected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
@@ -245,6 +278,7 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (99, 0), x             # disconnected @ 21
 
+    @attr('highmem')
     def test_connected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
@@ -255,6 +289,7 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ 20
 
+    @attr('highmem')
     def test_disconnected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
@@ -265,6 +300,7 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (999, 0), x            # disconnected @ K = 32
 
+    @attr('highmem')
     def test_connected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
@@ -275,11 +311,13 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ K = 31
 
-###
+#
+
 
 class Test_PythonAPI(object):
+
     def test_ordered_connect(self):
-        ht = khmer.new_hashbits(20, 4**15+1)
+        ht = khmer.new_hashbits(20, 4 ** 15 + 1)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"
@@ -289,16 +327,15 @@ class Test_PythonAPI(object):
         ppi = ht.find_all_tags(a[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 0, pid
-        
+
         print ht.consume(b)
         ppi = ht.find_all_tags(b[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 0, pid
-        
+
         print ht.consume(c)
         ppi = ht.find_all_tags(c[:20])
         pid = ht.assign_partition_id(ppi)
         assert pid == 2, pid
 
-###
-
+#
