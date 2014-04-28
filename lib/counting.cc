@@ -706,7 +706,9 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
             outfile.write((const char *) &it->second, sizeof(it->second));
         }
     }
-
+    if (outfile.fail()) {
+        perror("Hash writing file access failure:");
+    }
     outfile.close();
 }
 
