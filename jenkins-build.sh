@@ -31,7 +31,7 @@ then
 	fi
 else
 	echo "Not on a Linux node, skipping coverage check"
-		
+	export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
 fi
 
 if [[ "${JOB_NAME}" == khmer/* ]]
