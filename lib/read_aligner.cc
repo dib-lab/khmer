@@ -30,6 +30,7 @@ del_alignment_node_t del_alignment_node()
     return log2(.25) * length + log2(1.0 / (length + 1));
 }
 
+
   /*
     Turn two states in to a transition, or disallowed if the
     transition isn't modeled
@@ -63,13 +64,13 @@ del_alignment_node_t del_alignment_node()
   void ReadAligner::Enumerate(
                               NodeHeap& open,
                               std::vector<AlignmentNode*>& all_nodes,
-                              AlignmentNode* curr,
+			      AlignmentNode* curr,
                               bool forward,
                               const std::string& seq
                               ) {
     size_t next_seq_idx;
     int remaining;
-    size_t kmerCov;
+    int kmerCov;
     double hcost;
     double sc;
     Transition trans;
@@ -168,6 +169,21 @@ del_alignment_node_t del_alignment_node()
     }
 }
 
+  void ReadAligner::WriteNode(AlignmentNode* curr) {
+      std::cerr << "curr: " << curr << " "
+                << curr->prev << " " << " state=" << curr->state << " "
+                << _revhash(curr->fwd_hash, m_ch->ksize()) << " "
+                << _revhash(curr->rc_hash, m_ch->ksize())
+                << " cov="
+                << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
+                << " emission=" << curr->base
+                << " seqidx=" << curr->seq_idx
+                << " score=" << curr->score
+                << " fscore=" << curr->f_score
+                << " bits_saved=" << curr->score - GetNull(curr->length)
+                << std::endl;
+  }
+
   Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
                                    size_t seqLen,
                                    bool forward,
@@ -185,20 +201,13 @@ del_alignment_node_t del_alignment_node()
       curr = open.top();
 
       #if READ_ALIGNER_DEBUG
-      std::cerr << "curr: " << curr << " "
-                << curr->prev << " " << " state=" << curr->state << " "
-                << _revhash(curr->fwd_hash, m_ch->ksize()) << " "
-                << _revhash(curr->rc_hash, m_ch->ksize())
-                << " cov="
-                << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
-                << " emission=" << curr->base
-                << " seqidx=" << curr->seq_idx
-                << " score=" << curr->score
-                << " fscore=" << curr->f_score
-                << " bits_saved=" << curr->score - GetNull(curr->length)
-                << " " << ((best != NULL)?
-                           best->score - GetNull(best->length) : -1)
-                << std::endl;
+      WriteNode(curr);
+      if (curr->prev == NULL) {
+	std::cerr << "\tprev = null" << std::endl;
+      } else {
+	std::cerr << "\tprev = ";
+	WriteNode(curr->prev);
+      }
       #endif
       open.pop();
 
@@ -219,7 +228,7 @@ del_alignment_node_t del_alignment_node()
         //do nothing
       } else if ((*tmp).score > curr->score) {
         closed.erase(tmp);
-      } else if ((*tmp).score == curr->score) {
+	//} else if ((*tmp).score == curr->score) {
         //do nothing
       } else {
         continue;
@@ -341,7 +350,6 @@ struct SearchStart {
           start.kmer_idx = i;
           start.k_cov = kCov;
           start.kmer = kmer;
-          break;
         }
       }
     }
