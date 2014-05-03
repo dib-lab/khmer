@@ -11,21 +11,10 @@
 #include <string>
 #include "khmer_config.hh"
 
-/*
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern const int THRESHOLD_DATA[] = {
-  10, 20, 40, 80, 220, 400, 900, 1800, 3100,
-  6500, 11500, 20000, 50000, 120000, 350000 };
-
-#ifdef __cplusplus
-}
-#endif
-*/
 
 namespace khmer
 {
+
 class HLLCounter
 {
 public:

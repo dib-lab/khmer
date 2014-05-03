@@ -12,6 +12,8 @@
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
+#include "MurmurHash3.h"
+#include "sha1.h"
 
 using namespace std;
 
@@ -93,5 +95,106 @@ std::string _revhash(HashIntoType hash, WordLength k)
     return s;
 }
 
+char op_complement (char i)
+{ 
+  switch(i) {
+    case 'A':
+      return 'T';
+    case 'C':
+      return 'G';
+    case 'G':
+      return 'C';
+    case 'T':
+      return 'A';
+    default:
+      return i; /* TODO: raise exception */
+  }
+}
+
+std::string _revcomp(const std::string kmer)
+{
+    std::string out = kmer;
+    std::transform(kmer.rbegin(), kmer.rend(), out.begin(), op_complement);
+    return out;
+}
+
+HashIntoType _hash_murmur(const std::string kmer)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    return khmer::_hash_murmur(kmer, h, r);
+}
+
+HashIntoType _hash_murmur(const std::string kmer,
+                          HashIntoType& h, HashIntoType& r)
+{
+    HashIntoType out[2];
+    uint32_t seed = 0;
+    MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
+    h = out[0];
+
+    std::string rev = khmer::_revcomp(kmer);
+    MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
+    r = out[0];
+
+    return uniqify_rc(h, r);
+}
+
+HashIntoType _hash_murmur_forward(const char * kmer)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    khmer::_hash_murmur(kmer, h, r);
+    return h;
+}
+
+HashIntoType _hash_sha1(const std::string kmer)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    return khmer::_hash_sha1(kmer, h, r);
+}
+
+HashIntoType _hash_sha1(const std::string kmer,
+                        HashIntoType& h, HashIntoType& r)
+{
+    HashIntoType buf;
+    SHA1_CTX context;
+    uint8_t digest[20];
+    h = 0;
+    r = 0;
+
+    SHA1_Init(&context);
+    SHA1_Update(&context, (uint8_t*)kmer.c_str(), kmer.size());
+    SHA1_Final(&context, digest);
+    for (int i=0; i < 8; i++) {
+      buf = digest[i];
+      h |= buf << ((7 - i) * 8);
+    }
+
+    std::string rev = khmer::_revcomp(kmer);
+
+    SHA1_Init(&context);
+    SHA1_Update(&context, (uint8_t*)rev.c_str(), rev.size());
+    SHA1_Final(&context, digest);
+    for (int i=0; i < 8; i++) {
+      buf = digest[i];
+      r |= buf << ((7 - i) * 8);
+    }
+
+    return uniqify_rc(h, r);
+}
+
+HashIntoType _hash_sha1_forward(const std::string kmer)
+{
+    HashIntoType h = 0;
+    HashIntoType r = 0;
+
+    khmer::_hash_sha1(kmer, h, r);
+    return h;
+}
 
 };
