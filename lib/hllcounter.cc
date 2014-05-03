@@ -47,7 +47,7 @@ double get_threshold(int p)
 
 double ep_sum(double acc, int b)
 {
-    return acc += pow(2.0, -b);
+    return acc += pow(2.0, float(-b));
 }
 
 int get_rho(HashIntoType w, int max_width)
@@ -77,7 +77,7 @@ HLLCounter::HLLCounter(double error_rate)
 double HLLCounter::_Ep()
 {
     double sum = std::accumulate(this->M.begin(), this->M.end(), 0.0, ep_sum);
-    double E = this->alpha * pow(this->m, 2) / sum;
+    double E = this->alpha * pow(this->m, 2.0) / sum;
 
     /*
       if (E <= (5 * this->m))
@@ -97,13 +97,15 @@ HashIntoType HLLCounter::estimate_cardinality()
             return H;
         }
     }
-
     return this->_Ep();
 }
 
 void HLLCounter::add(const std::string &value)
 {
-    HashIntoType x = khmer::_hash(value.c_str(), 32);
+    //HashIntoType x = khmer::_hash(value.c_str(), 32);
+    //HashIntoType x = khmer::_hash_murmur(value);
+    //HashIntoType x = khmer::_hash_sha1(value);
+    HashIntoType x = khmer::_hash_sha1_forward(value);
     HashIntoType j = x & (this->m - 1);
     this->M[j] = max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
