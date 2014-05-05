@@ -249,9 +249,31 @@ HashIntoType HLLCounter::estimate_cardinality()
 void HLLCounter::add(const string &value)
 {
     //HashIntoType x = khmer::_hash(value.c_str(), value.size());
+    //HashIntoType x = khmer::_hash_forward(value.c_str(), value.size());
+
     //HashIntoType x = khmer::_hash_murmur(value);
+    //HashIntoType x = khmer::_hash_murmur_forward(value);
+
     HashIntoType x = khmer::_hash_sha1(value);
     //HashIntoType x = khmer::_hash_sha1_forward(value);
+
     HashIntoType j = x & (this->m - 1);
     this->M[j] = max(this->M[j], get_rho(x >> this->p, 64 - this->p));
+}
+
+unsigned int HLLCounter::consume_string(const std::string &s, unsigned int ksize) {
+    unsigned int n_consumed = 0;
+    std::string kmer = "";
+
+    for(std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
+        kmer.push_back(*it);
+        if (kmer.size() < ksize) {
+            continue;
+        }
+        this->add(kmer);
+
+        kmer.erase(0, 1);
+        n_consumed++;
+    }
+    return n_consumed;
 }
