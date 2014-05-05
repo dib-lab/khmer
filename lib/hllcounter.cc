@@ -19,6 +19,10 @@
 using namespace std;
 using namespace khmer;
 
+std::map<int, std::vector<double> > rawEstimateData;
+std::map<int, std::vector<double> > biasData;
+
+
 double get_alpha(const int p)
 {
     if ((p < 4) or (p > 16)) {
@@ -37,116 +41,116 @@ double get_alpha(const int p)
     }
 }
 
-vector<double> raw_estimate_data(int p) {
-    /* TODO avoid all this repetition/copying around */
-    vector<double> v;
-    switch(p) {
-      case 4:
-        v.assign(RAW_ESTIMATE_DATA_4, arr_len(RAW_ESTIMATE_DATA_4));
-        break;
-      case 5:
-        v.assign(RAW_ESTIMATE_DATA_5, arr_len(RAW_ESTIMATE_DATA_5));
-        break;
-      case 6:
-        v.assign(RAW_ESTIMATE_DATA_6, arr_len(RAW_ESTIMATE_DATA_6));
-        break;
-      case 7:
-        v.assign(RAW_ESTIMATE_DATA_7, arr_len(RAW_ESTIMATE_DATA_7));
-        break;
-      case 8:
-        v.assign(RAW_ESTIMATE_DATA_8, arr_len(RAW_ESTIMATE_DATA_8));
-        break;
-      case 9:
-        v.assign(RAW_ESTIMATE_DATA_9, arr_len(RAW_ESTIMATE_DATA_9));
-        break;
-      case 10:
-        v.assign(RAW_ESTIMATE_DATA_10, arr_len(RAW_ESTIMATE_DATA_10));
-        break;
-      case 11:
-        v.assign(RAW_ESTIMATE_DATA_11, arr_len(RAW_ESTIMATE_DATA_11));
-        break;
-      case 12:
-        v.assign(RAW_ESTIMATE_DATA_12, arr_len(RAW_ESTIMATE_DATA_12));
-        break;
-      case 13:
-        v.assign(RAW_ESTIMATE_DATA_13, arr_len(RAW_ESTIMATE_DATA_13));
-        break;
-      case 14:
-        v.assign(RAW_ESTIMATE_DATA_14, arr_len(RAW_ESTIMATE_DATA_14));
-        break;
-      case 15:
-        v.assign(RAW_ESTIMATE_DATA_15, arr_len(RAW_ESTIMATE_DATA_15));
-        break;
-      case 16:
-        v.assign(RAW_ESTIMATE_DATA_16, arr_len(RAW_ESTIMATE_DATA_16));
-        break;
-      case 17:
-        v.assign(RAW_ESTIMATE_DATA_17, arr_len(RAW_ESTIMATE_DATA_17));
-        break;
-      case 18:
-        v.assign(RAW_ESTIMATE_DATA_18, arr_len(RAW_ESTIMATE_DATA_18));
-        break;
-      default:
-        /* TODO raise exception */
-        break;
+void init_raw_estimate_data() {
+    if (rawEstimateData.empty()) {
+        for(int i=4; i <= 18; i++) {
+            vector<double> v;
+            switch(i) {
+              case 4:
+                v.assign(RAW_ESTIMATE_DATA_4, arr_len(RAW_ESTIMATE_DATA_4));
+                break;
+              case 5:
+                v.assign(RAW_ESTIMATE_DATA_5, arr_len(RAW_ESTIMATE_DATA_5));
+                break;
+              case 6:
+                v.assign(RAW_ESTIMATE_DATA_6, arr_len(RAW_ESTIMATE_DATA_6));
+                break;
+              case 7:
+                v.assign(RAW_ESTIMATE_DATA_7, arr_len(RAW_ESTIMATE_DATA_7));
+                break;
+              case 8:
+                v.assign(RAW_ESTIMATE_DATA_8, arr_len(RAW_ESTIMATE_DATA_8));
+                break;
+              case 9:
+                v.assign(RAW_ESTIMATE_DATA_9, arr_len(RAW_ESTIMATE_DATA_9));
+                break;
+              case 10:
+                v.assign(RAW_ESTIMATE_DATA_10, arr_len(RAW_ESTIMATE_DATA_10));
+                break;
+              case 11:
+                v.assign(RAW_ESTIMATE_DATA_11, arr_len(RAW_ESTIMATE_DATA_11));
+                break;
+              case 12:
+                v.assign(RAW_ESTIMATE_DATA_12, arr_len(RAW_ESTIMATE_DATA_12));
+                break;
+              case 13:
+                v.assign(RAW_ESTIMATE_DATA_13, arr_len(RAW_ESTIMATE_DATA_13));
+                break;
+              case 14:
+                v.assign(RAW_ESTIMATE_DATA_14, arr_len(RAW_ESTIMATE_DATA_14));
+                break;
+              case 15:
+                v.assign(RAW_ESTIMATE_DATA_15, arr_len(RAW_ESTIMATE_DATA_15));
+                break;
+              case 16:
+                v.assign(RAW_ESTIMATE_DATA_16, arr_len(RAW_ESTIMATE_DATA_16));
+                break;
+              case 17:
+                v.assign(RAW_ESTIMATE_DATA_17, arr_len(RAW_ESTIMATE_DATA_17));
+                break;
+              case 18:
+                v.assign(RAW_ESTIMATE_DATA_18, arr_len(RAW_ESTIMATE_DATA_18));
+                break;
+            }
+            rawEstimateData[i] = v;
+        }
     }
-    return v;
 }
 
-vector<double> raw_bias_data(int p) {
-    /* TODO avoid all this repetition/copying around */
-    vector<double> v;
-    switch(p) {
-      case 4:
-        v.assign(RAW_BIAS_DATA_4, arr_len(RAW_BIAS_DATA_4));
-        break;
-      case 5:
-        v.assign(RAW_BIAS_DATA_5, arr_len(RAW_BIAS_DATA_5));
-        break;
-      case 6:
-        v.assign(RAW_BIAS_DATA_6, arr_len(RAW_BIAS_DATA_6));
-        break;
-      case 7:
-        v.assign(RAW_BIAS_DATA_7, arr_len(RAW_BIAS_DATA_7));
-        break;
-      case 8:
-        v.assign(RAW_BIAS_DATA_8, arr_len(RAW_BIAS_DATA_8));
-        break;
-      case 9:
-        v.assign(RAW_BIAS_DATA_9, arr_len(RAW_BIAS_DATA_9));
-        break;
-      case 10:
-        v.assign(RAW_BIAS_DATA_10, arr_len(RAW_BIAS_DATA_10));
-        break;
-      case 11:
-        v.assign(RAW_BIAS_DATA_11, arr_len(RAW_BIAS_DATA_11));
-        break;
-      case 12:
-        v.assign(RAW_BIAS_DATA_12, arr_len(RAW_BIAS_DATA_12));
-        break;
-      case 13:
-        v.assign(RAW_BIAS_DATA_13, arr_len(RAW_BIAS_DATA_13));
-        break;
-      case 14:
-        v.assign(RAW_BIAS_DATA_14, arr_len(RAW_BIAS_DATA_14));
-        break;
-      case 15:
-        v.assign(RAW_BIAS_DATA_15, arr_len(RAW_BIAS_DATA_15));
-        break;
-      case 16:
-        v.assign(RAW_BIAS_DATA_16, arr_len(RAW_BIAS_DATA_16));
-        break;
-      case 17:
-        v.assign(RAW_BIAS_DATA_17, arr_len(RAW_BIAS_DATA_17));
-        break;
-      case 18:
-        v.assign(RAW_BIAS_DATA_18, arr_len(RAW_BIAS_DATA_18));
-        break;
-      default:
-        /* TODO raise exception */
-        break;
+void init_bias_data() {
+    if (biasData.empty()) {
+        for(int i=4; i <= 18; i++) {
+            vector<double> v;
+            switch(i) {
+              case 4:
+                v.assign(RAW_BIAS_DATA_4, arr_len(RAW_BIAS_DATA_4));
+                break;
+              case 5:
+                v.assign(RAW_BIAS_DATA_5, arr_len(RAW_BIAS_DATA_5));
+                break;
+              case 6:
+                v.assign(RAW_BIAS_DATA_6, arr_len(RAW_BIAS_DATA_6));
+                break;
+              case 7:
+                v.assign(RAW_BIAS_DATA_7, arr_len(RAW_BIAS_DATA_7));
+                break;
+              case 8:
+                v.assign(RAW_BIAS_DATA_8, arr_len(RAW_BIAS_DATA_8));
+                break;
+              case 9:
+                v.assign(RAW_BIAS_DATA_9, arr_len(RAW_BIAS_DATA_9));
+                break;
+              case 10:
+                v.assign(RAW_BIAS_DATA_10, arr_len(RAW_BIAS_DATA_10));
+                break;
+              case 11:
+                v.assign(RAW_BIAS_DATA_11, arr_len(RAW_BIAS_DATA_11));
+                break;
+              case 12:
+                v.assign(RAW_BIAS_DATA_12, arr_len(RAW_BIAS_DATA_12));
+                break;
+              case 13:
+                v.assign(RAW_BIAS_DATA_13, arr_len(RAW_BIAS_DATA_13));
+                break;
+              case 14:
+                v.assign(RAW_BIAS_DATA_14, arr_len(RAW_BIAS_DATA_14));
+                break;
+              case 15:
+                v.assign(RAW_BIAS_DATA_15, arr_len(RAW_BIAS_DATA_15));
+                break;
+              case 16:
+                v.assign(RAW_BIAS_DATA_16, arr_len(RAW_BIAS_DATA_16));
+                break;
+              case 17:
+                v.assign(RAW_BIAS_DATA_17, arr_len(RAW_BIAS_DATA_17));
+                break;
+              case 18:
+                v.assign(RAW_BIAS_DATA_18, arr_len(RAW_BIAS_DATA_18));
+                break;
+            }
+            biasData[i] = v;
+        }
     }
-    return v;
 }
 
 double get_threshold(int p)
@@ -179,8 +183,9 @@ vector<int> get_nearest_neighbors(double E, vector<double> estimate)
 
 double estimate_bias(double E, int p)
 {
-    vector<double> bias = raw_bias_data(p);
-    vector<double> raw_estimate = raw_estimate_data(p);
+    vector<double> bias = biasData[p];
+    vector<double> raw_estimate = rawEstimateData[p];
+
     vector<int> nearest = get_nearest_neighbors(E, raw_estimate);
     double estimate = 0.0;
 
@@ -219,6 +224,9 @@ HLLCounter::HLLCounter(double error_rate)
     this->p = p;
     this->m = 1 << p;
     this->M = M;
+
+    init_raw_estimate_data();
+    init_bias_data();
 }
 
 double HLLCounter::_Ep()
