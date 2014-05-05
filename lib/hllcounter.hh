@@ -21,6 +21,7 @@ public:
     HLLCounter(double error_rate);
 
     void add(const std::string &);
+    unsigned int consume_string(const std::string &, unsigned int);
     HashIntoType estimate_cardinality();
     virtual ~HLLCounter() {}
 private:

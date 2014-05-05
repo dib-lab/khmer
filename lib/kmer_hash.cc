@@ -138,10 +138,10 @@ HashIntoType _hash_murmur(const std::string kmer,
     MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
     r = out[0];
 
-    return uniqify_rc(h, r);
+    return h ^ r;
 }
 
-HashIntoType _hash_murmur_forward(const char * kmer)
+HashIntoType _hash_murmur_forward(const std::string kmer)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
@@ -185,7 +185,7 @@ HashIntoType _hash_sha1(const std::string kmer,
       r |= buf << ((7 - i) * 8);
     }
 
-    return uniqify_rc(h, r);
+    return h ^ r;
 }
 
 HashIntoType _hash_sha1_forward(const std::string kmer)

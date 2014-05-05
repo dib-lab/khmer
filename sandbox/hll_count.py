@@ -15,7 +15,6 @@ import sys
 from screed.fasta import fasta_iter
 
 from hyperloglog.hll import HyperLogLog
-from tqdm import tqdm
 
 
 filename = sys.argv[1]
@@ -29,7 +28,7 @@ hlllib = HyperLogLog(ERROR_RATE)
 counter = Counter()
 counter_norc = Counter()
 
-for n, record in tqdm(enumerate(fasta_iter(open(filename)))):
+for n, record in enumerate(fasta_iter(open(filename))):
     sequence = record['sequence']
     seq_len = len(sequence)
     for n in range(0, seq_len + 1 - K):
@@ -43,6 +42,7 @@ for n, record in tqdm(enumerate(fasta_iter(open(filename)))):
         if rc in counter:
             kmer = rc
         counter.update([kmer])
+    #hllcpp.consume_string(sequence, K)
 
 cpp_estimate = hllcpp.estimate_cardinality()
 py_estimate = len(hlllib)

@@ -4313,9 +4313,28 @@ hllcounter_estimate_cardinality( PyObject * self, PyObject * args )
     return PyLong_FromLong(hllcounter->estimate_cardinality());
 }
 
+static
+PyObject *
+hllcounter_consume_string( PyObject * self, PyObject * args )
+{
+    khmer_KHLLCounterObject * me = (khmer_KHLLCounterObject *) self;
+    khmer::HLLCounter * hllcounter = me->hllcounter;
+
+    const char * kmer_str;
+    WordLength ksize = 0;
+
+    if (!PyArg_ParseTuple(args, "sb", &kmer_str, &ksize)) {
+        return NULL;
+    }
+
+    /* TODO: handle errors */
+    return PyLong_FromLong(hllcounter->consume_string(kmer_str, ksize));
+}
+
 static PyMethodDef khmer_hllcounter_methods[] = {
     {"add", hllcounter_add, METH_VARARGS, ""},
     {"estimate_cardinality", hllcounter_estimate_cardinality, METH_VARARGS, ""},
+    {"consume_string", hllcounter_consume_string, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
