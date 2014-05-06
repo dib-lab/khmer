@@ -316,7 +316,7 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     unsigned int num_traversed;
     num_traversed = partition->sweep_for_tags(seq, tagged_kmers, all_tags,
                     range, break_on_stoptags, stop_big_traversals);
-    traverse_labels_and_resolve(tagged_kmers, found_labels);
+    //traverse_labels_and_resolve(tagged_kmers, found_labels);
     //printf("range=%u ", range);
     if (range == 0) {
         if (!(num_traversed == seq.length()-ksize()+1)) {
