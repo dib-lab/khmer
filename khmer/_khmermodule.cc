@@ -4209,6 +4209,32 @@ static PyObject * labelhash_get_tag_labels(PyObject * self, PyObject * args)
     return x;
 }
 
+static PyObject * labelhash_get_label_tags(PyObject * self, PyObjet * args)
+{
+    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
+    LabelHash * labelhash = me->labelhash;
+
+    Label label;
+
+    if (!PyArg_ParseTuple(args, "K", &label)) {
+        return NULL;
+    }
+
+    TagPtrSet tags;
+
+    tags = labelhash->get_label_tags(label);
+
+    PyObject * x = PyList_New(tag.size());
+    TagPtrSet::const_iterator si;
+    unsigned long long i = 0;
+    for (si=tags.begin(); si!=tags.end(); ++si) {
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *(*si)));
+        i++;
+    }
+
+    return x;
+}
+
 static PyObject * labelhash_n_labels(PyObject * self, PyObject * args)
 {
     khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
@@ -4227,6 +4253,7 @@ static PyMethodDef khmer_labelhash_methods[] = {
     {"consume_partitioned_fasta_and_tag_with_labels", labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
     {"sweep_tag_neighborhood", labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
     {"get_tag_labels", labelhash_get_tag_labels, METH_VARARGS, ""},
+    {"get_label_tags", labelhash_get_label_tags, METH_VARARGS, ""},
     {"consume_sequence_and_tag_with_labels", labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
     {"n_labels", labelhash_n_labels, METH_VARARGS, ""},
     {"get_label_dict", labelhash_get_label_dict, METH_VARARGS, "" },
