@@ -139,13 +139,16 @@ def get_parser():
     keeping (or discarding) each sequencing fragment. This helps with retention
     of repeats, especially.
 
-    With :option:`-s`/:option:`--savetable`, the k-mer counting table will be
-    saved to the specified file after all sequences have been processed. With
-    :option:`-d`, the k-mer counting table will be saved every d files for
-    multifile runs; if :option:`-s` is set, the specified name will be used,
-    and if not, the name `backup.ct` will be used.
-    :option:`-l`/:option:`--loadtable` will load the specified k-mer counting
-    table before processsing the specified files.
+    With :option:`-s`/:option:`--savetable`, the k-mer counting table
+    will be saved to the specified file after all sequences have been
+    processed. With :option:`-d`, the k-mer counting table will be
+    saved every d files for multifile runs; if :option:`-s` is set,
+    the specified name will be used, and if not, the name `backup.ct`
+    will be used.  :option:`-l`/:option:`--loadtable` will load the
+    specified k-mer counting table before processsing the specified
+    files.  Note that these tables are are in the same format as those
+    produced by :program:`load-into-counting.py` and consumed by
+    :program:`abundance-dist.py`.
 
     :option:`-f`/:option:`--fault-tolerant` will force the program to continue
     upon encountering a formatting error in a sequence file; the k-mer counting
