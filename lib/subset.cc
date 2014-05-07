@@ -1,6 +1,6 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// Copyright (C) Michigan State University, 2009-2014. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
@@ -40,8 +40,9 @@ static void print_tag_set(SeenSet& p)
 
 #endif //0
 
-void SubsetPartition::count_partitions(size_t& n_partitions,
-                                       size_t& n_unassigned)
+void SubsetPartition::count_partitions(
+    size_t& n_partitions,
+    size_t& n_unassigned)
 {
     n_partitions = 0;
     n_unassigned = 0;
@@ -65,11 +66,12 @@ void SubsetPartition::count_partitions(size_t& n_partitions,
 }
 
 
-size_t SubsetPartition::output_partitioned_file(const std::string infilename,
-        const std::string outputfile,
-        bool output_unassigned,
-        CallbackFn callback,
-        void * callback_data)
+size_t SubsetPartition::output_partitioned_file(
+    const std::string	infilename,
+    const std::string	outputfile,
+    bool		output_unassigned,
+    CallbackFn		callback,
+    void *		callback_data)
 {
     IParser* parser = IParser::get_parser(infilename);
     ofstream outfile(outputfile.c_str());
@@ -111,8 +113,8 @@ size_t SubsetPartition::output_partitioned_file(const std::string infilename,
             }
 
             // all sequences should have at least one tag in them.
-            // assert(found_tag);  @CTB currently breaks tests.  give fn flag to
-            // disable.
+            // assert(found_tag);  @CTB currently breaks tests.  give fn flag
+            // to disable.
 
             PartitionID partition_id = 0;
             if (found_tag) {
@@ -128,7 +130,8 @@ size_t SubsetPartition::output_partitioned_file(const std::string infilename,
 
             if (partition_id > 0 || output_unassigned) {
                 if (read.accuracy.length()) { // FASTQ
-                    outfile << "@" << read.name << "\t" << partition_id << "\n";
+                    outfile << "@" << read.name << "\t" << partition_id
+                            << "\n";
                     outfile << seq << "\n+\n";
                     outfile << read.accuracy << "\n";
                 } else {		// FASTA
@@ -166,11 +169,12 @@ size_t SubsetPartition::output_partitioned_file(const std::string infilename,
     return partitions.size() + n_singletons;
 }
 
-unsigned int SubsetPartition::find_unpart(const std::string infilename,
-        bool traverse,
-        bool stop_big_traversals,
-        CallbackFn callback,
-        void * callback_data)
+unsigned int SubsetPartition::find_unpart(
+    const std::string	infilename,
+    bool		traverse,
+    bool		stop_big_traversals,
+    CallbackFn		callback,
+    void *		callback_data)
 {
     IParser* parser = IParser::get_parser(infilename);
 
@@ -208,8 +212,8 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
             PartitionSet pset;
             bool found_zero = false;
 
-            for (SeenSet::iterator si = found_tags.begin(); si !=
-                    found_tags.end(); ++si) {
+            for (SeenSet::iterator si = found_tags.begin();
+                    si != found_tags.end(); ++si) {
                 PartitionMap::iterator pi = partition_map.find(*si);
                 PartitionID partition_id = 0;
                 if (pi != partition_map.end() && pi->second != NULL) {
@@ -224,10 +228,11 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 
             if (pset.size() > 1 || found_zero || n_consumed) {
 
-                // ok, we found something unaccounted for by the current partitioning.
-                // we can either
+                // ok, we found something unaccounted for by the current
+                // partitioning. We can either
                 //    (1) redo the partitioning of this area from scratch;
-                //    (2) just join tags that are on the same sequence (incl 0-tags);
+                //    (2) just join tags that are on the same sequence
+                //    (incl 0-tags);
                 // 1 is "perfect", 2 is imperfect but rilly fast.
 
                 // note, in the case of #2, we can dispense with the hashtable,
@@ -249,7 +254,8 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
                 }
 
                 //	std::cout << "got one! " << read.name << "\n";
-                // std::cout << pset.size() << " " << found_zero << " " << n_consumed << "\n";
+                // std::cout << pset.size() << " " << found_zero << " "
+                // << n_consumed << "\n";
             }
 
             total_reads++;
@@ -295,7 +301,8 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 
             // print out
             if (n % 1000 == 0) {
-                cout << "unpart-part " << n << " " << next_partition_id << "\n";
+                cout << "unpart-part " << n << " " << next_partition_id
+                     << "\n";
             }
         }
     }
@@ -309,12 +316,13 @@ unsigned int SubsetPartition::find_unpart(const std::string infilename,
 /* @cswelcher Brilliant idea: let's *not* copy this same piece of code
  * over and over again!
  */
-void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
-                                      HashIntoType kmer_r,
-                                      unsigned int breadth,
-                                      SeenSet& traversed_kmers,
-                                      NodeQueue& node_q,
-                                      std::queue<unsigned int>& breadth_q)
+void SubsetPartition::queue_neighbors(
+    HashIntoType		kmer_f,
+    HashIntoType		kmer_r,
+    unsigned int		breadth,
+    SeenSet&			traversed_kmers,
+    NodeQueue&			node_q,
+    std::queue<unsigned int>&	breadth_q)
 {
 
     HashIntoType f, r;
@@ -400,12 +408,13 @@ void SubsetPartition::queue_neighbors(HashIntoType kmer_f,
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
 //    connected to kmer_f/kmer_r in the graph.
 
-void SubsetPartition::find_all_tags(HashIntoType kmer_f,
-                                    HashIntoType kmer_r,
-                                    SeenSet& tagged_kmers,
-                                    const SeenSet& all_tags,
-                                    bool break_on_stop_tags,
-                                    bool stop_big_traversals)
+void SubsetPartition::find_all_tags(
+    HashIntoType	kmer_f,
+    HashIntoType	kmer_r,
+    SeenSet&		tagged_kmers,
+    const SeenSet&	all_tags,
+    bool		break_on_stop_tags,
+    bool		stop_big_traversals)
 {
     const HashIntoType bitmask = _ht->bitmask;
 
@@ -562,13 +571,15 @@ void SubsetPartition::find_all_tags(HashIntoType kmer_f,
 
 
 
-// Perform a breadth-first search starting from the k-mers in the given sequence
-unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
-        SeenSet& tagged_kmers,
-        const SeenSet& all_tags,
-        unsigned int range,
-        bool break_on_stop_tags,
-        bool stop_big_traversals)
+// Perform a breadth-first search starting from the k-mers in the given
+// sequence
+unsigned int SubsetPartition::sweep_for_tags(
+    const std::string&	seq,
+    SeenSet&		tagged_kmers,
+    const SeenSet&	all_tags,
+    unsigned int	range,
+    bool		break_on_stop_tags,
+    bool		stop_big_traversals)
 {
 
     SeenSet traversed_kmers;
@@ -654,7 +665,8 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
         }
 
         // removed for not doing anything
-        //assert(breadth >= cur_breadth); // keep track of watermark, for debugging.
+        //assert(breadth >= cur_breadth); // keep track of watermark, for
+        //debugging.
         //if (breadth > cur_breadth) { cur_breadth = breadth; }
 
         if (breadth == max_breadth) {
@@ -667,7 +679,8 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
             return total;    // truncate search @CTB exit?
         }
 
-        queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q, breadth_q);
+        queue_neighbors(kmer_f, kmer_r, breadth, traversed_kmers, node_q,
+                        breadth_q);
     }
     //printf("breadth_seen=%u, total=%u, traverse_kmers=%u\n", breadth_seen, total, traversed_kmers.size());
     return total;
@@ -676,14 +689,15 @@ unsigned int SubsetPartition::sweep_for_tags(const std::string& seq,
 // find_all_tags: the core of the partitioning code.  finds all tagged k-mers
 //    connected to kmer_f/kmer_r in the graph.
 
-void SubsetPartition::find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
-        HashIntoType kmer_r,
-        SeenSet& tagged_kmers,
-        const SeenSet& all_tags,
-        BoundedCounterType min_count,
-        BoundedCounterType max_count,
-        bool break_on_stop_tags,
-        bool stop_big_traversals)
+void SubsetPartition::find_all_tags_truncate_on_abundance(
+    HashIntoType	kmer_f,
+    HashIntoType	kmer_r,
+    SeenSet&		tagged_kmers,
+    const SeenSet&	all_tags,
+    BoundedCounterType	min_count,
+    BoundedCounterType	max_count,
+    bool		break_on_stop_tags,
+    bool		stop_big_traversals)
 {
     const HashIntoType bitmask = _ht->bitmask;
 
@@ -740,16 +754,17 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
         keeper.insert(kmer);
         total++;
 
-        // Is this a kmer-to-tag, and have we put this tag in a partition already?
-        // Search no further in this direction.  (This is where we connect
-        // partitions.)
+        // Is this a kmer-to-tag, and have we put this tag in a partition
+        // already? Search no further in this direction.  (This is where we
+        // connect partitions.)
         if (!first && set_contains(all_tags, kmer)) {
             tagged_kmers.insert(kmer);
             continue;
         }
 
         // @cswelcher Do these lines actually do anything?
-        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
+        if (!(breadth >= cur_breadth)) { // keep track of watermark, for
+            // debugging.
             throw std::exception();
         }
         if (breadth > cur_breadth) {
@@ -844,12 +859,13 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(HashIntoType kmer_f,
 
 ///////////////////////////////////////////////////////////////////////
 
-void SubsetPartition::do_partition(HashIntoType first_kmer,
-                                   HashIntoType last_kmer,
-                                   bool break_on_stop_tags,
-                                   bool stop_big_traversals,
-                                   CallbackFn callback,
-                                   void * callback_data)
+void SubsetPartition::do_partition(
+    HashIntoType	first_kmer,
+    HashIntoType	last_kmer,
+    bool		break_on_stop_tags,
+    bool		stop_big_traversals,
+    CallbackFn		callback,
+    void *		callback_data)
 {
     unsigned int total_reads = 0;
 
@@ -902,14 +918,15 @@ void SubsetPartition::do_partition(HashIntoType first_kmer,
     }
 }
 
-void SubsetPartition::do_partition_with_abundance(HashIntoType first_kmer,
-        HashIntoType last_kmer,
-        BoundedCounterType min_count,
-        BoundedCounterType max_count,
-        bool break_on_stop_tags,
-        bool stop_big_traversals,
-        CallbackFn callback,
-        void * callback_data)
+void SubsetPartition::do_partition_with_abundance(
+    HashIntoType	first_kmer,
+    HashIntoType	last_kmer,
+    BoundedCounterType	min_count,
+    BoundedCounterType	max_count,
+    bool		break_on_stop_tags,
+    bool		stop_big_traversals,
+    CallbackFn		callback,
+    void *		callback_data)
 {
     unsigned int total_reads = 0;
 
@@ -940,8 +957,9 @@ void SubsetPartition::do_partition_with_abundance(HashIntoType first_kmer,
         // find all tagged kmers within range.
         tagged_kmers.clear();
         find_all_tags_truncate_on_abundance(kmer_f, kmer_r, tagged_kmers,
-                                            _ht->all_tags, min_count, max_count,
-                                            break_on_stop_tags, stop_big_traversals);
+                                            _ht->all_tags, min_count,
+                                            max_count, break_on_stop_tags,
+                                            stop_big_traversals);
 
         // assign the partition ID
         assign_partition_id(kmer, tagged_kmers);
@@ -966,7 +984,9 @@ void SubsetPartition::do_partition_with_abundance(HashIntoType first_kmer,
 
 //
 
-void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
+void SubsetPartition::set_partition_id(
+    std::string kmer_s,
+    PartitionID p)
 {
     HashIntoType kmer;
     if (!(kmer_s.length() >= _ht->ksize())) {
@@ -977,7 +997,9 @@ void SubsetPartition::set_partition_id(std::string kmer_s, PartitionID p)
     set_partition_id(kmer, p);
 }
 
-void SubsetPartition::set_partition_id(HashIntoType kmer, PartitionID p)
+void SubsetPartition::set_partition_id(
+    HashIntoType	kmer,
+    PartitionID		p)
 {
     PartitionPtrSet * s = reverse_pmap[p];
     PartitionID * pp = NULL;
@@ -996,8 +1018,9 @@ void SubsetPartition::set_partition_id(HashIntoType kmer, PartitionID p)
     }
 }
 
-PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
-        SeenSet& tagged_kmers)
+PartitionID SubsetPartition::assign_partition_id(
+    HashIntoType	kmer,
+    SeenSet&		tagged_kmers)
 
 {
     PartitionID return_val = 0;
@@ -1019,8 +1042,8 @@ PartitionID SubsetPartition::assign_partition_id(HashIntoType kmer,
 // function!
 
 PartitionID * SubsetPartition::_join_partitions_by_tags(
-    const SeenSet& tagged_kmers,
-    const HashIntoType kmer)
+    const SeenSet&	tagged_kmers,
+    const HashIntoType	kmer)
 {
     SeenSet::const_iterator it = tagged_kmers.begin();
     unsigned int * this_partition_p = NULL;
@@ -1056,7 +1079,8 @@ PartitionID * SubsetPartition::_join_partitions_by_tags(
 
             if (pp_id == NULL) {	// entry is null? set;
                 pi->second = this_partition_p;
-            } else if (*pp_id != *this_partition_p) { // != entry? join partitions.
+            } else if (*pp_id != *this_partition_p) {
+                // != entry? join partitions.
                 _merge_two_partitions(this_partition_p, pp_id);
             }
         }
@@ -1072,8 +1096,9 @@ PartitionID * SubsetPartition::_join_partitions_by_tags(
 // map structures for two partitions and resetting each partition
 // pointer individually.
 
-PartitionID * SubsetPartition::_merge_two_partitions(PartitionID *the_pp,
-        PartitionID *merge_pp)
+PartitionID * SubsetPartition::_merge_two_partitions(
+    PartitionID *the_pp,
+    PartitionID *merge_pp)
 {
     PartitionPtrSet * s = reverse_pmap[*the_pp];
     PartitionPtrSet * t = reverse_pmap[*merge_pp];
@@ -1105,8 +1130,9 @@ PartitionID * SubsetPartition::_merge_two_partitions(PartitionID *the_pp,
     return the_pp;
 }
 
-PartitionID SubsetPartition::join_partitions(PartitionID orig,
-        PartitionID join)
+PartitionID SubsetPartition::join_partitions(
+    PartitionID orig,
+    PartitionID join)
 {
     if (orig == join) {
         return orig;
@@ -1172,9 +1198,10 @@ void SubsetPartition::merge(SubsetPartition * other)
 // Merge PartitionIDs from another SubsetPartition, based on overlapping
 // tags.  Utility function for merge() and merge_from_disk().
 
-void SubsetPartition::_merge_other(HashIntoType tag,
-                                   PartitionID other_partition,
-                                   PartitionPtrMap& diskp_to_pp)
+void SubsetPartition::_merge_other(
+    HashIntoType	tag,
+    PartitionID		other_partition,
+    PartitionPtrMap&	diskp_to_pp)
 {
     if (set_contains(_ht->stop_tags, tag)) { // don't merge if it's a stop_tag
         return;
@@ -1189,7 +1216,7 @@ void SubsetPartition::_merge_other(HashIntoType tag,
 
         if (existing_pp_0) {	// already seen this other_partition
             partition_map[tag] = existing_pp_0;
-        } else {			// new other_partition! create a new partition.
+        } else {		// new other_partition! create a new partition.
             pp_0 = get_new_partition();
 
             PartitionPtrSet * pp_set = new PartitionPtrSet();
@@ -1261,8 +1288,8 @@ void SubsetPartition::merge_from_disk(string other_filename)
     PartitionID * diskp = NULL;
 
     //
-    // Run through the entire partitionmap file, figuring out what partition IDs
-    // are present.
+    // Run through the entire partitionmap file, figuring out what partition
+    // IDs are present.
     //
 
     remainder = 0;
@@ -1467,9 +1494,9 @@ void SubsetPartition::join_partitions_by_path(std::string seq)
     assign_partition_id(*(tagged_kmers.begin()), tagged_kmers);
 }
 
-void SubsetPartition::partition_size_distribution(PartitionCountDistribution
-        &d,
-        unsigned int& n_unassigned)
+void SubsetPartition::partition_size_distribution(
+    PartitionCountDistribution	&d,
+    unsigned int		&n_unassigned)
 const
 {
     PartitionCountMap cm;
@@ -1482,8 +1509,9 @@ const
     }
 }
 
-void SubsetPartition::partition_sizes(PartitionCountMap &cm,
-                                      unsigned int& n_unassigned)
+void SubsetPartition::partition_sizes(
+    PartitionCountMap	&cm,
+    unsigned int	&n_unassigned)
 const
 {
     n_unassigned = 0;
@@ -1499,8 +1527,9 @@ const
     }
 }
 
-void SubsetPartition::partition_average_coverages(PartitionCountMap& cm,
-        CountingHash * ht) const
+void SubsetPartition::partition_average_coverages(
+    PartitionCountMap	&cm,
+    CountingHash *	ht) const
 {
     PartitionCountMap csum;
     PartitionCountMap cN;
@@ -1643,10 +1672,9 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 
         if (n % 1000 == 0) {
 #if VERBOSE_REPARTITION
-            std::cout << "found big 'un!  traversed " << n << " tags, " << n_big <<
-                      " big; " <<
-                      bigtags.size() << " total tags; " << _ht->stop_tags.size()
-                      << " stop tags\n";
+            std::cout << "found big 'un!  traversed " << n << " tags, " <<
+                      n_big << " big; " << bigtags.size() << " total tags; " <<
+                      _ht->stop_tags.size() << " stop tags\n";
 #endif // 0
         }
     }
@@ -1704,8 +1732,9 @@ void SubsetPartition::repartition_a_partition(const SeenSet& partition_tags)
 //    to that partition & (a) clears their PID, and (b) adds them to
 //    the SeenSet partition_tags.  partition_tags is cleared first.
 
-void SubsetPartition::_clear_partition(PartitionID the_partition,
-                                       SeenSet& partition_tags)
+void SubsetPartition::_clear_partition(
+    PartitionID	the_partition,
+    SeenSet&	partition_tags)
 {
     partition_tags.clear();
 
@@ -1750,12 +1779,13 @@ void SubsetPartition::report_on_partitions()
     }
 }
 
-void SubsetPartition::compare_to_partition(PartitionID pid1,
-        SubsetPartition *p2,
-        PartitionID pid2,
-        unsigned int &n_only1,
-        unsigned int &n_only2,
-        unsigned int &n_shared)
+void SubsetPartition::compare_to_partition(
+    PartitionID		pid1,
+    SubsetPartition	*p2,
+    PartitionID		pid2,
+    unsigned int	&n_only1,
+    unsigned int	&n_only2,
+    unsigned int	&n_shared)
 {
     SubsetPartition * p1 = this;
 
