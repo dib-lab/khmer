@@ -1,3 +1,8 @@
+2014-05-06  Titus Brown  <titus@idyll.org>
+
+    * sandbox/calc-best-assembly.py: added script to calculate best
+    assembly from a list of contig/scaffold files
+	
 2014-04-23  Titus Brown  <titus@idyll.org>
 
     * scripts/abundance-dist-single.py: fixed problem where ReadParser was
