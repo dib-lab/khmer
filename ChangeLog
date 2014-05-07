@@ -1,10 +1,22 @@
+2014-04-23  Titus Brown  <titus@idyll.org>
+
+    * scripts/abundance-dist-single.py: fixed problem where ReadParser was
+    being created anew for each thread; regression introduced in 4b823fc.
+
+2014-04-22  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * *.py: switch to explicit python2 invocation. Fixes #385.
+
 2014-04-21  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * setup.py,doc/installing.txt: Remove argparse from the requirements
     unless it isn't available. Argparse is bundled with Python 2.7+. This
     simplifies the installation instructions.
 
-2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+2014-04-06  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: added comment about table compatibility
+    with abundance-dist.
 
 2014-04-01  Titus Brown  <titus@idyll.org>
 
