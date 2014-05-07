@@ -1,7 +1,8 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 import screed
 import sys
 import argparse
+
 
 def main():
     parser = argparse.ArgumentParser()

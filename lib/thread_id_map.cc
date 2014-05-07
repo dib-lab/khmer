@@ -1,7 +1,8 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// the three-clause BSD license; see doc/LICENSE.txt.
+// Contact: khmer-project@idyll.org
 //
 
 #if defined (__linux__)
@@ -17,11 +18,13 @@ namespace khmer
 
 ThreadIDMap::
 ThreadIDMap( uint32_t number_of_threads )
-:   _number_of_threads( number_of_threads ),
-    _thread_counter( 0 ),
-    _tid_map_spin_lock( 0 )
+    :   _number_of_threads( number_of_threads ),
+        _thread_counter( 0 ),
+        _tid_map_spin_lock( 0 )
 {
-    if (0 == number_of_threads) throw InvalidNumberOfThreadsRequested( );
+    if (0 == number_of_threads) {
+        throw InvalidNumberOfThreadsRequested( );
+    }
 }
 
 
@@ -38,7 +41,7 @@ get_thread_id( )
 {
 #if defined (__linux__)
     // Note: No error handling because this call always succeeds, allegedly.
-    pid_t native_thread_id = syscall( SYS_gettid ); 
+    pid_t native_thread_id = syscall( SYS_gettid );
     std:: map< pid_t, uint32_t > :: iterator match;
 #elif defined (__APPLE__) && defined (__MACH__)
     // TODO? Error handling.
@@ -53,27 +56,24 @@ get_thread_id( )
     while (!__sync_bool_compare_and_swap( &_tid_map_spin_lock, 0, 1 ));
 
     match = _thread_id_map.find( native_thread_id );
-    if (match == _thread_id_map.end( ))
-    {
-	uint32_t thread_id;
+    if (match == _thread_id_map.end( )) {
+        uint32_t thread_id;
 
-	thread_id = _thread_counter++;
+        thread_id = _thread_counter++;
 
-	try
-	{
-	    if (_number_of_threads < _thread_counter)
-		throw TooManyThreads( );
-	    _thread_id_map[ native_thread_id ] = thread_id;
-	}
-	catch (...)
-	{
-	    _thread_counter--;
-	    __sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
-	    throw;
-	}
+        try {
+            if (_number_of_threads < _thread_counter) {
+                throw TooManyThreads( );
+            }
+            _thread_id_map[ native_thread_id ] = thread_id;
+        } catch (...) {
+            _thread_counter--;
+            __sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
+            throw;
+        }
 
-	__sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
-	return thread_id;
+        __sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );
+        return thread_id;
     }
 
     __sync_bool_compare_and_swap( &_tid_map_spin_lock, 1, 0 );

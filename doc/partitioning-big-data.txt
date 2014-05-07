@@ -53,22 +53,22 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   
   # the next command will create a '50m.ht' and a '50m.tagset',
   # representing the de Bruijn graph
-  python scripts/load-graph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz 
+  load-graph.py -k 32 -N 4 -x 16e9 50m iowa-corn-50m.fa.gz 
   
   # this will then partition that graph. should take a while.
   # update threads to something higher if you have more cores.
   # this creates a bunch of files, 50m.subset.*.pmap
-  python scripts/partition-graph.py --threads 4 -s 1e5 50m
+  partition-graph.py --threads 4 -s 1e5 50m
   
   # now, merge the pmap files into one big pmap file, 50m.pmap.merged
-  python scripts/merge-partitions 50m
+  merge-partitions.py 50m
   
   # next, annotate the original sequences with their partition numbers.
   # this will create iowa-corn-50m.fa.gz.part
-  python scripts/annotate-partitions.py 50m iowa-corn-50m.fa.gz
+  annotate-partitions.py 50m iowa-corn-50m.fa.gz
   
   # now, extract the partitions in groups into 'iowa-corn-50m.groupNNNN.fa'
-  python scripts/extract-partitions iowa-corn-50m iowa-corn-50m.fa.gz.part
+  extract-partitions.py iowa-corn-50m iowa-corn-50m.fa.gz.part
   
   # at this point, you can assemble the group files individually.  Note,
   # however, that the last one them is quite big?  this is because it's
@@ -79,27 +79,32 @@ https://s3.amazonaws.com/public.ged.msu.edu/khmer/iowa-corn-50m.fa.gz
   mv iowa-corn-50m.group0005.fa corn-50m.lump.fa
   
   # create graph,
-  python scripts/load-graph.py -x 8e9 lump corn-50m.lump.fa
+  load-graph.py -x 8e9 lump corn-50m.lump.fa
 
   # create an initial set of stoptags to help in knot-traversal; otherwise,
   # partitioning and knot-traversal (which is systematic) is really expensive.
-  python scripts/make-initial-stoptags.py lump
+  make-initial-stoptags.py lump
 
   # now partition the graph, using the stoptags file
-  python scripts/partition-graph.py --stoptags lump.stoptags lump
+  partition-graph.py --stoptags lump.stoptags lump
 
   # use the partitioned subsets to find the k-mers that nucleate the lump
-  python scripts/find-knots.py -x 2e8 -N 4 lump
+  find-knots.py -x 2e8 -N 4 lump
 
   # remove those k-mers from the fasta files
-  python scripts/filter-stoptags.py *.stoptags corn-50m.lump.fa
+  filter-stoptags.py *.stoptags corn-50m.lump.fa
 
   # now, reload the filtered data set in and partition again.
-  python scripts/load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
-  python scripts/partition-graph.py -T 4 lumpfilt
-  python scripts/merge-partitions.py lumpfilt
-  python scripts/annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt
-  python scripts/extract-partitions.py corn-50m-lump corn-50m.lump.fa.stopfilt.part
+  # NOTE: 'load-graph.py' uses the file extension to determine
+  # if the file is formatted as fasta or fastq. The default is
+  # fasta, therefore if your files are fastq formatted you need
+  # to append 'fastq' to the name so that 'load-graph.py' 
+  # will parse the file correctly
+  load-graph.py -x 8e9 lumpfilt corn-50m.lump.fa.stopfilt
+  partition-graph.py -T 4 lumpfilt
+  merge-partitions.py lumpfilt
+  annotate-partitions.py lumpfilt corn-50m.lump.fa.stopfilt
+  extract-partitions.py corn-50m-lump corn-50m.lump.fa.stopfilt.part
 
   # and voila, after all that, you should now have your de-knotted lump in
   # corn-50m-lump.group*.fa.  The *.group????.fa files can now be

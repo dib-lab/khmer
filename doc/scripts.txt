@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 ==============================
 khmer's command-line interface
 ==============================
@@ -5,12 +7,17 @@ khmer's command-line interface
 The simplest way to use khmer's functionality is through the command
 line scripts, located in the scripts/ directory of the khmer
 distribution.  Below is our documentation for these scripts.  Note
-that all scripts can be given '-h' as an option, which will print out
+that all scripts can be given :option:`-h` which will print out
 a list of arguments taken by that script.
 
-Many scripts take '-x' and '-N' parameters, which drive khmer's memory usage.
-These parameters depend on details of your data set; for more information
-on how to choose them, see :doc:`choosing-hash-sizes`.
+Many scripts take :option:`-x` and :option:`-N` parameters, which drive khmer's
+memory usage. These parameters depend on details of your data set; for more information
+on how to choose them, see :doc:`choosing-table-sizes`.
+
+You can also override the default values of :option:`--ksize`/:option:`-k`,
+:option:`--n_tables`/:option:`-N`, and :option:`--min-tablesize`/:option:`-x` with
+the environment variables `KHMER_KSIZE`, `KHMER_N_TABLES`, and
+`KHMER_MIN_TABLESIZE` respectively.
 
 1. :ref:`scripts-counting`
 2. :ref:`scripts-partitioning`
@@ -31,388 +38,87 @@ on how to choose them, see :doc:`choosing-hash-sizes`.
 k-mer counting and abundance filtering
 ======================================
 
-**load-into-counting.py**: build a counting hash.
+.. autoprogram:: load-into-counting:get_parser()
+        :prog: load-into-counting.py
 
-   Usage::
+.. autoprogram:: abundance-dist:get_parser()
+        :prog: abundance-dist.py
 
-	load-into-counting.py [ options ] <output.kh> <file1> <file2> ...
+.. autoprogram:: abundance-dist-single:get_parser()
+        :prog: abundance-dist-single.py
 
-   Build a counting hash table using the sequences in <file1-N>, and save it
-   to <output.kh>.
+.. autoprogram:: filter-abund:get_parser()
+        :prog: filter-abund.py
 
-   Note that with the '-b' option <output.kh> will be the exact size
-   of your hashtables, and load-into-counting.py will be constant
-   memory; in exchange, k-mer counts will stop at 255.  The memory
-   usage of this script with '-b' will be about 1.15x the product of
-   the -x and -N numbers.
+.. autoprogram:: filter-abund-single:get_parser()
+        :prog: filter-abund-single.py
 
-   Example::
+.. autoprogram:: count-median:get_parser()
+        :prog: count-median.py
 
-	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
-
-   Multiple threads can be used to accelerate the process, if you have extra
-   cores to spare.
-
-   Example::
-	
-	scripts/load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
-
-**abundance-dist.py**: calculate the abundance distribution.
-
-   Usage::
-	
-	scripts/abundance-dist.py [ options ] <input.kh> <datafile> <histout>
-
-   Use a counting hash table to count the k-mer abundance distribution in
-   <datafile>; output distribution to <histout>.
-
-   Example::
-
-	scripts/load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
-	scripts/abundance-dist.py -z out.kh data/100k-filtered.fa out.hist
-
-   The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
-   are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
-   of total distinct k-mers.
-
-**abundance-dist-single.py**: calculate the k-mer abundance distribution for a single file
-
-   Usage::
-	
-	scripts/abundance-dist-single.py [ options ] <datafile> <histout>
-
-   Count the k-mer abundance distribution in <datafile>; output
-   distribution to <histout>.  (This is a single-step/in-memory
-   version of abundance-dist.py; no counting hash file will be
-   created unless --savehash is specified.)
-
-   Note that with the '-b' option this script is constant memory; in
-   exchange, k-mer counts will stop at 255. The memory usage of this
-   script with '-b' will be about 1.15x the product of the -x and -N
-   numbers.
-
-   To count k-mers in multiple files, use load-into-counting.py and
-   abundance-dist.py.
-
-   Example::
-
-	scripts/abundance-dist-single.py -k 20 -x 5e7 data/100k-filtered.fa out.hist
-
-   The file 'out.hist' will contain the histogram of k-mer abundances.  Columns
-   are (1) k-mer abundance, (2) k-mer count, (3) cumulative count, (4) fraction
-   of total distinct k-mers.
-
-**filter-abund.py**: trim sequences at a min k-mer abundance.
-
-   Usage::
-	
-	filter-abund.py [ -C <cutoff> -V [ -Z num ] ] <input.kh> <file1> <file2> ...
-
-   Load a counting hash table from <input.kh> and use it to trim the
-   sequences in <file1-N>.  Trimmed sequences will be placed in
-   <fileN>.abundfilt.
-
-   The '-V' option sets variable coverage, which means that only
-   low-abundance k-mers in high-coverage reads are trimmed; this
-   should be used for RNAseq and metagenome data.  The '-Z num' option
-   sets the meaning of "high coverage"; by default it's 20.
-
-   Example::
-
-	scripts/load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
-	scripts/filter-abund.py -C 2 table.kh data/100k-filtered.fa
-
-**filter-abund-single.py**: trim sequences at a min k-mer abundance.
-
-   Usage::
-	
-	filter-abund-single.py [ -C <cutoff> ... ] <file>
-
-   Trim sequences at k-mer abundance < C.  (This is an in-memory
-   version of filter-abund.py that works for single files.)
-
-   Trimmed sequences will be placed in <file>.abundfilt.
-
-   This script is constant memory.
-
-   To trim reads based on k-mer abundance across multiple files, use
-   load-into-counting and filter-abund.
-
-   Example::
-
-	scripts/filter-abund-single.py -k 20 -x 5e7 -C 2 data/100k-filtered.fa
-
-**count-median.py**: count median, average, and stddev of k-mer abundance in sequences.
-
-   Usage::
-
-        count-median.py <input.kh> <input sequence file> <output file>
-
-   Load a counting hash table from <input.kh> and use it to calculate the
-   median, average, and stddev k-mer count for each sequence in the
-   <input sequence file>.  Output counts are placed in <output file>,
-   in the format "name median average stddev sequence_length".
-   
-   
-**count-overlap.py**: count the overlap k-mers, which are the k-mers
-   apperaring in two sequence datasets.
-
-   Usage::
-   
-        count-overlap.py [options] <first_filename> <second_filename> <report_filename>
-
-   Note: "curve_report_filename" is optional. If it is provided, the script will
-   generate a report of the increase of overlap k-mers as the number of
-   sequences in the second dataset increases. The report can be used to generate
-   a curve to show that trend easily.The report file contains the numbers of
-   unique k-mers in the two datasets separately and the number of overlap k-mers
-   appearing in both datasets..
+.. autoprogram:: count-overlap:get_parser()
+        :prog: count-overlap.py
 
 .. _scripts-partitioning:
 
 Partitioning
 ============
 
-**do-partition.py**: load, partition, and annotate sequences.
+.. autoprogram:: do-partition:get_parser()
+        :prog: do-partition.py
 
-   Usage::
+.. autoprogram:: load-graph:get_parser()
+        :prog: load-graph.py
 
-        do-partiton.py [ options] <graphbase> <file1> [ <file2> ... ]
+See :program:`extract-partitions.py` for a complete workflow.
 
-   Load in a set of sequences, partition them, merge the partitions,
-   and annotate the original sequences files with the partition information.
-
-   This script combines the functionality of load-graph, partition-graph,
-   merge-partitions, and annotate-partitions into one script.  This
-   is convenient but should probably not be used for large data sets,
-   because do-partition.py doesn't provide save/resume functionality.
-
-**load-graph.py**: load sequences into the compressible graph format.
-
-   Usage::
-
-        load-graph.py [ options ] <graphbase> <file1> [ <file2> ... ]
-
-   Load in a set of sequences, marking waypoints as you go, and save
-   into a ht/tagset pair of files.  See 'extract-partitions' for a
-   complete workflow.
-
-**partition-graph.py**: partition a graph based on waypoint connectivity.
-
-   Usage::
-
-	partition-graph.py [ options ] <graphbase>
-
-Partition the given graph (ht + tagset) into disconnected subgraphs, and save
-the resulting partitionmap(s) as ``*.pmap`` files.
+.. autoprogram:: partition-graph:get_parser()
+        :prog: partition-graph.py
 
 See 'Artifact removal' to understand the stoptags argument.
 
-**merge-partitions.py**: merge pmap files into a single merged pmap file.
+.. autoprogram:: merge-partitions:get_parser()
+        :prog: merge-partition.py
 
-   Usage::
+.. autoprogram:: annotate-partitions:get_parser()
+        :prog: annotate-partitions.py
 
-        merge-partitions.py [ options ] <graphbase>
-
-   Take the <graphbase>.subset.N.pmap files and merge them all into a
-   single <graphbase>.pmap.merged file for annotate-partitions to use.
-
-**annotate-partitions.py**: annotate sequences with partition IDs.
-
-   Usage::
-
-	annotate-partitions.py [ -k <ksize> ] <pmap.merged> <file1> [ <file2> ... ]
-
-   Load in a partitionmap (generally produced by
-   partition-graph.py/merge-partitins.py) and annotate the sequences
-   in the given files with their partition IDs.  Use
-   'extract-partitions.py' to actually extract sequences into separate
-   group files.
-
-   Example (results will be in ``random-20-a.fa.part``)::
-
-	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
-	scripts/partition-graph.py example
-	scripts/merge-partitions.py -k 20 example
-	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
-
-**extract-partitions.py**: separate sequences annotated with partitions into group files
-
-   Usage::
-
-	extract-partitions.py [ options ] <prefix> <file1.part> [ <file2.part> ... ]
-
-   Example (results will be in ``example.group0000.fa``)::
-
-	scripts/load-graph.py -k 20 example tests/test-data/random-20-a.fa
-	scripts/partition-graph.py example
-	scripts/merge-partitions.py -k 20 example
-	scripts/annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
-	scripts/extract-partitions.py example random-20-a.fa.part
-
-
+.. autoprogram:: extract-partitions:get_parser()
+        :prog: extract-partitions.py
+ 
 Artifact removal
 ----------------
 
 The following scripts are specialized scripts for finding and removing
 highly-connected k-mers (HCKs).  See :doc:`partitioning-big-data`.
 
-**make-initial-stoptags.py**: find an initial set of HCKs
+.. autoprogram:: make-initial-stoptags:get_parser()
+        :prog: make-initial-stoptags.py
 
-   Usage::
+.. autoprogram:: find-knots:get_parser()
+        :prog: find-knots.py
 
-	make-initial-stoptags.py [ options ] <graphbase>
-
-   Load a ht/tagset created by load-graph.py, and do a small set of
-   traversals from graph waypoints; on these traversals, look for
-   k-mers that are repeatedly traversed in high-density regions of the
-   graph, i.e. are highly connected.  Output those k-mers as an
-   initial set of stoptags, which can be fed into partition-graph.py,
-   find-knots.py, and filter-stoptags.py.
-
-   The hashtable size options parameters are for a counting hash to
-   keep track of repeatedly-traversed k-mers.  The subset size option
-   specifies the number of waypoints from which to traverse; for
-   highly connected data sets, the default (1000) is probably ok.
-
-**find-knots.py**: find all HCKs
-
-   Usage::
-
-       find-knots.py [ options ] <graphbase>
-
-   Load an ht/tagset created by load-graph, and a set of pmap files
-   created by partition-graph.  Go through each pmap file, select the
-   largest partition in each, and do the same kind of traversal as in
-   make-initial-stoptags from each of the waypoints in that partition;
-   this should identify all of the HCKs in that partition.  These HCKs
-   are output to <graphbase>.stoptags after each pmap file.
-
-   Parameter choice is reasonably important.  See the pipeline in
-   :doc:`partitioning-big-data` for an example run.
-
-   This script is not very scalable and may blow up memory and die
-   horribly.  You should be able to use the intermediate stoptags to
-   restart the process, and if you eliminate the already-processed
-   pmap files, you can continue where you left off.
-
-**filter-stoptags.py**: trim sequences at stoptags.
-
-   Usage::
-
-	filter-stoptags.py [ -k <ksize> ] <input.stoptags> <file1> [ <file2> ... ]
-
-   Load stoptags in from the given .stoptags file and use them to trim
-   or remove the sequences in <file1-N>.  Trimmed sequences will be placed in
-   <fileN>.stopfilt.
+.. autoprogram:: filter-stoptags:get_parser()
+        :prog: filter-stoptags.py
 
 .. _scripts-diginorm:
 
 Digital normalization
 =====================
 
-**normalize-by-median.py**: do digital normalization (remove mostly
-redundant sequences)
-
-   Usage::
-
-	normalize-by-median.py [ options ] <file1> <file2> ...
-
-   Discard sequences based on whether or not their **median** k-mer
-   abundance lies above a specified cutoff.  Kept sequences will be
-   placed in <fileN>.keep.
-
-   Paired end reads will be considered together if the ``-p`` flag is
-   set.  If either read will be kept, then both will be kept.  This
-   should result in keeping (or discarding) each sequencing
-   fragment. This helps with retention of repeats, especially.
-
-   With the ``-s/--savehash`` option, the counting hash will be saved to the
-   specified file after all sequences have been processed. With ``-d``,
-   the counting hash will be saved every d files for multifile runs;
-   if ``-s`` is set, the specified name will be used, and if not,
-   the name backup.ht will be used. ``-l/--loadhash`` will load the specified
-   hash.
-
-   The ``-f`` flag will force the program to continue upon encountering
-   a formatting error in a sequence file; the counting hash up to that
-   point will be dumped, and processing will continue on the next file.
-
-   Example::
-
-	scripts/normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
-
-   Example::
-
-	scripts/normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa
-
-   Example::
-        
-        scripts/normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq
-
-   Example::
-
-        scripts/normalize-by-median.py -k 17 -d 2 -s test.ht tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads.fq
+.. autoprogram:: normalize-by-median:get_parser()
+        :prog: normalize-by-median.py
 
 .. _scripts-read-handling:
 
 Read handling: interleaving, splitting, etc.
 ============================================
 
-**extract-paired-reads.py:** take an interleaved file with some orphan reads,
-and separate paired from orphans.
+.. autoprogram:: extract-paired-reads:get_parser()
+        :prog: extract-paired-reads.py
 
-   Usage::
+.. autoprogram:: interleave-reads:get_parser()
+        :prog: interleave-reads.py
 
-      extract-paired-reads.py <input file>
-
-   The output is two files, <input file>.pe and <input file>.se,
-   placed in the current directory.  The .pe file contains interleaved
-   and properly paired sequences, while the .se file contains orphan
-   sequences.
-
-   Many assemblers (e.g. Velvet) require that you give them either
-   perfectly interleaved files, or files containing only single reads.
-   This script takes files that were originally interleaved but where
-   reads may have been orphaned via error filtering, application of
-   abundance filtering, digital normalization in non-paired mode, or
-   partitioning.  
-
-   Example::
-
-      scripts/extract-paired-reads.py tests/test-data/paired.fq
-
-**interleave-reads.py:** take left (/1) and right (/2) reads, and interleave them.
-
-   Usage::
-
-      interleave-reads.py <R1> <R2> [ -o output ]
-
-   The output is an interleaved set of reads, with each read in <R1> paired
-   with a read in <R2>. By default, the output goes to stdout unless
-   '-o' is specified.
-
-   As a "bonus", this file ensures that read names are formatted in a
-   consistent way, such that they look like the latest Casava format
-   (@name/1, @name/2).
-
-   Example::
-
-      scripts/interleave-reads.py tests/test-data/paired.fq.1 tests/test-data/paired.fq.2 -o paired.fq
-
-**split-paired-reads.py:** split interleaved read files into two files, one left and one right.
-
-   Usage::
-
-      split-paired-reads.py <file>
-
-   The output is placed in <file>.1 and <file>.2.
-
-   Some programs want paired-end read input in the One True Format,
-   which is interleaved; other programs want input in Insanely Bad
-   Format, with left- and right- reads separated.  This reformats the
-   former to the latter.
-
-   Example::
-
-      scripts/split-paired-reads.py tests/test-data/paired.fq
+.. autoprogram:: split-paired-reads:get_parser()
+        :prog: split-paired-reads.py
