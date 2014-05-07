@@ -22,8 +22,9 @@ using namespace khmer:: read_parsers;
 /// output_fasta_kmer_pos_freq: outputs the kmer frequencies for each read
 ///
 
-void CountingHash::output_fasta_kmer_pos_freq(const std::string &inputfile,
-        const std::string &outputfile)
+void CountingHash::output_fasta_kmer_pos_freq(
+    const std::string &inputfile,
+    const std::string &outputfile)
 {
     IParser* parser = IParser::get_parser(inputfile.c_str());
     ofstream outfile;
@@ -86,8 +87,9 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
 }
 
 HashIntoType *
-CountingHash::abundance_distribution(read_parsers::IParser * parser,
-                                     Hashbits * tracking)
+CountingHash::abundance_distribution(
+    read_parsers::IParser *	parser,
+    Hashbits *			tracking)
 {
     HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
     HashIntoType i;
@@ -102,7 +104,8 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
     string seq;
 
     // if not, could lead to overflow.
-    if (!sizeof(BoundedCounterType) == 2) {
+    if (sizeof(BoundedCounterType) != 2) {
+        delete[] dist;
         throw std::exception();
     }
 
@@ -133,19 +136,21 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
 }
 
 
-HashIntoType * CountingHash::abundance_distribution(std::string filename,
-        Hashbits * tracking)
+HashIntoType * CountingHash::abundance_distribution(
+    std::string	filename,
+    Hashbits *	tracking)
 {
     IParser* parser = IParser::get_parser(filename.c_str());
 
     return abundance_distribution(parser, tracking);
 }
 
-HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &inputfile,
-        const unsigned int max_read_len,
-        BoundedCounterType limit_by_count,
-        CallbackFn callback,
-        void * callback_data)
+HashIntoType * CountingHash::fasta_count_kmers_by_position(
+    const std::string 	&inputfile,
+    const unsigned int 	max_read_len,
+    BoundedCounterType	limit_by_count,
+    CallbackFn		callback,
+    void * 		callback_data)
 {
     unsigned long long *counts = new unsigned long long[max_read_len];
 
@@ -186,7 +191,8 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
         // run callback, if specified
         if (read_num % CALLBACK_PERIOD == 0 && callback) {
             try {
-                callback("fasta_file_count_kmers_by_position", callback_data, read_num, 0);
+                callback("fasta_file_count_kmers_by_position", callback_data,
+                         read_num, 0);
             } catch (...) {
                 throw;
             }
@@ -198,10 +204,11 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &in
     return counts;
 }
 
-void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
-        BoundedCounterType limit_by_count,
-        CallbackFn callback,
-        void * callback_data)
+void CountingHash::fasta_dump_kmers_by_abundance(
+    const std::string	&inputfile,
+    BoundedCounterType	limit_by_count,
+    CallbackFn		callback,
+    void *		callback_data)
 {
     Read read;
     IParser* parser = IParser::get_parser(inputfile.c_str());
@@ -236,7 +243,8 @@ void CountingHash::fasta_dump_kmers_by_abundance(const std::string &inputfile,
         // run callback, if specified
         if (read_num % CALLBACK_PERIOD == 0 && callback) {
             try {
-                callback("fasta_file_dump_kmers_by_abundance", callback_data, read_num, 0);
+                callback("fasta_file_dump_kmers_by_abundance", callback_data,
+                         read_num, 0);
             } catch (...) {
                 throw;
             }
@@ -256,9 +264,10 @@ void CountingHash::load(std::string infilename)
     CountingHashFile::load(infilename, *this);
 }
 
-void CountingHash::get_kadian_count(const std::string &s,
-                                    BoundedCounterType &kadian,
-                                    unsigned int nk)
+void CountingHash::get_kadian_count(
+    const std::string 	&s,
+    BoundedCounterType 	&kadian,
+    unsigned int	nk)
 {
     std::vector<BoundedCounterType> counts;
     KMerIterator kmers(s.c_str(), _ksize);
@@ -293,10 +302,11 @@ void CountingHash::get_kadian_count(const std::string &s,
 }
 
 
-void CountingHash::get_kmer_abund_mean(const std::string &filename,
-                                       unsigned long long &total,
-                                       unsigned long long &count,
-                                       float &mean) const
+void CountingHash::get_kmer_abund_mean(
+    const std::string	&filename,
+    unsigned long long	&total,
+    unsigned long long	&count,
+    float		&mean) const
 {
     total = 0;
     count = 0;
@@ -335,9 +345,10 @@ void CountingHash::get_kmer_abund_mean(const std::string &filename,
     mean = float(total) / float(count);
 }
 
-void CountingHash::get_kmer_abund_abs_deviation(const std::string &filename,
-        float mean,
-        float &abs_deviation) const
+void CountingHash::get_kmer_abund_abs_deviation(
+    const std::string	&filename,
+    float		mean,
+    float		&abs_deviation) const
 {
     float total = 0.0;
     unsigned long long count = 0;
@@ -416,8 +427,9 @@ unsigned int CountingHash::max_hamming1_count(const std::string kmer_s)
     return max_count;
 }
 
-unsigned long CountingHash::trim_on_abundance(std::string seq,
-        BoundedCounterType min_abund)
+unsigned long CountingHash::trim_on_abundance(
+    std::string		seq,
+    BoundedCounterType	min_abund)
 const
 {
     if (!check_and_normalize_read(seq)) {
@@ -451,8 +463,9 @@ const
 }
 
 
-unsigned long CountingHash::trim_below_abundance(std::string seq,
-        BoundedCounterType max_abund)
+unsigned long CountingHash::trim_below_abundance(
+    std::string		seq,
+    BoundedCounterType	max_abund)
 const
 {
     if (!check_and_normalize_read(seq)) {
@@ -486,7 +499,9 @@ const
 }
 
 
-void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
+void CountingHashFile::load(
+    const std::string	&infilename,
+    CountingHash	&ht)
 {
     std::string filename(infilename);
     size_t found = filename.find_last_of(".");
@@ -500,7 +515,9 @@ void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
 }
 
 
-void CountingHashFile::save(const std::string &outfilename, const CountingHash &ht)
+void CountingHashFile::save(
+    const std::string	&outfilename,
+    const CountingHash	&ht)
 {
     std::string filename(outfilename);
     size_t found = filename.find_last_of(".");
@@ -514,7 +531,9 @@ void CountingHashFile::save(const std::string &outfilename, const CountingHash &
 }
 
 
-CountingHashFileReader::CountingHashFileReader(const std::string &infilename, CountingHash &ht)
+CountingHashFileReader::CountingHashFileReader(
+    const std::string	&infilename,
+    CountingHash	&ht)
 {
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
@@ -538,7 +557,8 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
 
     infile.read((char *) &version, 1);
     infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) or !(ht_type == SAVED_COUNTING_HT)) {
+    if (!(version == SAVED_FORMAT_VERSION)
+            or !(ht_type == SAVED_COUNTING_HT)) {
         throw std::exception();
     }
 
@@ -589,7 +609,9 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
     infile.close();
 }
 
-CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename, CountingHash &ht)
+CountingHashGzFileReader::CountingHashGzFileReader(
+    const std::string	&infilename,
+    CountingHash	&ht)
 {
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
@@ -610,7 +632,8 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
 
     gzread(infile, (char *) &version, 1);
     gzread(infile, (char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) or !(ht_type == SAVED_COUNTING_HT)) {
+    if (!(version == SAVED_FORMAT_VERSION)
+            or !(ht_type == SAVED_COUNTING_HT)) {
         throw std::exception();
     }
 
@@ -661,7 +684,9 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
     gzclose(infile);
 }
 
-CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht)
+CountingHashFileWriter::CountingHashFileWriter(
+    const std::string	&outfilename,
+    const CountingHash	&ht)
 {
     if (!ht._counts[0]) {
         throw std::exception();
@@ -710,7 +735,9 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
     outfile.close();
 }
 
-CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht)
+CountingHashGzFileWriter::CountingHashGzFileWriter(
+    const std::string	&outfilename,
+    const CountingHash	&ht)
 {
     if (!ht._counts[0]) {
         throw std::exception();
@@ -740,7 +767,8 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
     for (unsigned int i = 0; i < save_n_tables; i++) {
         save_tablesize = ht._tablesizes[i];
 
-        gzwrite(outfile, (const char *) &save_tablesize, sizeof(save_tablesize));
+        gzwrite(outfile, (const char *) &save_tablesize,
+                sizeof(save_tablesize));
         unsigned long long written = 0;
         while (written != save_tablesize) {
             written += gzwrite(outfile, (const char *) ht._counts[i],
@@ -763,10 +791,11 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilenam
     gzclose(outfile);
 }
 
-void CountingHash::collect_high_abundance_kmers(const std::string &filename,
-        unsigned int lower_count,
-        unsigned int upper_count,
-        SeenSet& found_kmers)
+void CountingHash::collect_high_abundance_kmers(
+    const std::string	&filename,
+    unsigned int	lower_count,
+    unsigned int	upper_count,
+    SeenSet&		found_kmers)
 {
     unsigned long long total_reads = 0;
 
