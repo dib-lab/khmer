@@ -103,6 +103,7 @@ CountingHash::abundance_distribution(read_parsers::IParser * parser,
 
     // if not, could lead to overflow.
     if (!sizeof(BoundedCounterType) == 2) {
+        delete[] dist;
         throw std::exception();
     }
 
@@ -141,11 +142,12 @@ HashIntoType * CountingHash::abundance_distribution(std::string filename,
     return abundance_distribution(parser, tracking);
 }
 
-HashIntoType * CountingHash::fasta_count_kmers_by_position(const std::string &inputfile,
-        const unsigned int max_read_len,
-        BoundedCounterType limit_by_count,
-        CallbackFn callback,
-        void * callback_data)
+HashIntoType * CountingHash::fasta_count_kmers_by_position(
+    const std::string &inputfile,
+    const unsigned int max_read_len,
+    BoundedCounterType limit_by_count,
+    CallbackFn callback,
+    void * callback_data)
 {
     unsigned long long *counts = new unsigned long long[max_read_len];
 
@@ -500,7 +502,8 @@ void CountingHashFile::load(const std::string &infilename, CountingHash &ht)
 }
 
 
-void CountingHashFile::save(const std::string &outfilename, const CountingHash &ht)
+void CountingHashFile::save(const std::string &outfilename,
+                            const CountingHash &ht)
 {
     std::string filename(outfilename);
     size_t found = filename.find_last_of(".");
@@ -514,7 +517,8 @@ void CountingHashFile::save(const std::string &outfilename, const CountingHash &
 }
 
 
-CountingHashFileReader::CountingHashFileReader(const std::string &infilename, CountingHash &ht)
+CountingHashFileReader::CountingHashFileReader(const std::string &infilename,
+        CountingHash &ht)
 {
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
@@ -589,7 +593,8 @@ CountingHashFileReader::CountingHashFileReader(const std::string &infilename, Co
     infile.close();
 }
 
-CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename, CountingHash &ht)
+CountingHashGzFileReader::CountingHashGzFileReader(const std::string
+        &infilename, CountingHash &ht)
 {
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
@@ -661,7 +666,8 @@ CountingHashGzFileReader::CountingHashGzFileReader(const std::string &infilename
     gzclose(infile);
 }
 
-CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, const CountingHash &ht)
+CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename,
+        const CountingHash &ht)
 {
     if (!ht._counts[0]) {
         throw std::exception();
@@ -710,7 +716,8 @@ CountingHashFileWriter::CountingHashFileWriter(const std::string &outfilename, c
     outfile.close();
 }
 
-CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht)
+CountingHashGzFileWriter::CountingHashGzFileWriter(const std::string
+        &outfilename, const CountingHash &ht)
 {
     if (!ht._counts[0]) {
         throw std::exception();

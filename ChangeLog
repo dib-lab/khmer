@@ -1,3 +1,8 @@
+2014-05-06  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/{subset,counting}.cc: fix cppcheck errors; astyle -A10
+    --max-code-length=80
+
 2014-05-06  Titus Brown  <titus@idyll.org>
 
     * sandbox/calc-best-assembly.py: added script to calculate best

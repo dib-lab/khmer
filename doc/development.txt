@@ -29,9 +29,9 @@ For C++, we use `Todd Hoff's coding standard
 <http://astyle.sourceforge.net/astyle.html>`__ indentation and
 bracing.  Note: @CTB needs emacs settings that work for this.
 
-Vim users may want to set the ARTISTIC_STYLE_OPTIONS shell variable to "-A10"
-and running ```:%!astyle``` to reformat. The four space indentation can be set
-with::
+Vim users may want to set the ARTISTIC_STYLE_OPTIONS shell variable to "-A10
+--max-code-length=80" and run ```:%!astyle``` to reformat. The four space
+indentation can be set with::
 
 	set expandtab
 	set shiftwidth=4
@@ -60,7 +60,8 @@ Copy and paste the following into a pull-request when it is ready for review::
    - [ ] If it introduces new functionality in scripts/ is it tested?
      Check for code coverage.
    - [ ] Is it well formatted? Look at `pep8`/`pylint`, `cppcheck`, and
-     `make doc` output. Use `autopep8` and `astyle -A10` if needed. 
+     `make doc` output. Use `autopep8` and `astyle -A10 --max-code-length=80`
+     if needed. 
    - [ ] Is it documented in the Changelog?
 
 git and github strategies
