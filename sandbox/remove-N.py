@@ -18,4 +18,3 @@ for n, record in enumerate(screed.open(sys.argv[1])):
         continue
 
     print >>outfp, '>%s\n%s' % (record.name, record.sequence)
-
