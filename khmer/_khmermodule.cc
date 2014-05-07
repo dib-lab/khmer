@@ -3625,7 +3625,7 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 
 // __new__ for hashbits; necessary for proper subclassing
 // This will essentially do what the old factory function did. Unlike many __new__
-// methods, we take our arguments here, because there's no "unitialized" hashbits
+// methods, we take our arguments here, because there's no "uninitialized" hashbits
 // object; we have to have k and the table sizes before creating the new objects
 static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObject * kwds)
 {
@@ -3891,7 +3891,7 @@ static void khmer_labelhash_dealloc(PyObject* obj)
     //PyObject_Del((PyObject *) obj);
 }
 
-// a little wierd; we don't actually want to call Hashbits' new method. Rather, we
+// a little weird; we don't actually want to call Hashbits' new method. Rather, we
 // define our own new method, and redirect the base's hashbits object to point to our
 // labelhash object
 static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -4116,7 +4116,7 @@ static PyObject * labelhash_sweep_label_neighborhood(PyObject * self, PyObject *
     return x;
 }
 
-// Similar to find_all_tags, but returns tags in a way actually useable by python
+// Similar to find_all_tags, but returns tags in a way actually usable by python
 // need a tags_in_sequence iterator or function in c++ land for reuse in all
 // these functions
 static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self, PyObject *args)

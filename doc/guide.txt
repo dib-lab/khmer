@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 An assembly handbook for khmer - rough draft
 ############################################
 
@@ -53,7 +55,7 @@ There's some documentation here:
 
    https://khmer.readthedocs.org/en/latest/
 
-There's also a khmer mailing list at lists.idyll.orgm that you can use to
+There's also a khmer mailing list at lists.idyll.org that you can use to
 get help with khmer.  To sign up, just go to 
 `the khmer lists page <http://lists.idyll.org/listinfo/khmer>`__ and
 subscribe.
@@ -70,7 +72,7 @@ All of our scripts will take in .fq or .fastq files as FASTQ, and all
 other files as FASTA.  gzip files are always accepted.  Let us know if
 not; that's a bug!
 
-Most scripts *output* fasta, and some mangle headers.  Sorry.  We're
+Most scripts *output* FASTA, and some mangle headers.  Sorry.  We're
 working on outputting FASTQ for FASTQ input, and removing any header
 mangling.
 
@@ -93,8 +95,8 @@ For high-coverage libraries (> ~50x), do three-pass digital
 normalization: run normalize-by-median to C=20 and then run
 filter-abund with C=1.  Now split out the remaining
 paired-end/interleaved and single-end reads using
-strip-and-split-for-assembly, and normalize-by-median the pe and se
-files to C=5 (in that order).
+strip-and-split-for-assembly, and normalize-by-median the paired-end and
+single-end files to C=5 (in that order).
 
 For low-coverage libraries (< 50x) do single-pass digital normalization:
 run normalize-by-median to C=10.

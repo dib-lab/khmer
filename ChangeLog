@@ -1,7 +1,3 @@
-2014-04-21  Titus Brown  <t@idyll.org>
-
-    * doc/development.txt: added spellcheck to review checklist
-
 2014-05-06  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * lib/{subset,counting}.cc: fix cppcheck errors; astyle -A10
@@ -20,6 +16,10 @@
 2014-04-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     *.py: switch to explicit python2 invocation. Fixes #385.
+
+2014-04-21  Titus Brown  <t@idyll.org>
+
+    * doc/development.txt: added spellcheck to review checklist
 
 2014-04-21  Titus Brown  <titus@idyll.org>
 

@@ -231,9 +231,8 @@ unsigned int SubsetPartition::find_unpart(
                 // ok, we found something unaccounted for by the current
                 // partitioning. We can either
                 //    (1) redo the partitioning of this area from scratch;
-                //    (2) just join tags that are on the same sequence
-                //    (incl 0-tags);
-                // 1 is "perfect", 2 is imperfect but rilly fast.
+                //    (2) just join tags that are on the same sequence (incl 0-tags);
+                // 1 is "perfect", 2 is imperfect but really fast.
 
                 // note, in the case of #2, we can dispense with the hashtable,
                 // and just use the tagset/partition map.

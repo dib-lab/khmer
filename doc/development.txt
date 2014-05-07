@@ -8,7 +8,7 @@ Third-party use
 
 We ask that third parties who build upon the codebase to do so from a
 versioned release. This will help them determine when bug fixes apply and
-generally make it easier to collaborate. If more intesive modifications happen
+generally make it easier to collaborate. If more intensive modifications happen
 then we request that the repository is forked, again preferably from a version
 tag.
 
@@ -40,6 +40,18 @@ indentation can be set with::
 For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ is our
 standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful. 
 
+Code, scripts, and documentation must have its spelling checked. Vim users can
+run::
+
+        :setlocal spell spelllang=en_us
+
+Use `]s` and `[s` to navigate between misspellings and `z=` to suggest a
+correctly spelled word. `zg` will add a word as a good word.
+
+GNU's `aspell` can also be used to check the spelling in a single file::
+
+        aspell check --mode ccpp $filename
+
 Code Review
 -----------
 
@@ -47,7 +59,8 @@ Please read `11 Best Practices for Peer Code Review
 <http://smartbear.com/SmartBear/media/pdfs/WP-CC-11-Best-Practices-of-Peer-Code-Review.pdf>`__.
 
 See also `Code reviews: the lab meeting for code
-<http://fperez.org/py4science/code_reviews.html>`__ and `the PyCogent coding guidelines
+<http://fperez.org/py4science/code_reviews.html>`__ and
+`the PyCogent coding guidelines
 <http://pycogent.org/coding_guidelines.html>`__.
 
 Checklist
@@ -63,7 +76,8 @@ Copy and paste the following into a pull-request when it is ready for review::
      `make doc` output. Use `autopep8` and `astyle -A10 --max-code-length=80`
      if needed. 
    - [ ] Is it documented in the Changelog?
-   - [ ] Was spellcheck run on the source code and documentation after changes were made?
+   - [ ] Was spellcheck run on the source code and documentation after changes
+     were made?
 
 git and github strategies
 -------------------------
@@ -77,13 +91,16 @@ repository and make a branch there.
 Each piece or fix you are working on should have its own branch; make a pull-
 request to ged-lab/master to aid in code review, testing, and feedback.
 
-If you want your code integrated then it needs to be mergable
+If you want your code integrated then it needs to be mergeable
 
 Example pull request update using the command line:
 
- #. Clone the source of the pull request (if needed) ``git clone git@github.com:mr-c/khmer.git``
- #. Checkout the source branch of the pull request ``git checkout my-pull-request``
- #. Pull in the destination of the pull request and resolve any conflicts ``git pull git@github.com:ged-lab/khmer.git master``
+ #. Clone the source of the pull request (if needed)
+     ``git clone git@github.com:mr-c/khmer.git``
+ #. Checkout the source branch of the pull request
+     ``git checkout my-pull-request``
+ #. Pull in the destination of the pull request and resolve any conflicts
+     ``git pull git@github.com:ged-lab/khmer.git master``
  #. Push your update to the source of the pull request ``git push``
  #. Jenkins will automatically attempt to build and test your pull requests.
 
@@ -173,7 +190,8 @@ check for correctness.
 
 https://gcc-python-plugin.readthedocs.org/en/latest/cpychecker.html
 
-Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev package
+Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev
+package
 
 Example usage: ::
 
@@ -189,8 +207,9 @@ Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 
 Warnings to address: ::
 
-	khmer/_khmermodule.cc:3109:1: note: this function is too complicated for the
-	reference-count checker to fully analyze: not all paths were analyze
+        khmer/_khmermodule.cc:3109:1: note: this function is too complicated
+        for the reference-count checker to fully analyze: not all paths were
+        analyzed
 
 Adjust --maxtrans and re-run. ::
 
@@ -205,5 +224,5 @@ Adjust --maxtrans and re-run. ::
 See below for a format string cheatsheet One also benefits by matching C type
 with the function signature used later. 
 
-"I" for unsinged int
+"I" for unsigned int
 "K" for unsigned long long a.k.a khmer::HashIntoType.

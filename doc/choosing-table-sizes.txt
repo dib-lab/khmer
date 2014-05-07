@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 ==============================
 Choosing table sizes for khmer
 ==============================
@@ -122,7 +124,7 @@ an error-code.
 Rules of thumb
 --------------
 
-Juse use -N 4, always, and vary the -x parameter.
+Just use -N 4, always, and vary the -x parameter.
 
 For digital normalization, we recommend:
 
