@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 Deploying the khmer project tools on Galaxy
 ===========================================
 
@@ -43,12 +45,11 @@ For one or more files into a single file:
 'Tools' menu.
 
 #. Compatible files already uploaded to your Galaxy instance should be listed.
-If not then you may need to `set their datatype manually <https://wiki.galaxyproject.org/Learn/Datatypes>`__.
+If not then you may need to `set their datatype manually
+<https://wiki.galaxyproject.org/Learn/Datatypes>`__.
 
-#. After selecting the input files specift if they are paired-interleaved
+#. After selecting the input files specify if they are paired-interleaved
 or not.
 
 #. Specify the sample type or show the advanced parameters to set the tablesize
 yourself. Consult :doc:`choosing-table-sizes` for assistance.
-
-

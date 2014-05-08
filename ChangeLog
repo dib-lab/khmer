@@ -17,6 +17,10 @@
 
     *.py: switch to explicit python2 invocation. Fixes #385.
 
+2014-04-21  Titus Brown  <t@idyll.org>
+
+    * doc/development.txt: added spellcheck to review checklist
+
 2014-04-21  Titus Brown  <titus@idyll.org>
 
     * scripts/normalize-by-median.py: updated FP rate to match latest info from

@@ -1687,7 +1687,7 @@ const
         keeper.insert(kmer);
         total++;
 
-        // QUESITON: Huh? What's up with the following?
+        // QUESTION: Huh? What's up with the following?
         if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
             continue;
         }

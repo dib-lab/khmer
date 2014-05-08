@@ -108,7 +108,8 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         cd build/khmer
         make test
 
-#. Create the final tag and publish the new release on PyPI (requires an authorized account).::
+#. Create the final tag and publish the new release on PyPI (requires an
+   authorized account).::
 
         cd ../../../khmer
         git tag v${new_version}
@@ -131,7 +132,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         ./setup.py bdist_wheel upload
 
 #. Tweet about the new release. Optionally send email including the contents of
-   the Changelog to khmer@lists.idyll.org and khmer-announce@lists.idyll.org
+   the ChangeLog to khmer@lists.idyll.org and khmer-announce@lists.idyll.org
 
 Upstream sources
 ----------------
@@ -151,7 +152,8 @@ Explanation
 Versioneer, from https://github.com/warner/python-versioneer, is used to
 determine the version number and is called by Setuptools and Sphinx. See the
 files ``versioneer.py``, the top of ``khmer/__init__.py``,
-``khmer/_version.py``, ``setup.py``, and ``doc/conf.py`` for the implementation.
+``khmer/_version.py``, ``setup.py``, and ``doc/conf.py`` for the
+implementation.
 
 The version number is determined through several methods: see 
 https://github.com/warner/python-versioneer#version-identifiers
@@ -164,12 +166,12 @@ If the source tree is from a git checkout then the version number is derived by
 If from an unpacked tarball then the name of the directory is queried.
 
 Lacking either of the two git-archive will record the version number at the top
-of ``khmer/_version.py`` via the ``$Format:%d$`` and ``$Format:%H$`` placeholders
-enabled by the "export-subst" entry in ``.gitattributes``.
+of ``khmer/_version.py`` via the ``$Format:%d$`` and ``$Format:%H$``
+placeholders enabled by the "export-subst" entry in ``.gitattributes``.
 
-Non source distributions will have a customized ``khmer/_version.py`` that contains
-hard-coded version strings. (see ``build/*/khmer/_version.py`` after a
+Non source distributions will have a customized ``khmer/_version.py`` that
+contains hard-coded version strings. (see ``build/*/khmer/_version.py`` after a
 ``python setup.py build`` for an example)
 
-``ez_setup.py`` bootstraps setuptools (if needed) by downloading and installing an
-appropriate version
+``ez_setup.py`` bootstraps Setuptools (if needed) by downloading and installing
+an appropriate version
