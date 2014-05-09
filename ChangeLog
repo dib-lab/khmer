@@ -1,3 +1,7 @@
+2014-05-09  Luiz Irber  <irberlui@msu.edu>
+
+    Version 1.0.1
+
 2014-05-09  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/release.txt: update release instructions
@@ -53,7 +57,6 @@
 
 2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-    Version 1.0.1
     * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
     * ChangeLog: fix date for 1.0 release, email addresses
 
