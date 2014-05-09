@@ -9,28 +9,21 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
-        git clone --depth 1 git@github.com:ged-lab/khmer.git
+        git clone git@github.com:ged-lab/khmer.git
         cd khmer
 
-#. (Optional) Check for updates to ``ez_setup.py`` and versioneer::
+#. (Optional) Check for updates to versioneer::
 
-        wget -N https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-        wget -N https://raw.github.com/warner/python-versioneer/master/versioneer.py
+        pip install versioneer
+        versioneer-installer
 
-        git diff ez_setup.py
+        git diff
         
-        git add ez_setup.py
-        git commit -m "new version of ez_setup.py"
-        # or
-        git checkout -- ez_setup.py
-
-        git diff versioneer.py
-        
-        git add versioneer.py
         ./setup.py versioneer
-        git commit -m "new version of versioneer.py"
+        git diff 
+        git commit -m -a "new version of versioneer.py"
         # or
-        git checkout -- versioneer.py
+        git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
 
 #. Review the git logs since the last release and diffs (if needed) and ensure
    that the ``Changelog`` is up to date::
@@ -70,7 +63,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         
         cd ../../testenv2
         source bin/activate
-        pip install --allow-external argparse -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
+        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
         cd src/khmer
         make dist
         make install
@@ -83,7 +76,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         
         cd ../../../testenv3/
         source bin/activate
-        pip install --allow-external argparse khmer*tar.gz
+        pip install khmer*tar.gz
         tar xzf khmer*tar.gz
         cd khmer*
         make dist
@@ -102,7 +95,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
         cd ../../testenv4
         source bin/activate
-        pip install --allow-external argparse argparse screed
+        pip install screed
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         normalize-by-median.py --version 2>&1 | awk ' { print $2 } '
         cd build/khmer
@@ -126,7 +119,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         virtualenv build
         cd build
         source bin/activate
-        pip install --allow-external argparse khmer==${new_version}
+        pip install khmer==${new_version}
         pip install wheel
         cd build/khmer
         ./setup.py bdist_wheel upload

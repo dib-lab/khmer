@@ -1,4 +1,8 @@
-2014-05-06  Michael R. Crusoe <mcrusoe@msu.edu>
+2014-05-09  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/release.txt: update release instructions
+
+2014-05-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/{subset,counting}.cc: fix cppcheck errors; astyle -A10
     --max-code-length=80
