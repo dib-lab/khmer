@@ -63,7 +63,7 @@ if [[ -n "$coverity" ]]
 	# was -v coverity but OS X bash not new enough
 then
 	tar czf khmer-cov.tgz cov-int
-	curl --form project=Khmer --form token=${COVERITY_TOKEN} --form \
+	curl --form project=ged-lab/khmer --form token=${COVERITY_TOKEN} --form \
 		email=mcrusoe@msu.edu --form file=@khmer-cov.tgz --form \
 		version=`git describe --tags | sed s/v//` \
 		http://scan5.coverity.com/cgi-bin/upload.py
