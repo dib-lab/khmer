@@ -17,6 +17,11 @@
     * Makefile: add sloccount target for humans and the sloccount.sc target for
    Jenkins
 
+2014-05-13  Michael Wright  <wrigh517@msu.edu>
+
+    * sandbox/fastq-to-fasta.py: now reports number of reads dropped due to
+    'N's in sequence. close 395
+
 2014-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/release.txt: additional fixes
