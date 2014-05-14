@@ -1,3 +1,8 @@
+2014-05-14  Adam Caldwell  <adam.caldwell@gmail.com>
+
+    * Makefile: change pip to pip2. Fixes assorted make problems on systems
+    where pip links to pip3
+
 2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/{zlib,bzip2} -> third-party/

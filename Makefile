@@ -24,7 +24,7 @@ debug:
 		--inplace
 
 doc: all
-	pip install --user sphinx sphinxcontrib-autoprogram || pip install \
+	pip2 install --user sphinx sphinxcontrib-autoprogram || pip2 install \
 		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env
 	@echo ''
@@ -32,7 +32,7 @@ doc: all
 	@echo ''
 
 pdf: FORCE
-	pip install --user sphinx sphinxcontrib-autoprogram || pip install \
+	pip2 install --user sphinx sphinxcontrib-autoprogram || pip2 install \
 		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
@@ -51,16 +51,16 @@ cppcheck: FORCE
 		--file-list=- -j8 --platform=unix64 --std=posix --quiet
 
 pep8: FORCE
-	pip install --user --quiet pep8==1.5 || pip install --quiet pep8==1.5
+	pip2 install --user --quiet pep8==1.5 || pip2 install --quiet pep8==1.5
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
 
 autopep8: FORCE
-	pip install --user autopep8 || pip install autopep8
+	pip2 install --user autopep8 || pip2 install autopep8
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
 		setup.py khmer/ scripts/ tests/
 
 pylint: FORCE
-	pip install --user pylint || pip install pylint
+	pip2 install --user pylint || pip2 install pylint
 	pylint -f parseable setup.py khmer/[!_]*.py khmer/__init__.py \
 		scripts/*.py tests || true
 
@@ -68,7 +68,7 @@ pylint: FORCE
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
 .coverage: FORCE
-	pip install --user coverage || pip install coverage
+	pip2 install --user coverage || pip2 install coverage
 	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
 
@@ -79,12 +79,12 @@ coverage.html: .coverage
 	coverage html
 
 coverage-gcovr.xml: FORCE
-	pip install --user gcovr || pip install gcovr
+	pip2 install --user gcovr || pip2 install gcovr
 	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
 		--output=coverage-gcovr.xml
 
 nosetests.xml: all
-	pip install --user nose || pip install nose
+	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests --with-xunit
 
 doxygen: FORCE
@@ -98,7 +98,7 @@ lib:
 	$(MAKE)
 
 test: all
-	pip install --user nose || pip install nose
+	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests
 
 sloccount.sc: FORCE 
