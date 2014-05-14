@@ -57,12 +57,12 @@ def get_parser():
     parser.add_argument('--prefix', dest='output_prefix',
                         default='',
                         help='Prefix for sorted read files')
-    parser.add_argument('--outdir', dest='outdir',
+    parser.add_argument('--outdir', dest='outdir', default='',
                         help='output directory; default is location of \
                               fastp file')
-    parser.add_argument('--query', nargs='+',
+    parser.add_argument('--query', dest='query', nargs='+',
                         help='Reads to be swept and sorted')
-    parser.add_argument('--db', nargs='+',
+    parser.add_argument('--db', dest='db', nargs='+',
                         help='Database reads for sweep')
 
     return parser
@@ -110,12 +110,6 @@ def main():
     N_HT = args.n_tables
 
     traversal_range = args.traversal_range
-    input_fastp = args.input_fastp
-
-    if not args.outdir:
-        outdir = os.path.dirname(input_fastp)
-    else:
-        outdir = args.outdir
 
     outputs = {}
 
@@ -126,7 +120,7 @@ def main():
 
         for i, dbfile in enumerate(args.db):
 
-            name = args.prefix + os.path.basename(dbfile)
+            name = args.output_prefix + os.path.basename(dbfile)
             outfp = open(os.path.join(args.outdir, name) + '.sweep', 'wb')
             outq = IODeque(args.max_queue_size, outfp)
             outputs[i] = outq
@@ -143,8 +137,8 @@ def main():
         print >>sys.stderr, '...error setting up outputs. exiting...'
 
     print >>sys.stderr, 'done consuming input sequence. \
-                        added {t} tags and {l} \
-                        labels...'.format(t=ht.n_tags(), l=ht.n_labels())
+                        added {t} tags and {l} labels...' \
+                        .format(t=ht.n_tags(), l=ht.n_labels())
 
     n_orphaned = 0
     n_labeled = 0
@@ -161,13 +155,11 @@ def main():
                 fn=read_file)
         else:
             for n, record in enumerate(read_fp):
-                if n % 50000 == 0:
-                    print >>sys.stderr, '\tswept {n} reads [{nc} labeled, \
-                                         {no} orphaned] \
-                                        ** {sec}s ({sect}s total)' \
-                                        .format(n=_, nc=n_labeled,
-                                                no=n_orphaned,
-                                                sec=batch_t, sect=file_t)
+                if n % 50000 == 0 and n > 0:
+                    print >>sys.stderr, \
+                        '\tswept {n} reads [{nc} labeled, {no} orphaned]' \
+                                        .format(n=n, nc=n_labeled,
+                                                no=n_orphaned)
                 seq = record.sequence
                 try:
                     labels = ht.sweep_label_neighborhood(seq, traversal_range)
