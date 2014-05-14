@@ -99,4 +99,11 @@ test: all
 	pip install --user nose || pip install nose
 	./setup.py nosetests
 
+sloccount.sc: FORCE 
+	sloccount --duplicates --wide --details lib khmer scripts tests \
+		setup.py Makefile > sloccount.sc
+
+sloccount: FORCE
+	sloccount lib khmer scripts tests setup.py Makefile
+
 FORCE:
