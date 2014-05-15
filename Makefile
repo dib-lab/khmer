@@ -41,13 +41,14 @@ pdf: FORCE
 
 cppcheck-result.xml: FORCE
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all --file-list=- -j8 \
-		--platform=unix64 --std=posix --xml --xml-version=2 2> cppcheck-result.xml
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
+		--file-list=- -j8 --platform=unix64 --std=posix --xml \
+		--xml-version=2 2> cppcheck-result.xml
 
 cppcheck: FORCE
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all --file-list=- -j8 \
-		--platform=unix64 --std=posix --quiet
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
+		--file-list=- -j8 --platform=unix64 --std=posix --quiet
 
 pep8: FORCE
 	pip2 install --user --quiet pep8==1.5 || pip2 install --quiet pep8==1.5
@@ -88,7 +89,8 @@ nosetests.xml: all
 
 doxygen: FORCE
 	mkdir -p doc/doxygen
-	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > Doxyfile
+	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > \
+		Doxyfile
 	doxygen
 
 lib:
@@ -98,5 +100,12 @@ lib:
 test: all
 	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests
+
+sloccount.sc: FORCE 
+	sloccount --duplicates --wide --details lib khmer scripts tests \
+		setup.py Makefile > sloccount.sc
+
+sloccount: FORCE
+	sloccount lib khmer scripts tests setup.py Makefile
 
 FORCE:

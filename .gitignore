@@ -28,4 +28,6 @@ pylint.out
 .coverage
 doxygen.out
 doc/doxygen
-lib/zlib/zconf.h
+third-party/zlib/zconf.h
+sloccount.sc
+cov-int/

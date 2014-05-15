@@ -149,13 +149,13 @@ NO_UNIQUE_RC=0
 
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
-ZLIB_DIR=zlib
+ZLIB_DIR=../third-party/zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
 	zutil.o inflate.o infback.o inftrees.o inffast.o
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
 
-BZIP2_DIR=bzip2
+BZIP2_DIR=../third-party/bzip2
 BZIP2_OBJS_BASE= \
 	blocksort.o huffman.o crctable.o randtable.o compress.o \
 	decompress.o bzlib.o
