@@ -24,16 +24,16 @@ debug:
 		--inplace
 
 doc: all
-	pip install --user sphinx sphinxcontrib-autoprogram || pip install sphinx \
-		sphinxcontrib-autoprogram
+	pip install --user sphinx sphinxcontrib-autoprogram || pip install \
+		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
 
 pdf: FORCE
-	pip install --user sphinx sphinxcontrib-autoprogram || pip install sphinx \
-		sphinxcontrib-autoprogram
+	pip install --user sphinx sphinxcontrib-autoprogram || pip install \
+		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''
@@ -41,13 +41,14 @@ pdf: FORCE
 
 cppcheck-result.xml: FORCE
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all --file-list=- -j8 \
-		--platform=unix64 --std=posix --xml --xml-version=2 2> cppcheck-result.xml
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
+		--file-list=- -j8 --platform=unix64 --std=posix --xml \
+		--xml-version=2 2> cppcheck-result.xml
 
 cppcheck: FORCE
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all --file-list=- -j8 \
-		--platform=unix64 --std=posix --quiet
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
+		--file-list=- -j8 --platform=unix64 --std=posix --quiet
 
 pep8: FORCE
 	pip install --user --quiet pep8==1.5 || pip install --quiet pep8==1.5
@@ -55,13 +56,13 @@ pep8: FORCE
 
 autopep8: FORCE
 	pip install --user autopep8 || pip install autopep8
-	autopep8 --recursive --in-place --exclude _version.py --ignore E309 setup.py \
-		khmer/ scripts/ tests/
+	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
+		setup.py khmer/ scripts/ tests/
 
 pylint: FORCE
 	pip install --user pylint || pip install pylint
-	pylint -f parseable setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py \
-		tests || true
+	pylint -f parseable setup.py khmer/[!_]*.py khmer/__init__.py \
+		scripts/*.py tests || true
 
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
@@ -88,7 +89,8 @@ nosetests.xml: all
 
 doxygen: FORCE
 	mkdir -p doc/doxygen
-	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > Doxyfile
+	sed "s/\$${VERSION}/`python ./lib/get_version.py`/" Doxyfile.in > \
+		Doxyfile
 	doxygen
 
 lib:
