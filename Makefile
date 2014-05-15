@@ -2,9 +2,16 @@
 # make autopep8 to fix most pep8 errors
 # make pylint to check Python code for enhanced compliance including naming
 #  and documentation
+SHELL=/bin/bash
+GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
+VERSION=`git describe --tags --dirty | sed s/v//`
 
 all: FORCE
 	./setup.py build_ext --inplace
+
+coverage-debug: FORCE
+	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"; ./setup.py \
+		build_ext --debug --inplace --libraries gcov
 
 install: FORCE
 	./setup.py build install
@@ -67,7 +74,7 @@ pylint: FORCE
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-.coverage: FORCE
+.coverage: coverage-debug
 	pip2 install --user coverage || pip2 install coverage
 	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
@@ -78,8 +85,9 @@ coverage.xml: .coverage
 coverage.html: .coverage
 	coverage html
 
-coverage-gcovr.xml: FORCE
-	pip2 install --user gcovr || pip2 install gcovr
+coverage-gcovr.xml: coverage-debug test
+	pip2 install --user --upgrade ${GCOVRURL}'#gcovr' || pip2 install \
+		--upgrade ${GCOVRURL}'#gcovr'
 	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
 		--output=coverage-gcovr.xml
 
@@ -97,7 +105,7 @@ lib:
 	cd lib && \
 	$(MAKE)
 
-test: all
+test:
 	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests
 
@@ -107,5 +115,26 @@ sloccount.sc: FORCE
 
 sloccount: FORCE
 	sloccount lib khmer scripts tests setup.py Makefile
+
+coverity:
+	if [[ -x ${cov_analysis_dir}/cov-build ]]; \
+	then if [[ -n "${COVERITY_TOKEN}" ]]; \
+		then \
+			export PATH=${PATH}:${cov_analysis_dir}; \
+			cov-build --dir cov-int python setup.py build_ext \
+				--build-temp ${PWD}; \
+			tar czf khmer-cov.tgz cov-int; \
+			curl --form project=ged-lab/khmer \
+				--form token=${COVERITY_TOKEN} --form \
+				email=mcrusoe@msu.edu --form \
+				file=@khmer-cov.tgz --form \
+				version=${VERSION} \
+				http://scan5.coverity.com/cgi-bin/upload.py; \
+		else echo 'Missing coverity credentials in $$COVERITY_TOKEN,'\
+			'skipping scan'; \
+		fi; \
+	else echo 'cov-build does not exist in $$cov_analysis_dir: '\
+		'${cov_analysis_dir}. Skipping coverity scan.'; \
+	fi
 
 FORCE:
