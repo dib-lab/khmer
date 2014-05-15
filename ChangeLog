@@ -1,3 +1,10 @@
+2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{zlib,bzip2} -> third-party/
+    * setup.{cfg,py}: Move third party libraries to their own directory
+    * Makefile: add sloccount target for humans and the sloccount.sc target for
+   Jenkins
+
 2014-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/release.txt: additional fixes
