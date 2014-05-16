@@ -1,3 +1,7 @@
+2014-05-16  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt: include sweep-reads-buffered.py
+
 2014-05-14  Adam Caldwell  <adam.caldwell@gmail.com>
 
     * Makefile: change pip to pip2. Fixes assorted make problems on systems
