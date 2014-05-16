@@ -25,7 +25,7 @@ then
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
 	python setup.py build_ext --build-temp $PWD --debug --inplace \
 		--libraries gcov
-	make coverage-gcovr.xml
+	make coverage-gcovr.xml coverage.xml
 	./setup.py install
 else
 	echo "gcov was not found (or we are on OSX), skipping coverage check"
@@ -41,8 +41,6 @@ if type doxygen >/dev/null 2>&1
 then
 	make doxygen 2>&1 > doxygen.out
 fi
-
-make coverage.xml
 
 if type hg >/dev/null 2>&1
 then
