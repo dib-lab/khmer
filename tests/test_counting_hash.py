@@ -100,10 +100,11 @@ class Test_CountingHash(object):
         hi = self.hi
         GG = 'G' * 12
         hi.consume(GG)
+        hi.consume(GG)
 
-        assert hi.get(GG) == 1
+        assert hi.get(GG) == 2
         hi.decrement_random()
-        assert hi.get(GG) == 0, hi.get(GG)
+        assert hi.get(GG) == 1, hi.get(GG)
 
 
 def test_3_tables():

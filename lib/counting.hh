@@ -180,7 +180,7 @@ public:
 
           bool found = false;
           for (HashIntoType j = start; j < _tablesizes[i]; j++) {
-            if (_counts[i][j] > 0) {
+            if (_counts[i][j] > 1) {
               _counts[i][j] -= 1;
               found = true;
               break;
@@ -190,7 +190,7 @@ public:
             break;
           }
           for (HashIntoType j = 0; j < start; j++) {
-            if (_counts[i][j] > 0) {
+            if (_counts[i][j] > 1) {
               _counts[i][j] -= 1;
               break;
             }
