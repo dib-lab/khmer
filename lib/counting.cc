@@ -546,7 +546,8 @@ CountingHashFileReader::CountingHashFileReader(
     ht._tablesizes.clear();
 
     ifstream infile;
-    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
 
     try {
        infile.open(infilename.c_str(), ios::binary);
@@ -594,13 +595,9 @@ CountingHashFileReader::CountingHashFileReader(
            ht._counts[i] = new Byte[tablesize];
 
            unsigned long long loaded = 0;
-           while (loaded != tablesize && !infile.eof()) {
+           while (loaded != tablesize) {
                infile.read((char *) ht._counts[i], tablesize - loaded);
-               loaded += infile.gcount();	// do I need to do this loop?
-           }
-
-           if (infile.eof() && loaded != tablesize) {
-             throw hashtable_file_exception("Unexpected end of table file.\n");
+               loaded += infile.gcount();
            }
        }
 
@@ -622,8 +619,12 @@ CountingHashFileReader::CountingHashFileReader(
 
        infile.close();
     }
-    catch (std::ifstream::failure e) {    
-       throw hashtable_file_exception("Error reading from k-mer table file.");
+    catch (std::ifstream::failure e) {
+      if (infile.eof()) {
+        throw hashtable_file_exception("Unexpected end of table file.");
+      } else {
+        throw hashtable_file_exception("Error reading from k-mer table file.");
+      }
     }
 }
 
