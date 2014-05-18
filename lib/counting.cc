@@ -545,74 +545,86 @@ CountingHashFileReader::CountingHashFileReader(
     }
     ht._tablesizes.clear();
 
-  ifstream infile;
-  infile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    ifstream infile;
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-  try {
-    infile.open(infilename.c_str(), ios::binary);
-  } catch (std::ifstream::failure e) {
-    if (!infile.is_open()) {
-      throw hashtable_file_exception("Cannot open file.");
-    }
-  }
-
-    unsigned int save_ksize = 0;
-    unsigned char save_n_tables = 0;
-    unsigned long long save_tablesize = 0;
-    unsigned char version, ht_type, use_bigcount;
-
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION)
-            or !(ht_type == SAVED_COUNTING_HT)) {
-        throw std::exception();
-    }
-
-    infile.read((char *) &use_bigcount, 1);
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    infile.read((char *) &save_n_tables, sizeof(save_n_tables));
-
-    ht._ksize = (WordLength) save_ksize;
-    ht._n_tables = (unsigned int) save_n_tables;
-    ht._init_bitstuff();
-
-    ht._use_bigcount = use_bigcount;
-
-    ht._counts = new Byte*[ht._n_tables];
-    for (unsigned int i = 0; i < ht._n_tables; i++) {
-        HashIntoType tablesize;
-
-        infile.read((char *) &save_tablesize, sizeof(save_tablesize));
-
-        tablesize = (HashIntoType) save_tablesize;
-        ht._tablesizes.push_back(tablesize);
-
-        ht._counts[i] = new Byte[tablesize];
-
-        unsigned long long loaded = 0;
-        while (loaded != tablesize) {
-            infile.read((char *) ht._counts[i], tablesize - loaded);
-            loaded += infile.gcount();	// do I need to do this loop?
+    try {
+       infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure e) {
+        if (!infile.is_open()) {
+           throw hashtable_file_exception("Cannot open file.");
+        }
+        else {
+          throw hashtable_file_exception("Unknown error in opening file.");
         }
     }
 
-    HashIntoType n_counts = 0;
-    infile.read((char *) &n_counts, sizeof(n_counts));
+    try {
+       unsigned int save_ksize = 0;
+       unsigned char save_n_tables = 0;
+       unsigned long long save_tablesize = 0;
+       unsigned char version, ht_type, use_bigcount;
 
-    if (n_counts) {
-        ht._bigcounts.clear();
+       infile.read((char *) &version, 1);
+       infile.read((char *) &ht_type, 1);
+       if (!(version == SAVED_FORMAT_VERSION)
+               or !(ht_type == SAVED_COUNTING_HT)) {
+           throw hashtable_file_exception("Incorrect table format version.");
+       }
 
-        HashIntoType kmer;
-        BoundedCounterType count;
+       infile.read((char *) &use_bigcount, 1);
+       infile.read((char *) &save_ksize, sizeof(save_ksize));
+       infile.read((char *) &save_n_tables, sizeof(save_n_tables));
 
-        for (HashIntoType n = 0; n < n_counts; n++) {
-            infile.read((char *) &kmer, sizeof(kmer));
-            infile.read((char *) &count, sizeof(count));
-            ht._bigcounts[kmer] = count;
-        }
+       ht._ksize = (WordLength) save_ksize;
+       ht._n_tables = (unsigned int) save_n_tables;
+       ht._init_bitstuff();
+
+       ht._use_bigcount = use_bigcount;
+
+       ht._counts = new Byte*[ht._n_tables];
+       for (unsigned int i = 0; i < ht._n_tables; i++) {
+           HashIntoType tablesize;
+
+           infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+
+           tablesize = (HashIntoType) save_tablesize;
+           ht._tablesizes.push_back(tablesize);
+
+           ht._counts[i] = new Byte[tablesize];
+
+           unsigned long long loaded = 0;
+           while (loaded != tablesize && !infile.eof()) {
+               infile.read((char *) ht._counts[i], tablesize - loaded);
+               loaded += infile.gcount();	// do I need to do this loop?
+           }
+
+           if (infile.eof() && loaded != tablesize) {
+             throw hashtable_file_exception("Unexpected end of table file.\n");
+           }
+       }
+
+       HashIntoType n_counts = 0;
+       infile.read((char *) &n_counts, sizeof(n_counts));
+
+       if (n_counts) {
+           ht._bigcounts.clear();
+
+           HashIntoType kmer;
+           BoundedCounterType count;
+
+           for (HashIntoType n = 0; n < n_counts; n++) {
+               infile.read((char *) &kmer, sizeof(kmer));
+               infile.read((char *) &count, sizeof(count));
+               ht._bigcounts[kmer] = count;
+           }
+       }
+
+       infile.close();
     }
-
-    infile.close();
+    catch (std::ifstream::failure e) {    
+       throw hashtable_file_exception("Error reading from k-mer table file.");
+    }
 }
 
 CountingHashGzFileReader::CountingHashGzFileReader(
