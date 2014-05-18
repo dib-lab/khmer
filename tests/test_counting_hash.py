@@ -569,4 +569,8 @@ def test_load_truncated_should_fail():
     fp.close()
 
     hi = khmer.new_counting_hash(12, 1)
-    hi.load(savepath)
+    try:
+        hi.load(savepath)
+        assert 0, "load should fail"
+    except IOError:
+        pass
