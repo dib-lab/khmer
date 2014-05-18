@@ -63,6 +63,7 @@ void Hashbits::load(std::string infilename)
     unsigned long long save_tablesize = 0;
     unsigned char version, ht_type;
 
+    // @CTB here
     ifstream infile(infilename.c_str(), ios::binary);
     if (!infile.is_open()) {
         throw new exception();

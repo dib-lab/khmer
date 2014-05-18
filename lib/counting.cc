@@ -641,6 +641,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     }
     ht._tablesizes.clear();
 
+    // @CTB here
     unsigned int save_ksize = 0;
     unsigned char save_n_tables = 0;
     unsigned long long save_tablesize = 0;

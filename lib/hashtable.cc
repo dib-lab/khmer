@@ -377,6 +377,7 @@ void Hashtable::save_tagset(std::string outfilename)
 
 void Hashtable::load_tagset(std::string infilename, bool clear_tags)
 {
+  // @CTB here
     ifstream infile(infilename.c_str(), ios::binary);
     if (!infile.is_open()) {
         throw std::exception();
@@ -1780,6 +1781,7 @@ const
 
 void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 {
+  // @CTB here
     ifstream infile(infilename.c_str(), ios::binary);
     if (!(infile.is_open())) {
         throw std::exception();

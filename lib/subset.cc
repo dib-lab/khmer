@@ -1251,6 +1251,7 @@ void SubsetPartition::_merge_other(
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
+  // @CTB here
     ifstream infile(other_filename.c_str(), ios::binary);
     if (!infile.is_open()) {
         throw std::exception();
