@@ -1,7 +1,8 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// the three-clause BSD license; see doc/LICENSE.txt.
+// Contact: khmer-project@idyll.org
 //
 
 #ifndef READ_PARSERS_HH
@@ -13,14 +14,15 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <stdlib.h>
 
 extern "C"
 {
 #include <regex.h>
 }
 
-#include "zlib/zlib.h"
-#include "bzip2/bzlib.h"
+#include "zlib.h"
+#include "bzlib.h"
 
 #include "khmer.hh"
 #include "khmer_config.hh"

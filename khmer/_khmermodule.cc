@@ -1,7 +1,8 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// the three-clause BSD license; see doc/LICENSE.txt.
+// Contact: khmer-project@idyll.org
 //
 
 //
@@ -15,11 +16,10 @@
 
 #include "khmer.hh"
 #include "khmer_config.hh"
-#include "ktable.hh"
+#include "kmer_hash.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
-#include "storage.hh"
 #include "aligner.hh"
 #include "labelhash.hh"
 
@@ -948,424 +948,6 @@ _PyObject_to_khmer_ReadParser( PyObject * py_object )
 /***********************************************************************/
 
 //
-// KTable object -- exact counting of k-mers.
-//
-
-typedef struct {
-    PyObject_HEAD
-    KTable * ktable;
-} khmer_KTableObject;
-
-static void khmer_ktable_dealloc(PyObject *);
-
-//
-// ktable_forward_hash - hash k-mers into numbers
-//
-
-static PyObject * ktable_forward_hash(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    const char * kmer;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
-        return NULL;
-    }
-
-    if (strlen(kmer) != ktable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashtable k-size");
-        return NULL;
-    }
-
-    return PyLong_FromUnsignedLongLong(_hash(kmer, ktable->ksize()));
-}
-
-//
-// ktable_forward_hash_no_rc -- hash k-mers into numbers, with no RC handling
-//
-
-static PyObject * ktable_forward_hash_no_rc(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    const char * kmer;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
-        return NULL;
-    }
-
-    if (strlen(kmer) != ktable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashtable k-size");
-        return NULL;
-    }
-
-    return PyLong_FromUnsignedLongLong(_hash_forward(kmer, ktable->ksize()));
-}
-
-//
-// ktable_reverse_hash -- reverse-hash numbers into DNA strings
-//
-
-static PyObject * ktable_reverse_hash(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    unsigned int val;
-
-    if (!PyArg_ParseTuple(args, "I", &val)) {
-        return NULL;
-    }
-
-    return PyString_FromString(_revhash(val, ktable->ksize()).c_str());
-}
-
-//
-// ktable_count -- count the given k-mer in the ktable
-//
-
-static PyObject * ktable_count(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    const char * kmer;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
-        return NULL;
-    }
-
-    if (strlen(kmer) != ktable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashtable k-size");
-        return NULL;
-    }
-
-    ktable->count(kmer);
-
-    return PyInt_FromLong(1);
-}
-
-//
-// ktable_consume -- count all of the k-mers in the given string
-//
-
-static PyObject * ktable_consume(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    const char * long_str;
-
-    if (!PyArg_ParseTuple(args, "s", &long_str)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < ktable->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    ktable->consume_string(long_str);
-
-    size_t n_consumed = strlen(long_str) - ktable->ksize() + 1;
-
-    return PyInt_FromSize_t(n_consumed);
-}
-
-static PyObject * ktable_get(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    PyObject * arg;
-
-    if (!PyArg_ParseTuple(args, "O", &arg)) {
-        return NULL;
-    }
-
-    ExactCounterType count = 0;
-
-    if(PyLong_Check(arg)) {
-        HashIntoType pos = PyLong_AsUnsignedLongLong(arg);
-        count = ktable->get_count(pos);
-    } else if (PyInt_Check(arg)) {
-        long pos = PyInt_AsLong(arg);
-        count = ktable->get_count((unsigned int) pos);
-    } else if (PyString_Check(arg)) {
-        std::string s = PyString_AsString(arg);
-        count = ktable->get_count(s.c_str());
-    }
-
-    return PyLong_FromUnsignedLongLong(count);
-}
-
-static PyObject * ktable__getitem__(PyObject * self, Py_ssize_t index)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    ExactCounterType count = ktable->get_count(index);
-
-    return PyLong_FromUnsignedLongLong(count);
-}
-
-static int ktable__contains__( PyObject * self, PyObject * val )
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-    // TODO: Consider other object types.
-    char * kmer_str = PyString_AsString( val );
-
-    if (kmer_str) {
-        return (int)(bool)ktable->get_count( kmer_str );
-    }
-    return -1;
-}
-
-static PyObject * ktable_set(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    PyObject * arg;
-    ExactCounterType count;
-
-    if (!PyArg_ParseTuple(args, "OK", &arg, &count)) {
-        return NULL;
-    }
-
-    if (PyInt_Check(arg)) {
-        long pos = PyInt_AsLong(arg);
-        ktable->set_count((unsigned int) pos, count);
-    } else if (PyString_Check(arg)) {
-        std::string s = PyString_AsString(arg);
-        ktable->set_count(s.c_str(), count);
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject * ktable_max_hash(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    return PyLong_FromUnsignedLongLong(ktable->max_hash());
-}
-
-static PyObject * ktable_n_entries(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    return PyLong_FromUnsignedLongLong(ktable->n_entries());
-}
-
-Py_ssize_t ktable__len__(PyObject * self)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    return ktable->n_entries();
-}
-
-static PyObject * ktable_ksize(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    return PyInt_FromLong(ktable->ksize());
-}
-
-static PyObject * ktable_clear(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    if (!PyArg_ParseTuple(args, "")) {
-        return NULL;
-    }
-
-    ktable->clear();
-
-    Py_RETURN_NONE;
-
-}
-
-// fwd decl --> defined below
-static PyObject * ktable_update(PyObject * self, PyObject * args);
-static PyObject * ktable_intersect(PyObject * self, PyObject * args);
-
-static PyMethodDef khmer_ktable_methods[] = {
-    { "forward_hash", ktable_forward_hash, METH_VARARGS, "Convert string to int" },
-    { "forward_hash_no_rc", ktable_forward_hash_no_rc, METH_VARARGS, "Convert string to int, with no reverse complement handling" },
-    { "reverse_hash", ktable_reverse_hash, METH_VARARGS, "Convert int to string" },
-    { "count", ktable_count, METH_VARARGS, "Count the given kmer" },
-    { "consume", ktable_consume, METH_VARARGS, "Count all k-mers in the given string" },
-    { "get", ktable_get, METH_VARARGS, "Get the count for the given k-mer" },
-    { "max_hash", ktable_max_hash, METH_VARARGS, "Get the maximum hash value"},
-    { "n_entries", ktable_n_entries, METH_VARARGS, "Get the number of possible entries"},
-    { "ksize", ktable_ksize, METH_VARARGS, "Get k"},
-    { "set", ktable_set, METH_VARARGS, "Set counter to a value"},
-    { "update", ktable_update, METH_VARARGS, "Combine another ktable with this one"},
-    {
-        "intersect", ktable_intersect, METH_VARARGS,
-        "Create another ktable containing the intersection of two ktables:"
-        "where both ktables have an entry, the counts will be summed."
-    },
-    { "clear", ktable_clear, METH_VARARGS, "Set all entries to 0." },
-
-    {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static PyObject *
-khmer_ktable_getattr(PyObject * obj, char * name)
-{
-    return Py_FindMethod(khmer_ktable_methods, obj, name);
-}
-
-#define is_ktable_obj(v)  ((v)->ob_type == &khmer_KTableType)
-
-static PySequenceMethods khmer_KTable_SequenceMethods = {
-    ktable__len__,
-    0,
-    0,
-    ktable__getitem__,
-    0,
-    0,
-    0,
-    ktable__contains__,
-    0,
-    0
-};
-
-static PyTypeObject khmer_KTableType
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KTableObject")
-= {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "KTable", sizeof(khmer_KTableObject),
-    0,
-    khmer_ktable_dealloc,	/*tp_dealloc*/
-    0,				/*tp_print*/
-    khmer_ktable_getattr,	/*tp_getattr*/
-    0,				/*tp_setattr*/
-    0,				/*tp_compare*/
-    0,				/*tp_repr*/
-    0,				/*tp_as_number*/
-    &khmer_KTable_SequenceMethods, /*tp_as_sequence*/
-    0,				/*tp_as_mapping*/
-    0,				/*tp_hash */
-    0,				/*tp_call*/
-    0,				/*tp_str*/
-    0,				/*tp_getattro*/
-    0,				/*tp_setattro*/
-    0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
-    "ktable object",           /* tp_doc */
-};
-
-//
-// new_ktable
-//
-
-static PyObject* new_ktable(PyObject * self, PyObject * args)
-{
-    unsigned int size = 0;
-
-    if (!PyArg_ParseTuple(args, "I", &size)) {
-        return NULL;
-    }
-
-    khmer_KTableObject * ktable_obj = (khmer_KTableObject *) \
-                                      PyObject_New(khmer_KTableObject, &khmer_KTableType);
-    if (ktable_obj == NULL) {
-        return NULL;
-    }
-
-    ktable_obj->ktable = new KTable(size);
-
-    return (PyObject *) ktable_obj;
-}
-
-//
-// khmer_ktable_dealloc -- clean up a table object.
-//
-
-static void khmer_ktable_dealloc(PyObject* self)
-{
-    khmer_KTableObject * obj = (khmer_KTableObject *) self;
-    delete obj->ktable;
-    obj->ktable = NULL;
-
-    PyObject_Del((PyObject *) obj);
-}
-
-static PyObject * ktable_update(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    khmer_KTableObject * other_o;
-
-    if(!PyArg_ParseTuple(args, "O!", &khmer_KTableType, &other_o)) {
-        return NULL;
-    }
-
-    KTable * other = other_o->ktable;
-
-    ktable->update(*other);
-
-    Py_RETURN_NONE;
-}
-
-static PyObject * ktable_intersect(PyObject * self, PyObject * args)
-{
-    khmer_KTableObject * me = (khmer_KTableObject *) self;
-    KTable * ktable = me->ktable;
-
-    khmer_KTableObject * other_o;
-
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KTableType, &other_o)) {
-        return NULL;
-    }
-
-    KTable * other = other_o->ktable;
-
-    KTable * intersection = ktable->intersect(*other);
-
-    khmer_KTableObject * ktable_obj = (khmer_KTableObject *) \
-                                      PyObject_New(khmer_KTableObject, &khmer_KTableType);
-    if (ktable_obj == NULL) {
-        delete intersection;
-        return NULL;
-    }
-    ktable_obj->ktable = intersection;
-
-    return (PyObject *) ktable_obj;
-}
-
-/***********************************************************************/
-
-//
 // KCountingHash object
 //
 
@@ -1841,7 +1423,7 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned int trim_at;
+    unsigned long trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     BoundedCounterType min_count = min_count_i;
@@ -1854,7 +1436,7 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("OI", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
 
     return ret;
@@ -1865,13 +1447,13 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     CountingHash * counting = me->counting;
 
     const char * seq = NULL;
-    unsigned int max_count_i = 0;
+    unsigned long max_count_i = 0;
 
     if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
         return NULL;
     }
 
-    unsigned int trim_at;
+    unsigned long trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     BoundedCounterType max_count = max_count_i;
@@ -1884,7 +1466,7 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("OI", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
 
     return ret;
@@ -2043,7 +1625,7 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
     std::vector<HashIntoType> ts = counting->get_tablesizes();
 
     PyObject * x = PyList_New(ts.size());
-    for (unsigned int i = 0; i < ts.size(); i++) {
+    for (size_t i = 0; i < ts.size(); i++) {
         PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(ts[i]));
     }
 
@@ -2307,11 +1889,11 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
 
 static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
 {
-    unsigned int k = 0;
+    WordLength k = 0;
     PyListObject * sizes_list_o = NULL;
     unsigned int n_threads = 1;
 
-    if (!PyArg_ParseTuple(args, "IO!|I", &k, &PyList_Type, &sizes_list_o,
+    if (!PyArg_ParseTuple(args, "bO!|I", &k, &PyList_Type, &sizes_list_o,
                           &n_threads)) {
         return NULL;
     }
@@ -2322,9 +1904,17 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
         return NULL;
     }
-    for (int i = 0; i < sizes_list_o_length; i++) {
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
         PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-        sizes.push_back(PyLong_AsLongLong(size_o));
+        if (PyInt_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+        } else if (PyLong_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+        } else {
+            return NULL;
+        }
     }
 
     khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
@@ -2544,7 +2134,7 @@ static PyObject * hashbits_n_tags(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyInt_FromLong(hashbits->n_tags());
+    return PyInt_FromSize_t(hashbits->n_tags());
 }
 
 static PyObject * hashbits_count(PyObject * self, PyObject * args)
@@ -2703,8 +2293,8 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self, PyObje
 
     CountingHash * counting = counting_o->counting;
 
-    unsigned int next_largest = subset_p->repartition_largest_partition(distance,
-                                threshold, frequency, *counting);
+    unsigned long next_largest = subset_p->repartition_largest_partition(distance,
+                                 threshold, frequency, *counting);
 
     return PyInt_FromLong(next_largest);
 }
@@ -2789,7 +2379,7 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned int trim_at;
+    size_t trim_at;
     Py_BEGIN_ALLOW_THREADS
 
     trim_at = hashbits->trim_on_stoptags(seq);
@@ -2800,7 +2390,7 @@ static PyObject * hashbits_trim_on_stoptags(PyObject * self, PyObject * args)
     if (trim_seq == NULL) {
         return NULL;
     }
-    PyObject * ret = Py_BuildValue("OI", trim_seq, trim_at);
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, (unsigned long) trim_at);
     Py_DECREF(trim_seq);
 
     return ret;
@@ -3296,7 +2886,7 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
         output_unassigned = true;
     }
 
-    unsigned int n_partitions = 0;
+    size_t n_partitions = 0;
 
     try {
         SubsetPartition * subset_p = hashbits->partition;
@@ -3423,10 +3013,10 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    unsigned int n_partitions = 0, n_unassigned = 0;
+    size_t n_partitions = 0, n_unassigned = 0;
     hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("II", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -3441,10 +3031,10 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
     SubsetPartition * subset_p;
     subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
 
-    unsigned int n_partitions = 0, n_unassigned = 0;
+    size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("II", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", n_partitions, n_unassigned);
 }
 
 static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
@@ -3901,7 +3491,7 @@ static PyObject * hashbits_get_hashsizes(PyObject * self, PyObject * args)
     std::vector<HashIntoType> ts = hashbits->get_tablesizes();
 
     PyObject * x = PyList_New(ts.size());
-    for (unsigned int i = 0; i < ts.size(); i++) {
+    for (size_t i = 0; i < ts.size(); i++) {
         PyList_SET_ITEM(x, i, PyLong_FromUnsignedLongLong(ts[i]));
     }
 
@@ -4041,7 +3631,7 @@ khmer_hashbits_getattr(PyObject * obj, char * name)
 
 // __new__ for hashbits; necessary for proper subclassing
 // This will essentially do what the old factory function did. Unlike many __new__
-// methods, we take our arguments here, because there's no "unitialized" hashbits
+// methods, we take our arguments here, because there's no "uninitialized" hashbits
 // object; we have to have k and the table sizes before creating the new objects
 static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObject * kwds)
 {
@@ -4049,18 +3639,27 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
     self = (khmer_KHashbitsObject *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        unsigned int k = 0;
+        WordLength k = 0;
         PyListObject* sizes_list_o = NULL;
 
-        if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
         std::vector<HashIntoType> sizes;
-        for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
+        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            sizes.push_back(PyLong_AsLongLong(size_o));
+            if (PyInt_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+            } else if (PyLong_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+            } else if (PyFloat_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+            } else {
+                return NULL;
+            }
         }
 
         self->hashbits = new Hashbits(k, sizes);
@@ -4088,10 +3687,10 @@ static PyObject * subset_count_partitions(PyObject * self,
         return NULL;
     }
 
-    unsigned int n_partitions = 0, n_unassigned = 0;
+    size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("II", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", n_partitions, n_unassigned);
 }
 
 static PyObject * subset_report_on_partitions(PyObject * self,
@@ -4298,7 +3897,7 @@ static void khmer_labelhash_dealloc(PyObject* obj)
     //PyObject_Del((PyObject *) obj);
 }
 
-// a little wierd; we don't actually want to call Hashbits' new method. Rather, we
+// a little weird; we don't actually want to call Hashbits' new method. Rather, we
 // define our own new method, and redirect the base's hashbits object to point to our
 // labelhash object
 static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -4307,19 +3906,29 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
     self = (khmer_KLabelHashObject*)type->tp_alloc(type, 0);
 
     if (self!=NULL) {
-        unsigned int k = 0;
+        WordLength k = 0;
         PyListObject * sizes_list_o = NULL;
 
-        if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
+        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
             Py_DECREF(self);
             return NULL;
         }
 
         std::vector<HashIntoType> sizes;
-        for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
+        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
             PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-            sizes.push_back(PyLong_AsLongLong(size_o));
+            if (PyInt_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+            } else if (PyLong_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+            } else if (PyFloat_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+            } else {
+                return NULL;
+            }
         }
+
 
         // We want the hashbits pointer in the base class to point to our labelhash,
         // so that the KHashbits methods are called on the correct object (a LabelHash)
@@ -4513,7 +4122,7 @@ static PyObject * labelhash_sweep_label_neighborhood(PyObject * self, PyObject *
     return x;
 }
 
-// Similar to find_all_tags, but returns tags in a way actually useable by python
+// Similar to find_all_tags, but returns tags in a way actually usable by python
 // need a tags_in_sequence iterator or function in c++ land for reuse in all
 // these functions
 static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self, PyObject *args)
@@ -4615,7 +4224,7 @@ static PyObject * labelhash_n_labels(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    return PyInt_FromLong(labelhash->n_labels());
+    return PyInt_FromSize_t(labelhash->n_labels());
 }
 
 static PyMethodDef khmer_labelhash_methods[] = {
@@ -4828,18 +4437,28 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
 
 static PyObject* _new_hashbits(PyObject * self, PyObject * args)
 {
-    unsigned int k = 0;
+    WordLength k = 0;
     PyListObject * sizes_list_o = NULL;
 
-    if (!PyArg_ParseTuple(args, "IO!", &k, &PyList_Type, &sizes_list_o)) {
+    if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
         return NULL;
     }
 
     std::vector<HashIntoType> sizes;
-    for (int i = 0; i < PyList_GET_SIZE(sizes_list_o); i++) {
+    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
         PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-        sizes.push_back(PyLong_AsLongLong(size_o));
+        if (PyInt_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+        } else if (PyLong_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+        } else if (PyFloat_Check(size_o)) {
+            sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+        } else {
+            return NULL;
+        }
     }
+
 
     khmer_KHashbitsObject * khashbits_obj = (khmer_KHashbitsObject *) \
                                             PyObject_New(khmer_KHashbitsObject, &khmer_KHashbitsType);
@@ -5035,10 +4654,6 @@ static PyMethodDef KhmerMethods[] = {
     },
 #endif
     {
-        "new_ktable",		new_ktable,
-        METH_VARARGS,		"Create an empty ktable"
-    },
-    {
         "new_hashtable",		new_hashtable,
         METH_VARARGS,		"Create an empty single-table counting hash"
     },
@@ -5080,7 +4695,6 @@ init_khmer(void)
     using namespace python;
 
     khmer_ConfigType.ob_type	      = &PyType_Type;
-    khmer_KTableType.ob_type	      = &PyType_Type;
     khmer_KCountingHashType.ob_type   = &PyType_Type;
 
     // implemented __new__ for Hashbits; keeping factory func around as well

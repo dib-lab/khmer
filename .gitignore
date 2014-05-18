@@ -1,3 +1,4 @@
+*.lo
 *.pyc
 *.o
 *.so
@@ -27,3 +28,6 @@ pylint.out
 .coverage
 doxygen.out
 doc/doxygen
+third-party/zlib/zconf.h
+sloccount.sc
+cov-int/

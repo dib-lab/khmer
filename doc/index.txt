@@ -6,9 +6,10 @@
 khmer -- k-mer counting & filtering FTW
 =======================================
 
-:Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe, 
-          Eric McDonald, Joshua Nahum, Kaben Nanlohy, Jason Pell, Jared Simpson,
-          Camille Scott, Qingpeng Zhang, and C. Titus Brown
+:Authors: Michael R. Crusoe, Greg Edvenson, Jordan Fish, Adina Howe,
+          Luiz Irber, Eric McDonald, Joshua Nahum, Kaben Nanlohy, Humberto
+          Ortiz-Zuazaga, Jason Pell, Jared Simpson, Camille Scott, Ramakrishnan
+          Rajaram Srinivasan, Qingpeng Zhang, and C. Titus Brown
 
 :Contact: khmer-project@idyll.org
 :License: BSD
@@ -47,15 +48,13 @@ Contents:
    guide
    scripts
    blog-posts
-   choosing-hash-sizes
+   choosing-table-sizes
    partitioning-big-data
-   ktable
    design
    details
    development
    galaxy
    known-issues
-   sequence-access-patterns
    release
    crazy-ideas
    contributors

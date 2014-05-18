@@ -1,7 +1,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 
 #
@@ -284,13 +285,13 @@ def test_save_load_tagset():
     ht.load_tagset(outfile)              # implicitly => clear_tags=True
     ht.save_tagset(outfile)
 
-    # if tags have been cleared, then the new tagfile will be larger (30 bytes)
-    # else smaller (22 bytes).
+    # if tags have been cleared, then the new tagfile will be larger (34 bytes)
+    # else smaller (26 bytes).
 
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 22, len(data)
+    assert len(data) == 26, len(data)
 
 
 def test_save_load_tagset_noclear():
@@ -306,13 +307,13 @@ def test_save_load_tagset_noclear():
     ht.load_tagset(outfile, False)       # set clear_tags => False; zero tags
     ht.save_tagset(outfile)
 
-    # if tags have been cleared, then the new tagfile will be large (30 bytes);
-    # else small (22 bytes).
+    # if tags have been cleared, then the new tagfile will be large (34 bytes);
+    # else small (26 bytes).
 
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 30, len(data)
+    assert len(data) == 34, len(data)
 
 
 @attr('highmem')

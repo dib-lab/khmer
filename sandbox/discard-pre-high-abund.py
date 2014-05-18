@@ -1,8 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Eliminate reads with median k-mer abundance higher than DESIRED_COVERAGE.
@@ -68,7 +69,7 @@ def parse_args(parser):
         print >>sys.stderr, \
             'Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize)' % (
-            args.n_hashes * args.min_hashsize)
+                args.n_hashes * args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     return args

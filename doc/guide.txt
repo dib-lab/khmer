@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 An assembly handbook for khmer - rough draft
 ############################################
 
@@ -53,7 +55,7 @@ There's some documentation here:
 
    https://khmer.readthedocs.org/en/latest/
 
-There's also a khmer mailing list at lists.idyll.orgm that you can use to
+There's also a khmer mailing list at lists.idyll.org that you can use to
 get help with khmer.  To sign up, just go to 
 `the khmer lists page <http://lists.idyll.org/listinfo/khmer>`__ and
 subscribe.
@@ -70,14 +72,14 @@ All of our scripts will take in .fq or .fastq files as FASTQ, and all
 other files as FASTA.  gzip files are always accepted.  Let us know if
 not; that's a bug!
 
-Most scripts *output* fasta, and some mangle headers.  Sorry.  We're
+Most scripts *output* FASTA, and some mangle headers.  Sorry.  We're
 working on outputting FASTQ for FASTQ input, and removing any header
 mangling.
 
-Picking hash table sizes and k parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Picking k-mer table sizes and k parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For hash table sizes, read :doc:`choosing-hash-sizes`
+For k-mer table sizes, read :doc:`choosing-table-sizes`
 
 For k-mer sizes, we recommend k=20 for digital normalization and k=32
 for partitioning; then assemble with a variety of k parameters.
@@ -93,8 +95,8 @@ For high-coverage libraries (> ~50x), do three-pass digital
 normalization: run normalize-by-median to C=20 and then run
 filter-abund with C=1.  Now split out the remaining
 paired-end/interleaved and single-end reads using
-strip-and-split-for-assembly, and normalize-by-median the pe and se
-files to C=5 (in that order).
+strip-and-split-for-assembly, and normalize-by-median the paired-end and
+single-end files to C=5 (in that order).
 
 For low-coverage libraries (< 50x) do single-pass digital normalization:
 run normalize-by-median to C=10.
@@ -197,16 +199,16 @@ you should load in paired end reads, or longer reads, first.
 Iterative and independent normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use --loadhash and --savehash to do iterative normalizations on
-multiple files in multiple steps. For example, break ::
+You can use :option:`--loadtable` and :option:`--savetable` to do iterative
+normalizations on multiple files in multiple steps. For example, break ::
 
   normalize-by-median.py [ ... ] file1.fa file2.fa file3.fa
 
 into multiple steps like so::
 
-  normalize-by-median.py [ ... ] --savehash file1.kh file1.fa
-  normalize-by-median.py [ ... ] --loadhash file1.kh --savehash file2.kh file2.fa
-  normalize-by-median.py [ ... ] --loadhash file2.kh --savehash file3.kh file3.fa
+  normalize-by-median.py [ ... ] --savetable file1.kh file1.fa
+  normalize-by-median.py [ ... ] --loadtable file1.kh --savetable file2.kh file2.fa
+  normalize-by-median.py [ ... ] --loadtable file2.kh --savetable file3.kh file3.fa
 
 The results should be identical!
 

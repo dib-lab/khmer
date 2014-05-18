@@ -1,3 +1,10 @@
+#! /usr/bin/env python2
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2013. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+#
 import khmer
 import sys
 import screed
@@ -19,12 +26,12 @@ for n, record in enumerate(screed.open(input_fasta)):
         print >>sys.stderr, '...loaded and tagged {} sequences'.format(n)
     name = record.name
     sequence = record.sequence
-    
+
     ht.consume_sequence_and_tag_with_labels(sequence, n)
     tags = ht.sweep_tag_neighborhood(sequence, 0)
-    for i in xrange(len(tags)-1):
+    for i in xrange(len(tags) - 1):
         src = tags[i]
-        dst = tags[i+1]
+        dst = tags[i + 1]
 
         new = False
 
@@ -40,7 +47,7 @@ for n, record in enumerate(screed.open(input_fasta)):
         if not dstv:
             dstv = sparse_graph.add_vertex()
             hashes[dstv] = dst
-            new = True        
+            new = True
         else:
             dstv = dstv[0]
 
@@ -50,6 +57,8 @@ for n, record in enumerate(screed.open(input_fasta)):
 print 'Sparse graph has {} nodes, {} edges'.format(sparse_graph.num_vertices(), sparse_graph.num_edges())
 comp = gt.label_largest_component(sparse_graph, directed=False)
 #pos = gt.radial_tree_layout(sparse_graph, sparse_graph.vertex(0))
-gt.graph_draw(sparse_graph, output_size=(5000,5000), output=input_fasta+'_sparse.png')
+gt.graph_draw(sparse_graph, output_size=(
+    5000, 5000), output=input_fasta + '_sparse.png')
 sparse_graph.set_vertex_filter(comp)
-gt.graph_draw(sparse_graph, output_size=(5000,5000), output=input_fasta+'_sparse_comp.png')
+gt.graph_draw(sparse_graph, output_size=(
+    5000, 5000), output=input_fasta + '_sparse_comp.png')

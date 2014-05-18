@@ -2,10 +2,10 @@
 This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 Copyright (C) Michigan State University, 2009-2014. It is licensed under
 the three-clause BSD license; see doc/LICENSE.txt.
+
 Contact: khmer-project@idyll.org
 '''
 
-from khmer._khmer import new_ktable
 from khmer._khmer import _new_counting_hash
 from khmer._khmer import _new_hashbits
 from khmer._khmer import set_reporting_callback
@@ -14,7 +14,7 @@ from khmer._khmer import _Hashbits
 from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
 
 from khmer._khmer import forward_hash  # figuregen/*.py
-# tests/test_{functions,counting_hash,ktable,labelhash,counting_single}.py
+# tests/test_{functions,counting_hash,labelhash,counting_single}.py
 
 from khmer._khmer import new_hashtable
 # sandbox/{occupy,ctb-iterative-bench{-2-old}}.py
@@ -22,11 +22,11 @@ from khmer._khmer import new_hashtable
 
 from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 
-from khmer._khmer import reverse_hash  # tests/test_{functions,ktable}.py
+from khmer._khmer import reverse_hash  # tests/test_functions.py
 # tests/counting_single.py
 
 from khmer._khmer import get_config  # tests/test_read_parsers.py
-# tests/test_{khmer_config,ktable}.py
+# tests/test_khmer_config.py
 # scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 

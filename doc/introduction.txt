@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 =====================
 Introduction to khmer
 =====================
@@ -11,7 +13,7 @@ assembly of metagenomes and mRNA.
 
 khmer can be used for a number of transformations, include inexact
 transformations (abundance filtering and error trimming) and exact
-transformations (graphsize filtering, to throw away disconnected
+transformations (graph-size filtering, to throw away disconnected
 reads; and partitioning, to split reads into disjoint sets).  Of
 these, only partitioning is not constant memory.  In all cases, the
 memory required for assembly with Velvet or another de Bruijn graph
@@ -21,9 +23,11 @@ Velvet, either, although we may not be able to *decrease* the memory
 required for assembly for every data set.
 
 Most of khmer relies on an underlying probabilistic data structure
-known as a `Bloom filter <http://en.wikipedia.org/wiki/Bloom_filter>`__ (also see `MinCount Sketch <http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf>`__), which is essentially a set of
-hash tables, each of different size, with no collision detection.
-These hash tables are used to store the presence of specific k-mers
+known as a `Bloom filter <http://en.wikipedia.org/wiki/Bloom_filter>`__
+(also see `MinCount Sketch
+<http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf>`__), which is
+essentially a set of hash tables, each of different size, with no collision
+detection. These hash tables are used to store the presence of specific k-mers
 and/or their count.  The lack of collision detection means that
 the Bloom filter may report a k-mer as being "present" when it is
 not, in fact, in the data set; however, it will never incorrectly
@@ -69,7 +73,7 @@ Practical considerations
 The most important thing to think about when using khmer is whether or
 not the transformation or filter you're applying is appropriate for
 the data you're trying to assemble.  Two of the most powerful
-operations available in khmer, graphsize filtering and graph
+operations available in khmer, graph-size filtering and graph
 partitioning, only make sense for assembly datasets with many
 theoretically unconnected components.  This is typical of metagenomic
 data sets.
@@ -77,7 +81,7 @@ data sets.
 The second most important consideration is memory usage.  The
 effectiveness of all of the Bloom filter-based functions (which is
 everything interesting in khmer!) depends critically on having enough
-memory to do a good job.  See :doc:`choosing-hash-sizes` for more
+memory to do a good job.  See :doc:`choosing-table-sizes` for more
 information.
 
 Copyright and license

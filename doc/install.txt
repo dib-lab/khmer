@@ -58,19 +58,9 @@ Linux
 Latest stable release
 ---------------------
 
-#) Check your pip version::
+#) Use pip to download, build, and install khmer and its dependencies::
 
-	pip --version
-
-#) Use pip to download, build, and install khmer and its dependencies.
-
-   - If you're running version 1.5 or greater of ``pip``::
-   
-        pip install --allow-external argparse khmer
-        
-   - For ``pip`` version 1.4.1 and earlier::
-   
-	    pip install khmer
+      pip install khmer
 
 #) The scripts are now in the ``env/bin`` directory and ready for your
    use. You can directly use them by name, see :doc:`scripts`.
@@ -83,13 +73,7 @@ Latest stable release
 Latest development branch
 -------------------------
 
-Repeat the above but modify the pip install line.
-
-- If you're running version 1.5 or greater of ``pip`` then::
-
-	pip install --allow-external argparse git+https://github.com/ged-lab/khmer.git@master#egg=khmer
-
-- For ``pip`` version 1.4.1 and earlier::
+Repeat the above but modify the pip install line::
 
    pip install git+https://github.com/ged-lab/khmer.git@master#egg=khmer
 

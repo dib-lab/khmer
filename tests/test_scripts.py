@@ -1,17 +1,21 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
+
+# pylint: disable=C0111,C0103,E1103,W0612
+
 import sys
 import os
 import shutil
 from cStringIO import StringIO
-import subprocess
 import traceback
 
-import khmer_tst_utils as utils
+import tests.khmer_tst_utils as utils
 import khmer
+import khmer.file
 import screed
 
 
@@ -51,6 +55,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
             print 'arguments', sysargs
             execfile(scriptname, {'__name__': '__main__'})
             status = 0
+        except SystemExit, e:
+            status = e.code
         except:
             traceback.print_exc(file=sys.stderr)
             status = -1
@@ -62,6 +68,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
         os.chdir(cwd)
 
     if status != 0 and not fail_ok:
+        print out
+        print err
         raise Exception(status, out, err)
 
     return status, out, err
@@ -103,38 +111,11 @@ def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
 
     return status, "", ""
 
-#
 
-
-# When testing argparse related options execfile does not work
-# TODO: figure out why replacing runscript with popenscript uses more memory
-def popenscript(scriptname, args, in_directory=None, fail_ok=False):
-    """
-    Run the given Python script, with the given args, in the given directory,
-    using 'Popen'.
-    """
-
-    out, err = None, None
-
-    try:
-        print 'running:', scriptname, 'in:', in_directory
-        print 'arguments', args
-        complete_args = [scriptname]
-        complete_args.extend(args)
-        process = subprocess.Popen(complete_args,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   cwd=in_directory)
-        out, err = process.communicate()
-        status = process.returncode
-    except:
-        traceback.print_exc(file=sys.stderr)
-        status = -1
-
-    if status != 0 and not fail_ok:
-        raise Exception(status, out, err)
-
-    return status, out, err
+def test_check_space():
+    # @CTB this probably belongs in a new test file, along with other
+    # tests of the file.py module.
+    khmer.file.check_space(['', utils.get_test_data('test-abund-read-2.fa')])
 
 
 def test_load_into_counting():
@@ -160,9 +141,7 @@ def test_load_into_counting_fail():
     args.extend([outfile, infile])
 
     (status, out, err) = runscript(script, args, fail_ok=True)
-    print out
-    print err
-    assert status == -1
+    assert status == 1, status
     assert "ERROR:" in err
 
 
@@ -386,10 +365,20 @@ def test_normalize_by_median():
 
 
 def test_normalize_by_median_version():
-
     script = scriptpath('normalize-by-median.py')
     args = ['--version']
-    status, out, err = popenscript(script, args)
+    status, out, err = runscript(script, args)
+
+    errlines = err.splitlines()
+    for err in errlines:
+        if err.startswith('||') or \
+           not err.strip():
+            continue
+        break
+
+    print errlines
+    print err
+
     assert err.startswith('khmer ')
 
 
@@ -466,12 +455,12 @@ def test_normalize_by_median_force():
 
     (status, out, err) = runscript(script, args, in_dir)
 
-    test_ht = khmer.load_counting_hash(corrupt_infile + '.ht.failed')
+    test_ht = khmer.load_counting_hash(corrupt_infile + '.ct.failed')
     test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
     test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
     assert test_ht.count(test_good_read[:17]) > 0
     assert test_ht.count(test_good_read2[:17]) > 0
-    assert os.path.exists(corrupt_infile + '.ht.failed')
+    assert os.path.exists(corrupt_infile + '.ct.failed')
     assert '*** Skipping' in err
     assert '** IOErrors' in err
 
@@ -486,7 +475,7 @@ def test_normalize_by_median_no_bigcount():
     counting_ht = _make_counting(infile, K=8)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', '1000', '-k 8', '--savehash', hashfile, infile]
+    args = ['-C', '1000', '-k 8', '--savetable', hashfile, infile]
 
     (status, out, err) = runscript(script, args, in_dir)
     assert status == 0, (out, err)
@@ -516,13 +505,13 @@ def test_normalize_by_median_dumpfrequency():
 
     (status, out, err) = runscript(script, args, in_dir)
 
-    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ht'))
+    test_ht = khmer.load_counting_hash(os.path.join(in_dir, 'backup.ct'))
     test_good_read = 'CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'
     test_good_read2 = 'TAGTATCATCAAGGTTCAAGATGTTAATGAATAACAATTGCGCAGCAA'
     assert test_ht.count(test_good_read[:17]) > 0
     assert test_ht.count(test_good_read2[:17]) > 0
 
-    assert os.path.exists(os.path.join(in_dir, 'backup.ht'))
+    assert os.path.exists(os.path.join(in_dir, 'backup.ct'))
     assert out.count('Backup: Saving') == 2
     assert 'Nothing' in out
 
@@ -576,7 +565,7 @@ def test_load_graph():
 
     runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -604,7 +593,7 @@ def test_load_graph_no_tags():
 
     runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -626,16 +615,16 @@ def test_load_graph_fail():
     args.extend([outfile, infile])
 
     (status, out, err) = runscript(script, args, fail_ok=True)
-    assert status == -1
+    assert status == 1, status
     assert "ERROR:" in err
 
 
-def _make_graph(infilename, SIZE=1e7, N=2, K=20,
+def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                 do_partition=False,
                 annotate_partitions=False,
                 stop_big_traverse=False):
     script = scriptpath('load-graph.py')
-    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data(infilename)
@@ -644,7 +633,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
 
     runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -658,7 +647,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
         runscript(script, args)
 
         script = scriptpath('merge-partitions.py')
-        args = [outfile, '-k', str(K)]
+        args = [outfile, '-k', str(ksize)]
         runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
@@ -666,7 +655,7 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
 
         if annotate_partitions:
             script = scriptpath('annotate-partitions.py')
-            args = ["-k", str(K), outfile, infilename]
+            args = ["-k", str(ksize), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
             runscript(script, args, in_dir)
@@ -677,12 +666,12 @@ def _make_graph(infilename, SIZE=1e7, N=2, K=20,
     return outfile
 
 
-def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
+def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
                       do_partition=False,
                       annotate_partitions=False,
                       stop_big_traverse=False):
     script = scriptpath('load-graph.py')
-    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data(infilename)
@@ -691,7 +680,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
 
     DEBUG_runscript(script, args)
 
-    ht_file = outfile + '.ht'
+    ht_file = outfile + '.ct'
     assert os.path.exists(ht_file), ht_file
 
     tagset_file = outfile + '.tagset'
@@ -707,7 +696,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
 
         print ">>>> DEBUG: Merging Partitions <<<"
         script = scriptpath('merge-partitions.py')
-        args = [outfile, '-k', str(K)]
+        args = [outfile, '-k', str(ksize)]
         DEBUG_runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
@@ -716,7 +705,7 @@ def _DEBUG_make_graph(infilename, SIZE=1e7, N=2, K=20,
         if annotate_partitions:
             print ">>>> DEBUG: Annotating Partitions <<<"
             script = scriptpath('annotate-partitions.py')
-            args = ["-k", str(K), outfile, infilename]
+            args = ["-k", str(ksize), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
             DEBUG_runscript(script, args, in_dir)
@@ -742,7 +731,7 @@ def test_partition_graph_1():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -752,7 +741,7 @@ def test_partition_graph_1():
 
 def test_partition_graph_nojoin_k21():
     # test with K=21
-    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), K=21)
+    graphbase = _make_graph(utils.get_test_data('random-20-a.fa'), ksize=21)
 
     script = scriptpath('partition-graph.py')
     args = [graphbase]
@@ -766,7 +755,7 @@ def test_partition_graph_nojoin_k21():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -779,7 +768,7 @@ def test_partition_graph_nojoin_stoptags():
     graphbase = _make_graph(utils.get_test_data('random-20-a.fa'))
 
     # add in some stop tags
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.add_stop_tag('TTGCATACGTTGAGCCAGCG')
     stoptags_file = graphbase + '.stoptags'
     ht.save_stop_tags(stoptags_file)
@@ -798,7 +787,7 @@ def test_partition_graph_nojoin_stoptags():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -813,7 +802,7 @@ def test_partition_graph_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -829,7 +818,7 @@ def test_partition_graph_no_big_traverse():
     final_pmap_file = graphbase + '.pmap.merged'
     assert os.path.exists(final_pmap_file)
 
-    ht = khmer.load_hashbits(graphbase + '.ht')
+    ht = khmer.load_hashbits(graphbase + '.pt')
     ht.load_tagset(graphbase + '.tagset')
     ht.load_partitionmap(final_pmap_file)
 
@@ -862,7 +851,7 @@ def test_annotate_partitions_2():
     # test with K=21 (no joining of sequences)
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = _make_graph(seqfile, do_partition=True,
-                            K=21)
+                            ksize=21)
     in_dir = os.path.dirname(graphbase)
 
     # get the final pmap file
@@ -941,6 +930,124 @@ def test_extract_partitions_fq():
     quals = set([r.accuracy for r in screed.open(partfile)])
     quals = list(quals)
     assert quals[0], quals
+
+
+def test_extract_partitions_output_unassigned():
+    seqfile = utils.get_test_data('random-20-a.fa')
+    graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-U', 'extracted', partfile]
+
+    runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    unassigned_file = os.path.join(in_dir, 'extracted.unassigned.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+    assert os.path.exists(unassigned_file)
+
+    dist = open(distfile).readline()
+    assert dist.strip() == '99 1 1 99'
+
+    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    assert len(parts) == 99, len(parts)
+    parts = set(parts)
+    assert len(parts) == 1, len(parts)
+
+
+def test_extract_partitions_no_output_groups():
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = _make_graph(
+        seqfile, do_partition=True, annotate_partitions=True)
+    in_dir = os.path.dirname(graphbase)
+
+    # get the final part file
+    partfile = os.path.join(in_dir, 'random-20-a.fa.part')
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-n', 'extracted', partfile]
+
+    # We expect a sys.exit -> we need the test to be tolerant
+    runscript(script, args, in_dir, fail_ok=True)
+
+    # Group files are created after output_groups is
+    # checked. They should not exist in this scenario
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    assert not os.path.exists(groupfile)
+
+
+def test_extract_partitions_pid_0():
+    basefile = utils.get_test_data('random-20-a.fa.part')
+    partfile = utils.get_temp_filename('random-20-a.fa.part')
+    shutil.copyfile(basefile, partfile)
+
+    in_dir = os.path.dirname(partfile)
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-U', 'extracted', partfile]
+
+    runscript(script, args, in_dir)
+
+    distfile = os.path.join(in_dir, 'extracted.dist')
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+    unassigned_file = os.path.join(in_dir, 'extracted.unassigned.fa')
+    assert os.path.exists(distfile)
+    assert os.path.exists(groupfile)
+    assert os.path.exists(unassigned_file)
+
+    # Assert unassigned file not empty
+    unassigned_content = open(unassigned_file).readline()
+    assert unassigned_content.strip().split('\t')[0] != ''
+
+
+def test_extract_partitions_multi_groups():
+    basefile = utils.get_test_data('random-20-a.fa.part')
+    partfile = utils.get_temp_filename('random-20-a.fa.part')
+    shutil.copyfile(basefile, partfile)
+
+    in_dir = os.path.dirname(partfile)
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['-m', '1', '-X', '1', 'extracted', partfile]
+
+    runscript(script, args, in_dir)
+
+    # Multiple group files are created after should be created
+    groupfile1 = os.path.join(in_dir, 'extracted.group0000.fa')
+    groupfile2 = os.path.join(in_dir, 'extracted.group0001.fa')
+    groupfile3 = os.path.join(in_dir, 'extracted.group0002.fa')
+    assert os.path.exists(groupfile1)
+    assert os.path.exists(groupfile2)
+    assert os.path.exists(groupfile3)
+
+
+def test_extract_partitions_no_groups():
+    empty_file = utils.get_temp_filename('empty-file')
+    basefile = utils.get_test_data('empty-file')
+
+    shutil.copyfile(basefile, empty_file)
+    in_dir = os.path.dirname(empty_file)
+
+    # ok, now run extract-partitions.
+    script = scriptpath('extract-partitions.py')
+    args = ['extracted', empty_file]
+
+    runscript(script, args, in_dir, fail_ok=True)
+
+    # No group files should be created
+    groupfile = os.path.join(in_dir, 'extracted.group0000.fa')
+
+    assert not os.path.exists(groupfile)
 
 
 def test_abundance_dist():
@@ -1257,7 +1364,7 @@ def test_sample_reads_randomly():
     script = scriptpath('sample-reads-randomly.py')
     # fix random number seed for reproducibility
     args = ['-N', '10', '-R', '1']
-    args.append('test.fq')
+    args.append(infile)
     runscript(script, args, in_dir)
 
     outfile = infile + '.subset'
@@ -1271,7 +1378,7 @@ def test_sample_reads_randomly():
                         '895:1:1:1335:19932', '895:1:1:1340:19387'])
 
 
-def test_sweep_reads_by_partition_buffered():
+def test_sweep_reads_buffered():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
     in_dir = os.path.dirname(contigfile)
@@ -1279,14 +1386,15 @@ def test_sweep_reads_by_partition_buffered():
     shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
-    script = scriptpath('sweep-reads-by-partition-buffered.py')
-    args = ['-k', '25', '-o', 'test',
+    script = scriptpath('sweep-reads-buffered.py')
+    args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
-    status, out, err = runscript(script, args, in_dir)
+
+    status, out, err = runscript(script, args, in_dir, fail_ok=True)
 
     # check if the bad file was skipped without issue
-    assert 'ERROR' in err
-    assert 'skipping' in err
+    assert 'ERROR' in err, err
+    assert 'skipping' in err, err
 
     out1 = os.path.join(in_dir, 'test_0.fa')
     out2 = os.path.join(in_dir, 'test_1.fa')
@@ -1309,3 +1417,87 @@ def test_sweep_reads_by_partition_buffered():
     assert (seqsm == set(['read4_multi\t0\t1']) or
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
+
+    try:
+        os.remove(out1)
+        os.remove(out2)
+        os.remove(mout)
+        os.remove(oout)
+    except (IOError, OSError) as e:
+        print >>sys.stderr, 'error removing test outputs'
+
+
+def test_sweep_reads_buffered_2():
+
+    infile = utils.get_temp_filename('seqs.fa')
+    inref = utils.get_temp_filename('ref.fa')
+    shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
+    wdir = os.path.dirname(inref)
+    script = scriptpath('sweep-reads-buffered.py')
+    args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
+            'test', '--label-by-seq', inref, infile]
+    status, out, err = runscript(script, args, wdir)
+
+    for i in xrange(99):
+        p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
+        print p, err, out
+        assert os.path.exists(p)
+        os.remove(p)
+    assert os.path.exists(os.path.join(wdir, 'test.counts.csv'))
+    assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
+    assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
+
+
+def test_sweep_reads_buffered_3():
+
+    infile = utils.get_temp_filename('seqs.fa')
+    shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
+    wdir = os.path.dirname(infile)
+    script = scriptpath('sweep-reads-buffered.py')
+    args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
+            'test', '--label-by-group', '10', infile, infile]
+    status, out, err = runscript(script, args, wdir)
+
+    for i in xrange(10):
+        p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
+        print p, err, out
+        assert os.path.exists(p)
+        os.remove(p)
+
+    counts_fn = os.path.join(wdir, 'test.counts.csv')
+    with open(counts_fn) as cfp:
+        for line in cfp:
+            _, _, c = line.partition(',')
+            assert int(c) in [9, 10]
+
+    assert os.path.exists(counts_fn)
+    assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
+    assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
+
+
+def test_count_overlap():
+    seqfile1 = utils.get_temp_filename('test-overlap1.fa')
+    in_dir = os.path.dirname(seqfile1)
+    seqfile2 = utils.get_temp_filename('test-overlap2.fa', in_dir)
+    outfile = utils.get_temp_filename('overlap.out', in_dir)
+    curvefile = utils.get_temp_filename('overlap.out.curve', in_dir)
+    shutil.copy(utils.get_test_data('test-overlap1.fa'), seqfile1)
+    shutil.copy(utils.get_test_data('test-overlap2.fa'), seqfile2)
+    htfile = _make_graph(seqfile1, ksize=20)
+    script = scriptpath('count-overlap.py')
+    args = ['--ksize', '20', '--n_tables', '2', '--min-tablesize', '10000000',
+            htfile + '.pt', seqfile2, outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert status == 0
+    assert os.path.exists(outfile), outfile
+    data = [x.strip() for x in open(outfile)]
+    data = set(data)
+    assert '# of unique k-mers in dataset2: 759047' in data
+    assert '# of overlap unique k-mers: 245621' in data
+    assert os.path.exists(curvefile), curvefile
+    data = [x.strip() for x in open(curvefile)]
+    data = set(data)
+    assert '178633 1155' in data
+    assert '496285 2970' in data
+    assert '752053 238627' in data

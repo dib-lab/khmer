@@ -1,7 +1,8 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// the three-clause BSD license; see doc/LICENSE.txt.
+// Contact: khmer-project@idyll.org
 //
 
 #include "kmer.hh"
@@ -15,7 +16,7 @@ namespace khmer
 Kmer::Kmer(std::string kmer)
 {
     _hash(kmer.c_str(), kmer.size(), h, r);
-    k = kmer.size();
+    k = (unsigned int) kmer.size();
 
     if (kmer == _revhash(h, k)) {
         direction = 1;

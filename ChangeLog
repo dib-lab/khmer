@@ -1,12 +1,573 @@
+2014-05-14  Adam Caldwell  <adam.caldwell@gmail.com>
+
+    * Makefile: change pip to pip2. Fixes assorted make problems on systems
+    where pip links to pip3
+
+2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{zlib,bzip2} -> third-party/
+    * setup.{cfg,py}: Move third party libraries to their own directory
+    * Makefile: add sloccount target for humans and the sloccount.sc target for
+   Jenkins
+
+2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{zlib,bzip2} -> third-party/
+    * setup.{cfg,py}: Move third party libraries to their own directory
+    * Makefile: add sloccount target for humans and the sloccount.sc target for
+   Jenkins
+
+2014-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/release.txt: additional fixes
+
+2014-05-09  Luiz Irber  <irberlui@msu.edu>
+
+    Version 1.0.1
+
+2014-05-09  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/release.txt: update release instructions
+
+2014-05-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{subset,counting}.cc: fix cppcheck errors; astyle -A10
+    --max-code-length=80
+
+2014-05-06  Titus Brown  <titus@idyll.org>
+
+    * sandbox/calc-best-assembly.py: added script to calculate best
+    assembly from a list of contig/scaffold files
+	
+2014-04-23  Titus Brown  <titus@idyll.org>
+
+    * scripts/abundance-dist-single.py: fixed problem where ReadParser was
+    being created anew for each thread; regression introduced in 4b823fc.
+
+2014-04-22  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    *.py: switch to explicit python2 invocation. Fixes #385.
+
+2014-04-21  Titus Brown  <t@idyll.org>
+
+    * doc/development.txt: added spellcheck to review checklist
+
+2014-04-21  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: updated FP rate to match latest info from
+      Qingpeng's paper; corrected spelling error.
+
+2014-04-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * setup.py,doc/installing.txt: Remove argparse from the requirements
+    unless it isn't available. Argparse is bundled with Python 2.7+. This
+    simplifies the installation instructions.
+
+2014-04-17  Ram RS  <ramrs@nyu.edu>
+
+    * scripts/make-initial-stoptags.py: fixed bug that threw error on
+     missing .ht input file while actual expected input file is .pt
+
+2014-04-11  Titus Brown  <t@idyll.org>
+
+    * scripts/*.py: fixed argument to check_space_for_hashtable to rely
+    on args.n_tables and not args.ksize.
+
+2014-04-06  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: added comment about table compatibility
+    with abundance-dist.
+
+2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
+    * ChangeLog: fix date for 1.0 release, email addresses
+
+2014-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    Version 1.0
+    * Makefile: run 'build' command before install; ignore _version.py for
+    coverage purposes.
+    * bink.ipynb: deleted
+    * doc/choosing-hash-sizes.txt -> choosing-table-sizes.txt
+    * setup.py,doc/{conf.py,index.txt}: update lists of authors
+    * doc/development.txt: typo
+    * doc/{galaxy,guide,index,introduction,scripts}.txt: remove some
+    references to implementation details of the k-mer tables
+    * doc/{known-issues,release}.txt: updated
+    * khmer/*.cc,lib/*.{cc,hh}: astyle -A10 formatted
+    * lib/read_parsers.cc: fixed case statement fall through
+    * lib/subset.cc: removed unnecessary NULL check (CID 1054804 & 1195088)
+    * scripts/*.py: additional documentation updates
+    * tests/test-data/test-overlap1.ht,data/MSB2-surrender.fa &
+    data/1m-filtered.fa: removed from repository history, .git is now 36M!
+
+2014-04-01  Titus Brown  <t@idyll.org>
+
+    * CITATION,khmer/khmer_args.py: Updated khmer software citation for
+    release.
+
+2014-03-31  Titus Brown  <t@idyll.org>
+
+    * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
+    20a433c2.
+
+    * khmer/file.py: Fixed incorrect use of __file__ dirname instead of
+    os.getcwd(); also fixed bug where statvfs would choke on an empty
+    dirname resulting from input files being in the cwd.
+
+2014-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * versioneer.py,ez_setup.py: updated to version 0.10 and 3.4.1
+    respectively.
+    * docs/release.txt,khmer/_version.py,MANIFEST.in: update ancillary
+    versioneer files
+
+2014-03-31  Titus Brown  <t@idyll.org>
+
+    * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
+    and added citation information to each script.
+    * CITATION: added basic citation information for khmer functionality.
+
+2013-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt,scripts/*.py,khmer/*.py: overhaul the documentation of
+    the scripts. Uses sphinxcontrib.autoprogram to leverage the existing
+    argparse objects. Moved the documentation into each script + misc cleanups.
+    All scripts support the --version option. Migrated the last scripts to use
+    khmer_args
+    * docs/blog-posts.txt: removed outdated reference to filter-exact.py; its
+    replacement filter-abund.py is better documented in the eel-pond protocol
+    * figuregen/,novelty/,plots/,templatem/,scripts/do-partition.sh: removed
+    outdated code not part of core project
+
+2013-03-30  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * setup.py: monkeypatched distutils.Distribution.reinitialize_command() so
+    that it matches the behavior of Distribution.get_command_obj(). This fixes
+    issues with 'pip install -e' and './setup.py nosetests' not respecting the
+    setup.cfg configuration directives for the build_ext command. Also
+    enhanced our build_ext command to respect the dry_run mode.
+
+    * .ycm_extra_conf.py: Update our custom YouCompleteMe configuration to
+    query the package configuration for the proper compilation flags.
+
+2014-03-28  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile,setup.py: demote nose & sphinx to extra dependencies.
+    Auto-install Python developer tools as needed.
+
+2013-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * The system zlib and bzip2 libraries are now used instead of the bundled
+    versions if specified in setup.cfg or the command line.
+
+2014-03-25  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: update cppcheck command to match new version of Jenkins
+    plugin. Now ignores the lib/test*.cc files.
+
+2013-03-20  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/storage.hh,khmer/_khmermodule.cc,lib/{readtable,read_parsers}.hh:
+    remove unused storage.hh
+
+2014-03-19  Qingpeng Zhang  <qingpeng@msu.edu>
+
+    * hashbits.cc: fix a bug of 'Division or modulo by zero' described in #182
+    * test_scripts.py: add test code for count-overlap.py
+    * count-overlap.py: (fix a bug because of a typo and hashsize was replaced
+    by min_hashsize)
+    * count-overlap.py: needs hashbits table generated by load-graph.py. 
+    This information is added to the "usage:" line.
+    * count-overlap.py: fix minor PyLint issues
+
+2014-03-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Update bundled zlib version to 1.2.8 from 1.2.3. Changes of note:
+    "Wholesale replacement of gz* functions with faster versions"
+    "Added LFS (Large File Summit) support for 64-bit file offsets"
+    "Fix serious but very rare decompression bug"
+
+2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/counting.hh: include hashtable.hh
+    * lib/{counting,aligner,hashbits,hashtable,labelhash,node,subset}.{cc,hh},
+    kmer.cc,khmer/_khmermodule.cc: removed downcast, replaced non-functional
+    asserts() with exception throws.
+    * khmer/_khmermodule.cc: fixed parsing of PyLists
+    * setup.py: force 64bit only builds on OS X.
+
+2014-03-19  Titus Brown  <t@idyll.org>
+
+    * Makefile: update documentation on targets at top; clean autopep8 output.
+    * test_counting_single.py: fixed pep8 violations in spacing
+    * test_scripts.py: eliminate popenscript in favor of proper SystemExit
+	handling in runscript; fix pep8 violations.
+
+2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu> and Luiz Irber
+<luiz.irber@gmail.com>
+
+    * lib/ktable.{cc,hh},khmer/{__init__.py},{_khmermodule.cc}, tests/
+    test_{counting_{hash,single},ktable}.py: remove the unused KTable object
+    * doc/{index,ktable}.txt: remove references to KTable
+    * lib/{ktable.{hh,cc} → kmer_hash.{hh,cc}}: rename remaining ktable files
+    to kmer_hash
+    * lib/{hashtable,kmer}.hh: replace ktable headers with kmer_hash
+
+2014-03-17  Ram RS  <ramrs@nyu.edu>
+
+    * extract-partitions.py: pylint warnings addressed
+    * test_scripts.py: tests added to cover extract-partitions completely
+
+2014-03-16  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/read_parsers.cc: fix for Coverity CID 1054789: Unititialized scalar
+    field II: fill_id is never zeroed out.
+
+2014-03-16  Ram RS  <ramrs@nyu.edu>
+
+    * Project email in copyright headers updated
+
+2014-03-14  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc, lib/{khmer.hh, hashtable.{cc,hh}},
+    tests/test_{hashbits,hashbits_obj,labelhash}.py: don't implicitly downcast
+    tagset_size(). Changes fileformat version for saved tagsets.
+
 2014-03-13  Ram RS  <ramrs@nyu.edu>
 
-	* Bug fix: tests.test_normalize_by_median_no_bigcount() now runs
-	within temp directory
+    * added: khmer/file.py - script to check disk space, check input file
+    status and check space before hashtable writing
+    * modified: scripts/*.py - all scripts now use khmer.file for above-mentioned
+    functionality.
+    * modified: scripts/*.py - pylint violations addressed in all scripts
+    under scripts/
 
-2014-03-11  Michael R. Crusoe  <mcrusoe@athyra>
+2014-03-13  Ram RS  <ramrs@nyu.edu>
+
+    * Bug fix: tests.test_normalize_by_median_no_bigcount() now runs within
+    temp directory
+
+2014-03-11  Michael R. Crusoe  <mcrusoe@mcrusoe.edu>
 
     * lib/read_parsers.hh: fix for Coverity CID 1054789: Uninitialized scalar
     field
+
+2014-03-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/development.txt: document fork/tag policy + formatting fixes
+
+2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/trace_logger.{cc,hh}: fix for Coverity CID 1063852: Uninitialized
+    scalar field (UNINIT_CTOR) 
+    * lib/node.cc: fix for Coverity CID 1173035:  Uninitialized scalar field
+    (UNINIT_CTOR)
+    * lib/hashbits.hh: fix for Coverity CID 1153101:  Resource leak in object
+    (CTOR_DTOR_LEAK)
+    * lib/{perf_metrics.{cc,hh},hashtable.{cc,hh}
+    ,read_parsers.{cc,hh},trace_logger.{cc,hh}}: ifndef WITH_INTERNAL_METRICS
+    then lets not + astyle -A10
+
+2014-02-27  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * tagged: version 0.8
+    * setup.py: Specify a known working version of setuptools so we don't
+    force an unneeded and awkward upgrade.
+    * setup.py: We aren't zipsafe, mark as such
+
+2014-02-18  Michael R. Crusoe <mcrusoe@msu.edu>
+
+* Normalized C++ namespace usage to fix CID 1054792
+* Updated install instructions. We recommend OS X users and those Linux
+users without root access to install virtualenv instead of pip.
+* New documentation: doc/known-issues.txt
+* Added code review checklist & other guidance: doc/development.txt
+
+2014-02-03  Camille Scott <camille.scott.w@gmail.com>
+
+* Standardized command line arguments in khmer_args; added version flag
+
+* Added support for sparse graph labeling
+
+* Added script to reinflate partitions from read files using the 
+  labeling system, called sweep-reads-by-partition-buffered.py
+
+* Implemented __new__ methods for Hashbits, enforced inheritance
+  hierarchy between it and the new LabelHash class both in C++
+  and CPython API
+
+2013-12-20  Titus Brown  <titus@idyll.org>
+
+* Fixed output_partitioned_file, sweep-reads3.py, and extract-partitions.py
+  to retain FASTQ format in output.
+
+2013-12-11  Michael R. Crusoe <mcrusoe@msu.edu>
+
+* normalize-by-median.py: new optional argument: --record-filenames to specify
+a path where a list of all the output filenames will be written to. Will
+be used to better integrate with Galaxy.
+
+* All commands that use the counting args now support the --version switch
+
+* abundance-dist-single.py, abundance-dist.py, do-partition.py,
+interleave-reads.py, load-graph.py, load-into-counting.py
+normalize-by-median.py now exit with return code 1 instead of 255 as is
+standard.
+
+2013-12-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* doc/install.txt Add setup instructions for RHEL6 & fix invocation to get
+master branch to work for non-developers
+
+2013-12-18  Titus Brown  <titus@idyll.org>
+
+* Added a test to ensure that normalize-by-median.py has bigcount set to
+  False.
+
+2013-11-22  Camille Scott  <camille.scott.w@gmail.com>
+
+* Makefile: Added debug target for profiling.
+
+2013-11-22  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Documented release process
+
+2013-10-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.7
+
+* New script: sample-reads-randomly.py which does a single pass random
+subsample using reservoir sampling.
+
+* the version number is now only stored in one place
+
+* Makefile: new dist, cppcheck, pep8, and autopep8 targets for developers.
+VERSION is now set by versioneer and exported to C/C++ code.
+
+* README switched from MarkDown to ReStructuredText format to clean up PyPI
+listing. Install count badge added.
+
+* doc/: updates to how the scripts are called. Sphinx now pulls version
+number from versioneer. C/Python integration is now partially documented.
+Reference to bleeding-edge has been removed. Release instructions have been
+clarified and simplified.
+
+* all python code in khmer/, scripts/, and tests/ should be PEP8 compliant now.
+
+* khmer/_khmermodule.cc has gotten a once-over with cpychecker. Type errors
+were eliminated and the error checking has improved.
+
+* Several fixes motivated by the results of a Coverity C/C++ scan. 
+
+* Tests that require greater than 0.5 gigabytes of memory are now annotated as
+being 'highmem' and be skipped by changing two lines in setup.cfg
+
+* warnings about -Wstrict-prototypes will no longer appear
+
+* contributors to this release are: ctb, mr-c and camillescott. 
+
+2013-10-15  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.6.1
+
+* No code changes, just build fixes
+
+2013-10-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+* Version 0.6
+
+* Switch to setuptools to run the entire build
+
+* The various Makefiles have been merged into one inside lib for posterity
+
+* A new top-level Makefile wraps "python setup.py"
+
+* argparse.py has been removed and is installed automatically by setuptools/pip
+
+* setup.py and the python/khmer directory have been moved to the root of the
+project to conform to the standard layout
+
+* The project contact address is now khmer-project@idyll.org
+
+* Due to the new build system the project now easily builds under OS X + XCode
+
+* In light of the above the installation instructions have been rewritten
+
+* Sphinx now builds the documentation without warnings or errors
+
+* It is now easy to calculate code coverage.
+
+* setup.py is now PEP8 compliant
+2014-04-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: run 'build' command before install; ignore _version.py for
+    coverage purposes.
+    * bink.ipynb: deleted
+    * doc/choosing-hash-sizes.txt -> choosing-table-sizes.txt
+    * setup.py,doc/{conf.py,index.txt}: update lists of authors
+    * doc/development.txt: typo
+    * doc/{galaxy,guide,index,introduction,scripts}.txt: remove some
+    references to implementation details of the k-mer tables
+    * doc/{known-issues,release}.txt: updated
+    * khmer/*.cc,lib/*.{cc,hh}: astyle -A10 formatted
+    * lib/read_parsers.cc: fixed case statement fall through
+    * lib/subset.cc: removed unnecessary NULL check (CID 1054804 & 1195088)
+    * scripts/*.py: additional documentation updates
+    * tests/test-data/test-overlap1.ht,data/MSB2-surrender.fa &
+    data/1m-filtered.fa: removed from repository history, .git is now 36M!
+
+2014-03-31  Titus Brown  <ctb@msu.edu>
+
+    * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
+    20a433c2.
+
+    * khmer/file.py: Fixed incorrect use of __file__ dirname instead of
+    os.getcwd(); also fixed bug where statvfs would choke on an empty
+    dirname resulting from input files being in the cwd.
+
+2014-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * versioneer.py,ez_setup.py: updated to version 0.10 and 3.4.1
+    respectively.
+    * docs/release.txt,khmer/_version.py,MANIFEST.in: update ancillary
+    versioneer files
+
+2014-03-31  Titus Brown  <ctb@msu.edu>
+
+    * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
+    and added citation information to each script.
+    * CITATION: added basic citation information for khmer functionality.
+
+2013-03-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt,scripts/*.py,khmer/*.py: overhaul the documentation of
+    the scripts. Uses sphinxcontrib.autoprogram to leverage the existing
+    argparse objects. Moved the documentation into each script + misc cleanups.
+    All scripts support the --version option. Migrated the last scripts to use
+    khmer_args
+    * docs/blog-posts.txt: removed outdated reference to filter-exact.py; its
+    replacement filter-abund.py is better documented in the eel-pond protocol
+    * figuregen/,novelty/,plots/,templatem/,scripts/do-partition.sh: removed
+    outdated code not part of core project
+
+2013-03-30  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * setup.py: monkeypatched distutils.Distribution.reinitialize_command() so
+    that it matches the behavior of Distribution.get_command_obj(). This fixes
+    issues with 'pip install -e' and './setup.py nosetests' not respecting the
+    setup.cfg configuration directives for the build_ext command. Also
+    enhanced our build_ext command to respect the dry_run mode.
+
+    * .ycm_extra_conf.py: Update our custom YouCompleteMe configuration to
+    query the package configuration for the proper compilation flags.
+
+2014-03-28  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile,setup.py: demote nose & sphinx to extra dependencies.
+    Auto-install Python developer tools as needed.
+
+2013-03-27  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * The system zlib and bzip2 libraries are now used instead of the bundled
+    versions if specified in setup.cfg or the command line.
+
+2014-03-25  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: update cppcheck command to match new version of Jenkins
+    plugin. Now ignores the lib/test*.cc files.
+
+2013-03-20  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/storage.hh,khmer/_khmermodule.cc,lib/{readtable,read_parsers}.hh:
+    remove unused storage.hh
+
+2014-03-19  Qingpeng Zhang  <qingpeng@msu.edu>
+
+    * hashbits.cc: fix a bug of 'Division or modulo by zero' described in #182
+    * test_scripts.py: add test code for count-overlap.py
+    * count-overlap.py: (fix a bug because of a typo and hashsize was replaced
+    by min_hashsize)
+    * count-overlap.py: needs hashbits table generated by load-graph.py. 
+    This information is added to the "usage:" line.
+    * count-overlap.py: fix minor PyLint issues
+
+2014-03-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Update bundled zlib version to 1.2.8 from 1.2.3. Changes of note:
+    "Wholesale replacement of gz* functions with faster versions"
+    "Added LFS (Large File Summit) support for 64-bit file offsets"
+    "Fix serious but very rare decompression bug"
+
+2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/counting.hh: include hashtable.hh
+    * lib/{counting,aligner,hashbits,hashtable,labelhash,node,subset}.{cc,hh},
+    kmer.cc,khmer/_khmermodule.cc: removed downcast, replaced non-functional
+    asserts() with exception throws.
+    * khmer/_khmermodule.cc: fixed parsing of PyLists
+    * setup.py: force 64bit only builds on OS X.
+
+2014-03-19  Titus Brown  <t@idyll.org>
+
+    * Makefile: update documentation on targets at top; clean autopep8 output.
+    * test_counting_single.py: fixed pep8 violations in spacing
+    * test_scripts.py: eliminate popenscript in favor of proper SystemExit
+	handling in runscript; fix pep8 violations.
+
+2014-03-19  Michael R. Crusoe <mcrusoe@msu.edu> and Luiz Irber
+<luiz.irber@gmail.com>
+
+    * lib/ktable.{cc,hh},khmer/{__init__.py},{_khmermodule.cc}, tests/
+    test_{counting_{hash,single},ktable}.py: remove the unused KTable object
+    * doc/{index,ktable}.txt: remove references to KTable
+    * lib/{ktable.{hh,cc} → kmer_hash.{hh,cc}}: rename remaining ktable files
+    to kmer_hash
+    * lib/{hashtable,kmer}.hh: replace ktable headers with kmer_hash
+
+2014-03-17  Ram RS  <ramrs@nyu.edu>
+
+    * extract-partitions.py: pylint warnings addressed
+    * test_scripts.py: tests added to cover extract-partitions completely
+
+2014-03-16  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/read_parsers.cc: fix for Coverity CID 1054789: Unititialized scalar
+    field II: fill_id is never zeroed out.
+
+2014-03-16  Ram RS  <ramrs@nyu.edu>
+
+    * Project email in copyright headers updated
+
+2014-03-14  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc, lib/{khmer.hh, hashtable.{cc,hh}},
+    tests/test_{hashbits,hashbits_obj,labelhash}.py: don't implicitly downcast
+    tagset_size(). Changes fileformat version for saved tagsets.
+
+2014-03-13  Ram RS  <ramrs@nyu.edu>
+
+    * added: khmer/file.py - script to check disk space, check input file
+    status and check space before hashtable writing
+    * modified: scripts/*.py - all scripts now use khmer.file for above-mentioned
+    functionality.
+    * modified: scripts/*.py - pylint violations addressed in all scripts
+    under scripts/
+
+2014-03-13  Ram RS  <ramrs@nyu.edu>
+
+    * Bug fix: tests.test_normalize_by_median_no_bigcount() now runs within
+    temp directory
+
+2014-03-11  Michael R. Crusoe  <mcrusoe@mcrusoe.edu>
+
+    * lib/read_parsers.hh: fix for Coverity CID 1054789: Uninitialized scalar
+    field
+
+2014-03-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/development.txt: document fork/tag policy + formatting fixes
 
 2014-03-03  Michael R. Crusoe  <mcrusoe@msu.edu>
 

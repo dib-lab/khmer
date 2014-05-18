@@ -1,11 +1,13 @@
-#! /usr/bin/env python
-import sys, khmer
+#! /usr/bin/env python2
+import sys
+import khmer
 import argparse
 import screed
 
-K=20
-N=4
-X=1e8
+K = 20
+N = 4
+X = 1e8
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -14,7 +16,7 @@ def main():
     outfp = open('out', 'w')
 
     kh = khmer.new_counting_hash(K, X, N)
-    
+
     for filename in args.readfiles:
         for n, record in enumerate(screed.open(filename)):
             if n % 1000 == 0:
@@ -26,7 +28,7 @@ def main():
                     p_cov = dict(p.partition_average_coverages(kh))
 
                     p_sizes_items = p_sizes.items()
-                    p_sizes_items.sort(key=lambda x:x[1], reverse=True)
+                    p_sizes_items.sort(key=lambda x: x[1], reverse=True)
 
                     for k, size in p_sizes_items[:5]:
                         print '\tp %d: size %d, avg cov %d' % (k, size, p_cov[k])
@@ -34,7 +36,7 @@ def main():
                     largest_p = p_sizes_items[0][0]
                     if p_cov[largest_p] > 100:
                         pass
-#break
+# break
 
             seq = record.sequence.upper()
 
