@@ -1,3 +1,8 @@
+2014-05-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: add target for python test coverage plain-text report;
+    clarified where the HTML report is
+
 2014-05-30  Titus Brown  <t@idyll.org>
 
     * khmer/_khmermodule.cc: remove merge2* functions: unused, untested.
