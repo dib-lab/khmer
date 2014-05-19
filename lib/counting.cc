@@ -89,8 +89,8 @@ BoundedCounterType CountingHash::get_max_count(const std::string &s)
 
 HashIntoType *
 CountingHash::abundance_distribution(
-    read_parsers::IParser *	parser,
-    Hashbits *			tracking)
+    read_parsers::IParser * parser,
+    Hashbits *          tracking)
 {
     HashIntoType * dist = new HashIntoType[MAX_BIGCOUNT + 1];
     HashIntoType i;
@@ -138,8 +138,8 @@ CountingHash::abundance_distribution(
 
 
 HashIntoType * CountingHash::abundance_distribution(
-    std::string	filename,
-    Hashbits *	tracking)
+    std::string filename,
+    Hashbits *  tracking)
 {
     IParser* parser = IParser::get_parser(filename.c_str());
 
@@ -147,11 +147,11 @@ HashIntoType * CountingHash::abundance_distribution(
 }
 
 HashIntoType * CountingHash::fasta_count_kmers_by_position(
-    const std::string 	&inputfile,
-    const unsigned int 	max_read_len,
-    BoundedCounterType	limit_by_count,
-    CallbackFn		callback,
-    void * 		callback_data)
+    const std::string   &inputfile,
+    const unsigned int  max_read_len,
+    BoundedCounterType  limit_by_count,
+    CallbackFn      callback,
+    void *      callback_data)
 {
     unsigned long long *counts = new unsigned long long[max_read_len];
 
@@ -206,10 +206,10 @@ HashIntoType * CountingHash::fasta_count_kmers_by_position(
 }
 
 void CountingHash::fasta_dump_kmers_by_abundance(
-    const std::string	&inputfile,
-    BoundedCounterType	limit_by_count,
-    CallbackFn		callback,
-    void *		callback_data)
+    const std::string   &inputfile,
+    BoundedCounterType  limit_by_count,
+    CallbackFn      callback,
+    void *      callback_data)
 {
     Read read;
     IParser* parser = IParser::get_parser(inputfile.c_str());
@@ -266,9 +266,9 @@ void CountingHash::load(std::string infilename)
 }
 
 void CountingHash::get_kadian_count(
-    const std::string 	&s,
-    BoundedCounterType 	&kadian,
-    unsigned int	nk)
+    const std::string   &s,
+    BoundedCounterType  &kadian,
+    unsigned int    nk)
 {
     std::vector<BoundedCounterType> counts;
     KMerIterator kmers(s.c_str(), _ksize);
@@ -282,7 +282,7 @@ void CountingHash::get_kadian_count(
     if (!counts.size()) {
         throw std::exception();
     }
-    unsigned int kpos = nk*_ksize;
+    unsigned int kpos = nk * _ksize;
 
     if (counts.size() < kpos) {
         kadian = 0;
@@ -302,135 +302,9 @@ void CountingHash::get_kadian_count(
 #endif // 0
 }
 
-
-void CountingHash::get_kmer_abund_mean(
-    const std::string	&filename,
-    unsigned long long	&total,
-    unsigned long long	&count,
-    float		&mean) const
-{
-    total = 0;
-    count = 0;
-    mean = 0.0;
-
-    Read read;
-    IParser* parser = IParser::get_parser(filename.c_str());
-    string name;
-    string seq;
-
-    while(!parser->is_complete()) {
-        read = parser->get_next_read();
-        seq = read.sequence;
-
-        if (check_and_normalize_read(seq)) {
-            for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-                string kmer = seq.substr(i, i + _ksize);
-                BoundedCounterType n = get_count(kmer.c_str());
-
-                total += n;
-                count ++;
-            }
-
-            name.clear();
-            seq.clear();
-        }
-
-    }
-
-    delete parser;
-
-    if (count == 0) {
-        throw InvalidReadFileFormat(NULL, "no counts");
-    }
-
-    mean = float(total) / float(count);
-}
-
-void CountingHash::get_kmer_abund_abs_deviation(
-    const std::string	&filename,
-    float		mean,
-    float		&abs_deviation) const
-{
-    float total = 0.0;
-    unsigned long long count = 0;
-
-    Read read;
-    IParser* parser = IParser::get_parser(filename.c_str());
-    string name;
-    string seq;
-
-    while(!parser->is_complete()) {
-        read = parser->get_next_read();
-        seq = read.sequence;
-
-        if (check_and_normalize_read(seq)) {
-            for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
-                string kmer = seq.substr(i, i + _ksize);
-                BoundedCounterType n = get_count(kmer.c_str());
-
-                float diff = mean - (unsigned int)n;
-                if (diff < 0) {
-                    diff = -diff;
-                }
-                total += diff;
-                count ++;
-            }
-
-            name.clear();
-            seq.clear();
-        }
-
-    }
-
-    delete parser;
-
-    if (count == 0) {
-        throw InvalidReadFileFormat(NULL, "no counts");
-    }
-
-    abs_deviation = total / float(count);
-}
-
-unsigned int CountingHash::max_hamming1_count(const std::string kmer_s)
-{
-    std::string ksub;
-
-    unsigned int max_count = 0;
-    for (unsigned int i = 0; i < _ksize; i++) {
-        unsigned int the_count;
-
-        ksub = kmer_s;
-        ksub[i] = 'A';
-        the_count = get_count(ksub.c_str());
-        if (the_count > max_count) {
-            max_count = the_count;
-        }
-
-        ksub[i] = 'C';
-        the_count = get_count(ksub.c_str());
-        if (the_count > max_count) {
-            max_count = the_count;
-        }
-
-        ksub[i] = 'G';
-        the_count = get_count(ksub.c_str());
-        if (the_count > max_count) {
-            max_count = the_count;
-        }
-
-        ksub[i] = 'T';
-        the_count = get_count(ksub.c_str());
-        if (the_count > max_count) {
-            max_count = the_count;
-        }
-    }
-
-    return max_count;
-}
-
 unsigned long CountingHash::trim_on_abundance(
-    std::string		seq,
-    BoundedCounterType	min_abund)
+    std::string     seq,
+    BoundedCounterType  min_abund)
 const
 {
     if (!check_and_normalize_read(seq)) {
@@ -465,8 +339,8 @@ const
 
 
 unsigned long CountingHash::trim_below_abundance(
-    std::string		seq,
-    BoundedCounterType	max_abund)
+    std::string     seq,
+    BoundedCounterType  max_abund)
 const
 {
     if (!check_and_normalize_read(seq)) {
@@ -501,12 +375,12 @@ const
 
 
 void CountingHashFile::load(
-    const std::string	&infilename,
-    CountingHash	&ht)
+    const std::string   &infilename,
+    CountingHash    &ht)
 {
     std::string filename(infilename);
     size_t found = filename.find_last_of(".");
-    std::string type = filename.substr(found+1);
+    std::string type = filename.substr(found + 1);
 
     if (type == "gz") {
         CountingHashGzFileReader(filename, ht);
@@ -517,12 +391,12 @@ void CountingHashFile::load(
 
 
 void CountingHashFile::save(
-    const std::string	&outfilename,
-    const CountingHash	&ht)
+    const std::string   &outfilename,
+    const CountingHash  &ht)
 {
     std::string filename(outfilename);
     size_t found = filename.find_last_of(".");
-    std::string type = filename.substr(found+1);
+    std::string type = filename.substr(found + 1);
 
     if (type == "gz") {
         CountingHashGzFileWriter(filename, ht);
@@ -533,8 +407,8 @@ void CountingHashFile::save(
 
 
 CountingHashFileReader::CountingHashFileReader(
-    const std::string	&infilename,
-    CountingHash	&ht)
+    const std::string   &infilename,
+    CountingHash    &ht)
 {
     ifstream infile;
     // configure ifstream to raise exceptions for everything.
@@ -577,13 +451,13 @@ CountingHashFileReader::CountingHashFileReader(
                 << " while reading k-mer count file from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_COUNTING_HT)) {
-            std::ostringstream err;
-            err << "Incorrect file format type " << (int) ht_type
-                << " while reading k-mer count file from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
-        }
+        } else
+            if (!(ht_type == SAVED_COUNTING_HT)) {
+                std::ostringstream err;
+                err << "Incorrect file format type " << (int) ht_type
+                    << " while reading k-mer count file from " << infilename;
+                throw khmer_file_exception(err.str().c_str());
+            }
 
         infile.read((char *) &use_bigcount, 1);
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -646,8 +520,8 @@ CountingHashFileReader::CountingHashFileReader(
 }
 
 CountingHashGzFileReader::CountingHashGzFileReader(
-    const std::string	&infilename,
-    CountingHash	&ht)
+    const std::string   &infilename,
+    CountingHash    &ht)
 {
     gzFile infile = gzopen(infilename.c_str(), "rb");
     if (infile == Z_NULL) {
@@ -673,32 +547,33 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     int read_v = gzread(infile, (char *) &version, 1);
     int read_t = gzread(infile, (char *) &ht_type, 1);
 
-    if (read_v <=0 || read_t <= 0) {
+    if (read_v <= 0 || read_t <= 0) {
         std::string err = "K-mer count file read error: " + infilename;
         throw khmer_file_exception(err.c_str());
-    } else if (!(version == SAVED_FORMAT_VERSION)
-               || !(ht_type == SAVED_COUNTING_HT)) {
-        if (!(version == SAVED_FORMAT_VERSION)) {
-            std::ostringstream err;
-            err << "Incorrect file format version " << (int) version
-                << " while reading k-mer count file from " << infilename
-                << "; should be " << (int) SAVED_FORMAT_VERSION;
-            throw khmer_file_exception(err.str().c_str());
+    } else
+        if (!(version == SAVED_FORMAT_VERSION)
+                || !(ht_type == SAVED_COUNTING_HT)) {
+            if (!(version == SAVED_FORMAT_VERSION)) {
+                std::ostringstream err;
+                err << "Incorrect file format version " << (int) version
+                    << " while reading k-mer count file from " << infilename
+                    << "; should be " << (int) SAVED_FORMAT_VERSION;
+                throw khmer_file_exception(err.str().c_str());
+            } else
+                if (!(ht_type == SAVED_COUNTING_HT)) {
+                    std::ostringstream err;
+                    err << "Incorrect file format type " << (int) ht_type
+                        << " while reading k-mer count file from " << infilename;
+                    throw khmer_file_exception(err.str().c_str());
+                }
         }
-        else if (!(ht_type == SAVED_COUNTING_HT)) {
-            std::ostringstream err;
-            err << "Incorrect file format type " << (int) ht_type
-                << " while reading k-mer count file from " << infilename;
-            throw khmer_file_exception(err.str().c_str());
-        }
-    }
 
     int read_b = gzread(infile, (char *) &use_bigcount, 1);
     int read_k = gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
     int read_nt = gzread(infile, (char *) &save_n_tables,
                          sizeof(save_n_tables));
 
-    if (read_b <=0 || read_k <= 0 || read_nt <= 0) {
+    if (read_b <= 0 || read_k <= 0 || read_nt <= 0) {
         std::string err = "K-mer count file header read error: " + infilename;
         throw khmer_file_exception(err.c_str());
     }
@@ -718,7 +593,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
         if (read_b <= 0) {
             std::string err = "K-mer count file header read error: " \
-              + infilename;
+                              + infilename;
             throw khmer_file_exception(err.c_str());
         }
 
@@ -772,8 +647,8 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 }
 
 CountingHashFileWriter::CountingHashFileWriter(
-    const std::string	&outfilename,
-    const CountingHash	&ht)
+    const std::string   &outfilename,
+    const CountingHash  &ht)
 {
     if (!ht._counts[0]) {
         throw std::exception();
@@ -825,8 +700,8 @@ CountingHashFileWriter::CountingHashFileWriter(
 }
 
 CountingHashGzFileWriter::CountingHashGzFileWriter(
-    const std::string	&outfilename,
-    const CountingHash	&ht)
+    const std::string   &outfilename,
+    const CountingHash  &ht)
 {
     if (!ht._counts[0]) {
         throw std::exception();
@@ -881,10 +756,10 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
 }
 
 void CountingHash::collect_high_abundance_kmers(
-    const std::string	&filename,
-    unsigned int	lower_count,
-    unsigned int	upper_count,
-    SeenSet&		found_kmers)
+    const std::string   &filename,
+    unsigned int    lower_count,
+    unsigned int    upper_count,
+    SeenSet&        found_kmers)
 {
     unsigned long long total_reads = 0;
 

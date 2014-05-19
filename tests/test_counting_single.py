@@ -34,6 +34,29 @@ def test_collision():
     assert kh.get('TTTT') == 2
 
 
+def test_badcount():
+    countingtable = khmer.new_hashtable(4, 85)
+    try:
+        countingtable.count()
+        assert 0, "count should require one argument"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.count('ABCDE')
+        assert 0, "count should require k-mer size to be equal"
+    except ValueError, err:
+        print str(err)
+
+
+def test_hashtable_n_entries():
+    countingtable = khmer.new_hashtable(4, 4 ** 4)
+    try:
+        countingtable.n_entries("nope")
+        assert 0, "n_entries should accept no arguments"
+    except TypeError, err:
+        print str(err)
+
+
 def test_complete_no_collision():
     kh = khmer.new_hashtable(4, 4 ** 4)
 
@@ -276,6 +299,11 @@ class Test_ConsumeString(object):
         assert self.kh.n_occupied() == 1
         self.kh.consume('AACT')
         assert self.kh.n_occupied() == 2
+        try:
+            self.kh.n_occupied("MU", 1, 3)
+            assert 0, "n_occupied shouldn't accept three arguments"
+        except TypeError, err:
+            print str(err)
 
     @attr('highmem')
     def test_abundance_by_pos(self):

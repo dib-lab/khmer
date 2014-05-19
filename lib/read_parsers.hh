@@ -60,6 +60,8 @@ protected:
 class InvalidFASTAFileFormat: public InvalidReadFileFormat {
 
 public:
+
+public:
     InvalidFASTAFileFormat(
         char const * reason	= NULL,
         char const * evidence	= NULL
@@ -68,6 +70,8 @@ public:
 };
 
 class InvalidFASTQFileFormat: public InvalidReadFileFormat {
+
+public:
 
 public:
     InvalidFASTQFileFormat(
