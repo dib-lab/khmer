@@ -5,17 +5,17 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=invalid-name,missing-docstring
 
 """
 Convert FASTQ files to FASTA format.
 
-% python sandbox/fastq-to-fasta.py [ -N -o ] <fastq_name>
+% python sandbox/fastq-to-fasta.py [ -n -o ] <fastq_name>
 
 Use '-h' for parameter help.
 """
 import sys
 import argparse
-import os
 import screed
 
 
@@ -28,20 +28,19 @@ def get_parser():
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', help='The name of the output'
                         ' FASTA sequence file.')
-    parser.add_argument('-N', '--N_keep', default=False, action='store_true',
+    parser.add_argument('-n', '--n_keep', default=False, action='store_true',
                         help='Option to drop reads containing \'N\'s.')
     return parser
 
 
 def main():
     args = get_parser().parse_args()
-    infile = args.input
     print('fastq from ', args.input)
 
     if args.output:
         write_out = open(args.output, 'w')
 
-    N_count = 0
+    n_count = 0
     for n, record in enumerate(screed.open(sys.argv[1])):
         if n % 10000 == 0:
             print>>sys.stderr, '...', n
@@ -50,8 +49,8 @@ def main():
         name = record['name']
 
         if 'N' in sequence:
-            if not args.N_keep:
-                N_count += 1
+            if not args.n_keep:
+                n_count += 1
                 continue
         if args.output:
             write_out.write('>' + name + '\n')
@@ -62,8 +61,8 @@ def main():
 
     print '\n' + 'lines from ' + args.input
 
-    if not args.N_keep:
-        print >> sys.stderr, str(N_count) + ' lines dropped.'
+    if not args.n_keep:
+        print >> sys.stderr, str(n_count) + ' lines dropped.'
 
     else:
         print 'No lines dropped from file.'
