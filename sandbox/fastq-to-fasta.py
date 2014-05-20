@@ -5,6 +5,19 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+<<<<<<< Updated upstream
+=======
+# pylint: disable=invalid-name,missing-docstring
+
+"""
+Convert FASTQ files to FASTA format.
+
+% python sandbox/fastq-to-fasta.py [ -h ] [ -n ] [ -o <output> ] 
+
+
+Use '-h' for parameter help.
+"""
+>>>>>>> Stashed changes
 import sys
 sys.path.insert(0, '/u/t/dev/screed')
 import screed
