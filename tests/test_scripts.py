@@ -1517,14 +1517,20 @@ def test_fastq_to_fasta():
     n_outfile = n_infile + '.keep.fa'
     clean_outfile = clean_infile + '.keep.fa'
 
-    args = [clean_infile, '-n', '-o', clean_outfile]  
-    args2 = [n_infile, '-n', '-o', n_outfile]  
-
     in_dir = os.path.dirname(clean_infile)
     in_dir2 = os.path.dirname(n_infile)
 
+    args = [clean_infile, '-n', '-o', clean_outfile]  
+    args2 = [n_infile, '-n', '-o', n_outfile]  
+    
     runscript(script, args, in_dir)
     runscript(script, args2, in_dir)
 
     assert os.path.exists(clean_outfile), clean_outfile
     assert os.path.exists(n_outfile), n_outfile
+
+    args = [clean_infile, '-n', '-o', clean_outfile]  
+    args2 = [n_infile, '-n', '-o', n_outfile]  
+    
+    runscript(script, args, in_dir)
+    runscript(script, args2, in_dir)
