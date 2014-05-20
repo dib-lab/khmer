@@ -1501,3 +1501,30 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
+
+def test_fastq_to_fasta():
+    script = scriptpath('fastq-to-fasta.py')
+
+    n_infile = utils.get_temp_filename('test-n.fq')
+    clean_infile = utils.get_temp_filename('test-clean.fq',
+                                          tempdir=os.path.dirname(
+                                              n_infile))
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), n_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'),
+            clean_infile)
+
+
+    n_outfile = n_infile + '.keep.fa'
+    clean_outfile = clean_infile + '.keep.fa'
+
+    args = [clean_infile, '-n', '-o', clean_outfile]  
+    args2 = [n_infile, '-n', '-o', n_outfile]  
+
+    in_dir = os.path.dirname(clean_infile)
+    in_dir2 = os.path.dirname(n_infile)
+
+    runscript(script, args, in_dir)
+    runscript(script, args2, in_dir)
+
+    assert os.path.exists(clean_outfile), clean_outfile
+    assert os.path.exists(n_outfile), n_outfile
