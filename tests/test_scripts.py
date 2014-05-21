@@ -1503,34 +1503,54 @@ def test_count_overlap():
     assert '752053 238627' in data
 
 def test_fastq_to_fasta():
+
+    def run_test(script, args, in_dir, test_num, file_type):
+        (status, out, err) = runscript(script, args, in_dir)
+        print 'TEST #' + test_num + ' with ' + file_type + ':'
+
+        if '-n' in args:
+            print err
+            print out
+            assert "No lines dropped" in err
+            assert not "No lines dropped" in out
+        elif not '-n' in args:
+            print 'no -n!!!'
+            if file_type == "N_FILE":
+                print err
+                print out
+                assert "3 lines dropped" in err 
+                assert not "3 lines dropped" in out
+            if file_type == 'CLEAN_FILE':
+                print err
+                print out
+                assert "0 lines dropped" in err
+                assert not "0 lines dropped" in out
+        else:
+            print err
+            print 'LOGIC ERROR'
+            assert 1==0
+
     script = scriptpath('fastq-to-fasta.py')
-
+    clean_infile = utils.get_temp_filename('test-clean.fq')
     n_infile = utils.get_temp_filename('test-n.fq')
-    clean_infile = utils.get_temp_filename('test-clean.fq',
-                                          tempdir=os.path.dirname(
-                                              n_infile))
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), n_infile)
-    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'),
-            clean_infile)
 
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), clean_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
 
-    n_outfile = n_infile + '.keep.fa'
     clean_outfile = clean_infile + '.keep.fa'
+    n_outfile = n_infile + '.keep.fa'
 
     in_dir = os.path.dirname(clean_infile)
     in_dir2 = os.path.dirname(n_infile)
 
     args = [clean_infile, '-n', '-o', clean_outfile]  
     args2 = [n_infile, '-n', '-o', n_outfile]  
-    
-    runscript(script, args, in_dir)
-    runscript(script, args2, in_dir)
 
-    assert os.path.exists(clean_outfile), clean_outfile
-    assert os.path.exists(n_outfile), n_outfile
+    run_test(script, args, in_dir, '1', 'CLEAN_FILE')
+    run_test(script, args2, in_dir2, '1', 'N_FILE')
 
-    args = [clean_infile, '-n', '-o', clean_outfile]  
-    args2 = [n_infile, '-n', '-o', n_outfile]  
-    
-    runscript(script, args, in_dir)
-    runscript(script, args2, in_dir)
+    args = [clean_infile, '-o', clean_outfile]  
+    args2 = [n_infile, '-o', n_outfile]  
+
+    run_test(script, args, in_dir, '2', 'CLEAN_FILE')
+    run_test(script, args2, in_dir2, '2', 'N_FILE')
