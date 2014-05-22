@@ -114,6 +114,9 @@ Digital normalization
 Read handling: interleaving, splitting, etc.
 ============================================
 
+.. autoprogram:: sweep-reads-buffered:get_parser()
+        :prog: sweep-reads-buffered.py
+
 .. autoprogram:: extract-paired-reads:get_parser()
         :prog: extract-paired-reads.py
 
