@@ -583,3 +583,38 @@ def test_load_truncated_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
+def test_load_gz_notexist_should_fail():
+    return
+
+    savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
+
+    hi = khmer.new_counting_hash(12, 1000)
+    try:
+        hi.load(savepath)
+        assert 0, "load should fail"
+    except IOError, e:
+        print str(e)
+
+def test_load_gz_truncated_should_fail():
+    inpath = utils.get_test_data('random-20-a.fa')
+    savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
+
+    hi = khmer.new_counting_hash(12, 1000)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    fp = open(savepath, 'rb')
+    data = fp.read()
+    fp.close()
+
+    fp = open(savepath, 'wb')
+    fp.write(data[:1000])
+    fp.close()
+
+    hi = khmer.new_counting_hash(12, 1)
+    try:
+        hi.load(savepath)
+        assert 0, "load should fail"
+    except IOError, e:
+        print str(e)
