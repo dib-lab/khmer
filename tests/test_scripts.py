@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -1501,3 +1501,64 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
+
+
+def test_fastq_to_fasta():
+    def run_test(script, args, in_dir, test_num, file_type):
+        (status, out, err) = runscript(script, args, in_dir)
+        print 'TEST #' + test_num + ' with ' + file_type + ':'
+
+        if '-o' not in args:
+            assert len(out.splitlines()) > 2
+        if '-n' in args:
+            if '-o' in args:
+                assert "No lines dropped" in err
+                assert len(out.splitlines()) == 2
+        if '-n' not in args:
+            if '-o' in args:
+                if file_type == "N_FILE":
+                    assert "3 lines dropped" in err
+                    assert len(out.splitlines()) == 2
+            if file_type == 'CLEAN_FILE':
+                if '-o' in args:
+                    if file_type == "N_FILE":
+                        assert "0 lines dropped" in err
+                        assert len(out.splitlines()) == 2
+                        print out
+
+    script = scriptpath('fastq-to-fasta.py')
+    clean_infile = utils.get_temp_filename('test-clean.fq')
+    n_infile = utils.get_temp_filename('test-n.fq')
+
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), clean_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
+
+    clean_outfile = clean_infile + '.keep.fa'
+    n_outfile = n_infile + '.keep.fa'
+
+    in_dir = os.path.dirname(clean_infile)
+    in_dir2 = os.path.dirname(n_infile)
+
+    args = [clean_infile, '-n', '-o', clean_outfile]
+    args2 = [n_infile, '-n', '-o', n_outfile]
+
+    run_test(script, args, in_dir, '1', 'CLEAN_FILE')
+    run_test(script, args2, in_dir2, '1', 'N_FILE')
+
+    args = [clean_infile, '-o', clean_outfile]
+    args2 = [n_infile, '-o', n_outfile]
+
+    run_test(script, args, in_dir, '2', 'CLEAN_FILE')
+    run_test(script, args2, in_dir2, '2', 'N_FILE')
+
+    args = [clean_infile]
+    args2 = [n_infile]
+
+    run_test(script, args, in_dir, '3', 'CLEAN_FILE')
+    run_test(script, args2, in_dir2, '3', 'N_FILE')
+
+    args = [clean_infile, '-n']
+    args2 = [n_infile, '-n']
+
+    run_test(script, args, in_dir, '4', 'CLEAN_FILE')
+    run_test(script, args2, in_dir2, '4', 'N_FILE')
