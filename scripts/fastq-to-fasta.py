@@ -21,21 +21,22 @@ import screed
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description='Convert fastq (.fq) files to fasta (.fa).',
+        description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input', help='The name of the input'
+    parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', help='The name of the output'
                         ' FASTA sequence file.')
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
-                        help='Option to drop reads containing \'N\'s.')
+                        help='Option to drop reads containing \'N\'s in ' +
+                        'input_sequence file.')
     return parser
 
 
 def main():
     args = get_parser().parse_args()
-    print >> sys.stderr, ('fastq from ', args.input)
+    print >> sys.stderr, ('fastq from ', args.input_sequence)
 
     if args.output:
         write_out = open(args.output, 'w')
@@ -59,7 +60,7 @@ def main():
             print '>' + name
             print sequence
 
-    print >> sys.stderr, '\n' + 'lines from ' + args.input
+    print >> sys.stderr, '\n' + 'lines from ' + args.input_sequence
 
     if not args.n_keep:
         print >> sys.stderr, str(n_count) + ' lines dropped.'
