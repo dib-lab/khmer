@@ -535,6 +535,24 @@ CountingHashFileReader::CountingHashFileReader(
     const std::string	&infilename,
     CountingHash	&ht)
 {
+    ifstream infile;
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+       infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure e) {
+      std::string err;
+        if (!infile.is_open()) {
+          err = "Cannot open file: " + infilename;
+        }
+        else {
+          err = "Unknown error in opening file: " + infilename;
+        }
+        throw hashtable_file_exception(err.c_str());
+    }
+
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
             delete ht._counts[i];
@@ -545,32 +563,19 @@ CountingHashFileReader::CountingHashFileReader(
     }
     ht._tablesizes.clear();
 
-    ifstream infile;
-    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
-                      std::ifstream::eofbit);
-
-    try {
-       infile.open(infilename.c_str(), ios::binary);
-    } catch (std::ifstream::failure e) {
-        if (!infile.is_open()) {
-           throw hashtable_file_exception("Cannot open file.");
-        }
-        else {
-          throw hashtable_file_exception("Unknown error in opening file.");
-        }
-    }
-
     try {
        unsigned int save_ksize = 0;
        unsigned char save_n_tables = 0;
        unsigned long long save_tablesize = 0;
-       unsigned char version, ht_type, use_bigcount;
+       unsigned char version = 0, ht_type = 0, use_bigcount = 0;
 
        infile.read((char *) &version, 1);
        infile.read((char *) &ht_type, 1);
        if (!(version == SAVED_FORMAT_VERSION)
                or !(ht_type == SAVED_COUNTING_HT)) {
-           throw hashtable_file_exception("Incorrect table format version.");
+         std::string err = "Incorrect table format version in file " + \
+           infilename;
+         throw hashtable_file_exception(err.c_str());
        }
 
        infile.read((char *) &use_bigcount, 1);
@@ -584,6 +589,10 @@ CountingHashFileReader::CountingHashFileReader(
        ht._use_bigcount = use_bigcount;
 
        ht._counts = new Byte*[ht._n_tables];
+       for (unsigned int i = 0; i < ht._n_tables; i++) {
+         ht._counts[i] = NULL;
+       }
+
        for (unsigned int i = 0; i < ht._n_tables; i++) {
            HashIntoType tablesize;
 
@@ -620,11 +629,13 @@ CountingHashFileReader::CountingHashFileReader(
        infile.close();
     }
     catch (std::ifstream::failure e) {
+      std::string err;
       if (infile.eof()) {
-        throw hashtable_file_exception("Unexpected end of table file.");
+        err = "Unexpected end of table file: " + infilename;
       } else {
-        throw hashtable_file_exception("Error reading from k-mer table file.");
+        err = "Error reading from k-mer table file: " + infilename;
       }
+      throw hashtable_file_exception(err.c_str());
     }
 }
 
