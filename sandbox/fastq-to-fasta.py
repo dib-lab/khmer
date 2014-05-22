@@ -35,7 +35,7 @@ def get_parser():
 
 def main():
     args = get_parser().parse_args()
-    print >> sys.stderr, ('fastq from ', args.input)
+    print('fastq from ', args.input)
 
     if args.output:
         write_out = open(args.output, 'w')
@@ -59,13 +59,13 @@ def main():
             print '>' + name
             print sequence
 
-    print >> sys.stderr, '\n' + 'lines from ' + args.input
+    print '\n' + 'lines from ' + args.input
 
     if not args.n_keep:
         print >> sys.stderr, str(n_count) + ' lines dropped.'
 
     else:
-        print >> sys.stderr, 'No lines dropped from file.'
+        print 'No lines dropped from file.'
 
 if __name__ == '__main__':
     main()
