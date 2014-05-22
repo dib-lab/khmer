@@ -3088,7 +3088,12 @@ static PyObject * hashbits_load(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    hashbits->load(filename);
+    try {
+      hashbits->load(filename);
+    } catch (hashtable_file_exception e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }

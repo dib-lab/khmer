@@ -48,6 +48,25 @@ void Hashbits::save(std::string outfilename)
 
 void Hashbits::load(std::string infilename)
 {
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+       infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure e) {
+      std::string err;
+      if (!infile.is_open()) {
+        err = "Cannot open file: " + infilename;
+      }
+      else {
+        err = "Unknown error in opening file: " + infilename;
+      }
+      throw hashtable_file_exception(err.c_str());
+    }
+
     if (_counts) {
         for (unsigned int i = 0; i < _n_tables; i++) {
             delete _counts[i];
@@ -58,32 +77,29 @@ void Hashbits::load(std::string infilename)
     }
     _tablesizes.clear();
 
-    unsigned int save_ksize = 0;
-    unsigned char save_n_tables = 0;
-    unsigned long long save_tablesize = 0;
-    unsigned char version, ht_type;
+    try {
+      unsigned int save_ksize = 0;
+      unsigned char save_n_tables = 0;
+      unsigned long long save_tablesize = 0;
+      unsigned char version, ht_type;
 
-    // @CTB here
-    ifstream infile(infilename.c_str(), ios::binary);
-    if (!infile.is_open()) {
-        throw new exception();
-    }
+      infile.read((char *) &version, 1);
+      infile.read((char *) &ht_type, 1);
+      if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
+         std::string err = "Incorrect table format version in file " + \
+           infilename;
+         throw hashtable_file_exception(err.c_str());
+      }
 
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
-        throw std::exception();
-    }
+      infile.read((char *) &save_ksize, sizeof(save_ksize));
+      infile.read((char *) &save_n_tables, sizeof(save_n_tables));
 
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+      _ksize = (WordLength) save_ksize;
+      _n_tables = (unsigned int) save_n_tables;
+      _init_bitstuff();
 
-    _ksize = (WordLength) save_ksize;
-    _n_tables = (unsigned int) save_n_tables;
-    _init_bitstuff();
-
-    _counts = new Byte*[_n_tables];
-    for (unsigned int i = 0; i < _n_tables; i++) {
+      _counts = new Byte*[_n_tables];
+      for (unsigned int i = 0; i < _n_tables; i++) {
         HashIntoType tablesize;
         unsigned long long tablebytes;
 
@@ -100,8 +116,18 @@ void Hashbits::load(std::string infilename)
             infile.read((char *) _counts[i], tablebytes - loaded);
             loaded += infile.gcount();	// do I need to do this loop?
         }
+      }
+      infile.close();
     }
-    infile.close();
+    catch (std::ifstream::failure e) {
+      std::string err;
+      if (infile.eof()) {
+        err = "Unexpected end of table file: " + infilename;
+      } else {
+        err = "Error reading from k-mer table file: " + infilename;
+      }
+      throw hashtable_file_exception(err.c_str());
+    }
 }
 
 // for counting overlap k-mers specifically!!
