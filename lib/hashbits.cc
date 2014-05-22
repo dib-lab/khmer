@@ -114,7 +114,7 @@ void Hashbits::load(std::string infilename)
         unsigned long long loaded = 0;
         while (loaded != tablebytes) {
             infile.read((char *) _counts[i], tablebytes - loaded);
-            loaded += infile.gcount();	// do I need to do this loop?
+            loaded += infile.gcount();
         }
       }
       infile.close();
