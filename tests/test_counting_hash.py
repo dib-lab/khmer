@@ -551,7 +551,6 @@ def test_consume_high_abund_kmers():
 
 ####
 
-@attr('highmem')
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
