@@ -1574,8 +1574,7 @@ static PyObject * hash_load(PyObject * self, PyObject * args)
     try {
         counting->load(filename);
     } catch (hashtable_file_exception e) {
-        PyErr_SetString(PyExc_IOError,
-                        e.what());
+        PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
 
@@ -3242,8 +3241,7 @@ static PyObject * hashbits_merge2_subset(PyObject * self, PyObject * args)
 
     Py_END_ALLOW_THREADS
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
@@ -3267,8 +3265,7 @@ static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
 
     Py_END_ALLOW_THREADS
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject * hashbits__validate_subset_partitionmap(PyObject * self, PyObject * args)
@@ -3705,8 +3702,7 @@ static PyObject * subset_report_on_partitions(PyObject * self,
 
     subset_p->report_on_partitions();
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject * subset_compare_partitions(PyObject * self,
