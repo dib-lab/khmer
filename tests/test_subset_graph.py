@@ -18,7 +18,7 @@ def teardown():
 class Test_RandomData(object):
 
     def test_3_merge_013(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
 
         filename = utils.get_test_data('test-graph2.fa')
 
@@ -38,7 +38,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_3_merge_023(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -57,7 +57,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_5_merge_046(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph5.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -194,7 +194,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_load_merge(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -227,7 +227,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_load_merge_2(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -258,7 +258,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_merge_from_disk(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -288,7 +288,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_merge_from_disk_2(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -314,6 +314,22 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
+    @attr('highmem')
+    def test_save_merge_from_disk_file_not_exist(self):
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        filename = utils.get_test_data('test-graph2.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
+
+        divvy = ht.divide_tags_into_subsets(1)
+        print divvy
+        (a, b, c) = divvy
+
+        outfile1 = utils.get_temp_filename('x.pmap')
+
+        # fail to create file...
+        ht.merge_subset_from_disk(outfile1)
 
 def test_output_partitions():
     filename = utils.get_test_data('test-output-partitions.fa')
