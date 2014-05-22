@@ -1504,27 +1504,6 @@ def test_count_overlap():
 
 
 def test_fastq_to_fasta():
-    def run_test(script, args, in_dir, test_num, file_type):
-        (status, out, err) = runscript(script, args, in_dir)
-        print 'TEST #' + test_num + ' with ' + file_type + ':'
-
-        if '-o' not in args:
-            assert len(out.splitlines()) > 2
-        if '-n' in args:
-            if '-o' in args:
-                assert "No lines dropped" in err
-                assert len(out.splitlines()) == 2
-        if '-n' not in args:
-            if '-o' in args:
-                if file_type == "N_FILE":
-                    assert "3 lines dropped" in err
-                    assert len(out.splitlines()) == 2
-            if file_type == 'CLEAN_FILE':
-                if '-o' in args:
-                    if file_type == "N_FILE":
-                        assert "0 lines dropped" in err
-                        assert len(out.splitlines()) == 2
-                        print out
 
     script = scriptpath('fastq-to-fasta.py')
     clean_infile = utils.get_temp_filename('test-clean.fq')
@@ -1537,28 +1516,34 @@ def test_fastq_to_fasta():
     n_outfile = n_infile + '.keep.fa'
 
     in_dir = os.path.dirname(clean_infile)
-    in_dir2 = os.path.dirname(n_infile)
+    in_dir_n = os.path.dirname(n_infile)
 
     args = [clean_infile, '-n', '-o', clean_outfile]
-    args2 = [n_infile, '-n', '-o', n_outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "No lines dropped" in err
 
-    run_test(script, args, in_dir, '1', 'CLEAN_FILE')
-    run_test(script, args2, in_dir2, '1', 'N_FILE')
+    args = [n_infile, '-n', '-o', n_outfile]
+    (status, out, err) = runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) == 2
+    assert "No lines dropped" in err
 
     args = [clean_infile, '-o', clean_outfile]
-    args2 = [n_infile, '-o', n_outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "0 lines dropped" in err
 
-    run_test(script, args, in_dir, '2', 'CLEAN_FILE')
-    run_test(script, args2, in_dir2, '2', 'N_FILE')
+    args = [n_infile, '-o', n_outfile]
+    (status, out, err) = runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) == 2, out
+    assert "4 lines dropped" in err, err
 
     args = [clean_infile]
-    args2 = [n_infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert len(out.splitlines()) > 2
+    assert "0 lines dropped" in err
 
-    run_test(script, args, in_dir, '3', 'CLEAN_FILE')
-    run_test(script, args2, in_dir2, '3', 'N_FILE')
-
-    args = [clean_infile, '-n']
-    args2 = [n_infile, '-n']
-
-    run_test(script, args, in_dir, '4', 'CLEAN_FILE')
-    run_test(script, args2, in_dir2, '4', 'N_FILE')
+    args = [n_infile]
+    (status, out, err) = runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) > 2
+    assert "4 lines dropped" in err
