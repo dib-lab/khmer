@@ -643,6 +643,12 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     const std::string	&infilename,
     CountingHash	&ht)
 {
+    gzFile infile = gzopen(infilename.c_str(), "rb");
+    if (infile == Z_NULL) {
+      std::string err = "Cannot open file: " + infilename;
+      throw hashtable_file_exception(err.c_str());
+    }
+
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
             delete ht._counts[i];
@@ -653,24 +659,34 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     }
     ht._tablesizes.clear();
 
-    // @CTB here
     unsigned int save_ksize = 0;
     unsigned char save_n_tables = 0;
     unsigned long long save_tablesize = 0;
     unsigned char version, ht_type, use_bigcount;
 
-    gzFile infile = gzopen(infilename.c_str(), "rb");
+    int read_v = gzread(infile, (char *) &version, 1);
+    int read_t = gzread(infile, (char *) &ht_type, 1);
 
-    gzread(infile, (char *) &version, 1);
-    gzread(infile, (char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION)
-            or !(ht_type == SAVED_COUNTING_HT)) {
-        throw std::exception();
+    if (read_v <=0 || read_t <= 0) {
+      std::string err = "Read error or end-of-file: " + infilename;
+      throw hashtable_file_exception(err.c_str());
+    }
+    else if (!(version == SAVED_FORMAT_VERSION)
+             || !(ht_type == SAVED_COUNTING_HT)) {
+      std::string err = "Incorrect format version of data file type: " +\
+        infilename;
+      throw hashtable_file_exception(err.c_str());
     }
 
-    gzread(infile, (char *) &use_bigcount, 1);
-    gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
-    gzread(infile, (char *) &save_n_tables, sizeof(save_n_tables));
+    int read_b = gzread(infile, (char *) &use_bigcount, 1);
+    int read_k = gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
+    int read_nt = gzread(infile, (char *) &save_n_tables,
+                         sizeof(save_n_tables));
+
+    if (read_b <=0 || read_k <= 0 || read_nt <= 0) {
+      std::string err = "Header read error: " + infilename;
+      throw hashtable_file_exception(err.c_str());
+    }
 
     ht._ksize = (WordLength) save_ksize;
     ht._n_tables = (unsigned int) save_n_tables;
@@ -682,7 +698,13 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     for (unsigned int i = 0; i < ht._n_tables; i++) {
         HashIntoType tablesize;
 
-        gzread(infile, (char *) &save_tablesize, sizeof(save_tablesize));
+        read_b = gzread(infile, (char *) &save_tablesize,
+                        sizeof(save_tablesize));
+
+        if (read_b <= 0) {
+          std::string err = "Table header read error: " + infilename;
+          throw hashtable_file_exception(err.c_str());
+        }
 
         tablesize = (HashIntoType) save_tablesize;
         ht._tablesizes.push_back(tablesize);
@@ -691,13 +713,24 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
         HashIntoType loaded = 0;
         while (loaded != tablesize) {
-            loaded += gzread(infile, (char *) ht._counts[i],
-                             (unsigned) (tablesize - loaded));
+            read_b = gzread(infile, (char *) ht._counts[i],
+                            (unsigned) (tablesize - loaded));
+
+            if (read_b <= 0) {
+              std::string err = "Data read error: " + infilename;
+              throw hashtable_file_exception(err.c_str());
+            }
+
+            loaded += read_b;
         }
     }
 
     HashIntoType n_counts = 0;
-    gzread(infile, (char *) &n_counts, sizeof(n_counts));
+    read_b = gzread(infile, (char *) &n_counts, sizeof(n_counts));
+    if (read_b <= 0) {
+      std::string err = "Count header read error: " + infilename;
+      throw hashtable_file_exception(err.c_str());
+    }
 
     if (n_counts) {
         ht._bigcounts.clear();
@@ -705,9 +738,16 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         HashIntoType kmer;
         BoundedCounterType count;
 
+        int read_k, read_c;
         for (HashIntoType n = 0; n < n_counts; n++) {
-            gzread(infile, (char *) &kmer, sizeof(kmer));
-            gzread(infile, (char *) &count, sizeof(count));
+            read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
+            read_c = gzread(infile, (char *) &count, sizeof(count));
+
+            if (read_k <= 0 || read_c <= 0) {
+              std::string err = "Count read error: " + infilename;
+              throw hashtable_file_exception(err.c_str());
+            }
+
             ht._bigcounts[kmer] = count;
         }
     }

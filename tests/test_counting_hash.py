@@ -585,8 +585,6 @@ def test_load_truncated_should_fail():
         print str(e)
 
 def test_load_gz_notexist_should_fail():
-    return
-
     savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
 
     hi = khmer.new_counting_hash(12, 1000)
