@@ -2511,7 +2511,12 @@ static PyObject * hashbits_merge_from_disk(PyObject * self, PyObject *args)
         return NULL;
     }
 
-    hashbits->partition->merge_from_disk(filename);
+    try {
+      hashbits->partition->merge_from_disk(filename);
+    } catch (hashtable_file_exception e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3264,13 +3269,26 @@ static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
     SubsetPartition * subset1_p;
     subset1_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
 
+    bool fail = false;
+    std::string err;
+
     Py_BEGIN_ALLOW_THREADS
 
-    subset1_p->merge_from_disk(filename);
+    try {
+      subset1_p->merge_from_disk(filename);
+    } catch (hashtable_file_exception e) {
+      fail = true;
+      err = e.what();
+    }
 
     Py_END_ALLOW_THREADS
 
-    Py_RETURN_NONE;
+    if (fail) {
+        PyErr_SetString(PyExc_IOError, err.c_str());
+        return NULL;
+    } else {
+       Py_RETURN_NONE;
+    }
 }
 
 static PyObject * hashbits__validate_subset_partitionmap(PyObject * self, PyObject * args)

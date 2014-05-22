@@ -1251,36 +1251,52 @@ void SubsetPartition::_merge_other(
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
-  // @CTB here
-    ifstream infile(other_filename.c_str(), ios::binary);
-    if (!infile.is_open()) {
-        throw std::exception();
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try {
+      infile.open(other_filename.c_str(), ios::binary);
+    }  catch (std::ifstream::failure e) {
+      std::string err;
+      if (!infile.is_open()) {
+        err = "Cannot open file: " + other_filename;
+      }
+      else {
+        err = "Unknown error in opening file: " + other_filename;
+      }
+      throw hashtable_file_exception(err.c_str());
     }
 
-    unsigned int save_ksize = 0;
-    unsigned char version, ht_type;
+    try {
+      unsigned int save_ksize = 0;
+      unsigned char version, ht_type;
 
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_SUBSET)) {
-        throw std::exception();
+      infile.read((char *) &version, 1);
+      infile.read((char *) &ht_type, 1);
+      if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_SUBSET)) {
+        std::string err;
+        err = "Invalid data version or saved filetype: " + other_filename;
+        throw hashtable_file_exception(err.c_str());
+      }
+
+      infile.read((char *) &save_ksize, sizeof(save_ksize));
+      if (!(save_ksize == _ht->ksize())) { // @CTB tested?
+        std::string err = "Saved k-mer size does not match hashtable k size.";
+        throw hashtable_file_exception(err.c_str());
+      }
+    } catch (std::ifstream::failure e) {
+      std::string err;
+      err = "Unknown error reading header info from: " + other_filename;
+      throw hashtable_file_exception(err.c_str());
     }
 
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    if (!(save_ksize == _ht->ksize())) {
-        throw std::exception();
-    }
-
-    char * buf = NULL;
-    buf = new char[IO_BUF_SIZE];
+    char * buf = new char[IO_BUF_SIZE];
 
     unsigned int loaded = 0;
     long remainder;
 
-    if (!(infile.is_open())) {
-        delete[] buf;
-        throw std::exception();
-    }
 
     PartitionPtrMap diskp_to_pp;
 
@@ -1295,35 +1311,47 @@ void SubsetPartition::merge_from_disk(string other_filename)
     remainder = 0;
     unsigned int iteration = 0;
     while (!infile.eof()) {
-        unsigned int i;
+      unsigned int i;
 
+      try {
         infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        long n_bytes = infile.gcount() + remainder;
-        remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
-        n_bytes -= remainder;
+      } catch (std::ifstream::failure e) {
 
-        iteration++;
-
-        for (i = 0; i < n_bytes;) {
-            kmer_p = (HashIntoType *) (buf + i);
-            i += sizeof(HashIntoType);
-            diskp = (PartitionID *) (buf + i);
-            i += sizeof(PartitionID);
-
-            if (!(*diskp != 0)) {		// sanity check.
-                throw std::exception();
-            }
-
-            _merge_other(*kmer_p, *diskp, diskp_to_pp);
-
-            loaded++;
+        // We may get an exception here if we fail to read all the
+        // expected bytes due to EOF -- only pass it up if we read
+        // _nothing_.  Note that the while loop exits on EOF.
+        
+        if (infile.gcount() == 0) {
+          std::string err;
+          err = "Unknown error reading data from: " + other_filename;
+          throw hashtable_file_exception(err.c_str());
         }
-        if (!(i == n_bytes)) {
-            throw std::exception();
-        }
-        memcpy(buf, buf + n_bytes, remainder);
+      }
 
-        // _merge_from_disk_consolidate(diskp_to_pp);
+      long n_bytes = infile.gcount() + remainder;
+      remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
+      n_bytes -= remainder;
+
+      iteration++;
+
+      for (i = 0; i < n_bytes;) {
+        kmer_p = (HashIntoType *) (buf + i);
+        i += sizeof(HashIntoType);
+        diskp = (PartitionID *) (buf + i);
+        i += sizeof(PartitionID);
+
+        if (!(*diskp != 0)) {		// sanity check.
+          throw std::exception();
+        }
+
+        _merge_other(*kmer_p, *diskp, diskp_to_pp);
+
+        loaded++;
+      }
+      if (!(i == n_bytes)) {
+        throw std::exception();
+      }
+      memcpy(buf, buf + n_bytes, remainder);
     }
 
     delete[] buf;

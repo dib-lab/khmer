@@ -328,8 +328,13 @@ class Test_SaveLoadPmap(object):
 
         outfile1 = utils.get_temp_filename('x.pmap')
 
-        # fail to create file...
-        ht.merge_subset_from_disk(outfile1)
+        # fail to create file... => failure expected
+
+        try:
+            ht.merge_subset_from_disk(outfile1)
+            assert 0
+        except IOError, e:
+            print str(e)
 
 def test_output_partitions():
     filename = utils.get_test_data('test-output-partitions.fa')
