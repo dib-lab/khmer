@@ -558,8 +558,8 @@ def test_load_notexist_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError:
-        pass
+    except IOError, e:
+        print str(e)
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
@@ -581,5 +581,5 @@ def test_load_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError:
-        pass
+    except IOError, e:
+        print str(e)
