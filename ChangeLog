@@ -1,3 +1,15 @@
+2014-05-22  Michael Wright  <wrigh517@msu.edu>
+
+    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts 
+    from sandbox
+    * tests/test_scripts.py: Added tests for fastq-to-fasta.py
+    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in 
+    sequence for testing
+
+2014-05-16  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt: include sweep-reads-buffered.py
+
 2014-05-14  Adam Caldwell  <adam.caldwell@gmail.com>
 
     * Makefile: change pip to pip2. Fixes assorted make problems on systems
