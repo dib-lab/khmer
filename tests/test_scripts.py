@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -1501,3 +1501,49 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
+
+
+def test_fastq_to_fasta():
+
+    script = scriptpath('fastq-to-fasta.py')
+    clean_infile = utils.get_temp_filename('test-clean.fq')
+    n_infile = utils.get_temp_filename('test-n.fq')
+
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), clean_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
+
+    clean_outfile = clean_infile + '.keep.fa'
+    n_outfile = n_infile + '.keep.fa'
+
+    in_dir = os.path.dirname(clean_infile)
+    in_dir_n = os.path.dirname(n_infile)
+
+    args = [clean_infile, '-n', '-o', clean_outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "No lines dropped" in err
+
+    args = [n_infile, '-n', '-o', n_outfile]
+    (status, out, err) = runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) == 2
+    assert "No lines dropped" in err
+
+    args = [clean_infile, '-o', clean_outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "0 lines dropped" in err
+
+    args = [n_infile, '-o', n_outfile]
+    (status, out, err) = runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) == 2, out
+    assert "4 lines dropped" in err, err
+
+    args = [clean_infile]
+    (status, out, err) = runscript(script, args, in_dir)
+    assert len(out.splitlines()) > 2
+    assert "0 lines dropped" in err
+
+    args = [n_infile]
+    (status, out, err) = runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) > 2
+    assert "4 lines dropped" in err
