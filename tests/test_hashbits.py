@@ -582,3 +582,38 @@ def test_load_truncated_should_fail():
         assert 0, "load should fail"
     except IOError:
         pass
+
+def test_save_load_tagset_notexist():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    outfile = utils.get_temp_filename('tagset')
+    try:
+        ht.load_tagset(outfile)
+        assert 0, "this test should fail"
+    except IOError:
+        pass                            # proper exception was raised
+
+def test_save_load_tagset_trunc():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    outfile = utils.get_temp_filename('tagset')
+
+    ht.add_tag('A' * 32)
+    ht.add_tag('G' * 32)
+    ht.save_tagset(outfile)
+
+    # truncate tagset file...
+    fp = open(outfile, 'rb')
+    data = fp.read()
+    fp.close()
+
+    fp = open(outfile, 'wb')
+    fp.write(data[:26])
+    fp.close()
+
+    # try loading it...
+    try:
+        ht.load_tagset(outfile)
+        assert 0, "this test should fail"
+    except IOError:
+        pass
