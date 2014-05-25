@@ -1,3 +1,14 @@
+2014-05-25  Titus Brown  <t@idyll.org>
+
+    * lib/counting.cc: added I/O exception handling to CountingHashFileReader
+	and CountingHashGzFileReader.
+    * lib/hashbits.cc: added I/O exception handling to Hashbits::load.
+    * lib/subset.cc: added I/O exception handling to merge_from_disk.
+    * lib/hashtable.cc: added I/O exception handling to load_tagset and
+	load_stop_tags
+    * khmer/_khmermodule.cc: added I/O exception propogation from C++ to
+	Python, for all loading functions.
+
 2014-05-22  Michael Wright  <wrigh517@msu.edu>
 
     * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts 
