@@ -1258,7 +1258,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
     try {
         infile.open(other_filename.c_str(), ios::binary);
-    }  catch (std::ifstream::failure e) {
+    }  catch (std::ifstream::failure &e) {
         std::string err;
         if (!infile.is_open()) {
             err = "Cannot open file: " + other_filename;
@@ -1285,7 +1285,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             std::string err = "Saved k-mer size does not match hashtable k size.";
             throw khmer_file_exception(err.c_str());
         }
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err;
         err = "Unknown error reading header info from: " + other_filename;
         throw khmer_file_exception(err.c_str());
@@ -1314,7 +1314,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
         try {
             infile.read(buf + remainder, IO_BUF_SIZE - remainder);
-        } catch (std::ifstream::failure e) {
+        } catch (std::ifstream::failure &e) {
 
             // We may get an exception here if we fail to read all the
             // expected bytes due to EOF -- only pass it up if we read

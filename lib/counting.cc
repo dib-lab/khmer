@@ -542,7 +542,7 @@ CountingHashFileReader::CountingHashFileReader(
 
     try {
         infile.open(infilename.c_str(), ios::binary);
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err;
         if (!infile.is_open()) {
             err = "Cannot open file: " + infilename;
@@ -626,7 +626,7 @@ CountingHashFileReader::CountingHashFileReader(
         }
 
         infile.close();
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err;
         if (infile.eof()) {
             err = "Unexpected end of table file: " + infilename;

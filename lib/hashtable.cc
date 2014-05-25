@@ -385,7 +385,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
 
     try {
         infile.open(infilename.c_str(), ios::binary);
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err;
         if (!(infile.is_open())) {
             err = "Cannot open file: " + infilename;
@@ -432,7 +432,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         }
 
         delete[] buf;
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err = "Error reading data from: " + infilename;
         throw khmer_file_exception(err.c_str());
     }
@@ -1810,7 +1810,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 
     try {
         infile.open(infilename.c_str(), ios::binary);
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err;
         if (!(infile.is_open())) {
             err = "Cannot open file: " + infilename;
@@ -1854,7 +1854,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
             stop_tags.insert(buf[i]);
         }
         delete[] buf;
-    } catch (std::ifstream::failure e) {
+    } catch (std::ifstream::failure &e) {
         std::string err = "Error reading data from: " + infilename;
         throw khmer_file_exception(err.c_str());
     }
