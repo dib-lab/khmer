@@ -2229,7 +2229,14 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
     if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
         clear_tags = false;
     }
-    hashbits->load_stop_tags(filename, clear_tags);
+
+
+    try {
+      hashbits->load_stop_tags(filename, clear_tags);
+    } catch (hashtable_file_exception e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3135,7 +3142,13 @@ static PyObject * hashbits_load_tagset(PyObject * self, PyObject * args)
     if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
         clear_tags = false;
     }
-    hashbits->load_tagset(filename, clear_tags);
+
+    try {
+      hashbits->load_tagset(filename, clear_tags);
+    } catch (hashtable_file_exception e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
