@@ -1573,7 +1573,7 @@ static PyObject * hash_load(PyObject * self, PyObject * args)
 
     try {
         counting->load(filename);
-    } catch (hashtable_file_exception e) {
+    } catch (khmer_file_exception e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
@@ -2233,7 +2233,7 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
 
     try {
       hashbits->load_stop_tags(filename, clear_tags);
-    } catch (hashtable_file_exception e) {
+    } catch (khmer_file_exception e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
@@ -2520,7 +2520,7 @@ static PyObject * hashbits_merge_from_disk(PyObject * self, PyObject *args)
 
     try {
       hashbits->partition->merge_from_disk(filename);
-    } catch (hashtable_file_exception e) {
+    } catch (khmer_file_exception e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
@@ -3102,7 +3102,7 @@ static PyObject * hashbits_load(PyObject * self, PyObject * args)
 
     try {
       hashbits->load(filename);
-    } catch (hashtable_file_exception e) {
+    } catch (khmer_file_exception e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
@@ -3145,7 +3145,7 @@ static PyObject * hashbits_load_tagset(PyObject * self, PyObject * args)
 
     try {
       hashbits->load_tagset(filename, clear_tags);
-    } catch (hashtable_file_exception e) {
+    } catch (khmer_file_exception e) {
         PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
@@ -3289,7 +3289,7 @@ static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
 
     try {
       subset1_p->merge_from_disk(filename);
-    } catch (hashtable_file_exception e) {
+    } catch (khmer_file_exception e) {
       fail = true;
       err = e.what();
     }

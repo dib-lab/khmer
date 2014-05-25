@@ -64,7 +64,7 @@ void Hashbits::load(std::string infilename)
       else {
         err = "Unknown error in opening file: " + infilename;
       }
-      throw hashtable_file_exception(err.c_str());
+      throw khmer_file_exception(err.c_str());
     }
 
     if (_counts) {
@@ -88,7 +88,7 @@ void Hashbits::load(std::string infilename)
       if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
          std::string err = "Incorrect table format version in file " + \
            infilename;
-         throw hashtable_file_exception(err.c_str());
+         throw khmer_file_exception(err.c_str());
       }
 
       infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -126,7 +126,7 @@ void Hashbits::load(std::string infilename)
       } else {
         err = "Error reading from k-mer table file: " + infilename;
       }
-      throw hashtable_file_exception(err.c_str());
+      throw khmer_file_exception(err.c_str());
     }
 }
 

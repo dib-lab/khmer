@@ -393,7 +393,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     else {
       err = "Unknown error in opening file: " + infilename;
     }
-    throw hashtable_file_exception(err.c_str());
+    throw khmer_file_exception(err.c_str());
   }
 
     if (clear_tags) {
@@ -411,14 +411,14 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
       if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_TAGS)) {
         std::string err = "File format error while reading tagset: " + \
           infilename;
-        throw hashtable_file_exception(err.c_str());
+        throw khmer_file_exception(err.c_str());
       }
 
       infile.read((char *) &save_ksize, sizeof(save_ksize));
       if (!(save_ksize == _ksize)) {
         std::string err = "Incorrect k-mer size while reading tagset: " + \
           infilename;
-        throw hashtable_file_exception(err.c_str());
+        throw khmer_file_exception(err.c_str());
       }
 
       infile.read((char *) &tagset_size, sizeof(tagset_size));
@@ -435,7 +435,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
       delete[] buf;
     } catch (std::ifstream::failure e) {
       std::string err = "Error reading data from: " + infilename;
-      throw hashtable_file_exception(err.c_str());
+      throw khmer_file_exception(err.c_str());
     }
 }
 
@@ -1819,7 +1819,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     else {
       err = "Unknown error in opening file: " + infilename;
     }
-    throw hashtable_file_exception(err.c_str());
+    throw khmer_file_exception(err.c_str());
   }
 
     if (clear_tags) {
@@ -1837,14 +1837,14 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
       if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_STOPTAGS)) {
         std::string err = "File format error while reading stoptags: " + \
           infilename;
-        throw hashtable_file_exception(err.c_str());
+        throw khmer_file_exception(err.c_str());
       }
 
       infile.read((char *) &save_ksize, sizeof(save_ksize));
       if (!(save_ksize == _ksize)) {
         std::string err = "Incorrect k-mer size while reading stoptags: " + \
           infilename;
-        throw hashtable_file_exception(err.c_str());
+        throw khmer_file_exception(err.c_str());
       }
       infile.read((char *) &tagset_size, sizeof(tagset_size));
 
@@ -1859,7 +1859,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
     }
     catch (std::ifstream::failure e) {
       std::string err = "Error reading data from: " + infilename;
-      throw hashtable_file_exception(err.c_str());
+      throw khmer_file_exception(err.c_str());
     }
 }
 

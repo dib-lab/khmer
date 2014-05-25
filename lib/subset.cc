@@ -1266,7 +1266,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
       else {
         err = "Unknown error in opening file: " + other_filename;
       }
-      throw hashtable_file_exception(err.c_str());
+      throw khmer_file_exception(err.c_str());
     }
 
     try {
@@ -1278,18 +1278,18 @@ void SubsetPartition::merge_from_disk(string other_filename)
       if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_SUBSET)) {
         std::string err;
         err = "Invalid data version or saved filetype: " + other_filename;
-        throw hashtable_file_exception(err.c_str());
+        throw khmer_file_exception(err.c_str());
       }
 
       infile.read((char *) &save_ksize, sizeof(save_ksize));
       if (!(save_ksize == _ht->ksize())) { // @CTB tested?
         std::string err = "Saved k-mer size does not match hashtable k size.";
-        throw hashtable_file_exception(err.c_str());
+        throw khmer_file_exception(err.c_str());
       }
     } catch (std::ifstream::failure e) {
       std::string err;
       err = "Unknown error reading header info from: " + other_filename;
-      throw hashtable_file_exception(err.c_str());
+      throw khmer_file_exception(err.c_str());
     }
 
     char * buf = new char[IO_BUF_SIZE];
@@ -1324,7 +1324,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
         if (infile.gcount() == 0) {
           std::string err;
           err = "Unknown error reading data from: " + other_filename;
-          throw hashtable_file_exception(err.c_str());
+          throw khmer_file_exception(err.c_str());
         }
       }
 

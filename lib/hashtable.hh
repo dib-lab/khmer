@@ -63,10 +63,10 @@ struct HashTablePerformanceMetrics : public IPerformanceMetrics {
 };
 #endif
 
-class hashtable_file_exception : public std::exception
+class khmer_file_exception : public std::exception
 {
 public:
-    hashtable_file_exception(const char * msg) : _msg(msg) { };
+    khmer_file_exception(const char * msg) : _msg(msg) { };
 
     virtual const char* what() const throw() {
         return _msg;
