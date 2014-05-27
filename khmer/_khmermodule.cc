@@ -899,7 +899,6 @@ _init_ReadParser_Type( )
     }
 
     ReadParser_Type.tp_dict	    = cls_attrs_DICT;
-    Py_DECREF(cls_attrs_DICT);
     _debug_class_attrs( ReadParser_Type );
 
 } // _init_ReadParser_Type
@@ -1447,9 +1446,9 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     CountingHash * counting = me->counting;
 
     const char * seq = NULL;
-    unsigned long max_count_i = 0;
+    BoundedCounterType max_count_i = 0;
 
-    if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count_i)) {
         return NULL;
     }
 
@@ -1912,6 +1911,8 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         } else if (PyFloat_Check(size_o)) {
             sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
         } else {
+	    PyErr_SetString(PyExc_TypeError,
+		    "2nd argument must be a list of ints, longs, or floats");
             return NULL;
         }
     }
@@ -3027,7 +3028,8 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
     size_t n_partitions = 0, n_unassigned = 0;
     hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("nn", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
+	    (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -3045,7 +3047,8 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
     size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("nn", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
+	    (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
@@ -3691,6 +3694,9 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
             } else if (PyFloat_Check(size_o)) {
                 sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
             } else {
+		Py_DECREF(self);
+		PyErr_SetString(PyExc_TypeError,
+			"2nd argument must be a list of ints, longs, or floats");
                 return NULL;
             }
         }
@@ -3723,7 +3729,8 @@ static PyObject * subset_count_partitions(PyObject * self,
     size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("nn", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
+	    (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * subset_report_on_partitions(PyObject * self,
@@ -3957,6 +3964,9 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
             } else if (PyFloat_Check(size_o)) {
                 sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
             } else {
+		Py_DECREF(self);
+		PyErr_SetString(PyExc_TypeError,
+			"2nd argument must be a list of ints, longs, or floats");
                 return NULL;
             }
         }
@@ -4487,6 +4497,8 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
         } else if (PyFloat_Check(size_o)) {
             sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
         } else {
+	    PyErr_SetString(PyExc_TypeError,
+		    "2nd argument must be a list of ints, longs, or floats");
             return NULL;
         }
     }
