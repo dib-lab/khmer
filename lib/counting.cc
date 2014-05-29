@@ -571,11 +571,17 @@ CountingHashFileReader::CountingHashFileReader(
 
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION)
-                or !(ht_type == SAVED_COUNTING_HT)) {
+        if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
-            err << "Incorrect k-mer count file format version "
-                << (int)version << " in " << infilename;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
             throw khmer_file_exception(err.str().c_str());
         }
 
@@ -672,10 +678,19 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         throw khmer_file_exception(err.c_str());
     } else if (!(version == SAVED_FORMAT_VERSION)
                || !(ht_type == SAVED_COUNTING_HT)) {
-        std::ostringstream err;
-        err << "Incorrect k-mer count file format version " << version 
-            << " in " << infilename;
-        throw khmer_file_exception(err.str().c_str());
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
     }
 
     int read_b = gzread(infile, (char *) &use_bigcount, 1);

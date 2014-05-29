@@ -411,7 +411,8 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
-                << " while reading tagset from " << infilename;
+                << " while reading tagset from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
         }
         else if (!(ht_type == SAVED_TAGS)) {
@@ -1844,7 +1845,8 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
         if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
-                << " while reading stoptags from " << infilename;
+                << " while reading stoptags from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
         }
         else if (!(ht_type == SAVED_STOPTAGS)) {

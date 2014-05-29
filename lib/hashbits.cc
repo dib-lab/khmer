@@ -89,7 +89,8 @@ void Hashbits::load(std::string infilename)
         if (!(version == SAVED_FORMAT_VERSION)) {
             std::ostringstream err;
             err << "Incorrect file format version " << (int) version
-                << " while reading k-mer graph from " << infilename;
+                << " while reading k-mer graph from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
         }
         else if (!(ht_type == SAVED_HASHBITS)) {
