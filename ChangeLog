@@ -1,4 +1,4 @@
-2014-05-29  Titus Brown  <t@idyll.org>
+2014-05-30  Titus Brown  <t@idyll.org>
 
     * lib/counting.cc, lib/hashbits.cc, lib/hashtable.cc: made file loading
 	exceptions more verbose and informative.
