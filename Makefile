@@ -18,7 +18,7 @@ khmer/_khmermodule.so: $(SOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(SOURCES)	
-	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"; ./setup.py \
+	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
 		build_ext --debug --inplace --libraries gcov
 	touch coverage-debug
 
@@ -131,17 +131,17 @@ coverage-report: .coverage
 		coverage
 	coverage report
 
-coverage-gcovr.xml: coverage-debug test
+coverage-gcovr.xml: coverage-debug .coverage
 	pip2 install --user --upgrade ${GCOVRURL}'#gcovr' || pip2 install \
 		--upgrade ${GCOVRURL}'#gcovr'
 	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
 		--output=coverage-gcovr.xml
 
-diff-cover: clean coverage-gcovr.xml coverage.xml
+diff-cover: coverage-gcovr.xml coverage.xml
 	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-cover coverage-gcovr.xml coverage.xml
 
-diff-cover.html: clean coverage-gcovr.xml coverage.xml
+diff-cover.html: coverage-gcovr.xml coverage.xml
 	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-cover coverage-gcovr.xml coverage.xml \
 		--html-report diff-cover.html
