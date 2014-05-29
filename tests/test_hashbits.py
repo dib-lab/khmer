@@ -580,8 +580,8 @@ def test_load_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError:
-        pass
+    except IOError, e:
+        print str(e)
 
 def test_save_load_tagset_notexist():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -590,8 +590,8 @@ def test_save_load_tagset_notexist():
     try:
         ht.load_tagset(outfile)
         assert 0, "this test should fail"
-    except IOError:
-        pass                            # proper exception was raised
+    except IOError, e:
+        print str(e)
 
 def test_save_load_tagset_trunc():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -668,8 +668,8 @@ def test_hashbits_file_version_check():
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError:
-        pass
+    except IOError, e:
+        print str(e)
 
 def test_stoptags_file_version_check():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -679,14 +679,18 @@ def test_stoptags_file_version_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError:
-        pass
+    except IOError, e:
+        print str(e)
 
 def test_stoptags_ksize_check():
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.new_hashbits(31, 1, 1)
 
     inpath = utils.get_test_data('goodversion-k32.stoptags')
-    ht.load_stop_tags(inpath)
+    try:
+        ht.load_stop_tags(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
 
 def test_tagset_file_version_check():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -696,11 +700,15 @@ def test_tagset_file_version_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError:
-        pass
+    except IOError, e:
+        print str(e)
 
 def test_tagset_ksize_check():
-    ht = khmer.new_hashbits(32, 1, 1)
+    ht = khmer.new_hashbits(31, 1, 1)
 
     inpath = utils.get_test_data('goodversion-k32.tagset')
-    ht.load_tagset(inpath)
+    try:
+        ht.load_tagset(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
