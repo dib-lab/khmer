@@ -256,6 +256,14 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
+    def test_save_load_merge_nexist(self):
+        ht = khmer.new_hashbits(20, 1)
+        try:
+            a = ht.load_subset_partitionmap('this does not exist')
+            assert 0, "this should not succeed"
+        except IOError, e:
+            print str(e)
+
     @attr('highmem')
     def test_save_merge_from_disk(self):
         ht = khmer.new_hashbits(20, 4 ** 10 + 1)
