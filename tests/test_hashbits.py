@@ -550,6 +550,7 @@ def test_simple_median():
 
 ####
 
+
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('temphashbitssave0.ht')
 
@@ -559,6 +560,7 @@ def test_load_notexist_should_fail():
         assert 0, "load should fail"
     except IOError:
         pass
+
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
@@ -583,6 +585,7 @@ def test_load_truncated_should_fail():
     except IOError, e:
         print str(e)
 
+
 def test_save_load_tagset_notexist():
     ht = khmer.new_hashbits(32, 1, 1)
 
@@ -592,6 +595,7 @@ def test_save_load_tagset_notexist():
         assert 0, "this test should fail"
     except IOError, e:
         print str(e)
+
 
 def test_save_load_tagset_trunc():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -622,23 +626,25 @@ def test_save_load_tagset_trunc():
 # to build the test files used below, add 'test' to this function
 # and then look in /tmp. You will need to tweak the version info in
 # khmer.hh in order to create "bad" versions, of course. -CTB
+
+
 def _build_testfiles():
-    ### hashbits file
+    # hashbits file
 
     inpath = utils.get_test_data('random-20-a.fa')
     hi = khmer.new_hashbits(12, 50)
     hi.consume_fasta(inpath)
     hi.save('/tmp/goodversion-k12.ht')
 
-    ### tagset file
-    
+    # tagset file
+
     ht = khmer.new_hashbits(32, 1, 1)
 
     ht.add_tag('A' * 32)
     ht.add_tag('G' * 32)
     ht.save_tagset('/tmp/goodversion-k32.tagset')
 
-    ### stoptags file
+    # stoptags file
 
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
@@ -660,6 +666,7 @@ def _build_testfiles():
 
     ht.save_stop_tags('/tmp/goodversion-k32.stoptags')
 
+
 def test_hashbits_file_version_check():
     ht = khmer.new_hashbits(12, 1, 1)
 
@@ -670,6 +677,7 @@ def test_hashbits_file_version_check():
         assert 0, "this should fail"
     except IOError, e:
         print str(e)
+
 
 def test_stoptags_file_version_check():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -682,6 +690,7 @@ def test_stoptags_file_version_check():
     except IOError, e:
         print str(e)
 
+
 def test_stoptags_ksize_check():
     ht = khmer.new_hashbits(31, 1, 1)
 
@@ -691,6 +700,7 @@ def test_stoptags_ksize_check():
         assert 0, "this should fail"
     except IOError, e:
         print str(e)
+
 
 def test_tagset_file_version_check():
     ht = khmer.new_hashbits(32, 1, 1)
@@ -702,6 +712,7 @@ def test_tagset_file_version_check():
         assert 0, "this should fail"
     except IOError, e:
         print str(e)
+
 
 def test_tagset_ksize_check():
     ht = khmer.new_hashbits(31, 1, 1)

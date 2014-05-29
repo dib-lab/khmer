@@ -111,6 +111,7 @@ def test_fakelump_repartitioning():
     (n_partitions, n_singletons) = ht.count_partitions()
     assert n_partitions == 3, n_partitions
 
+
 @attr('highmem')
 def test_fakelump_load_stop_tags_trunc():
     fakelump_fa = utils.get_test_data('fakelump.fa')
@@ -142,7 +143,7 @@ def test_fakelump_load_stop_tags_trunc():
 
     ht.save_stop_tags(fakelump_fa_foo)
     data = open(fakelump_fa_foo).read()
-    
+
     fp = open(fakelump_fa_foo, 'wb')
     fp.write(data[:10])
     fp.close()
@@ -156,6 +157,7 @@ def test_fakelump_load_stop_tags_trunc():
         assert 0, "this test should fail"
     except IOError:
         pass
+
 
 @attr('highmem')
 def test_fakelump_load_stop_tags_notexist():

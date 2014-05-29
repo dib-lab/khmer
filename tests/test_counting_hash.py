@@ -551,6 +551,7 @@ def test_consume_high_abund_kmers():
 
 ####
 
+
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
 
@@ -560,6 +561,7 @@ def test_load_notexist_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
@@ -584,6 +586,7 @@ def test_load_truncated_should_fail():
     except IOError, e:
         print str(e)
 
+
 def test_load_gz_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
 
@@ -593,6 +596,7 @@ def test_load_gz_notexist_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
 
 def test_load_gz_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
@@ -616,6 +620,7 @@ def test_load_gz_truncated_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
 
 def test_counting_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
