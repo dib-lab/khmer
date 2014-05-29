@@ -1,7 +1,14 @@
 2014-05-29  Titus Brown  <t@idyll.org>
 
-    * added tests for fail-on-load of bad file format versions.
-    * added various temporary pip & build files to .gitignore.
+    * lib/counting.cc, lib/hashbits.cc, lib/hashtable.cc: made file loading
+	exceptions more verbose and informative.
+    * tests/test_subset_graph.py: added tests for SubsetPartition::
+	load_partitionmap.
+    * khmer/_khmermodule.cc, lib/subset.cc, wrapped SubsetPartition::
+	load_partitionmap to catch, propagate exceptions
+    * tests/test_hashbits.py, tests/test_counting_hash.py: added tests
+	for fail-on-load of bad file format versions; print exception messages.
+    * .gitignore: added various temporary pip & build files
 
 2014-05-25  Titus Brown  <t@idyll.org>
 
@@ -11,7 +18,7 @@
     * lib/subset.cc: added I/O exception handling to merge_from_disk.
     * lib/hashtable.cc: added I/O exception handling to load_tagset and
 	load_stop_tags
-    * khmer/_khmermodule.cc: added I/O exception propogation from C++ to
+    * khmer/_khmermodule.cc: added I/O exception propagation from C++ to
 	Python, for all loading functions.
 
 2014-05-22  Michael Wright  <wrigh517@msu.edu>

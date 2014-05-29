@@ -10,6 +10,8 @@
 #include "hashbits.hh"
 #include "read_parsers.hh"
 
+#include <sstream>
+
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
@@ -59,7 +61,7 @@ void Hashbits::load(std::string infilename)
     } catch (std::ifstream::failure &e) {
         std::string err;
         if (!infile.is_open()) {
-            err = "Cannot open file: " + infilename;
+            err = "Cannot open k-mer graph file: " + infilename;
         } else {
             err = "Unknown error in opening file: " + infilename;
         }
@@ -84,10 +86,17 @@ void Hashbits::load(std::string infilename)
 
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
-            std::string err = "Incorrect table format version in file " + \
-                              infilename;
-            throw khmer_file_exception(err.c_str());
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer graph from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_HASHBITS)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer graph from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -120,9 +129,9 @@ void Hashbits::load(std::string infilename)
     } catch (std::ifstream::failure &e) {
         std::string err;
         if (infile.eof()) {
-            err = "Unexpected end of table file: " + infilename;
+            err = "Unexpected end of k-mer graph file: " + infilename;
         } else {
-            err = "Error reading from k-mer table file: " + infilename;
+            err = "Error reading from k-mer graph file: " + infilename;
         }
         throw khmer_file_exception(err.c_str());
     }
