@@ -9,9 +9,6 @@
     * tests/test_hashbits.py, tests/test_counting_hash.py: added tests
 	for fail-on-load of bad file format versions; print exception messages.
     * .gitignore: added various temporary pip & build files
-
-2014-05-25  Titus Brown  <t@idyll.org>
-
     * lib/counting.cc: added I/O exception handling to CountingHashFileReader
 	and CountingHashGzFileReader.
     * lib/hashbits.cc: added I/O exception handling to Hashbits::load.
