@@ -601,6 +601,7 @@ def test_save_load_tagset_trunc():
     ht.add_tag('A' * 32)
     ht.add_tag('G' * 32)
     ht.save_tagset(outfile)
+    ht.save_tagset('/tmp/goodversion-k32.tagset')
 
     # truncate tagset file...
     fp = open(outfile, 'rb')
@@ -617,3 +618,89 @@ def test_save_load_tagset_trunc():
         assert 0, "this test should fail"
     except IOError:
         pass
+
+# to build the test files used below, add 'test' to this function
+# and then look in /tmp. You will need to tweak the version info in
+# khmer.hh in order to create "bad" versions, of course. -CTB
+def _build_testfiles():
+    ### hashbits file
+
+    inpath = utils.get_test_data('random-20-a.fa')
+    hi = khmer.new_hashbits(12, 50)
+    hi.consume_fasta(inpath)
+    hi.save('/tmp/goodversion-k12.ht')
+
+    ### tagset file
+    
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    ht.add_tag('A' * 32)
+    ht.add_tag('G' * 32)
+    ht.save_tagset('/tmp/goodversion-k32.tagset')
+
+    ### stoptags file
+
+    fakelump_fa = utils.get_test_data('fakelump.fa')
+
+    ht = khmer.new_hashbits(32, 1e7, 4)
+    ht.consume_fasta_and_tag(fakelump_fa)
+
+    subset = ht.do_subset_partition(0, 0)
+    ht.merge_subset(subset)
+
+    EXCURSION_DISTANCE = 40
+    EXCURSION_KMER_THRESHOLD = 82
+    EXCURSION_KMER_COUNT_THRESHOLD = 1
+    counting = khmer.new_counting_hash(32, 1e7, 4)
+
+    ht.repartition_largest_partition(None, counting,
+                                     EXCURSION_DISTANCE,
+                                     EXCURSION_KMER_THRESHOLD,
+                                     EXCURSION_KMER_COUNT_THRESHOLD)
+
+    ht.save_stop_tags('/tmp/goodversion-k32.stoptags')
+
+def test_hashbits_file_version_check():
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k12.ht')
+
+    try:
+        ht.load(inpath)
+        assert 0, "this should fail"
+    except IOError:
+        pass
+
+def test_stoptags_file_version_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k32.stoptags')
+
+    try:
+        ht.load_stop_tags(inpath)
+        assert 0, "this should fail"
+    except IOError:
+        pass
+
+def test_stoptags_ksize_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.stoptags')
+    ht.load_stop_tags(inpath)
+
+def test_tagset_file_version_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k32.tagset')
+
+    try:
+        ht.load_tagset(inpath)
+        assert 0, "this should fail"
+    except IOError:
+        pass
+
+def test_tagset_ksize_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.tagset')
+    ht.load_tagset(inpath)

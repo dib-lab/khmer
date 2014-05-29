@@ -616,3 +616,14 @@ def test_load_gz_truncated_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
+def test_counting_file_version_check():
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k12.kh')
+
+    try:
+        ht.load(inpath)
+        assert 0, "this should fail"
+    except IOError:
+        pass

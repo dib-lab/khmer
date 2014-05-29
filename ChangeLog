@@ -1,5 +1,6 @@
 2014-05-29  Titus Brown  <t@idyll.org>
 
+    * added tests for fail-on-load of bad file format versions.
     * added various temporary pip & build files to .gitignore.
 
 2014-05-25  Titus Brown  <t@idyll.org>
