@@ -28,8 +28,8 @@ from khmer.file import (check_space, check_space_for_hashtable,
                         check_valid_file_exists)
 DEFAULT_DESIRED_COVERAGE = 10
 
-MAX_FALSE_POSITIVE_RATE=0.8             # see Zhang et al.,
-                                        # http://arxiv.org/abs/1309.2975
+MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
+# http://arxiv.org/abs/1309.2975
 
 # Iterate a collection in arbitrary batches
 # from: http://stackoverflow.com/questions/4628290/pairs-from-single-list

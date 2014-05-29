@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring
 import khmer
 import screed
 
@@ -366,6 +367,7 @@ class Test_SaveLoadPmap(object):
             assert 0, "this should fail"
         except IOError, e:
             print str(e)
+
 
 def test_output_partitions():
     filename = utils.get_test_data('test-output-partitions.fa')

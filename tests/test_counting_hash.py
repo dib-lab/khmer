@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,protected-access
 import gzip
 
 import khmer
@@ -551,6 +552,7 @@ def test_consume_high_abund_kmers():
 
 ####
 
+
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
 
@@ -560,6 +562,7 @@ def test_load_notexist_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
@@ -584,6 +587,7 @@ def test_load_truncated_should_fail():
     except IOError, e:
         print str(e)
 
+
 def test_load_gz_notexist_should_fail():
     savepath = utils.get_temp_filename('tempcountingsave0.ht.gz')
 
@@ -593,6 +597,7 @@ def test_load_gz_notexist_should_fail():
         assert 0, "load should fail"
     except IOError, e:
         print str(e)
+
 
 def test_load_gz_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
@@ -617,6 +622,7 @@ def test_load_gz_truncated_should_fail():
     except IOError, e:
         print str(e)
 
+
 def test_counting_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
@@ -626,4 +632,12 @@ def test_counting_file_version_check():
         ht.load(inpath)
         assert 0, "this should fail"
     except IOError, e:
+        print str(e)
+
+
+def test_counting_bad_primes_list():
+    try:
+        ht = khmer._new_counting_hash(12, ["a", "b", "c"], 1)
+        assert 0, "bad list of primes should fail"
+    except TypeError, e:
         print str(e)
