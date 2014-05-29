@@ -115,6 +115,11 @@ diff-cover: clean coverage-gcovr.xml coverage.xml
 	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-cover coverage-gcovr.xml coverage.xml
 
+diff-cover.html: clean coverage-gcovr.xml coverage.xml
+	pip2 install --user diff_cover || pip2 install diff_cover
+	diff-cover coverage-gcovr.xml coverage.xml \
+		--html-report diff-cover.html
+
 nosetests.xml: all
 	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests --with-xunit
