@@ -9,6 +9,8 @@
 #include "subset.hh"
 #include "read_parsers.hh"
 
+#include <sstream>
+
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
 
@@ -1261,7 +1263,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
     }  catch (std::ifstream::failure &e) {
         std::string err;
         if (!infile.is_open()) {
-            err = "Cannot open file: " + other_filename;
+            err = "Cannot open subset pmap file: " + other_filename;
         } else {
             err = "Unknown error in opening file: " + other_filename;
         }
@@ -1274,16 +1276,25 @@ void SubsetPartition::merge_from_disk(string other_filename)
 
         infile.read((char *) &version, 1);
         infile.read((char *) &ht_type, 1);
-        if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_SUBSET)) {
-            std::string err;
-            err = "Invalid data version or saved filetype: " + other_filename;
-            throw khmer_file_exception(err.c_str());
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading subset pmap from " << other_filename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_SUBSET)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading subset pmap from " << other_filename;
+            throw khmer_file_exception(err.str().c_str());
         }
 
         infile.read((char *) &save_ksize, sizeof(save_ksize));
-        if (!(save_ksize == _ht->ksize())) { // @CTB tested?
-            std::string err = "Saved k-mer size does not match hashtable k size.";
-            throw khmer_file_exception(err.c_str());
+        if (!(save_ksize == _ht->ksize())) {
+            std::ostringstream err;
+            err << "Incorrect k-mer size " << save_ksize
+                << " while reading subset pmap from " << other_filename;
+            throw khmer_file_exception(err.str().c_str());
         }
     } catch (std::ifstream::failure &e) {
         std::string err;

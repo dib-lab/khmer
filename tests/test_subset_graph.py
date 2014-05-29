@@ -332,7 +332,30 @@ class Test_SaveLoadPmap(object):
 
         try:
             ht.merge_subset_from_disk(outfile1)
-            assert 0
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
+
+    def test_save_merge_from_disk_ksize(self):
+        ht = khmer.new_hashbits(20, 4 ** 6 + 1)
+        filename = utils.get_test_data('test-graph2.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
+
+        divvy = ht.divide_tags_into_subsets(1)
+        print divvy
+        (a, b, c) = divvy
+
+        outfile1 = utils.get_temp_filename('x.pmap')
+        x = ht.do_subset_partition(a, b)
+        ht.save_subset_partitionmap(x, outfile1)
+        del x
+
+        ht = khmer.new_hashbits(19, 1, 1)
+        try:
+            ht.merge_subset_from_disk(outfile1)
+            assert 0, "this should fail"
         except IOError, e:
             print str(e)
 

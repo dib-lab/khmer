@@ -3207,13 +3207,26 @@ static PyObject * hashbits_load_subset_partitionmap(PyObject * self, PyObject * 
     SubsetPartition * subset_p;
     subset_p = new SubsetPartition(hashbits);
 
+    bool fail = false;
+    std::string err;
+
     Py_BEGIN_ALLOW_THREADS
 
-    subset_p->load_partitionmap(filename);
+    try {
+        subset_p->load_partitionmap(filename);
+    } catch (khmer_file_exception &e) {
+        fail = true;
+        err = e.what();
+    }
 
     Py_END_ALLOW_THREADS
 
-    return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+    if (fail) {
+        PyErr_SetString(PyExc_IOError, err.c_str());
+        return NULL;
+    } else {
+        return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+    }
 }
 
 static PyObject * hashbits__set_tag_density(PyObject * self, PyObject * args)
