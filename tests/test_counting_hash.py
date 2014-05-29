@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,protected-access
 import gzip
 
 import khmer
@@ -631,4 +632,12 @@ def test_counting_file_version_check():
         ht.load(inpath)
         assert 0, "this should fail"
     except IOError, e:
+        print str(e)
+
+
+def test_counting_bad_primes_list():
+    try:
+        ht = khmer._new_counting_hash(12, ["a", "b", "c"], 1)
+        assert 0, "bad list of primes should fail"
+    except TypeError, e:
         print str(e)

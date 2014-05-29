@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,protected-access
 import khmer
 
 from screed.fasta import fasta_iter
@@ -722,4 +723,12 @@ def test_tagset_ksize_check():
         ht.load_tagset(inpath)
         assert 0, "this should fail"
     except IOError, e:
+        print str(e)
+
+
+def test_bad_primes_list():
+    try:
+        coutingtable = khmer._new_hashbits(31, ["a", "b", "c"], 1)
+        assert 0, "Bad primes list should fail"
+    except TypeError, e:
         print str(e)

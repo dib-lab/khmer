@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring
 import khmer
 import screed
 
