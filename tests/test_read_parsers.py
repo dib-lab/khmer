@@ -245,4 +245,28 @@ def test_read_pair_iterator_in_ignore_mode():
     assert 2 == len(read_pairs)
 
 
+def test_constructor():
+
+    # Note: Using a data file with only one read.
+    try:
+        rparser = ReadParser(utils.get_test_data("single-read.fq"), "a")
+        assert 0, "ReadParser's constructor shouldn't accept a character for the number of threads"
+    except TypeError, err:
+        print str(err)
+    try:
+        rparser = ReadParser("non-existent-file-name")
+        assert 0, "ReadParser shouldn't accept a non-existant file name"
+    except ValueError, err:
+        print str(err)
+
+
+def test_iternext():
+    rparser = ReadParser(utils.get_test_data("fakelump.fa.stoptags.txt"))
+    read_pairs = []
+    try:
+        for read_1, read_2 in rparser.iter_read_pairs():
+            read_pairs.append(read_1, read_2)
+        assert 0, "Shouldn't be able to iterate over non FASTA file"
+    except IOError, err:
+        print str(err)
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

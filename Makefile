@@ -36,6 +36,7 @@ clean: FORCE
 	rm -f khmer/_khmermodule.so || true
 	rm khmer/*.pyc lib/*.pyc || true
 	./setup.py clean --all || true
+	rm coverage-debug || true
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \

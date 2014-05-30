@@ -64,7 +64,7 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
     "counting", "subset", "aligner", "scoringmatrix", "node", "kmer"])
 
-EXTRA_COMPILE_ARGS = []
+EXTRA_COMPILE_ARGS = ['-O3']
 
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
@@ -148,9 +148,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "z" and "bz2" not in self.libraries:
-            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
-                    ' configure || bash ./configure --static ) && make -f '
-                    'Makefile.pic PIC']
+            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( bash ./configure '
+                    '--static ) && make -f Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']

@@ -32,7 +32,22 @@ class Test_Filter(object):
         outname = utils.get_temp_filename('test_abund.out')
 
         ht.consume_fasta(filename)
+        try:
+            ht.consume_fasta()
+            assert 0, "should fail"
+        except TypeError, err:
+            print str(err)
+        try:
+            ht.consume_fasta("nonexistent")
+            assert 0, "should fail"
+        except ValueError, err:
+            print str(err)
         ht.output_fasta_kmer_pos_freq(filename, outname)
+        try:
+            ht.output_fasta_kmer_pos_freq()
+            assert 0, "should fail"
+        except TypeError, err:
+            print str(err)
 
         fd = open(outname, "r")
 
