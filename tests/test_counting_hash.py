@@ -648,8 +648,6 @@ def test_counting_gz_file_version_check():
 
 
 def test_counting_file_type_check():
-    ht = khmer.new_hashbits(12, 1, 1)
-
     inpath = utils.get_test_data('goodversion-k12.ht')
 
     kh = khmer.new_counting_hash(12, 1, 1)
