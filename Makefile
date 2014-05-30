@@ -61,6 +61,15 @@ pep8: FORCE
 	pip2 install --user --quiet pep8==1.5 || pip2 install --quiet pep8==1.5
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
 
+pep8_report.txt: FORCE
+	pip2 install --user --quiet pep8==1.5 || pip2 install --quiet pep8==1.5
+	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \
+		> pep8_report.txt || true
+
+diff_pep8_report: pep8_report.txt
+	pip2 install --user diff_cover || pip2 install diff_cover
+	diff-quality --violations=pep8 pep8_report.txt
+
 autopep8: FORCE
 	pip2 install --user autopep8 || pip2 install autopep8
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
@@ -68,8 +77,19 @@ autopep8: FORCE
 
 pylint: FORCE
 	pip2 install --user pylint || pip2 install pylint
-	pylint -f parseable setup.py khmer/[!_]*.py khmer/__init__.py \
-		scripts/*.py tests || true
+	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
+		|| true
+
+pylint_report.txt: FORCE
+	pip2 install --user pylint || pip2 install pylint
+	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
+		> pylint_report.txt || true
+
+diff_pylint_report: pylint_report.txt
+	pip2 install --user diff_cover || pip2 install diff_cover
+	diff-quality --violations=pylint pylint_report.txt
 
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
@@ -90,6 +110,15 @@ coverage-gcovr.xml: coverage-debug test
 		--upgrade ${GCOVRURL}'#gcovr'
 	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
 		--output=coverage-gcovr.xml
+
+diff-cover: clean coverage-gcovr.xml coverage.xml
+	pip2 install --user diff_cover || pip2 install diff_cover
+	diff-cover coverage-gcovr.xml coverage.xml
+
+diff-cover.html: clean coverage-gcovr.xml coverage.xml
+	pip2 install --user diff_cover || pip2 install diff_cover
+	diff-cover coverage-gcovr.xml coverage.xml \
+		--html-report diff-cover.html
 
 nosetests.xml: all
 	pip2 install --user nose || pip2 install nose

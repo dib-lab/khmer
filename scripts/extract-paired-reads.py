@@ -69,9 +69,8 @@ def get_parser():
         extract-paired-reads.py tests/test-data/paired.fq
     """
     parser = argparse.ArgumentParser(
-        description=
-        'Take a mixture of reads and split into pairs and orphans.',
-        epilog=textwrap.dedent(epilog))
+        description='Take a mixture of reads and split into pairs and '
+        'orphans.', epilog=textwrap.dedent(epilog))
     parser.add_argument('infile')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
@@ -104,6 +103,7 @@ def main():
     n_se = 0
 
     record = None
+    index = 0
     for index, record in enumerate(screed.open(sys.argv[1])):
         if index % 100000 == 0 and index > 0:
             print '...', index
