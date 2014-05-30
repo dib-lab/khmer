@@ -679,6 +679,7 @@ def test_hashbits_file_version_check():
     except IOError, e:
         print str(e)
 
+
 def test_hashbits_file_type_check():
     kh = khmer.new_counting_hash(12, 1, 1)
     savepath = utils.get_temp_filename('tempcountingsave0.kh')
