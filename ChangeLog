@@ -1,5 +1,6 @@
 2014-05-30  Titus Brown  <t@idyll.org>
 
+    * khmer/_khmermodule.cc: remove merge2* functions: unused, untested.
     * lib/counting.cc, lib/hashbits.cc, lib/hashtable.cc: made file loading
 	exceptions more verbose and informative.
     * tests/test_subset_graph.py: added tests for SubsetPartition::

@@ -3258,68 +3258,6 @@ static PyObject * hashbits__get_tag_density(PyObject * self, PyObject * args)
     return PyInt_FromLong(d);
 }
 
-static PyObject * hashbits_merge2_subset(PyObject * self, PyObject * args)
-{
-    // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    // Hashbits * hashbits = me->hashbits;
-
-    PyObject * subset1_obj, * subset2_obj;
-
-    if (!PyArg_ParseTuple(args, "OO", &subset1_obj, &subset2_obj)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset1_p;
-    SubsetPartition * subset2_p;
-    subset1_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
-    subset2_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset2_obj);
-
-    Py_BEGIN_ALLOW_THREADS
-
-    subset1_p->merge(subset2_p);
-
-    Py_END_ALLOW_THREADS
-
-    Py_RETURN_NONE;
-}
-
-static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
-{
-    // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    // Hashbits * hashbits = me->hashbits;
-
-    PyObject * subset1_obj;
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "Os", &subset1_obj, &filename)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset1_p;
-    subset1_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
-
-    bool fail = false;
-    std::string err;
-
-    Py_BEGIN_ALLOW_THREADS
-
-    try {
-        subset1_p->merge_from_disk(filename);
-    } catch (khmer_file_exception &e) {
-        fail = true;
-        err = e.what();
-    }
-
-    Py_END_ALLOW_THREADS
-
-    if (fail) {
-        PyErr_SetString(PyExc_IOError, err.c_str());
-        return NULL;
-    } else {
-        Py_RETURN_NONE;
-    }
-}
-
 static PyObject * hashbits__validate_subset_partitionmap(PyObject * self, PyObject * args)
 {
     PyObject * subset_obj = NULL;
@@ -3656,8 +3594,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "subset_partition_size_distribution", hashbits_subset_partition_size_distribution, METH_VARARGS, "" },
     { "save_subset_partitionmap", hashbits_save_subset_partitionmap, METH_VARARGS },
     { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },
-    { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },
-    { "merge2_subset_from_disk", hashbits_merge2_from_disk, METH_VARARGS },
     { "_validate_subset_partitionmap", hashbits__validate_subset_partitionmap, METH_VARARGS, "" },
     { "set_partition_id", hashbits_set_partition_id, METH_VARARGS, "" },
     { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
