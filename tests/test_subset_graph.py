@@ -345,6 +345,28 @@ class Test_SaveLoadPmap(object):
         except IOError, e:
             print str(e)
 
+    @attr('highmem')
+    def test_merge_from_disk_file_bad_type(self):
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        infile = utils.get_test_data('goodversion-k12.ht')
+
+        try:
+            ht.merge_subset_from_disk(infile)
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
+
+    @attr('highmem')
+    def test_merge_from_disk_file_version(self):
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        infile = utils.get_test_data('badversion-k12.ht')
+
+        try:
+            ht.merge_subset_from_disk(infile)
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
+
     def test_save_merge_from_disk_ksize(self):
         ht = khmer.new_hashbits(20, 4 ** 6 + 1)
         filename = utils.get_test_data('test-graph2.fa')
