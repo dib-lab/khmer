@@ -647,6 +647,20 @@ def test_counting_gz_file_version_check():
         print str(e)
 
 
+def test_counting_file_type_check():
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k12.ht')
+
+    kh = khmer.new_counting_hash(12, 1, 1)
+
+    try:
+        kh.load(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
 def test_counting_gz_file_type_check():
     ht = khmer.new_hashbits(12, 1, 1)
 
