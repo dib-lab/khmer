@@ -5,6 +5,7 @@
 SHELL=/bin/bash
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=`git describe --tags --dirty | sed s/v//`
+PYLINT_TEMPLATE="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
 all: FORCE
 	./setup.py build_ext --inplace
@@ -77,13 +78,13 @@ autopep8: FORCE
 
 pylint: FORCE
 	pip2 install --user pylint || pip2 install pylint
-	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+	pylint --msg-template=${PYLINT_TEMPLATE} --disable=locally-disabled \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		|| true
 
 pylint_report.txt: FORCE
 	pip2 install --user pylint || pip2 install pylint
-	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+	pylint --msg-template=${PYLINT_TEMPLATE} --disable=locally-disabled \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		> pylint_report.txt || true
 
