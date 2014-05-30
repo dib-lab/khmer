@@ -635,6 +635,32 @@ def test_counting_file_version_check():
         print str(e)
 
 
+def test_counting_gz_file_version_check():
+    ht = khmer.new_counting_hash(12, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k12.kh.gz')
+
+    try:
+        ht.load(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_counting_gz_file_type_check():
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k12.ht.gz')
+
+    kh = khmer.new_counting_hash(12, 1, 1)
+
+    try:
+        kh.load(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
 def test_counting_bad_primes_list():
     try:
         ht = khmer._new_counting_hash(12, ["a", "b", "c"], 1)
