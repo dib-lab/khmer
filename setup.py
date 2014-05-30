@@ -64,12 +64,15 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
     "counting", "subset", "aligner", "scoringmatrix", "node", "kmer"])
 
+EXTRA_COMPILE_ARGS = []
+
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
 
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
+        "extra_compile_args": EXTRA_COMPILE_ARGS,
         "extra_objects": EXTRA_OBJS,
         "depends": BUILD_DEPENDS,
         "language": "c++",
