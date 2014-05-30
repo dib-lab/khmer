@@ -98,6 +98,8 @@ def main():
 
     fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
+    info_fp.write('fp rate estimated to be %1.3f' % fp_rate)
+    
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print >> sys.stderr, "**"
         print >> sys.stderr, ("** ERROR: the graph structure is too small for "
