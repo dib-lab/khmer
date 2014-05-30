@@ -679,6 +679,19 @@ def test_hashbits_file_version_check():
     except IOError, e:
         print str(e)
 
+def test_hashbits_file_type_check():
+    kh = khmer.new_counting_hash(12, 1, 1)
+    savepath = utils.get_temp_filename('tempcountingsave0.kh')
+    kh.save(savepath)
+
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    try:
+        ht.load(savepath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
 
 def test_stoptags_file_version_check():
     ht = khmer.new_hashbits(32, 1, 1)
