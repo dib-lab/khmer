@@ -716,6 +716,17 @@ def test_stoptags_ksize_check():
         print str(e)
 
 
+def test_stop_tags_filetype_check():
+    ht = khmer.new_hashbits(31, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.tagset')
+    try:
+        ht.load_stop_tags(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
 def test_tagset_file_version_check():
     ht = khmer.new_hashbits(32, 1, 1)
 
@@ -732,6 +743,17 @@ def test_tagset_ksize_check():
     ht = khmer.new_hashbits(31, 1, 1)
 
     inpath = utils.get_test_data('goodversion-k32.tagset')
+    try:
+        ht.load_tagset(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_tagset_filetype_check():
+    ht = khmer.new_hashbits(31, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.stoptags')
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
