@@ -1,3 +1,16 @@
+2014-05-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc,lib/counting.{cc,hh}, 
+    sandbox/{stoptag-abundance-ham1-hist.py,off-by-one.py,filter-ham1.py}:
+    Remove CountingHash get_kmer_abund_mean, get_kmer_abund_abs_deviation, and
+    max_hamming1_count along with Python glue code and sandbox scripts. They
+    are no longer useful.
+
+2014-05-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: add target for python test coverage plain-text report;
+    clarified where the HTML report is
+
 2014-05-30  Titus Brown  <t@idyll.org>
 
     * khmer/_khmermodule.cc: remove merge2* functions: unused, untested.

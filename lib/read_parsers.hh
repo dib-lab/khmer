@@ -45,7 +45,9 @@ namespace read_parsers
 {
 
 
-struct InvalidReadFileFormat: public std:: exception {
+class InvalidReadFileFormat: public std:: exception {
+
+public:
 
     InvalidReadFileFormat(
         char const * exc_name,
@@ -61,7 +63,9 @@ protected:
 
 };
 
-struct InvalidFASTAFileFormat: public InvalidReadFileFormat {
+class InvalidFASTAFileFormat: public InvalidReadFileFormat {
+
+public:
 
     InvalidFASTAFileFormat(
         char const * reason	= NULL,
@@ -70,7 +74,9 @@ struct InvalidFASTAFileFormat: public InvalidReadFileFormat {
 
 };
 
-struct InvalidFASTQFileFormat: public InvalidReadFileFormat {
+class InvalidFASTQFileFormat: public InvalidReadFileFormat {
+
+public:
 
     InvalidFASTQFileFormat(
         char const * reason	= NULL,

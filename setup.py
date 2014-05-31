@@ -148,9 +148,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "z" and "bz2" not in self.libraries:
-            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
-                    ' configure || bash ./configure --static ) && make -f '
-                    'Makefile.pic PIC']
+            zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( bash ./configure '
+                    '--static ) && make -f Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
