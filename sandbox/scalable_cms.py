@@ -11,7 +11,7 @@ import khmer, math
 INITIAL_SIZE = 512
 GROWTH_RATE = 2
 N_TABLES = 4
-ERROR=.1
+ERROR=.01
 ERROR_TIGHTENING_RATIO=0.5
 
 class ScalableCounter(object):
@@ -41,25 +41,29 @@ class ScalableCounter(object):
         
         self.table_capacity.append(capacity)
 
-        print 'new table:', n_tables, size, capacity
+        print 'added new table of size %d/capacity %d (now %d tables total)' %\
+              (size, capacity, n_tables + 1)
 
     def count(self, dna):
         n = len(self.tables) - 1
+
+        # iterate over the tables
         while n >= 0:
             kh = self.tables[n]
             if kh.get(dna):
                 kh.count(dna)
-                if self.table_counts[n] >= self.table_capacity[n]:
-                    kh.decrement_random()
-                    pass
+#                if self.table_counts[n] >= self.table_capacity[n]:
+#                    kh.decrement_random()
                 return
             
             n -= 1
 
+        # do we need to expand the table capacity?
         if self.table_counts[-1] >= self.table_capacity[-1]:
             kh = self.tables[-1]
-            fpr = khmer.calc_expected_collisions(kh)
-            print 'adding new table', self.table_counts[-1], fpr
+            old_fpr = khmer.calc_expected_collisions(kh)
+            print 'last table is full! %d counts, FP rate %.3f' % (\
+                self.table_counts[-1], old_fpr)
             self.add_table()
             
         kh = self.tables[-1]
@@ -70,7 +74,9 @@ class ScalableCounter(object):
         n = len(self.tables) - 1
         while n >= 0:
             kh = self.tables[n]
-            return kh.get(dna)
+            count = kh.get(dna)
+            if count:
+                return count
 
             n -= 1
 
@@ -81,22 +87,26 @@ if __name__ == '__main__':
     thenums = []
     
     K = 20
-    limit = 4**(K-1)
+    limit = 4**K
 
+    print 'Creating new ScalableCounter: growth rate %d, error ratio %.2f, bound %.3f' % \
+          (GROWTH_RATE, ERROR_TIGHTENING_RATIO, ERROR)
     kh = ScalableCounter(K)
 
     NN = 10000
 
     for i in range(NN):
+        if i % 1000 == 0:
+            print '...added', i
         r = random.randint(0, limit)
-        dna = khmer.reverse_hash(r, K-1)
-        dna = 'A'+dna
+        dna = khmer.reverse_hash(r, K)
         kh.count(dna)
         thenums.append(dna)
 
     #####
 
     total = 0
+    #print 'shuffling items'
     #random.shuffle(thenums)
     for i, dna in enumerate(thenums):
         count = kh.get(dna)
@@ -105,4 +115,7 @@ if __name__ == '__main__':
     for i in range(10):
         print thenums[i], kh.get(thenums[i])
 
+    total_size = sum([ sum(t.hashsizes()) for t in kh.tables ])
+    print 'total memory used: %.1fk' % (total_size / 1000.)
     print 'average miscount:', float(total) / float(NN)
+
