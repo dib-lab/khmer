@@ -1348,43 +1348,6 @@ static PyObject * hash_get_kadian_count(PyObject * self, PyObject * args)
     return Py_BuildValue("i", kad);
 }
 
-static PyObject * hash_get_kmer_abund_mean(PyObject * self, PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    unsigned long long total = 0;
-    unsigned long long count = 0;
-    float mean = 0.0;
-    counting->get_kmer_abund_mean(filename, total, count, mean);
-
-    return Py_BuildValue("KKf", total, count, mean);
-}
-
-static PyObject * hash_get_kmer_abund_abs_deviation(PyObject * self, PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    const char * filename = NULL;
-    float mean = 0.0;
-
-    if (!PyArg_ParseTuple(args, "sf", &filename, &mean)) {
-        return NULL;
-    }
-
-    float abs_dev = 0.0;
-    counting->get_kmer_abund_abs_deviation(filename, mean, abs_dev);
-
-    return Py_BuildValue("f", abs_dev);
-}
-
 static PyObject * hash_get(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1406,22 +1369,6 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
             std::string s = PyString_AsString(arg);
             count = counting->get_count(s.c_str());
         }
-
-    return PyInt_FromLong(count);
-}
-
-static PyObject * hash_max_hamming1_count(PyObject * self, PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    const char * kmer;
-
-    if (!PyArg_ParseTuple(args, "s", &kmer)) {
-        return NULL;
-    }
-
-    unsigned long count = counting->max_hamming1_count(kmer);
 
     return PyInt_FromLong(count);
 }
@@ -1519,7 +1466,7 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
 
     PyObject * x = PyList_New(max_read_len);
 
-    for (int i = 0; i < max_read_len; i++) {
+    for (unsigned int i = 0; i < max_read_len; i++) {
         int ret = PyList_SetItem(x, i, PyLong_FromUnsignedLongLong(counts[i]));
         if (ret < 0) {
             delete counts;
@@ -1824,7 +1771,6 @@ static PyMethodDef khmer_counting_methods[] = {
     },
     { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
     { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
-    { "max_hamming1_count", hash_max_hamming1_count, METH_VARARGS, "Get the count for the given k-mer" },
     { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
     { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
     { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
@@ -1837,8 +1783,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
     { "load", hash_load, METH_VARARGS, "" },
     { "save", hash_save, METH_VARARGS, "" },
-    { "get_kmer_abund_abs_deviation", hash_get_kmer_abund_abs_deviation, METH_VARARGS, "" },
-    { "get_kmer_abund_mean", hash_get_kmer_abund_mean, METH_VARARGS, "" },
     {
         "collect_high_abundance_kmers", hash_collect_high_abundance_kmers,
         METH_VARARGS, ""

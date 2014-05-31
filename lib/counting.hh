@@ -228,16 +228,6 @@ public:
                                        CallbackFn callback = NULL,
                                        void * callback_data = NULL);
 
-    void get_kmer_abund_mean(const std::string &inputfile,
-                             unsigned long long &total,
-                             unsigned long long &count,
-                             float &mean) const;
-
-    void get_kmer_abund_abs_deviation(const std::string &inputfile,
-                                      float mean, float &abs_deviation) const;
-
-    unsigned int max_hamming1_count(const std::string kmer);
-
     unsigned long trim_on_abundance(std::string seq,
                                     BoundedCounterType min_abund) const;
     unsigned long trim_below_abundance(std::string seq,
