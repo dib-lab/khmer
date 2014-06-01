@@ -10,6 +10,8 @@
 #include "hashbits.hh"
 #include "read_parsers.hh"
 
+#include <sstream>
+
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
@@ -48,6 +50,24 @@ void Hashbits::save(std::string outfilename)
 
 void Hashbits::load(std::string infilename)
 {
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+        infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!infile.is_open()) {
+            err = "Cannot open k-mer graph file: " + infilename;
+        } else {
+            err = "Unknown error in opening file: " + infilename;
+        }
+        throw khmer_file_exception(err.c_str());
+    }
+
     if (_counts) {
         for (unsigned int i = 0; i < _n_tables; i++) {
             delete _counts[i];
@@ -58,49 +78,64 @@ void Hashbits::load(std::string infilename)
     }
     _tablesizes.clear();
 
-    unsigned int save_ksize = 0;
-    unsigned char save_n_tables = 0;
-    unsigned long long save_tablesize = 0;
-    unsigned char version, ht_type;
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char save_n_tables = 0;
+        unsigned long long save_tablesize = 0;
+        unsigned char version, ht_type;
 
-    ifstream infile(infilename.c_str(), ios::binary);
-    if (!infile.is_open()) {
-        throw new exception();
-    }
-
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_HASHBITS)) {
-        throw std::exception();
-    }
-
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    infile.read((char *) &save_n_tables, sizeof(save_n_tables));
-
-    _ksize = (WordLength) save_ksize;
-    _n_tables = (unsigned int) save_n_tables;
-    _init_bitstuff();
-
-    _counts = new Byte*[_n_tables];
-    for (unsigned int i = 0; i < _n_tables; i++) {
-        HashIntoType tablesize;
-        unsigned long long tablebytes;
-
-        infile.read((char *) &save_tablesize, sizeof(save_tablesize));
-
-        tablesize = (HashIntoType) save_tablesize;
-        _tablesizes.push_back(tablesize);
-
-        tablebytes = tablesize / 8 + 1;
-        _counts[i] = new Byte[tablebytes];
-
-        unsigned long long loaded = 0;
-        while (loaded != tablebytes) {
-            infile.read((char *) _counts[i], tablebytes - loaded);
-            loaded += infile.gcount();	// do I need to do this loop?
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer graph from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str().c_str());
         }
+        else if (!(ht_type == SAVED_HASHBITS)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer graph from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        infile.read((char *) &save_n_tables, sizeof(save_n_tables));
+
+        _ksize = (WordLength) save_ksize;
+        _n_tables = (unsigned int) save_n_tables;
+        _init_bitstuff();
+
+        _counts = new Byte*[_n_tables];
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            HashIntoType tablesize;
+            unsigned long long tablebytes;
+
+            infile.read((char *) &save_tablesize, sizeof(save_tablesize));
+
+            tablesize = (HashIntoType) save_tablesize;
+            _tablesizes.push_back(tablesize);
+
+            tablebytes = tablesize / 8 + 1;
+            _counts[i] = new Byte[tablebytes];
+
+            unsigned long long loaded = 0;
+            while (loaded != tablebytes) {
+                infile.read((char *) _counts[i], tablebytes - loaded);
+                loaded += infile.gcount();
+            }
+        }
+        infile.close();
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (infile.eof()) {
+            err = "Unexpected end of k-mer graph file: " + infilename;
+        } else {
+            err = "Error reading from k-mer graph file: " + infilename;
+        }
+        throw khmer_file_exception(err.c_str());
     }
-    infile.close();
 }
 
 // for counting overlap k-mers specifically!!

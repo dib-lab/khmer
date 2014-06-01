@@ -1,3 +1,36 @@
+2014-05-30  Titus Brown  <t@idyll.org>
+
+    * khmer/_khmermodule.cc: remove merge2* functions: unused, untested.
+    * lib/counting.cc, lib/hashbits.cc, lib/hashtable.cc: made file loading
+	exceptions more verbose and informative.
+    * tests/test_subset_graph.py: added tests for SubsetPartition::
+	load_partitionmap.
+    * khmer/_khmermodule.cc, lib/subset.cc, wrapped SubsetPartition::
+	load_partitionmap to catch, propagate exceptions
+    * tests/test_hashbits.py, tests/test_counting_hash.py: added tests
+	for fail-on-load of bad file format versions; print exception messages.
+    * .gitignore: added various temporary pip & build files
+    * lib/counting.cc: added I/O exception handling to CountingHashFileReader
+	and CountingHashGzFileReader.
+    * lib/hashbits.cc: added I/O exception handling to Hashbits::load.
+    * lib/subset.cc: added I/O exception handling to merge_from_disk.
+    * lib/hashtable.cc: added I/O exception handling to load_tagset and
+	load_stop_tags
+    * khmer/_khmermodule.cc: added I/O exception propagation from C++ to
+	Python, for all loading functions.
+
+2014-05-22  Michael Wright  <wrigh517@msu.edu>
+
+    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts 
+    from sandbox
+    * tests/test_scripts.py: Added tests for fastq-to-fasta.py
+    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in 
+    sequence for testing
+
+2014-05-16  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt: include sweep-reads-buffered.py
+
 2014-05-14  Adam Caldwell  <adam.caldwell@gmail.com>
 
     * Makefile: change pip to pip2. Fixes assorted make problems on systems
@@ -16,6 +49,11 @@
     * setup.{cfg,py}: Move third party libraries to their own directory
     * Makefile: add sloccount target for humans and the sloccount.sc target for
    Jenkins
+
+2014-05-13  Michael Wright  <wrigh517@msu.edu>
+
+    * sandbox/fastq-to-fasta.py: now reports number of reads dropped due to
+    'N's in sequence. close 395
 
 2014-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 

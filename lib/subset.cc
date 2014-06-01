@@ -9,6 +9,8 @@
 #include "subset.hh"
 #include "read_parsers.hh"
 
+#include <sstream>
+
 #define IO_BUF_SIZE 250*1000*1000
 #define BIG_TRAVERSALS_ARE 200
 
@@ -1251,35 +1253,60 @@ void SubsetPartition::_merge_other(
 
 void SubsetPartition::merge_from_disk(string other_filename)
 {
-    ifstream infile(other_filename.c_str(), ios::binary);
-    if (!infile.is_open()) {
-        throw std::exception();
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try {
+        infile.open(other_filename.c_str(), ios::binary);
+    }  catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!infile.is_open()) {
+            err = "Cannot open subset pmap file: " + other_filename;
+        } else {
+            err = "Unknown error in opening file: " + other_filename;
+        }
+        throw khmer_file_exception(err.c_str());
     }
 
-    unsigned int save_ksize = 0;
-    unsigned char version, ht_type;
+    try {
+        unsigned int save_ksize = 0;
+        unsigned char version, ht_type;
 
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_SUBSET)) {
-        throw std::exception();
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading subset pmap from " << other_filename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_SUBSET)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading subset pmap from " << other_filename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        if (!(save_ksize == _ht->ksize())) {
+            std::ostringstream err;
+            err << "Incorrect k-mer size " << save_ksize
+                << " while reading subset pmap from " << other_filename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        err = "Unknown error reading header info from: " + other_filename;
+        throw khmer_file_exception(err.c_str());
     }
 
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    if (!(save_ksize == _ht->ksize())) {
-        throw std::exception();
-    }
-
-    char * buf = NULL;
-    buf = new char[IO_BUF_SIZE];
+    char * buf = new char[IO_BUF_SIZE];
 
     unsigned int loaded = 0;
     long remainder;
 
-    if (!(infile.is_open())) {
-        delete[] buf;
-        throw std::exception();
-    }
 
     PartitionPtrMap diskp_to_pp;
 
@@ -1296,7 +1323,21 @@ void SubsetPartition::merge_from_disk(string other_filename)
     while (!infile.eof()) {
         unsigned int i;
 
-        infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+        try {
+            infile.read(buf + remainder, IO_BUF_SIZE - remainder);
+        } catch (std::ifstream::failure &e) {
+
+            // We may get an exception here if we fail to read all the
+            // expected bytes due to EOF -- only pass it up if we read
+            // _nothing_.  Note that the while loop exits on EOF.
+
+            if (infile.gcount() == 0) {
+                std::string err;
+                err = "Unknown error reading data from: " + other_filename;
+                throw khmer_file_exception(err.c_str());
+            }
+        }
+
         long n_bytes = infile.gcount() + remainder;
         remainder = n_bytes % (sizeof(PartitionID) + sizeof(HashIntoType));
         n_bytes -= remainder;
@@ -1321,8 +1362,6 @@ void SubsetPartition::merge_from_disk(string other_filename)
             throw std::exception();
         }
         memcpy(buf, buf + n_bytes, remainder);
-
-        // _merge_from_disk_consolidate(diskp_to_pp);
     }
 
     delete[] buf;

@@ -31,3 +31,8 @@ doc/doxygen
 third-party/zlib/zconf.h
 sloccount.sc
 cov-int/
+*.orig
+*.zip
+*.tar.gz
+third-party/zlib/zlib.pc
+pip-log.txt
