@@ -14,8 +14,8 @@ graft doc
 prune doc/doxygen
 graft data
 graft examples
-graft tests
 global-exclude *.orig
 global-exclude *.pyc
+graft khmer/tests/test-data
 
 include khmer/_version.py

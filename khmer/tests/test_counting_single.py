@@ -8,7 +8,7 @@
 # pylint: disable=C0111,C0103
 
 import khmer
-import tests.khmer_tst_utils as utils
+import khmer.tests.khmer_tst_utils as utils
 from nose.plugins.attrib import attr
 
 MAX_COUNT = 255

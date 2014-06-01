@@ -4,12 +4,12 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-import os
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
+#import os
+#thisdir = os.path.dirname(__file__)
+#thisdir = os.path.abspath(thisdir)
 
-pythondir = os.path.join(thisdir, '..', 'python')
-pythondir = os.path.abspath(pythondir)
+#pythondir = os.path.join(thisdir, '..', 'python')
+#pythondir = os.path.abspath(pythondir)
 
-import sys
+#import sys
 # sys.path.insert(0, pythondir)

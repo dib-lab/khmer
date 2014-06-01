@@ -13,7 +13,7 @@ import shutil
 from cStringIO import StringIO
 import traceback
 
-import tests.khmer_tst_utils as utils
+import khmer.tests.khmer_tst_utils as utils
 import khmer
 import khmer.file
 import screed
