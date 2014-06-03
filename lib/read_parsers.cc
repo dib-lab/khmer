@@ -39,7 +39,7 @@ what( ) const throw( )
 InvalidReadFileFormat::
 InvalidReadFileFormat(
     char const * exc_name, char const * reason, char const * evidence
-)
+) : khmer_file_exception(reason)
 {
 
     if (reason) {

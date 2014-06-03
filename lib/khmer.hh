@@ -115,6 +115,33 @@ void deallocate_ptr_set(T& s)
         delete *i;
     }
 }
+
+class khmer_file_exception : public std::exception
+{
+public:
+    khmer_file_exception(const char * msg) : _msg(msg) { };
+
+    virtual const char* what() const throw() {
+        return _msg;
+    }
+protected:
+    const char * _msg;
+};
+
+class InvalidStreamHandle : public khmer_file_exception {
+public:
+	InvalidStreamHandle()
+		: khmer_file_exception("Generic InvalidStreamHandle error") {}
+	InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
+};
+
+class StreamReadError : public khmer_file_exception {
+public:
+	StreamReadError()
+		: khmer_file_exception("Generic StreamReadError error") {}
+	StreamReadError(const char * msg) : khmer_file_exception(msg) {}
+};
+
 }
 
 #endif // KHMER_HH
