@@ -7,15 +7,12 @@
 import tempfile
 import os
 import shutil
-
-thisdir = os.path.dirname(__file__)
-thisdir = os.path.abspath(thisdir)
-
-tempfile.tempdir = thisdir
+from pkg_resources import Requirement, resource_filename
 
 
 def get_test_data(filename):
-    return os.path.join(thisdir, 'test-data', filename)
+    return resource_filename(
+        Requirement.parse("khmer"), "khmer/tests/test-data/" + filename)
 
 cleanup_list = []
 
