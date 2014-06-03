@@ -1138,6 +1138,10 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
         counting->consume_fasta(filename, total_reads, n_consumed,
                                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
+	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
         return NULL;
     }
 
@@ -2029,9 +2033,21 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     Hashbits * hashbits = tracking_obj->hashbits;
     HashIntoType * dist;
 
+    char const * result;
+    bool exception = false;
     Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(filename, hashbits);
+    try {
+        dist = counting->abundance_distribution(filename, hashbits);
+    } catch (khmer_file_exception &e) {
+	exception = true;
+	result = e.what();
+    }
     Py_END_ALLOW_THREADS
+
+    if (exception) {
+	PyErr_SetString(PyExc_IOError, result);
+	return NULL;
+    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {
