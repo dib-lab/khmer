@@ -14,9 +14,9 @@ Convert FASTQ files to FASTA format.
 
 Use '-h' for parameter help.
 """
-import sys
 import argparse
 import screed
+import sys
 
 
 def get_parser():
@@ -28,45 +28,32 @@ def get_parser():
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', help='The name of the output'
                         ' FASTA sequence file.')
-    parser.add_argument('-n', '--n_keep', default=False, action='store_true',
-                        help='Option to drop reads containing \'N\'s in ' +
-                        'input_sequence file.')
     return parser
 
 
 def main():
-    args = get_parser().parse_args()
-    print >> sys.stderr, ('fastq from ', args.input_sequence)
-
+    min_length = int(sys.argv[1])
     if args.output:
         write_out = open(args.output, 'w')
 
-    n_count = 0
-    for n, record in enumerate(screed.open(sys.argv[1])):
-        if n % 10000 == 0:
-            print>>sys.stderr, '...', n
+    for filename in sys.argv[2:]:
+        for record in screed.open(filename):
+            if len(record['sequence']) >= min_length:
+                #if fasta
 
-        sequence = record['sequence']
-        name = record['name']
-
-        if 'N' in sequence:
-            if not args.n_keep:
-                n_count += 1
-                continue
-        if args.output:
-            write_out.write('>' + name + '\n')
-            write_out.write(sequence + '\n')
-        else:
-            print '>' + name
-            print sequence
-
-    print >> sys.stderr, '\n' + 'lines from ' + args.input_sequence
-
-    if not args.n_keep:
-        print >> sys.stderr, str(n_count) + ' lines dropped.'
-
-    else:
-        print >> sys.stderr, 'No lines dropped from file.'
+                    print >> sys.stderr, ( '>%s\n%s' % (record['name'], 
+                        record['sequence'],) )
+                #elif fastq
+                    if hasattr(record, 'accuracy'):
+                        outfp.write(
+                            '@{name}\n{seq}\n'
+                            '+\n{acc}\n'.format(name=record.name,
+                                                seq=record.sequence,
+                                                acc=record.accuracy))
+                    else:
+                        outfp.write(
+                            '>{name}\n{seq}\n'.format(name=record.name,
+                                                        seq=record.sequence))
 
 if __name__ == '__main__':
     main()
