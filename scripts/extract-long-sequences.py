@@ -21,37 +21,39 @@ import sys
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
+        description='Extracts FASTQ or FASTA sequences longer than argument 
+        specified length.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input_sequence', help='The name of the input'
-                        ' FASTQ sequence file.')
+    parser.add_argument('input_filenames', help='Input FAST[AQ]'
+                        ' sequence filename.', nargs='+')
     parser.add_argument('-o', '--output', help='The name of the output'
-                        ' FASTA sequence file.')
+                        ' sequence file.')
+    parser.add_argument('-l', '--length', help='The minimum length of the'
+                        ' sequence file.')
     return parser
 
 
 def main():
-    min_length = int(sys.argv[1])
+    args = get_parser().parse_args()
     if args.output:
         write_out = open(args.output, 'w')
 
-    for filename in sys.argv[2:]:
-        for record in screed.open(filename):
-            if len(record['sequence']) >= min_length:
-                #if fasta
-
+    for file in args.input_filenames
+        for record in screed.open(file):
+            if len(record['sequence']) >= args.length:
+                if ('+' in file):
                     print >> sys.stderr, ( '>%s\n%s' % (record['name'], 
                         record['sequence'],) )
-                #elif fastq
+                else:
                     if hasattr(record, 'accuracy'):
-                        outfp.write(
+                        write_out.write(
                             '@{name}\n{seq}\n'
                             '+\n{acc}\n'.format(name=record.name,
                                                 seq=record.sequence,
                                                 acc=record.accuracy))
                     else:
-                        outfp.write(
+                        write_out.write(
                             '>{name}\n{seq}\n'.format(name=record.name,
                                                         seq=record.sequence))
 
