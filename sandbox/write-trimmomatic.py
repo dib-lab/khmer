@@ -14,8 +14,6 @@ for r1 in filelist:
     final_pe = r1[:-9] + '.pe.fq.gz'
     final_se = r1[:-9] + '.se.fq.gz'
     print """\
-mkdir trim
-cd trim
 java -jar /usr/local/bin/trimmomatic-0.30.jar PE ../%s ../%s s1_pe s1_se s2_pe s2_se ILLUMINACLIP:/usr/local/share/adapters/TruSeq3-PE.fa:2:30:10
 /usr/local/share/khmer/scripts/interleave-reads.py s1_pe s2_pe | gzip -9c > ../%s
 
