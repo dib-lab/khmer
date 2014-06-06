@@ -55,8 +55,6 @@ def main():
     for infile in infiles:
         check_file_status(infile)
 
-    check_space(infiles)
-
     print('hashtable from', args.input_counting_table_filename)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
