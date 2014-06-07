@@ -89,7 +89,7 @@ class IODeque(deque):
 
     def clear(self):
         while(len(self)):
-            self.outfp.write(output_single(self.pop()))
+            self.outfp.write(output_single(self.popleft()))
         deque.clear(self)
 
 
