@@ -4,12 +4,8 @@
    You might also want to replace the UA- string for google analytics.
 #}
 
-{# {% set google_analytics_id = 'UA-36028965-1' %} #}
-{% set disqus_shortname = 'khmer-docs' %}
-
-{# note, currently these must be set... #}
-{% set github_base_account = 'ged-lab' %}
-{% set github_project = 'khmer' %}
+{#  set google_analytics_id, disqus_shortname, github_base_account, and
+    github_project in conf.py #}
 
 {##################################################}
 {# for plone-derived "edit me" & Google analytics #}
@@ -19,6 +15,8 @@
 {{ super() }}
 
 {# Add plone-derived 'edit me' sticky note #}
+{% if github_base_account %}
+
 <div id="editor-trap">
       <h3>Edit this document!</h3>
 
@@ -61,6 +59,8 @@
 
   </div>
 
+{% endif %}
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -86,7 +86,7 @@
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-    var disqus_shortname = 'labibi'; // required: replace example with your forum shortname
+    var disqus_shortname = '{{ disqus_shortname }}'; // required: replace example with your forum shortname
 
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
@@ -117,7 +117,7 @@
 {% if google_analytics_id %}
 <script type="text/javascript">
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-16853172-1']);
+  _gaq.push(['_setAccount', '{{ google_analytics_id }}']);
   _gaq.push(['_trackPageview']);
 
   (function() {
