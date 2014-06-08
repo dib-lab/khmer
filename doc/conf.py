@@ -186,6 +186,15 @@ html_style = 'labibi.css'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'khmerdoc'
 
+##
+# Various settings to pass to templates:
+
+html_context = {
+   "google_analytics_id" : 'UA-51731094-1',
+   "disqus_shortname" : 'khmer-docs',
+#   "github_base_account" : 'ged-lab',
+   "github_project" : 'khmer-protocols',
+}
 
 # -- Options for LaTeX output -------------------------------------------------
 

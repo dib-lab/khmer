@@ -1,3 +1,10 @@
+2014-06-08  Titus Brown  <t@idyll.org>
+
+    * doc/conf.py: set google_analytics_id and disqus_shortname properly;
+	disable "editme" popup.
+    * doc/_templates/page.html: take google_analytics_id and disqus_shortname
+	from doc/conf.py.
+
 2014-06-03 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
 
     * scripts/abundance-dist.py: removed call to check_space on infiles.  
