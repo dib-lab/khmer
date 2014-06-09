@@ -60,9 +60,9 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
                     scriptname, ns)
                 status = 0
             except pkg_resources.ResolutionError, err:
-                paths = os.environ['PATH'].split(':')
-                paths.append(os.path.join(os.path.dirname(__file__),
-                                          "../../scripts"))
+                paths = [os.path.join(os.path.dirname(__file__),
+                                      "../../scripts")]
+                paths.append(os.environ['PATH'].split(':'))
                 for path in paths:
                     scriptfile = os.path.join(path, scriptname)
                     if os.path.isfile(scriptfile):
