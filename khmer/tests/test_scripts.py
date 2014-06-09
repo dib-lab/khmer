@@ -26,6 +26,25 @@ def scriptpath(script):
 def teardown():
     utils.cleanup()
 
+def _runscript(scriptname):
+    import pkg_resources
+    ns = {"__name__":"__main__"}
+    ns['sys'] = globals()['sys']
+    try:
+        pkg_resources.get_distribution("khmer").run_script(
+            scriptname, ns)
+        return 0
+    except pkg_resources.ResolutionError, err:
+        paths = [os.path.join(os.path.dirname(__file__),
+                              "../../scripts")]
+        paths.extend(os.environ['PATH'].split(':'))
+        for path in paths:
+            scriptfile = os.path.join(path, scriptname)
+            if os.path.isfile(scriptfile):
+                execfile(scriptfile, ns)
+                return 0
+    return -1
+
 
 def runscript(scriptname, args, in_directory=None, fail_ok=False):
     """
@@ -52,22 +71,7 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
         try:
             print 'running:', scriptname, 'in:', in_directory
             print 'arguments', sysargs
-            import pkg_resources
-            ns = {"__name__":"__main__"}
-            ns['sys'] = globals()['sys']
-            try:
-                pkg_resources.get_distribution("khmer").run_script(
-                    scriptname, ns)
-                status = 0
-            except pkg_resources.ResolutionError, err:
-                paths = [os.path.join(os.path.dirname(__file__),
-                                      "../../scripts")]
-                paths.extend(os.environ['PATH'].split(':'))
-                for path in paths:
-                    scriptfile = os.path.join(path, scriptname)
-                    if os.path.isfile(scriptfile):
-                        execfile(scriptfile, ns)
-                        status = 0
+            status = _runscript(scriptname)
         except SystemExit, e:
             status = e.code
         except:
