@@ -64,12 +64,6 @@ static void		_trace_logger(
     }
 
 }
-#else
-static uint8_t const	_MODULE_TRACE_LEVEL	= TraceLogger:: TLVL_NONE;
-static inline void	_trace_logger(
-    uint8_t level, char const * format, ...
-)
-{ }
 #endif
 
 
@@ -2033,7 +2027,7 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     Hashbits * hashbits = tracking_obj->hashbits;
     HashIntoType * dist;
 
-    char const * result;
+    char const * result = "";
     bool exception = false;
     Py_BEGIN_ALLOW_THREADS
     try {
