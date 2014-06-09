@@ -7,12 +7,17 @@
 import tempfile
 import os
 import shutil
-from pkg_resources import Requirement, resource_filename
+from pkg_resources import Requirement, resource_filename, ResolutionError
 
 
 def get_test_data(filename):
-    return resource_filename(
-        Requirement.parse("khmer"), "khmer/tests/test-data/" + filename)
+    try:
+        filename = resource_filename(
+            Requirement.parse("khmer"), "khmer/tests/test-data/" + filename)
+    except ResolutionError:
+        filename = os.path.join(os.path.dirname(__file__), 'test-data',
+                                filename)
+    return filename
 
 cleanup_list = []
 
