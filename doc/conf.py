@@ -193,7 +193,7 @@ html_context = {
    "google_analytics_id" : 'UA-51731094-1',
    "disqus_shortname" : 'khmer-docs',
 #   "github_base_account" : 'ged-lab',
-   "github_project" : 'khmer-protocols',
+   "github_project" : 'khmer',
 }
 
 # -- Options for LaTeX output -------------------------------------------------
