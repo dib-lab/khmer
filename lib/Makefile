@@ -171,7 +171,7 @@ PARSERS_OBJS= read_parsers.o
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
 
 clean:
-	-(cd $(ZLIB_DIR) && make clean)
+	-(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS) $(AUX_PROGS) zlib/Makefile
 
