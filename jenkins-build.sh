@@ -45,7 +45,8 @@ fi
 if type hg >/dev/null 2>&1
 then
 	rm -Rf sphinx-contrib
-	hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
+	#hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
+	hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
 	pip install --upgrade sphinx-contrib/autoprogram/
 	make doc
 fi
