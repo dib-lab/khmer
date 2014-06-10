@@ -35,14 +35,12 @@ def get_parser():
     epilog = ("""
     
     Take a list of files containing sequences, and subsample 100,000
-    sequences (-N) uniformly, using reservoir sampling.  Stop after first
-    100m sequences (-M). By default take one subsample, but take -S samples
-    if specified.
+    sequences (:option:`-N`) uniformly, using reservoir sampling.  Stop after
+    first 100m sequences (:option:`-M`). By default take one subsample, but
+    take :option:`-S` samples if specified.
     
-    100,000 reads (or -N) are subsampled once (or -S times) from up to
-    100 million reads (or -M).  The output is placed in '-o' (for a
-    single sample) or in <file>.subset.0 to <file>.subset.S-1 (for more
-    than one sample).
+    The output is placed in :option:`-o` (for a single sample) or in
+    <file>.subset.0 to <file>.subset.S-1 (for more than one sample).
 
     This script uses the `reservoir sampling
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
