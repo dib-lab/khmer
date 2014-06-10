@@ -20,6 +20,8 @@ import argparse
 import screed
 import os.path
 import random
+import textwrap
+
 import khmer
 from khmer.file import check_file_status, check_space
 from khmer.khmer_args import info
@@ -30,9 +32,26 @@ DEBUG = True
 
 
 def get_parser():
+    epilog = ("""
+    
+    Take a list of files containing sequences, and subsample 100,000
+    sequences (-N) uniformly, using reservoir sampling.  Stop after first
+    100m sequences (-M). By default take one subsample, but take -S samples
+    if specified.
+    
+    100,000 reads (or -N) are subsampled once (or -S times) from up to
+    100 million reads (or -M).  The output is placed in '-o' (for a
+    single sample) or in <file>.subset.0 to <file>.subset.S-1 (for more
+    than one sample).
+
+    This script uses the `reservoir sampling
+    <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
+    """)   # noqa
+    
     parser = argparse.ArgumentParser(
         description="Uniformly subsample sequences from a collection of files",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        epilog=textwrap.dedent(epilog))
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
