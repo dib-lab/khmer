@@ -1564,10 +1564,22 @@ def test_extract_long_sequences():
     in_dir_fq = os.path.dirname(fq_infile)
     in_dir_fa = os.path.dirname(fa_infile)
 
-    args = [fq_infile, '-l', 50, '-o', fq_outfile]
+    args = [fq_infile, '-l', '10', '-o', 'fq_outfile']
     (status, out, err) = runscript(script, args, in_dir_fa)
-    assert 'CGTTCAGTGAAACTTTTTCCATTGCTTTGCGCGCCGCCTCA' in out, out 
 
-    args = [fa_infile, '-l', 50, '-o', fa_outfile]
-    (status, out, err) = runscript(script, args, in_dir_fq)
-    assert 'CGTTCAGTGAAACTTTTTCCA' in out, out
+    countlines = 0
+    readfq = open(fq_infile, 'r')
+    for line in readfq:
+        countlines += 1
+    assert countlines == 44
+    readfq.close()
+
+    args = [fa_infile, '-l', '10', '-o', 'fa_outfile']
+    (status, out, err) = runscript(script, args, in_dir_fa)
+
+    countlines = 0
+    readfa = open(fa_infile, 'r')
+    for line in readfa:
+        countlines += 1
+    assert countlines == 22
+    readfa.close()
