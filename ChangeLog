@@ -1,3 +1,14 @@
+2014-06-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * setup.py,tests/{__init__,khmer_tst_utils,test_scripts,
+    khmer_test_counting_single}.py: made tests runnable after installation.
+    * lib/{khmer.hh,hashtable.hh,read_parsers.cc,read_parsers.hh}: restructure
+    exception hierarchy.
+    * khmer/_khmermodule.cc: Nicer error checking for hash_consume_fasta,
+    hash_abundance_distribution, hashbits_consume_{fasta,fasta_and_tag
+    {,with_stoptags},partitioned_fasta}, hashbits_output_partitions, and
+    labelhash_consume_{,partitioned_}fasta_and_tag_with_labels.
+
 2014-06-13  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
     * doc/install.txt: updated virtuaenv command to use python2 explicitly,
