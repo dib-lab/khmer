@@ -42,7 +42,7 @@ def main():
         write_out = open(args.output, 'w')
 
     n_count = 0
-    for n, record in enumerate(screed.open(sys.argv[1])):
+    for n, record in enumerate(screed.open(args.input_sequence)):
         if n % 10000 == 0:
             print>>sys.stderr, '...', n
 
