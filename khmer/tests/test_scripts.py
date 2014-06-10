@@ -26,9 +26,10 @@ def scriptpath(script):
 def teardown():
     utils.cleanup()
 
+
 def _runscript(scriptname):
     import pkg_resources
-    ns = {"__name__":"__main__"}
+    ns = {"__name__": "__main__"}
     ns['sys'] = globals()['sys']
     try:
         pkg_resources.get_distribution("khmer").run_script(
