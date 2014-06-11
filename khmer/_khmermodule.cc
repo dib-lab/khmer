@@ -1132,7 +1132,7 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
         counting->consume_fasta(filename, total_reads, n_consumed,
                                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
-	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
     } catch (khmer_file_exception &e) {
         PyErr_SetString(PyExc_IOError, e.what());
@@ -1909,8 +1909,8 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         } else if (PyFloat_Check(size_o)) {
             sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
         } else {
-	    PyErr_SetString(PyExc_TypeError,
-		    "2nd argument must be a list of ints, longs, or floats");
+            PyErr_SetString(PyExc_TypeError,
+                            "2nd argument must be a list of ints, longs, or floats");
             return NULL;
         }
     }
@@ -2033,14 +2033,14 @@ static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
     try {
         dist = counting->abundance_distribution(filename, hashbits);
     } catch (khmer_file_exception &e) {
-	exception = true;
-	result = e.what();
+        exception = true;
+        result = e.what();
     }
     Py_END_ALLOW_THREADS
 
     if (exception) {
-	PyErr_SetString(PyExc_IOError, result);
-	return NULL;
+        PyErr_SetString(PyExc_IOError, result);
+        return NULL;
     }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
@@ -2560,11 +2560,11 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
         hashbits->consume_fasta(filename, total_reads, n_consumed,
                                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
-	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
     } catch (khmer_file_exception &e) {
-	PyErr_SetString(PyExc_IOError, e.what());
-	return NULL;
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
     }
 
     return Py_BuildValue("IK", total_reads, n_consumed);
@@ -2657,11 +2657,11 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self, PyObject * arg
         hashbits->consume_fasta_and_tag(filename, total_reads, n_consumed,
                                         _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
-	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
     } catch (khmer_file_exception &e) {
-	PyErr_SetString(PyExc_IOError, e.what());
-	return NULL;
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
     }
 
     return Py_BuildValue("IK", total_reads, n_consumed);
@@ -2726,11 +2726,11 @@ static PyObject * hashbits_consume_fasta_and_tag_with_stoptags(PyObject * self, 
                 total_reads, n_consumed,
                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
-	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
     } catch (khmer_file_exception &e) {
-	PyErr_SetString(PyExc_IOError, e.what());
-	return NULL;
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
     }
 
     return Py_BuildValue("IK", total_reads, n_consumed);
@@ -2757,11 +2757,11 @@ static PyObject * hashbits_consume_partitioned_fasta(PyObject * self, PyObject *
         hashbits->consume_partitioned_fasta(filename, total_reads, n_consumed,
                                             _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
-	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
     } catch (khmer_file_exception &e) {
-	PyErr_SetString(PyExc_IOError, e.what());
-	return NULL;
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
     }
 
     return Py_BuildValue("IK", total_reads, n_consumed);
@@ -2934,11 +2934,11 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
                        _report_fn,
                        callback_obj);
     } catch (_khmer_signal &e) {
-	PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
     } catch (khmer_file_exception &e) {
-	PyErr_SetString(PyExc_IOError, e.what());
-	return NULL;
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
     }
 
     return PyInt_FromLong(n_partitions);
@@ -3059,7 +3059,7 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
     hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
     return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
-	    (Py_ssize_t) n_unassigned);
+                         (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -3078,7 +3078,7 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
     subset_p->count_partitions(n_partitions, n_unassigned);
 
     return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
-	    (Py_ssize_t) n_unassigned);
+                         (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
@@ -3673,9 +3673,9 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
             } else if (PyFloat_Check(size_o)) {
                 sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
             } else {
-		Py_DECREF(self);
-		PyErr_SetString(PyExc_TypeError,
-			"2nd argument must be a list of ints, longs, or floats");
+                Py_DECREF(self);
+                PyErr_SetString(PyExc_TypeError,
+                                "2nd argument must be a list of ints, longs, or floats");
                 return NULL;
             }
         }
@@ -3709,7 +3709,7 @@ static PyObject * subset_count_partitions(PyObject * self,
     subset_p->count_partitions(n_partitions, n_unassigned);
 
     return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
-	    (Py_ssize_t) n_unassigned);
+                         (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * subset_report_on_partitions(PyObject * self,
@@ -3943,9 +3943,9 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
             } else if (PyFloat_Check(size_o)) {
                 sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
             } else {
-		Py_DECREF(self);
-		PyErr_SetString(PyExc_TypeError,
-			"2nd argument must be a list of ints, longs, or floats");
+                Py_DECREF(self);
+                PyErr_SetString(PyExc_TypeError,
+                                "2nd argument must be a list of ints, longs, or floats");
                 return NULL;
             }
         }
@@ -3996,7 +3996,7 @@ static PyObject * labelhash_get_label_dict(PyObject * self, PyObject * args)
 }
 
 static PyObject * labelhash_consume_fasta_and_tag_with_labels(
-	PyObject * self, PyObject * args)
+    PyObject * self, PyObject * args)
 {
     khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * hb = me->labelhash;
@@ -4016,15 +4016,15 @@ static PyObject * labelhash_consume_fasta_and_tag_with_labels(
     //Py_BEGIN_ALLOW_THREADS
     try {
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,
-		n_consumed, _report_fn, callback_obj);
+                                              n_consumed, _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
-	exc = e.get_message().c_str();
+        exc = e.get_message().c_str();
     } catch (khmer_file_exception &e) {
-	exc = e.what();
+        exc = e.what();
     }
     //Py_END_ALLOW_THREADS
     if (exc != NULL) {
-	PyErr_SetString(PyExc_IOError, exc);
+        PyErr_SetString(PyExc_IOError, exc);
         return NULL;
     }
 
@@ -4057,8 +4057,8 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
         PyErr_SetString(PyExc_IOError, "error parsing in consume_partitioned_fasta_and_tag_with_labels");
         return NULL;
     } catch (khmer_file_exception &e) {
-	PyErr_SetString(PyExc_IOError, e.what());
-	return NULL;
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
     }
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
@@ -4482,8 +4482,8 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
         } else if (PyFloat_Check(size_o)) {
             sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
         } else {
-	    PyErr_SetString(PyExc_TypeError,
-		    "2nd argument must be a list of ints, longs, or floats");
+            PyErr_SetString(PyExc_TypeError,
+                            "2nd argument must be a list of ints, longs, or floats");
             return NULL;
         }
     }
