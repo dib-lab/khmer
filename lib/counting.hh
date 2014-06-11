@@ -80,12 +80,12 @@ public:
         if (_counts) {
             for (size_t i = 0; i < _n_tables; i++) {
                 if (_counts[i]) {
-                    delete _counts[i];
+                    delete[] _counts[i];
                     _counts[i] = NULL;
                 }
             }
 
-            delete _counts;
+            delete[] _counts;
             _counts = NULL;
 
             _n_tables = 0;

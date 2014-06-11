@@ -687,19 +687,22 @@ _ReadParser_iternext( PyObject * self )
     IParser *       parser  = myself->parser;
 
     bool    stop_iteration  = false;
-    bool    invalid_file_format = false;
-    char    exc_message[ CHAR_MAX ];
+    char    const * exc = NULL;
     Read *  the_read_PTR    = new Read( );
 
     Py_BEGIN_ALLOW_THREADS
-    stop_iteration = parser->is_complete( );
-    if (!stop_iteration)
-        try {
-            parser->imprint_next_read( *the_read_PTR );
-        } catch (InvalidReadFileFormat &exc) {
-            invalid_file_format = true;
-            strncpy( exc_message, exc.what( ), CHAR_MAX );
-        }
+    try {
+	stop_iteration = parser->is_complete( );
+	if (!stop_iteration)
+	    try {
+		parser->imprint_next_read( *the_read_PTR );
+	    } catch (InvalidReadFileFormat &e) {
+		exc = e.what( );
+	    }
+    }
+    catch (StreamReadError &e) {
+	exc = e.what();
+    }
     Py_END_ALLOW_THREADS
 
     // Note: Can simply return NULL instead of setting the StopIteration
@@ -709,8 +712,8 @@ _ReadParser_iternext( PyObject * self )
         return NULL;
     }
 
-    if (invalid_file_format) {
-        PyErr_SetString( PyExc_IOError, (char const *)exc_message );
+    if (exc != NULL) {
+        PyErr_SetString(PyExc_IOError, exc);
         return NULL;
     }
 
@@ -1459,12 +1462,12 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self, PyObject *
     for (unsigned int i = 0; i < max_read_len; i++) {
         int ret = PyList_SetItem(x, i, PyLong_FromUnsignedLongLong(counts[i]));
         if (ret < 0) {
-            delete counts;
+            delete[] counts;
             return NULL;
         }
     }
 
-    delete counts;
+    delete[] counts;
 
     return x;
 }

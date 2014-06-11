@@ -429,10 +429,10 @@ CountingHashFileReader::CountingHashFileReader(
 
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
-            delete ht._counts[i];
+            delete[] ht._counts[i];
             ht._counts[i] = NULL;
         }
-        delete ht._counts;
+        delete[] ht._counts;
         ht._counts = NULL;
     }
     ht._tablesizes.clear();
@@ -531,10 +531,10 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
     if (ht._counts) {
         for (unsigned int i = 0; i < ht._n_tables; i++) {
-            delete ht._counts[i];
+            delete[] ht._counts[i];
             ht._counts[i] = NULL;
         }
-        delete ht._counts;
+        delete[] ht._counts;
         ht._counts = NULL;
     }
     ht._tablesizes.clear();

@@ -68,6 +68,16 @@ def test_bzip2_decompression():
     assert 100 == reads_count
 
 
+def test_badbzip2():
+    rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
+    try:
+        for read in rparser:
+            pass
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
+
+
 @attr('highmem')
 def test_with_multiple_threads():
 
