@@ -1567,19 +1567,11 @@ def test_extract_long_sequences():
     args = [fq_infile, '-l', '10', '-o', 'fq_outfile']
     (status, out, err) = runscript(script, args, in_dir_fa)
 
-    countlines = 0
-    readfq = open(fq_infile, 'r')
-    for line in readfq:
-        countlines += 1
-    assert countlines == 44
-    readfq.close()
+    countlines = sum(1 for line in open(fq_infile))
+    assert countlines == 44, countlines
 
     args = [fa_infile, '-l', '10', '-o', 'fa_outfile']
     (status, out, err) = runscript(script, args, in_dir_fa)
 
-    countlines = 0
-    readfa = open(fa_infile, 'r')
-    for line in readfa:
-        countlines += 1
-    assert countlines == 22
-    readfa.close()
+    countlines = sum(1 for line in open(fa_infile))
+    assert countlines == 22, countlines

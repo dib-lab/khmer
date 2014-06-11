@@ -11,7 +11,8 @@
 Write out lines of FASTQ and FASTA files that exceed an argument-specified
 length.
 
-% python scripts/extract-long-sequences.py [ -l ] [ -o ] <input_file_name(s)>
+% scripts/extract-long-sequences.py [-h] [-o OUTPUT] -l LENGTH
+                                 input_filenames [input_filenames ...]
 
 Use '-h' for parameter help.
 """
