@@ -35,12 +35,14 @@ def get_parser():
     epilog = ("""
     
     Take a list of files containing sequences, and subsample 100,000
-    sequences (:option:`-N`) uniformly, using reservoir sampling.  Stop after
-    first 100m sequences (:option:`-M`). By default take one subsample, but
-    take :option:`-S` samples if specified.
+    sequences (:option:`-N`/:option:`--num_reads`) uniformly, using
+    reservoir sampling.  Stop after first 100m sequences
+    (:option:`-M`/:option:`--max_reads`). By default take one subsample,
+    but take :option:`-S`/:option:`--samples` samples if specified.
     
-    The output is placed in :option:`-o` (for a single sample) or in
-    <file>.subset.0 to <file>.subset.S-1 (for more than one sample).
+    The output is placed in :option:`-o`/:option:`--output` <file>
+    (for a single sample) or in <file>.subset.0 to <file>.subset.S-1
+    (for more than one sample).
 
     This script uses the `reservoir sampling
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
@@ -60,6 +62,7 @@ def get_parser():
                         default=1)
     parser.add_argument('-R', '--random-seed', type=int, dest='random_seed')
     parser.add_argument('-o', '--output', dest='output_file',
+                        metavar='output_file',
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
