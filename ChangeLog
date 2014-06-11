@@ -1,3 +1,10 @@
+2014-06-10  Michael Wright <wrigh517@msu.edu>
+
+    * scripts/extract-long-sequences: Moved from sandbox, added argparse and 
+    FASTQ support.
+    * scripts/fastq-to-fasta: Fixed outdated argparse oversight.
+    * tests/test_scripts.py: Added tests for extract-long-sequences.py
+
 2014-06-04  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * lib/Makefile: do a distclean as the CFLAGS may have changed. Fixes #442

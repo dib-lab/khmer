@@ -1547,3 +1547,31 @@ def test_fastq_to_fasta():
     (status, out, err) = runscript(script, args, in_dir_n)
     assert len(out.splitlines()) > 2
     assert "4 lines dropped" in err
+
+
+def test_extract_long_sequences():
+
+    script = scriptpath('extract-long-sequences.py')
+    fq_infile = utils.get_temp_filename('test.fq')
+    fa_infile = utils.get_temp_filename('test.fa')
+
+    shutil.copyfile(utils.get_test_data('paired-mixed.fq'), fq_infile)
+    shutil.copyfile(utils.get_test_data('paired-mixed.fa'), fa_infile)
+
+    fq_outfile = fq_infile + '.keep.fq'
+    fa_outfile = fa_infile + '.keep.fa'
+
+    in_dir_fq = os.path.dirname(fq_infile)
+    in_dir_fa = os.path.dirname(fa_infile)
+
+    args = [fq_infile, '-l', '10', '-o', 'fq_outfile']
+    (status, out, err) = runscript(script, args, in_dir_fa)
+
+    countlines = sum(1 for line in open(fq_infile))
+    assert countlines == 44, countlines
+
+    args = [fa_infile, '-l', '10', '-o', 'fa_outfile']
+    (status, out, err) = runscript(script, args, in_dir_fa)
+
+    countlines = sum(1 for line in open(fa_infile))
+    assert countlines == 22, countlines
