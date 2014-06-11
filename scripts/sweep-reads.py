@@ -246,8 +246,9 @@ def main():
             label = -1
             g = 0
             try:
-                outfp = open('{pref}_base_{g}.fa'.format(pref=output_pref,
-                                                         g=g), 'wb')
+                outfn = os.path.join(args.outdir, 
+                    '{pref}_base_{g}.fa'.format(pref=output_pref, g=g) 
+                outfp = open(outfn, 'wb')
                 for n, record in enumerate(screed.open(input_fastp)):
                     if n % args.group_size == 0:
                         label += 1
