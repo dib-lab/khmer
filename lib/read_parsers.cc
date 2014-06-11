@@ -384,8 +384,8 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
         case BZ_STREAM_END:
             block_complete = true;
-	    nbread_total += nbread;
-	    break;
+            nbread_total += nbread;
+            break;
         case BZ_OK:
             nbread_total += nbread;
             break;
@@ -582,7 +582,7 @@ CacheManager::
     }
     delete [ ] _segments;
     _segments		= NULL;
-
+    delete &_stream_reader;
 }
 
 
@@ -1436,7 +1436,6 @@ IParser::
 ~IParser( )
 {
     delete[] _states;
-
     regfree( &_re_read_2_nosub );
     regfree( &_re_read_1 );
     regfree( &_re_read_2 );

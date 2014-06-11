@@ -692,16 +692,15 @@ _ReadParser_iternext( PyObject * self )
 
     Py_BEGIN_ALLOW_THREADS
     try {
-	stop_iteration = parser->is_complete( );
-	if (!stop_iteration)
-	    try {
-		parser->imprint_next_read( *the_read_PTR );
-	    } catch (InvalidReadFileFormat &e) {
-		exc = e.what( );
-	    }
-    }
-    catch (StreamReadError &e) {
-	exc = e.what();
+        stop_iteration = parser->is_complete( );
+        if (!stop_iteration)
+            try {
+                parser->imprint_next_read( *the_read_PTR );
+            } catch (InvalidReadFileFormat &e) {
+                exc = e.what( );
+            }
+    } catch (StreamReadError &e) {
+        exc = e.what();
     }
     Py_END_ALLOW_THREADS
 
@@ -713,6 +712,7 @@ _ReadParser_iternext( PyObject * self )
     }
 
     if (exc != NULL) {
+        delete the_read_PTR;
         PyErr_SetString(PyExc_IOError, exc);
         return NULL;
     }
@@ -2573,7 +2573,7 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
 
     Py_END_ALLOW_THREADS
     if (exc != NULL) {
-	PyErr_SetString(PyExc_IOError, exc);
+        PyErr_SetString(PyExc_IOError, exc);
         return NULL;
     }
 
