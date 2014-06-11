@@ -2,7 +2,6 @@
 # make autopep8 to fix most pep8 errors
 # make pylint to check Python code for enhanced compliance including naming
 #  and documentation
-SHELL=/bin/bash
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=`git describe --tags --dirty | sed s/v//`
 
