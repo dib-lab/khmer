@@ -899,7 +899,6 @@ _init_ReadParser_Type( )
     }
 
     ReadParser_Type.tp_dict	    = cls_attrs_DICT;
-    Py_DECREF(cls_attrs_DICT);
     _debug_class_attrs( ReadParser_Type );
 
 } // _init_ReadParser_Type
@@ -1447,9 +1446,9 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     CountingHash * counting = me->counting;
 
     const char * seq = NULL;
-    unsigned long max_count_i = 0;
+    BoundedCounterType max_count_i = 0;
 
-    if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count_i)) {
         return NULL;
     }
 
@@ -1571,7 +1570,12 @@ static PyObject * hash_load(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    counting->load(filename);
+    try {
+        counting->load(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -1907,6 +1911,8 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         } else if (PyFloat_Check(size_o)) {
             sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
         } else {
+	    PyErr_SetString(PyExc_TypeError,
+		    "2nd argument must be a list of ints, longs, or floats");
             return NULL;
         }
     }
@@ -2224,7 +2230,14 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
     if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
         clear_tags = false;
     }
-    hashbits->load_stop_tags(filename, clear_tags);
+
+
+    try {
+        hashbits->load_stop_tags(filename, clear_tags);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -2506,7 +2519,12 @@ static PyObject * hashbits_merge_from_disk(PyObject * self, PyObject *args)
         return NULL;
     }
 
-    hashbits->partition->merge_from_disk(filename);
+    try {
+        hashbits->partition->merge_from_disk(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3010,7 +3028,8 @@ static PyObject * hashbits_count_partitions(PyObject * self, PyObject * args)
     size_t n_partitions = 0, n_unassigned = 0;
     hashbits->partition->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("nn", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
+	    (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * hashbits_subset_count_partitions(PyObject * self,
@@ -3028,7 +3047,8 @@ static PyObject * hashbits_subset_count_partitions(PyObject * self,
     size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("nn", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
+	    (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
@@ -3083,7 +3103,12 @@ static PyObject * hashbits_load(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    hashbits->load(filename);
+    try {
+        hashbits->load(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3120,7 +3145,13 @@ static PyObject * hashbits_load_tagset(PyObject * self, PyObject * args)
     if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
         clear_tags = false;
     }
-    hashbits->load_tagset(filename, clear_tags);
+
+    try {
+        hashbits->load_tagset(filename, clear_tags);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -3176,13 +3207,26 @@ static PyObject * hashbits_load_subset_partitionmap(PyObject * self, PyObject * 
     SubsetPartition * subset_p;
     subset_p = new SubsetPartition(hashbits);
 
+    bool fail = false;
+    std::string err;
+
     Py_BEGIN_ALLOW_THREADS
 
-    subset_p->load_partitionmap(filename);
+    try {
+        subset_p->load_partitionmap(filename);
+    } catch (khmer_file_exception &e) {
+        fail = true;
+        err = e.what();
+    }
 
     Py_END_ALLOW_THREADS
 
-    return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+    if (fail) {
+        PyErr_SetString(PyExc_IOError, err.c_str());
+        return NULL;
+    } else {
+        return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+    }
 }
 
 static PyObject * hashbits__set_tag_density(PyObject * self, PyObject * args)
@@ -3212,57 +3256,6 @@ static PyObject * hashbits__get_tag_density(PyObject * self, PyObject * args)
     unsigned int d = hashbits->_get_tag_density();
 
     return PyInt_FromLong(d);
-}
-
-static PyObject * hashbits_merge2_subset(PyObject * self, PyObject * args)
-{
-    // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    // Hashbits * hashbits = me->hashbits;
-
-    PyObject * subset1_obj, * subset2_obj;
-
-    if (!PyArg_ParseTuple(args, "OO", &subset1_obj, &subset2_obj)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset1_p;
-    SubsetPartition * subset2_p;
-    subset1_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
-    subset2_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset2_obj);
-
-    Py_BEGIN_ALLOW_THREADS
-
-    subset1_p->merge(subset2_p);
-
-    Py_END_ALLOW_THREADS
-
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-static PyObject * hashbits_merge2_from_disk(PyObject * self, PyObject * args)
-{
-    // khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    // Hashbits * hashbits = me->hashbits;
-
-    PyObject * subset1_obj;
-    const char * filename = NULL;
-
-    if (!PyArg_ParseTuple(args, "Os", &subset1_obj, &filename)) {
-        return NULL;
-    }
-
-    SubsetPartition * subset1_p;
-    subset1_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset1_obj);
-
-    Py_BEGIN_ALLOW_THREADS
-
-    subset1_p->merge_from_disk(filename);
-
-    Py_END_ALLOW_THREADS
-
-    Py_INCREF(Py_None);
-    return Py_None;
 }
 
 static PyObject * hashbits__validate_subset_partitionmap(PyObject * self, PyObject * args)
@@ -3601,8 +3594,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "subset_partition_size_distribution", hashbits_subset_partition_size_distribution, METH_VARARGS, "" },
     { "save_subset_partitionmap", hashbits_save_subset_partitionmap, METH_VARARGS },
     { "load_subset_partitionmap", hashbits_load_subset_partitionmap, METH_VARARGS },
-    { "merge2_subset", hashbits_merge2_subset, METH_VARARGS },
-    { "merge2_subset_from_disk", hashbits_merge2_from_disk, METH_VARARGS },
     { "_validate_subset_partitionmap", hashbits__validate_subset_partitionmap, METH_VARARGS, "" },
     { "set_partition_id", hashbits_set_partition_id, METH_VARARGS, "" },
     { "join_partitions", hashbits_join_partitions, METH_VARARGS, "" },
@@ -3652,6 +3643,9 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args, PyObje
             } else if (PyFloat_Check(size_o)) {
                 sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
             } else {
+		Py_DECREF(self);
+		PyErr_SetString(PyExc_TypeError,
+			"2nd argument must be a list of ints, longs, or floats");
                 return NULL;
             }
         }
@@ -3684,7 +3678,8 @@ static PyObject * subset_count_partitions(PyObject * self,
     size_t n_partitions = 0, n_unassigned = 0;
     subset_p->count_partitions(n_partitions, n_unassigned);
 
-    return Py_BuildValue("nn", n_partitions, n_unassigned);
+    return Py_BuildValue("nn", (Py_ssize_t) n_partitions,
+	    (Py_ssize_t) n_unassigned);
 }
 
 static PyObject * subset_report_on_partitions(PyObject * self,
@@ -3699,8 +3694,7 @@ static PyObject * subset_report_on_partitions(PyObject * self,
 
     subset_p->report_on_partitions();
 
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject * subset_compare_partitions(PyObject * self,
@@ -3919,6 +3913,9 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args, PyObje
             } else if (PyFloat_Check(size_o)) {
                 sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
             } else {
+		Py_DECREF(self);
+		PyErr_SetString(PyExc_TypeError,
+			"2nd argument must be a list of ints, longs, or floats");
                 return NULL;
             }
         }
@@ -4449,6 +4446,8 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
         } else if (PyFloat_Check(size_o)) {
             sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
         } else {
+	    PyErr_SetString(PyExc_TypeError,
+		    "2nd argument must be a list of ints, longs, or floats");
             return NULL;
         }
     }

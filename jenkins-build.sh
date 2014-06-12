@@ -1,8 +1,5 @@
 #!/bin/bash
 
-cov_analysis_dir=/usr/local/cov-analysis-linux64-6.6.1/bin
-cov_analysis_bin=cov-build
-
 rm -Rf .env build dist khmer/_khmermodule.so cov-int lib/zlib/Makefile
 
 virtualenv .env
@@ -12,82 +9,50 @@ pip install --quiet nose coverage pylint pep8==1.5 screed
 
 make clean
 
-unset coverage_pre coverage_post coverity
-
-if [[ "${NODE_LABELS}" == *linux* ]]
+if type ccache >/dev/null 2>&1
 then
-        if type ccache >/dev/null 2>&1
-        then
-                echo Enabling ccache
-                ccache --max-files=0 --max-size=500G
-                export PATH="/usr/lib/ccache:${PATH}"
-        fi
-	if type gcov >/dev/null 2>&1
-	then
-		export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
-		coverage_post='--debug --inplace --libraries gcov'
-	else
-		echo "gcov was not found, skipping coverage check"
-	fi
-else
-	echo "Not on a Linux node, skipping coverage check"
+        echo Enabling ccache
+        ccache --max-files=0 --max-size=500G
+        export PATH="/usr/lib/ccache:${PATH}"
+fi
+if [[ "${NODE_LABELS}" == *osx* ]]
+then
 	export ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future
 fi
 
-if [[ "${JOB_NAME}" == khmer/* ]]
+if type gcov >/dev/null 2>&1 && [[ "${NODE_LABELS}" != *osx* ]]
 then
-	if [[ -x ${cov_analysis_dir}/${cov_analysis_bin} ]]
-	then
-		if [[ -n "${COVERITY_TOKEN}" ]]
-			#was -v COVERITY_TOKEN, but OS X bash not new enough
-		then
-			PATH=${PATH}:${cov_analysis_dir}
-			coverity="${cov_analysis_bin} --dir cov-int"
-		else
-			echo "Missing coverity credentials, skipping scan"
-		fi
-	else
-		echo "${cov_analysis_bin} does not exist in \
-			${cov_analysis_dir}. Skipping coverity scan."
-	fi
+	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
+	python setup.py build_ext --build-temp $PWD --debug --inplace \
+		--libraries gcov
+	make coverage-gcovr.xml coverage.xml
+	./setup.py install
 else
-	echo "Not the main build so skipping the coverity scan"
+	echo "gcov was not found (or we are on OSX), skipping coverage check"
+	./setup.py install
+	make nosetests.xml
 fi
 
-if [[ -n "${coverage_post}" ]]
+if type cppcheck >/dev/null 2>&1
 then
-	${coverity} python setup.py build_ext --build-temp $PWD ${coverage_post}
+	make cppcheck-result.xml
+fi
+if type doxygen >/dev/null 2>&1
+then
+	make doxygen 2>&1 > doxygen.out
 fi
 
-if [[ -n "$coverity" ]]
-	# was -v coverity but OS X bash not new enough
+if type hg >/dev/null 2>&1
 then
-	tar czf khmer-cov.tgz cov-int
-	curl --form project=ged-lab/khmer --form token=${COVERITY_TOKEN} --form \
-		email=mcrusoe@msu.edu --form file=@khmer-cov.tgz --form \
-		version=`git describe --tags | sed s/v//` \
-		http://scan5.coverity.com/cgi-bin/upload.py
-fi
-./setup.py install
-
-if [[ -n "${coverage_post}" ]]
-then
-	make coverage.xml
 	rm -Rf sphinx-contrib
 	hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
 	pip install --upgrade sphinx-contrib/autoprogram/
 	make doc
+fi
+make pylint 2>&1 > pylint.out
+make pep8 2>&1 > pep8.out
 
-	make pylint 2>&1 > pylint.out
-
-	make pep8 2>&1 > pep8.out
-
-	pip install --quiet -U gcovr
-	make coverage-gcovr.xml
-
-	make cppcheck-result.xml
-
-	make doxygen 2>&1 > doxygen.out
-else
-	make nosetests.xml
+if type sloccount >/dev/null 2>&1
+then
+	make sloccount.sc
 fi

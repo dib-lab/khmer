@@ -74,7 +74,7 @@ def test_complete_2_collision():
         s = khmer.reverse_hash(i, 4)
         if kh.get(s):                   # string hashing is rc aware
             n_rc_filled += 1
-    #    if kh.get(i):                   # int hashing is not rc aware
+    # if kh.get(i):                   # int hashing is not rc aware
     #        n_fwd_filled += 1
 
     assert n_rc_filled == 128, n_rc_filled
@@ -95,7 +95,7 @@ def test_complete_4_collision():
         s = khmer.reverse_hash(i, 4)
         if kh.get(s):                   # string hashing is rc aware
             n_rc_filled += 1
-    #   if kh.get(i):                   # int hashing is not rc aware
+    # if kh.get(i):                   # int hashing is not rc aware
     #       n_fwd_filled += 1
 
     assert n_rc_filled == 64, n_rc_filled
