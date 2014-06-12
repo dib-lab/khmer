@@ -49,9 +49,9 @@ def check_space(in_files):
     # Get input file size as worst case estimate of
     # output file size
     file_sizes = [os.stat(f).st_size for f in valid_files]
-    total_size = reduce(lambda f1, f2: f1+f2, file_sizes)
+    total_size = reduce(lambda f1, f2: f1 + f2, file_sizes)
 
-    size_diff = total_size-free_space
+    size_diff = total_size - free_space
     if size_diff > 0:
         print >>sys.stderr, "ERROR: Not enough free space on disk " \
                             "need at least %s more" % str(size_diff)
@@ -67,7 +67,7 @@ def check_space_for_hashtable(hash_size):
     target = os.statvfs(dir_path)
     free_space = target.f_frsize * target.f_bavail
 
-    size_diff = hash_size-free_space
+    size_diff = hash_size - free_space
     if size_diff > 0:
         print >>sys.stderr, "ERROR: Not enough free space on disk, " \
                             "need at least %s more," % str(size_diff)

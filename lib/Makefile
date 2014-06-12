@@ -149,13 +149,13 @@ NO_UNIQUE_RC=0
 
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
-ZLIB_DIR=zlib
+ZLIB_DIR=../third-party/zlib
 ZLIB_OBJS_BASE=\
 	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
 	zutil.o inflate.o infback.o inftrees.o inffast.o
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
 
-BZIP2_DIR=bzip2
+BZIP2_DIR=../third-party/bzip2
 BZIP2_OBJS_BASE= \
 	blocksort.o huffman.o crctable.o randtable.o compress.o \
 	decompress.o bzlib.o
@@ -171,7 +171,7 @@ PARSERS_OBJS= read_parsers.o
 all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
 
 clean:
-	-(cd $(ZLIB_DIR) && make clean)
+	-(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
 	rm -f *.o $(DRV_PROGS) $(AUX_PROGS) zlib/Makefile
 
