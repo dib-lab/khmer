@@ -9,22 +9,24 @@
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
-% sweep-reads-buffered.py -r <range> <contigs fastp> \
-<reads1> <reads2> ... <readsN>
+% sweep-files.py -r <range> --db <fasta/q files> \
+--query <fasta/q files separate>
 """
 
 EPILOG = """
-Output will be a collection of files corresponding to the partitions;
-each partition gets a file (prefixed with the output prefix option),
-which means this could output many tens or hundreds of thousands of files.
-Users should plan accordingly.
+Output will be a collection of fasta/q files, each corresponding to a database
+file. Each of these is the subset of sequences in the query files which are 
+connected to the sequences in the given database file in the de Bruijn graph.
+The --range flag sets the breadth of traversal when searching for matches
+with the database sequences; for general use, the default (maximum range)
+is recommended.
 
-This script is very lenient on IO errors, due to the large number of file
-operations needed. Thus, errors opening a file for buffer flush or writing
-a read to a file will not crash the program; instead, if there were errors,
-the user will be warned at the end of execution. Errors with opening read files
-are also handled -- we move on to the next read file if there is an error
-opening.
+By default, the script will use no output prefix and put outputs in the current
+directory. This behavior can be changed with the --prefix and --outdir flags.
+
+The script also uses a queue to improve IO performance with many files. By
+default it buffers 1000 reads at a time; this can be changed with 
+--max_queue_size.
 """
 
 import screed
@@ -55,7 +57,7 @@ def get_parser():
                                     from each read')
     parser.add_argument('--max_queue_size', type=int, default=1000)
     parser.add_argument('--prefix', dest='output_prefix',
-                        default='',
+                        default=DEFAULT_OUT_PREF,
                         help='Prefix for sorted read files')
     parser.add_argument('--outdir', dest='outdir', default='',
                         help='output directory; default is location of \
@@ -75,6 +77,10 @@ def output_single(r):
         return ">%s\n%s\n" % (r.name, r.sequence)
 
 
+'''
+Simple deque subclass for flushing to a file when a maximum size
+is exceeded.
+'''
 class IODeque(deque):
 
     def __init__(self, limit, outfp):
@@ -113,7 +119,8 @@ def main():
 
     outputs = {}
 
-    # consume the partitioned fasta with which to label the graph
+    # Consume the database files and assign each a unique label in the
+    # de Bruin graph; open a file and output queue for each file as well.
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
     try:
         print >>sys.stderr, 'consuming and labeling input sequences...'
@@ -144,6 +151,8 @@ def main():
     n_labeled = 0
     n_mlabeled = 0
 
+    # Iterate through all the reads and check for the labels with which they
+    # intersect. Queue to the corresponding label when found.
     for read_file in args.query:
         print >>sys.stderr, '** sweeping {read_file} for labels...'.format(
             read_file=read_file)
