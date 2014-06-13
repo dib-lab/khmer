@@ -770,6 +770,7 @@ def test_bad_primes_list():
     except TypeError, e:
         print str(e)
 
+
 def test_consume_absentfasta_with_reads_parser():
     presencetable = khmer.new_hashbits(31, 1, 1)
     try:

@@ -565,6 +565,7 @@ def test_bad_primes():
     except TypeError, e:
         print str(e)
 
+
 def test_consume_fasta_and_tag_with_badreads_parser():
     presencetable = khmer.Hashbits(6, 1e6, 2)
     readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
