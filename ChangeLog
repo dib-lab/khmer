@@ -6,6 +6,7 @@
 	added test hooks.
     * tests/test_script_arguments.py: added tests for several functions in
 	khmer/file.py.
+    * sandbox/assemstats3.py: handle missing input files.
 
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
