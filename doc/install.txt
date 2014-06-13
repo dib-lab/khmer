@@ -32,7 +32,7 @@ skip to step 4.
 
       curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.x.y.tar.gz
       tar xzf virtualenv*
-      cd virtualenv-*; python2 virtualenv.py ../khmerEnv; cd ..
+      cd virtualenv-*; python2.7 virtualenv.py ../khmerEnv; cd ..
       source khmerEnv/bin/activate
 
 Linux
@@ -47,12 +47,12 @@ Linux
    - For RHEL6::
 
          sudo yum install -y python-devel python-pip git gcc gcc-c++ make
-         sudo pip2 install virtualenv   
+         sudo pip install virtualenv   
 
 #) Create a virtualenv and activate it::
 
       cd a/writeable/directory/
-      python2 -m virtualenv khmerEnv
+      python2.7 -m virtualenv khmerEnv
       source khmerEnv/bin/activate
 
    Linux users without root access can try step 4 from the OS X instructions above.
