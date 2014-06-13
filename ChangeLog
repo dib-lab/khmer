@@ -1,3 +1,7 @@
+2014-06-13  Titus Brown  <t@idyll.org>
+
+    * sandbox/assemstats3.py: handle missing input files.
+
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
     * scripts/load-into-counting: Fixed docstring misnomer to 
