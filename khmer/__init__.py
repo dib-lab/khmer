@@ -1,10 +1,12 @@
-'''
-This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-Copyright (C) Michigan State University, 2009-2014. It is licensed under
-the three-clause BSD license; see doc/LICENSE.txt.
-
-Contact: khmer-project@idyll.org
-'''
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+#
+"""
+This is khmer; please see http://github.com/ged-lab/khmer/.
+"""
 
 from khmer._khmer import _new_counting_hash
 from khmer._khmer import _new_hashbits

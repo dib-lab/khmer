@@ -1,10 +1,10 @@
-#! /usr/bin/env python
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+
 '''
 File handling/checking utilities for command-line scripts.
 '''
@@ -29,7 +29,7 @@ def check_file_status(file_path):
             sys.exit(1)
 
 
-def check_space(in_files):
+def check_space(in_files, _testhook_free_space=None):
     """
     Estimate size of input files passed, then calculate
     disk space available. Exit if insufficient disk space,
@@ -41,7 +41,11 @@ def check_space(in_files):
 
     dir_path = os.path.dirname(os.path.realpath(in_file))
     target = os.statvfs(dir_path)
-    free_space = target.f_frsize * target.f_bavail
+
+    if _testhook_free_space is None:
+        free_space = target.f_frsize * target.f_bavail
+    else:
+        free_space = _testhook_free_space
 
     # Check input file array, remove corrupt files
     valid_files = [f for f in in_files if os.path.isfile(f)]
@@ -49,28 +53,43 @@ def check_space(in_files):
     # Get input file size as worst case estimate of
     # output file size
     file_sizes = [os.stat(f).st_size for f in valid_files]
-    total_size = reduce(lambda f1, f2: f1 + f2, file_sizes)
+    total_size = sum(file_sizes)
 
     size_diff = total_size - free_space
     if size_diff > 0:
         print >>sys.stderr, "ERROR: Not enough free space on disk " \
-                            "need at least %s more" % str(size_diff)
+                            "for output files;\n" \
+                            "       Need at least %.1f GB more." \
+                            % (float(size_diff) / 1e9)
+        print >>sys.stderr, "       Estimated output size: %.1f GB" \
+                            % (float(total_size) / 1e9,)
+        print >>sys.stderr, "       Free space: %.1f GB" \
+                            % (float(free_space) / 1e9,)
         sys.exit(1)
 
 
-def check_space_for_hashtable(hash_size):
+def check_space_for_hashtable(hash_size, _testhook_free_space=None):
     """
     Check we have enough size to write a hash table
     """
     cwd = os.getcwd()
     dir_path = os.path.dirname(os.path.realpath(cwd))
     target = os.statvfs(dir_path)
-    free_space = target.f_frsize * target.f_bavail
+    if _testhook_free_space is None:
+        free_space = target.f_frsize * target.f_bavail
+    else:
+        free_space = _testhook_free_space  # allow us to test this code...
 
     size_diff = hash_size - free_space
     if size_diff > 0:
-        print >>sys.stderr, "ERROR: Not enough free space on disk, " \
-                            "need at least %s more," % str(size_diff)
+        print >>sys.stderr, "ERROR: Not enough free space on disk " \
+                            "for saved table files;" \
+                            "       Need at least %s GB more." \
+                            % (float(size_diff) / 1e9,)
+        print >>sys.stderr, "       Table size: %.1f GB" \
+                            % (float(hash_size) / 1e9,)
+        print >>sys.stderr, "       Free space: %.1f GB" \
+                            % (float(free_space) / 1e9,)
         sys.exit(1)
 
 
