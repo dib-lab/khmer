@@ -1593,7 +1593,6 @@ def test_sample_reads_randomly_S():
     (status, out, err) = runscript(script, badargs, in_dir, fail_ok=True)
     assert status == -1, (status, out, err)
 
-
     args.append('test.fq')
 
     runscript(script, args, in_dir)
