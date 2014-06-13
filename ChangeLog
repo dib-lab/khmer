@@ -1,3 +1,8 @@
+2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * MANIFEST.in: don't include docs/, data/, or examples/ in our PyPI
+    distribution. Saves 15MB.
+
 2014-06-13  Titus Brown  <t@Titus-MacBook-Air-2.local>
 
     * doc/install.txt: updated virtuaenv command to use python2 explicitly,
