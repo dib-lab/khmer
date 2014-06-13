@@ -1575,3 +1575,58 @@ def test_extract_long_sequences():
 
     countlines = sum(1 for line in open(fa_infile))
     assert countlines == 22, countlines
+
+
+def test_sample_reads_randomly_S():
+    infile = utils.get_temp_filename('test.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+
+    script = scriptpath('sample-reads-randomly.py')
+
+    # fix random number seed for reproducibility
+    args = ['-N', '10', '-R', '1', '-S', '3']
+
+    badargs = list(args)
+    badargs.extend(['-o', 'test', 'test.fq', 'test.fq'])
+    (status, out, err) = runscript(script, badargs, in_dir, fail_ok=True)
+    assert status == -1, (status, out, err)
+
+
+    args.append('test.fq')
+
+    runscript(script, args, in_dir)
+
+    outfile = infile + '.subset.0'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print seqs
+    assert seqs == set(['895:1:1:1298:13380', '895:1:1:1347:3237',
+                        '895:1:1:1295:6189', '895:1:1:1342:11001',
+                        '895:1:1:1252:19493', '895:1:1:1318:10532',
+                        '895:1:1:1314:10430', '895:1:1:1347:8723',
+                        '895:1:1:1381:4958', '895:1:1:1338:6614'])
+
+    outfile = infile + '.subset.1'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print seqs
+    assert seqs == set(['895:1:1:1384:20217', '895:1:1:1347:3237',
+                        '895:1:1:1348:18672', '895:1:1:1290:11501',
+                        '895:1:1:1386:7536', '895:1:1:1373:13994',
+                        '895:1:1:1355:13535', '895:1:1:1303:6251',
+                        '895:1:1:1381:4958', '895:1:1:1338:6614'])
+
+    outfile = infile + '.subset.2'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile)])
+    print seqs
+    assert seqs == set(['895:1:1:1326:7273', '895:1:1:1384:20217',
+                        '895:1:1:1347:3237', '895:1:1:1353:6642',
+                        '895:1:1:1340:19387', '895:1:1:1252:19493',
+                        '895:1:1:1381:7062', '895:1:1:1383:3089',
+                        '895:1:1:1342:20695', '895:1:1:1303:6251'])

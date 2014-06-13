@@ -18,6 +18,14 @@
     * scripts/load-into-counting: Fixed docstring misnomer to 
     load-into-counting.py
 
+2014-06-10  Titus Brown  <t@idyll.org>
+
+    * Makefile: remove SHELL setting so that 'make doc' works in virtualenvs.
+    * scripts/sample-reads-randomly.py: extend to take multiple subsamples
+	with -S.
+    * tests/test_scripts.py: added test for multiple subsamples from
+	sample-reads-randomly.py
+
 2014-06-10  Michael Wright <wrigh517@msu.edu>
 
     * scripts/extract-long-sequences: Moved from sandbox, added argparse and 
