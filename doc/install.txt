@@ -30,7 +30,7 @@ skip to step 4.
 
       curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.x.y.tar.gz
       tar xzf virtualenv*
-      cd virtualenv-*; python virtualenv.py ../khmerEnv; cd ..
+      cd virtualenv-*; python2 virtualenv.py ../khmerEnv; cd ..
       source khmerEnv/bin/activate
 
 Linux
