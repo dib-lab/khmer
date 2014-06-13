@@ -5,7 +5,7 @@
 # Contact: khmer-project@idyll.org
 #
 """
-This is khmer; please see http://github.com/ged-lab/khmer/.
+This is khmer; please see http://khmer.readthedocs.org/.
 """
 
 from khmer._khmer import _new_counting_hash
