@@ -5,6 +5,12 @@
 
 2014-06-13  Titus Brown  <t@idyll.org>
 
+    * khmer/__init__.py, khmer/file_args.py: Moved copyright message to a
+	comment.
+    * khmer/file.py: updated error messages for disk-space checking functions;
+	added test hooks.
+    * tests/test_script_arguments.py: added tests for several functions in
+	khmer/file.py.
     * sandbox/assemstats3.py: handle missing input files.
 
 2014-06-11  Michael Wright <wrigh517@msu.edu>
