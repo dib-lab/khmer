@@ -39,7 +39,8 @@ namespace read_parsers
 {
 
 
-class InvalidReadFileFormat: public khmer:: khmer_file_exception  {
+class InvalidReadFileFormat: public khmer:: khmer_file_exception
+{
 
 public:
 
@@ -57,7 +58,8 @@ protected:
 
 };
 
-class InvalidFASTAFileFormat: public InvalidReadFileFormat {
+class InvalidFASTAFileFormat: public InvalidReadFileFormat
+{
 
 public:
 
@@ -69,7 +71,8 @@ public:
 
 };
 
-class InvalidFASTQFileFormat: public InvalidReadFileFormat {
+class InvalidFASTQFileFormat: public InvalidReadFileFormat
+{
 
 public:
 

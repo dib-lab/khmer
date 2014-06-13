@@ -1435,7 +1435,15 @@ IParser(
 IParser::
 ~IParser( )
 {
-    delete[] _states;
+    if (_states != NULL) {
+        for (int i = 0; i < _number_of_threads; i++) {
+            if (_states[i] != NULL) {
+                delete _states[i];
+            }
+        }
+        delete[] _states;
+    }
+
     regfree( &_re_read_2_nosub );
     regfree( &_re_read_1 );
     regfree( &_re_read_2 );

@@ -143,7 +143,9 @@ HashIntoType * CountingHash::abundance_distribution(
 {
     IParser* parser = IParser::get_parser(filename.c_str());
 
-    return abundance_distribution(parser, tracking);
+    HashIntoType * distribution = abundance_distribution(parser, tracking);
+    delete parser;
+    return distribution;
 }
 
 HashIntoType * CountingHash::fasta_count_kmers_by_position(
@@ -451,13 +453,12 @@ CountingHashFileReader::CountingHashFileReader(
                 << " while reading k-mer count file from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        } else
-            if (!(ht_type == SAVED_COUNTING_HT)) {
-                std::ostringstream err;
-                err << "Incorrect file format type " << (int) ht_type
-                    << " while reading k-mer count file from " << infilename;
-                throw khmer_file_exception(err.str().c_str());
-            }
+        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
 
         infile.read((char *) &use_bigcount, 1);
         infile.read((char *) &save_ksize, sizeof(save_ksize));
@@ -549,24 +550,25 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
     if (read_v <= 0 || read_t <= 0) {
         std::string err = "K-mer count file read error: " + infilename;
+        gzclose(infile);
         throw khmer_file_exception(err.c_str());
-    } else
-        if (!(version == SAVED_FORMAT_VERSION)
-                || !(ht_type == SAVED_COUNTING_HT)) {
-            if (!(version == SAVED_FORMAT_VERSION)) {
-                std::ostringstream err;
-                err << "Incorrect file format version " << (int) version
-                    << " while reading k-mer count file from " << infilename
-                    << "; should be " << (int) SAVED_FORMAT_VERSION;
-                throw khmer_file_exception(err.str().c_str());
-            } else
-                if (!(ht_type == SAVED_COUNTING_HT)) {
-                    std::ostringstream err;
-                    err << "Incorrect file format type " << (int) ht_type
-                        << " while reading k-mer count file from " << infilename;
-                    throw khmer_file_exception(err.str().c_str());
-                }
+    } else if (!(version == SAVED_FORMAT_VERSION)
+               || !(ht_type == SAVED_COUNTING_HT)) {
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading k-mer count file from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            gzclose(infile);
+            throw khmer_file_exception(err.str().c_str());
+        } else if (!(ht_type == SAVED_COUNTING_HT)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading k-mer count file from " << infilename;
+            gzclose(infile);
+            throw khmer_file_exception(err.str().c_str());
         }
+    }
 
     int read_b = gzread(infile, (char *) &use_bigcount, 1);
     int read_k = gzread(infile, (char *) &save_ksize, sizeof(save_ksize));
@@ -575,6 +577,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
     if (read_b <= 0 || read_k <= 0 || read_nt <= 0) {
         std::string err = "K-mer count file header read error: " + infilename;
+        gzclose(infile);
         throw khmer_file_exception(err.c_str());
     }
 
@@ -594,6 +597,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         if (read_b <= 0) {
             std::string err = "K-mer count file header read error: " \
                               + infilename;
+            gzclose(infile);
             throw khmer_file_exception(err.c_str());
         }
 
@@ -609,6 +613,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
             if (read_b <= 0) {
                 std::string err = "K-mer count file read error: " + infilename;
+                gzclose(infile);
                 throw khmer_file_exception(err.c_str());
             }
 
@@ -620,6 +625,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
     read_b = gzread(infile, (char *) &n_counts, sizeof(n_counts));
     if (read_b <= 0) {
         std::string err = "K-mer count header read error: " + infilename;
+        gzclose(infile);
         throw khmer_file_exception(err.c_str());
     }
 
@@ -636,6 +642,7 @@ CountingHashGzFileReader::CountingHashGzFileReader(
 
             if (read_k <= 0 || read_c <= 0) {
                 std::string err = "K-mer count read error: " + infilename;
+                gzclose(infile);
                 throw khmer_file_exception(err.c_str());
             }
 

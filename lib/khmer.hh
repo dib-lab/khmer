@@ -128,18 +128,20 @@ protected:
     const char * _msg;
 };
 
-class InvalidStreamHandle : public khmer_file_exception {
+class InvalidStreamHandle : public khmer_file_exception
+{
 public:
-	InvalidStreamHandle()
-		: khmer_file_exception("Generic InvalidStreamHandle error") {}
-	InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
+    InvalidStreamHandle()
+        : khmer_file_exception("Generic InvalidStreamHandle error") {}
+    InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
 };
 
-class StreamReadError : public khmer_file_exception {
+class StreamReadError : public khmer_file_exception
+{
 public:
-	StreamReadError()
-		: khmer_file_exception("Generic StreamReadError error") {}
-	StreamReadError(const char * msg) : khmer_file_exception(msg) {}
+    StreamReadError()
+        : khmer_file_exception("Generic StreamReadError error") {}
+    StreamReadError(const char * msg) : khmer_file_exception(msg) {}
 };
 
 }

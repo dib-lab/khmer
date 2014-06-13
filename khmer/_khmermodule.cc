@@ -2522,8 +2522,8 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
     // call the C++ function, and trap signals => Python
 
-    unsigned long long n_consumed;
-    unsigned int total_reads;
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
 
     try {
         hashbits->consume_fasta(filename, total_reads, n_consumed,
@@ -3229,6 +3229,7 @@ static PyObject * hashbits_load_subset_partitionmap(PyObject * self, PyObject * 
 
     if (fail) {
         PyErr_SetString(PyExc_IOError, err.c_str());
+        delete subset_p;
         return NULL;
     } else {
         return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
@@ -4526,17 +4527,6 @@ static void khmer_counting_dealloc(PyObject* self)
 //
 // khmer_hashbits_dealloc -- clean up a hashbits object.
 //
-/*
-static void khmer_hashbits_dealloc(PyObject* self)
-{
-  khmer_KHashbitsObject * obj = (khmer_KHashbitsObject *) self;
-  delete obj->hashbits;
-  obj->hashbits = NULL;
-
-  self->ob_type->tp_free((PyObject*)obj);
-  PyObject_Del((PyObject *) obj);
-}
-*/
 static void khmer_hashbits_dealloc(PyObject* obj)
 {
     khmer_KHashbitsObject * self = (khmer_KHashbitsObject *) obj;
