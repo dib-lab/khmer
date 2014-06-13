@@ -176,26 +176,42 @@ sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 sloccount: 
 	sloccount lib khmer scripts tests setup.py Makefile
 
-coverity: setup.py $(wildcard {lib/khmer}/*.{cc,hh}) \
-	$(wildcard {scripts,khmer}/*.py})
-	if [[ -x ${cov_analysis_dir}/cov-build ]]; \
-	then if [[ -n "${COVERITY_TOKEN}" ]]; \
-		then \
-			export PATH=${PATH}:${cov_analysis_dir}; \
-			cov-build --dir cov-int python setup.py build_ext \
-				--build-temp ${PWD}; \
-			tar czf khmer-cov.tgz cov-int; \
-			curl --form project=ged-lab/khmer \
-				--form token=${COVERITY_TOKEN} --form \
-				email=mcrusoe@msu.edu --form \
-				file=@khmer-cov.tgz --form \
-				version=${VERSION} \
-				http://scan5.coverity.com/cgi-bin/upload.py; \
-		else echo 'Missing coverity credentials in $$COVERITY_TOKEN,'\
-			'skipping scan'; \
-		fi; \
-	else echo 'cov-build does not exist in $$cov_analysis_dir: '\
+coverity-build:
+	if [[ -x ${cov_analysis_dir}/bin/cov-build ]]; \
+	then \
+		export PATH=${PATH}:${cov_analysis_dir}/bin; \
+		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
+		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr '!known_failing' ; \
+		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
+	else echo 'bin/cov-build does not exist in $$cov_analysis_dir: '\
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
+	fi
+
+coverity-upload: cov-int
+	if [[ -n "${COVERITY_TOKEN}" ]]; \
+	then \
+		tar czf khmer-cov.tgz cov-int; \
+		curl --form project=ged-lab/khmer \
+			--form token=${COVERITY_TOKEN} --form \
+			email=mcrusoe@msu.edu --form file=@khmer-cov.tgz \
+			--form version=${VERSION} \
+			http://scan5.coverity.com/cgi-bin/upload.py; \
+	else echo 'Missing coverity credentials in $$COVERITY_TOKEN,'\
+		'skipping scan'; \
+	fi
+
+coverity-clean-configuration:
+	rm -f ${cov_analysis_dir}/config/coverity_config.xml
+
+coverity-configure:
+	if [[ -x ${cov_analysis_dir}/bin/cov-configure ]]; \
+	then \
+		export PATH=${PATH}:${cov_analysis_dir}/bin; \
+		for compiler in /usr/bin/gcc-4.8 /usr/bin/x86_64-linux-gnu-gcc; do \
+       			cov-configure --comptype gcc --compiler $${compiler}; \
+		done; \
+	else echo 'bin/cov-configure does not exist in $$cov_analysis_dir: '\
+		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
 FORCE:
