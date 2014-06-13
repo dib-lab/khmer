@@ -1436,7 +1436,7 @@ IParser::
 ~IParser( )
 {
     if (_states != NULL) {
-        for (int i = 0; i < _number_of_threads; i++) {
+        for (uint32_t i = 0; i < _number_of_threads; i++) {
             if (_states[i] != NULL) {
                 delete _states[i];
             }
