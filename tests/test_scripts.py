@@ -1587,7 +1587,15 @@ def test_sample_reads_randomly_S():
 
     # fix random number seed for reproducibility
     args = ['-N', '10', '-R', '1', '-S', '3']
+
+    badargs = list(args)
+    badargs.extend(['-o', 'test', 'test.fq', 'test.fq'])
+    (status, out, err) = runscript(script, badargs, in_dir, fail_ok=True)
+    assert status == -1, (status, out, err)
+
+
     args.append('test.fq')
+
     runscript(script, args, in_dir)
 
     outfile = infile + '.subset.0'

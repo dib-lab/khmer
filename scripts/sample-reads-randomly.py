@@ -21,6 +21,7 @@ import screed
 import os.path
 import random
 import textwrap
+import sys
 
 import khmer
 from khmer.file import check_file_status, check_space
