@@ -47,7 +47,7 @@ def get_parser():
     This script uses the `reservoir sampling
     <http://en.wikipedia.org/wiki/Reservoir_sampling>`__ algorithm.
     """)   # noqa
-    
+
     parser = argparse.ArgumentParser(
         description="Uniformly subsample sequences from a collection of files",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -99,7 +99,7 @@ def main():
     output_file = args.output_file
     if output_file:
         if num_samples > 1:
-            sys.stderr.write(\
+            sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
             sys.exit(-1)
         output_filename = output_file.name
@@ -111,12 +111,11 @@ def main():
         print 'Subsampling %d reads using reservoir sampling.' % args.num_reads
         print 'Subsampled reads will be placed in %s' % output_filename
         print ''
-    else: # > 1
+    else:  # > 1
         print 'Subsampling %d reads, %d times, using reservoir sampling.' % \
             (args.num_reads, num_samples)
         print 'Subsampled reads will be placed in %s.N' % output_filename
         print ''
-        
 
     reads = []
     for n in range(num_samples):
