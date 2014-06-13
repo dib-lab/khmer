@@ -1,3 +1,8 @@
+2014-06-13  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+    * doc/install.txt: updated virtuaenv command to use python2 explicitly,
+	for arch support.
+
 2014-06-13  Titus Brown  <t@idyll.org>
 
     * sandbox/assemstats3.py: handle missing input files.
