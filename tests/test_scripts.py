@@ -13,20 +13,38 @@ import shutil
 from cStringIO import StringIO
 import traceback
 
-import tests.khmer_tst_utils as utils
+import khmer_tst_utils as utils
 import khmer
 import khmer.file
 import screed
 
 
-def scriptpath(scriptfile):
-    path = os.path.join(utils.thisdir, '..', 'scripts', scriptfile)
-    path = os.path.abspath(path)
-    return path
+def scriptpath(script):
+    return script
 
 
 def teardown():
     utils.cleanup()
+
+
+def _runscript(scriptname):
+    import pkg_resources
+    ns = {"__name__": "__main__"}
+    ns['sys'] = globals()['sys']
+    try:
+        pkg_resources.get_distribution("khmer").run_script(
+            scriptname, ns)
+        return 0
+    except pkg_resources.ResolutionError, err:
+        paths = [os.path.join(os.path.dirname(__file__),
+                              "../scripts")]
+        paths.extend(os.environ['PATH'].split(':'))
+        for path in paths:
+            scriptfile = os.path.join(path, scriptname)
+            if os.path.isfile(scriptfile):
+                execfile(scriptfile, ns)
+                return 0
+    return -1
 
 
 def runscript(scriptname, args, in_directory=None, fail_ok=False):
@@ -40,6 +58,7 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
     cwd = os.getcwd()
 
     try:
+        status = -1
         oldargs = sys.argv
         sys.argv = sysargs
 
@@ -53,8 +72,7 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
         try:
             print 'running:', scriptname, 'in:', in_directory
             print 'arguments', sysargs
-            execfile(scriptname, {'__name__': '__main__'})
-            status = 0
+            status = _runscript(scriptname)
         except SystemExit, e:
             status = e.code
         except:
@@ -70,46 +88,9 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False):
     if status != 0 and not fail_ok:
         print out
         print err
-        raise Exception(status, out, err)
+        assert False, (status, out, err)
 
     return status, out, err
-
-
-def DEBUG_runscript(scriptname, args, in_directory=None, fail_ok=False):
-    """
-    Run the given Python script, with the given args, in the given directory,
-    using 'execfile'.
-
-    @CTB what does this do differently from runscript?
-    """
-    sysargs = [scriptname]
-    sysargs.extend(args)
-
-    cwd = os.getcwd()
-
-    try:
-        oldargs = sys.argv
-        sys.argv = sysargs
-
-        if in_directory:
-            os.chdir(in_directory)
-
-        try:
-            print 'running:', scriptname, 'in:', in_directory
-            execfile(scriptname, {'__name__': '__main__'})
-            status = 0
-        except:
-            traceback.print_exc(file=sys.stderr)
-            status = -1
-    finally:
-        sys.argv = oldargs
-
-        os.chdir(cwd)
-
-    if status != 0 and not fail_ok:
-        raise Exception(status)
-
-    return status, "", ""
 
 
 def test_check_space():
@@ -627,7 +608,7 @@ def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
     outfile = utils.get_temp_filename('out')
-    infile = utils.get_test_data(infilename)
+    infile = infilename
 
     args.extend([outfile, infile])
 
@@ -678,7 +659,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     args.extend([outfile, infile])
 
-    DEBUG_runscript(script, args)
+    runscript(script, args)
 
     ht_file = outfile + '.ct'
     assert os.path.exists(ht_file), ht_file
@@ -692,12 +673,12 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
         args = [outfile]
         if stop_big_traverse:
             args.insert(0, '--no-big-traverse')
-        DEBUG_runscript(script, args)
+        runscript(script, args)
 
         print ">>>> DEBUG: Merging Partitions <<<"
         script = scriptpath('merge-partitions.py')
         args = [outfile, '-k', str(ksize)]
-        DEBUG_runscript(script, args)
+        runscript(script, args)
 
         final_pmap_file = outfile + '.pmap.merged'
         assert os.path.exists(final_pmap_file)
@@ -708,7 +689,7 @@ def _DEBUG_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
             args = ["-k", str(ksize), outfile, infilename]
 
             in_dir = os.path.dirname(outfile)
-            DEBUG_runscript(script, args, in_dir)
+            runscript(script, args, in_dir)
 
             baseinfile = os.path.basename(infilename)
             assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
@@ -1520,7 +1501,7 @@ def test_fastq_to_fasta():
 
     args = [clean_infile, '-n', '-o', clean_outfile]
     (status, out, err) = runscript(script, args, in_dir)
-    assert len(out.splitlines()) == 2
+    assert len(out.splitlines()) == 2, len(out.splitlines())
     assert "No lines dropped" in err
 
     args = [n_infile, '-n', '-o', n_outfile]
