@@ -1,3 +1,9 @@
+2014-06-14  Titus Brown  <t@idyll.org>
+
+    * doc/scripts.txt, tests/test_scripts.py, scripts/sweep-reads.py:
+	renamed sweep-reads-buffered to sweep-reads; added FASTQ output to
+	sweep-reads.
+
 2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: split coverity target in two: -build and -upload. Added
@@ -131,6 +137,7 @@
 
     * doc/release.txt: additional fixes
 
+>>>>>>> origin/cs/sweepfix
 2014-05-09  Luiz Irber  <irberlui@msu.edu>
 
     Version 1.0.1

@@ -1359,7 +1359,7 @@ def test_sample_reads_randomly():
                         '895:1:1:1335:19932', '895:1:1:1340:19387'])
 
 
-def test_sweep_reads_buffered():
+def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
     in_dir = os.path.dirname(contigfile)
@@ -1367,7 +1367,7 @@ def test_sweep_reads_buffered():
     shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
-    script = scriptpath('sweep-reads-buffered.py')
+    script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
@@ -1399,23 +1399,63 @@ def test_sweep_reads_buffered():
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
 
-    try:
-        os.remove(out1)
-        os.remove(out2)
-        os.remove(mout)
-        os.remove(oout)
-    except (IOError, OSError) as e:
-        print >>sys.stderr, 'error removing test outputs'
+
+def test_sweep_reads_fq():
+    readfile = utils.get_temp_filename('reads.fa')
+    contigfile = utils.get_temp_filename('contigs.fp')
+    in_dir = os.path.dirname(contigfile)
+
+    shutil.copyfile(utils.get_test_data('test-sweep-reads.fq'), readfile)
+    shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
+
+    script = scriptpath('sweep-reads.py')
+    args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
+            contigfile, readfile, 'junkfile.fa']
+
+    status, out, err = runscript(script, args, in_dir, fail_ok=True)
+
+    # check if the bad file was skipped without issue
+    assert 'ERROR' in err, err
+    assert 'skipping' in err, err
+
+    out1 = os.path.join(in_dir, 'test_0.fq')
+    out2 = os.path.join(in_dir, 'test_1.fq')
+    mout = os.path.join(in_dir, 'test_multi.fq')
+    oout = os.path.join(in_dir, 'test_orphaned.fq')
+
+    print open(out1).read()
+
+    print os.listdir(in_dir)
+
+    seqs1 = set([r.name for r in screed.open(out1)])
+    seqs2 = set([r.name for r in screed.open(out2)])
+    seqsm = set([r.name for r in screed.open(mout)])
+    seqso = set([r.name for r in screed.open(oout)])
+
+    print seqs1
+    print seqs2
+    print seqsm
+    print seqso
+    assert seqs1 == set(['read1_p0\t0', 'read2_p0\t0'])
+    assert seqs2 == set(['read3_p1\t1'])
+    assert (seqsm == set(['read4_multi\t0\t1']) or
+            seqsm == set(['read4_multi\t1\t0']))
+    assert seqso == set(['read5_orphan'])
+
+    seqs1 = set([r.accuracy for r in screed.open(out1)])
+    seqs2 = set([r.accuracy for r in screed.open(out2)])
+    seqsm = set([r.accuracy for r in screed.open(mout)])
+    seqso = set([r.accuracy for r in screed.open(oout)])
 
 
-def test_sweep_reads_buffered_2():
+def test_sweep_reads_2():
 
     infile = utils.get_temp_filename('seqs.fa')
     inref = utils.get_temp_filename('ref.fa')
     shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
     wdir = os.path.dirname(inref)
-    script = scriptpath('sweep-reads-buffered.py')
+    script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
             'test', '--label-by-seq', inref, infile]
     status, out, err = runscript(script, args, wdir)
@@ -1430,12 +1470,12 @@ def test_sweep_reads_buffered_2():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
-def test_sweep_reads_buffered_3():
+def test_sweep_reads_3():
 
     infile = utils.get_temp_filename('seqs.fa')
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
     wdir = os.path.dirname(infile)
-    script = scriptpath('sweep-reads-buffered.py')
+    script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
             'test', '--label-by-group', '10', infile, infile]
     status, out, err = runscript(script, args, wdir)
