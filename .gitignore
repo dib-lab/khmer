@@ -36,3 +36,4 @@ cov-int/
 *.tar.gz
 third-party/zlib/zlib.pc
 pip-log.txt
+sphinx-contrib
