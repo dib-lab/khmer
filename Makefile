@@ -8,7 +8,6 @@ CPPSOURCES=$(wildcard {lib,khmer}/*.{cc,hh})
 PYSOURCES=$(wildcard {khmer,scripts}/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 
-SHELL=/bin/bash
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
 
