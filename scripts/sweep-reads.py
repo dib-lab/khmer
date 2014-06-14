@@ -9,8 +9,8 @@
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
-% sweep-reads-buffered.py -r <range> <contigs fastp> \
-<reads1> <reads2> ... <readsN>
+% sweep-reads.py -r <range> <contigs fastp> \
+       <reads1> <reads2> ... <readsN>
 """
 
 EPILOG = """
