@@ -14,6 +14,7 @@ loading a prebuilt k-mer counting table.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import os
 import sys
 import khmer
@@ -58,6 +59,8 @@ def get_parser():
     parser.add_argument('--savetable', default='', metavar="filename",
                         help="Save the k-mer counting table to the specified "
                         "filename.")
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -73,32 +76,32 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
-        print >> sys.stderr, 'ERROR: %s exists; not squashing.' % \
-            args.output_histogram_filename
+        print('ERROR: %s exists; not squashing.' %
+              args.output_histogram_filename, file=sys.stderr)
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
 
-    print 'making k-mer counting table'
+    print('making k-mer counting table')
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                             args.n_tables,
                                             args.threads)
     counting_hash.set_use_bigcount(args.bigcount)
 
-    print 'building k-mer tracking table'
+    print('building k-mer tracking table')
     tracking = khmer.new_hashbits(counting_hash.ksize(), args.min_tablesize,
                                   args.n_tables)
 
-    print 'kmer_size:', counting_hash.ksize()
-    print 'k-mer counting table sizes:', counting_hash.hashsizes()
-    print 'outputting to', args.output_histogram_filename
+    print('kmer_size:', counting_hash.ksize())
+    print('k-mer counting table sizes:', counting_hash.hashsizes())
+    print('outputting to', args.output_histogram_filename)
 
     khmer.get_config().set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
     threads = []
-    print 'consuming input, round 1 --', args.input_sequence_filename
+    print('consuming input, round 1 --', args.input_sequence_filename)
     for _ in xrange(args.threads):
         thread = \
             threading.Thread(
@@ -111,6 +114,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for thread in threads:
         thread.join()
 
+    if args.report_total_kmers:
+        print('Total number of k-mers: {}'.format(counting_hash.n_occupied()),
+              file=sys.stderr)
+
     abundance_lists = []
 
     def __do_abundance_dist__(read_parser):
@@ -118,10 +125,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             read_parser, tracking)
         abundance_lists.append(abundances)
 
-    print 'preparing hist from %s...' % args.input_sequence_filename
+    print('preparing hist from %s...' % args.input_sequence_filename)
     rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
     threads = []
-    print 'consuming input, round 2 --', args.input_sequence_filename
+    print('consuming input, round 2 --', args.input_sequence_filename)
     for _ in xrange(args.threads):
         thread = \
             threading.Thread(
@@ -143,10 +150,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     total = sum(abundance.values())
 
     if 0 == total:
-        print >> sys.stderr, \
-            "ERROR: abundance distribution is uniformly zero; " \
-            "nothing to report."
-        print >> sys.stderr, "\tPlease verify that the input files are valid."
+        print("ERROR: abundance distribution is uniformly zero; "
+              "nothing to report.", file=sys.stderr)
+        print("\tPlease verify that the input files are valid.",
+              file=sys.stderr)
         sys.exit(1)
 
     sofar = 0
@@ -157,14 +164,13 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         sofar += i
         frac = sofar / float(total)
 
-        print >> hist_fp, _, i, sofar, round(frac, 3)
-
+        print(_, i, sofar, round(frac, 3), file=hist_fp)
         if sofar == total:
             break
 
     if args.savetable:
-        print 'Saving k-mer counting table ', args.savetable
-        print '...saving to', args.savetable
+        print('Saving k-mer counting table ', args.savetable)
+        print('...saving to', args.savetable)
         counting_hash.save(args.savetable)
 
 if __name__ == '__main__':

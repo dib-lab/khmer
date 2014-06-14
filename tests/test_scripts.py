@@ -101,14 +101,15 @@ def test_check_space():
 
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
 
-    runscript(script, args)
+    (status, out, err) = runscript(script, args)
+    assert 'Total number of k-mers: 95' in err, err
     assert os.path.exists(outfile)
 
 
@@ -214,8 +215,10 @@ def test_filter_abund_1_singlefile():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('filter-abund-single.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
-    runscript(script, args, in_dir)
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+
+    assert 'Total number of k-mers: 98' in err, err
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
@@ -334,8 +337,10 @@ def test_normalize_by_median():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('normalize-by-median.py')
-    args = ['-C', CUTOFF, '-k', '17', infile]
-    runscript(script, args, in_dir)
+    args = ['-C', CUTOFF, '-k', '17', '-t', infile]
+    (status, out, err) = runscript(script, args, in_dir)
+
+    assert 'Total number of k-mers: 98' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -1079,8 +1084,11 @@ def test_abundance_dist_single():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('abundance-dist-single.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', infile, outfile]
-    runscript(script, args, in_dir)
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile,
+            outfile]
+    (status, out, err) = runscript(script, args, in_dir)
+
+    assert 'Total number of k-mers: 98' in err, err
 
     fp = iter(open(outfile))
     line = fp.next().strip()

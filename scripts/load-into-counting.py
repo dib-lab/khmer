@@ -13,6 +13,7 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 Use '-h' for parameter help.
 """
 
+from __future__ import print_function
 import sys
 import threading
 import textwrap
@@ -54,6 +55,8 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -72,10 +75,10 @@ def main():
     check_space(args.input_sequence_filename)
     check_space_for_hashtable(args.n_tables * args.min_tablesize)
 
-    print 'Saving k-mer counting table to %s' % base
-    print 'Loading kmers from sequences in %s' % repr(filenames)
+    print('Saving k-mer counting table to %s' % base)
+    print('Loading kmers from sequences in %s' % repr(filenames))
 
-    print 'making k-mer counting table'
+    print('making k-mer counting table')
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables, args.n_threads)
     htable.set_use_bigcount(args.bigcount)
@@ -87,7 +90,7 @@ def main():
 
         rparser = khmer.ReadParser(filename, args.n_threads)
         threads = []
-        print 'consuming input', filename
+        print('consuming input', filename)
         for _ in xrange(args.n_threads):
             cur_thrd = \
                 threading.Thread(
@@ -102,29 +105,33 @@ def main():
 
         if index > 0 and index % 10 == 0:
             check_space_for_hashtable(args.n_tables * args.min_tablesize)
-            print 'mid-save', base
+            print('mid-save', base)
             htable.save(base)
             open(base + '.info', 'w').write('through %s' % filename)
 
-    print 'saving', base
+    if args.report_total_kmers:
+        print('Total number of k-mers: {}'.format(htable.n_occupied()),
+              file=sys.stderr)
+
+    print('saving', base)
     htable.save(base)
 
     info_fp = open(base + '.info', 'w')
-    info_fp.write('through end: %s\n' % filename)
+    print('through end: %s\n' % filename, file=info_fp)
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be %1.3f' % fp_rate
-    print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate)
+    print('fp rate estimated to be %1.3f' % fp_rate, file=info_fp)
 
     if fp_rate > 0.20:
-        print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " this data set.  Increase tablesize/# tables.")
-        print >> sys.stderr, "**"
+        print("**", file=sys.stderr)
+        print("** ERROR: the k-mer counting table is too small",
+              " this data set.  Increase tablesize/# tables.", file=sys.stderr)
+        print("**", file=sys.stderr)
         sys.exit(1)
 
-    print 'DONE.'
+    print('DONE.')
 
 if __name__ == '__main__':
     main()

@@ -1,3 +1,9 @@
+2014-06-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
+    normalize-by-median}.py,tests/test_scripts.py: added '--report-total-kmers' 
+    option to all scripts that create k-mer tables.
+
 2014-06-15  Titus Brown  <t@idyll.org>
 
     * sandbox/calc-median-distribution.py: updates to print cumulative

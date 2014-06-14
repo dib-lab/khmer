@@ -15,7 +15,9 @@ placed in 'infile.abundfilt'.
 
 Use '-h' for parameter help.
 """
+from __future__ import print_function
 import os
+import sys
 import khmer
 import threading
 import textwrap
@@ -53,7 +55,8 @@ def get_parser():
                         "k-mer counting table to")
     parser.add_argument('datafile', metavar='input_sequence_filename',
                         help="FAST[AQ] sequence file to trim")
-
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -69,7 +72,7 @@ def main():
     config = khmer.get_config()
     config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
-    print 'making k-mer counting table'
+    print('making k-mer counting table')
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables,
                                      args.threads)
@@ -77,7 +80,7 @@ def main():
     # first, load reads into hash table
     rparser = khmer.ReadParser(args.datafile, args.threads)
     threads = []
-    print 'consuming input, round 1 --', args.datafile
+    print('consuming input, round 1 --', args.datafile)
     for _ in xrange(args.threads):
         cur_thread = \
             threading.Thread(
@@ -90,8 +93,12 @@ def main():
     for _ in threads:
         _.join()
 
+    if args.report_total_kmers:
+        print('Total number of k-mers: {}'.format(htable.n_occupied()),
+              file=sys.stderr)
+
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print('fp rate estimated to be %1.3f' % fp_rate)
 
     # now, trim.
 
@@ -110,18 +117,18 @@ def main():
         return None, None
 
     # the filtering loop
-    print 'filtering', args.datafile
+    print('filtering', args.datafile)
     outfile = os.path.basename(args.datafile) + '.abundfilt'
     outfp = open(outfile, 'w')
 
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print 'output in', outfile
+    print('output in', outfile)
 
     if args.savetable:
-        print 'Saving k-mer counting table filename', args.savetable
-        print '...saving to', args.savetable
+        print('Saving k-mer counting table filename', args.savetable)
+        print('...saving to', args.savetable)
         htable.save(args.savetable)
 
 if __name__ == '__main__':
