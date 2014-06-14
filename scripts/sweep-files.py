@@ -1,4 +1,4 @@
-# !/usr/bin/env python2
+#! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
@@ -65,7 +65,7 @@ def get_parser():
     parser.add_argument('--query', dest='query', nargs='+',
                         help='Reads to be swept and sorted')
     parser.add_argument('--db', dest='db', nargs='+',
-                        help='Database reads for sweep')
+                        help='Database reads for sweep', required=True)
 
     return parser
 
