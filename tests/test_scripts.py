@@ -542,14 +542,16 @@ def test_count_median():
 
 def test_load_graph():
     script = scriptpath('load-graph.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
 
     outfile = utils.get_temp_filename('out')
     infile = utils.get_test_data('random-20-a.fa')
 
     args.extend([outfile, infile])
 
-    runscript(script, args)
+    (status, out, err) = runscript(script, args)
+
+    assert 'Total number of k-mers: 3959' in err, err
 
     ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
