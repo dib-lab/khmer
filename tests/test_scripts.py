@@ -1359,7 +1359,7 @@ def test_sample_reads_randomly():
                         '895:1:1:1335:19932', '895:1:1:1340:19387'])
 
 
-def test_sweep_reads_buffered():
+def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
     in_dir = os.path.dirname(contigfile)
@@ -1367,7 +1367,7 @@ def test_sweep_reads_buffered():
     shutil.copyfile(utils.get_test_data('test-sweep-reads.fa'), readfile)
     shutil.copyfile(utils.get_test_data('test-sweep-contigs.fp'), contigfile)
 
-    script = scriptpath('sweep-reads-buffered.py')
+    script = scriptpath('sweep-reads.py')
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
@@ -1408,14 +1408,14 @@ def test_sweep_reads_buffered():
         print >>sys.stderr, 'error removing test outputs'
 
 
-def test_sweep_reads_buffered_2():
+def test_sweep_reads_2():
 
     infile = utils.get_temp_filename('seqs.fa')
     inref = utils.get_temp_filename('ref.fa')
     shutil.copyfile(utils.get_test_data('random-20-X2.fa'), infile)
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), inref)
     wdir = os.path.dirname(inref)
-    script = scriptpath('sweep-reads-buffered.py')
+    script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
             'test', '--label-by-seq', inref, infile]
     status, out, err = runscript(script, args, wdir)
@@ -1430,12 +1430,12 @@ def test_sweep_reads_buffered_2():
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
 
 
-def test_sweep_reads_buffered_3():
+def test_sweep_reads_3():
 
     infile = utils.get_temp_filename('seqs.fa')
     shutil.copyfile(utils.get_test_data('random-20-a.fa'), infile)
     wdir = os.path.dirname(infile)
-    script = scriptpath('sweep-reads-buffered.py')
+    script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
             'test', '--label-by-group', '10', infile, infile]
     status, out, err = runscript(script, args, wdir)
