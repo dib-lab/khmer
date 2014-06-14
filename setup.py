@@ -110,7 +110,8 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
-        "packages": ['khmer'],
+        "packages": ['khmer', 'khmer.tests'],
+        "package_dir": {'khmer.tests': 'tests'},
         "install_requires": INSTALL_REQUIRES,
         "extras_require": {'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},

@@ -128,3 +128,6 @@ Read handling: interleaving, splitting, etc.
 
 .. autoprogram:: fastq-to-fasta:get_parser()
         :prog: fastq-to-fasta.py
+
+.. autoprogram:: sample-reads-randomly:get_parser()
+        :prog: sample-reads-randomly.py

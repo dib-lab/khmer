@@ -1,7 +1,46 @@
+2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: split coverity target in two: -build and -upload. Added
+    configuration target
+
+2014-06-13  Titus Brown  <t@Titus-MacBook-Air-2.local>
+
+    * doc/install.txt: updated virtuaenv command to use python2 explicitly,
+	for arch support.
+
+2014-06-13  Titus Brown  <t@idyll.org>
+
+    * khmer/__init__.py, khmer/file_args.py: Moved copyright message to a
+	comment.
+    * khmer/file.py: updated error messages for disk-space checking functions;
+	added test hooks.
+    * tests/test_script_arguments.py: added tests for several functions in
+	khmer/file.py.
+    * sandbox/assemstats3.py: handle missing input files.
+
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
     * scripts/load-into-counting: Fixed docstring misnomer to 
     load-into-counting.py
+
+2014-06-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * setup.py,tests/{__init__,khmer_tst_utils,test_scripts,
+    khmer_test_counting_single}.py: made tests runnable after installation.
+    * lib/{khmer.hh,hashtable.hh,read_parsers.cc,read_parsers.hh}: restructure
+    exception hierarchy.
+    * khmer/_khmermodule.cc: Nicer error checking for hash_consume_fasta,
+    hash_abundance_distribution, hashbits_consume_{fasta,fasta_and_tag
+    {,with_stoptags},partitioned_fasta}, hashbits_output_partitions, and
+    labelhash_consume_{,partitioned_}fasta_and_tag_with_labels.
+
+2014-06-10  Titus Brown  <t@idyll.org>
+
+    * Makefile: remove SHELL setting so that 'make doc' works in virtualenvs.
+    * scripts/sample-reads-randomly.py: extend to take multiple subsamples
+	with -S.
+    * tests/test_scripts.py: added test for multiple subsamples from
+	sample-reads-randomly.py
 
 2014-06-10  Michael Wright <wrigh517@msu.edu>
 
@@ -24,6 +63,14 @@
 2014-06-03 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
 
     * scripts/abundance-dist.py: removed call to check_space on infiles.  
+
+2014-05-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc,lib/counting.{cc,hh},
+    sandbox/{stoptag-abundance-ham1-hist.py,off-by-one.py,filter-ham1.py}:
+    Remove CountingHash get_kmer_abund_mean, get_kmer_abund_abs_deviation, and
+    max_hamming1_count along with Python glue code and sandbox scripts. They
+    are no longer useful.
 
 2014-05-30  Titus Brown  <t@idyll.org>
 
@@ -54,6 +101,11 @@
     * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in 
     sequence for testing
 
+2014-05-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: add target for python test coverage plain-text report;
+    clarified where the HTML report is
+
 2014-05-16  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * docs/scripts.txt: include sweep-reads-buffered.py
@@ -62,13 +114,6 @@
 
     * Makefile: change pip to pip2. Fixes assorted make problems on systems
     where pip links to pip3
-
-2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
-
-    * lib/{zlib,bzip2} -> third-party/
-    * setup.{cfg,py}: Move third party libraries to their own directory
-    * Makefile: add sloccount target for humans and the sloccount.sc target for
-   Jenkins
 
 2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 

@@ -6,6 +6,7 @@
 #
 # pylint: disable=missing-docstring,protected-access
 import khmer
+from khmer import ReadParser
 
 from screed.fasta import fasta_iter
 import screed
@@ -768,3 +769,18 @@ def test_bad_primes_list():
         assert 0, "Bad primes list should fail"
     except TypeError, e:
         print str(e)
+
+
+def test_consume_absentfasta_with_reads_parser():
+    presencetable = khmer.new_hashbits(31, 1, 1)
+    try:
+        presencetable.consume_fasta_with_reads_parser()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    readparser = ReadParser(utils.get_test_data('empty-file'))
+    try:
+        presencetable.consume_fasta_with_reads_parser(readparser)
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
