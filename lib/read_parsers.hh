@@ -34,18 +34,15 @@ namespace khmer
 {
 
 
-struct InvalidStreamHandle : public std:: exception {
-};
-
-struct StreamReadError : public std:: exception {
-};
-
 
 namespace read_parsers
 {
 
 
-struct InvalidReadFileFormat: public std:: exception {
+class InvalidReadFileFormat: public khmer:: khmer_file_exception
+{
+
+public:
 
     InvalidReadFileFormat(
         char const * exc_name,
@@ -61,8 +58,12 @@ protected:
 
 };
 
-struct InvalidFASTAFileFormat: public InvalidReadFileFormat {
+class InvalidFASTAFileFormat: public InvalidReadFileFormat
+{
 
+public:
+
+public:
     InvalidFASTAFileFormat(
         char const * reason	= NULL,
         char const * evidence	= NULL
@@ -70,8 +71,12 @@ struct InvalidFASTAFileFormat: public InvalidReadFileFormat {
 
 };
 
-struct InvalidFASTQFileFormat: public InvalidReadFileFormat {
+class InvalidFASTQFileFormat: public InvalidReadFileFormat
+{
 
+public:
+
+public:
     InvalidFASTQFileFormat(
         char const * reason	= NULL,
         char const * evidence	= NULL

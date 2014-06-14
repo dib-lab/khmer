@@ -359,4 +359,9 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
     }
 }
 
-
+LabelHash::~LabelHash() {
+	for (LabelPtrMap::iterator itr=label_ptrs.begin();
+			itr!=label_ptrs.end(); itr++) {
+		delete itr->second;
+	}
+}
