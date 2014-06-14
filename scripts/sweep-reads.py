@@ -52,6 +52,12 @@ def fmt_fasta(name, seq, labels=[]):
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
+def fmt_fastq(name, seq, accuracy, labels=[]):
+    return '@{name}\t{labels}\n{seq}\n+\n{acc}\n'.format(
+        name=name, labels='\t'.join([str(l) for l in labels]), seq=seq,
+        acc=accuracy)
+
+
 class ReadBuffer(object):
 
     def __init__(self):
@@ -75,11 +81,13 @@ class ReadBuffer(object):
 
 class ReadBufferManager(object):
 
-    def __init__(self, max_buffers, max_reads, max_size, output_pref, outdir):
+    def __init__(self, max_buffers, max_reads, max_size, output_pref, outdir,
+                 extension):
         self.buffers = {}
         self.buffer_counts = {}
         self.max_buffers = max_buffers
         self.max_reads = max_reads
+        self.extension = extension
 
         self.output_pref = output_pref
         self.outdir = outdir
@@ -99,8 +107,9 @@ class ReadBufferManager(object):
                     buf_flush=self.buffer_flush)
 
     def flush_buffer(self, buf_id):
-        fn = '{prefix}_{buffer_id}.fa'.format(prefix=self.output_pref,
-                                              buffer_id=buf_id)
+        fn = '{prefix}_{buffer_id}.{ext}'.format(prefix=self.output_pref,
+                                                 buffer_id=buf_id,
+                                                 ext=self.extension)
         fpath = os.path.join(self.outdir, fn)
         buf = self.buffers[buf_id]
         try:
@@ -219,11 +228,21 @@ def main():
     check_valid_file_exists(args.input_files)
     all_input_files = [input_fastp]
     all_input_files.extend(args.input_files)
+
     # Check disk space availability
     check_space(all_input_files)
 
+    # figure out input file type (FA/FQ) -- based on first file
+    ix = iter(screed.open(args.input_files[0]))
+    record = ix.next()
+    del ix
+
+    extension = 'fa'
+    if hasattr(record, 'accuracy'):      # fastq!
+        extension = 'fq'
+
     output_buffer = ReadBufferManager(
-        max_buffers, max_reads, buf_size, output_pref, outdir)
+        max_buffers, max_reads, buf_size, output_pref, outdir, extension)
 
     # consume the partitioned fasta with which to label the graph
     ht = khmer.LabelHash(K, HT_SIZE, N_HT)
@@ -246,23 +265,33 @@ def main():
             label = -1
             g = 0
             try:
-                outfn = os.path.join(args.outdir, 
-                    '{pref}_base_{g}.fa'.format(pref=output_pref, g=g) 
-                outfp = open(outfn, 'wb')
+                outfp = open('{pref}_base_{g}.{ext}'.format(pref=output_pref,
+                                                            g=g,
+                                                            ext=extension
+                                                            ), 'wb')
                 for n, record in enumerate(screed.open(input_fastp)):
                     if n % args.group_size == 0:
                         label += 1
                         if label > g:
                             g = label
-                            outfp = open('{pref}_base_{g}.fa'.format(
-                                pref=output_pref, g=g), 'wb')
+                            outfp = open('{pref}_base_{g}.{ext}'.format(
+                                pref=output_pref, g=g,
+                                ext=extension), 'wb')
                     if n % 50000 == 0:
                         print >>sys.stderr, \
                             '...consumed {n} sequences...'.format(n=n)
                     ht.consume_sequence_and_tag_with_labels(record.sequence,
                                                             label)
-                    outfp.write('>{name}\n{seq}\n'.format(name=record.name,
-                                                          seq=record.sequence))
+
+                    if hasattr(record, 'accuracy'):
+                        outfp.write('@{name}\n{seq}+{accuracy}\n'.format(
+                            name=record.name,
+                            seq=record.sequence,
+                            accuracy=record.accuracy))
+                    else:
+                        outfp.write('>{name}\n{seq}\n'.format(
+                            name=record.name,
+                            seq=record.sequence))
 
             except IOError as e:
                 print >>sys.stderr, '!! ERROR !!', e
@@ -316,7 +345,10 @@ def main():
                 except ValueError as e:
                     pass
                 else:
-                    seq_str = fmt_fasta(name, seq, labels)
+                    if hasattr(record, 'accuracy'):
+                        seq_str = fmt_fastq(name, seq, record.accuracy, labels)
+                    else:
+                        seq_str = fmt_fasta(name, seq, labels)
                     label_number_dist.append(len(labels))
                     if labels:
                         n_labeled += 1
