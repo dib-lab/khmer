@@ -11,7 +11,7 @@
 Write out lines of FASTQ and FASTA files that exceed an argument-specified
 length.
 
-% scripts/extract-long-sequences.py [-h] [-o OUTPUT] -l LENGTH
+% scripts/extract-long-sequences.py [-h] [-o OUTPUT] [-l LENGTH]
                                  input_filenames [input_filenames ...]
 
 Use '-h' for parameter help.
@@ -23,8 +23,8 @@ import sys
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description='Extracts FASTQ or FASTA sequences longer than argument'
-        ' specified length.',
+        description='Extract FASTQ or FASTA sequences longer than'
+        ' specified length (default: 200 bp).',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('input_filenames', help='Input FAST[AQ]'
@@ -32,8 +32,8 @@ def get_parser():
     parser.add_argument('-o', '--output', help='The name of the output'
                         ' sequence file.', default="/dev/stdout")
     parser.add_argument('-l', '--length', help='The minimum length of'
-                        ' the sequence file. Required argument.',
-                        type=int, required=True)
+                        ' the sequence file.',
+                        type=int, default=200)
     return parser
 
 
