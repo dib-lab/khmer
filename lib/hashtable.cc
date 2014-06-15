@@ -404,6 +404,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
+    HashIntoType * buf = NULL;
 
     try {
         infile.read((char *) &version, 1);
@@ -433,7 +434,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         infile.read((char *) &tagset_size, sizeof(tagset_size));
         infile.read((char *) &_tag_density, sizeof(_tag_density));
 
-        HashIntoType * buf = new HashIntoType[tagset_size];
+        buf = new HashIntoType[tagset_size];
 
         infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
 
@@ -444,6 +445,9 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading data from: " + infilename;
+	if (buf != NULL) {
+	  delete[] buf;
+	}
         throw khmer_file_exception(err.c_str());
     }
 }

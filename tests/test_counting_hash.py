@@ -9,6 +9,8 @@ import gzip
 
 import khmer
 import khmer_tst_utils as utils
+from khmer import ReadParser
+
 from nose.plugins.attrib import attr
 
 MAX_COUNT = 255
@@ -679,3 +681,223 @@ def test_counting_bad_primes_list():
         assert 0, "bad list of primes should fail"
     except TypeError, e:
         print str(e)
+
+
+def test_bad_use_bigcount():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    countingtable.set_use_bigcount(True)
+    assert countingtable.get_use_bigcount()
+    try:
+        countingtable.get_use_bigcount(True)
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_consume_absentfasta():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.consume_fasta("absent_file.fa")
+        assert 0, "This should fail"
+    except IOError, err:
+        print str(err)
+
+
+def test_consume_absentfasta_with_reads_parser():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.consume_fasta_with_reads_parser()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    readparser = ReadParser(utils.get_test_data('empty-file'))
+    try:
+        countingtable.consume_fasta_with_reads_parser(readparser)
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
+
+
+def test_badconsume():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.consume()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.consume("AAA")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_badconsume_high_abund_kmers():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.consume_high_abund_kmers()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.consume_high_abund_kmers("AAA", 2)
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+    try:
+        countingtable.consume_high_abund_kmers("AAAAA", 256)
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_get_badmin_count():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.get_min_count()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.get_min_count("AAA")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_get_badmax_count():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.get_max_count()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.get_max_count("AAA")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_get_badmedian_count():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.get_median_count()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.get_median_count("AAA")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_get_badkadian_count():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.get_kadian_count()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.get_kadian_count("AAA")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_badget():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.get()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_badtrim():
+    countingtable = khmer.new_counting_hash(6, 1e6, 2)
+
+    countingtable.consume(DNA)
+    try:
+        countingtable.trim_on_abundance()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    countingtable.trim_on_abundance("AAAAAA", 1)
+
+
+def test_badfasta_count_kmers_by_position():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.fasta_count_kmers_by_position()
+    except TypeError, err:
+        print str(err)
+
+    filename = utils.get_test_data("test-short.fa")
+    try:
+        countingtable.fasta_count_kmers_by_position(filename, -1, 0)
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+    try:
+        countingtable.fasta_count_kmers_by_position(filename, 0, -1)
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
+def test_badload():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.load()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_badsave():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.save()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_badksize():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.ksize(True)
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_badhashsizes():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.hashsizes(True)
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_badconsume_and_tag():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.consume_and_tag()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+
+
+def test_consume_fasta_and_tag():
+    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
+    try:
+        countingtable.consume_fasta_and_tag()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    countingtable.consume_fasta_and_tag(utils.get_test_data("test-graph2.fa"))

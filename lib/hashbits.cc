@@ -70,10 +70,10 @@ void Hashbits::load(std::string infilename)
 
     if (_counts) {
         for (unsigned int i = 0; i < _n_tables; i++) {
-            delete _counts[i];
+            delete[] _counts[i];
             _counts[i] = NULL;
         }
-        delete _counts;
+        delete[] _counts;
         _counts = NULL;
     }
     _tablesizes.clear();
@@ -92,8 +92,7 @@ void Hashbits::load(std::string infilename)
                 << " while reading k-mer graph from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_HASHBITS)) {
+        } else if (!(ht_type == SAVED_HASHBITS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading k-mer graph from " << infilename;
