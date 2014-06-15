@@ -11,6 +11,11 @@
 
 2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+    * MANIFEST.in: don't include docs/, data/, or examples/ in our PyPI
+    distribution. Saves 15MB.
+
+2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
     * Makefile: split coverity target in two: -build and -upload. Added
     configuration target
 
