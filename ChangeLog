@@ -1,3 +1,8 @@
+2014-06-15  Titus Brown  <t@idyll.org>
+
+    * tests/test_script_arguments.py: capture file.py output to stderr
+	so that it is not displayed during tests.
+
 2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: split coverity target in two: -build and -upload. Added
