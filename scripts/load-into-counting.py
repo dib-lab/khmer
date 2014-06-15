@@ -33,7 +33,7 @@ def get_parser():
 
     Example::
 
-        load_into_counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.

@@ -41,15 +41,15 @@ os.environ['OPT'] = " ".join(
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
 
-ZLIBDIR = 'lib/zlib'
-BZIP2DIR = 'lib/bzip2'
+ZLIBDIR = 'third-party/zlib'
+BZIP2DIR = 'third-party/bzip2'
 
 EXTRA_OBJS = []
-EXTRA_OBJS.extend(path_join("lib", "zlib", bn + ".lo") for bn in [
+EXTRA_OBJS.extend(path_join("third-party", "zlib", bn + ".lo") for bn in [
     "adler32", "compress", "crc32", "deflate", "gzclose", "gzlib", "gzread",
     "gzwrite", "infback", "inffast", "inflate", "inftrees", "trees", "uncompr",
     "zutil"])
-EXTRA_OBJS.extend(path_join("lib", "bzip2", bn + ".o") for bn in [
+EXTRA_OBJS.extend(path_join("third-party", "bzip2", bn + ".o") for bn in [
     "blocksort", "huffman", "crctable", "randtable", "compress", "decompress",
     "bzlib"])
 
@@ -110,7 +110,8 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
-        "packages": ['khmer'],
+        "packages": ['khmer', 'khmer.tests'],
+        "package_dir": {'khmer.tests': 'tests'},
         "install_requires": INSTALL_REQUIRES,
         "extras_require": {'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},

@@ -1,3 +1,170 @@
+2014-06-14  Titus Brown  <t@idyll.org>
+
+    * doc/scripts.txt: added extract-long-sequences.py doc reference.
+    * scripts/extract-long-sequences.py: set default sequence length to
+	extract to 200 bp.
+
+2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * MANIFEST.in: don't include docs/, data/, or examples/ in our PyPI
+    distribution. Saves 15MB.
+
+2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: split coverity target in two: -build and -upload. Added
+    configuration target
+
+2014-06-13  Titus Brown  <t@idyll.org>
+
+    * doc/install.txt: updated virtualenv command to use python2 explicitly,
+	for arch support.
+
+2014-06-13  Titus Brown  <t@idyll.org>
+
+    * khmer/__init__.py, khmer/file_args.py: Moved copyright message to a
+	comment.
+    * khmer/file.py: updated error messages for disk-space checking functions;
+	added test hooks.
+    * tests/test_script_arguments.py: added tests for several functions in
+	khmer/file.py.
+    * sandbox/assemstats3.py: handle missing input files.
+
+2014-06-12  Michael Wright <wrigh517@msu.edu>
+
+    * sandbox/load-into-hashbits: Deleted from sandbox. It is superseded
+    by load-graph.py --no-tagset.
+
+2014-06-11  Michael Wright <wrigh517@msu.edu>
+
+    * scripts/load-into-counting: Fixed docstring misnomer to 
+	load-into-counting.py
+
+2014-06-10  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * setup.py,tests/{__init__,khmer_tst_utils,test_scripts,
+    khmer_test_counting_single}.py: made tests runnable after installation.
+    * lib/{khmer.hh,hashtable.hh,read_parsers.cc,read_parsers.hh}: restructure
+    exception hierarchy.
+    * khmer/_khmermodule.cc: Nicer error checking for hash_consume_fasta,
+    hash_abundance_distribution, hashbits_consume_{fasta,fasta_and_tag
+    {,with_stoptags},partitioned_fasta}, hashbits_output_partitions, and
+    labelhash_consume_{,partitioned_}fasta_and_tag_with_labels.
+
+2014-06-10  Titus Brown  <t@idyll.org>
+
+    * Makefile: remove SHELL setting so that 'make doc' works in virtualenvs.
+    * scripts/sample-reads-randomly.py: extend to take multiple subsamples
+	with -S.
+    * tests/test_scripts.py: added test for multiple subsamples from
+	sample-reads-randomly.py
+
+2014-06-10  Michael Wright <wrigh517@msu.edu>
+
+    * scripts/extract-long-sequences: Moved from sandbox, added argparse and 
+    FASTQ support.
+    * scripts/fastq-to-fasta: Fixed outdated argparse oversight.
+    * tests/test_scripts.py: Added tests for extract-long-sequences.py
+
+2014-06-08  Titus Brown  <t@idyll.org>
+
+    * doc/conf.py: set google_analytics_id and disqus_shortname properly;
+	disable "editme" popup.
+    * doc/_templates/page.html: take google_analytics_id and disqus_shortname
+	from doc/conf.py.
+
+2014-06-04  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * lib/Makefile: do a distclean as the CFLAGS may have changed. Fixes #442
+
+2014-06-03 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
+
+    * scripts/abundance-dist.py: removed call to check_space on infiles.  
+
+2014-05-31  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc,lib/counting.{cc,hh},
+    sandbox/{stoptag-abundance-ham1-hist.py,off-by-one.py,filter-ham1.py}:
+    Remove CountingHash get_kmer_abund_mean, get_kmer_abund_abs_deviation, and
+    max_hamming1_count along with Python glue code and sandbox scripts. They
+    are no longer useful.
+
+2014-05-30  Titus Brown  <t@idyll.org>
+
+    * khmer/_khmermodule.cc: remove merge2* functions: unused, untested.
+    * lib/counting.cc, lib/hashbits.cc, lib/hashtable.cc: made file loading
+	exceptions more verbose and informative.
+    * tests/test_subset_graph.py: added tests for SubsetPartition::
+	load_partitionmap.
+    * khmer/_khmermodule.cc, lib/subset.cc, wrapped SubsetPartition::
+	load_partitionmap to catch, propagate exceptions
+    * tests/test_hashbits.py, tests/test_counting_hash.py: added tests
+	for fail-on-load of bad file format versions; print exception messages.
+    * .gitignore: added various temporary pip & build files
+    * lib/counting.cc: added I/O exception handling to CountingHashFileReader
+	and CountingHashGzFileReader.
+    * lib/hashbits.cc: added I/O exception handling to Hashbits::load.
+    * lib/subset.cc: added I/O exception handling to merge_from_disk.
+    * lib/hashtable.cc: added I/O exception handling to load_tagset and
+	load_stop_tags
+    * khmer/_khmermodule.cc: added I/O exception propagation from C++ to
+	Python, for all loading functions.
+
+2014-05-22  Michael Wright  <wrigh517@msu.edu>
+
+    * scripts/fastq-to-fasta: Moved and improved fastq-to-fasta.py into scripts 
+    from sandbox
+    * tests/test_scripts.py: Added tests for fastq-to-fasta.py
+    * tests/test-data: Added test-fastq-n-to-fasta.py file with N's in 
+    sequence for testing
+
+2014-05-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: add target for python test coverage plain-text report;
+    clarified where the HTML report is
+
+2014-05-16  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * docs/scripts.txt: include sweep-reads-buffered.py
+
+2014-05-14  Adam Caldwell  <adam.caldwell@gmail.com>
+
+    * Makefile: change pip to pip2. Fixes assorted make problems on systems
+    where pip links to pip3
+
+2014-05-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{zlib,bzip2} -> third-party/
+    * setup.{cfg,py}: Move third party libraries to their own directory
+    * Makefile: add sloccount target for humans and the sloccount.sc target for
+   Jenkins
+
+2014-05-13  Michael Wright  <wrigh517@msu.edu>
+
+    * sandbox/fastq-to-fasta.py: now reports number of reads dropped due to
+    'N's in sequence. close 395
+
+2014-05-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/release.txt: additional fixes
+
+2014-05-09  Luiz Irber  <irberlui@msu.edu>
+
+    Version 1.0.1
+
+2014-05-09  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/release.txt: update release instructions
+
+2014-05-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{subset,counting}.cc: fix cppcheck errors; astyle -A10
+    --max-code-length=80
+
+2014-05-06  Titus Brown  <titus@idyll.org>
+
+    * sandbox/calc-best-assembly.py: added script to calculate best
+    assembly from a list of contig/scaffold files
+	
 2014-04-23  Titus Brown  <titus@idyll.org>
 
     * scripts/abundance-dist-single.py: fixed problem where ReadParser was
@@ -5,44 +172,22 @@
 
 2014-04-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-    * *.py: switch to explicit python2 invocation. Fixes #385.
+    *.py: switch to explicit python2 invocation. Fixes #385.
+
+2014-04-21  Titus Brown  <t@idyll.org>
+
+    * doc/development.txt: added spellcheck to review checklist
+
+2014-04-21  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: updated FP rate to match latest info from
+      Qingpeng's paper; corrected spelling error.
 
 2014-04-21  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * setup.py,doc/installing.txt: Remove argparse from the requirements
     unless it isn't available. Argparse is bundled with Python 2.7+. This
     simplifies the installation instructions.
-
-2014-04-06  Titus Brown  <titus@idyll.org>
-
-    * scripts/normalize-by-median.py: added comment about table compatibility
-    with abundance-dist.
-
-2014-04-01  Titus Brown  <titus@idyll.org>
-
-    * CITATION,khmer/khmer_args.py: Updated khmer software citation for
-    release.
-
-2014-03-31  Titus Brown  <titus@idyll.org>
-
-    * scripts/normalize-by-median.py: Fixed unbound variable bug introduced in
-    20a433c2.
-
-    * khmer/file.py: Fixed incorrect use of __file__ dirname instead of
-    os.getcwd(); also fixed bug where statvfs would choke on an empty
-    dirname resulting from input files being in the cwd.
-
-2014-03-31  Titus Brown  <titus@idyll.org>
-
-    * scripts/*.py,khmer/khmer_args.py: added 'info' function to khmer_args,
-    and added citation information to each script.
-    * CITATION: added basic citation information for khmer functionality.
-
-2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
-
-    Version 1.0.1
-    * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
-    * ChangeLog: fix date for 1.0 release, email addresses
 
 2014-04-17  Ram RS  <ramrs@nyu.edu>
 
@@ -53,6 +198,16 @@
 
     * scripts/*.py: fixed argument to check_space_for_hashtable to rely
     on args.n_tables and not args.ksize.
+
+2014-04-06  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: added comment about table compatibility
+    with abundance-dist.
+
+2014-04-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * MANIFEST.in,setup.py: fix to correct zlib packaging for #365
+    * ChangeLog: fix date for 1.0 release, email addresses
 
 2014-04-01  Michael R. Crusoe  <mcrusoe@msu.edu>
 

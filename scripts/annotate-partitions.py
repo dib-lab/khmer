@@ -31,7 +31,7 @@ def get_parser():
     Load in a partitionmap (generally produced by partition-graph.py or
     merge-partitions.py) and annotate the sequences in the given files with
     their partition IDs. Use :program:`extract-partitions.py` to extract
-    sequences into seperate group files.
+    sequences into separate group files.
 
     Example (results will be in ``random-20-a.fa.part``)::
 

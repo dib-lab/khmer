@@ -11,6 +11,7 @@
 #include "counting.hh"
 
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 using namespace khmer;
@@ -377,9 +378,22 @@ void Hashtable::save_tagset(std::string outfilename)
 
 void Hashtable::load_tagset(std::string infilename, bool clear_tags)
 {
-    ifstream infile(infilename.c_str(), ios::binary);
-    if (!infile.is_open()) {
-        throw std::exception();
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+        infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!(infile.is_open())) {
+            err = "Cannot open tagset file: " + infilename;
+        } else {
+            err = "Unknown error in opening file: " + infilename;
+        }
+        throw khmer_file_exception(err.c_str());
     }
 
     if (clear_tags) {
@@ -390,30 +404,52 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
     unsigned int save_ksize = 0;
 
     size_t tagset_size = 0;
+    HashIntoType * buf = NULL;
 
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_TAGS)) {
-        throw std::exception();
+    try {
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading tagset from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_TAGS)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading tagset from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        if (!(save_ksize == _ksize)) {
+            std::ostringstream err;
+            err << "Incorrect k-mer size " << save_ksize
+                << " while reading tagset from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+
+        infile.read((char *) &tagset_size, sizeof(tagset_size));
+        infile.read((char *) &_tag_density, sizeof(_tag_density));
+
+        buf = new HashIntoType[tagset_size];
+
+        infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+
+        for (unsigned int i = 0; i < tagset_size; i++) {
+            all_tags.insert(buf[i]);
+        }
+
+        delete[] buf;
+    } catch (std::ifstream::failure &e) {
+        std::string err = "Error reading data from: " + infilename;
+	if (buf != NULL) {
+	  delete[] buf;
+	}
+        throw khmer_file_exception(err.c_str());
     }
-
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    if (!(save_ksize == _ksize)) {
-        throw std::exception();
-    }
-
-    infile.read((char *) &tagset_size, sizeof(tagset_size));
-    infile.read((char *) &_tag_density, sizeof(_tag_density));
-
-    HashIntoType * buf = new HashIntoType[tagset_size];
-
-    infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
-
-    for (unsigned int i = 0; i < tagset_size; i++) {
-        all_tags.insert(buf[i]);
-    }
-
-    delete[] buf;
 }
 
 void Hashtable::consume_sequence_and_tag(const std::string& seq,
@@ -1687,7 +1723,7 @@ const
         keeper.insert(kmer);
         total++;
 
-        // QUESITON: Huh? What's up with the following?
+        // QUESTION: Huh? What's up with the following?
         if (false && !is_first_kmer && set_contains(all_tags, kmer)) {
             continue;
         }
@@ -1780,9 +1816,22 @@ const
 
 void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 {
-    ifstream infile(infilename.c_str(), ios::binary);
-    if (!(infile.is_open())) {
-        throw std::exception();
+    ifstream infile;
+
+    // configure ifstream to raise exceptions for everything.
+    infile.exceptions(std::ifstream::failbit | std::ifstream::badbit |
+                      std::ifstream::eofbit);
+
+    try {
+        infile.open(infilename.c_str(), ios::binary);
+    } catch (std::ifstream::failure &e) {
+        std::string err;
+        if (!(infile.is_open())) {
+            err = "Cannot open stoptags file: " + infilename;
+        } else {
+            err = "Unknown error in opening file: " + infilename;
+        }
+        throw khmer_file_exception(err.c_str());
     }
 
     if (clear_tags) {
@@ -1794,27 +1843,44 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
 
     size_t tagset_size = 0;
 
-    infile.read((char *) &version, 1);
-    infile.read((char *) &ht_type, 1);
-    if (!(version == SAVED_FORMAT_VERSION) || !(ht_type == SAVED_STOPTAGS)) {
-        throw std::exception();
+    try {
+        infile.read((char *) &version, 1);
+        infile.read((char *) &ht_type, 1);
+        if (!(version == SAVED_FORMAT_VERSION)) {
+            std::ostringstream err;
+            err << "Incorrect file format version " << (int) version
+                << " while reading stoptags from " << infilename
+                << "; should be " << (int) SAVED_FORMAT_VERSION;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        else if (!(ht_type == SAVED_STOPTAGS)) {
+            std::ostringstream err;
+            err << "Incorrect file format type " << (int) ht_type
+                << " while reading stoptags from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+
+        infile.read((char *) &save_ksize, sizeof(save_ksize));
+        if (!(save_ksize == _ksize)) {
+            std::ostringstream err;
+            err << "Incorrect k-mer size " << save_ksize
+                << " while reading stoptags from " << infilename;
+            throw khmer_file_exception(err.str().c_str());
+        }
+        infile.read((char *) &tagset_size, sizeof(tagset_size));
+
+        HashIntoType * buf = new HashIntoType[tagset_size];
+
+        infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
+
+        for (unsigned int i = 0; i < tagset_size; i++) {
+            stop_tags.insert(buf[i]);
+        }
+        delete[] buf;
+    } catch (std::ifstream::failure &e) {
+        std::string err = "Error reading stoptags from: " + infilename;
+        throw khmer_file_exception(err.c_str());
     }
-
-    infile.read((char *) &save_ksize, sizeof(save_ksize));
-    if (!(save_ksize == _ksize)) {
-        throw std::exception();
-    }
-    infile.read((char *) &tagset_size, sizeof(tagset_size));
-
-    HashIntoType * buf = new HashIntoType[tagset_size];
-
-    infile.read((char *) buf, sizeof(HashIntoType) * tagset_size);
-
-    for (unsigned int i = 0; i < tagset_size; i++) {
-        stop_tags.insert(buf[i]);
-    }
-
-    delete[] buf;
 }
 
 void Hashtable::save_stop_tags(std::string outfilename)

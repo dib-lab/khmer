@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,protected-access
 
 #
 # This is an exact copy of test_hashbits, with all invocations of
@@ -554,3 +555,22 @@ def test_simple_median():
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
+
+
+def test_bad_primes():
+    try:
+        countingtable = khmer._Hashbits.__new__(
+            khmer._Hashbits, 6, ["a", "b", "c"])
+        assert 0, "this should fail"
+    except TypeError, e:
+        print str(e)
+
+
+def test_consume_fasta_and_tag_with_badreads_parser():
+    presencetable = khmer.Hashbits(6, 1e6, 2)
+    readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
+    try:
+        presencetable.consume_fasta_and_tag_with_reads_parser(readsparser)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)

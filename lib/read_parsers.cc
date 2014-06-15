@@ -39,7 +39,7 @@ what( ) const throw( )
 InvalidReadFileFormat::
 InvalidReadFileFormat(
     char const * exc_name, char const * reason, char const * evidence
-)
+) : khmer_file_exception(reason)
 {
 
     if (reason) {
@@ -384,8 +384,8 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 
         case BZ_STREAM_END:
             block_complete = true;
-	    nbread_total += nbread;
-	    break;
+            nbread_total += nbread;
+            break;
         case BZ_OK:
             nbread_total += nbread;
             break;
@@ -582,7 +582,7 @@ CacheManager::
     }
     delete [ ] _segments;
     _segments		= NULL;
-
+    delete &_stream_reader;
 }
 
 
@@ -1435,7 +1435,14 @@ IParser(
 IParser::
 ~IParser( )
 {
-    delete[] _states;
+    if (_states != NULL) {
+        for (uint32_t i = 0; i < _number_of_threads; i++) {
+            if (_states[i] != NULL) {
+                delete _states[i];
+            }
+        }
+        delete[] _states;
+    }
 
     regfree( &_re_read_2_nosub );
     regfree( &_re_read_1 );

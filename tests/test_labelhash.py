@@ -4,6 +4,7 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,protected-access
 import khmer
 from khmer import LabelHash
 from screed.fasta import fasta_iter
@@ -717,3 +718,11 @@ def test_simple_median():
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
+
+
+def test_bad_primes():
+    try:
+        hi = khmer._LabelHash.__new__(khmer.LabelHash, 6, ["a", "b", "c"])
+        assert 0, "Non number prime list should fail"
+    except TypeError, e:
+        print str(e)

@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 =======================================
 Blog posts and additional documentation
 =======================================

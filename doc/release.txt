@@ -9,28 +9,21 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 #. The below should be done in a clean checkout::
 
         cd `mktemp -d`
-        git clone --depth 1 git@github.com:ged-lab/khmer.git
+        git clone git@github.com:ged-lab/khmer.git
         cd khmer
 
-#. (Optional) Check for updates to ``ez_setup.py`` and versioneer::
+#. (Optional) Check for updates to versioneer::
 
-        wget -N https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-        wget -N https://raw.github.com/warner/python-versioneer/master/versioneer.py
+        pip install versioneer
+        versioneer-installer
 
-        git diff ez_setup.py
+        git diff
         
-        git add ez_setup.py
-        git commit -m "new version of ez_setup.py"
-        # or
-        git checkout -- ez_setup.py
-
-        git diff versioneer.py
-        
-        git add versioneer.py
         ./setup.py versioneer
-        git commit -m "new version of versioneer.py"
+        git diff 
+        git commit -m -a "new version of versioneer.py"
         # or
-        git checkout -- versioneer.py
+        git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
 
 #. Review the git logs since the last release and diffs (if needed) and ensure
    that the ``Changelog`` is up to date::
@@ -70,7 +63,8 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         
         cd ../../testenv2
         source bin/activate
-        pip install --allow-external argparse -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
+        pip install -U setuptools==3.4.1
+        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
         cd src/khmer
         make dist
         make install
@@ -83,7 +77,8 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         
         cd ../../../testenv3/
         source bin/activate
-        pip install --allow-external argparse khmer*tar.gz
+        pip install -U setuptools==3.4.1
+        pip install khmer*tar.gz
         tar xzf khmer*tar.gz
         cd khmer*
         make dist
@@ -102,13 +97,15 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
         cd ../../testenv4
         source bin/activate
-        pip install --allow-external argparse argparse screed
+        pip install -U setuptools==3.4.1
+        pip install screed nose
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         normalize-by-median.py --version 2>&1 | awk ' { print $2 } '
         cd build/khmer
-        make test
+        ./setup.py nosetests
 
-#. Create the final tag and publish the new release on PyPI (requires an authorized account).::
+#. Create the final tag and publish the new release on PyPI (requires an
+   authorized account).::
 
         cd ../../../khmer
         git tag v${new_version}
@@ -125,33 +122,64 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         virtualenv build
         cd build
         source bin/activate
-        pip install --allow-external argparse khmer==${new_version}
-        pip install wheel
+        pip install -U setuptools==3.4.1 wheel
+        pip install --no-clean khmer==${new_version}
         cd build/khmer
         ./setup.py bdist_wheel upload
 
-#. Tweet about the new release. Optionally send email including the contents of
-   the Changelog to khmer@lists.idyll.org and khmer-announce@lists.idyll.org
+#. Update Read the Docs to point to the new version. Visit
+   https://readthedocs.org/builds/khmer/ and 'Build Version: master' to pick up
+   the new tag. Once that build has finished check the "Activate" box next to
+   the new version at https://readthedocs.org/dashboard/khmer/versions/ under
+   "Choose Active Versions". Finally change the default version at
+   https://readthedocs.org/dashboard/khmer/advanced/ to the new version.
 
-Upstream sources
-----------------
+#. Delete any RC tags created::
+
+        git tag -d ${new_version}-rc1
+        git push origin :refs/tags/${new_version}-rc1
+
+#. Tweet about the new release.
+
+#. Send email including the contents of the ChangeLog to khmer@lists.idyll.org
+   and khmer-announce@lists.idyll.org
+
+BaTLab testing
+--------------
+
+The UW-Madison Build and Test Lab provides the khmer project with a free
+cross-platform testing environment.
+
+#. Connect to their head node::
+
+        ssh mcrusoe@submit-1.batlab.org
+
+#. Move into the khmer directory and download a release from PyPI's main server
+   or the test PyPI server::
+
+        cd khmer/
+        wget https://testpypi.python.org/packages/source/k/khmer/khmer-1.0.1-rc3.tar.gz
+        vim khmer-v1.0.inputs # change the scp_file to point to the release
+        vim khmer-v1.0.run-spec # change version number
+        nmi_submit khmer-v1.0.run-spec
+
+Setuptools Bootstrap
+--------------------
 
 ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
 
-versioneer.py is from
-https://raw.github.com/warner/python-versioneer/master/versioneer.py
-
-Before major releases they should be examined to see if there are new
+Before major releases it should be examined to see if there are new
 versions available and if the change would be useful
 
 
-Explanation
------------
+Versioning Explanation
+----------------------
 
 Versioneer, from https://github.com/warner/python-versioneer, is used to
 determine the version number and is called by Setuptools and Sphinx. See the
 files ``versioneer.py``, the top of ``khmer/__init__.py``,
-``khmer/_version.py``, ``setup.py``, and ``doc/conf.py`` for the implementation.
+``khmer/_version.py``, ``setup.py``, and ``doc/conf.py`` for the
+implementation.
 
 The version number is determined through several methods: see 
 https://github.com/warner/python-versioneer#version-identifiers
@@ -164,12 +192,12 @@ If the source tree is from a git checkout then the version number is derived by
 If from an unpacked tarball then the name of the directory is queried.
 
 Lacking either of the two git-archive will record the version number at the top
-of ``khmer/_version.py`` via the ``$Format:%d$`` and ``$Format:%H$`` placeholders
-enabled by the "export-subst" entry in ``.gitattributes``.
+of ``khmer/_version.py`` via the ``$Format:%d$`` and ``$Format:%H$``
+placeholders enabled by the "export-subst" entry in ``.gitattributes``.
 
-Non source distributions will have a customized ``khmer/_version.py`` that contains
-hard-coded version strings. (see ``build/*/khmer/_version.py`` after a
+Non source distributions will have a customized ``khmer/_version.py`` that
+contains hard-coded version strings. (see ``build/*/khmer/_version.py`` after a
 ``python setup.py build`` for an example)
 
-``ez_setup.py`` bootstraps setuptools (if needed) by downloading and installing an
-appropriate version
+``ez_setup.py`` bootstraps Setuptools (if needed) by downloading and installing
+an appropriate version

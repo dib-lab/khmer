@@ -25,7 +25,7 @@ Author: Jason Pell (pelljaso@cse.msu.edu)
 import screed
 import sys
 import glob
-
+import os
 
 def trimLens(lens, minLen):
     '''
@@ -102,6 +102,10 @@ def main():
     print "N\tsum\tmax\tfilename"
 
     for filename in sys.argv[2:]:
+        if not os.path.exists(filename):
+            print >>sys.stderr, "WARNING: file %s does not exist." % filename
+            continue
+        
         lens = getLens(filename)
         trimmedLens = trimLens(lens, minLen)
 

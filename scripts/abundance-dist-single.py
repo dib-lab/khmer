@@ -74,7 +74,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):
         print >> sys.stderr, 'ERROR: %s exists; not squashing.' % \
-              args.output_histogram_filename
+            args.output_histogram_filename
         sys.exit(1)
     else:
         hist_fp = open(args.output_histogram_filename, 'w')

@@ -12,8 +12,8 @@ For example, while using load-into-counting.py. If you experience this then
 add "--threads=1" to your command line. This issue is being tracked in
 https://github.com/ged-lab/khmer/issues/249
 
-If your hashfile gets truncated, perhaps from a full filesystem, then our
-tools currently will get stuck. This is being tracked in 
+If your counting or presence table gets truncated, perhaps from a full
+filesystem, then our tools currently will get stuck. This is being tracked in 
 https://github.com/ged-lab/khmer/issues/247 and
 https://github.com/ged-lab/khmer/issues/96 and
 https://github.com/ged-lab/khmer/issues/246
