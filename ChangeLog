@@ -1,11 +1,17 @@
+2014-06-14  Titus Brown  <t@idyll.org>
+
+    * doc/scripts.txt: added extract-long-sequences.py doc reference.
+    * scripts/extract-long-sequences.py: set default sequence length to
+	extract to 200 bp.
+
 2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: split coverity target in two: -build and -upload. Added
     configuration target
 
-2014-06-13  Titus Brown  <t@Titus-MacBook-Air-2.local>
+2014-06-13  Titus Brown  <t@idyll.org>
 
-    * doc/install.txt: updated virtuaenv command to use python2 explicitly,
+    * doc/install.txt: updated virtualenv command to use python2 explicitly,
 	for arch support.
 
 2014-06-13  Titus Brown  <t@idyll.org>
@@ -21,7 +27,7 @@
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
     * scripts/load-into-counting: Fixed docstring misnomer to 
-    load-into-counting.py
+	load-into-counting.py
 
 2014-06-10  Michael R. Crusoe  <mcrusoe@msu.edu>
 
