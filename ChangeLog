@@ -1,3 +1,8 @@
+2014-06-15  Titus Brown  <t@idyll.org>
+
+    * sandbox/calc-median-distribution.py: updates to print cumulative
+	distribution for calc-median-distribution.
+
 2014-06-14  Titus Brown  <t@idyll.org>
 
     * doc/scripts.txt: added extract-long-sequences.py doc reference.
