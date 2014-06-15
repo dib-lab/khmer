@@ -1,13 +1,13 @@
-2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
-
-    * Makefile: split coverity target in two: -build and -upload. Added
-    configuration target
-
 2014-06-14  Titus Brown  <t@idyll.org>
 
     * doc/scripts.txt: added extract-long-sequences.py doc reference.
     * scripts/extract-long-sequences.py: set default sequence length to
 	extract to 200 bp.
+
+2014-06-13  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: split coverity target in two: -build and -upload. Added
+    configuration target
 
 2014-06-13  Titus Brown  <t@idyll.org>
 
