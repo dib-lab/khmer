@@ -5,6 +5,8 @@
 	and sweep-files.py over to sandbox.
     * tests/test_sandbox_scripts.py: created a test file for scripts in
 	sandbox/.
+    * sandbox/calc-median-distribution.py: updates to print cumulative
+	distribution for calc-median-distribution.
 
 2014-06-14  Titus Brown  <t@idyll.org>
 
@@ -39,6 +41,11 @@
     * tests/test_script_arguments.py: added tests for several functions in
 	khmer/file.py.
     * sandbox/assemstats3.py: handle missing input files.
+
+2014-06-12  Michael Wright <wrigh517@msu.edu>
+
+    * sandbox/load-into-hashbits: Deleted from sandbox. It is superseded
+    by load-graph.py --no-tagset.
 
 2014-06-11  Michael Wright <wrigh517@msu.edu>
 
