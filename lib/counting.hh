@@ -80,12 +80,12 @@ public:
         if (_counts) {
             for (size_t i = 0; i < _n_tables; i++) {
                 if (_counts[i]) {
-                    delete _counts[i];
+                    delete[] _counts[i];
                     _counts[i] = NULL;
                 }
             }
 
-            delete _counts;
+            delete[] _counts;
             _counts = NULL;
 
             _n_tables = 0;
@@ -227,16 +227,6 @@ public:
                                        BoundedCounterType limit_by_count,
                                        CallbackFn callback = NULL,
                                        void * callback_data = NULL);
-
-    void get_kmer_abund_mean(const std::string &inputfile,
-                             unsigned long long &total,
-                             unsigned long long &count,
-                             float &mean) const;
-
-    void get_kmer_abund_abs_deviation(const std::string &inputfile,
-                                      float mean, float &abs_deviation) const;
-
-    unsigned int max_hamming1_count(const std::string kmer);
 
     unsigned long trim_on_abundance(std::string seq,
                                     BoundedCounterType min_abund) const;

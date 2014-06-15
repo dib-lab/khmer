@@ -25,12 +25,14 @@ skip to step 4.
 #) Install the Xcode command-line tools: Xcode -> preferences ->
    Downloads -> Command Line Tools (requires root).
 
-#) From a terminal install virtualenv. You'll need the URL of the `latest virtualenv 
-   release <https://pypi.python.org/packages/source/v/virtualenv/>`__. ::
+#) From a terminal download the virtualenv package and create a
+   virtual environment with it. You'll need the URL of the `latest
+   virtualenv release
+   <https://pypi.python.org/packages/source/v/virtualenv/>`__. ::
 
       curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.x.y.tar.gz
       tar xzf virtualenv*
-      cd virtualenv-*; python virtualenv.py ../khmerEnv; cd ..
+      cd virtualenv-*; python2.7 virtualenv.py ../khmerEnv; cd ..
       source khmerEnv/bin/activate
 
 Linux
@@ -50,7 +52,7 @@ Linux
 #) Create a virtualenv and activate it::
 
       cd a/writeable/directory/
-      virtualenv khmerEnv
+      python2.7 -m virtualenv khmerEnv
       source khmerEnv/bin/activate
 
    Linux users without root access can try step 4 from the OS X instructions above.
@@ -60,7 +62,7 @@ Latest stable release
 
 #) Use pip to download, build, and install khmer and its dependencies::
 
-      pip install khmer
+      pip2 install khmer
 
 #) The scripts are now in the ``env/bin`` directory and ready for your
    use. You can directly use them by name, see :doc:`scripts`.
@@ -75,7 +77,7 @@ Latest development branch
 
 Repeat the above but modify the pip install line::
 
-   pip install git+https://github.com/ged-lab/khmer.git@master#egg=khmer
+   pip2 install git+https://github.com/ged-lab/khmer.git@master#egg=khmer
 
 You can change ``master`` in the above command to the name of another branch.
 
@@ -85,7 +87,7 @@ Run the tests
 If you're running a version of ``pip`` less than 1.4 and you want to run the
 tests then you should upgrade ``pip``::
 
-	pip install --user --upgrade pip
+	pip2 install --user --upgrade pip
 
 Repeat the appropriate installation procedure from above but add "--no-clean"
 to the ``pip`` invocation.

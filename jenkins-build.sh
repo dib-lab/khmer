@@ -1,13 +1,13 @@
 #!/bin/bash
 
-rm -Rf .env build dist khmer/_khmermodule.so cov-int lib/zlib/Makefile
+make clean
+
+rm -Rf .env dist cov-int
 
 virtualenv .env
 
 . .env/bin/activate
 pip install --quiet nose coverage pylint pep8==1.5 screed
-
-make clean
 
 if type ccache >/dev/null 2>&1
 then
@@ -45,7 +45,8 @@ fi
 if type hg >/dev/null 2>&1
 then
 	rm -Rf sphinx-contrib
-	hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
+	#hg clone http://bitbucket.org/mcrusoe/sphinx-contrib
+	hg clone http://athyra.ged.msu.edu/~mcrusoe/sphinx-contrib
 	pip install --upgrade sphinx-contrib/autoprogram/
 	make doc
 fi
