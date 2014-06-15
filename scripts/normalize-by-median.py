@@ -72,8 +72,8 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
             print('... in file', input_filename)
 
             if report_fp:
-                print(total, total - discarded, 1. -(discarded / float(total)),
-                      file=report_fp)
+                print(total, total - discarded, 1. -
+                      (discarded / float(total)), file=report_fp)
                 report_fp.flush()
 
         total += batch_size
@@ -266,10 +266,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             else:
                 total += total_acc
                 discarded += discarded_acc
-                print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                    .format(inp=input_filename,
-                            kept=total - discarded, total=total,
-                            perc=int(100. - discarded / float(total) * 100.)))
+                print('DONE with {inp}; kept {kept} of {total} or {perc:2}%'
+                      .format(inp=input_filename, kept=total - discarded,
+                              total=total, perc=int(100. - discarded /
+                                                    float(total) * 100.)))
                 print('output in', output_name)
 
         if (args.dump_frequency > 0 and
