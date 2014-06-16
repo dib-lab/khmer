@@ -1,5 +1,7 @@
 2014-06-15  Titus Brown  <t@idyll.org>
 
+    * tests/test_script_arguments.py: capture file.py output to stderr
+	so that it is not displayed during tests.
     * sandbox/calc-median-distribution.py: updates to print cumulative
 	distribution for calc-median-distribution.
 
