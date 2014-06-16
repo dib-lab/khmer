@@ -6,20 +6,20 @@ Release notes w/links: https://github.com/ged-lab/khmer/releases/tag/v1.1
 
 ## New items of note:
 
-removed unnecessary files from PyPI package; distribution is now under 2 MB (#419)
-tests are now distributed with package and can be run after 'pip install' (#451)
-complain properly on file read failures (#333)
+* removed unnecessary files from PyPI package; distribution is now under 2 MB (#419)
+* tests are now distributed with package and can be run after 'pip install' (#451)
+* complain properly on file read failures (#333)
 
 ## Notable bugs fixed/issues closed:
 
-removed sandbox/load-into-hashbits.py (superseded by scripts/load-graph.py --no-tagset) (#480)
-Sequence loading scripts will now report total numbers of k-mers if given --report_total_kmers (#491/#429)
-promoted extract-long-sequences.py to scripts (#461)
-promoted fastq-to-fasta.py to scripts (#436)
-removed a number of memory leaks found by Coverity and valgrind (#451)
-updated reservoir sampling to produce multiple subsamples with -S (#197)
-fixed pip2, python2 issues (#428 and #485)
-removed untested/unused code and scripts (#438)
+* removed sandbox/load-into-hashbits.py (superseded by scripts/load-graph.py --no-tagset) (#480)
+* Sequence loading scripts will now report total numbers of k-mers if given --report_total_kmers (#491/#429)
+* promoted extract-long-sequences.py to scripts (#461)
+* promoted fastq-to-fasta.py to scripts (#436)
+* removed a number of memory leaks found by Coverity and valgrind (#451)
+* updated reservoir sampling to produce multiple subsamples with -S (#197)
+* fixed pip2, python2 issues (#428 and #485)
+* removed untested/unused code and scripts (#438)
 
 ## Known issues:
 
