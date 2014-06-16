@@ -14,7 +14,6 @@ Build a graph from the given sequences, save in <htname>.
 Use '-h' for parameter help.
 """
 
-from __future__ import print_function
 import sys
 import threading
 
@@ -58,14 +57,14 @@ def main():
     check_space(args.input_filenames)
     check_space_for_hashtable(float(args.n_tables * args.min_tablesize) / 8.)
 
-    print('Saving k-mer presence table to %s' % base)
-    print('Loading kmers from sequences in %s' % repr(filenames))
+    print 'Saving k-mer presence table to %s' % base
+    print 'Loading kmers from sequences in %s' % repr(filenames)
     if args.no_build_tagset:
-        print('We WILL NOT build the tagset.')
+        print 'We WILL NOT build the tagset.'
     else:
-        print('We WILL build the tagset (for partitioning/traversal).')
+        print 'We WILL build the tagset (for partitioning/traversal).'
 
-    print('making k-mer presence table')
+    print 'making k-mer presence table'
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
     if args.no_build_tagset:
@@ -80,7 +79,7 @@ def main():
 
         rparser = khmer.ReadParser(filename, n_threads)
         threads = []
-        print('consuming input', filename)
+        print 'consuming input', filename
         for _ in xrange(n_threads):
             cur_thrd = threading.Thread(target=target_method, args=(rparser, ))
             threads.append(cur_thrd)
@@ -90,26 +89,26 @@ def main():
             thread.join()
 
     if args.report_total_kmers:
-        print('Total number of k-mers: {}'.format(htable.n_occupied()),
-              file=sys.stderr)
+        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+            htable.n_occupied())
 
-    print('saving k-mer presence table in', base + '.pt')
+    print 'saving k-mer presence table in', base + '.pt'
     htable.save(base + '.pt')
 
     if not args.no_build_tagset:
-        print('saving tagset in', base + '.tagset')
+        print 'saving tagset in', base + '.tagset'
         htable.save_tagset(base + '.tagset')
 
     info_fp = open(base + '.info', 'w')
     info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print('fp rate estimated to be %1.3f' % fp_rate)
+    print 'fp rate estimated to be %1.3f' % fp_rate
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
-        print("**", file=sys.stderr)
-        print("** ERROR: the graph structure is too small for this data set."
-              "Increase table size/# tables.", file=sys.stderr)
-        print("**", file=sys.stderr)
+        print >> sys.stderr, "**"
+        print >> sys.stderr, ("** ERROR: the graph structure is too small for "
+                              "this data set. Increase table size/# tables.")
+        print >> sys.stderr, "**"
         sys.exit(1)
 
 if __name__ == '__main__':

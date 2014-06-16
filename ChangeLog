@@ -1,7 +1,5 @@
 2014-06-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-2014-06-14  Michael R. Crusoe  <mcrusoe@msu.edu>
-
     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
     normalize-by-median,load-graph}.py,tests/test_scripts.py: added
     '--report-total-kmers' option to all scripts that create k-mer tables.
