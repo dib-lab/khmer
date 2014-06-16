@@ -12,6 +12,7 @@ import os
 import shutil
 from cStringIO import StringIO
 import traceback
+import nose
 
 import khmer_tst_utils as utils
 import khmer
@@ -28,23 +29,16 @@ def teardown():
 
 
 def _runsandbox(scriptname):
-    import pkg_resources
     ns = {"__name__": "__main__"}
     ns['sys'] = globals()['sys']
-    try:
-        pkg_resources.get_distribution("khmer").run_script(
-            scriptname, ns)
+
+    path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    scriptfile = os.path.join(path, scriptname)
+    if os.path.isfile(scriptfile):
+        execfile(scriptfile, ns)
         return 0
-    except pkg_resources.ResolutionError, err:
-        paths = [os.path.join(os.path.dirname(__file__),
-                              "../sandbox")]
-        paths.extend(os.environ['PATH'].split(':'))
-        for path in paths:
-            scriptfile = os.path.join(path, scriptname)
-            if os.path.isfile(scriptfile):
-                execfile(scriptfile, ns)
-                return 0
-    return -1
+        
+    raise nose.SkipTest("sandbox tests are only run in a repository.")
 
 
 def runsandbox(scriptname, args, in_directory=None, fail_ok=False):
@@ -73,6 +67,8 @@ def runsandbox(scriptname, args, in_directory=None, fail_ok=False):
             print 'running:', scriptname, 'in:', in_directory
             print 'arguments', sysargs
             status = _runsandbox(scriptname)
+        except nose.SkipTest:
+            raise
         except SystemExit, e:
             status = e.code
         except:
