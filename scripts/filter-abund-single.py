@@ -16,6 +16,7 @@ placed in 'infile.abundfilt'.
 Use '-h' for parameter help.
 """
 import os
+import sys
 import khmer
 import threading
 import textwrap
@@ -53,7 +54,8 @@ def get_parser():
                         "k-mer counting table to")
     parser.add_argument('datafile', metavar='input_sequence_filename',
                         help="FAST[AQ] sequence file to trim")
-
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -89,6 +91,10 @@ def main():
 
     for _ in threads:
         _.join()
+
+    if args.report_total_kmers:
+        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+            htable.n_occupied())
 
     fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
