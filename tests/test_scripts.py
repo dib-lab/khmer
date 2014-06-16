@@ -1497,8 +1497,6 @@ def test_sample_reads_randomly_S():
                         '895:1:1:1342:20695', '895:1:1:1303:6251'])
 
 
-
-
 def test_count_overlap():
     seqfile1 = utils.get_temp_filename('test-overlap1.fa')
     in_dir = os.path.dirname(seqfile1)

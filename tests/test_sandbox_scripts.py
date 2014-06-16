@@ -37,7 +37,7 @@ def _runsandbox(scriptname):
     if os.path.isfile(scriptfile):
         execfile(scriptfile, ns)
         return 0
-        
+
     raise nose.SkipTest("sandbox tests are only run in a repository.")
 
 
