@@ -33,12 +33,12 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 #. Review the issue list for any new bugs that will not be fixed in this
    release. Add them to ``doc/known-issues.txt``
 
-#. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-multi/
+#. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
 
 #. Tag the branch with the release candidate version number prefixed by the
    letter 'v'::
 
-        new_version=1.0.1
+        new_version=1.1
         git tag v${new_version}-rc1
         git push --tags git@github.com:ged-lab/khmer.git
 
