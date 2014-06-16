@@ -109,7 +109,7 @@ def main():
             open(base + '.info', 'w').write('through %s' % filename)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
             htable.n_occupied())
 
     print 'saving', base
