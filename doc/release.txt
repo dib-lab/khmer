@@ -35,10 +35,13 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
 #. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
 
-#. Tag the branch with the release candidate version number prefixed by the
-   letter 'v'::
+#. Set your new version number::
 
         new_version=1.1
+
+   and then tag the release candidate with the new version number prefixed by
+   the letter 'v'::
+
         git tag v${new_version}-rc1
         git push --tags git@github.com:ged-lab/khmer.git
 
@@ -84,12 +87,13 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         make dist
         make test
 
-#. Publish the new release on the testing PyPI server::
+#. Publish the new release on the testing PyPI server.  You will need
+   to change your PyPI credentials as documented here:
+   https://wiki.python.org/moin/TestPyPI.  You may need to reregister:
 
         python setup.py register --repository test
 
-   Change your PyPI credentials as documented in
-   https://wiki.python.org/moin/TestPyPI::
+   Now, upload the new release::
 
         python setup.py sdist upload -r test
 
