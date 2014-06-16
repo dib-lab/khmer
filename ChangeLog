@@ -1,18 +1,26 @@
+2014-06-15  Titus Brown  <t@idyll.org>
+
+    * doc/scripts.txt: removed sweep-reads.py from script documentation.
+    * scripts/sweep-reads.py, scripts/sweep-files.py: moved sweep-reads.py
+	and sweep-files.py over to sandbox.
+    * tests/test_sandbox_scripts.py: created a test file for scripts in
+	sandbox/; skip when not in developer mode (e.g. installed egg).
+    * tests/test_script_arguments.py: capture file.py output to stderr
+	so that it is not displayed during tests.
+    * sandbox/calc-median-distribution.py: updates to print cumulative
+	distribution for calc-median-distribution.
+
 2014-06-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
     normalize-by-median,load-graph}.py,tests/test_scripts.py: added
     '--report-total-kmers' option to all scripts that create k-mer tables.
 
-2014-06-15  Titus Brown  <t@idyll.org>
-
-    * tests/test_script_arguments.py: capture file.py output to stderr
-	so that it is not displayed during tests.
-    * sandbox/calc-median-distribution.py: updates to print cumulative
-	distribution for calc-median-distribution.
-
 2014-06-14  Titus Brown  <t@idyll.org>
 
+    * doc/scripts.txt, tests/test_scripts.py, scripts/sweep-reads.py:
+	renamed sweep-reads-buffered to sweep-reads; added FASTQ output to
+	sweep-reads.
     * doc/scripts.txt: added extract-long-sequences.py doc reference.
     * scripts/extract-long-sequences.py: set default sequence length to
 	extract to 200 bp.
