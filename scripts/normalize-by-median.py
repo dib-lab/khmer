@@ -199,6 +199,9 @@ def get_parser():
                         ' file with the specified filename')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename.', nargs='+')
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers"
+                        " post-normalization to stderr")
     add_loadhash_args(parser)
     return parser
 
@@ -251,6 +254,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                          htable)
             if not args.force:
                 print >> sys.stderr, '** Exiting!'
+
                 sys.exit(1)
             else:
                 print >> sys.stderr, '*** Skipping error file, moving on...'
@@ -262,9 +266,9 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 total += total_acc
                 discarded += discarded_acc
                 print 'DONE with {inp}; kept {kept} of {total} or {perc:2}%'\
-                    .format(inp=input_filename,
-                            kept=total - discarded, total=total,
-                            perc=int(100. - discarded / float(total) * 100.))
+                      .format(inp=input_filename, kept=total - discarded,
+                              total=total, perc=int(100. - discarded /
+                                                    float(total) * 100.))
                 print 'output in', output_name
 
         if (args.dump_frequency > 0 and
@@ -277,6 +281,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                 hashname = 'backup.ct'
                 print 'Nothing given for savetable, saving to', hashname
             htable.save(hashname)
+
+    if args.report_total_kmers:
+        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+            htable.n_occupied())
 
     if args.savetable:
         print 'Saving k-mer counting table through', input_filename
@@ -294,7 +302,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     if fp_rate > MAX_FALSE_POSITIVE_RATE:
         print >> sys.stderr, "**"
         print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " for this data set.  Increase tablesize/# "
+                              " for this data set. Increase tablesize/# "
                               "tables.")
         print >> sys.stderr, "**"
         print >> sys.stderr, "** Do not use these results!!"

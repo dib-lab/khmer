@@ -58,6 +58,8 @@ def get_parser():
     parser.add_argument('--savetable', default='', metavar="filename",
                         help="Save the k-mer counting table to the specified "
                         "filename.")
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -110,6 +112,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
     for thread in threads:
         thread.join()
+
+    if args.report_total_kmers:
+        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+            counting_hash.n_occupied())
 
     abundance_lists = []
 

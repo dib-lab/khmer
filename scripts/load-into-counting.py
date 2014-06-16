@@ -54,6 +54,8 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -105,6 +107,10 @@ def main():
             print 'mid-save', base
             htable.save(base)
             open(base + '.info', 'w').write('through %s' % filename)
+
+    if args.report_total_kmers:
+        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+            htable.n_occupied())
 
     print 'saving', base
     htable.save(base)

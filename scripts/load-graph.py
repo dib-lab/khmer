@@ -37,6 +37,8 @@ def get_parser():
                         ' k-mer presence table filename.')
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequence filename')
+    parser.add_argument('--report-total-kmers', '-t', action='store_true',
+                        help="Prints the total number of k-mers to stderr")
     return parser
 
 
@@ -86,6 +88,10 @@ def main():
         for thread in threads:
             thread.join()
 
+    if args.report_total_kmers:
+        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+            htable.n_occupied())
+
     print 'saving k-mer presence table in', base + '.pt'
     htable.save(base + '.pt')
 
@@ -101,7 +107,7 @@ def main():
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print >> sys.stderr, "**"
         print >> sys.stderr, ("** ERROR: the graph structure is too small for "
-                              "this data set.  Increase table size/# tables.")
+                              "this data set. Increase table size/# tables.")
         print >> sys.stderr, "**"
         sys.exit(1)
 
