@@ -39,6 +39,16 @@ release makers, following this checklist by MRC.
 
 #. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
 
+#. Submit a build to Coverity Scan if it hasn't been done recently. You can get the token
+from https://gitlab.msu.edu/ged-lab/ged-internal-docs/wikis/coverity-scan or 
+https://scan.coverity.com/projects/621?tab=project_settings
+
+::
+
+        make clean
+        cov_analysis_dir=~/src/coverity/cov-analysis-linux64-7.0.2/ make coverity-build
+        COVERITY_TOKEN=${COVERITY_TOKEN} make coverity-upload
+
 #. Set your new version number and release candidate::
 
         new_version=1.1
