@@ -55,8 +55,8 @@ enum State { MATCH, INSERT_READ, INSERT_GRAPH };
                   HashIntoType _rc_hash, size_t _length)
       :prev(_prev), base(_emission), seq_idx(_seq_idx),
        state(_state), trans(_trans), fwd_hash(_fwd_hash),
-       rc_hash(_rc_hash), length(_length), scrore(0), f_score(0), h_score(0), 
-	trusted(false) {}
+       rc_hash(_rc_hash), score(0), f_score(0), h_score(0), trusted(false),
+	length(_length) {}
 
     bool operator== (const AlignmentNode& rhs) const {
       return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
