@@ -1,10 +1,11 @@
 .. vim: set filetype=rst
 
-===========================
-How to make a khmer release
-===========================
+=====================================
+How to make a khmer release candidate
+=====================================
 
-Michael R. Crusoe is the current release maker. This is his checklist.
+Michael R. Crusoe, Luiz Irber, and C. Titus Brown have all been
+release makers, following this checklist by MRC.
 
 #. The below should be done in a clean checkout::
 
@@ -89,7 +90,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
-   https://wiki.python.org/moin/TestPyPI.  You may need to reregister:
+   https://wiki.python.org/moin/TestPyPI.  You may need to reregister::
 
         python setup.py register --repository test
 
@@ -108,6 +109,17 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         cd build/khmer
         ./setup.py nosetests
 
+#. Do any final testing (BaTLab and/or acceptance tests).
+
+#. Make sure any release notes are merged into doc/release-notes/.
+
+===========================
+How to make a final release
+===========================
+
+When you've got a thoroughly tested release candidate, cut a release like
+so:
+
 #. Create the final tag and publish the new release on PyPI (requires an
    authorized account).::
 
@@ -120,8 +132,6 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         git tag -d v${new_version}-rc1
         git push git@github.com:ged-lab/khmer.git
         git push --tags git@github.com:ged-lab/khmer.git
-
-#. Make sure any release notes are merged into doc/release-notes/.
 
 #. Add the release on github, using the tag you just pushed.  Name
    it 'version X.Y.Z', and copy and paste in the release notes.
