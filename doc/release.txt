@@ -121,6 +121,11 @@ Michael R. Crusoe is the current release maker. This is his checklist.
         git push git@github.com:ged-lab/khmer.git
         git push --tags git@github.com:ged-lab/khmer.git
 
+#. Make sure any release notes are merged into doc/release-notes/.
+
+#. Add the release on github, using the tag you just pushed.  Name
+   it 'version X.Y.Z', and copy and paste in the release notes.
+
 #. Make a binary wheel on OS X.::
 
         virtualenv build
@@ -145,7 +150,7 @@ Michael R. Crusoe is the current release maker. This is his checklist.
 
 #. Tweet about the new release.
 
-#. Send email including the contents of the ChangeLog to khmer@lists.idyll.org
+#. Send email including the release notes to khmer@lists.idyll.org
    and khmer-announce@lists.idyll.org
 
 BaTLab testing
