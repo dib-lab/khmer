@@ -12,19 +12,18 @@ For example, while using load-into-counting.py. If you experience this then
 add "--threads=1" to your command line. This issue is being tracked in
 https://github.com/ged-lab/khmer/issues/249
 
-If your counting or presence table gets truncated, perhaps from a full
-filesystem, then our tools currently will get stuck. This is being tracked in 
-https://github.com/ged-lab/khmer/issues/247 and
-https://github.com/ged-lab/khmer/issues/96 and
-https://github.com/ged-lab/khmer/issues/246
+If your k-mer table is truncated on write, an error may not be reported; this
+is being tracked in https://github.com/ged-lab/khmer/issues/443.
+However, khmer will now (correctly) fail when trying to read a truncated file
+(See #333).
 
 Paired-end reads from Casava 1.8 currently require renaming for use in
 normalize-by-median and abund-filter when used in paired mode. The
 integration of a fix for this is being tracked in
 https://github.com/ged-lab/khmer/issues/23
 
-annotate-partitions.py only outputs FASTA even if given a FASTQ file. This
-issue is being tracked in https://github.com/ged-lab/khmer/issues/46
+Some scripts only output FASTA even if given a FASTQ file. This issue
+is being tracked in https://github.com/ged-lab/khmer/issues/46
 
 A user reported that abundance-dist-single.py fails with small files and many
 threads. This issue is being tracked in

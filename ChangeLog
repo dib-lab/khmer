@@ -1,6 +1,12 @@
+2014-06-16  Titus Brown  <t@idyll.org>
+
+    * doc/release.txt: updated release process.
+    * doc/known-issues.txt: updated known-issues for v1.1 release
+    * doc/release-notes/: added release notes for 1.0, 1.0.1, and 1.1
+
 2014-06-16  Michael R. Crusoe  <mcrusoe@msu.edu>
 
-     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
+    * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
     normalize-by-median,load-graph}.py: restore Python 2.6 compatability for
     Debian 6, RedHat 6, SL6, and Ubuntu 10.04 LTS users.
 
