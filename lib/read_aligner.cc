@@ -70,14 +70,12 @@ del_alignment_node_t del_alignment_node()
                               ) {
     size_t next_seq_idx;
     size_t remaining;
-    BoundedCounterType kmerCov;
     double hcost;
     double sc;
     Transition trans;
     HashIntoType fwd = curr->fwd_hash;
     HashIntoType rc = curr->rc_hash;
-    HashIntoType next_fwd, next_rc, hash;
-    unsigned char next_nucl;
+    HashIntoType next_fwd, next_rc;
 
     AlignmentNode* next;
 
@@ -94,7 +92,7 @@ del_alignment_node_t del_alignment_node()
 
     // loop for MATCHes and INSERT_READs
     for (int i = A; i <= T; i++) {
-      next_nucl = nucl_lookup[i];
+      unsigned char next_nucl = nucl_lookup[i];
 
       if(forward) {
         next_fwd = next_f(fwd, next_nucl);
@@ -104,8 +102,8 @@ del_alignment_node_t del_alignment_node()
         next_rc = prev_r(rc, next_nucl);
       }
 
-      hash = uniqify_rc(next_fwd, next_rc);
-      kmerCov = m_ch->get_count(hash);
+      HashIntoType hash = uniqify_rc(next_fwd, next_rc);
+      BoundedCounterType kmerCov = m_ch->get_count(hash);
 
       if (kmerCov == 0) {
         continue;
@@ -168,21 +166,6 @@ del_alignment_node_t del_alignment_node()
       }
     }
 }
-
-  void ReadAligner::WriteNode(AlignmentNode* curr) {
-      std::cerr << "curr: " << curr << " "
-                << curr->prev << " " << " state=" << curr->state << " "
-                << _revhash(curr->fwd_hash, m_ch->ksize()) << " "
-                << _revhash(curr->rc_hash, m_ch->ksize())
-                << " cov="
-                << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
-                << " emission=" << curr->base
-                << " seqidx=" << curr->seq_idx
-                << " score=" << curr->score
-                << " fscore=" << curr->f_score
-                << " bits_saved=" << curr->score - GetNull(curr->length)
-                << std::endl;
-  }
 
   Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
                                    size_t seqLen,
@@ -263,7 +246,6 @@ del_alignment_node_t del_alignment_node()
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";
-    std::string cov = "";
     ret->score = node->score;
     ret->truncated = (node->seq_idx != 0)
       && (node->seq_idx != read.length() - 1);

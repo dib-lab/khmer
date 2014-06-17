@@ -55,7 +55,8 @@ enum State { MATCH, INSERT_READ, INSERT_GRAPH };
                   HashIntoType _rc_hash, size_t _length)
       :prev(_prev), base(_emission), seq_idx(_seq_idx),
        state(_state), trans(_trans), fwd_hash(_fwd_hash),
-       rc_hash(_rc_hash), length(_length) {}
+       rc_hash(_rc_hash), length(_length), scrore(0), f_score(0), h_score(0), 
+	trusted(false) {}
 
     bool operator== (const AlignmentNode& rhs) const {
       return (seq_idx == rhs.seq_idx) && (state == rhs.state) &&
@@ -119,8 +120,6 @@ struct ScoringMatrix {
     void Enumerate(NodeHeap&, std::vector<AlignmentNode*>& all_nodes,
                    AlignmentNode*, bool, const std::string&);
     Alignment* Subalign(AlignmentNode*, size_t, bool, const std::string&);
-
-    void WriteNode(AlignmentNode* curr);
 
     // These variables are required to use the _revhash and hash macros
     // might as well just compute them once
