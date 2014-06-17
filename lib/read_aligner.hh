@@ -145,7 +145,7 @@ struct ScoringMatrix {
     Alignment* Align(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch,
-                size_t trusted_cutoff, double bits_theta)
+                BoundedCounterType trusted_cutoff, double bits_theta)
       : bitmask(comp_bitmask(ch->ksize())),
         rc_left_shift(ch->ksize() * 2 - 2),
         m_ch(ch), m_sm(

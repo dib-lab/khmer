@@ -69,8 +69,8 @@ del_alignment_node_t del_alignment_node()
                               const std::string& seq
                               ) {
     size_t next_seq_idx;
-    int remaining;
-    int kmerCov;
+    size_t remaining;
+    BoundedCounterType kmerCov;
     double hcost;
     double sc;
     Transition trans;
@@ -328,7 +328,7 @@ del_alignment_node_t del_alignment_node()
 
 struct SearchStart {
     size_t kmer_idx;
-    size_t k_cov;
+    BoundedCounterType k_cov;
     std::string kmer;
   };
 
