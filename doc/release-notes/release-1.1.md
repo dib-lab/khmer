@@ -1,4 +1,4 @@
-This release adds several new scripts.
+This is a minor version release; this release adds several new scripts.
 
 Docs at: https://khmer.readthedocs.org/en/v1.1/
 
