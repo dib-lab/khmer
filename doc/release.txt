@@ -1,8 +1,11 @@
 .. vim: set filetype=rst
 
-=====================================
+================================
+Releasing a new version of khmer
+================================
+
 How to make a khmer release candidate
-=====================================
+-------------------------------------
 
 Michael R. Crusoe, Luiz Irber, and C. Titus Brown have all been
 release makers, following this checklist by MRC.
@@ -36,14 +39,15 @@ release makers, following this checklist by MRC.
 
 #. Verify that the build is clean: http://ci.ged.msu.edu/job/khmer-master/
 
-#. Set your new version number::
+#. Set your new version number and release candidate::
 
         new_version=1.1
+        rc=rc3
 
    and then tag the release candidate with the new version number prefixed by
    the letter 'v'::
 
-        git tag v${new_version}-rc1
+        git tag v${new_version}-${rc}
         git push --tags git@github.com:ged-lab/khmer.git
 
 #. Test the release candidate. Bonus: repeat on Mac OS X::
@@ -57,7 +61,7 @@ release makers, following this checklist by MRC.
         
         cd testenv1
         source bin/activate
-        git clone --depth 1 --branch v${new_version}-rc1 https://github.com/ged-lab/khmer.git
+        git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
         cd khmer
         make install
         make test
@@ -68,7 +72,7 @@ release makers, following this checklist by MRC.
         cd ../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
-        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-rc1#egg=khmer
+        pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-${rc}#egg=khmer
         cd src/khmer
         make dist
         make install
@@ -113,9 +117,8 @@ release makers, following this checklist by MRC.
 
 #. Make sure any release notes are merged into doc/release-notes/.
 
-===========================
 How to make a final release
-===========================
+---------------------------
 
 When you've got a thoroughly tested release candidate, cut a release like
 so:
@@ -129,7 +132,7 @@ so:
 
 #. Delete the release candidate tag and push the tag updates to github.::
 
-        git tag -d v${new_version}-rc1
+        git tag -d v${new_version}-${rc}
         git push git@github.com:ged-lab/khmer.git
         git push --tags git@github.com:ged-lab/khmer.git
 
@@ -155,8 +158,8 @@ so:
 
 #. Delete any RC tags created::
 
-        git tag -d ${new_version}-rc1
-        git push origin :refs/tags/${new_version}-rc1
+        git tag -d ${new_version}-${rc}
+        git push origin :refs/tags/${new_version}-${rc}
 
 #. Tweet about the new release.
 
@@ -178,8 +181,8 @@ cross-platform testing environment.
 
         cd khmer/
         wget https://testpypi.python.org/packages/source/k/khmer/khmer-1.0.1-rc3.tar.gz
-        vim khmer-v1.0.inputs # change the scp_file to point to the release
-        vim khmer-v1.0.run-spec # change version number
+        vim khmer-v1.0.inputs # change the 'scp_file' to point to the release
+        vim khmer-v1.0.run-spec # change 'project_version' at bottom
         nmi_submit khmer-v1.0.run-spec
 
 Setuptools Bootstrap
