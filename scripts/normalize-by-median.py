@@ -283,7 +283,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             htable.save(hashname)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {}'.format(
+        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
             htable.n_occupied())
 
     if args.savetable:

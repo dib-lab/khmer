@@ -1,3 +1,9 @@
+2014-06-16  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+     * scripts/{abundance-dist-single,filter-abund-single,load-into-counting,
+    normalize-by-median,load-graph}.py: restore Python 2.6 compatability for
+    Debian 6, RedHat 6, SL6, and Ubuntu 10.04 LTS users.
+
 2014-06-15  Titus Brown  <t@idyll.org>
 
     * doc/scripts.txt: removed sweep-reads.py from script documentation.
