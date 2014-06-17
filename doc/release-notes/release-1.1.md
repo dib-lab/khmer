@@ -1,4 +1,4 @@
-This is a minor version release; this release adds several new scripts.
+This is v1.1, a minor version release; this version adds several new scripts.
 
 Docs at: https://khmer.readthedocs.org/en/v1.1/
 
@@ -10,6 +10,7 @@ Release notes w/links: https://github.com/ged-lab/khmer/releases/tag/v1.1
 * tests are now distributed with package and can be run after 'pip install' (#451) @mr-c
 * complain properly on file read failures (#333) @ctb
 * Sequence loading scripts will now report total numbers of k-mers if given --report_total_kmers (#491/#429) @mr-c
+* added metagenome protocol to acceptance testing (#472) @SherineAwad @ctb
 
 ## Notable bugs fixed/issues closed:
 
