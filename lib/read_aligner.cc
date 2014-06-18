@@ -321,6 +321,7 @@ struct SearchStart {
 
     SearchStart start;
     start.k_cov = 0;
+    start.kmer_idx = 0;
 
     for (size_t i = 0; i < num_kmers; i++) {
       std::string kmer = read.substr(i, k);
