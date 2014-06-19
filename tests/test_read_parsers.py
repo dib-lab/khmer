@@ -78,6 +78,7 @@ def test_badbzip2():
         print str(err)
 
 
+@attr('multithread')
 @attr('highmem')
 def test_with_multiple_threads():
 
@@ -114,6 +115,7 @@ def test_with_multiple_threads():
     assert reads_count_1thr == sum(reads_counts_per_thread)
 
 
+@attr('multithread')
 def test_old_illumina_pair_mating():
 
     import threading
@@ -147,6 +149,7 @@ def test_old_illumina_pair_mating():
     config.set_reads_input_buffer_size(bufsz)
 
 
+@attr('multithread')
 def test_casava_1_8_pair_mating():
 
     import threading
