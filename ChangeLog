@@ -1,3 +1,14 @@
+2014-06-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/read_aligner.{cc,hh},khmer/_khmermodule.cc,setup.py,
+    tests/test_read_aligner.py,sandbox/{normalize-by-align,read-aligner}.py:
+    Update of @fishjord's graph alignment work
+    * lib/{aligner,kmer,node}.{cc,hh},tests/test_align.py: removed as they are
+    superceded by the above
+    * Makefile: fixed wildcards
+    * tests/read_parsers.py: tests that are too complicated to run with
+    Valgrind's memcheck are now marked @attr('multithread')
+
 2014-06-20  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * doc/release.txt: Add Coverity Scan to release checklist
