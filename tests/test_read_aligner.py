@@ -191,8 +191,8 @@ def test_readalign_new():
     for query in queries:
         score, graphAlign, readAlign, trunc = aligner.align(query["seq"])
 
-        eq_(graphAlign, query["graph_aln"])
         try:
+            eq_(graphAlign, query["graph_aln"])
             eq_(readAlign, query["read_aln"])
         except AssertionError, err:
             if sys.platform == 'darwin':
