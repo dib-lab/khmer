@@ -1385,6 +1385,9 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
     Py_END_ALLOW_THREADS;
 
     PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
+    if (trim_seq == NULL) {
+	return NULL;
+    }
     PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
 
@@ -1456,6 +1459,10 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
              (unsigned short) limit_by_count_int, _report_fn, callback_obj);
 
     PyObject * x = PyList_New(max_read_len);
+    if (x == NULL) {
+	delete[] counts;
+	return NULL;
+    }
 
     for (unsigned int i = 0; i < max_read_len; i++) {
         int ret = PyList_SetItem(x, i, PyLong_FromUnsignedLongLong(counts[i]));
