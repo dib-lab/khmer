@@ -36,6 +36,7 @@ clean: FORCE
 	rm khmer/*.pyc lib/*.pyc || true
 	./setup.py clean --all || true
 	rm coverage-debug || true
+	rm -Rf .coverage || true
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
@@ -213,4 +214,7 @@ coverity-configure:
 		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
+compile_commands.json: clean
+	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
+		bear -- ./setup.py build_ext
 FORCE:

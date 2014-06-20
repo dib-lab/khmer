@@ -37,3 +37,4 @@ cov-int/
 third-party/zlib/zlib.pc
 pip-log.txt
 sphinx-contrib
+compile_commands.json
