@@ -30,7 +30,7 @@ release makers, following this checklist by MRC.
         git checkout -- versioneer.py khmer/_version.py khmer/__init__.py MANIFEST.in
 
 #. Review the git logs since the last release and diffs (if needed) and ensure
-   that the ``Changelog`` is up to date::
+   that the ``ChangeLog`` is up to date::
 
         git log --minimal --patch `git describe --tags --always --abbrev=0`..HEAD
 
@@ -104,7 +104,7 @@ https://scan.coverity.com/projects/621?tab=project_settings
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
-   https://wiki.python.org/moin/TestPyPI.  You may need to reregister::
+   https://wiki.python.org/moin/TestPyPI.  You may need to re-register::
 
         python setup.py register --repository test
 
@@ -140,13 +140,13 @@ so:
         git tag v${new_version}
         python setup.py register sdist upload
 
-#. Delete the release candidate tag and push the tag updates to github.::
+#. Delete the release candidate tag and push the tag updates to GitHub.::
 
         git tag -d v${new_version}-${rc}
         git push git@github.com:ged-lab/khmer.git
         git push --tags git@github.com:ged-lab/khmer.git
 
-#. Add the release on github, using the tag you just pushed.  Name
+#. Add the release on GitHub, using the tag you just pushed.  Name
    it 'version X.Y.Z', and copy and paste in the release notes.
 
 #. Make a binary wheel on OS X.::
