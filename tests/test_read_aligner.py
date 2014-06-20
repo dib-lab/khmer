@@ -21,6 +21,11 @@ from nose.tools import assert_almost_equals, eq_
 def test_alignnocov():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
+    try:
+        aligner_bad = khmer.new_readaligner()
+        assert 0, "this should fail"
+    except TypeError, err:
+        pass
     aligner = khmer.new_readaligner(ch, 0, 0)
     for i in range(20):
         ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
