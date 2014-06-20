@@ -43,7 +43,7 @@ debug: FORCE
 
 doc: build/sphinx/html/index.html
 
-build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py
+build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
 	pip2 install --user sphinx sphinxcontrib-autoprogram || pip2 install \
 		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env
