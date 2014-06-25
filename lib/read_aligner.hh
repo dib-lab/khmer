@@ -17,7 +17,7 @@
 #include <queue>
 #include <memory>
 
-#define READ_ALIGNER_DEBUG 1 
+#define READ_ALIGNER_DEBUG 0 
 
 namespace khmer {
 
