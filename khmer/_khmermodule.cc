@@ -1099,6 +1099,17 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
     return PyInt_FromLong(1);
 }
 
+static PyObject * hash_decrement_random(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    counting->decrement_random();
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self, PyObject *args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1755,6 +1766,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
+    { "decrement_random", hash_decrement_random, METH_VARARGS, "" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
     { "consume_high_abund_kmers", hash_consume_high_abund_kmers, METH_VARARGS, "Count all k-mers in the given string with abund >= min specified" },
     { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },

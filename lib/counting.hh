@@ -176,6 +176,30 @@ public:
 
     } // count
 
+    virtual void decrement_random() {
+        for (unsigned int i = 0; i < _n_tables; i++) {
+          HashIntoType start = (HashIntoType) (drand48() * (double)_tablesizes[i]);
+
+          bool found = false;
+          for (HashIntoType j = start; j < _tablesizes[i]; j++) {
+            if (_counts[i][j] > 1) {
+              _counts[i][j] -= 1;
+              found = true;
+              break;
+            }
+          }
+          if (found) {
+            break;
+          }
+          for (HashIntoType j = 0; j < start; j++) {
+            if (_counts[i][j] > 1) {
+              _counts[i][j] -= 1;
+              break;
+            }
+          }
+        }
+    }
+
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const {
         HashIntoType hash = _hash(kmer, _ksize);
