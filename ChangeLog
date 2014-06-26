@@ -147,6 +147,11 @@
 
     * doc/release.txt: fix formatting.
 
+2014-06-25  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * scripts/load-graph.py: fix #507. Threading doesn't give any advantages
+    to this script right now; the threading parameter is ignored for now.
+
 2014-06-20  Chuck Pepe-Ranney  <chuck.peperanney@gmail.com>
 
     * scripts/extract-partitions.py: added epilog documentation for 
