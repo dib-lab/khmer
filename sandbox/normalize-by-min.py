@@ -1,8 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Eliminate reads with minimum k-mer abundance higher than
@@ -34,7 +35,7 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
+        if args.min_hashsize == DEFAULT_MIN_HASHSIZE and not args.loadhash:
             print >>sys.stderr, "** WARNING: hashsize is default!  " \
                 "You absodefly want to increase this!\n** " \
                 "Please read the docs!"
@@ -47,7 +48,7 @@ def main():
         print >>sys.stderr, ''
         print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize)' % (
-            args.n_hashes * args.min_hashsize)
+                args.n_hashes * args.min_hashsize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize

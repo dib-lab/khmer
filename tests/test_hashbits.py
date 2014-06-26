@@ -1,11 +1,15 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring,protected-access
 import khmer
+from khmer import ReadParser
 
 from screed.fasta import fasta_iter
+import screed
 
 import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
@@ -276,13 +280,13 @@ def test_save_load_tagset():
     ht.load_tagset(outfile)              # implicitly => clear_tags=True
     ht.save_tagset(outfile)
 
-    # if tags have been cleared, then the new tagfile will be larger (30 bytes)
-    # else smaller (22 bytes).
+    # if tags have been cleared, then the new tagfile will be larger (34 bytes)
+    # else smaller (26 bytes).
 
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 22, len(data)
+    assert len(data) == 26, len(data)
 
 
 def test_save_load_tagset_noclear():
@@ -298,13 +302,13 @@ def test_save_load_tagset_noclear():
     ht.load_tagset(outfile, False)       # set clear_tags => False; zero tags
     ht.save_tagset(outfile)
 
-    # if tags have been cleared, then the new tagfile will be large (30 bytes);
-    # else small (22 bytes).
+    # if tags have been cleared, then the new tagfile will be large (34 bytes);
+    # else small (26 bytes).
 
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 30, len(data)
+    assert len(data) == 34, len(data)
 
 
 @attr('highmem')
@@ -545,3 +549,238 @@ def test_simple_median():
     assert median == 1
     assert average == 1.0
     assert stddev == 0.0
+
+####
+
+
+def test_load_notexist_should_fail():
+    savepath = utils.get_temp_filename('temphashbitssave0.ht')
+
+    hi = khmer.new_counting_hash(12, 1000)
+    try:
+        hi.load(savepath)
+        assert 0, "load should fail"
+    except IOError:
+        pass
+
+
+def test_load_truncated_should_fail():
+    inpath = utils.get_test_data('random-20-a.fa')
+    savepath = utils.get_temp_filename('temphashbitssave0.kh')
+
+    hi = khmer.new_counting_hash(12, 1000)
+    hi.consume_fasta(inpath)
+    hi.save(savepath)
+
+    fp = open(savepath, 'rb')
+    data = fp.read()
+    fp.close()
+
+    fp = open(savepath, 'wb')
+    fp.write(data[:1000])
+    fp.close()
+
+    hi = khmer.new_counting_hash(12, 1)
+    try:
+        hi.load(savepath)
+        assert 0, "load should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_save_load_tagset_notexist():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    outfile = utils.get_temp_filename('tagset')
+    try:
+        ht.load_tagset(outfile)
+        assert 0, "this test should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_save_load_tagset_trunc():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    outfile = utils.get_temp_filename('tagset')
+
+    ht.add_tag('A' * 32)
+    ht.add_tag('G' * 32)
+    ht.save_tagset(outfile)
+    ht.save_tagset('/tmp/goodversion-k32.tagset')
+
+    # truncate tagset file...
+    fp = open(outfile, 'rb')
+    data = fp.read()
+    fp.close()
+
+    fp = open(outfile, 'wb')
+    fp.write(data[:26])
+    fp.close()
+
+    # try loading it...
+    try:
+        ht.load_tagset(outfile)
+        assert 0, "this test should fail"
+    except IOError:
+        pass
+
+# to build the test files used below, add 'test' to this function
+# and then look in /tmp. You will need to tweak the version info in
+# khmer.hh in order to create "bad" versions, of course. -CTB
+
+
+def _build_testfiles():
+    # hashbits file
+
+    inpath = utils.get_test_data('random-20-a.fa')
+    hi = khmer.new_hashbits(12, 50)
+    hi.consume_fasta(inpath)
+    hi.save('/tmp/goodversion-k12.ht')
+
+    # tagset file
+
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    ht.add_tag('A' * 32)
+    ht.add_tag('G' * 32)
+    ht.save_tagset('/tmp/goodversion-k32.tagset')
+
+    # stoptags file
+
+    fakelump_fa = utils.get_test_data('fakelump.fa')
+
+    ht = khmer.new_hashbits(32, 1e7, 4)
+    ht.consume_fasta_and_tag(fakelump_fa)
+
+    subset = ht.do_subset_partition(0, 0)
+    ht.merge_subset(subset)
+
+    EXCURSION_DISTANCE = 40
+    EXCURSION_KMER_THRESHOLD = 82
+    EXCURSION_KMER_COUNT_THRESHOLD = 1
+    counting = khmer.new_counting_hash(32, 1e7, 4)
+
+    ht.repartition_largest_partition(None, counting,
+                                     EXCURSION_DISTANCE,
+                                     EXCURSION_KMER_THRESHOLD,
+                                     EXCURSION_KMER_COUNT_THRESHOLD)
+
+    ht.save_stop_tags('/tmp/goodversion-k32.stoptags')
+
+
+def test_hashbits_file_version_check():
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k12.ht')
+
+    try:
+        ht.load(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_hashbits_file_type_check():
+    kh = khmer.new_counting_hash(12, 1, 1)
+    savepath = utils.get_temp_filename('tempcountingsave0.kh')
+    kh.save(savepath)
+
+    ht = khmer.new_hashbits(12, 1, 1)
+
+    try:
+        ht.load(savepath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_stoptags_file_version_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k32.stoptags')
+
+    try:
+        ht.load_stop_tags(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_stoptags_ksize_check():
+    ht = khmer.new_hashbits(31, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.stoptags')
+    try:
+        ht.load_stop_tags(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_stop_tags_filetype_check():
+    ht = khmer.new_hashbits(31, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.tagset')
+    try:
+        ht.load_stop_tags(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_tagset_file_version_check():
+    ht = khmer.new_hashbits(32, 1, 1)
+
+    inpath = utils.get_test_data('badversion-k32.tagset')
+
+    try:
+        ht.load_tagset(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_tagset_ksize_check():
+    ht = khmer.new_hashbits(31, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.tagset')
+    try:
+        ht.load_tagset(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_tagset_filetype_check():
+    ht = khmer.new_hashbits(31, 1, 1)
+
+    inpath = utils.get_test_data('goodversion-k32.stoptags')
+    try:
+        ht.load_tagset(inpath)
+        assert 0, "this should fail"
+    except IOError, e:
+        print str(e)
+
+
+def test_bad_primes_list():
+    try:
+        coutingtable = khmer._new_hashbits(31, ["a", "b", "c"], 1)
+        assert 0, "Bad primes list should fail"
+    except TypeError, e:
+        print str(e)
+
+
+def test_consume_absentfasta_with_reads_parser():
+    presencetable = khmer.new_hashbits(31, 1, 1)
+    try:
+        presencetable.consume_fasta_with_reads_parser()
+        assert 0, "this should fail"
+    except TypeError, err:
+        print str(err)
+    readparser = ReadParser(utils.get_test_data('empty-file'))
+    try:
+        presencetable.consume_fasta_with_reads_parser(readparser)
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)

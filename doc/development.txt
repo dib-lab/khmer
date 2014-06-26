@@ -1,5 +1,16 @@
+.. vim: set filetype=rst textwidth=80
+
 Development miscellany
 ======================
+
+Third-party use
+---------------
+
+We ask that third parties who build upon the codebase to do so from a
+versioned release. This will help them determine when bug fixes apply and
+generally make it easier to collaborate. If more intensive modifications happen
+then we request that the repository is forked, again preferably from a version
+tag.
 
 Build framework
 ---------------
@@ -9,15 +20,64 @@ Build framework
 Coding standards
 ----------------
 
-For C++, let's use `Todd Hoff's coding standard
+All plain-text files should have line widths of 80 characters or less unless
+that is not supported for the particular file format.
+
+For C++, we use `Todd Hoff's coding standard
 <http://www.possibility.com/Cpp/CppCodingStandard.html>`__, and
 `astyle -A10 / "One True Brace Style"
 <http://astyle.sourceforge.net/astyle.html>`__ indentation and
-bracing.  Note: we need to find vi and emacs settings that work for this!
+bracing.  Note: @CTB needs emacs settings that work for this.
 
-For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ seems
-like a good standard to default to, and there are tools to check it,
-too.
+Vim users may want to set the ARTISTIC_STYLE_OPTIONS shell variable to "-A10
+--max-code-length=80" and run ```:%!astyle``` to reformat. The four space
+indentation can be set with::
+
+	set expandtab
+	set shiftwidth=4
+	set softtabstop=4
+
+For Python, `PEP 8 <http://www.python.org/dev/peps/pep-0008/>`__ is our
+standard. The ```pep8``` and ```autopep8``` Makefile targets are helpful. 
+
+Code, scripts, and documentation must have its spelling checked. Vim users can
+run::
+
+        :setlocal spell spelllang=en_us
+
+Use `]s` and `[s` to navigate between misspellings and `z=` to suggest a
+correctly spelled word. `zg` will add a word as a good word.
+
+GNU's `aspell` can also be used to check the spelling in a single file::
+
+        aspell check --mode ccpp $filename
+
+Code Review
+-----------
+
+Please read `11 Best Practices for Peer Code Review
+<http://smartbear.com/SmartBear/media/pdfs/WP-CC-11-Best-Practices-of-Peer-Code-Review.pdf>`__.
+
+See also `Code reviews: the lab meeting for code
+<http://fperez.org/py4science/code_reviews.html>`__ and
+`the PyCogent coding guidelines
+<http://pycogent.org/coding_guidelines.html>`__.
+
+Checklist
+---------
+
+Copy and paste the following into a pull-request when it is ready for review::
+   
+   - [ ] Is it mergable
+   - [ ] Did it pass the tests?
+   - [ ] If it introduces new functionality in scripts/ is it tested?
+     Check for code coverage.
+   - [ ] Is it well formatted? Look at `pep8`/`pylint`, `cppcheck`, and
+     `make doc` output. Use `autopep8` and `astyle -A10 --max-code-length=80`
+     if needed. 
+   - [ ] Is it documented in the Changelog?
+   - [ ] Was spellcheck run on the source code and documentation after changes
+     were made?
 
 git and github strategies
 -------------------------
@@ -25,11 +85,38 @@ git and github strategies
 Still in the works, but read `this
 <http://scottchacon.com/2011/08/31/github-flow.html>`__.
 
+Make a branch on ged-lab (preferred so others can contribute) or fork the
+repository and make a branch there.
+
+Each piece or fix you are working on should have its own branch; make a pull-
+request to ged-lab/master to aid in code review, testing, and feedback.
+
+If you want your code integrated then it needs to be mergeable
+
+Example pull request update using the command line:
+
+ #. Clone the source of the pull request (if needed)
+     ``git clone git@github.com:mr-c/khmer.git``
+ #. Checkout the source branch of the pull request
+     ``git checkout my-pull-request``
+ #. Pull in the destination of the pull request and resolve any conflicts
+     ``git pull git@github.com:ged-lab/khmer.git master``
+ #. Push your update to the source of the pull request ``git push``
+ #. Jenkins will automatically attempt to build and test your pull requests.
+
 Testing
 -------
 
-'nosetests' is the canonical way to run the tests.  This is what 'make test'
-does.
+``./setup.py nosetest`` is the canonical way to run the tests.  This is what
+``make test`` does.
+
+Code coverage
+-------------
+
+Jenkins calculates code coverage for every build. Navigate to the results from
+the master node first to view the coverage information.
+
+Code coverage should never go down and new functionality needs to be tested.
 
 Pipelines
 ---------
@@ -78,6 +165,10 @@ CTB: should we squash output files (overwrite them if they exist), or not?
 So far, leaning towards 'not', as that way no one is surprised and loses
 their data.
 
+A general error should be signaled by exit code `1` and success by `0`. Linux
+supports exit codes from `0` to `255` where the value `1` means a general
+error. An exit code of `-1` will get converted to `255`.
+
 ----
 
 CLI reading:
@@ -99,12 +190,13 @@ check for correctness.
 
 https://gcc-python-plugin.readthedocs.org/en/latest/cpychecker.html
 
-Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev package
+Developers using Ubuntu Precise will want to install the gcc-4.6-plugin-dev
+package
 
-Example usage:
+Example usage: ::
 
-  CC="/home/mcrusoe/src/gcc-plugin-python/gcc-python-plugin/gcc-with-cpychecker
---maxtrans=512" python setup.py build_ext 2>&1 | less
+	CC="/home/mcrusoe/src/gcc-plugin-python/gcc-python-plugin/gcc-with-cpychecker
+	--maxtrans=512" python setup.py build_ext 2>&1 | less
 
 False positives abound: ignore errors about the C++ standard library. This tool
 is primarily useful for reference count checking, error-handling checking, and
@@ -113,30 +205,24 @@ format string checking.
 Errors to ignore: "Unhandled Python exception raised calling 'execute' method",
 "AttributeError: 'NoneType' object has no attribute 'file'"
 
-Warnings to address: 
+Warnings to address: ::
 
-"khmer/_khmermodule.cc:3109:1: note: this function is too complicated for the
-reference-count checker to fully analyze: not all paths were analyze"
+        khmer/_khmermodule.cc:3109:1: note: this function is too complicated
+        for the reference-count checker to fully analyze: not all paths were
+        analyzed
 
-Adjust --maxtrans and re-run.
+Adjust --maxtrans and re-run. ::
 
-khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
-Py_BuildValue with format code "i" [enabled by default]
-  argument 2 ("D.68937") had type
-    "long long unsigned int"
-  but was expecting
-    "int"
-  for format code "i"
+	khmer/_khmermodule.cc:2191:61: warning: Mismatching type in call to
+	Py_BuildValue with format code "i" [enabled by default]
+	  argument 2 ("D.68937") had type
+	    "long long unsigned int"
+	  but was expecting
+	    "int"
+	  for format code "i"
 
 See below for a format string cheatsheet One also benefits by matching C type
 with the function signature used later. 
 
-"I" for unsinged int
+"I" for unsigned int
 "K" for unsigned long long a.k.a khmer::HashIntoType.
-
-Upstream sources
-----------------
-
-ez_setup.py is from https://bitbucket.org/pypa/setuptools/raw/bootstrap/
-
-Before major releases it should be examined to see if there is a new version

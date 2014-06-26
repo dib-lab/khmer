@@ -1,8 +1,12 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
+
+# pylint: disable=C0111,C0103
+
 import khmer
 import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
@@ -30,20 +34,42 @@ def test_collision():
     assert kh.get('TTTT') == 2
 
 
+def test_badcount():
+    countingtable = khmer.new_hashtable(4, 85)
+    try:
+        countingtable.count()
+        assert 0, "count should require one argument"
+    except TypeError, err:
+        print str(err)
+    try:
+        countingtable.count('ABCDE')
+        assert 0, "count should require k-mer size to be equal"
+    except ValueError, err:
+        print str(err)
+
+
+def test_hashtable_n_entries():
+    countingtable = khmer.new_hashtable(4, 4 ** 4)
+    try:
+        countingtable.n_entries("nope")
+        assert 0, "n_entries should accept no arguments"
+    except TypeError, err:
+        print str(err)
+
+
 def test_complete_no_collision():
     kh = khmer.new_hashtable(4, 4 ** 4)
-    kt = khmer.new_ktable(4)
 
-    for i in range(0, kt.n_entries()):
-        s = kt.reverse_hash(i)
+    for i in range(0, kh.n_entries()):
+        s = khmer.reverse_hash(i, 4)
         kh.count(s)
 
     n_palindromes = 0
     n_rc_filled = 0
     n_fwd_filled = 0
 
-    for i in range(0, kt.n_entries()):
-        s = kt.reverse_hash(i)
+    for i in range(0, kh.n_entries()):
+        s = khmer.reverse_hash(i, 4)
         if kh.get(s):                   # string hashing is rc aware
             n_rc_filled += 1
         if kh.get(s) == 1:              # palindromes are singular
@@ -51,53 +77,51 @@ def test_complete_no_collision():
         if kh.get(i):                   # int hashing is not rc aware
             n_fwd_filled += 1
 
-    assert n_rc_filled == kt.n_entries(),  n_rc_filled
+    assert n_rc_filled == kh.n_entries(), n_rc_filled
     assert n_palindromes == 16, n_palindromes  # @CTB check this
-    assert n_fwd_filled == kt.n_entries() / 2 + n_palindromes / 2, \
+    assert n_fwd_filled == kh.n_entries() / 2 + n_palindromes / 2, \
         n_fwd_filled
 
 
 def test_complete_2_collision():
     kh = khmer.new_hashtable(4, 4 ** 4 / 2)
-    kt = khmer.new_ktable(4)
 
-    for i in range(0, kt.n_entries()):
-        s = kt.reverse_hash(i)
+    for i in range(0, kh.n_entries()):
+        s = khmer.reverse_hash(i, 4)
         kh.count(s)
 
     n_rc_filled = 0
-    n_fwd_filled = 0
+    #  n_fwd_filled = 0
 
     for i in range(0, 128):
-        s = kt.reverse_hash(i)
+        s = khmer.reverse_hash(i, 4)
         if kh.get(s):                   # string hashing is rc aware
             n_rc_filled += 1
-        if kh.get(i):                   # int hashing is not rc aware
-            n_fwd_filled += 1
+    # if kh.get(i):                   # int hashing is not rc aware
+    #        n_fwd_filled += 1
 
-    assert n_rc_filled == 128,  n_rc_filled
+    assert n_rc_filled == 128, n_rc_filled
     # @CTB assert n_fwd_filled == 100 # kt.n_entries() / 2, n_fwd_filled
 
 
 def test_complete_4_collision():
     kh = khmer.new_hashtable(4, 4 ** 4 / 4)
-    kt = khmer.new_ktable(4)
 
-    for i in range(0, kt.n_entries()):
-        s = kt.reverse_hash(i)
+    for i in range(0, kh.n_entries()):
+        s = khmer.reverse_hash(i, 4)
         kh.count(s)
 
     n_rc_filled = 0
-    n_fwd_filled = 0
+    #  n_fwd_filled = 0
 
     for i in range(0, 64):
-        s = kt.reverse_hash(i)
+        s = khmer.reverse_hash(i, 4)
         if kh.get(s):                   # string hashing is rc aware
             n_rc_filled += 1
-        if kh.get(i):                   # int hashing is not rc aware
-            n_fwd_filled += 1
+    # if kh.get(i):                   # int hashing is not rc aware
+    #       n_fwd_filled += 1
 
-    assert n_rc_filled == 64,  n_rc_filled
+    assert n_rc_filled == 64, n_rc_filled
     # @CTB assert n_fwd_filled == kt.n_entries() / 2, n_fwd_filled
 
 
@@ -106,7 +130,7 @@ def test_maxcount():
     kh = khmer.new_hashtable(4, 4 ** 4)
 
     last_count = None
-    for i in range(0, 10000):
+    for _ in range(0, 10000):
         kh.count('AAAA')
         c = kh.get('AAAA')
 
@@ -125,7 +149,7 @@ def test_maxcount_with_bigcount():
     kh.set_use_bigcount(True)
 
     last_count = None
-    for i in range(0, 10000):
+    for _ in range(0, 10000):
         kh.count('AAAA')
         c = kh.get('AAAA')
 
@@ -271,19 +295,24 @@ class Test_ConsumeString(object):
 
     def test_n_occupied(self):
         assert self.kh.n_occupied() == 0
-        n = self.kh.consume('AAAA')
+        self.kh.consume('AAAA')
         assert self.kh.n_occupied() == 1
-        n = self.kh.consume('AACT')
+        self.kh.consume('AACT')
         assert self.kh.n_occupied() == 2
+        try:
+            self.kh.n_occupied("MU", 1, 3)
+            assert 0, "n_occupied shouldn't accept three arguments"
+        except TypeError, err:
+            print str(err)
 
     @attr('highmem')
     def test_abundance_by_pos(self):
         kh = self.kh
 
-        for i in range(0, 300):
+        for _ in range(0, 300):
             kh.count('ATCG')
 
-        for i in range(0, 10):
+        for _ in range(0, 10):
             kh.count('ATGG')
 
         short_filename = utils.get_test_data('test-short.fa')
@@ -301,10 +330,10 @@ class Test_ConsumeString(object):
         kh = self.kh
         kh.set_use_bigcount(True)       # count past MAX_COUNT
 
-        for i in range(0, 300):
+        for _ in range(0, 300):
             kh.count('ATCG')
 
-        for i in range(0, 10):
+        for _ in range(0, 10):
             kh.count('ATGG')
 
         short_filename = utils.get_test_data('test-short.fa')
@@ -319,15 +348,15 @@ class Test_ConsumeString(object):
 
     def test_n_occupied_args(self):
         assert self.kh.n_occupied() == 0
-        n = self.kh.consume('AAAA')
+        self.kh.consume('AAAA')
         assert self.kh.n_occupied(0, 1) == 1
         assert self.kh.n_occupied(1, 4 ** 4) == 0
 
-        hash = khmer.forward_hash('AACT', 4)
-        n = self.kh.consume('AACT')
-        assert self.kh.n_occupied(0, hash + 1) == 2
-        assert self.kh.n_occupied(hash + 1, 4 ** 4) == 0
-        assert self.kh.n_occupied(hash, hash + 1) == 1
+        hashvalue = khmer.forward_hash('AACT', 4)
+        self.kh.consume('AACT')
+        assert self.kh.n_occupied(0, hashvalue + 1) == 2
+        assert self.kh.n_occupied(hashvalue + 1, 4 ** 4) == 0
+        assert self.kh.n_occupied(hashvalue, hashvalue + 1) == 1
 
     def test_simple(self):
         n = self.kh.consume('AAAA')

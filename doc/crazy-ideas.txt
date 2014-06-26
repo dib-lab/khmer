@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 Crazy ideas
 ===========
 

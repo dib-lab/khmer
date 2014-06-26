@@ -1,8 +1,10 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
+# pylint: disable=missing-docstring
 import khmer
 import screed
 
@@ -17,7 +19,7 @@ def teardown():
 class Test_RandomData(object):
 
     def test_3_merge_013(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
 
         filename = utils.get_test_data('test-graph2.fa')
 
@@ -37,7 +39,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_3_merge_023(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -56,7 +58,7 @@ class Test_RandomData(object):
         assert n_partitions == 1, n_partitions        # combined.
 
     def test_5_merge_046(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph5.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -193,7 +195,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_load_merge(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -226,7 +228,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_load_merge_2(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -255,9 +257,17 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
+    def test_save_load_merge_nexist(self):
+        ht = khmer.new_hashbits(20, 1)
+        try:
+            a = ht.load_subset_partitionmap('this does not exist')
+            assert 0, "this should not succeed"
+        except IOError, e:
+            print str(e)
+
     @attr('highmem')
     def test_save_merge_from_disk(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -287,7 +297,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_merge_from_disk_2(self):
-        ht = khmer.new_hashbits(20, 4 ** 14 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
         filename = utils.get_test_data('random-20-a.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
@@ -312,6 +322,73 @@ class Test_SaveLoadPmap(object):
         outfile = utils.get_temp_filename('out.part')
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
+
+    @attr('highmem')
+    def test_save_merge_from_disk_file_not_exist(self):
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        filename = utils.get_test_data('test-graph2.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
+
+        divvy = ht.divide_tags_into_subsets(1)
+        print divvy
+        (a, b, c) = divvy
+
+        outfile1 = utils.get_temp_filename('x.pmap')
+
+        # fail to create file... => failure expected
+
+        try:
+            ht.merge_subset_from_disk(outfile1)
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
+
+    @attr('highmem')
+    def test_merge_from_disk_file_bad_type(self):
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        infile = utils.get_test_data('goodversion-k12.ht')
+
+        try:
+            ht.merge_subset_from_disk(infile)
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
+
+    @attr('highmem')
+    def test_merge_from_disk_file_version(self):
+        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        infile = utils.get_test_data('badversion-k12.ht')
+
+        try:
+            ht.merge_subset_from_disk(infile)
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
+
+    def test_save_merge_from_disk_ksize(self):
+        ht = khmer.new_hashbits(20, 4 ** 6 + 1)
+        filename = utils.get_test_data('test-graph2.fa')
+
+        (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
+        assert total_reads == 3, total_reads
+
+        divvy = ht.divide_tags_into_subsets(1)
+        print divvy
+        (a, b, c) = divvy
+
+        outfile1 = utils.get_temp_filename('x.pmap')
+        x = ht.do_subset_partition(a, b)
+        ht.save_subset_partitionmap(x, outfile1)
+        del x
+
+        ht = khmer.new_hashbits(19, 1, 1)
+        try:
+            ht.merge_subset_from_disk(outfile1)
+            assert 0, "this should fail"
+        except IOError, e:
+            print str(e)
 
 
 def test_output_partitions():
@@ -389,3 +466,125 @@ def test_small_real_partitions():
     assert set(parts) != set(['0'])
 
 test_small_real_partitions.runme = True
+
+a = """\
+CAGACTTGGAAGCTGAGAGTCCGACGTCACTGCCTCAACTCGCGCAAATGTTCCCGCCAA\
+ATTGTATCCTAGGGATCTTCCATAAGCTTATATACGGGGGTTTCCAAGGCCCTGATGCCA\
+GTGCCTAATCTTTTGGAGTCCTCTCAGGGCCACTAGATGCCATGCTACGCGTCCCAGGTT\
+GGCCTGAGGGTCTACACGGAGTGGGAAGCATGGGTACCTTAGCGAACATTCATACTGGCC\
+TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
+"""
+
+b = """\
+TGTTTATGCTTATCAGACTTCAGCTTCGCTTAGCGCGTCACCGTTTGTAACTTGTTATCT\
+GACTGTAGACTTGAACCTCGATGGAATGCAGGTCCCATTCTCTGGCCTGACTCATGGAAC\
+CGAGGCCAAAAAAGCATGGCACGAAGACGCTATGCGAGGGTGCTCGCCCATGTCGTCGCC\
+GTACCACGACAGATTTATACAATGCGTTTCTACAGGCCCCATTGGGAACAAACAAAAAGT\
+CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
+"""
+
+
+def test_partition_on_abundance_1():
+    print (a,)
+    print (b,)
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+
+    for i in range(10):
+        print kh.consume_and_tag(b)
+
+    # all paths in 'a' and 'b'
+    p = kh.do_subset_partition_with_abundance(10, 50)
+    x = p.count_partitions()
+    assert x == (1, 0)                  # one partition, no remainders
+
+
+def test_partition_on_abundance_2():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+
+    for i in range(5):
+        print kh.consume_and_tag(b)
+
+    # all paths in 'a'
+    p = kh.do_subset_partition_with_abundance(10, 50)
+    x = p.count_partitions()
+    assert x == (1, 6)                  # one partition, six disconnected
+
+
+def test_partition_on_abundance_3():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        print kh.consume_and_tag(a)
+
+    for i in range(5):
+        print kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'b'
+    p = kh.do_subset_partition_with_abundance(5, 10)
+
+    x = p.count_partitions()
+    print x
+    assert x == (2, 2)                  # two partitions, two ignored tags
+
+
+def test_partition_overlap_1():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        kh.consume_and_tag(a)
+
+    for i in range(10):
+        kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p1 = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'a', again -- should be the same!
+    p2 = kh.do_subset_partition_with_abundance(10, 50)
+
+    # p1.report_on_partitions()
+    # p2.report_on_partitions()
+
+    x = p1.compare_partitions(3, p2, 3)
+    assert x == (0, 0, 14), x
+
+
+def test_partition_overlap_2():
+    kh = khmer.new_counting_hash(20, 1e6, 4)
+    for i in range(10):
+        kh.consume_and_tag(a)
+
+    for i in range(5):
+        kh.consume_and_tag(b)
+
+    # this will get paths only in 'a'
+    p1 = kh.do_subset_partition_with_abundance(10, 50)
+
+    # this will get paths only in 'b'
+    p2 = kh.do_subset_partition_with_abundance(5, 10)
+
+    # p1.report_on_partitions()
+    # p2.report_on_partitions()
+
+    x = p1.compare_partitions(3, p2, 3)
+    assert x == (8, 6, 0), x
+
+    x = p1.compare_partitions(3, p2, 5)
+    assert x == (2, 0, 6), x
+
+    x = p1.partition_sizes()
+    assert x == ([(3L, 8L)], 0), x
+
+    x = p2.partition_sizes()
+    assert x == ([(3L, 6L), (5L, 6L)], 2), x
+
+    x = p1.partition_average_coverages(kh)
+    assert x == [(3L, 11L)]
+
+    x = p2.partition_average_coverages(kh)
+    assert x == [(3L, 5L), (5L, 10L)], x
