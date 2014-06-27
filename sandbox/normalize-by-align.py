@@ -14,13 +14,13 @@ import sys
 import screed
 import os
 import khmer
-from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_counting_args
 
 DEFAULT_MINIMUM_COVERAGE = 5
 
 
 def main():
-    parser = build_construct_args()
+    parser = build_counting_args()
     parser.add_argument("-t", "--trusted-cutoff", dest="trusted_cutoff", type=int, default=3)
     parser.add_argument("--bits-theta", help="Tuning parameter controlling trade off of speed vs alignment sensitivity", default=1.0, type=float, dest="bits_theta")
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
@@ -34,11 +34,6 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        if args.min_hashsize == DEFAULT_MIN_HASHSIZE:
-            print >>sys.stderr, "** WARNING: hashsize is default!  " \
-                "You absodefly want to increase this!\n** " \
-                "Please read the docs!"
-
         print >>sys.stderr, '\nPARAMETERS:'
         print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
         print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
