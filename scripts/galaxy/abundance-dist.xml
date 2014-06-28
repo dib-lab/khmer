@@ -1,0 +1,57 @@
+<tool	id="gedlab-khmer-normalize-by-median"
+	name="Abundance Dist"
+	version="1.1-1"
+	force_history_refresh="true">
+	
+	<description>
+		Calculate abundance distribution of the k-mers in a given sequence
+		file using a pre-made k-mer counting table.
+	</description>
+        <macros>
+                <token name="@BINARY@">abundance-dist-single.py</token>
+        </macros>
+        <expand macro="requirements" />
+	<command>
+## The command is a Cheetah template which allows some Python based syntax.
+## Lines starting hash hash are comments. Galaxy will turn newlines into spaces
+mkdir output; cd output;
+@BINARY@
+		$input_counting_table_filename
+		$input_sequence_filename
+		$output_histogram_filename	
+	</command>
+
+	<inputs>
+		<expand macro="input_sequence_filename" />
+		<expand macro="input_counting_table_filename" />
+	</inputs>
+	<outputs>
+		<expand macro="abundance-histogram-output" />
+	</outputs>
+ 	<stdio>
+        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
+		<exit_code	range="1:"
+				level="fatal" />
+	</stdio>
+    
+    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
+    <tests>
+        <!-- [HELP] Test files have to be in the ~/test-data directory
+        <test>
+            <param name="input" value="input_test.tab" />
+            <param name="int"   value="10" />
+            <output name="output" file="output_test.txt" />
+	</test> -->
+        <!-- [HELP] Multiple tests can be defined with different parameters -->
+<!--
+        <test>
+        </test>
+-->
+    </tests>
+    
+    <!-- [OPTIONAL] Help displayed in Galaxy -->
+    <!--
+	<help>
+	</help>
+    -->    
+</tool>

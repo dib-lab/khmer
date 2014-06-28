@@ -1,17 +1,17 @@
 <tool	id="gedlab-khmer-filter-abund"
 	name="Filter by abundance"
-	version="0.7.1"
+	version="1.1-1"
 	force_history_refresh="true">
 	
 	<description>
 		Trims fastq/fasta sequences at k-mers of a given abundance
-		based on a provided hash table.
+		based on a provided k-mer counting table.
 	</description>
 
 	<requirements>
 		<requirement
-			type="python-module"
-			version="0.7">
+			type="package"
+			version="1.1">
 				khmer
 		</requirement>
     	</requirements>
@@ -20,11 +20,11 @@
 		filter-abund.py --version
     	</version_command>
 
-   	<command>
+	<command>
+		mkdir output; cd output;
 		filter-abund.py
 		$variable_coverage
-		$hashtable_to_load
-		--out=$output
+		$presencetable_to_load
 		#for input in $inputs
 			$input
 		#end for
@@ -46,16 +46,18 @@
 			label="Variable coverage"
 			help="Only trim when a sequence has high enough coverage (median abundance > 20)" />
 
-		<param	name="hashtable_to_load"
+		<param	name="presencetable_to_load"
 			type="data"
 			optional="false"
 			label="the khmer abundance table to load"
-			help="The inputs file(s) will be processed using the kmer counts in the specified hashtable file." />
+			help="The inputs file(s) will be processed using the kmer counts in the specified k-mer counting table file." />
 	</inputs>
 	<outputs>
 		<data	name="output"
 			format="input"
-		       	label="${tool.name} processed reads from #echo ', '.join(map(str, $inputs ))#"	/>
+			label="${tool.name} processed nucleotide sequence file">
+			<discover_datasets pattern="__name__" directory="output" visible="true"/>
+		</data>
 	</outputs>
  	<stdio>
         <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->

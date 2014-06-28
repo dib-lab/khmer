@@ -1,0 +1,92 @@
+<macros>
+	<xml name="requirements">
+		<requirements>
+			<!-- <requirement type="binary">@BINARY@</requirement> -->
+			<requirement type="package" version="1.1">khmer</requirement>
+		</requirements>
+		<version_command>@BINARY@ --version</version_command>
+	</xml>
+	<token name="TABLEPARAMS">#if $parameters.type == "simple"
+--ksize=20
+--n_tables=4
+--min-tablesize=$parameters.tablesize
+#else
+--ksize=$parameters.ksize
+--n_tables=$parameters.n_tables
+--min-tablesize=$parameters.tablesize_specific
+#end if</token>
+	<xml name="tableinputs">
+		<conditional name="parameters">
+			<param	name="type"
+				type="select"
+				label="Advanced Parameters"
+				help="ksize, n_hashess, a specific hashsize" >
+				<option	value="simple"
+					selected="true">
+					Hide
+				</option>
+				<option value="specific">
+					Show
+				</option>
+            		</param>
+			<when	value="simple">
+				<param	name="hashsize"
+					type="select"
+					label="Sample Type"
+					display="radio">
+					<option	value="1e9"
+						selected="true">
+						Microbial Genome
+					</option>
+					<option value="2e9">
+						Animal Transcriptome
+					</option>
+					<option value="4e9">
+						Small Animal Genome or Low-Diversity Metagenome
+					</option>
+					<option value="16e9">
+						Large Animal Genome
+					</option>
+				</param>
+			</when>
+			<when	value="specific">
+				<param	name="ksize"
+					type="integer"
+					value="20"
+					label="ksize"
+					help="k-mer size to use" />
+				<param	name="n_hashes"
+					type="integer"
+					min="1"
+					value="4"
+					label="n_hashes"
+					help="number of hash tables to use" />
+				<param	name="hashsize_specifc"
+					type="text"
+					label="hashsize"
+					help="lower bound on the hashsize to use" />
+			</when>
+		</conditional>
+	</xml>
+	<xml name="input_sequence_filename">
+                <param  name="input_sequence_filename"
+                        type="data"
+                        format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
+                        label="FAST[AQ] file(s)" />
+	</xml>
+	<xml name="input_counting_table_filename">
+                <param  name="input_counting_table_filename"
+                        type="data"
+                        label="the k-mer counting table to query"
+                        help="The abundances of the k-mers in the input nucleotide sequence file will be calculated using the kmer counts in this k-mer counting table." />
+	</xml>
+	<xml name="abundance-histogram-output">
+                <data   name="output_histogram_filename"
+                        format="text"
+                        label="${tool.name} k-mer abundance histogram. The
+                        columns are: (1) k-mer abundance, (2) k-mer count, (3)
+                        cumulative count, (4) fraction of total distinct
+                        k-mers.">
+                </data>
+	</xml>
+</macros>

@@ -1,6 +1,6 @@
 <tool	id="gedlab-khmer-normalize-by-median"
 	name="Normalize By Median"
-	version="0.7.1.1"
+	version="1.1-4"
 	force_history_refresh="true">
 	
 	<description>
@@ -10,8 +10,8 @@
 
 	<requirements>
 		<requirement
-			type="python-module"
-			version="0.7">
+			type="package"
+			version="1.1">
 				khmer
 		</requirement>
     	</requirements>
@@ -20,27 +20,28 @@
 		normalize-by-median.py --version
     	</version_command>
 
-   	<command>
+	<command>
+		mkdir output;
+		cd output;
 		normalize-by-median.py
 		$paired_switch
 		#if $parameters.type == "simple"
 			--ksize=20
-			--n_hashes=4
-			--hashsize=$parameters.hashsize
+			--n_tables=4
+			--min-tablesize=$parameters.tablesize
 			--cutoff=20
 		#else
 			--ksize=$parameters.ksize
-			--n_hashes=$parameters.n_hashes 
-			--hashsize=$parameters.hashsize_specific
+			--n_tables=$parameters.n_tables
+			--min-tablesize=$parameters.tablesize_specific
 			--cutoff=$parameters.cutoff
 		#end if
-		#if $save_hashtable
-			--savehash=$hash
+		#if $save_countingtable
+			--savetable=$countingtable
 		#end if
-		#if $hashtable_to_load
-			--loadhash=$hashtable_to_load
+		#if $countingtable_to_load
+			--loadtable=$countingtable_to_load
 		#end if
-		--out=$output
 		#for input in $inputs
 			$input
 		#end for
@@ -57,27 +58,27 @@
 		<param	name="paired_switch"
 			type="boolean"
 			checked="false"
-			truevalue="-p"
+			truevalue="--paired"
 			falsevalue=""
 			label="Are the inputs interleaved paired ends?"
 			help="If so, then selecting this option will process the paired ends together." />
 
-		<param	name="hashtable_to_load"
+		<param	name="countingtable_to_load"
 			type="data"
 			optional="true"
-			label="an optional khmer hashtable to load"
-			help="The inputs file(s) will be processed using the kmer counts in the specified hashtable file as a starting point." />
+			label="an optional k-mer counting table to load"
+			help="The inputs file(s) will be processed using the kmer counts in the specified k-mer counting table file as a starting point." />
 
-		<param	name="save_hashtable"
+		<param	name="save_countingtable"
 			type="boolean"
-			label="Save the kmer counts hashtable(s) in a file"
+			label="Save the k-mer counting table(s) in a file"
 			help="" />
 
 		<conditional name="parameters">
 			<param	name="type"
 				type="select"
 				label="Advanced Parameters"
-				help="ksize, n_hashess, a specific hashsize, cutoff" >
+				help="ksize, n_tabless, a specific tablesize, cutoff" >
 				<option	value="simple"
 					selected="true">
 					Hide
@@ -87,7 +88,7 @@
 				</option>
             		</param>
 			<when	value="simple">
-				<param	name="hashsize"
+				<param	name="tablesize"
 					type="select"
 					label="Sample Type"
 					display="radio">
@@ -112,16 +113,16 @@
 					value="20"
 					label="ksize"
 					help="k-mer size to use" />
-				<param	name="n_hashes"
+				<param	name="n_tables"
 					type="integer"
 					min="1"
 					value="4"
-					label="n_hashes"
-					help="number of hash tables to use" />
-				<param	name="hashsize_specifc"
+					label="n_tables"
+					help="number of k-mer counting tables to use" />
+				<param	name="tablesize_specific"
 					type="text"
-					label="hashsize"
-					help="lower bound on the hashsize to use" />
+					label="tablesize"
+					help="lower bound on the tablesize to use" />
 				<param	name="cutoff"
 					type="integer"
 					min="1"
@@ -131,14 +132,17 @@
 		</conditional>
 	</inputs>
 	<outputs>
-		<data	name="hash"
+		<data	name="countingtable"
 			format="data"
-			label="${tool.name} kmer counts hashtable from  #echo ', '.join(map(str, $inputs ))#">
-			<filter>save_hashtable == True</filter>
+			label="${tool.name} k-mer counting table from  #echo ', '.join(map(str, $inputs ))#">
+			<filter>save_countingtable == True</filter>
 		</data>
-		<data	name="output"
+		<data	name="outputs"
 			format="input"
-		       	label="${tool.name} processed reads from #echo ', '.join(map(str, $inputs ))#"	/>
+			label="${tool.name} processed nucleotide sequence file">
+			<discover_datasets pattern="__name__" directory="output" visible="true"/>
+		</data>
+
 	</outputs>
  	<stdio>
         <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
