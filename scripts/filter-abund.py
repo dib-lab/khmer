@@ -43,8 +43,8 @@ def get_parser():
         description='Trim sequences at a minimum k-mer abundance.',
         epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
-    parser.add_argument('input_table', metavar='input_presence_table_filename',
-                        help='The input k-mer presence table filename')
+    parser.add_argument('input_table', metavar='input_counting_table_filename',
+                        help='The input k-mer counting table filename')
     parser.add_argument('input_filename', metavar='input_sequence_filename',
                         help='Input FAST[AQ] sequence filename', nargs='+')
     add_threading_args(parser)
