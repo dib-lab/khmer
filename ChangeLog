@@ -1,3 +1,8 @@
+2014-06-20 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
+
+    * scripts/extract-partitions.py: added epilog documentation for 
+	<base>.dist columns.
+
 2014-06-20  Michael R. Crusoe <mcrusoe@msu.edu>
 
     * doc/release.txt: Add Coverity Scan to release checklist
