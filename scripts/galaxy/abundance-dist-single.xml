@@ -1,4 +1,4 @@
-<tool	id="gedlab-khmer-normalize-by-median"
+<tool	id="gedlab-khmer-abudance-dist-single"
 	name="Abundance Distribution (all-in-one)"
 	version="1.1-1"
 	force_history_refresh="true">
@@ -9,6 +9,7 @@
 	</description>
 	<macros>
 		<token name="@BINARY@">abundance-dist-single.py</token>
+		<import>macros.xml</import>
 	</macros>
 	<expand macro="requirements" />
 	<command>
@@ -17,12 +18,13 @@
 mkdir output; cd output;
 @BINARY@
 @TABLEPARAMS@
-$no_zero
-$no_bigcount
+$zero
+$bigcount
 #if $save_countingtable
 --savetable=$countingtable_to_save
 #end if
 --report-total-kmers
+--squash
 $input_sequence_filename
 $output_histogram_filename	
 	</command>
@@ -33,6 +35,13 @@ $output_histogram_filename
 			type="boolean"
 			label="Save the k-mer counting table(s) in a file"
 			help="" />
+		<expand macro="input_zero" />
+		<param	name="bigcount"
+			type="boolean"
+			truevalue=""
+			falsevalue="--no-bigcount"
+			checked="true"
+			help="Count k-mers past 255" />
 		<expand macro="tableinputs" />
 	</inputs>
 	<outputs>
@@ -44,19 +53,37 @@ $output_histogram_filename
 				level="fatal" />
 	</stdio>
     
-    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
     <tests>
-        <!-- [HELP] Test files have to be in the ~/test-data directory
-        <test>
-            <param name="input" value="input_test.tab" />
-            <param name="int"   value="10" />
-            <output name="output" file="output_test.txt" />
-	</test> -->
-        <!-- [HELP] Multiple tests can be defined with different parameters -->
-<!--
-        <test>
-        </test>
--->
+	    <test>
+		    <param name="input_sequence_filename" value="test-abund-read-2.fa" />
+		    <param name="type" value="specific" />
+		    <param name="tablesize_specific" value="1e7" />
+		    <param name="n_tables" value="2" />
+		    <param name="ksize" value="17" />
+		    <param name="no_zero" value="false" />
+		    <output name="output_histogram_filename">
+			    <assert_contents>
+				    <has_text text="1 96 96 0.98" />
+				    <has_text text="1001 2 98 1.0" />
+			    </assert_contents>
+		    </output>
+	    </test>
+	    <test>
+		    <param name="input_sequence_filename" value="test-abund-read-2.fa" />
+		    <param name="type" value="specific" />
+		    <param name="tablesize_specific" value="1e7" />
+		    <param name="n_tables" value="2" />
+		    <param name="ksize" value="17" />
+		    <param name="no_zero" value="false" />
+		    <param name="bigcount" value="false" />
+		    <output name="output_histogram_filename">
+			    <assert_contents>
+				    <has_text text="1 96 96 0.98" />
+				    <has_text text="255 2 98 1.0" />
+			    </assert_contents>
+		    </output>
+	    </test>
+
     </tests>
     
     <!-- [OPTIONAL] Help displayed in Galaxy -->

@@ -1,5 +1,5 @@
-<tool	id="gedlab-khmer-normalize-by-median"
-	name="Abundance Dist"
+<tool	id="gedlab-khmer-abundance-dist"
+	name="Abundance Distribution"
 	version="1.1-1"
 	force_history_refresh="true">
 	
@@ -8,7 +8,8 @@
 		file using a pre-made k-mer counting table.
 	</description>
         <macros>
-                <token name="@BINARY@">abundance-dist-single.py</token>
+		<token name="@BINARY@">abundance-dist.py</token>
+		<import>macros.xml</import>
         </macros>
         <expand macro="requirements" />
 	<command>
@@ -16,14 +17,16 @@
 ## Lines starting hash hash are comments. Galaxy will turn newlines into spaces
 mkdir output; cd output;
 @BINARY@
-		$input_counting_table_filename
-		$input_sequence_filename
-		$output_histogram_filename	
+--squash
+$input_counting_table_filename
+$input_sequence_filename
+$output_histogram_filename	
 	</command>
 
 	<inputs>
 		<expand macro="input_sequence_filename" />
 		<expand macro="input_counting_table_filename" />
+		<expand macro="input_zero" />
 	</inputs>
 	<outputs>
 		<expand macro="abundance-histogram-output" />
@@ -34,20 +37,30 @@ mkdir output; cd output;
 				level="fatal" />
 	</stdio>
     
-    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
-    <tests>
-        <!-- [HELP] Test files have to be in the ~/test-data directory
-        <test>
-            <param name="input" value="input_test.tab" />
-            <param name="int"   value="10" />
-            <output name="output" file="output_test.txt" />
-	</test> -->
-        <!-- [HELP] Multiple tests can be defined with different parameters -->
-<!--
-        <test>
-        </test>
--->
-    </tests>
+	<tests>
+		<test>
+                    	<param name="input_sequence_filename" value="test-abund-read-2.fa" />
+			<param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
+			<param name="no_zero" value="false" />
+                    	<output name="output_histogram_filename">
+				<assert_contents>
+					<has_line_matching expression="1 96 96 0.98" />
+					<has_line_matching expression="1001 2 98 1.0" />
+				</assert_contents>
+			</output>
+		</test>
+		<test>
+                    	<param name="input_sequence_filename" value="test-abund-read-2.fa" />
+ 			<param name="input_counting_table_filename" value="test-abund-read-2.nobigcount.ct" ftype="ct" />
+ 	                <param name="no_zero" value="false" />
+                    	<output name="output_histogram_filename">
+                            	<assert_contents>
+                                    	<has_line_matching="1 96 96 0.98" />
+                                    	<has_line_matching="255 2 98 1.0" />
+                            	</assert_contents>
+                    	</output>
+            	</test>
+    	</tests>
     
     <!-- [OPTIONAL] Help displayed in Galaxy -->
     <!--

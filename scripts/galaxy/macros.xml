@@ -6,21 +6,21 @@
 		</requirements>
 		<version_command>@BINARY@ --version</version_command>
 	</xml>
-	<token name="TABLEPARAMS">#if $parameters.type == "simple"
---ksize=20
---n_tables=4
---min-tablesize=$parameters.tablesize
+	<token name="@TABLEPARAMS@">#if $parameters.type == "simple"
+  --ksize=20
+  --n_tables=4
+  --min-tablesize=$parameters.tablesize
 #else
---ksize=$parameters.ksize
---n_tables=$parameters.n_tables
---min-tablesize=$parameters.tablesize_specific
+  --ksize=$parameters.ksize
+  --n_tables=$parameters.n_tables
+  --min-tablesize=$parameters.tablesize_specific
 #end if</token>
 	<xml name="tableinputs">
 		<conditional name="parameters">
 			<param	name="type"
 				type="select"
 				label="Advanced Parameters"
-				help="ksize, n_hashess, a specific hashsize" >
+				help="ksize, n_tables, a specific tablesize" >
 				<option	value="simple"
 					selected="true">
 					Hide
@@ -30,7 +30,7 @@
 				</option>
             		</param>
 			<when	value="simple">
-				<param	name="hashsize"
+				<param	name="tablesize"
 					type="select"
 					label="Sample Type"
 					display="radio">
@@ -55,18 +55,26 @@
 					value="20"
 					label="ksize"
 					help="k-mer size to use" />
-				<param	name="n_hashes"
+				<param	name="n_tables"
 					type="integer"
 					min="1"
 					value="4"
-					label="n_hashes"
-					help="number of hash tables to use" />
-				<param	name="hashsize_specifc"
+					label="n_tables"
+					help="number of tables to use" />
+				<param	name="tablesize_specific"
 					type="text"
-					label="hashsize"
-					help="lower bound on the hashsize to use" />
+					label="tablesize"
+					help="lower bound on the tablesize to use" />
 			</when>
 		</conditional>
+	</xml>
+	<xml name="input_sequences_filenames">
+                <param  name="inputs"
+                        multiple="true"
+                        type="data"
+                        format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
+                        label="FAST[AQ] file(s)"
+                        help="Put in order of precedence such as longest reads first." />
 	</xml>
 	<xml name="input_sequence_filename">
                 <param  name="input_sequence_filename"
@@ -89,4 +97,19 @@
                         k-mers.">
                 </data>
 	</xml>
-</macros>
+	<xml name="output_sequences">
+                <data   name="output"
+                        format="input"
+                        label="${tool.name} processed nucleotide sequence file">
+                        <discover_datasets pattern="__name__" directory="output" visible="true"/>
+                </data>
+	</xml>
+	<xml name="input_zero">
+                <param  name="zero"
+                        type="boolean"
+                        truevalue=""
+                        falsevalue="--no-zero"
+                        checked="true" 
+                        help="Output zero count bins" />
+	</xml>
+`</macros>

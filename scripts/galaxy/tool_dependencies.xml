@@ -3,7 +3,7 @@
     <package name="khmer" version="1.1">
         <install version="1.0">
             <actions>
-                <action type="shell_command">easy_install -U setuptools==3.4.1; pip install --user khmer==1.1 || pip install khmer==1.1</action>
+		    <action type="setup_virtualenv">setuptools==3.4.1 khmer==1.1</action>
             </actions>
         </install>
     </package>

@@ -1,4 +1,4 @@
-<tool	id="gedlab-khmer-normalize-by-median"
+<tool	id="gedlab-khmer-count-median"
 	name="Count Median"
 	version="1.1-1"
 	force_history_refresh="true">
@@ -9,7 +9,8 @@
 		estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
 	</description>
         <macros>
-                <token name="@BINARY@">count-median.py</token>
+		<token name="@BINARY@">count-median.py</token>
+		<import>macros.xml</import>
         </macros>
         <expand macro="requirements" />
 	<command>
@@ -34,21 +35,19 @@ mkdir output; cd output;
 		<exit_code	range="1:"
 				level="fatal" />
 	</stdio>
-    
-    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
-    <tests>
-        <!-- [HELP] Test files have to be in the ~/test-data directory
-        <test>
-            <param name="input" value="input_test.tab" />
-            <param name="int"   value="10" />
-            <output name="output" file="output_test.txt" />
-	</test> -->
-        <!-- [HELP] Multiple tests can be defined with different parameters -->
-<!--
-        <test>
-        </test>
--->
-    </tests>
+
+	<tests>
+		<test>
+                        <param name="input_sequence_filename" value="test-abund-read-2.fa" />
+                        <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
+                        <output name="output_summary_filename">
+                                <assert_contents>
+                                        <has_line_matching expression="seq 1001 1001.0 0.0 18" />
+                                        <has_line_matching expression="895:1:37:17593:9954/1 1 103.803741455 303.702941895 114" />
+                                </assert_contents>
+                        </output>
+		</test>
+	</tests>
     
     <!-- [OPTIONAL] Help displayed in Galaxy -->
     <!--

@@ -7,37 +7,26 @@
 		Trims fastq/fasta sequences at k-mers of a given abundance
 		based on a provided k-mer counting table.
 	</description>
-
-	<requirements>
-		<requirement
-			type="package"
-			version="1.1">
-				khmer
-		</requirement>
-    	</requirements>
-	
-	<version_command>
-		filter-abund.py --version
-    	</version_command>
-
+	<macros>
+		<token name="@BINARY@">filter-abund.py</token>
+		<import>macros.xml</import>
+	</macros>
+	<expand macro="requirements" />
 	<command>
-		mkdir output; cd output;
-		filter-abund.py
-		$variable_coverage
-		$presencetable_to_load
-		#for input in $inputs
-			$input
-		#end for
+mkdir output; cd output;
+filter-abund.py
+#if $cutoff != 2
+  --cutoff=$cutoff
+#fi
+$variable_coverage
+$countingtable_to_load
+#for input in $inputs
+ $input
+#end for
 	</command>
 
 	<inputs>
-		<param	name="inputs"
-			multiple="true"
-			type="data"
-			format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
-			label="FAST[AQ] file(s)"
-			help="Put in order of precedence such as longest reads first." />
-
+		<expand macro="input_sequences_filenames" />
 		<param	name="variable_coverage"
 			type="boolean"
 			checked="false"
@@ -45,42 +34,47 @@
 			falsevalue=""
 			label="Variable coverage"
 			help="Only trim when a sequence has high enough coverage (median abundance > 20)" />
-
-		<param	name="presencetable_to_load"
-			type="data"
-			optional="false"
-			label="the khmer abundance table to load"
-			help="The inputs file(s) will be processed using the kmer counts in the specified k-mer counting table file." />
+		<param	name="cutoff"
+			type="integer"
+			value="2"
+			label="cutoff"
+			help="Trim at k-mers below this abundance." />
+		<expand macro="input_counting_table_filename" />	
 	</inputs>
 	<outputs>
-		<data	name="output"
-			format="input"
-			label="${tool.name} processed nucleotide sequence file">
-			<discover_datasets pattern="__name__" directory="output" visible="true"/>
-		</data>
+		<expand macro="output_sequences" />
 	</outputs>
  	<stdio>
         <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
 		<exit_code	range="1:"
 				level="fatal" />
 	</stdio>
-    
-    <!-- [OPTIONAL] Tests to be run manually by the Galaxy admin -->
-    <tests>
-        <!-- [HELP] Test files have to be in the ~/test-data directory
-        <test>
-            <param name="input" value="input_test.tab" />
-            <param name="int"   value="10" />
-            <output name="output" file="output_test.txt" />
-	</test> -->
-        <!-- [HELP] Multiple tests can be defined with different parameters -->
-<!--
-        <test>
-        </test>
--->
-    </tests>
-    
-    <!-- [OPTIONAL] Help displayed in Galaxy -->
+        <tests>
+                <test interactor="api">
+                        <param name="inputs" value="test-abund-read-2.fa" />
+                        <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
+                        <output name="output">
+				<discover_dataset name="test-abund-read-2.fa.abundfilt">
+                                	<assert_contents>
+                                        	<has_text text="GGTTGACGGGGCTCAGGG" />
+                                	</assert_contents>
+				</discover_dataset>
+                        </output>
+                </test>
+                <test interactor="api">
+                        <param name="input_sequence_filename" value="test-abund-read-2.fa" />
+                        <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
+			<param name="cutoff" value="1" />
+                        <output name="output">
+				<discover_dataset name="test-abund-read-2.fa.abundfilt">
+                                	<assert_contents>
+                                        	<has_text text="GGTTGACGGGGCTCAGGG" />
+                                	</assert_contents>
+				</discover_dataset>
+                        </output>
+                </test>
+        </tests> 
+	<!-- [OPTIONAL] Help displayed in Galaxy -->
     <!--
 	<help>
 	</help>
