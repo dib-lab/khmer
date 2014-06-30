@@ -54,6 +54,11 @@ def get_parser():
         merge-partitions.py -k 20 example
         annotate-partitions.py -k 20 example tests/test-data/random-20-a.fa
         extract-partitions.py example random-20-a.fa.part
+
+        (extract-partitions.py will produce a partition size distribution
+        in <base>.dist. The columns are: (1) number of reads, (2) count
+        of partitions with n reads, (3) cumulative sum of partitions,
+        (4) cumulative sum of reads.)
     """
     parser = argparse.ArgumentParser(
         description="Separate sequences that are annotated with partitions "
