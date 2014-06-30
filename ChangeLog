@@ -1,3 +1,7 @@
+2014-06-20  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * doc/release.txt: Add Coverity Scan to release checklist
+
 2014-06-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/read_aligner.{cc,hh},khmer/_khmermodule.cc,setup.py,
@@ -8,10 +12,6 @@
     * Makefile: fixed wildcards
     * tests/read_parsers.py: tests that are too complicated to run with
     Valgrind's memcheck are now marked @attr('multithread')
-
-2014-06-20  Michael R. Crusoe <mcrusoe@msu.edu>
-
-    * doc/release.txt: Add Coverity Scan to release checklist
 
 2014-06-16  Titus Brown  <t@idyll.org>
 

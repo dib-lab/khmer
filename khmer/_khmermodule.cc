@@ -1008,10 +1008,12 @@ typedef struct {
 
 static void khmer_counting_dealloc(PyObject *);
 
-static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args);
-
-static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
+static PyObject * hash_abundance_distribution(PyObject * self,
         PyObject * args);
+
+static PyObject * hash_abundance_distribution_with_reads_parser(
+    PyObject * self,
+    PyObject * args);
 
 static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
 {
@@ -1386,7 +1388,7 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
 
     PyObject * trim_seq = PyString_FromStringAndSize(seq, trim_at);
     if (trim_seq == NULL) {
-	return NULL;
+        return NULL;
     }
     PyObject * ret = Py_BuildValue("Ok", trim_seq, trim_at);
     Py_DECREF(trim_seq);
@@ -1460,8 +1462,8 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
 
     PyObject * x = PyList_New(max_read_len);
     if (x == NULL) {
-	delete[] counts;
-	return NULL;
+        delete[] counts;
+        return NULL;
     }
 
     for (unsigned int i = 0; i < max_read_len; i++) {
@@ -1956,8 +1958,9 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbitsObject")
     0,                       /* tp_alloc */
 };
 
-static PyObject * hash_abundance_distribution_with_reads_parser(PyObject * self,
-        PyObject * args)
+static PyObject * hash_abundance_distribution_with_reads_parser(
+    PyObject * self,
+    PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
@@ -2063,7 +2066,8 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
     PyObject * callback_obj = NULL;
     Hashbits * ht2;
 
-    if (!PyArg_ParseTuple(args, "sO!|O", &filename, &khmer_KHashbitsType, &ht2_argu,
+    if (!PyArg_ParseTuple(args, "sO!|O", &filename, &khmer_KHashbitsType,
+                          &ht2_argu,
                           &callback_obj)) {
         return NULL;
     }
@@ -2424,7 +2428,8 @@ static PyObject * hashbits_identify_stoptags_by_position(PyObject * self,
     return x;
 }
 
-static PyObject * hashbits_do_subset_partition(PyObject * self, PyObject * args)
+static PyObject * hashbits_do_subset_partition(PyObject * self,
+        PyObject * args)
 {
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
@@ -3355,7 +3360,8 @@ static PyObject * hashbits_get_partition_id(PyObject * self, PyObject * args)
     return PyInt_FromLong(partition_id);
 }
 
-static PyObject * hashbits_is_single_partition(PyObject * self, PyObject * args)
+static PyObject * hashbits_is_single_partition(PyObject * self,
+        PyObject * args)
 {
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
@@ -4425,8 +4431,9 @@ static PyObject* new_readaligner(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    readaligner_obj->aligner = new ReadAligner(ch->counting,
-            trusted_cov_cutoff, bits_theta);
+    readaligner_obj->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
+            bits_theta);
+
     return (PyObject *) readaligner_obj;
 }
 

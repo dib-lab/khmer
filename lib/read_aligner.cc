@@ -37,25 +37,73 @@ double GetNull(size_t length)
  */
 Transition get_trans(State s1, State s2)
 {
-    if(s1 == MATCH) {
-        if(s2 == MATCH) {
+    if (s1 == MATCH) {
+        if (s2 == MATCH) {
             return MM;
-        } else if(s2 == INSERT_GRAPH) {
+        } else if (s2 == INSERT_GRAPH) {
             return MIg;
-        } else if(s2 == INSERT_READ) {
+        } else if (s2 == INSERT_READ) {
             return MIr;
+        } else if (s2 == MATCH_UNTRUSTED) {
+            return MMu;
+        } else if (s2 == INSERT_GRAPH_UNTRUSTED) {
+            return MIgu;
+        } else if (s2 == INSERT_READ_UNTRUSTED) {
+            return MIru;
         }
-    } else if(s1 == INSERT_GRAPH) {
-        if(s2 == MATCH) {
+    } else if (s1 == INSERT_GRAPH) {
+        if (s2 == MATCH) {
             return IgM;
-        } else if(s2 == INSERT_GRAPH) {
+        } else if (s2 == INSERT_GRAPH) {
             return IgIg;
+        } else if (s2 == MATCH_UNTRUSTED) {
+            return IgMu;
+        } else if (s2 == INSERT_GRAPH_UNTRUSTED) {
+            return IgIgu;
         }
-    } else if(s1 == INSERT_READ) {
+    } else if (s1 == INSERT_READ) {
         if(s2 == MATCH) {
             return IrM;
-        } else if(s2 == INSERT_READ) {
+        } else if (s2 == INSERT_READ) {
             return IrIr;
+        } else if(s2 == MATCH_UNTRUSTED) {
+            return IrMu;
+        } else if (s2 == INSERT_READ_UNTRUSTED) {
+            return IrIru;
+        }
+    } else if (s1 == MATCH_UNTRUSTED) {
+        if (s2 == MATCH) {
+            return MuM;
+        } else if (s2 == INSERT_GRAPH) {
+            return MuIg;
+        } else if (s2 == INSERT_READ) {
+            return MuIr;
+        } else if (s2 == MATCH_UNTRUSTED) {
+            return MuMu;
+        } else if (s2 == INSERT_GRAPH_UNTRUSTED) {
+            return MuIgu;
+        } else if (s2 == INSERT_READ_UNTRUSTED) {
+            return MuIru;
+        }
+    } else if (s1 == INSERT_GRAPH_UNTRUSTED) {
+        if (s2 == MATCH) {
+            return IguM;
+        } else if (s2 == INSERT_GRAPH) {
+            return IguIg;
+        } else if (s2 == MATCH_UNTRUSTED) {
+            return IguMu;
+        } else if (s2 == INSERT_GRAPH_UNTRUSTED) {
+            return IguIgu;
+        }
+    } else if (s1 == INSERT_READ_UNTRUSTED) {
+        if(s2 == MATCH) {
+            return IruM;
+        } else if (s2 == INSERT_READ) {
+            return IruIr;
+        } else if(s2 == MATCH_UNTRUSTED) {
+            return IruMu;
+        } else if (s2 == INSERT_READ_UNTRUSTED) {
+            return IruIru;
         }
     }
 
@@ -92,6 +140,11 @@ void ReadAligner::Enumerate(
         remaining = next_seq_idx;
     }
 
+    double match_sc;
+    double mismatch_sc;
+    int start_state;
+    int end_state;
+
     // loop for MATCHes and INSERT_READs
     for (int i = A; i <= T; i++) {
         unsigned char next_nucl = nucl_lookup[i];
@@ -109,15 +162,28 @@ void ReadAligner::Enumerate(
 
         if (kmerCov == 0) {
             continue;
+        } else if (kmerCov < m_trusted_cutoff) {
+            start_state = MATCH_UNTRUSTED;
+            end_state = INSERT_GRAPH_UNTRUSTED;
+            //match_sc = m_sm.untrusted_match;
+            //mismatch_sc = m_sm.untrusted_mismatch;
+            match_sc = m_sm.trusted_match;
+            mismatch_sc = m_sm.trusted_mismatch;
+        } else {
+            start_state = MATCH;
+            end_state = INSERT_GRAPH;
+            match_sc = m_sm.trusted_match;
+            mismatch_sc = m_sm.trusted_mismatch;
         }
 
-        for(int next_state_iter = MATCH;
-                next_state_iter <= INSERT_GRAPH;
+        for(int next_state_iter = start_state;
+                next_state_iter <= end_state;
                 next_state_iter++) {
+
             State next_state = static_cast<State>(next_state_iter);
             trans = get_trans(curr->state, next_state);
             hcost = m_sm.tsc[get_trans(next_state, MATCH)]
-                    + m_sm.tsc[MM]
+                    + (m_sm.tsc[MM] + m_sm.trusted_match)
                     * ((remaining == 0) ?
                        0 : (remaining - 1));
 
@@ -125,33 +191,32 @@ void ReadAligner::Enumerate(
                 continue;
             }
 
-            if(next_state == MATCH) {
+            if(next_state == MATCH || next_state == MATCH_UNTRUSTED) {
                 if(next_nucl == seq[next_seq_idx]) {
-                    sc = (kmerCov >= m_trusted_cutoff)?
-                         m_sm.trusted_match
-                         : m_sm.untrusted_match;
+                    sc = match_sc;
                 } else {
-                    sc = (kmerCov >= m_trusted_cutoff)?
-                         m_sm.trusted_mismatch
-                         : m_sm.untrusted_mismatch;
+                    sc = mismatch_sc;
                 }
             } else {
-                sc = 0;
+                sc = background_prob;
             }
 
-            if(next_state == MATCH) {
+            if(next_state == MATCH || next_state == MATCH_UNTRUSTED) {
                 next = new AlignmentNode(curr, (Nucl)i,
                                          next_seq_idx, (State)next_state, trans,
                                          next_fwd, next_rc, curr->length + 1);
-            } else if(next_state == INSERT_READ) {
+                next->num_indels = curr->num_indels;
+            } else if(next_state == INSERT_READ || next_state == INSERT_READ_UNTRUSTED) {
                 next = new AlignmentNode(curr, (Nucl)i,
                                          next_seq_idx, (State)next_state, trans,
                                          curr->fwd_hash, curr->rc_hash,
                                          curr->length + 1);
-            } else if(next_state == INSERT_GRAPH) {
+                next->num_indels = curr->num_indels + 1;
+            } else if(next_state == INSERT_GRAPH || next_state == INSERT_GRAPH_UNTRUSTED) {
                 next = new AlignmentNode(curr, (Nucl)i,
                                          curr->seq_idx, (State)next_state, trans,
                                          next_fwd, next_rc, curr->length);
+                next->num_indels = curr->num_indels + 1;
             }
 
             next->score = curr->score + sc + m_sm.tsc[trans];
@@ -159,7 +224,9 @@ void ReadAligner::Enumerate(
             next->h_score = hcost;
             next->f_score = next->score + next->h_score;
 
-            if (next->score - GetNull(next->length) > next->length * m_bits_theta) {
+            // TODO(fishjord) make max indels tunable)
+            if (next->num_indels < 3
+                    && next->score - GetNull(next->length) > next->length * m_bits_theta) {
                 open.push(next);
                 all_nodes.push_back(next);
             } else {
@@ -169,6 +236,22 @@ void ReadAligner::Enumerate(
     }
 }
 
+void ReadAligner::WriteNode(AlignmentNode* curr)
+{
+    std::cerr << "curr: " << curr << " "
+              << curr->prev << " " << " state=" << curr->state << " "
+              << _revhash(curr->fwd_hash, m_ch->ksize()) << " "
+              << _revhash(curr->rc_hash, m_ch->ksize())
+              << " cov="
+              << m_ch->get_count(uniqify_rc(curr->fwd_hash, curr->rc_hash))
+              << " emission=" << curr->base
+              << " seqidx=" << curr->seq_idx
+              << " score=" << curr->score
+              << " fscore=" << curr->f_score
+              << " bits_saved=" << curr->score - GetNull(curr->length)
+              << std::endl;
+}
+
 Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
                                  size_t seqLen,
                                  bool forward,
@@ -176,12 +259,14 @@ Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
 {
     std::vector<AlignmentNode*> all_nodes;
     NodeHeap open;
-    std::set<AlignmentNode> closed;
+    std::map<AlignmentNode, unsigned int> closed;
     open.push(start_vert);
 
     AlignmentNode* curr = NULL;
     AlignmentNode* best = NULL;
-    std::set<AlignmentNode>::iterator tmp;
+    std::map<AlignmentNode, unsigned int>::iterator tmp;
+
+    unsigned int times_closed = 0;
 
     while (!open.empty()) {
         curr = open.top();
@@ -210,17 +295,24 @@ Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
         }
 
         tmp = closed.find(*curr);
-        if(tmp == closed.end()) {
+        if(tmp == closed.end()) {  //Hasn't been closed yet
             //do nothing
-        } else if ((*tmp).score > curr->score) {
+            times_closed = 0;
+        } else if (tmp->first.score > curr->score) { //Better than what we've closed
+            times_closed = tmp->second;
             closed.erase(tmp);
-            //} else if ((*tmp).score == curr->score) {
-            //do nothing
+        } else if (tmp->first.score == curr->score) { //Same as what we've closed
+            times_closed = tmp->second;
+            closed.erase(tmp);
         } else {
             continue;
         }
 
-        closed.insert(*curr);
+        if (times_closed > 200) {
+            continue;
+        }
+
+        closed[*curr] = times_closed + 1;
 
         Enumerate(open, all_nodes, curr, forward, seq);
     }
@@ -269,20 +361,20 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
 #endif
 
     while(node != NULL && node->prev != NULL) {
-        if(node->state == MATCH) {
+        if(node->state == MATCH || node->state == MATCH_UNTRUSTED) {
             graph_base = toupper(nucl_lookup[node->base]);
             read_base = read[node->seq_idx];
-        } else if(node->state == INSERT_READ) {
+        } else if(node->state == INSERT_READ || node->state == INSERT_READ_UNTRUSTED) {
             graph_base = '-';
             read_base = tolower(read[node->seq_idx]);
-        } else if(node->state == INSERT_GRAPH) {
+        } else if(node->state == INSERT_GRAPH
+                  || node->state == INSERT_GRAPH_UNTRUSTED) {
             graph_base = tolower(nucl_lookup[node->base]);
             read_base = '-';
         } else {
             graph_base = '?';
             read_base = '?';
         }
-
 #if READ_ALIGNER_DEBUG
         std::cerr << graph_base << "\t" << read_base << "\t"
                   << node->score << "\t" << node->h_score << "\t"
@@ -310,11 +402,12 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     ret->trusted = trusted;
 
     return ret;
+
 }
 
 struct SearchStart {
     size_t kmer_idx;
-    BoundedCounterType k_cov;
+    size_t k_cov;
     std::string kmer;
 };
 
@@ -322,7 +415,6 @@ Alignment* ReadAligner::Align(const std::string& read)
 {
     int k = m_ch->ksize();
     size_t num_kmers = read.length() - k + 1;
-    size_t mid_kmer = num_kmers / 2;
 
     SearchStart start;
     start.k_cov = 0;
@@ -332,13 +424,10 @@ Alignment* ReadAligner::Align(const std::string& read)
         std::string kmer = read.substr(i, k);
 
         size_t kCov = m_ch->get_count(kmer.c_str());
-        if(kCov > 0) {
-            if(start.k_cov < m_trusted_cutoff ||
-                    labs(mid_kmer - i) < labs(mid_kmer - start.kmer_idx)) {
-                start.kmer_idx = i;
-                start.k_cov = kCov;
-                start.kmer = kmer;
-            }
+        if(kCov > start.k_cov) {
+            start.kmer_idx = i;
+            start.k_cov = kCov;
+            start.kmer = kmer;
         }
     }
 

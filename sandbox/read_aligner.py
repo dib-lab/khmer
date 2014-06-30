@@ -13,7 +13,8 @@ import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
-from khmer.counting_args import build_counting_multifile_args
+from khmer.khmer_args import build_counting_args
+from khmer.khmer_args import add_loadhash_args
 
 ###
 
@@ -22,9 +23,13 @@ DEFAULT_MAX_ERROR_REGION = 40
 
 
 def main():
-    parser = build_counting_multifile_args()
+    parser = build_counting_args()
     parser.add_argument("--trusted-cov", dest="trusted_cov", type=int, default=2)
     parser.add_argument("--theta", type=float, default=1.0)
+    parser.add_argument("input_table")
+    parser.add_argument("input_filenames", nargs="+")
+    add_loadhash_args(parser)
+
     args = parser.parse_args()
 
     counting_ht = args.input_table
@@ -53,10 +58,7 @@ def main():
             print >>sys.stderr, graph_alignment
             print >>sys.stderr, read_alignment
             print >>sys.stderr, truncated
-            if truncated:
-                print ">{0}\n{1}".format(name, seq)
-            else:
-                print ">{0}\n{1}".format(name, graph_alignment)
+            print ">{0}\n{1}".format(name, graph_alignment)
 
 if __name__ == '__main__':
     main()
