@@ -13,30 +13,22 @@
         </macros>
         <expand macro="requirements" />
 	<command>
-		mkdir output;
-		cd output;
-		normalize-by-median.py
-		$paired_switch
-		#if $parameters.type == "simple"
-			--ksize=20
-			--n_tables=4
-			--min-tablesize=$parameters.tablesize
-		#else
-			--ksize=$parameters.ksize
-			--n_tables=$parameters.n_tables
-			--min-tablesize=$parameters.tablesize_specific
-		#end if
-		--cutoff=$cutoff
-		#if $save_countingtable
-			--savetable=$countingtable
-		#end if
-		#if $countingtable_to_load
-			--loadtable=$countingtable_to_load
-		#end if
-		--report-total-kmers
-		#for input in $inputs
-			$input
-		#end for
+mkdir output;
+cd output;
+normalize-by-median.py
+$paired_switch
+@TABLEPARAMS@
+--cutoff=$cutoff
+#if $save_countingtable
+--savetable=$countingtable
+#end if
+#if $countingtable_to_load
+--loadtable=$countingtable_to_load
+#end if
+--report-total-kmers
+#for input in $inputs
+$input
+#end for
 	</command>
 
 	<inputs>
@@ -64,57 +56,7 @@
 			min="1"
 			value="20"
 			label="cutoff" />
-		<conditional name="parameters">
-			<param	name="type"
-				type="select"
-				label="Advanced Parameters"
-				help="ksize, n_tables, a specific tablesize" >
-				<option	value="simple"
-					selected="true">
-					Hide
-				</option>
-				<option value="specific">
-					Show
-				</option>
-            		</param>
-			<when	value="simple">
-				<param	name="tablesize"
-					type="select"
-					label="Sample Type"
-					display="radio">
-					<option	value="1e9"
-						selected="true">
-						Microbial Genome
-					</option>
-					<option value="2e9">
-						Animal Transcriptome
-					</option>
-					<option value="4e9">
-						Small Animal Genome or Low-Diversity Metagenome
-					</option>
-					<option value="16e9">
-						Large Animal Genome
-					</option>
-				</param>
-			</when>
-			<when	value="specific">
-				<param	name="ksize"
-					type="integer"
-					value="20"
-					label="ksize"
-					help="k-mer size to use" />
-				<param	name="n_tables"
-					type="integer"
-					min="1"
-					value="4"
-					label="n_tables"
-					help="number of k-mer counting tables to use" />
-				<param	name="tablesize_specific"
-					type="text"
-					label="tablesize"
-					help="lower bound on the tablesize to use" />
-			</when>
-		</conditional>
+		<expand macro="tableinputs" />
 	</inputs>
 	<outputs>
 		<data	name="countingtable"

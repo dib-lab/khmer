@@ -55,8 +55,8 @@ $output_histogram_filename
  	                <param name="no_zero" value="false" />
                     	<output name="output_histogram_filename">
                             	<assert_contents>
-                                    	<has_line_matching="1 96 96 0.98" />
-                                    	<has_line_matching="255 2 98 1.0" />
+                                    	<has_line_matching expression="1 96 96 0.98" />
+                                    	<has_line_matching expression="255 2 98 1.0" />
                             	</assert_contents>
                     	</output>
             	</test>

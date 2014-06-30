@@ -19,6 +19,7 @@ filter-abund.py
   --cutoff=$cutoff
 #fi
 $variable_coverage
+@THREADS@
 $countingtable_to_load
 #for input in $inputs
  $input
@@ -74,7 +75,7 @@ $countingtable_to_load
                         </output>
                 </test>
         </tests> 
-	<!-- [OPTIONAL] Help displayed in Galaxy -->
+	<!-- [OPTIONAL] ReST Help displayed in Galaxy -->
     <!--
 	<help>
 	</help>

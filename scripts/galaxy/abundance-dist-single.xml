@@ -25,6 +25,7 @@ $bigcount
 #end if
 --report-total-kmers
 --squash
+@THREADS@
 $input_sequence_filename
 $output_histogram_filename	
 	</command>
