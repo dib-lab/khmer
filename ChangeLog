@@ -1,3 +1,7 @@
+2014-07-06  Titus Brown <t@idyll.org>
+
+    * doc/release.txt: fix formatting.
+
 2014-06-20 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
 
     * scripts/extract-partitions.py: added epilog documentation for 
