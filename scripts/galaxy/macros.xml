@@ -85,7 +85,8 @@
 	</xml>
 	<xml name="input_counting_table_filename">
                 <param  name="input_counting_table_filename"
-                        type="data"
+			type="data"
+			format="ct"
                         label="the k-mer counting table to query"
                         help="The abundances of the k-mers in the input nucleotide sequence file will be calculated using the kmer counts in this k-mer counting table." />
 	</xml>

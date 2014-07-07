@@ -37,7 +37,7 @@ mkdir output; cd output;
 	</stdio>
 
 	<tests>
-		<test>
+		<test interactor="api">
                         <param name="input_sequence_filename" value="test-abund-read-2.fa" />
                         <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
                         <output name="output_summary_filename">

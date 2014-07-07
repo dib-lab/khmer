@@ -21,7 +21,7 @@ mkdir output; cd output;
 $zero
 $bigcount
 #if $save_countingtable
---savetable=$countingtable_to_save
+--savetable=$optional_output_countingtable
 #end if
 --report-total-kmers
 --squash
@@ -46,6 +46,11 @@ $output_histogram_filename
 		<expand macro="tableinputs" />
 	</inputs>
 	<outputs>
+		<data	name="optional_output_countingtable"
+			format="ct"
+			label="${tool.name} k-mer counting table">
+			<filter>save_countingtable == True</filter>
+		</data>
 		<expand macro="abundance-histogram-output" />	
 	</outputs>
  	<stdio>
