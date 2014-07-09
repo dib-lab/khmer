@@ -1,0 +1,1 @@
+make read_aligner.o && g++ -o test_read_aligner test_read_aligner.cc *.o bzip2/*.o zlib/*.o && gdb ./test_read_aligner

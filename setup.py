@@ -62,7 +62,7 @@ SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
     "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
-    "counting", "subset", "aligner", "scoringmatrix", "node", "kmer"])
+    "counting", "subset", "read_aligner"])
 
 EXTRA_COMPILE_ARGS = ['-O3']
 

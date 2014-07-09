@@ -4,8 +4,8 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard {lib,khmer}/*.{cc,hh})
-PYSOURCES=$(wildcard {khmer,scripts}/*.py)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
+PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
@@ -13,10 +13,10 @@ VERSION=$(shell git describe --tags --dirty | sed s/v//)
 
 all: khmer/_khmermodule.so
 
-khmer/_khmermodule.so: $(SOURCES)
+khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
-coverage-debug: $(SOURCES)
+coverage-debug: $(CPPSOURCES)
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
 		build_ext --debug --inplace --libraries gcov
 	touch coverage-debug
@@ -36,6 +36,7 @@ clean: FORCE
 	rm khmer/*.pyc lib/*.pyc || true
 	./setup.py clean --all || true
 	rm coverage-debug || true
+	rm -Rf .coverage || true
 
 debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
@@ -213,4 +214,7 @@ coverity-configure:
 		'${cov_analysis_dir}. Skipping coverity configuration.'; \
 	fi
 
+compile_commands.json: clean
+	export PATH=$(shell echo $$PATH | sed 's=/usr/lib/ccache:==g') ; \
+		bear -- ./setup.py build_ext
 FORCE:
