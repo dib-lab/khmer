@@ -41,6 +41,5 @@ else:
     print '---------------'
     print "\n".join(output)
     print '---------------'
-    print '%d bp / %d seqs; %.1f average length -- total' % (total_bp,
-                                                             total_seqs,
-                                                             total_bp / float(total_seqs))
+    print '%d bp / %d seqs; %.1f average length -- total' %
+        (total_bp, total_seqs, total_bp / float(total_seqs))
