@@ -123,8 +123,7 @@ private:
     std::string _message;
 public:
     _khmer_exception(std::string message) : _message(message) { };
-    inline const std::string get_message() const
-    {
+    inline const std::string get_message() const {
         return _message;
     };
 };
