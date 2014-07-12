@@ -107,7 +107,7 @@
                 </data>
 	</xml>
 	<xml name="output_sequences_single">
-                <data   name="output sequences"
+                <data   name="output"
                         format="input"
                         label="${tool.name} processed nucleotide sequence file" />
 	</xml>

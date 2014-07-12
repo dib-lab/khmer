@@ -17,13 +17,14 @@ mkdir output; cd output;
 @BINARY@
 #if $cutoff != 2
   --cutoff=$cutoff
-#fi
+#end if
 $variable_coverage
 @THREADS@
-$countingtable_to_load
+$input_counting_table_filename
 #for input in $inputs
  $input
 #end for
+--out $output
 	</command>
 
 	<inputs>

@@ -67,7 +67,7 @@ $input
 	<outputs>
 		<data	name="countingtable"
 			format="ct"
-			label="${tool.name} k-mer counting table from  #echo ', '.join(map(str, $inputs ))#">
+			label="${tool.name} k-mer counting table">
 			<filter>save_countingtable == True</filter>
 		</data>
 		<!-- <expand macro="output_sequences" /> -->
