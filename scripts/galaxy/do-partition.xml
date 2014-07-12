@@ -1,77 +1,37 @@
-<tool	id="gedlab-khmer-normalize-by-median"
-	name="Normalize By Median"
-	version="1.1-4"
+<tool	id="gedlab-khmer-do-partition"
+	name="Sequence partition all-in-one"
+	version="1.1-1"
 	force_history_refresh="true">
 	
 	<description>
-		Filters a fastq/fasta file using digital normalization via
-	    	median k-mer abundances.
+		Load, partition, and annotate FAST[AQ] sequences
 	</description>
         <macros>
-                <token name="@BINARY@">normalize-by-median.py</token>
+                <token name="@BINARY@">do-parition.py</token>
                 <import>macros.xml</import>
         </macros>
         <expand macro="requirements" />
 	<command>
-mkdir output;
-cd output;
-normalize-by-median.py
-$paired_switch
+mkdir -p output;
+@BINARY@
 @TABLEPARAMS@
---cutoff=$cutoff
-#if $save_countingtable
---savetable=$countingtable
-#end if
-#if $countingtable_to_load
---loadtable=$countingtable_to_load
-#end if
---report-total-kmers
-#for entry in $many_inputs
-#for input in $entry.inputs
+@THREADS@
+output
+#for input in $inputs
 $input
-#end for
-#end for
---out=$output
+#end for ;
+mv output.info $infomation ;
+mv *.part output/
 	</command>
 
 	<inputs>
-		<repeat name="many_inputs" title="input(s) set" min="1" default="1">
-			<expand macro="input_sequences_filenames" />
-		</repeat>
-		<param	name="paired_switch"
-			type="boolean"
-			checked="false"
-			truevalue="--paired"
-			falsevalue=""
-			label="Are the inputs interleaved paired ends?"
-			help="If so, then selecting this option will process the paired ends together." />
-
-		<param	name="countingtable_to_load"
-			type="data"
-			format="ct"
-			optional="true"
-			label="an optional k-mer counting table to load"
-			help="The inputs file(s) will be processed using the kmer counts in the specified k-mer counting table file as a starting point." />
-
-		<param	name="save_countingtable"
-			type="boolean"
-			label="Save the k-mer counting table(s) in a file"
-			help="" />
-		<param	name="cutoff"
-			type="integer"
-			min="1"
-			value="20"
-			label="cutoff" />
-		<expand macro="tableinputs" />
+		<expand macro="input_sequences_filenames" />
 	</inputs>
 	<outputs>
-		<data	name="countingtable"
-			format="ct"
-			label="${tool.name} k-mer counting table from  #echo ', '.join(map(str, $inputs ))#">
-			<filter>save_countingtable == True</filter>
-		</data>
-		<!-- <expand macro="output_sequences" /> -->
-		<expand macro="output_sequences_single" />
+		<data	name="information"
+			format="text"
+			label="${tool.name} summary for #echo ','.join(map(str, $inputs ))#" />
+		<expand macro="output_sequences" />
 	</outputs>
  	<stdio>
         <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
@@ -79,7 +39,7 @@ $input
 				level="fatal" />
 	</stdio>
 	
-	<tests>
+<!--	<tests>
 		<test interactor="api">
 			<conditional name="parameters">
 				<param name="type" value="specific" />
@@ -124,7 +84,7 @@ $input
 		</test>
 
 	</tests>
-    
+    -->
     <!-- [OPTIONAL] Help displayed in Galaxy -->
     <!--
 	<help>

@@ -1,45 +1,28 @@
-<tool	id="gedlab-khmer-filter-abund"
-	name="Filter by abundance"
+<tool	id="gedlab-khmer-filter-below-abund"
+	name="Filter below abundance cutoff of 50"
 	version="1.1-1"
 	force_history_refresh="true">
 	
 	<description>
-		Trims fastq/fasta sequences at k-mers of a given abundance
+		Trims fastq/fasta sequences at k-mers with abundance below 50
 		based on a provided k-mer counting table.
 	</description>
 	<macros>
-		<token name="@BINARY@">filter-abund.py</token>
+		<token name="@BINARY@">filter-below-abund.py</token>
 		<import>macros.xml</import>
 	</macros>
 	<expand macro="requirements" />
 	<command>
 mkdir output; cd output;
 @BINARY@
-#if $cutoff != 2
-  --cutoff=$cutoff
-#fi
-$variable_coverage
-@THREADS@
 $countingtable_to_load
-#for input in $inputs
+#for input in inputs
  $input
 #end for
 	</command>
 
 	<inputs>
 		<expand macro="input_sequences_filenames" />
-		<param	name="variable_coverage"
-			type="boolean"
-			checked="false"
-			truevalue="--variable-coverage"
-			falsevalue=""
-			label="Variable coverage"
-			help="Only trim when a sequence has high enough coverage (median abundance > 20)" />
-		<param	name="cutoff"
-			type="integer"
-			value="2"
-			label="cutoff"
-			help="Trim at k-mers below this abundance." />
 		<expand macro="input_counting_table_filename" />	
 	</inputs>
 	<outputs>
@@ -51,15 +34,12 @@ $countingtable_to_load
 		<exit_code	range="1:"
 				level="fatal" />
 	</stdio>
-        <tests>
+	<!--        <tests>
                 <test interactor="api">
                         <param name="inputs" value="test-abund-read-2.fa" />
                         <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
                         <output name="output">
 				<discover_dataset name="test-abund-read-2.fa.abundfilt">
-                                	<assert_contents>
-                                        	<has_text text="GGTTGACGGGGCTCAGGG" />
-                                	</assert_contents>
 				</discover_dataset>
                         </output>
                 </test>
@@ -75,7 +55,7 @@ $countingtable_to_load
 				</discover_dataset>
                         </output>
                 </test>
-        </tests> 
+	</tests> -->
 	<!-- [OPTIONAL] ReST Help displayed in Galaxy -->
     <!--
 	<help>
