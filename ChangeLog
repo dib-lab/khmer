@@ -1,3 +1,7 @@
+2014-07-10 Joe Stein <joeaarons@gmail.com>
+
+    * sandbox/readstats.py: fixed divide-by-zero error, issue #458
+
 2014-07-06  Titus Brown <t@idyll.org>
 
     * doc/release.txt: fix formatting.
