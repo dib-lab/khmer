@@ -1,0 +1,75 @@
+<tool	id="gedlab-khmer-extract-partitions"
+	name="Extract partitions"
+	version="1.1-1"
+	force_history_refresh="true">
+	
+	<description>
+		Separate sequences that are annotated with partitions into grouped files.
+	</description>
+        <macros>
+                <token name="@BINARY@">extract-partitions.py</token>
+                <import>macros.xml</import>
+        </macros>
+        <expand macro="requirements" />
+	<command>
+mkdir -p output ;
+cd output ;
+@BINARY@
+--max-size $max_size
+--min-partition-size $min_partition_size
+$output_unasssigned
+output
+#for input in $inputs
+$input
+#end for ;
+mv output.dist $distribution
+	</command>
+
+	<inputs>
+		<expand macro="input_sequences_filenames" />
+		<param	name="max_size"
+			type="integer"
+			label="Max group size"
+			help="No more than this many number of sequences will be stored in each output"
+			value="1000000" />
+		<param	name="min_partition_size"
+			type="integer"
+			label="Min partition size"
+			help="The minimum partition size worth keeping"
+			value="5" />
+		<param	name="output_unassigned"
+			type="boolean"
+			checked="false"
+			truevalue="--output-unassigned"
+			falsevalue=""
+			label="Output unassigned sequences" />
+	</inputs>
+	<outputs>
+		<data	name="distribution"
+			format="text"
+			label="Partition size distribution from ${tool.name}" />
+		<expand macro="output_sequences" />
+	</outputs>
+ 	<stdio>
+        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
+		<exit_code	range="1:"
+				level="fatal" />
+	</stdio>
+	
+	<tests>
+		<test interactor="api">
+			<param name="inputs" value="random-20-a.fa.part"/>
+			<output name="distribution">
+				<assert_contents>
+					<has_line_matching expression="'99 1 1 99" />
+				</assert_contents>
+			</output>
+		</test>
+
+	</tests>
+    <!-- [OPTIONAL] Help displayed in Galaxy -->
+    <!--
+	<help>
+	</help>
+    -->    
+</tool>
