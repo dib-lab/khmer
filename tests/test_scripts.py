@@ -535,9 +535,7 @@ def test_count_median():
     data = set(data)
     assert len(data) == 2, data
     assert 'seq 1001 1001.0 0.0 18' in data
-    assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
-
-#
+    assert '895:1:37:17593:9954/1 1 103.803741455 303.702362061 114' in data
 
 
 def test_load_graph():

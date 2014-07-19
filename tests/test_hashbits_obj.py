@@ -292,7 +292,7 @@ def test_save_load_tagset():
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 26, len(data)
+    assert len(data) == 22, len(data)
 
 
 def test_save_load_tagset_noclear():
@@ -314,7 +314,7 @@ def test_save_load_tagset_noclear():
     fp = open(outfile, 'rb')
     data = fp.read()
     fp.close()
-    assert len(data) == 34, len(data)
+    assert len(data) == 30, len(data)
 
 
 @attr('highmem')
