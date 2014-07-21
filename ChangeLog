@@ -1,3 +1,8 @@
+2014-07-21  Titus Brown <t@idyll.org>
+
+    * sandbox/saturate-by-median.py: introduce new sandbox script for
+	saturation analysis of low-coverage data sets.
+
 2014-07-10 Joe Stein <joeaarons@gmail.com>
 
     * sandbox/readstats.py: fixed divide-by-zero error, issue #458
