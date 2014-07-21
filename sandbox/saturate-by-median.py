@@ -7,12 +7,9 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Eliminate reads with median k-mer abundance higher than
-DESIRED_COVERAGE.  Output sequences will be placed in 'infile.keep'.
-
-% python scripts/normalize-by-median.py [ -C <cutoff> ] <data1> <data2> ...
-
-Use '-h' for parameter help.
+Count saturation curve for reads with a coverage of 1, but collect
+reads whether or not they have high coverage.  This is better for
+assessing saturation of (esp) low-coverage data sets.
 """
 
 import sys
@@ -26,7 +23,7 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
 import argparse
 from khmer.file import (check_space, check_space_for_hashtable,
                         check_valid_file_exists)
-DEFAULT_DESIRED_COVERAGE = 10
+DEFAULT_DESIRED_COVERAGE = 1
 
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
 # http://arxiv.org/abs/1309.2975
@@ -148,21 +145,21 @@ def get_parser():
 
     Example::
 
-        normalize-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
+        saturate-by-median.py -k 17 tests/test-data/test-abund-read-2.fa
 
     Example::
 
-""" "        normalize-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa"  # noqa
+""" "        saturate-by-median.py -p -k 17 tests/test-data/test-abund-read-paired.fa"  # noqa
     """
 
     Example::
 
-""" "        normalize-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq"  # noqa
+""" "        saturate-by-median.py -k 17 -f tests/test-data/test-error-reads.fq tests/test-data/test-fastq-reads.fq"  # noqa
     """
 
     Example::
 
-""" "        normalize-by-median.py -k 17 -d 2 -s test.ct tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads")   # noqa
+""" "        saturate-by-median.py -k 17 -d 2 -s test.ct tests/test-data/test-abund-read-2.fa tests/test-data/test-fastq-reads")   # noqa
     parser = build_counting_args(
         descr="Do digital normalization (remove mostly redundant sequences)",
         epilog=textwrap.dedent(epilog))
@@ -192,7 +189,7 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
-    info('normalize-by-median.py', ['diginorm'])
+    info('saturate-by-median.py', ['diginorm'])
     args = get_parser().parse_args()
 
     report_on_config(args)
