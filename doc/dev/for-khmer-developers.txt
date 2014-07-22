@@ -1,0 +1,10 @@
+A guide for khmer committers
+============================
+
+If you have commit privileges to the ged-lab/khmer repository, here are a
+few useful tips.
+
+First, never merge something unless it's been through a review!
+
+Second, you can authorize a continuous integration run on someone
+else's pull request by putting "ok to test" in the comments.
