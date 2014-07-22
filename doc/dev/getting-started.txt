@@ -127,11 +127,53 @@ Claiming an issue and starting to develop
 
    This will be issue dependent ;).
 
+#. Run the tests and/or build the docs _after_ your changes have been committed::
+
+      make doc test
+
+   Make sure they all pass!
+
 #. Push your branch to your own github fork::
 
       git push origin
 
    (This pushes all of your changes to your own fork.)
 
-#. Set up a Pull Request.
+#. Repeat until you're ready to merge your changes into "official" khmer.
 
+#. Set up a Pull Request asking to merge things into the central khmer repository.
+
+   Go to your github fork of khmer, e.g.::
+
+      https://github.com/empty-titus/khmer
+
+   and you will see a list of "recently pushed branches" just above the
+   source code listing.  On the right side of that should be a
+   "Compare & pull request" green button.  Click on it!
+
+   You should now have a title and comment box; add a descriptive title and
+   put a link to the issue in by saying something like "fixes issue #532".
+   This will automagically link to the khmer issue tracker.
+
+   Click "create pull request".  This creates a new issue where we can
+   all discuss your proposed changes; the khmer team will be automatically
+   notified and you will receive e-mail notifications as we add comments.
+
+   (A "pull request", or PR, is a request to the khmer team to merge
+   your changes into the khmer repository; see `GitHub flow
+   <http://scottchacon.com/2011/08/31/github-flow.html>`__ for more
+   info.)
+
+#. The khmer team will now review your merge request and communicate
+   with you through the pull request page.  Please feel free to add
+   'ping!' in the comments if you are looking for feedback -- this
+   will alert us that you are still on the line -- but we will automatically
+   get notified of your pull request and any new comments, so use sparingly.
+
+   If this is still your first issue, please *don't* take another issue until
+   we've merged your first one - thanks!
+
+#. If we request changes, return to the step "Make some changes and
+   commit them" and go from there.  Any additional commits you make and
+   push to your branch will automatically be added to the pull request
+   (which is pretty dang cool.)
