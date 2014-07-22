@@ -11,4 +11,10 @@ Contents:
    codebase-guide
    coding-guidelines-and-review
    for-khmer-developers
+   release
 
+   design
+   details
+   development
+   galaxy
+   crazy-ideas

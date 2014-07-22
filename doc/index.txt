@@ -45,22 +45,10 @@ Contents:
    :maxdepth: 1
 
    introduction
-   install
-   examples
-   guide
-   scripts
-   blog-posts
-   choosing-table-sizes
-   partitioning-big-data
-   design
-   details
-   development
-   galaxy
-   known-issues
-   release
-   crazy-ideas
    contributors
-   biblio
+
+   user/index
+   dev/index
 
    LICENSE
 

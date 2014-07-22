@@ -12,7 +12,7 @@ working!
   does mean that at least most of the code works at some basic level.
 
 * we have other tests that we run periodically (for example, before
-  each release) -- see :doc:`../release` for details.  These tests
+  each release) -- see :doc:`release` for details.  These tests
   check that our code works on multiple systems and with other
   people's software.
 
