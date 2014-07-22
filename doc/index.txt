@@ -14,6 +14,8 @@ khmer -- k-mer counting & filtering FTW
 :Contact: khmer-project@idyll.org
 :License: BSD
 
+July 2014 HACKATHON!
+
 khmer is a library and suite of command line tools for working with
 DNA sequence.  It is primarily aimed at short-read sequencing data
 such as that produced by the Illumina platform.  khmer takes a k-mer-centric
