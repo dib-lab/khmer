@@ -39,6 +39,8 @@ def get_parser():
                         nargs='+', help='input FAST[AQ] sequence filename')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('--write-fp-rate', '-w', action='store_true',
+                        help="Write fp rate information into ")                
     return parser
 
 
@@ -100,10 +102,13 @@ def main():
         htable.save_tagset(base + '.tagset')
 
     info_fp = open(base + '.info', 'w')
-    info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
+    info_fp.write('%d unique k-mers\n' % htable.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
+    if args.write_fp_rate:
+        print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
+
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print >> sys.stderr, "**"
         print >> sys.stderr, ("** ERROR: the graph structure is too small for "
