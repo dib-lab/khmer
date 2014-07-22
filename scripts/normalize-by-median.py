@@ -71,10 +71,14 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
             print '... in file', input_filename
 
             if report_fp:
-                print >> report_fp, total, total - discarded, \
+                floated-total=float(total)
+                if floated-total=0.0: 
+                   print >>'Division by zero'
+                   sys.exit(0)
+                else:
+                   print >> report_fp, total, total - discarded, \
                     1. - (discarded / float(total))
-                report_fp.flush()
-
+                   report_fp.flush()
         total += batch_size
 
         # If in paired mode, check that the reads are properly interleaved
