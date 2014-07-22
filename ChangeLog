@@ -1,3 +1,6 @@
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
+
+   * tests/test_subset_graph.py: decrease the amount of memory that is being requested for the hash tables in test.
 
 2014-07-22  Jim Stapleton <jas@msu.edu>
 
