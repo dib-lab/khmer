@@ -77,7 +77,7 @@ Building khmer and running the tests
 
    If this fails, we apologize -- please `go create a new issue
    <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__,
-   paste in the failure message, and we'll try to hep you work through it!
+   paste in the failure message, and we'll try to help you work through it!
 
    (This takes the C++ source code and compiles it into something that Python
    can run.)
@@ -135,7 +135,16 @@ Claiming an issue and starting to develop
 
    You will need to visit and revisit :doc:`coding-guidelines-and-review`.
 
-#. Run the tests and/or build the docs _after_ your changes have been committed::
+#. Periodically update your branch from the main khmer master branch::
+
+      git checkout master
+      git pull ged master
+
+   (This pulls in all of the latest changes from whatever we've been
+   doing on ged-lab - important especially during periods of fast change
+   or for long-running pull requests.
+
+#. Run the tests and/or build the docs *before* pushing to github::
 
       make doc test
 
@@ -149,7 +158,8 @@ Claiming an issue and starting to develop
 
 #. Repeat until you're ready to merge your changes into "official" khmer.
 
-#. Set up a Pull Request asking to merge things into the central khmer repository.
+#. Set up a Pull Request asking to merge things into the central khmer
+   repository.
 
    Go to your github fork of khmer, e.g.::
 
@@ -170,7 +180,10 @@ Claiming an issue and starting to develop
    (A "pull request", or PR, is a request to the khmer team to merge
    your changes into the khmer repository; see `GitHub flow
    <http://scottchacon.com/2011/08/31/github-flow.html>`__ for more
-   info.)
+   info.
+
+   Note that you can push multiple changes to a single pull request,
+   and that pull requests can be progressive.)
 
 #. The khmer team will now review your merge request and communicate
    with you through the pull request page.  Please feel free to add
