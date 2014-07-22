@@ -45,7 +45,7 @@ def cleanup():
     cleanup_list = []
 
 
-def _runscript(scriptname, sandbox):
+def _runscript(scriptname, sandbox=False):
     import pkg_resources
     ns = {"__name__": "__main__"}
     ns['sys'] = globals()['sys']
@@ -97,7 +97,7 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False, sandbox=False)
         try:
             print 'running:', scriptname, 'in:', in_directory
             print 'arguments', sysargs
-            status = _runscript(scriptname, sandbox)
+            status = _runscript(scriptname, sandbox=sandbox)
         except nose.SkipTest:
             raise
         except SystemExit, e:

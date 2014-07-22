@@ -39,7 +39,7 @@ def test_sweep_reads():
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
-    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True,sandbox=True)
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -80,7 +80,7 @@ def test_sweep_reads_fq():
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
-    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True,sandbox=True)
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -126,7 +126,7 @@ def test_sweep_reads_2():
     script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
             'test', '--label-by-seq', inref, infile]
-    status, out, err = utils.runscript(script, args, wdir,sandbox=True)
+    status, out, err = utils.runscript(script, args, wdir, sandbox=True)
 
     for i in xrange(99):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
@@ -146,7 +146,7 @@ def test_sweep_reads_3():
     script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
             'test', '--label-by-group', '10', infile, infile]
-    status, out, err = utils.runscript(script, args, wdir,sandbox=True)
+    status, out, err = utils.runscript(script, args, wdir, sandbox=True)
 
     for i in xrange(10):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
