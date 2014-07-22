@@ -40,7 +40,7 @@ def get_parser():
         filter-abund.py -C 2 table.kh data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(
-        descr='Trim sequences at a minimum k-mer abundance.',
+        description='Trim sequences at a minimum k-mer abundance.',
         epilog=textwrap.dedent(epilog),
         formatter_class=ComboFormatter)
     parser.add_argument('input_table', metavar='input_presence_table_filename',
