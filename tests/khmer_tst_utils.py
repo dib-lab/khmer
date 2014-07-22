@@ -95,6 +95,8 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False, sandbox=False)
             os.chdir(in_directory)
 
         try:
+            print 'running:', scriptname, 'in:', in_directory
+            print 'arguments', sysargs
             status = _runscript(scriptname, sandbox)
         except nose.SkipTest:
             raise
