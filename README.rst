@@ -69,5 +69,6 @@ khmer project contributors also edit documents collaboratively at `our wiki
 
 MRC 2014-05-14
 
-.. vim: set filetype=rst
+Random change.
 
+.. vim: set filetype=rst
