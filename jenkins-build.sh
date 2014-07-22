@@ -4,7 +4,13 @@ make clean
 
 rm -Rf .env dist cov-int
 
-virtualenv .env
+if type python2> /dev/null 2>&1
+then
+    PYTHON_EXECUTABLE=$(which python2)
+else
+    PYTHON_EXECUTABLE=$(which python)
+fi
+virtualenv -p ${PYTHON_EXECUTABLE} .env
 
 . .env/bin/activate
 make install-dependencies
