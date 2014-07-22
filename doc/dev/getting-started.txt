@@ -5,6 +5,12 @@ Start by making your own copy of khmer and setting yourself up for
 development; then, build khmer and run the tests; and finally, claim
 an issue and start developing!
 
+If you're unfamiliar with git and branching in particular, check out
+the `git-scm book <http://git-scm.com/book/en/Git-Branching>`__.
+
+We've provided a quick guide to the khmer code base here:
+:doc:`codebase-guide`.
+
 One-time Preparation
 --------------------
 
@@ -126,6 +132,8 @@ Claiming an issue and starting to develop
 #. Make some changes and commit them.
 
    This will be issue dependent ;).
+
+   You will need to visit and revisit :doc:`coding-guidelines-and-review`.
 
 #. Run the tests and/or build the docs _after_ your changes have been committed::
 

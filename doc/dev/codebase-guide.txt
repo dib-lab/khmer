@@ -1,0 +1,14 @@
+A quick guide to the khmer codebase
+===================================
+
+The ChangeLog file lists changes to the codebase, most recent first.
+
+The lib/ directory contains all of the C++ code.
+
+The khmer/ directory contains the khmer package (khmer/khmer/__init__.py etc)
+and the C++-to-Python bridge (khmer/_khmermodule.cc).
+
+The scripts/ and sandbox/ directory contain command-line scripts.
+
+The tests/ directory contains all of the tests.
+
