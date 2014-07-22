@@ -1,0 +1,28 @@
+package:
+  name: khmer-deps
+  version: 1.1
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - nose
+    - zlib
+    - bzip2
+    - python
+    - screed
+    - setuptools
+  run:
+    - nose
+    - zlib
+    - bzip2
+    - python
+    - screed
+    - setuptools
+
+about:
+  home: https://github.com/ged-lab/khmer
+  license: BSD
+
+# vim:set ts=8 sw=2 sts=2 tw=78 et:

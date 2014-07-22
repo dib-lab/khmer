@@ -1,0 +1,26 @@
+package:
+  name: screed
+  version: 0.7.1
+
+source:
+  fn: screed-v0.7.1.zip
+  url: https://github.com/ged-lab/screed/archive/v0.7.1.zip
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - python
+  run:
+    - python
+
+test:
+  imports:
+    - screed
+
+about:
+  home: https://github.com/ged-lab/screed
+  license: BSD
+
+# vim:set ts=8 sw=2 sts=2 tw=78 et:

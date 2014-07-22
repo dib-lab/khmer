@@ -1,0 +1,31 @@
+package:
+  name: khmer
+  version: 1.1
+
+source:
+  fn: khmer-v1.1.zip
+  url: https://github.com/tpn/khmer/archive/v1.1.zip
+  patches:
+    - setup.cfg.patch
+    - khmer_tst_utils.py.patch
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - khmer-deps
+  run:
+    - khmer-deps
+
+test:
+  imports:
+    - khmer
+  commands:
+    - nosetests khmer --attr '!known_failing'
+
+about:
+  home: https://github.com/ged-lab/khmer
+  license: BSD
+
+# vim:set ts=8 sw=2 sts=2 tw=78 et:
