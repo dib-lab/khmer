@@ -43,3 +43,55 @@ implement the probabilistic k-mer counting described in:
    Zhang Q, Pell J, Canino-Koning R, Howe AC, Brown CT.
    arXiv:1309.2975 [q-bio.GN]
    http://arxiv.org/abs/1309.2975
+
+
+BibTeX for each citation
+------------------------
+
+Software citation
+-----------------
+
+@article{Brown2014,
+author = "C. Titus Brown and Michael R. Crusoe",
+title = "{The khmer software package: enabling efficient sequence analysis}",
+year = "2014",
+month = "04",
+url = "http://dx.doi.org/10.6084/m9.figshare.979190"
+}
+
+Graph partitioning and/or compressible graph representation
+-----------------------------------------------------------
+
+@article{Pell2012,
+author = {Pell, Jason and Hintze, Arend and Canino-Koning, Rosangela and Howe, Adina and Tiedje, James M. and Brown, C. Titus}, 
+title = {Scaling metagenome sequence assembly with probabilistic de Bruijn graphs},
+volume = {109}, 
+number = {33}, 
+pages = {13272-13277}, 
+year = {2012}, 
+doi = {10.1073/pnas.1121464109}, 
+abstract ={Deep sequencing has enabled the investigation of a wide range of environmental microbial ecosystems, but the high memory requirements for de novo assembly of short-read shotgun sequencing data from these complex populations are an increasingly large practical barrier. Here we introduce a memory-efficient graph representation with which we can analyze the k-mer connectivity of metagenomic samples. The graph representation is based on a probabilistic data structure, a Bloom filter, that allows us to efficiently store assembly graphs in as little as 4 bits per k-mer, albeit inexactly. We show that this data structure accurately represents DNA assembly graphs in low memory. We apply this data structure to the problem of partitioning assembly graphs into components as a prelude to assembly, and show that this reduces the overall memory requirements for de novo assembly of metagenomes. On one soil metagenome assembly, this approach achieves a nearly 40-fold decrease in the maximum memory requirements for assembly. This probabilistic graph representation is a significant theoretical advance in storing assembly graphs and also yields immediate leverage on metagenomic assembly.}, 
+URL = {http://www.pnas.org/content/109/33/13272.abstract}, 
+eprint = {http://www.pnas.org/content/109/33/13272.full.pdf+html}, 
+journal = {Proceedings of the National Academy of Sciences} 
+
+Digital normalization
+----------------------
+
+@misc{Brown2012
+Author = {C. Titus Brown and Adina Howe and Qingpeng Zhang and Alexis B. Pyrkosz and Timothy H. Brom},
+Title = {A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data},
+Year = {2012},
+Eprint = {arXiv:1203.4802},
+}
+
+K-mer counting
+--------------
+
+@misc{Zhang2013
+Author = {Qingpeng Zhang and Jason Pell and Rosangela Canino-Koning and Adina Chuang Howe and C. Titus Brown},
+Title = {These are not the k-mers you are looking for: efficient online k-mer counting using a probabilistic data structure},
+Year = {2013},
+Eprint = {arXiv:1309.2975},
+}
+
