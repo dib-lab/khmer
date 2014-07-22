@@ -15,7 +15,7 @@ MAX_COUNT = 255
 
 
 def test_no_collision():
-    kh = khmer.new_hashtable(4, 86)
+    kh = khmer.new_hashtable(4, 4)
 
     kh.count('AAAA')
     assert kh.get('AAAA') == 1
@@ -25,7 +25,7 @@ def test_no_collision():
 
 
 def test_collision():
-    kh = khmer.new_hashtable(4, 85)
+    kh = khmer.new_hashtable(4, 4)
 
     kh.count('AAAA')
     assert kh.get('AAAA') == 1
@@ -35,7 +35,7 @@ def test_collision():
 
 
 def test_badcount():
-    countingtable = khmer.new_hashtable(4, 85)
+    countingtable = khmer.new_hashtable(4, 4)
     try:
         countingtable.count()
         assert 0, "count should require one argument"
@@ -49,7 +49,7 @@ def test_badcount():
 
 
 def test_hashtable_n_entries():
-    countingtable = khmer.new_hashtable(4, 4 ** 4)
+    countingtable = khmer.new_hashtable(4, 4)
     try:
         countingtable.n_entries("nope")
         assert 0, "n_entries should accept no arguments"
@@ -58,7 +58,7 @@ def test_hashtable_n_entries():
 
 
 def test_complete_no_collision():
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4 ** 2)
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)
@@ -84,7 +84,7 @@ def test_complete_no_collision():
 
 
 def test_complete_2_collision():
-    kh = khmer.new_hashtable(4, 4 ** 4 / 2)
+    kh = khmer.new_hashtable(4, 4)
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)
@@ -105,7 +105,7 @@ def test_complete_2_collision():
 
 
 def test_complete_4_collision():
-    kh = khmer.new_hashtable(4, 4 ** 4 / 4)
+    kh = khmer.new_hashtable(4, 2)
 
     for i in range(0, kh.n_entries()):
         s = khmer.reverse_hash(i, 4)
@@ -127,7 +127,7 @@ def test_complete_4_collision():
 
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     last_count = None
     for _ in range(0, 10000):
@@ -145,7 +145,7 @@ def test_maxcount():
 
 def test_maxcount_with_bigcount():
     # hashtable should not saturate, if use_bigcount is set.
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
     kh.set_use_bigcount(True)
 
     last_count = None
@@ -163,7 +163,7 @@ def test_maxcount_with_bigcount():
 
 
 def test_consume_uniqify_first():
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     s = "TTTT"
     s_rc = "AAAA"
@@ -175,7 +175,7 @@ def test_consume_uniqify_first():
 
 def test_maxcount_consume():
     # hashtable should saturate at some point so as not to overflow counter
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     s = "A" * 10000
     kh.consume(s)
@@ -186,7 +186,7 @@ def test_maxcount_consume():
 
 def test_maxcount_consume_with_bigcount():
     # use the bigcount hack to avoid saturating the hashtable.
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
     kh.set_use_bigcount(True)
 
     s = "A" * 10000
@@ -197,7 +197,7 @@ def test_maxcount_consume_with_bigcount():
 
 
 def test_get_mincount():
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     s = "AAAAACGT"
     kh.consume(s)
@@ -211,7 +211,7 @@ def test_get_mincount():
 
 
 def test_get_maxcount():
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     s = "AAAAACGT"
     kh.consume(s)
@@ -225,7 +225,7 @@ def test_get_maxcount():
 
 
 def test_get_maxcount_rc():
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     s = "AAAAACGT"
     src = "ACGTTTTT"
@@ -240,7 +240,7 @@ def test_get_maxcount_rc():
 
 
 def test_get_mincount_rc():
-    kh = khmer.new_hashtable(4, 4 ** 4)
+    kh = khmer.new_hashtable(4, 4)
 
     s = "AAAAACGT"
     src = "ACGTTTTT"
@@ -255,7 +255,7 @@ def test_get_mincount_rc():
 
 
 def test_64bitshift():
-    kh = khmer.new_hashtable(25, 4 ** 10)
+    kh = khmer.new_hashtable(25, 4)
     fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"
     substr = "ATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGC"
 
@@ -265,7 +265,7 @@ def test_64bitshift():
 
 @attr('highmem')
 def test_64bitshift_2():
-    kh = khmer.new_hashtable(25, 4 ** 10)
+    kh = khmer.new_hashtable(25, 4)
     fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"
 
     kh.consume(fullstr)
@@ -277,12 +277,12 @@ def test_64bitshift_2():
 @attr('highmem')
 def test_very_short_read():
     short_filename = utils.get_test_data('test-short.fa')
-    kh = khmer.new_hashtable(9, 4 ** 4 + 1)
+    kh = khmer.new_hashtable(9, 4)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
     assert n_reads == 1
     assert n_kmers == 0
 
-    kh = khmer.new_hashtable(8, 4 ** 4 + 1)
+    kh = khmer.new_hashtable(8, 4)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
     assert n_reads == 1
     assert n_kmers == 1
@@ -389,7 +389,7 @@ class Test_ConsumeString(object):
 class Test_AbundanceDistribution(object):
 
     def setup(self):
-        self.kh = khmer.new_hashtable(4, 4 ** 4)
+        self.kh = khmer.new_hashtable(4, 4)
         A_filename = utils.get_test_data('all-A.fa')
         self.kh.consume_fasta(A_filename)
 
@@ -397,7 +397,7 @@ class Test_AbundanceDistribution(object):
     def test_count_A(self):
         A_filename = utils.get_test_data('all-A.fa')
 
-        tracking = khmer.new_hashbits(4, 4 ** 4, 1)
+        tracking = khmer.new_hashbits(4, 4, 1)
         dist = self.kh.abundance_distribution(A_filename, tracking)
 
         assert sum(dist) == 1
