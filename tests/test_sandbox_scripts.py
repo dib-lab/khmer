@@ -27,68 +27,6 @@ def scriptpath(script):
 def teardown():
     utils.cleanup()
 
-
-def _runsandbox(scriptname):
-    ns = {"__name__": "__main__"}
-    ns['sys'] = globals()['sys']
-
-    path = os.path.join(os.path.dirname(__file__), "../sandbox")
-    scriptfile = os.path.join(path, scriptname)
-    if os.path.isfile(scriptfile):
-        execfile(scriptfile, ns)
-        return 0
-
-    raise nose.SkipTest("sandbox tests are only run in a repository.")
-
-
-def runsandbox(scriptname, args, in_directory=None, fail_ok=False):
-    """
-    Run the given Python script, with the given args, in the given directory,
-    using 'execfile'.
-    """
-    sysargs = [scriptname]
-    sysargs.extend(args)
-
-    cwd = os.getcwd()
-
-    try:
-        status = -1
-        oldargs = sys.argv
-        sys.argv = sysargs
-
-        oldout, olderr = sys.stdout, sys.stderr
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
-
-        if in_directory:
-            os.chdir(in_directory)
-
-        try:
-            print 'running:', scriptname, 'in:', in_directory
-            print 'arguments', sysargs
-            status = _runsandbox(scriptname)
-        except nose.SkipTest:
-            raise
-        except SystemExit, e:
-            status = e.code
-        except:
-            traceback.print_exc(file=sys.stderr)
-            status = -1
-    finally:
-        sys.argv = oldargs
-        out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
-        sys.stdout, sys.stderr = oldout, olderr
-
-        os.chdir(cwd)
-
-    if status != 0 and not fail_ok:
-        print out
-        print err
-        assert False, (status, out, err)
-
-    return status, out, err
-
-
 def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
@@ -101,7 +39,7 @@ def test_sweep_reads():
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
-    status, out, err = runsandbox(script, args, in_dir, fail_ok=True)
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True,sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -142,7 +80,7 @@ def test_sweep_reads_fq():
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
-    status, out, err = runsandbox(script, args, in_dir, fail_ok=True)
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True,sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -188,7 +126,7 @@ def test_sweep_reads_2():
     script = scriptpath('sweep-reads.py')
     args = ['-m', '50', '-k', '20', '-l', '9', '-b', '60', '--prefix',
             'test', '--label-by-seq', inref, infile]
-    status, out, err = runsandbox(script, args, wdir)
+    status, out, err = utils.runscript(script, args, wdir,sandbox=True)
 
     for i in xrange(99):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
@@ -208,7 +146,7 @@ def test_sweep_reads_3():
     script = scriptpath('sweep-reads.py')
     args = ['-m', '75', '-k', '20', '-l', '1', '--prefix',
             'test', '--label-by-group', '10', infile, infile]
-    status, out, err = runsandbox(script, args, wdir)
+    status, out, err = utils.runscript(script, args, wdir,sandbox=True)
 
     for i in xrange(10):
         p = os.path.join(wdir, 'test_{i}.fa'.format(i=i))
