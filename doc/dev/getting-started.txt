@@ -200,6 +200,13 @@ But! You can now do a couple of things!
   Please visit the issues list and browse about and find something
   interesting looking.
 
+* One general thing we'd like to do is increase our test coverage.
+  You can go find test coverage information `on our continuous
+  integration server
+  <http://ci.ged.msu.edu/job/khmer-master/label=linux/cobertura>`__ by
+  clicking down to individual files; or, ask us on
+  khmer-project@idyll.org for suggestions.
+
 * You can help other people out by watching for new issues or looking at
   pull requests.  Remember to be nice and polite!
 
