@@ -1,34 +1,38 @@
-
-2014-07-22  Jim Stapleton <jas@msu.edu>
+2014-07-22  Jim Stapleton  <jas@msu.edu>
 
     * scripts/filter-abund.py: no longer asks for parameters that are unused, issue #524
 
-2014-07-22  Jeramia Ory <jeramia.ory@gmail.com>
+2014-07-22  Jeramia Ory  <jeramia.ory@gmail.com>
 
     * khmer/_khmermodule.cc: removed unused KhmerError, issue #503
 
-2014-07-22 Leonor Garcia-Gutierrez <l.garcia-gutierrez@warwick.ac.uk>
+2014-07-22  Rodney Picett  <pickett.rodney@gmail.com>
+
+    * removed assign function from scoringmatrix, issue #502
+ 
+2014-07-22  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
+
     * reduced memory requirements in test_counting_single.py
     
-2014-07-21  Titus Brown <t@idyll.org>
+2014-07-21  Titus Brown  <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
 	saturation analysis of low-coverage data sets.
 
-2014-07-10 Joe Stein <joeaarons@gmail.com>
+2014-07-10  Joe Stein  <joeaarons@gmail.com>
 
     * sandbox/readstats.py: fixed divide-by-zero error, issue #458
 
-2014-07-06  Titus Brown <t@idyll.org>
+2014-07-06  Titus Brown  <t@idyll.org>
 
     * doc/release.txt: fix formatting.
 
-2014-06-20 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
+2014-06-20  Chuck Pepe-Ranney  <chuck.peperanney@gmail.com>
 
     * scripts/extract-partitions.py: added epilog documentation for 
 	<base>.dist columns.
 
-2014-06-20  Michael R. Crusoe <mcrusoe@msu.edu>
+2014-06-20  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/release.txt: Add Coverity Scan to release checklist
 
