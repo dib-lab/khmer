@@ -7,11 +7,18 @@
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
+DEVPKGS=sphinxcontrib-autoprogram pep8==1.5 diff_cover autopep8 \
+		 pylint coverage gcovr nose 
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
 
 all: khmer/_khmermodule.so
+
+install-dependencies:
+	pip2 install --user --upgrade $(DEVPKGS) || pip2 install --upgrade \
+		$(DEVPKGS) || pip install --user --upgrade $(DEVPKGS) || pip \
+		install --upgrade $(DEVPKGS)
 
 khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
@@ -45,8 +52,6 @@ debug: FORCE
 doc: build/sphinx/html/index.html
 
 build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
-	pip2 install --user sphinx sphinxcontrib-autoprogram || pip2 install \
-		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env
 	@echo ''
 	@echo '--> docs in build/sphinx/html <--'
@@ -55,8 +60,6 @@ build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
 pdf: build/sphinx/latex/khmer.pdf
 
 build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
-	pip2 install --user sphinx sphinxcontrib-autoprogram || pip2 install \
-		sphinx sphinxcontrib-autoprogram
 	./setup.py build_sphinx --fresh-env --builder latex
 	cd build/sphinx/latex && ${MAKE} all-pdf
 	@echo ''
@@ -74,83 +77,63 @@ cppcheck: $(CPPSOURCES)
 		--file-list=- -j8 --platform=unix64 --std=posix --quiet
 
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pip2 install --user --quiet pep8==1.5 || pip2 install --quiet pep8==1.5
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
 
 pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
-	pip2 install --user --quiet pep8==1.5 || pip2 install --quiet pep8==1.5
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ \
 		> pep8_report.txt || true
 
 diff_pep8_report: pep8_report.txt
-	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-quality --violations=pep8 pep8_report.txt
 
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
-	pip2 install --user autopep8 || pip2 install autopep8
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
 		setup.py khmer/ scripts/ tests/
 
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
-	pip2 install --user pylint || pip2 install pylint
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		|| true
 
 pylint_report.txt: ${PYSOURCES} $(wildcard tests/*.py)
-	pip2 install --user pylint || pip2 install pylint
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
 		> pylint_report.txt || true
 
 diff_pylint_report: pylint_report.txt
-	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-quality --violations=pylint pylint_report.txt
 
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
 .coverage: $(PYSOURCES) $(wildcard tests/*.py)
-	pip2 install --user --upgrade coverage || pip2 install --upgrade \
-		coverage
 	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
 
 coverage.xml: .coverage
-	pip2 install --user --upgrade coverage || pip2 install --upgrade \
-		coverage
 	coverage xml
 
 coverage.html: htmlcov/index.html
 
 htmlcov/index.html: .coverage
-	pip2 install --user --upgrade coverage || pip2 install --upgrade \
-		coverage
 	coverage html
 	@echo Test coverage of the Python code is now in htmlcov/index.html
 
 coverage-report: .coverage
-	pip2 install --user --upgrade coverage || pip2 install --upgrade \
-		coverage
 	coverage report
 
 coverage-gcovr.xml: coverage-debug .coverage
-	pip2 install --user --upgrade ${GCOVRURL}'#gcovr' || pip2 install \
-		--upgrade ${GCOVRURL}'#gcovr'
 	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
 		--output=coverage-gcovr.xml
 
 diff-cover: coverage-gcovr.xml coverage.xml
-	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-cover coverage-gcovr.xml coverage.xml
 
 diff-cover.html: coverage-gcovr.xml coverage.xml
-	pip2 install --user diff_cover || pip2 install diff_cover
 	diff-cover coverage-gcovr.xml coverage.xml \
 		--html-report diff-cover.html
 
 nosetests.xml: FORCE
-	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests --with-xunit
 
 doxygen: doc/doxygen/html/index.html
@@ -166,7 +149,6 @@ lib:
 	$(MAKE)
 
 test:
-	pip2 install --user nose || pip2 install nose
 	./setup.py nosetests
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
