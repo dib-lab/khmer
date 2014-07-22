@@ -72,7 +72,8 @@ def _runscript(scriptname, sandbox=False):
     return -1
 
 
-def runscript(scriptname, args, in_directory=None, fail_ok=False, sandbox=False):
+def runscript(scriptname, args, in_directory=None,
+              fail_ok=False, sandbox=False):
     """
     Run the given Python script, with the given args, in the given directory,
     using 'execfile'.

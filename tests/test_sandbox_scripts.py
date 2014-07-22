@@ -27,6 +27,7 @@ def scriptpath(script):
 def teardown():
     utils.cleanup()
 
+
 def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')
     contigfile = utils.get_temp_filename('contigs.fp')
@@ -39,7 +40,8 @@ def test_sweep_reads():
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
-    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True, sandbox=True)
+    status, out, err = utils.runscript(
+        script, args, in_dir, fail_ok=True, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
@@ -80,7 +82,8 @@ def test_sweep_reads_fq():
     args = ['-k', '25', '--prefix', 'test', '--label-by-pid',
             contigfile, readfile, 'junkfile.fa']
 
-    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True, sandbox=True)
+    status, out, err = utils.runscript(
+        script, args, in_dir, fail_ok=True, sandbox=True)
 
     # check if the bad file was skipped without issue
     assert 'ERROR' in err, err
