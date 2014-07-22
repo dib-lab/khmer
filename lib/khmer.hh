@@ -58,7 +58,7 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #   define MIN( a, b )	(((a) > (b)) ? (b) : (a))
 #   define MAX( a, b )	(((a) < (b)) ? (b) : (a))
 
-#include <khmer_exception.hh>
+#include "khmer_exception.hh"
 namespace khmer
 {
 // largest number we can count up to, exactly. (8 bytes)
@@ -79,7 +79,7 @@ typedef void (*CallbackFn)(const char * info, void * callback_data,
                            unsigned long long n_reads,
                            unsigned long long other);
 
-struct InvalidStreamBuffer : public std:: exception {
+struct InvalidStreamBuffer : public khmer_exception {
 };
 
 

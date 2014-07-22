@@ -9,6 +9,7 @@
 #define KHMER_EXCEPTION_HH
 
 #include <exception>
+#include <string>
 
 namespace khmer
 {
@@ -21,19 +22,26 @@ namespace khmer
 class khmer_exception : public std::exception
 {
 public:
-    khmer_exception(const char * msg) : _msg(msg) { };
+    explicit khmer_exception(const char * msg) : _msg(msg) { }
+    explicit khmer_exception(const std::string& msg = "Generic khmer exception")
+        : _msg(msg.c_str()) { }
 
-    virtual const char* what() const throw() {
-        return _msg;
-    }
+    virtual ~khmer_exception() throw() { }
+    virtual const char* what() const throw () { return _msg; }
+
 protected:
     const char * _msg;
 };
 
+///
+// A base class for file exceptions.
+//
 class khmer_file_exception : public khmer_exception
 {
 public:
-    khmer_file_exception(const char * msg) : khmer_exception(msg) { };
+    explicit khmer_file_exception(const char * msg) : khmer_exception(msg) { }
+    explicit khmer_file_exception(const std::string& msg)
+        : khmer_exception(msg) { }
 };
 
 }
