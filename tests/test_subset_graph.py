@@ -195,7 +195,7 @@ class Test_SaveLoadPmap(object):
 
     @attr('highmem')
     def test_save_load_merge(self):
-        ht = khmer.new_hashbits(20, 4 ** 10 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 4 + 1)
         filename = utils.get_test_data('test-graph2.fa')
 
         (total_reads, total_kmers) = ht.consume_fasta_and_tag(filename)
