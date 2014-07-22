@@ -54,7 +54,7 @@ For adding tests to **old code**, we recommend a mix of two approaches:
    write tests that recapitulate bugs before we fix those bugs.
 
 #. look at test coverage (see `khmer's cobertura test coverage, here
-   <http://ivory.idyll.org/blog/stupidity-driven-testing.html>`__) and
+   <http://ci.ged.msu.edu/job/khmer-master/label=linux/cobertura>`__) and
    identify lines of C++ or Python code that are not being executed by
    the current tests.  Then write new tests targeting the new code.
 
