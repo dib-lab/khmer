@@ -3,11 +3,6 @@
     * Makefile: combine pip invocation into single "install-dependencies"
     target.
 
-2014-07-22  Michael R. Crusoe <mcrusoe@msu.edu>
-
-    * Makefile: combine pip invocation into single "install-dependencies"
-    target.
-
 2014-07-22  Jim Stapleton  <jas@msu.edu>
 
     * scripts/filter-abund.py: no longer asks for parameters that are unused, issue #524
