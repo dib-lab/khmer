@@ -107,8 +107,10 @@ Claiming an issue and starting to develop
    <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__
    and find one you like; we suggest starting with `the low-hanging fruit issues <https://github.com/ged-lab/khmer/issues?direction=desc&labels=low-hanging-fruit&page=1&sort=created&state=open>`__).
 
-   Once you've found an issue you like, add a comment "I am working on
-   this issue." You've staked your claim!
+   Once you've found an issue you like, make sure that no one has been
+   assigned to it (see "assignee", bottom right near "notifications").
+   Then, add a comment "I am working on this issue." You've staked
+   your claim!
 
    (We're trying to avoid having multiple people working on the same issue.)
 
@@ -137,7 +139,6 @@ Claiming an issue and starting to develop
 
 #. Periodically update your branch from the main khmer master branch::
 
-      git checkout master
       git pull ged master
 
    (This pulls in all of the latest changes from whatever we've been

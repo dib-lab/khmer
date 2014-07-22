@@ -52,7 +52,8 @@ See also `Code reviews: the lab meeting for code
 Checklist
 ---------
 
-Copy and paste the following into a pull-request when it is ready for review::
+Copy and paste the following into a pull request comment when it is
+ready for review::
    
    - [ ] Is it mergable
    - [ ] Did it pass the tests?
@@ -64,6 +65,10 @@ Copy and paste the following into a pull-request when it is ready for review::
    - [ ] Is it documented in the Changelog?
    - [ ] Was spellcheck run on the source code and documentation after changes
      were made?
+
+Note that after you submit the comment you can check and uncheck the
+individual boxes on the formatted comment; no need to put x or y in the
+middle.
 
 Testing
 -------
