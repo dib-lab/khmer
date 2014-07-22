@@ -30,6 +30,13 @@ review. What fun!
 
 To get started, go to :doc:`getting-started`!
 
+You can contact us directly at khmer-project@idyll.org, but if you're
+experience trouble of any kind, please feel to `create an issue
+<https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__
+where we can help you out.  Also keep an eye on `issue #446
+<https://github.com/ged-lab/khmer/issues/446>`__ where we're updating
+hackathon information more generally.
+
 Problems, questions, and solutions
 ----------------------------------
 
