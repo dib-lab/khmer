@@ -166,7 +166,7 @@ lib:
 	$(MAKE)
 
 test:
-	pip2 install --user nose || pip2 install nose
+	pip2 install --user nose || pip2 install --upgrade nose
 	./setup.py nosetests
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
