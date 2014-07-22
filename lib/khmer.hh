@@ -34,8 +34,6 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
 #endif
 
-// C++ standard exceptions are subclassed almost ubiquitously.
-#include <exception>
 #include <set>
 #include <map>
 #include <queue>
@@ -60,6 +58,7 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #   define MIN( a, b )	(((a) > (b)) ? (b) : (a))
 #   define MAX( a, b )	(((a) < (b)) ? (b) : (a))
 
+#include <khmer_exception.hh>
 namespace khmer
 {
 // largest number we can count up to, exactly. (8 bytes)
@@ -115,18 +114,6 @@ void deallocate_ptr_set(T& s)
         delete *i;
     }
 }
-
-class khmer_file_exception : public std::exception
-{
-public:
-    khmer_file_exception(const char * msg) : _msg(msg) { };
-
-    virtual const char* what() const throw() {
-        return _msg;
-    }
-protected:
-    const char * _msg;
-};
 
 class InvalidStreamHandle : public khmer_file_exception
 {
