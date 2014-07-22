@@ -1,0 +1,43 @@
+index faf84d3..aaae37e 100644
+--- tests/khmer_tst_utils.py
++++ tests/khmer_tst_utils.py
+@@ -7,20 +7,19 @@
+ import tempfile
+ import os
+ import shutil
+-from pkg_resources import Requirement, resource_filename, ResolutionError
+ 
++from os.path import (
++    join,
++    abspath,
++    dirname,
++)
++
++# Test data lives in 'test-data' directory, relative to the abspath of this
++# file.
++test_data_dir = join(dirname(abspath(__file__)), 'test-data')
+ 
+ def get_test_data(filename):
+-    filepath = None
+-    try:
+-        filepath = resource_filename(
+-            Requirement.parse("khmer"), "khmer/tests/test-data/" + filename)
+-    except ResolutionError:
+-        pass
+-    if not filepath or not os.path.isfile(filepath):
+-        filepath = os.path.join(os.path.dirname(__file__), 'test-data',
+-                                filename)
+-    return filepath
++    return join(test_data_dir, filename)
+ 
+ cleanup_list = []
+ 
+@@ -30,7 +29,7 @@ def get_temp_filename(filename, tempdir=None):
+         tempdir = tempfile.mkdtemp(prefix='khmertest_')
+         cleanup_list.append(tempdir)
+ 
+-    return os.path.join(tempdir, filename)
++    return join(tempdir, filename)
+ 
+ 
+ def cleanup():
