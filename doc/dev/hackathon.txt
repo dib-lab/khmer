@@ -1,4 +1,18 @@
 Hackathon information (July 2014)
 =================================
 
-Foo.
+Please track `khmer issue #446
+<https://github.com/ged-lab/khmer/issues/446>`__ for up-to-the-minute
+information.  You can subscribe to this issue (lower right on issue page)
+to get automatic e-mail updates.
+
+**Start here!** :doc:`getting-started`
+
+Problems, questions, and solutions
+----------------------------------
+
+#. I don't have access to a UNIX machine that can compile khmer.  What can
+   I do?
+
+   Contact us at khmer-project@idyll.org and we'll give you an account
+   for the duration.  You'll need to have an SSH client, note.

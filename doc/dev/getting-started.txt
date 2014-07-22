@@ -1,4 +1,91 @@
 Getting started with khmer development
 ======================================
 
-More info here.
+Start by making your own copy of khmer and setting yourself up for
+development; then, build khmer and run the tests; and finally, claim
+an issue and start developing!
+
+One-time Preparation
+--------------------
+
+#. Get a `GitHub <http://github.com>`__ account.
+
+   (We use GitHub to manage khmer contributions.)
+
+#. Fork `github.com/ged-lab/khmer <http://github.com/ged-lab/khmer>`__.
+
+   Visit that page, and then click on the 'fork' button (upper right).
+
+   (This makes a copy of the khmer source code in your own github account.)
+
+#. Clone your copy of khmer to your local development environment.
+
+   Your clone URL should look something like this::
+
+       https://github.com/empty-titus/khmer.git
+
+   and the UNIX shell command should be::
+
+       git clone https://github.com/empty-titus/khmer.git
+
+   (This makes a local copy of khmer on your development machine.)
+
+#. Create a virtual Python environment within which to work with
+   `virtualenv <https://pypi.python.org/pypi/virtualenv>`__::
+
+       python2.7 -m virtualenv env
+
+   (This gives you a place to install packages necessary for running khmer.)
+
+#. Activate the virtualenv and install a few packages::
+
+       . env/bin/activate
+       pip install sphinx nose
+
+   (This installs `Sphinx <http://sphinx-doc.org/>`__ and `nose
+   <https://nose.readthedocs.org/en/latest/>`__, packages we use for
+   building the documentation and running the tests.)
+
+Building khmer and running the tests
+------------------------------------
+
+#. Activate the virtualenv::
+
+      . env/bin/activae
+
+   You can run this many times without any ill effects.
+
+   (This puts you in a cozy environment that you control.)
+
+#. Build khmer::
+
+      cd khmer
+      make
+
+   If this fails, we apologize -- please `go create a new issue
+   <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__,
+   paste in the failure message, and we'll try to hep you work through it!
+
+   (This takes the C++ source code and compiles it into something that Python
+   can run.)
+
+#. Run the tests::
+
+      make test
+
+   You should see lots of output, with::
+
+      Ran 360 tests in 10.403s
+
+      OK
+
+   at the end.
+
+   (This will run all of the Python tests.)
+
+Congratulations! You're ready to develop!
+
+Claiming an issue and starting to develop
+------------------------------------------
+
+More here.
