@@ -166,8 +166,13 @@ lib:
 	$(MAKE)
 
 test:
-	pip2 install --user nose || pip2 install nose
-	./setup.py nosetests
+	if [[ -z "${CONDA_DEFAULT_ENV}" ]]; \
+	then \
+		pip2 install --user nose || pip2 install nose \
+		./setup.py nosetests; \
+	else \
+		nosetests . --attr '!known_failing'; \
+	fi
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
