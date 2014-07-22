@@ -1,3 +1,7 @@
+2014-07-22  Jeramia Ory <jeramia.ory@gmail.com>
+
+    * khmer/_khmermodule.cc: removed unused KhmerError, issue #503
+
 2014-07-22 Leonor Garcia-Gutierrez <l.garcia-gutierrez@warwick.ac.uk>
     * reduced memory requirements in test_counting_single.py
     
