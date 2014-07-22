@@ -19,7 +19,6 @@ class ScoringMatrix
     double scores[4];
 
 private:
-    int assign(char);
 
 public:
     ScoringMatrix() {
