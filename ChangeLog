@@ -3,6 +3,11 @@
     * Makefile: combine pip invocation into single "install-dependencies"
     target.
 
+2014-07-22  Michael R. Crusoe <mcrusoe@msu.edu>
+
+    * Makefile: combine pip invocation into single "install-dependencies"
+    target.
+
 2014-07-22  Jim Stapleton  <jas@msu.edu>
 
     * scripts/filter-abund.py: no longer asks for parameters that are unused, issue #524
@@ -10,6 +15,10 @@
 2014-07-22  Jeramia Ory  <jeramia.ory@gmail.com>
 
     * khmer/_khmermodule.cc: removed unused KhmerError, issue #503
+
+2014-07-22 Leonor Garcia-Gutierrez <l.garcia-gutierrez@warwick.ac.uk>
+
+    * reduced memory requirements in test_counting_single.py
 
 2014-07-22  Rodney Picett  <pickett.rodney@gmail.com>
 
