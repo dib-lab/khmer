@@ -30,6 +30,13 @@ One-time Preparation
 
    (This makes a local copy of khmer on your development machine.)
 
+#. Add a git reference to the khmer ged-lab repository::
+
+       git remote add ged https://github.com/ged-lab/khmer.git
+
+   (This makes it easy for you to pull down the latest changes in the
+   main repository.)
+
 #. Create a virtual Python environment within which to work with
    `virtualenv <https://pypi.python.org/pypi/virtualenv>`__::
 
@@ -88,4 +95,43 @@ Congratulations! You're ready to develop!
 Claiming an issue and starting to develop
 ------------------------------------------
 
-More here.
+#. Find an open issue and claim it.
+
+   Go to `the list of open khmer issues
+   <https://github.com/ged-lab/khmer/issues?direction=desc&sort=created&state=open>`__
+   and find one you like; we suggest starting with `the low-hanging fruit issues <https://github.com/ged-lab/khmer/issues?direction=desc&labels=low-hanging-fruit&page=1&sort=created&state=open>`__).
+
+   Once you've found an issue you like, add a comment "I am working on
+   this issue." You've staked your claim!
+
+   (We're trying to avoid having multiple people working on the same issue.)
+
+#. Update your master branch from the main khmer master branch::
+
+      git checkout master
+      git pull ged master
+
+   (This pulls in all of the latest changes from whatever we've been
+   doing on ged-lab.)
+
+#. Create a new branch and link it to your github fork::
+
+      git checkout -b fix/issue_number
+      git push -u origin fix/issue_number
+
+   where you replace "issue_number" with the number of the issue.
+
+   (This is the set of changes you're going to ask to be merged into khmer.)
+
+#. Make some changes and commit them.
+
+   This will be issue dependent ;).
+
+#. Push your branch to your own github fork::
+
+      git push origin
+
+   (This pushes all of your changes to your own fork.)
+
+#. Set up a Pull Request.
+
