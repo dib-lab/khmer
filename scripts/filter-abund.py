@@ -17,9 +17,11 @@ Use '-h' for parameter help.
 import os
 import khmer
 import textwrap
+import argparse
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.khmer_args import (build_counting_args, add_threading_args, info)
+from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
 from khmer.file import check_file_status, check_space
+from khmer import __version__
 #
 
 DEFAULT_NORMALIZE_LIMIT = 20
@@ -37,9 +39,10 @@ def get_parser():
         load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
         filter-abund.py -C 2 table.kh data/100k-filtered.fa
     """
-    parser = build_counting_args(
+    parser = argparse.ArgumentParser(
         descr='Trim sequences at a minimum k-mer abundance.',
-        epilog=textwrap.dedent(epilog))
+        epilog=textwrap.dedent(epilog),
+        formatter_class=ComboFormatter)
     parser.add_argument('input_table', metavar='input_presence_table_filename',
                         help='The input k-mer presence table filename')
     parser.add_argument('input_filename', metavar='input_sequence_filename',
@@ -61,6 +64,8 @@ def get_parser():
                         help='Output the trimmed sequences into a single file '
                         'with the given filename instead of creating a new '
                         'file for each input file.')
+    parser.add_argument('--version', action='version',
+                        version='khmer {v}'.format(v=__version__))
     return parser
 
 
