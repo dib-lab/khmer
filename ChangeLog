@@ -1,3 +1,7 @@
+2014-07-22 Rodney Picett <pickett.rodney@gmail.com>
+
+    * removed assign function from scoringmatrix, issue #502
+ 
 2014-07-22 Leonor Garcia-Gutierrez <l.garcia-gutierrez@warwick.ac.uk>
     * reduced memory requirements in test_counting_single.py
     

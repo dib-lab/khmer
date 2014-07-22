@@ -18,8 +18,6 @@ class ScoringMatrix
     //double sm[5][5];
     double scores[4];
 
-private:
-
 public:
     ScoringMatrix() {
         /*
