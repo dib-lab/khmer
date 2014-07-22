@@ -1,0 +1,12 @@
+The khmer developer documentation
+=================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 1
+
+   getting-started
+   a-quick-guide-to-testing
+   codebase-guide
+   coding-guidelines-and-review

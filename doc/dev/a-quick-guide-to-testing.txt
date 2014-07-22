@@ -1,0 +1,91 @@
+A Quick Guide to Testing (for khmer)
+====================================
+
+One of our most important "secret sauces" for khmer development is
+that we do a fair bit of testing to make sure our code works and keeps
+working!
+
+* We maintain fairly complete test coverage of our code.  What this
+  means is that we have automated tests that, when run, execute most
+  of the lines of Python and C++ code in our lib/, khmer/ and scripts/
+  directories.  This doesn't *guarantee* things are correct, but it
+  does mean that at least most of the code works at some basic level.
+
+* we have other tests that we run periodically (for example, before
+  each release) -- see :doc:`../release` for details.  These tests
+  check that our code works on multiple systems and with other
+  people's software.
+
+CTB and others have written a great deal about testing, and testing in
+Python in particular.  Here's an `introductory guide
+<http://ivory.idyll.org/articles/nose-intro.html>`__ CTB wrote a long
+time ago.
+
+For the more general motivation, see `the Lack of Testing Death Spiral
+<http://ivory.idyll.org/blog/software-quality-death-spiral.html>`__.
+
+But... how do you do testing??
+
+----
+
+First, let's talk about specific choices for testing.  What should you
+be aiming for in your tests?  You can always add more testing code,
+but that might not be useful.
+
+We suggest the following approach to writing tests for **new code**:
+
+#. Write a test that just *runs* the new code, generally by copying existing
+   test code to a new test and changing it.  Don't do anything clever for the
+   first test -- just run something straightforward, and try to use existing
+   data.
+
+#. Decide which use cases should be tested.  This is necessarily code
+   specific but our main advice is "don't be clever" -- write some tests
+   to make sure that the code basically works.
+
+#. Add in tests for edge cases.  By this we mean look for special cases in
+   your code -- if statements, fencepost bound errors, etc. -- and write
+   tests that exercise those bits of code specifically.
+
+For adding tests to **old code**, we recommend a mix of two approaches:
+
+#. use `"stupidity driven testing"
+   <http://ivory.idyll.org/blog/stupidity-driven-testing.html>`__ and
+   write tests that recapitulate bugs before we fix those bugs.
+
+#. look at test coverage (see `khmer's cobertura test coverage, here
+   <http://ivory.idyll.org/blog/stupidity-driven-testing.html>`__) and
+   identify lines of C++ or Python code that are not being executed by
+   the current tests.  Then write new tests targeting the new code.
+
+----
+
+Next, to add a test, you have two options: either write a new one from 
+scratch, or copy an existing one.  (We recommend the latter.)
+
+To write a new one, you'll need to know how to write tests. For
+getting an idea of the syntax, read this `introductory guide
+<http://ivory.idyll.org/articles/nose-intro.html>`__ and the `official
+documentation
+<https://nose.readthedocs.org/en/latest/writing_tests.html>`__.  Then
+find the right file in ``tests/*.py`` and add your test!
+
+A better approach is, frankly, to go into the existing test code, find
+a test that does something similar to what you want to do, copy it,
+rename it, and then modify it to do the new test.
+
+----
+
+Finally, *where* do you add new tests and how do you run just *your* test?
+
+Put new tests somewhere in ``tests/*.py``.  If you have trouble
+figuring out what file to add them to, just put them in *some* file
+and we'll help you figure out where to move them when we do code
+review.
+
+To run one specific test rather than all of them, you can do::
+
+  ./setup.py nosetests --tests tests/test_scripts.py:test_load_into_counting
+
+Here, you're running just one test -- the test function named
+``test_load_into_counting`` in the file ``test_scripts.py``.
