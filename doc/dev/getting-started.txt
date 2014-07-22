@@ -64,7 +64,7 @@ Building khmer and running the tests
 
 #. Activate the virtualenv::
 
-      . env/bin/activae
+      . env/bin/activate
 
    You can run this many times without any ill effects.
 
