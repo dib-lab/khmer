@@ -15,8 +15,8 @@
 	<command>
 mkdir output; cd output;
 @BINARY@
-$countingtable_to_load
-#for input in inputs
+$input_counting_table_filename
+#for input in $inputs
  $input
 #end for
 	</command>

@@ -57,11 +57,11 @@ $input_counting_table_filename
                         <param name="inputs" value="test-abund-read-2.fa" />
                         <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
                         <output name="output">
-				<discover_dataset name="test-abund-read-2.fa.abundfilt">
+				<!-- <discover_dataset name="test-abund-read-2.fa.abundfilt"> -->
                                 	<assert_contents>
                                         	<has_text text="GGTTGACGGGGCTCAGGG" />
                                 	</assert_contents>
-				</discover_dataset>
+				<!-- </discover_dataset> -->
                         </output>
                 </test>
                 <test interactor="api">
@@ -69,11 +69,11 @@ $input_counting_table_filename
                         <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
 			<param name="cutoff" value="1" />
                         <output name="output">
-				<discover_dataset name="test-abund-read-2.fa.abundfilt">
+				<!-- <discover_dataset name="test-abund-read-2.fa.abundfilt"> -->
                                 	<assert_contents>
                                         	<has_text text="GGTTGACGGGGCTCAGGG" />
                                 	</assert_contents>
-				</discover_dataset>
+				<!-- </discover_dataset> -->
                         </output>
                 </test>
         </tests> 
