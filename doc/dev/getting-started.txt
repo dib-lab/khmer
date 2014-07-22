@@ -177,3 +177,28 @@ Claiming an issue and starting to develop
    commit them" and go from there.  Any additional commits you make and
    push to your branch will automatically be added to the pull request
    (which is pretty dang cool.)
+
+After your first issue is successfully merged...
+------------------------------------------------
+
+You're now a journeyman!  The main thing we would ask you to do is NOT
+take any more low-hanging fruit -- you should leave those for the
+novices.
+
+But! You can now do a couple of things!
+
+* If you're knowledgeable in C++ and/or Python and/or documentation
+  and/or biology, we'd love to attract further contributions to khmer.
+  Please visit the issues list and browse about and find something
+  interesting looking.
+
+* You can help other people out by watching for new issues or looking at
+  pull requests.  Remember to be nice and polite!
+
+* There's a whole bunch of `other projects
+  <https://etherpad.mozilla.org/sciencelab-2014summersprint-sites>`__
+  that you can join -- and now that you've successfully contributed to
+  our github project, you're ready to contribute to theirs, too!
+  (Note: they may not use the same issue tracker or pull requests, but
+  the basic process should be similar - fork, clone, make changes,
+  push, notify the project of the pushed changes.)
