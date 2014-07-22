@@ -82,14 +82,9 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False, sandbox=False)
 
     cwd = os.getcwd()
 
-    print 'testing testing'
     try:
-        print 'hello hello'
         status = -1
-        print 'jdl'
         oldargs = sys.argv
-        print 'wordup'
-        print 'oldargs: {}'.format(oldargs)
         sys.argv = sysargs
 
         oldout, olderr = sys.stdout, sys.stderr
@@ -100,8 +95,6 @@ def runscript(scriptname, args, in_directory=None, fail_ok=False, sandbox=False)
             os.chdir(in_directory)
 
         try:
-            print 'running:', scriptname, 'in:', in_directory
-            print 'arguments', sysargs
             status = _runscript(scriptname, sandbox)
         except nose.SkipTest:
             raise
