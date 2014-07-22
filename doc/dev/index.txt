@@ -10,3 +10,5 @@ Contents:
    a-quick-guide-to-testing
    codebase-guide
    coding-guidelines-and-review
+   for-khmer-developers
+

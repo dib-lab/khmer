@@ -1,7 +1,7 @@
 Coding guidelines and code review checklist
 ===========================================
 
-(Copied from :doc:`../development.txt`)
+(Copied from :doc:`../development`)
 
 Coding standards
 ----------------
