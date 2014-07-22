@@ -1,3 +1,6 @@
+2014-01-22 Heather Wiencko <timiat@yahoo.com>
+	* CITATION: Added BibTeX to the bottom of the file
+
 2014-07-21  Titus Brown <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
