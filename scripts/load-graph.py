@@ -40,7 +40,7 @@ def get_parser():
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
     parser.add_argument('--write-fp-rate', '-w', action='store_true',
-                        help="Write fp rate information into .info file")                
+                        help="Write fp rate information into .info file")
     return parser
 
 
