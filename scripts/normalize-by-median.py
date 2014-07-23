@@ -71,9 +71,9 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
             print '... in file', input_filename
 
             if report_fp:
-                floated-total=float(total)
-                if floated-total=0.0: 
-                   print >>'Division by zero'
+                floated_total=float(total)
+                if floated_total==0.0: 
+                   print 'Division by zero'
                    sys.exit(0)
                 else:
                    print >> report_fp, total, total - discarded, \
