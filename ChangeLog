@@ -1,8 +1,6 @@
 2014-07-23  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
-    * tests/test_hashbits.py: reduced memory requirement
-    * tests/test_graph.py: reduced memory requirement
-    * tests/test_lump.py: reduced memory requirement
+    * tests/test_hashbits.py, tests/test_graph.py, tests/test_lump.py: reduced memory requirement
     
 2014-07-23  Heather L. Wiencko  <wienckhl@tcd.ie>
 
