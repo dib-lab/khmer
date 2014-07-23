@@ -1,9 +1,11 @@
 2014-07-22  Justin Lippi  <jlippi@gmail.com>
  
-   *  khmer/_khmermodule.cc: cleaned up cppcheck violations issue 506
-   *  lib/read_aligner.cc: cleaned up cppcheck violations issue 506
-   *  lib/read_aligner.hh: cleaned up cppcheck violations issue 506
-   *  lib/read_parsers.cc: cleaned up cppcheck violations issue 506
+   *  khmer/_khmermodule.cc: removed unused assignment
+   *  lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
+      in the same compiler options that the only invocations are in to avoid
+      unusedPrivateFunction violation.
+   *  lib/read_parsers.cc: fix redundantassignment error by assigning variable
+      to its value directly
 
 2014-07-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
