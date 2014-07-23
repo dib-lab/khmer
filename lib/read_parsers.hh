@@ -84,22 +84,22 @@ public:
 
 };
 
-struct CacheSegmentUnavailable : public std:: exception {
+struct CacheSegmentUnavailable : public  khmer_exception {
 };
 
-struct CacheSegmentBoundaryViolation : public std:: exception {
+struct CacheSegmentBoundaryViolation : public  khmer_exception {
 };
 
-struct InvalidCacheSizeRequested : public std:: exception {
+struct InvalidCacheSizeRequested : public  khmer_exception {
 };
 
-struct NoMoreReadsAvailable : public std:: exception {
+struct NoMoreReadsAvailable : public  khmer_exception {
 };
 
-struct UnknownPairReadingMode : public std:: exception {
+struct UnknownPairReadingMode : public  khmer_exception {
 };
 
-struct InvalidReadPair : public std:: exception {
+struct InvalidReadPair : public  khmer_exception {
 };
 
 #ifdef WITH_INTERNAL_METRICS
