@@ -4627,6 +4627,17 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
+static
+PyObject *
+get_version( PyObject * self, PyObject * args )
+{
+#define xstr(s) str(s)
+#define str(s) #s
+    std::string dVersion = xstr(VERSION);
+    return PyString_FromString(dVersion.c_str());
+}
+
+
 //
 // Module machinery.
 //
@@ -4682,7 +4693,7 @@ static PyMethodDef KhmerMethods[] = {
     },
     {
         "get_version", get_version,
-        METH_VARARGS,       "",
+        METH_VARARGS, "return the VERSION c++ compiler option"
     },
     { NULL, NULL, 0, NULL } // sentinel
 };

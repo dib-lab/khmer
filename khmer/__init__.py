@@ -27,6 +27,8 @@ from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 from khmer._khmer import reverse_hash  # tests/test_functions.py
 # tests/counting_single.py
 
+from khmer._khmer import get_version # tests/test_version.py
+
 from khmer._khmer import get_config  # tests/test_read_parsers.py
 # tests/test_khmer_config.py
 # scripts/{filter-abund-single,load-graph}.py
@@ -106,7 +108,6 @@ def reset_reporting_callback():
     set_reporting_callback(_default_reporting_callback)
 
 reset_reporting_callback()
-
 
 def extract_hashbits_info(filename):
     """Open the given hashbits file and return a tuple of information.
