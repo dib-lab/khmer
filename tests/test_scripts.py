@@ -464,7 +464,7 @@ def test_normalize_by_median_fpr():
 
     (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
 
-    assert os.path.exists(infile + '.keep'), in_dir + '\n'+ infile + '.keep'
+    assert os.path.exists(infile + '.keep')
     assert 'fp rate estimated to be' in out, out
     assert '** ERROR: the k-mer counting table is too small' in err, err
 
