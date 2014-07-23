@@ -4627,6 +4627,11 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
+//
+// technique for resolving literal below found here:
+// https://gcc.gnu.org/onlinedocs/gcc-4.8.1/cpp.pdf
+//
+
 static
 PyObject *
 get_version( PyObject * self, PyObject * args )
