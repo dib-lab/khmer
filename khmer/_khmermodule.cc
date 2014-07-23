@@ -4693,9 +4693,12 @@ static PyMethodDef KhmerMethods[] = {
     },
     {
         "set_reporting_callback",   set_reporting_callback,
-        METH_VARARGS,       ""
+        METH_VARARGS,       "",
     },
-
+    {
+        "get_version", get_version,
+        METH_VARARGS,       "",
+    },
     { NULL, NULL, 0, NULL } // sentinel
 };
 
