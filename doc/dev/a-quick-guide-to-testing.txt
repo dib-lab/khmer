@@ -28,9 +28,12 @@ But... how do you do testing??
 
 ----
 
-First, let's talk about specific choices for testing.  What should you
-be aiming for in your tests?  You can always add more testing code,
-but that might not be useful.
+First, let's talk about specific goals for testing.  What should you
+be aiming for tests to do?  You can always add more testing code, but
+that might not be useful if they are redundant or over-complicated.
+
+An overall rule is to "keep it simple" -- keep things as simple as
+possible, testing as few things as possible in each test.
 
 We suggest the following approach to writing tests for **new code**:
 
