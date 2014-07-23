@@ -107,7 +107,8 @@ def main():
     fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
     if args.write_fp_rate:
-        print >> info_fp, '\nfalse positive rate estimated to be %1.3f' % fp_rate
+        print >> info_fp, \
+            '\nfalse positive rate estimated to be %1.3f' % fp_rate
 
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print >> sys.stderr, "**"
