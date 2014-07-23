@@ -191,7 +191,10 @@ Claiming an issue and starting to develop
 #. Paste in the committer checklist from :doc:`coding-guidelines-and-review`
    and, after its pasted in, check off as many of the boxes as you can.
 
-#. The khmer team will now review your merge request and communicate
+#. When you are ready to have the pull request reviewed, please add a
+   comment "ready for review!".
+
+#. The khmer team will now review your pull request and communicate
    with you through the pull request page.  Please feel free to add
    'ping!' in the comments if you are looking for feedback -- this
    will alert us that you are still on the line -- but we will
