@@ -627,8 +627,6 @@ def test_load_graph_write_fp():
     data = set(data)
     assert '3959 unique k-mers' in data
     assert 'fp rate estimated to be 0.002' in data
-    
-
 
 
 def _make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
