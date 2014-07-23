@@ -131,9 +131,6 @@ public:
 
 typedef pre_partition_info _pre_partition_info;
 
-// Python exception to raise
-static PyObject *KhmerError;
-
 // default callback obj;
 static PyObject *_callback_obj = NULL;
 
@@ -686,7 +683,7 @@ _ReadParser_iternext( PyObject * self )
     ReadParser_Object * myself  = (ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
 
-    bool    stop_iteration  = false;
+    bool    stop_iteration;
     char    const * exc = NULL;
     Read *  the_read_PTR    = new Read( );
 
@@ -4724,16 +4721,6 @@ init_khmer(void)
     _init_ReadPairIterator_Type( );
     // TODO: Finish initialization of other types.
 
-    KhmerError = PyErr_NewException((char *)"_khmer.error", NULL, NULL);
-    if (KhmerError == NULL) {
-        return;
-    }
-    Py_INCREF(KhmerError);
-
-    if (PyModule_AddObject( m, "error", KhmerError ) < 0) {
-        Py_DECREF(KhmerError);
-        return;
-    }
     if (PyModule_AddObject( m, "ReadParser", (PyObject *)&ReadParser_Type ) < 0) {
         return;
     }
