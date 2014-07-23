@@ -217,8 +217,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_on_config(args)
 
     report_fp = args.report
-
-    check_valid_file_exists(args.input_filenames)
+    try:
+       check_valid_file_exists(args.input_filenames)
+    except: 
+       print 'I/O Error: files does not exist'
+       sys.exit(0)
     check_space(args.input_filenames)
     if args.savetable:
         check_space_for_hashtable(args.n_tables * args.min_tablesize)
