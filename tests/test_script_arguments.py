@@ -37,3 +37,15 @@ def test_check_tablespace():
         print str(e)
     finally:
         sys.stderr = save_stderr
+
+
+def test_invalid_file_warn():
+    save_stderr, sys.stderr = sys.stderr, cStringIO.StringIO()
+    try:
+        khmer.file.check_valid_file_exists(["nonexistent", "nonexistent2"])
+        assert sys.stderr.getvalue().count("\n") == 2,  \
+            "Should produce two warning lines"
+    except SystemExit, e:
+        print str(e)
+    finally:
+        sys.stderr = save_stderr
