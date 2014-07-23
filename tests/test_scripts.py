@@ -452,6 +452,23 @@ def test_normalize_by_median_empty():
     assert os.path.exists(outfile), outfile
 
 
+def test_normalize_by_median_fpr():
+    MIN_TABLESIZE_PARAM = 1
+
+    infile = utils.get_temp_filename('test-fpr.fq')
+    in_dir = os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-f', '-k 17', '-x ' + str(MIN_TABLESIZE_PARAM), infile]
+
+    (status, out, err) = utils.runscript(script, args, in_dir, fail_ok=True)
+
+    assert os.path.exists(infile + '.keep')
+    assert 'fp rate estimated to be' in out, out
+    assert '** ERROR: the k-mer counting table is too small' in err, err
+
+
 def test_count_median():
     infile = utils.get_temp_filename('test.fa')
     outfile = infile + '.counts'

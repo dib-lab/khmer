@@ -1,3 +1,8 @@
+2014-07-23  Heather L. Wiencko  <wienckhl@tcd.ie>
+
+	* khmer_tst_utils.py: added import traceback
+	* test_scripts.py: added test for normalize_by_median.py for fpr rate
+
 2014-07-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: combine pip invocation into single "install-dependencies"

@@ -12,6 +12,7 @@ from cStringIO import StringIO
 import nose
 import sys
 import khmer.file
+import traceback
 
 
 def get_test_data(filename):
