@@ -121,7 +121,7 @@ def test_with_zero_threads():
         #rparser = ReadParser(utils.get_test_data("aaaaa.fq.bz2"), N_THREADS)
     except ValueError, e:
         assert str(e) == \
-            'invalid thread number, must be integer greater than zero'
+            'Invalid thread number, must be integer greater than zero'
 
 @attr('multithread')
 def test_old_illumina_pair_mating():

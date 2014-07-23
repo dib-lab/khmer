@@ -656,7 +656,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     if (number_of_threads == 0) {
         PyErr_SetString(
             PyExc_ValueError,
-            "invalid thread number, must be integer greater than zero"
+            "Invalid thread number, must be integer greater than zero."
         );
         return NULL;
     }
