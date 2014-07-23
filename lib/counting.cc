@@ -107,7 +107,7 @@ CountingHash::abundance_distribution(
     // if not, could lead to overflow.
     if (sizeof(BoundedCounterType) != 2) {
         delete[] dist;
-        throw std::exception();
+        throw khmer_exception();
     }
 
     while(!parser->is_complete()) {
@@ -282,7 +282,7 @@ void CountingHash::get_kadian_count(
     }
 
     if (!counts.size()) {
-        throw std::exception();
+        throw khmer_exception();
     }
     unsigned int kpos = nk * _ksize;
 
@@ -658,7 +658,7 @@ CountingHashFileWriter::CountingHashFileWriter(
     const CountingHash  &ht)
 {
     if (!ht._counts[0]) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     unsigned int save_ksize = ht._ksize;
@@ -711,7 +711,7 @@ CountingHashGzFileWriter::CountingHashGzFileWriter(
     const CountingHash  &ht)
 {
     if (!ht._counts[0]) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     unsigned int save_ksize = ht._ksize;

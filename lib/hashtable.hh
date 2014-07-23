@@ -10,7 +10,6 @@
 
 #include <vector>
 #include <iostream>
-#include <exception>
 #include <list>
 #include <queue>
 
@@ -21,6 +20,7 @@
 #include <queue>
 
 #include "khmer.hh"
+#include "khmer_exception.hh"
 #include "read_parsers.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
@@ -109,7 +109,7 @@ public:
 
     HashIntoType next(HashIntoType& f, HashIntoType& r) {
         if (done()) {
-            throw std::exception();
+            throw khmer_exception();
         }
 
         if (!initialized) {
@@ -120,7 +120,7 @@ public:
         unsigned char ch = _seq[index];
         index++;
         if (!(index <= length)) {
-            throw std::exception();
+            throw khmer_exception();
         }
 
         // left-shift the previous hash over
@@ -211,7 +211,7 @@ protected:
             _ksize( ksize ) {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
-            throw std::exception();
+            throw khmer_exception();
         }
         partition = new SubsetPartition(this);
         _init_bitstuff();
@@ -398,7 +398,7 @@ public:
     // for debugging/testing purposes only!
     void _set_tag_density(unsigned int d) {
         if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
-            throw std::exception();
+            throw khmer_exception();
         }
         _tag_density = d;
     }

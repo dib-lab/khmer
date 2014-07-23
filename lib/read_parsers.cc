@@ -1410,7 +1410,7 @@ IParser(
             REG_EXTENDED | REG_NOSUB
         );
     if (regex_rc) {
-        throw std::exception();
+        throw khmer_exception();
     }
     regex_rc =
         regcomp(
@@ -1418,7 +1418,7 @@ IParser(
             "^.+(/1| 1:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw std::exception();
+        throw khmer_exception();
     }
     regex_rc =
         regcomp(
@@ -1426,7 +1426,7 @@ IParser(
             "^.+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+).{0}", REG_EXTENDED
         );
     if (regex_rc) {
-        throw std::exception();
+        throw khmer_exception();
     }
 }
 
