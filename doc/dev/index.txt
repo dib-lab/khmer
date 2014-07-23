@@ -13,7 +13,6 @@ Contents:
    for-khmer-developers
    release
 
-   design
    details
    development
    galaxy

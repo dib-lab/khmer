@@ -1,4 +1,4 @@
-A Quick Guide to Testing (for khmer)
+A quick guide to testing (for khmer)
 ====================================
 
 One of our most important "secret sauces" for khmer development is
