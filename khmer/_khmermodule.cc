@@ -683,7 +683,7 @@ _ReadParser_iternext( PyObject * self )
     ReadParser_Object * myself  = (ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
 
-    bool    stop_iteration  = false;
+    bool    stop_iteration;
     char    const * exc = NULL;
     Read *  the_read_PTR    = new Read( );
 

@@ -1,3 +1,10 @@
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
+ 
+   *  khmer/_khmermodule.cc: cleaned up cppcheck violations issue 506
+   *  lib/read_aligner.cc: cleaned up cppcheck violations issue 506
+   *  lib/read_aligner.hh: cleaned up cppcheck violations issue 506
+   *  lib/read_parsers.cc: cleaned up cppcheck violations issue 506
+
 2014-07-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: combine pip invocation into single "install-dependencies"
