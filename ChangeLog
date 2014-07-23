@@ -1,4 +1,11 @@
 2014-07-22  Justin Lippi  <jlippi@gmail.com>
+
+  *   khmer/__init__.py: import get_version method.
+  *   khmer/_khmermodule.cc: write get_version method in c
+  *   tests/test_version.py: check that version from c matches version from
+      versioneer
+
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
  
    *  khmer/_khmermodule.cc: removed unused assignment
    *  lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
