@@ -114,7 +114,7 @@ class Test_ExactGraphFu(object):
 class Test_InexactGraphFu(object):
 
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4 ** 2 + 1 )
+        self.ht = khmer.new_hashbits(12, 4 ** 2 + 1)
 
     def test_graph_links_next_a(self):
         ht = self.ht
