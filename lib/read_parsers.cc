@@ -1402,8 +1402,7 @@ IParser(
         _states[ i ] = NULL;
     }
 
-    int regex_rc = -1;
-    regex_rc =
+    int regex_rc =
         regcomp(
             &_re_read_2_nosub,
             // ".+(/2| 2:[YN]:[[:digit:]]+:[[:alpha:]]+)$",

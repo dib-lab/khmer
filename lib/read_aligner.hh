@@ -177,7 +177,9 @@ private:
                    AlignmentNode*, bool, const std::string&);
     Alignment* Subalign(AlignmentNode*, size_t, bool, const std::string&);
 
+#if READ_ALIGNER_DEBUG
     void WriteNode(AlignmentNode* curr);
+#endif
 
     // These variables are required to use the _revhash and hash macros
     // might as well just compute them once

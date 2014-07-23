@@ -3,6 +3,15 @@
 	* khmer_tst_utils.py: added import traceback
 	* test_scripts.py: added test for normalize_by_median.py for fpr rate
 
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
+ 
+   *  khmer/_khmermodule.cc: removed unused assignment
+   *  lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
+      in the same compiler options that the only invocations are in to avoid
+      unusedPrivateFunction violation.
+   *  lib/read_parsers.cc: fix redundantassignment error by assigning variable
+      to its value directly
+
 2014-07-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: combine pip invocation into single "install-dependencies"
