@@ -1,29 +1,56 @@
-2014-07-22  Jeramia Ory <jeramia.ory@gmail.com>
+2014-07-22  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: combine pip invocation into single "install-dependencies"
+    target.
+
+2014-07-22  Justin Lippi  <jlippi@gmail.com>
+
+   * tests/test_subset_graph.py: decrease the amount of memory that is being
+   requested for the hash tables in test.
+
+2014-07-22  Jim Stapleton  <jas@msu.edu>
+
+    * scripts/filter-abund.py: no longer asks for parameters that are unused,
+    issue #524
+
+2014-07-22  Justin Lippi  <jlippi@gmail.com> 
+
+    * tests/khmer_tst_utils.py: put runscript here
+    * tests/test_sandbox_scripts.py: remove 'runsandbox', renamed to runscript
+      and placed in khmer_tst_utils
+    * tests/test_scripts.py: removed 'runscript' and placed in khmer_tst_utils
+
+2014-07-22  Jeramia Ory  <jeramia.ory@gmail.com>
 
     * khmer/_khmermodule.cc: removed unused KhmerError, issue #503
 
-2014-07-22 Leonor Garcia-Gutierrez <l.garcia-gutierrez@warwick.ac.uk>
-    * reduced memory requirements in test_counting_single.py
+2014-07-22  Rodney Picett  <pickett.rodney@gmail.com>
+
+    * lib/scoringmatrix.{cc,hh}: removed assign function, issue #502
+ 
+2014-07-22  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
+
+    * tests/test_counting_single.py: reduced memory requirements
     
-2014-07-21  Titus Brown <t@idyll.org>
+2014-07-21  Titus Brown  <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
 	saturation analysis of low-coverage data sets.
 
-2014-07-10 Joe Stein <joeaarons@gmail.com>
+2014-07-10  Joe Stein  <joeaarons@gmail.com>
 
     * sandbox/readstats.py: fixed divide-by-zero error, issue #458
 
-2014-07-06  Titus Brown <t@idyll.org>
+2014-07-06  Titus Brown  <t@idyll.org>
 
     * doc/release.txt: fix formatting.
 
-2014-06-20 Chuck Pepe-Ranney <chuck.peperanney@gmail.com>
+2014-06-20  Chuck Pepe-Ranney  <chuck.peperanney@gmail.com>
 
     * scripts/extract-partitions.py: added epilog documentation for 
 	<base>.dist columns.
 
-2014-06-20  Michael R. Crusoe <mcrusoe@msu.edu>
+2014-06-20  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/release.txt: Add Coverity Scan to release checklist
 
