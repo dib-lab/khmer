@@ -1,3 +1,7 @@
+2014-07-23  Qingpeng Zhang <qingpeng@gmail.com>
+    * scripts/load-graph.py: write fp rate into *.info file with option 
+    to switch on
+
 2014-07-21  Titus Brown <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
