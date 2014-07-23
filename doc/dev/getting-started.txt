@@ -172,24 +172,32 @@ Claiming an issue and starting to develop
    source code listing.  On the right side of that should be a
    "Compare & pull request" green button.  Click on it!
 
-   You should now have a title and comment box; add a descriptive title and
-   put a link to the issue in by saying something like "fixes issue #532".
-   This will automagically link to the khmer issue tracker.
+   Now:
 
-   Click "create pull request".  This creates a new issue where we can
-   all discuss your proposed changes; the khmer team will be automatically
-   notified and you will receive e-mail notifications as we add comments.
+     * add a descriptive title ("updated tests for XXX")
+     * put the issue number in the comment ("fixes issue #532")
+   
+   then click "Create pull request."
 
-   (A "pull request", or PR, is a request to the khmer team to merge
-   your changes into the khmer repository; see `GitHub flow
+   (This creates a new issue where we can all discuss your proposed
+   changes; the khmer team will be automatically notified and you will
+   receive e-mail notifications as we add comments.  See `GitHub flow
    <http://scottchacon.com/2011/08/31/github-flow.html>`__ for more
-   info.
-
-   Note that you can push multiple changes to a single pull request,
-   and that pull requests can be progressive.)
+   info.)
 
 #. Paste in the committer checklist from :doc:`coding-guidelines-and-review`
    and, after its pasted in, check off as many of the boxes as you can.
+
+   Note that::
+
+      make pep8
+
+   will check your Python formatting.
+
+#. As you add new commits to address bugs or formatting issues, you can keep
+   pushing your changes to the pull request by doing::
+
+      git push origin
 
 #. When you are ready to have the pull request reviewed, please add a
    comment "ready for review!".
