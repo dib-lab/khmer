@@ -44,6 +44,25 @@ public:
         : khmer_exception(msg) { }
 };
 
+struct InvalidStreamBuffer : public khmer_exception {
+};
+
+class InvalidStreamHandle : public khmer_file_exception
+{
+public:
+    InvalidStreamHandle()
+        : khmer_file_exception("Generic InvalidStreamHandle error") {}
+    InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
+};
+
+class StreamReadError : public khmer_file_exception
+{
+public:
+    StreamReadError()
+        : khmer_file_exception("Generic StreamReadError error") {}
+    StreamReadError(const char * msg) : khmer_file_exception(msg) {}
+};
+
 }
 
 #endif // KHMER_EXCEPTION_HH

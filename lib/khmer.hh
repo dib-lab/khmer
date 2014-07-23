@@ -79,10 +79,6 @@ typedef void (*CallbackFn)(const char * info, void * callback_data,
                            unsigned long long n_reads,
                            unsigned long long other);
 
-struct InvalidStreamBuffer : public khmer_exception {
-};
-
-
 typedef unsigned int PartitionID;
 typedef std::set<HashIntoType> SeenSet;
 typedef std::set<PartitionID> PartitionSet;
@@ -114,22 +110,6 @@ void deallocate_ptr_set(T& s)
         delete *i;
     }
 }
-
-class InvalidStreamHandle : public khmer_file_exception
-{
-public:
-    InvalidStreamHandle()
-        : khmer_file_exception("Generic InvalidStreamHandle error") {}
-    InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
-};
-
-class StreamReadError : public khmer_file_exception
-{
-public:
-    StreamReadError()
-        : khmer_file_exception("Generic StreamReadError error") {}
-    StreamReadError(const char * msg) : khmer_file_exception(msg) {}
-};
 
 }
 
