@@ -1,9 +1,11 @@
-2014-07-24 Ivan Gonzalez <iglpdc@gmail.com>
+2014-07-24  Ivan Gonzalez  <iglpdc@gmail.com>
 
-    * All exceptions are now derived from a new base class exception,
-	khmer::khmer_exception. Issue #508. 
-    * All exceptions thrown are now instances (or derived from)
-	khmer::khmer_exception.
+    * lib/khmer.hh, lib/khmer_exception.hh: All exceptions are now derived from
+	a new base class exception, khmer::khmer_exception. Issue #508.
+    * lib/counting.cc, lib/hashbits.cc, lib/hashtable.{cc,hh},lib/kmer_hash.cc,
+	lib/labelhash.cc, lib/perf_metrics.hh, lib/read_parsers.{cc,hh},
+	lib/subset.cc, lib/thread_id_map.hh: All exceptions thrown are now
+	instances (or derived from) khmer::khmer_exception.
 
 2014-07-22  Jeramia Ory <jeramia.ory@gmail.com>
 
