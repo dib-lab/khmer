@@ -1,6 +1,6 @@
 2014-07-23  Ryan R. Boyce  <boycerya@msu.edu>
 
-   * Makefile: fixed >80 character line wrap-around
+    * Makefile: fixed >80 character line wrap-around
 
 2014-07-23  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
@@ -9,17 +9,17 @@
     
 2014-07-23  Heather L. Wiencko  <wienckhl@tcd.ie>
 
-	* khmer_tst_utils.py: added import traceback
-	* test_scripts.py: added test for normalize_by_median.py for fpr rate
+    * khmer_tst_utils.py: added import traceback
+    * test_scripts.py: added test for normalize_by_median.py for fpr rate
 
 2014-07-22  Justin Lippi  <jlippi@gmail.com>
  
-   *  khmer/_khmermodule.cc: removed unused assignment
-   *  lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
-      in the same compiler options that the only invocations are in to avoid
-      unusedPrivateFunction violation.
-   *  lib/read_parsers.cc: fix redundantassignment error by assigning variable
-      to its value directly
+    * khmer/_khmermodule.cc: removed unused assignment
+    * lib/read_aligner.cc,lib/read_aligner.hh: wrapped function declarations
+    in the same compiler options that the only invocations are in to avoid
+    unusedPrivateFunction violation.
+    * lib/read_parsers.cc: fix redundantassignment error by assigning variable
+    to its value directly
 
 2014-07-22  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -28,13 +28,13 @@
 
 2014-07-22  Justin Lippi  <jlippi@gmail.com>
 
-   * tests/test_subset_graph.py: decrease the amount of memory that is being
-   requested for the hash tables in test.
+    * tests/test_subset_graph.py: decrease the amount of memory that is being
+    requested for the hash tables in test.
 
 2014-07-22  Jim Stapleton  <jas@msu.edu>
 
-    * scripts/filter-abund.py: no longer asks for parameters that are unused,
-    issue #524
+     * scripts/filter-abund.py: no longer asks for parameters that are unused,
+     issue #524
 
 2014-07-22  Justin Lippi  <jlippi@gmail.com> 
 
