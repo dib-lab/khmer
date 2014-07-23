@@ -671,7 +671,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     } catch (InvalidStreamHandle &exc) {
         PyErr_SetString( PyExc_ValueError, "invalid input file name" );
         return NULL;
-    } catch (InvalidStreamHandle &exc) {
+    } catch (InvalidNumberOfThreadsRequested &exc) {
         PyErr_SetString( PyExc_ValueError, "invalid thread number" );
         return NULL;
     }
