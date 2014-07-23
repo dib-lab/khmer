@@ -1,6 +1,7 @@
 2014-07-23  Qingpeng Zhang <qingpeng@gmail.com>
     * scripts/load-graph.py: write fp rate into *.info file with option 
     to switch on
+    * tests/test_scripts.py: add test_load_graph_write_fp
 
 2014-07-21  Titus Brown <t@idyll.org>
 
