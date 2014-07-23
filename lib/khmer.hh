@@ -38,6 +38,8 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #include <map>
 #include <queue>
 
+#include "khmer_exception.hh"
+
 #   define MAX_COUNT 255
 #   define MAX_BIGCOUNT 65535
 #   define DEFAULT_TAG_DENSITY 40   // must be even
@@ -58,7 +60,6 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #   define MIN( a, b )	(((a) > (b)) ? (b) : (a))
 #   define MAX( a, b )	(((a) < (b)) ? (b) : (a))
 
-#include "khmer_exception.hh"
 namespace khmer
 {
 // largest number we can count up to, exactly. (8 bytes)
