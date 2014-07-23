@@ -1,3 +1,8 @@
+2014-07-23  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
+
+    * tests/test_hashbits.py, tests/test_graph.py, 
+    tests/test_lump.py: reduced memory requirement
+    
 2014-07-23  Heather L. Wiencko  <wienckhl@tcd.ie>
 
 	* khmer_tst_utils.py: added import traceback
