@@ -38,7 +38,9 @@ One-time Preparation
 
 #. Add a git reference to the khmer ged-lab repository::
 
+       cd khmer
        git remote add ged https://github.com/ged-lab/khmer.git
+       cd ../
 
    (This makes it easy for you to pull down the latest changes in the
    main repository.)
@@ -53,7 +55,8 @@ One-time Preparation
 #. Activate the virtualenv and install a few packages::
 
        . env/bin/activate
-       pip install sphinx nose
+       cd khmer
+       make install-dependencies
 
    (This installs `Sphinx <http://sphinx-doc.org/>`__ and `nose
    <https://nose.readthedocs.org/en/latest/>`__, packages we use for
@@ -62,17 +65,16 @@ One-time Preparation
 Building khmer and running the tests
 ------------------------------------
 
-#. Activate the virtualenv::
+#. Activate (or re-activate) the virtualenv::
 
-      . env/bin/activate
+      . ../env/bin/activate
 
    You can run this many times without any ill effects.
 
-   (This puts you in a cozy environment that you control.)
+   (This puts you in the development environment.)
 
 #. Build khmer::
 
-      cd khmer
       make
 
    If this fails, we apologize -- please `go create a new issue
@@ -86,7 +88,7 @@ Building khmer and running the tests
 
       make test
 
-   You should see lots of output, with::
+   You should see lots of output, with something like::
 
       Ran 360 tests in 10.403s
 
@@ -94,7 +96,7 @@ Building khmer and running the tests
 
    at the end.
 
-   (This will run all of the Python tests.)
+   (This will run all of the Python tests in the tests/ directory.)
 
 Congratulations! You're ready to develop!
 
@@ -135,7 +137,7 @@ Claiming an issue and starting to develop
 
    This will be issue dependent ;).
 
-   You will need to visit and revisit :doc:`coding-guidelines-and-review`.
+   (You should visit and read :doc:`coding-guidelines-and-review`.)
 
 #. Periodically update your branch from the main khmer master branch::
 
@@ -186,11 +188,15 @@ Claiming an issue and starting to develop
    Note that you can push multiple changes to a single pull request,
    and that pull requests can be progressive.)
 
+#. Paste in the committer checklist from :doc:`coding-guidelines-and-review`
+   and, after its pasted in, check off as many of the boxes as you can.
+
 #. The khmer team will now review your merge request and communicate
    with you through the pull request page.  Please feel free to add
    'ping!' in the comments if you are looking for feedback -- this
-   will alert us that you are still on the line -- but we will automatically
-   get notified of your pull request and any new comments, so use sparingly.
+   will alert us that you are still on the line -- but we will
+   automatically get notified of your pull request and any new
+   comments, so use sparingly.
 
    If this is still your first issue, please *don't* take another issue until
    we've merged your first one - thanks!
@@ -221,8 +227,12 @@ But! You can now do a couple of things!
   clicking down to individual files; or, ask us on
   khmer-project@idyll.org for suggestions.
 
-* You can help other people out by watching for new issues or looking at
-  pull requests.  Remember to be nice and polite!
+* Ask us! Ask khmer-project@idyll.org for suggestions on what to do next.
+  We can suggest particularly ripe low-hanging fruit, or find some other
+  issues that suit your interests and background.
+
+* You can also help other people out by watching for new issues or
+  looking at pull requests.  Remember to be nice and polite!
 
 * There's a whole bunch of `other projects
   <https://etherpad.mozilla.org/sciencelab-2014summersprint-sites>`__

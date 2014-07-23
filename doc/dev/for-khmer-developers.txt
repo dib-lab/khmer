@@ -8,3 +8,9 @@ First, never merge something unless it's been through a review!
 
 Second, you can authorize a continuous integration run on someone
 else's pull request by putting "ok to test" in the comments.
+
+Third, we ask that all contributors set up standing Pull Requests
+while they are working something.  (This is a **requirement** if
+you're in the GED lab.)  This lets us track what's going on. On the
+flip side, please do not review pull requests until they are indicated
+as "ready for review".
