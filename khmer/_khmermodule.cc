@@ -653,6 +653,13 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
             )) {
         return NULL;
     }
+    if (number_of_threads == 0) {
+        PyErr_SetString(
+            PyExc_ValueError,
+            "invalid thread number, must be integer greater than zero"
+        );
+        return NULL;
+    }
     // TODO: Handle keyword arguments.
     std:: string    ifile_name( ifile_name_CSTR );
 
@@ -671,11 +678,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     } catch (InvalidStreamHandle &exc) {
         PyErr_SetString( PyExc_ValueError, "invalid input file name" );
         return NULL;
-    } catch (InvalidNumberOfThreadsRequested &exc) {
-        PyErr_SetString( PyExc_ValueError, "invalid thread number" );
-        return NULL;
     }
-
     return self;
 }
 
