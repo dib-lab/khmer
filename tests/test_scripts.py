@@ -616,7 +616,7 @@ def test_load_graph_write_fp():
 
     args.extend([outfile, infile])
 
-    (status, out, err) = runscript(script, args)
+    (status, out, err) = utils.runscript(script, args)
 
     ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
