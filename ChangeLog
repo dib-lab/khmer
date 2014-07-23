@@ -1,3 +1,7 @@
+2014-07-23  Ryan R. Boyce  <boycerya@msu.edu>
+
+   * Makefile: fixed >80char line wrap-around
+
 2014-07-23  Leonor Garcia-Gutierrez  <l.garcia-gutierrez@warwick.ac.uk>
 
     * tests/test_hashbits.py, tests/test_graph.py, 
