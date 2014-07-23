@@ -320,7 +320,7 @@ unsigned int LabelHash::sweep_label_neighborhood(const std::string& seq,
     //printf("range=%u ", range);
     if (range == 0) {
         if (!(num_traversed == seq.length()-ksize()+1)) {
-            throw std::exception();
+            throw khmer_exception();
         }
     }
     tagged_kmers.clear();

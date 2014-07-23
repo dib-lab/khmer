@@ -28,7 +28,7 @@ HashIntoType _hash(const char * kmer, const WordLength k,
 {
     // sizeof(HashIntoType) * 8 bits / 2 bits/base
     if (!(k <= sizeof(HashIntoType)*4) || !(strlen(kmer) >= k)) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     HashIntoType h = 0, r = 0;
