@@ -236,6 +236,7 @@ void ReadAligner::Enumerate(
     }
 }
 
+#if READ_ALIGNER_DEBUG
 void ReadAligner::WriteNode(AlignmentNode* curr)
 {
     std::cerr << "curr: " << curr << " "
@@ -251,6 +252,7 @@ void ReadAligner::WriteNode(AlignmentNode* curr)
               << " bits_saved=" << curr->score - GetNull(curr->length)
               << std::endl;
 }
+#endif
 
 Alignment* ReadAligner::Subalign(AlignmentNode* start_vert,
                                  size_t seqLen,
