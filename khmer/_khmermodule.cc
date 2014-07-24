@@ -4644,7 +4644,7 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 
 //
 // technique for resolving literal below found here:
-// https://gcc.gnu.org/onlinedocs/gcc-4.8.1/cpp.pdf
+// https://gcc.gnu.org/onlinedocs/gcc-4.9.1/cpp/Stringification.html
 //
 
 static
