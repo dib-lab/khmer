@@ -118,8 +118,8 @@ def test_with_zero_threads():
     N_THREADS=0
     try:
         rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"), N_THREADS)
-        #rparser = ReadParser(utils.get_test_data("aaaaa.fq.bz2"), N_THREADS)
-    except ValueError, e:
+        assert 0, "should fail"
+    except ValueError as e:
         assert str(e) == \
             'Invalid thread number, must be integer greater than zero.'
 
