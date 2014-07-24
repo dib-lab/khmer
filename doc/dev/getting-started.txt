@@ -1,6 +1,13 @@
 Getting started with khmer development
 ======================================
 
+This document is for people who would like to contribute to khmer.  It
+walks first-time contributors through making their own copy of khmer,
+building it, and submitting changes for review and merge into the master
+copy of khmer.
+
+----
+
 Start by making your own copy of khmer and setting yourself up for
 development; then, build khmer and run the tests; and finally, claim
 an issue and start developing!

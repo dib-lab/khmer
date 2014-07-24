@@ -4,6 +4,9 @@
 Releasing a new version of khmer
 ================================
 
+This document is for khmer release managers, and details the process
+for making a new release of the khmer project.
+
 How to make a khmer release candidate
 -------------------------------------
 

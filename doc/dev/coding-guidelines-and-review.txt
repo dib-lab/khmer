@@ -1,7 +1,12 @@
 Coding guidelines and code review checklist
 ===========================================
 
+This document is for khmer developers, and describes our coding standards
+and code review checklist.
+
 (Copied from :doc:`development`)
+
+----
 
 Coding standards
 ----------------

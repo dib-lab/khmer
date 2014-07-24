@@ -3,6 +3,11 @@
 Deploying the khmer project tools on Galaxy
 ===========================================
 
+This document is for people interested in deploying the khmer tools on
+the Galaxy platform.
+
+----
+
 We are developing the support for running normalize-by-median in `Galaxy 
 <http://galaxyproject.org/>`__.
 

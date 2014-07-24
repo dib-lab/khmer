@@ -1,6 +1,10 @@
 The khmer developer documentation
 =================================
 
+This section of the documentation is for people who are contributing
+(or would like to contribute to) the khmer project codebase, either by
+contributing code or by helping improve the documentation.
+
 Contents:
 
 .. toctree::

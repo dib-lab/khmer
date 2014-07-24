@@ -1,6 +1,11 @@
 Hackathon information (July 2014)
 =================================
 
+This document is for contributors to the July 2014 hackathon (see `the
+blog post <http://ivory.idyll.org/blog/2014-khmer-hackathon.html>`__).
+
+----
+
 Please track `khmer issue #446
 <https://github.com/ged-lab/khmer/issues/446>`__ for up-to-the-minute
 information.  You can subscribe to this issue (lower right on issue page)

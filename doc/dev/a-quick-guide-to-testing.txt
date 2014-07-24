@@ -1,6 +1,12 @@
 A quick guide to testing (for khmer)
 ====================================
 
+This document is for contributors new to automated testing, and explains
+some of the motivation and logic behind the khmer project's testing
+approach.
+
+----
+
 One of our most important "secret sauces" for khmer development is
 that we do a fair bit of testing to make sure our code works and keeps
 working!
