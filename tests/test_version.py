@@ -10,6 +10,7 @@ import versioneer
 import os
 
 
+@attr ('jenkins')
 def test_python_and_c_match():
     #checks c++ compiler option version against versioneer version
     # (respectively)
