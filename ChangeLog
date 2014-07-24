@@ -1,3 +1,10 @@
+2014-07-24 Jiarong Guo <guojiaro@gmail.com>
+
+    * khmer/_khmermodule.cc: add python exception when thread = 0 
+	for ReadParser.
+    * tests/test_read_parsers.py: add test_with_zero_threads() 
+	to test python exception when ReadParser has zero threads.
+
 2014-07-21  Titus Brown <t@idyll.org>
 
     * sandbox/saturate-by-median.py: introduce new sandbox script for
