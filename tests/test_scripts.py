@@ -166,21 +166,21 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
 
 
 def test_filter_abund_1():
-script = scriptpath('filter-abund.py')
+    script = scriptpath('filter-abund.py')
 
     clean_infile = utils.get_temp_filename('test.fa')
     n_infile = utils.get_temp_filename('test-fastq-n-reads.fq')
 
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), clean_infile)
     shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
 
-    in_dir = os.path.dirname(infile)
+    in_dir = os.path.dirname(clean_infile)
     n_in_dir = os.path.dirname(n_infile)
 
-    clean_counting_ht = _make_counting(infile, K=17)
+    clean_counting_ht = _make_counting(clean_infile, K=17)
     n_counting_ht = _make_counting(n_infile, K=17)
 
-    clean_outfile = infile + '.abundfilt'
+    clean_outfile = clean_infile + '.abundfilt'
     n_outfile = n_infile + '.abundfilt'
 
     args = [clean_counting_ht, clean_infile]
@@ -197,6 +197,8 @@ script = scriptpath('filter-abund.py')
 
     assert os.path.exists(n_outfile), n_outfile
 
+    args = [n_counting_ht, n_infile, '-o' 'outfile']
+    utils.runscript(script, args, in_dir)
 
 def test_filter_abund_2():
     infile = utils.get_temp_filename('test.fa')
