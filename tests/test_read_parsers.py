@@ -115,6 +115,17 @@ def test_with_multiple_threads():
     assert reads_count_1thr == sum(reads_counts_per_thread)
 
 
+def test_with_zero_threads():
+    N_THREADS = 0
+    try:
+        rparser = \
+            ReadParser(utils.get_test_data("test-reads.fq.bz2"), N_THREADS)
+        assert 0, "should fail"
+    except ValueError as e:
+        assert str(e) == \
+            'Invalid thread number, must be integer greater than zero.'
+
+
 @attr('multithread')
 def test_old_illumina_pair_mating():
 
