@@ -1,3 +1,10 @@
+2014-07-24  Jiarong Guo  <guojiaro@gmail.com>
+
+    * khmer/_khmermodule.cc: add python exception when thread = 0 for
+    ReadParser.
+    * tests/test_read_parsers.py: add test_with_zero_threads() to test Python
+    exception when ReadParser has zero threads.
+
 2014-07-23  Ryan R. Boyce  <boycerya@msu.edu>
 
     * Makefile: fixed >80 character line wrap-around
