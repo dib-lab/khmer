@@ -4649,7 +4649,7 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 
 static
 PyObject *
-get_version( PyObject * self, PyObject * args )
+get_version_cpp( PyObject * self, PyObject * args )
 {
 #define xstr(s) str(s)
 #define str(s) #s
@@ -4712,7 +4712,7 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,       "",
     },
     {
-        "get_version", get_version,
+        "get_version_cpp", get_version_cpp,
         METH_VARARGS, "return the VERSION c++ compiler option"
     },
     { NULL, NULL, 0, NULL } // sentinel
