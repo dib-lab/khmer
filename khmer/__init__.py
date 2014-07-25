@@ -27,7 +27,7 @@ from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 from khmer._khmer import reverse_hash  # tests/test_functions.py
 # tests/counting_single.py
 
-from khmer._khmer import get_version # tests/test_version.py
+from khmer._khmer import get_version_cpp  # tests/test_version.py
 
 from khmer._khmer import get_config  # tests/test_read_parsers.py
 # tests/test_khmer_config.py

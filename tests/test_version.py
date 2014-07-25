@@ -14,6 +14,6 @@ import os
 def test_python_and_c_match():
     #checks c++ compiler option version against versioneer version
     # (respectively)
-    print 'c++ version {}:'.format(khmer.get_version())
+    print 'c++ version {}:'.format(khmer.get_version_cpp())
     print 'versioneer (python) version: {}'.format(khmer.__version__)
-    assert khmer.get_version() == khmer.__version__;
+    assert khmer.get_version_cpp() == khmer.__version__;
