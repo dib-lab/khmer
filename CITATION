@@ -283,7 +283,7 @@ in:
 Decontamination filtering
 -------------------------
 
-The :program:`filter-contamination.py` script implement the classification of
+The :program:`filter-contamination.py` script implements the classification of
 sequences described in:
 
    Classification of DNA sequences using Bloom filters
