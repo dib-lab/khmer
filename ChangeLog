@@ -1,4 +1,3 @@
-
 2014-07-24  Jiarong Guo  <guojiaro@gmail.com>
 
     * khmer/_khmermodule.cc: add python exception when thread = 0 for
