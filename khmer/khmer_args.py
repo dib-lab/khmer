@@ -175,7 +175,7 @@ _algorithms = {
     'counting': "Q Zhang et al., PLoS ONE, 2014 doi: "
                 "10.1371/journal.pone.0101271",
     'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
-    'classification': "Stranneheim H., et al., doi: "
+    'classification': "Stranneheim H., et al., Bioinformatics, 2010 doi: "
                       "10.1093/bioinformatics/btq230",
 }
 
