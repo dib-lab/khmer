@@ -8,7 +8,6 @@
 #ifndef THREAD_ID_MAP_HH
 #   define THREAD_ID_MAP_HH
 
-#include <exception>
 #include <map>
 
 // TODO? Just use 'pthread_t' everywhere.
@@ -31,10 +30,10 @@ namespace khmer
 {
 
 
-struct InvalidNumberOfThreadsRequested : public std:: exception {
+struct InvalidNumberOfThreadsRequested : public khmer_exception {
 };
 
-struct TooManyThreads : public std:: exception {
+struct TooManyThreads : public khmer_exception {
 };
 
 

@@ -42,7 +42,8 @@ Linux
 
    - On recent Debian and Ubuntu this can be done with::
 
-         sudo apt-get install python2.7-dev python-virtualenv python-pip gcc
+         sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
+                g++
 
    - For RHEL6::
 
