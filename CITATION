@@ -47,8 +47,8 @@ implement the probabilistic k-mer counting described in:
 Decontamination filtering
 -------------------------
 
-The filter-contamination.py script implement the classification of sequences
-described in:
+The filter-contamination.py script implements the classification of sequences
+as described in:
 
    Classification of DNA sequences using Bloom filters
    Stranneheim H, Käer M, Allander T, Andersson B, Arvestad L, Lundeberg J
