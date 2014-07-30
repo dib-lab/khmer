@@ -316,7 +316,7 @@ void Hashtable::get_median_count(const std::string &s,
     }
 
     if (!counts.size()) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     if (!counts.size()) {
@@ -1159,7 +1159,7 @@ const
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw std::exception();
+            throw khmer_exception();
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -1524,7 +1524,7 @@ const
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw std::exception();
+            throw khmer_exception();
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -1729,7 +1729,7 @@ const
         }
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw std::exception();
+            throw khmer_exception();
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -2036,7 +2036,7 @@ void Hashtable::extract_unique_paths(std::string seq,
         // then extract.
 
         if (!(j == min_length)) {
-            throw std::exception();
+            throw khmer_exception();
         }
         if ( ((float)seen_counter / (float) j) <= max_seen) {
             unsigned int start = i;

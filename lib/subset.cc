@@ -144,7 +144,7 @@ size_t SubsetPartition::output_partitioned_file(
 #ifdef VALIDATE_PARTITIONS
             std::cout << "checking: " << read.name << "\n";
             if (!is_single_partition(seq)) {
-                throw std::exception();
+                throw khmer_exception();
             }
 #endif // VALIDATE_PARTITIONS
 
@@ -478,7 +478,7 @@ void SubsetPartition::find_all_tags(
 
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
             // debugging.
-            throw std::exception();
+            throw khmer_exception();
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -766,7 +766,7 @@ void SubsetPartition::find_all_tags_truncate_on_abundance(
         // @cswelcher Do these lines actually do anything?
         if (!(breadth >= cur_breadth)) { // keep track of watermark, for
             // debugging.
-            throw std::exception();
+            throw khmer_exception();
         }
         if (breadth > cur_breadth) {
             cur_breadth = breadth;
@@ -991,7 +991,7 @@ void SubsetPartition::set_partition_id(
 {
     HashIntoType kmer;
     if (!(kmer_s.length() >= _ht->ksize())) {
-        throw std::exception();
+        throw khmer_exception();
     }
     kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
@@ -1161,7 +1161,7 @@ PartitionID SubsetPartition::get_partition_id(std::string kmer_s)
 {
     HashIntoType kmer;
     if (!(kmer_s.length() >= _ht->ksize())) {
-        throw std::exception();
+        throw khmer_exception();
     }
     kmer = _hash(kmer_s.c_str(), _ht->ksize());
 
@@ -1351,7 +1351,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             i += sizeof(PartitionID);
 
             if (!(*diskp != 0)) {		// sanity check.
-                throw std::exception();
+                throw khmer_exception();
             }
 
             _merge_other(*kmer_p, *diskp, diskp_to_pp);
@@ -1359,7 +1359,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             loaded++;
         }
         if (!(i == n_bytes)) {
-            throw std::exception();
+            throw khmer_exception();
         }
         memcpy(buf, buf + n_bytes, remainder);
     }
@@ -1442,7 +1442,7 @@ void SubsetPartition::_validate_pmap()
 
         if (pp_id != NULL) {
             if (!(*pp_id >= 1) || !(*pp_id < next_partition_id)) {
-                throw std::exception();
+                throw khmer_exception();
             }
         }
     }
@@ -1453,7 +1453,7 @@ void SubsetPartition::_validate_pmap()
         PartitionPtrSet *s = (*ri).second;
 
         if (!(s != NULL)) {
-            throw std::exception();
+            throw khmer_exception();
         }
 
         for (PartitionPtrSet::const_iterator si = s->begin(); si != s->end();
@@ -1462,7 +1462,7 @@ void SubsetPartition::_validate_pmap()
             pp = *si;
 
             if (!(p == *pp)) {
-                throw std::exception();
+                throw khmer_exception();
             }
         }
     }
@@ -1626,7 +1626,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
     --di;
 
     if (d.empty()) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
@@ -1636,7 +1636,7 @@ unsigned long long SubsetPartition::repartition_largest_partition(
         }
     }
     if (!(biggest_p != 0)) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
 #if VERBOSE_REPARTITION

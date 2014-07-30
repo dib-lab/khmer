@@ -34,11 +34,11 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
 #endif
 
-// C++ standard exceptions are subclassed almost ubiquitously.
-#include <exception>
 #include <set>
 #include <map>
 #include <queue>
+
+#include "khmer_exception.hh"
 
 #   define MAX_COUNT 255
 #   define MAX_BIGCOUNT 65535
@@ -80,10 +80,6 @@ typedef void (*CallbackFn)(const char * info, void * callback_data,
                            unsigned long long n_reads,
                            unsigned long long other);
 
-struct InvalidStreamBuffer : public std:: exception {
-};
-
-
 typedef unsigned int PartitionID;
 typedef std::set<HashIntoType> SeenSet;
 typedef std::set<PartitionID> PartitionSet;
@@ -115,34 +111,6 @@ void deallocate_ptr_set(T& s)
         delete *i;
     }
 }
-
-class khmer_file_exception : public std::exception
-{
-public:
-    khmer_file_exception(const char * msg) : _msg(msg) { };
-
-    virtual const char* what() const throw() {
-        return _msg;
-    }
-protected:
-    const char * _msg;
-};
-
-class InvalidStreamHandle : public khmer_file_exception
-{
-public:
-    InvalidStreamHandle()
-        : khmer_file_exception("Generic InvalidStreamHandle error") {}
-    InvalidStreamHandle(const char * msg) : khmer_file_exception(msg) {}
-};
-
-class StreamReadError : public khmer_file_exception
-{
-public:
-    StreamReadError()
-        : khmer_file_exception("Generic StreamReadError error") {}
-    StreamReadError(const char * msg) : khmer_file_exception(msg) {}
-};
 
 }
 

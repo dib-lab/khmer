@@ -12,16 +12,14 @@
 #include <cstring>
 #include <ctime>
 
-#include <exception>
 
 #include "khmer.hh"
-
 
 namespace khmer
 {
 
 #ifdef WITH_INTERNAL_METRICS
-struct InvalidPerformanceMetricsKey : public std:: exception {
+struct InvalidPerformanceMetricsKey : public khmer_exception {
 };
 
 
