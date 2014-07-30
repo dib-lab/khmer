@@ -453,8 +453,8 @@ _algorithms = {
     'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
     'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11',
     'hll': 'Irber and Brown, unpublished',
-    'classification': "Stranneheim H., et al., doi: "
-                      "10.1093/bioinformatics/btq230"
+    'classification': "Stranneheim H., et al., Bioinformatics, 2010 doi: "
+                      "10.1093/bioinformatics/btq230",
 }
 
 
