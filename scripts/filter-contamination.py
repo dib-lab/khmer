@@ -38,7 +38,7 @@ def get_parser():
 
 
 def main():
-    info('filter-contamination.py', ['graph'])
+    info('filter-contamination.py', ['graph', 'classification'])
     args = get_parser().parse_args()
     graph = args.graph
     data = args.data
