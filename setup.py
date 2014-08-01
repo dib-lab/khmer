@@ -86,14 +86,6 @@ SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
                 if script.endswith(".py")])
 
-INSTALL_REQUIRES = ["screed >= 0.7.1"]
-
-try:
-    import argparse
-    del argparse
-except ImportError:
-    INSTALL_REQUIRES.append("argparse >= 1.2.1")
-
 SETUP_METADATA = \
     {
         "name": "khmer",
@@ -112,8 +104,9 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer', 'khmer.tests'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": INSTALL_REQUIRES,
-        "extras_require": {'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
+        "install_requires": ['screed >= 0.7'],
+        "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
+                           'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
         "ext_modules": [EXTENSION_MOD, ],
