@@ -1,3 +1,10 @@
+2014-08-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc,lib/{kmer_hash.{cc,hh},read_aligner.cc,
+    read_parsers.{cc,hh},trace_logger.cc: Replace remaining use of assert()
+    with a khmer_exception. Fixes #215.
+    * setup.py: simplify argparse conditional dependency
+
 2014-08-03  Titus Brown & Michael R. Crusoe  <t@idyll.org>
 
     * doc/{artifact-removal,partitioning-workflow{.graffle,.png}},{biblio,
