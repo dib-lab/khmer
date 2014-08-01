@@ -250,7 +250,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
         return 0;
     }
     if (!(NULL != cache)) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 
 #ifdef __linux__
@@ -297,7 +297,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     uint64_t	nbread_total	    = 0;
 
     if (! (NULL != cache)) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
     if (0 == cache_size) {
         return 0;
@@ -347,7 +347,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     uint64_t	nbread_total	    = 0;
 
     if (! (NULL != cache)) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
     if (0 == cache_size) {
         return 0;
@@ -888,7 +888,7 @@ _perform_segment_maintenance( CacheSegment &segment )
 {
 #if (0)
     if (!( segment.avail )) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 #endif
 
@@ -1081,7 +1081,7 @@ _get_segment( bool const higher )
     CacheSegment *  segment_PTR		= NULL;
 
     if (!( NULL != _segments )) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 
     // If referring to a segment to snoop,

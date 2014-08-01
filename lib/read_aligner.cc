@@ -340,10 +340,10 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     }
 
     if (!(node->seq_idx < read.length())) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
     if (!(node->seq_idx >= 0)) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
     std::string read_alignment = "";
     std::string graph_alignment = "";

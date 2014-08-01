@@ -75,10 +75,10 @@ _common_init_Type(
 )
 {
     if (!name) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
     if (!doc) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 
     tobj.ob_size        = 0;
@@ -3124,7 +3124,7 @@ static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
         PyList_SET_ITEM(x, i, value);
     }
     if (!(i == d.size())) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 
     PyObject * returnValue = Py_BuildValue("NI", x, n_unassigned);
@@ -3807,7 +3807,7 @@ static PyObject * subset_partition_size_distribution(PyObject * self,
         Py_XDECREF(tup);
     }
     if (!(i == d.size())) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 
     PyObject * ret = Py_BuildValue("OI", x, n_unassigned);

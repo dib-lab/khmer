@@ -490,8 +490,8 @@ protected:
         ParserState *	state_PTR	= NULL;
 
         if(!( NULL != _states )) {
-	    throw khmer_exception();
-	}
+            throw khmer_exception();
+        }
 
         state_PTR = _states[ thread_id ];
         if (NULL == state_PTR) {
@@ -540,7 +540,7 @@ inline PartitionID _parse_partition_id(std::string name)
     PartitionID p = 0;
     const char * s = name.c_str() + name.length() - 1;
     if (!(*(s + 1) == (unsigned int) NULL)) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 
     while(*s != '\t' && s >= name.c_str()) {

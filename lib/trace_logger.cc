@@ -20,7 +20,7 @@ TraceLogger( uint8_t const level, FILE * stream_handle )
     : _level( level ), _shared_stream( true ), _stream_handle( stream_handle )
 {
     if( !(NULL != stream_handle) ) {
-	throw khmer_exception();
+        throw khmer_exception();
     }
 }
 #endif
