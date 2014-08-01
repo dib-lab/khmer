@@ -5,7 +5,6 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include <assert.h>
 #include <math.h>
 #include <string>
 #include <iostream>

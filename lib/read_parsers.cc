@@ -18,7 +18,7 @@
 #endif
 
 #include "read_parsers.hh"
-
+#include "khmer_exception.hh"
 
 namespace khmer
 {
@@ -246,9 +246,11 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     ssize_t	nbread		    = 0;
     uint64_t	nbread_total	    = 0;
 
-    assert (NULL != cache);
     if (0 == cache_size) {
         return 0;
+    }
+    if (!(NULL != cache)) {
+	throw khmer_exception();
     }
 
 #ifdef __linux__
@@ -294,7 +296,9 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     int		nbread		    = 0;
     uint64_t	nbread_total	    = 0;
 
-    assert (NULL != cache);
+    if (! (NULL != cache)) {
+	throw khmer_exception();
+    }
     if (0 == cache_size) {
         return 0;
     }
@@ -342,7 +346,9 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
     int		nbread		    = 0;
     uint64_t	nbread_total	    = 0;
 
-    assert (NULL != cache);
+    if (! (NULL != cache)) {
+	throw khmer_exception();
+    }
     if (0 == cache_size) {
         return 0;
     }
@@ -881,7 +887,9 @@ CacheManager::
 _perform_segment_maintenance( CacheSegment &segment )
 {
 #if (0)
-    assert( segment.avail );
+    if (!( segment.avail )) {
+	throw khmer_exception();
+    }
 #endif
 
 #ifdef TRACE_STATE_CHANGES
@@ -1072,7 +1080,9 @@ _get_segment( bool const higher )
     uint32_t	    thread_id		= _thread_id_map.get_thread_id( );
     CacheSegment *  segment_PTR		= NULL;
 
-    assert( NULL != _segments );
+    if (!( NULL != _segments )) {
+	throw khmer_exception();
+    }
 
     // If referring to a segment to snoop,
     // then index is for the thread with the next higher ID.

@@ -22,6 +22,7 @@
 #include "counting.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
+#include "khmer_exception.hh"
 
 using namespace khmer;
 
@@ -73,8 +74,12 @@ _common_init_Type(
     PyTypeObject &tobj, char const * name, char const * doc
 )
 {
-    assert( name );
-    assert( doc );
+    if (!name) {
+	throw khmer_exception();
+    }
+    if (!doc) {
+	throw khmer_exception();
+    }
 
     tobj.ob_size        = 0;
     tobj.ob_type        = &PyType_Type;
@@ -3118,7 +3123,9 @@ static PyObject * hashbits_subset_partition_size_distribution(PyObject * self,
         }
         PyList_SET_ITEM(x, i, value);
     }
-    assert (i == d.size());
+    if (!(i == d.size())) {
+	throw khmer_exception();
+    }
 
     PyObject * returnValue = Py_BuildValue("NI", x, n_unassigned);
     if (returnValue == NULL) {
@@ -3799,7 +3806,9 @@ static PyObject * subset_partition_size_distribution(PyObject * self,
         }
         Py_XDECREF(tup);
     }
-    assert (i == d.size());
+    if (!(i == d.size())) {
+	throw khmer_exception();
+    }
 
     PyObject * ret = Py_BuildValue("OI", x, n_unassigned);
     Py_DECREF(x);
