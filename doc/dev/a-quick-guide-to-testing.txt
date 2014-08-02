@@ -25,7 +25,9 @@ working!
 CTB and others have written a great deal about testing, and testing in
 Python in particular.  Here's an `introductory guide
 <http://ivory.idyll.org/articles/nose-intro.html>`__ CTB wrote a long
-time ago.
+time ago.  You might also be interested in reading `this description
+of the different kinds of tests
+<http://www.ibm.com/developerworks/library/j-test/index.html>`__.
 
 For the more general motivation, see `the Lack of Testing Death Spiral
 <http://ivory.idyll.org/blog/software-quality-death-spiral.html>`__.
