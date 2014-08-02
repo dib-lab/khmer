@@ -1,10 +1,8 @@
 Coding guidelines and code review checklist
 ===========================================
 
-This document is for khmer developers, and describes our coding standards
-and code review checklist.
-
-(Copied from :doc:`development`)
+This document is for anyone who want to contribute code to the khmer
+project, and describes our coding standards and code review checklist.
 
 ----
 
@@ -74,10 +72,3 @@ ready for review::
 **Note** that after you submit the comment you can check and uncheck
 the individual boxes on the formatted comment; no need to put x or y
 in the middle.
-
-Testing
--------
-
-``./setup.py nosetest`` is the canonical way to run the tests.  This is what
-``make test`` does.
-
