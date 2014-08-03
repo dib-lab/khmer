@@ -63,7 +63,6 @@ def main():
     len_reads = []
 
     # For each read determine % k-mers that are present in the hashbits table
-    # XXX: Which number of **reads** from input (data argument) are present in the hashbits table (graph argument)?
     #
     # Output should resemble:
     # {
@@ -83,15 +82,20 @@ def main():
             n_reads = n_reads + 1
             htable.consume(r.sequence)
 
-        # 31 == K - 1
+        # XXX: use htable.consume_fasta_with_reads_parser(rparser) as the documentation states:
+        # http://khmer.readthedocs.org/en/v1.1/design.html
+        # Will this method support fastq? fq.gz? fq.bz2?
+
+        # XXX: This should return the proportion of the k-mers in the read that are in the htable, for all reads.
+        # 31 == K - 1 ... how do I query K from python?
         contam = 1 - float(htable.n_unique_kmers() / (len_reads[0] - 31))
 
-        print >> sys.stderr, 'Total number reads: {0}'.format(n_reads)
+        print >> sys.stderr, 'Total number of reads: {0}'.format(n_reads)
         print >> sys.stderr, 'Average read length: {0}'.format(sum(len_reads)/n_reads)
         print >> sys.stderr, 'Total unique kmers in graph table: {0}'.format(total_unique_kmers)
 
         # XXX: n_occupied? Are those the k-mers present in the hashbits table? What about "present"? "found"?
-        # (in hashbits table)... *** make khmer more boring! ***
+        # (in hashbits table)... *** make khmer more boring! *** ;)
         # Less surprises, less guessing == more developer happiness :)
 
         print >> sys.stderr, 'Total number of occupied (already seen?) k-mers: {0}'.format(htable.n_occupied())
