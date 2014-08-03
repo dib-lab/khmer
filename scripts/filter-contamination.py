@@ -13,10 +13,12 @@ Screen for contamination in a similar way as FACS, fastq_screen or deconseq do.
 
 Use '-h' for parameter help.
 """
+from __future__ import division
 
 # Built the test graph using:
 # scripts/load-graph.py -x 4e9 -N 4 --no-build-tagset foo.khmer ../data/16s.fa
 
+import os
 import sys
 
 import khmer
@@ -42,6 +44,9 @@ def main():
     args = get_parser().parse_args()
     graph = args.graph
     data = args.data
+
+    # XXX: I bet there's a better built-in method to get table.info?
+    total_unique_kmers = int(open(os.path.splitext(graph)[0] + '.info').read().split(' ')[0])
 
     # Get samples to be analyzed against the graph file
     filenames = [data]
@@ -78,10 +83,19 @@ def main():
             n_reads = n_reads + 1
             htable.consume(r.sequence)
 
-    print >> sys.stderr, 'Total number reads: {0}'.format(n_reads)
-    print >> sys.stderr, 'Average read length: {0}'.format(sum(len_reads)/n_reads)
-    print >> sys.stderr, 'Total number of occupied k-mers: {0}'.format(htable.n_occupied())
-    print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(htable.n_unique_kmers())
+        contam = float(htable.n_unique_kmers() / total_unique_kmers)
+
+        print >> sys.stderr, 'Total number reads: {0}'.format(n_reads)
+        print >> sys.stderr, 'Average read length: {0}'.format(sum(len_reads)/n_reads)
+        print >> sys.stderr, 'Total unique kmers in graph table: {0}'.format(total_unique_kmers)
+
+        # XXX: n_occupied? Are those the k-mers present in the hashbits table? What about "present"? "found"?
+        # (in hashbits table)... *** make khmer more boring! ***
+        # Less surprises, less guessing == more developer happiness :)
+
+        print >> sys.stderr, 'Total number of occupied (already seen?) k-mers: {0}'.format(htable.n_occupied())
+        print >> sys.stderr, 'Total number of unique (newly found?) k-mers: {0}'.format(htable.n_unique_kmers())
+        print >> sys.stderr, 'Contamination: {0:0.9f}'.format(contam)
 
     # XXX: Make a decision based on a threshold and write to disk in appropriate places
 
