@@ -83,7 +83,8 @@ def main():
             n_reads = n_reads + 1
             htable.consume(r.sequence)
 
-        contam = float(htable.n_unique_kmers() / total_unique_kmers)
+        # 31 == K - 1
+        contam = 1 - float(htable.n_unique_kmers() / (len_reads[0] - 31))
 
         print >> sys.stderr, 'Total number reads: {0}'.format(n_reads)
         print >> sys.stderr, 'Average read length: {0}'.format(sum(len_reads)/n_reads)
