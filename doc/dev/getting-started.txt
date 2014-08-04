@@ -23,28 +23,29 @@ One-time Preparation
 
 #. Install the dependencies.
 
-   OS X users:
+   OS X users
 
-        #.  Install Xcode from the `Mac App Store (requires root)
-            <https://developer.apple.com/xcode/>`_.
-        #.  `Register as an Apple Developer
-            <https://developer.apple.com/register>`__.
-        #.  Install the Xcode command-line tools: Xcode -> preferences ->
-            Downloads -> Command Line Tools (requires root).
+   a.  Install Xcode from the `Mac App Store (requires root)
+       <https://developer.apple.com/xcode/>`_.
+   #.  `Register as an Apple Developer
+       <https://developer.apple.com/register>`__.
+   #.  Install the Xcode command-line tools: Xcode -> preferences ->
+       Downloads -> Command Line Tools (requires root).
 
-   Linux users:
+   Linux users
 
-        #. Install the python development environment, virtualenv, pip, gcc,
-           and g++.
-	   On recent Debian and Ubuntu this can be done with::
+   a.  Install the python development environment, virtualenv, pip, gcc, and
+       g++.
 
-                sudo apt-get install python2.7-dev python-virtualenv python-pip
-                gcc g++
+       On recent Debian and Ubuntu this can be done with::
 
-	   For RHEL6::
+           sudo apt-get install python2.7-dev python-virtualenv python-pip gcc \
+           g++
 
-                sudo yum install -y python-devel python-pip git gcc gcc-c++ make
-                sudo pip install virtualenv
+       For RHEL6::
+
+           sudo yum install -y python-devel python-pip git gcc gcc-c++ make
+           sudo pip install virtualenv
 
 #. Get a `GitHub <http://github.com>`__ account.
 
@@ -82,16 +83,25 @@ One-time Preparation
 
        python2.7 -m virtualenv env
 
-   This gives you a place to install packages necessary for running khmer. OS X
-   users and others may need to download virtualenv first::
+   This gives you a place to install packages necessary for running khmer.
+
+   OS X users and others may need to download virtualenv first::
 
 	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
 	tar xzf virtualenv*
 	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
 
+   `Conda <https://github.com/conda/conda>`__ users on any platform can install
+   virtualenv this way::
+
+       conda install pip
+       hash -r
+       pip install virtualenv
+       python2.7 -m virtualenv env 
+
 #. Activate the virtualenv and install a few packages::
 
-       . env/bin/activate
+       source env/bin/activate
        cd khmer
        make install-dependencies
 
@@ -104,7 +114,7 @@ Building khmer and running the tests
 
 #. Activate (or re-activate) the virtualenv::
 
-      . ../env/bin/activate
+      source ../env/bin/activate
 
    You can run this many times without any ill effects.
 
