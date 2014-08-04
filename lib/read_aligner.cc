@@ -4,7 +4,7 @@
 // the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 //
 #include "read_aligner.hh"
-#include <stdlib.h>     /* labs */
+#include "khmer_exception.hh"
 
 namespace khmer
 {
@@ -339,8 +339,9 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
         return ret;
     }
 
-    assert(node->seq_idx < read.length());
-    assert(node->seq_idx >= 0);
+    if (!(node->seq_idx < read.length())) {
+        throw khmer_exception();
+    }
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";

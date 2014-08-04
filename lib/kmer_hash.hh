@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <assert.h>
 
 #include "khmer.hh"
 
