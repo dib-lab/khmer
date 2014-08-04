@@ -1,3 +1,19 @@
+2014-08-03  Titus Brown & Michael R. Crusoe  <t@idyll.org>
+
+    * doc/{artifact-removal,partitioning-workflow{.graffle,.png}},{biblio,
+    blog-posts,guide,install,choosing-table-sizes,known-issues,scripts,
+    partitioning-big-data.txt: moved to doc/user/
+    * doc/{crazy-ideas,details,development,galaxy,release,examples}.txt: moved
+    to doc/dev/
+    * doc/dev/{a-quick-guide-to-testing,codebase-guide,
+    coding-guidelines-and-review,for-khmer-developers,getting-started,
+    hackathon,index}.txt,doc/user/index.txt: new content.
+    * doc/design.txt: deleted
+    The documentation has been split into user focused documentation and
+    developer focused documentation. The new developer docs were field tested
+    as part of the Mozilla Science Lab global sprint that we participated in;
+    we are grateful to all the volunteers.
+
 2014-07-24  Ivan Gonzalez  <iglpdc@gmail.com>
 
     * lib/khmer.hh, lib/khmer_exception.hh: All exceptions are now derived from
