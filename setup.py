@@ -104,7 +104,7 @@ SETUP_METADATA = \
         "url": 'http://ged.msu.edu/',
         "packages": ['khmer', 'khmer.tests'],
         "package_dir": {'khmer.tests': 'tests'},
-        "install_requires": ['screed >= 0.7'],
+        "install_requires": ['screed >= 0.7.1'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
