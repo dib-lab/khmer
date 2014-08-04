@@ -1,0 +1,1 @@
+http://athyra.ged.msu.edu/~mcrusoe/autoprogram/sphinxcontrib-autoprogram-0.1.1-khmerdev-20140331.tar.gz#egg=sphinxcontrib-autoprogram==0.1.1-khmerdev-20140331
