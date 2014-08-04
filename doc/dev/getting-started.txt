@@ -21,6 +21,31 @@ We've provided a quick guide to the khmer code base here:
 One-time Preparation
 --------------------
 
+#. Install the dependencies.
+
+   OS X users:
+
+        #.  Install Xcode from the `Mac App Store (requires root)
+            <https://developer.apple.com/xcode/>`_.
+        #.  `Register as an Apple Developer
+            <https://developer.apple.com/register>`__.
+        #.  Install the Xcode command-line tools: Xcode -> preferences ->
+            Downloads -> Command Line Tools (requires root).
+
+   Linux users:
+
+        #. Install the python development environment, virtualenv, pip, gcc,
+           and g++.
+	   On recent Debian and Ubuntu this can be done with::
+
+                sudo apt-get install python2.7-dev python-virtualenv python-pip
+                gcc g++
+
+	   For RHEL6::
+
+                sudo yum install -y python-devel python-pip git gcc gcc-c++ make
+                sudo pip install virtualenv
+
 #. Get a `GitHub <http://github.com>`__ account.
 
    (We use GitHub to manage khmer contributions.)
@@ -57,7 +82,12 @@ One-time Preparation
 
        python2.7 -m virtualenv env
 
-   (This gives you a place to install packages necessary for running khmer.)
+   This gives you a place to install packages necessary for running khmer. OS X
+   users and others may need to download virtualenv first::
+
+	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
+	tar xzf virtualenv*
+	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
 
 #. Activate the virtualenv and install a few packages::
 
