@@ -55,7 +55,7 @@ We suggest the following approach to writing tests for **new code**:
    to make sure that the code basically works.
 
 #. Add in tests for edge cases.  By this we mean look for special cases in
-   your code -- if statements, fencepost bound errors, etc. -- and write
+   your code -- if statements, fence-post bound errors, etc. -- and write
    tests that exercise those bits of code specifically.
 
 For adding tests to **old code**, we recommend a mix of two approaches:

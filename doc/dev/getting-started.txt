@@ -55,7 +55,7 @@ One-time Preparation
 
    Visit that page, and then click on the 'fork' button (upper right).
 
-   (This makes a copy of the khmer source code in your own github account.)
+   (This makes a copy of the khmer source code in your own GitHub account.)
 
 #. Clone your copy of khmer to your local development environment.
 
@@ -195,13 +195,13 @@ Claiming an issue and starting to develop
    doing on ged-lab - important especially during periods of fast change
    or for long-running pull requests.
 
-#. Run the tests and/or build the docs *before* pushing to github::
+#. Run the tests and/or build the docs *before* pushing to GitHub::
 
       make doc test pep8
 
    Make sure they all pass!
 
-#. Push your branch to your own github fork::
+#. Push your branch to your own GitHub fork::
 
       git push origin
 

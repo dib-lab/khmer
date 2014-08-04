@@ -17,7 +17,7 @@ Build framework
 
 'make' should build everything, including tests and "development" code.
 
-git and github strategies
+git and GitHub strategies
 -------------------------
 
 Still in the works, but read `this
@@ -29,7 +29,7 @@ repository and make a branch there.
 Each piece or fix you are working on should have its own branch; make a pull-
 request to ged-lab/master to aid in code review, testing, and feedback.
 
-If you want your code integrated then it needs to be mergeable
+If you want your code integrated then it needs to be mergable
 
 Example pull request update using the command line:
 
@@ -79,7 +79,7 @@ Command line thoughts:
    chaining of commands.  We're thinking about how best to allow
    override of this, e.g. ::
 
-      filter-abund.py <kh file> <filename> [ -o <filename.keep> ]
+      filter-abund.py <ct file> <filename> [ -o <filename.keep> ]
 
 ----
 
@@ -153,7 +153,7 @@ Adjust --maxtrans and re-run. ::
 	    "int"
 	  for format code "i"
 
-See below for a format string cheatsheet One also benefits by matching C type
+See below for a format string cheat sheet One also benefits by matching C type
 with the function signature used later. 
 
 "I" for unsigned int

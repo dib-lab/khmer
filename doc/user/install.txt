@@ -39,7 +39,7 @@ Linux
 
 #) Create a virtualenv and activate it::
 
-      cd a/writeable/directory/
+      cd a/writable/directory/
       python2.7 -m virtualenv khmerEnv
       source khmerEnv/bin/activate
 
