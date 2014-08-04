@@ -78,6 +78,7 @@ release makers, following this checklist by MRC.
         git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
         cd khmer
         make install
+        nosetests khmer --attr '!known_failing'
         make test
         normalize-by-median.py --version # double-check version number
 
@@ -90,6 +91,7 @@ release makers, following this checklist by MRC.
         cd src/khmer
         make dist
         make install
+        nosetests khmer --attr '!known_failing'
         make test
         normalize-by-median.py --version # double-check version number
         cp dist/khmer*tar.gz ../../../testenv3/
@@ -101,6 +103,7 @@ release makers, following this checklist by MRC.
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install khmer*tar.gz
+        nosetests khmer --attr '!known_failing'
         tar xzf khmer*tar.gz
         cd khmer*
         make dist
@@ -123,6 +126,7 @@ release makers, following this checklist by MRC.
         pip install -U setuptools==3.4.1
         pip install screed nose
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
+        nosetests khmer --attr '!known_failing'
         normalize-by-median.py --version 2>&1 | awk ' { print $2 } '
         cd build/khmer
         ./setup.py nosetests
