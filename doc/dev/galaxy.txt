@@ -3,6 +3,11 @@
 Deploying the khmer project tools on Galaxy
 ===========================================
 
+This document is for people interested in deploying the khmer tools on
+the Galaxy platform.
+
+----
+
 We are developing the support for running normalize-by-median in `Galaxy 
 <http://galaxyproject.org/>`__.
 
@@ -52,4 +57,4 @@ If not then you may need to `set their datatype manually
 or not.
 
 #. Specify the sample type or show the advanced parameters to set the tablesize
-yourself. Consult :doc:`choosing-table-sizes` for assistance.
+yourself. Consult :doc:`../user/choosing-table-sizes` for assistance.
