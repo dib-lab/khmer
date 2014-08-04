@@ -139,7 +139,7 @@ def test_bloom_c_2():  # simple one
 
 @attr('highmem')
 def test_filter_if_present():
-    ht = khmer.new_hashbits(32, 1e6, 2)
+    ht = khmer.new_hashbits(32, 2, 2)
 
     maskfile = utils.get_test_data('filter-test-A.fa')
     inputfile = utils.get_test_data('filter-test-B.fa')
@@ -200,7 +200,7 @@ def test_load_partitioned():
 @attr('highmem')
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.new_hashbits(4, 2, 2)
 
     print ht.consume_fasta(inpfile)
     n = ht.count_kmers_within_radius('AAAA', 1)
@@ -213,13 +213,13 @@ def test_count_within_radius_simple():
 @attr('highmem')
 def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
-    ht = khmer.new_hashbits(20, 1e6, 4)
+    ht = khmer.new_hashbits(20, 1e5, 4)
 
     ht.consume_fasta(inpfile)
     n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGG', int(1e6))
     assert n == 3960
 
-    ht = khmer.new_hashbits(21, 1e6, 4)
+    ht = khmer.new_hashbits(21, 1e5, 4)
     ht.consume_fasta(inpfile)
     n = ht.count_kmers_within_radius('CGCAGGCTGGATTCTAGAGGC', int(1e6))
     assert n == 39
@@ -228,7 +228,7 @@ def test_count_within_radius_big():
 @attr('highmem')
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.new_hashbits(4, 2, 2)
     ht.consume_fasta(inpfile)
 
     assert ht.kmer_degree('AAAA') == 2
@@ -240,7 +240,7 @@ def test_count_kmer_degree():
 @attr('highmem')
 def test_find_radius_for_volume():
     inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.new_hashbits(4, 2, 2)
     ht.consume_fasta(inpfile)
 
     assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
@@ -249,7 +249,7 @@ def test_find_radius_for_volume():
 
 
 def test_circumference():
-    ht = khmer.new_hashbits(4, 1e6, 2)
+    ht = khmer.new_hashbits(4, 10, 2)
 
     ht.count('ATGC')
     ht.count('GATG')
@@ -316,7 +316,7 @@ def test_stop_traverse():
     filename = utils.get_test_data('random-20-a.fa')
 
     K = 20  # size of kmer
-    HT_SIZE = 100000  # size of hashtable
+    HT_SIZE = 1e4  # size of hashtable
     N_HT = 3  # number of hashtables
 
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -338,7 +338,7 @@ def test_tag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
     K = 20  # size of kmer
-    HT_SIZE = 100000  # size of hashtable
+    HT_SIZE = 1e4  # size of hashtable
     N_HT = 3  # number of hashtables
 
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -367,7 +367,7 @@ def test_notag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
     K = 20  # size of kmer
-    HT_SIZE = 100000  # size of hashtable
+    HT_SIZE = 1e4  # size of hashtable
     N_HT = 3  # number of hashtables
 
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -413,7 +413,7 @@ def test_get_hashsizes():
 
 
 def test_extract_unique_paths_0():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.new_hashbits(10, 4, 4)
 
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
     assert x == ['ATGGAGAGACACAGATAGACAGGAGTGGCGATG']
@@ -424,7 +424,7 @@ def test_extract_unique_paths_0():
 
 
 def test_extract_unique_paths_1():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.new_hashbits(10, 4, 4)
 
     kh.consume('AGTGGCGATG')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
@@ -433,7 +433,7 @@ def test_extract_unique_paths_1():
 
 
 def test_extract_unique_paths_2():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.new_hashbits(10, 4, 4)
 
     kh.consume('ATGGAGAGAC')
     x = kh.extract_unique_paths('ATGGAGAGACACAGATAGACAGGAGTGGCGATG', 10, 1)
@@ -442,7 +442,7 @@ def test_extract_unique_paths_2():
 
 
 def test_extract_unique_paths_3():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.new_hashbits(10, 4, 4)
 
     kh.consume('ATGGAGAGAC')
     kh.consume('AGTGGCGATG')
@@ -453,7 +453,7 @@ def test_extract_unique_paths_3():
 
 
 def test_extract_unique_paths_4():
-    kh = khmer.new_hashbits(10, 1e5, 4)
+    kh = khmer.new_hashbits(10, 4, 4)
 
     kh.consume('ATGGAGAGAC')
     kh.consume('AGTGGCGATG')
@@ -471,7 +471,7 @@ def test_find_unpart():
     filename2 = utils.get_test_data('random-20-a.even.fa')
 
     K = 20  # size of kmer
-    HT_SIZE = 100000  # size of hashtable
+    HT_SIZE = 1e4  # size of hashtable
     N_HT = 3  # number of hashtables
 
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -494,7 +494,7 @@ def test_find_unpart_notraverse():
     filename2 = utils.get_test_data('random-20-a.even.fa')
 
     K = 20  # size of kmer
-    HT_SIZE = 100000  # size of hashtable
+    HT_SIZE = 1e4  # size of hashtable
     N_HT = 3  # number of hashtables
 
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -517,7 +517,7 @@ def test_find_unpart_fail():
     filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
 
     K = 20  # size of kmer
-    HT_SIZE = 100000  # size of hashtable
+    HT_SIZE = 1e4  # size of hashtable
     N_HT = 3  # number of hashtables
 
     ht = khmer.new_hashbits(K, HT_SIZE, N_HT)
@@ -535,7 +535,7 @@ def test_find_unpart_fail():
 
 
 def test_simple_median():
-    hi = khmer.new_hashbits(6, 1e6, 2)
+    hi = khmer.new_hashbits(6, 2, 2)
 
     (median, average, stddev) = hi.get_median_count("AAAAAA")
     print median, average, stddev
@@ -556,7 +556,7 @@ def test_simple_median():
 def test_load_notexist_should_fail():
     savepath = utils.get_temp_filename('temphashbitssave0.ht')
 
-    hi = khmer.new_counting_hash(12, 1000)
+    hi = khmer.new_counting_hash(12, 2)
     try:
         hi.load(savepath)
         assert 0, "load should fail"
@@ -634,7 +634,7 @@ def _build_testfiles():
     # hashbits file
 
     inpath = utils.get_test_data('random-20-a.fa')
-    hi = khmer.new_hashbits(12, 50)
+    hi = khmer.new_hashbits(12, 2)
     hi.consume_fasta(inpath)
     hi.save('/tmp/goodversion-k12.ht')
 
@@ -650,7 +650,7 @@ def _build_testfiles():
 
     fakelump_fa = utils.get_test_data('fakelump.fa')
 
-    ht = khmer.new_hashbits(32, 1e7, 4)
+    ht = khmer.new_hashbits(32, 4, 4)
     ht.consume_fasta_and_tag(fakelump_fa)
 
     subset = ht.do_subset_partition(0, 0)
@@ -659,7 +659,7 @@ def _build_testfiles():
     EXCURSION_DISTANCE = 40
     EXCURSION_KMER_THRESHOLD = 82
     EXCURSION_KMER_COUNT_THRESHOLD = 1
-    counting = khmer.new_counting_hash(32, 1e7, 4)
+    counting = khmer.new_counting_hash(32, 4, 4)
 
     ht.repartition_largest_partition(None, counting,
                                      EXCURSION_DISTANCE,

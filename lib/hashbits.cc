@@ -19,7 +19,7 @@ using namespace khmer:: read_parsers;
 void Hashbits::save(std::string outfilename)
 {
     if (!_counts[0]) {
-        throw std::exception();
+        throw khmer_exception();
     }
 
     unsigned int save_ksize = _ksize;
