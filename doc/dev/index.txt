@@ -19,5 +19,4 @@ Contents:
 
    details
    development
-   galaxy
    crazy-ideas

@@ -14,5 +14,6 @@ Contents:
    choosing-table-sizes
    partitioning-big-data
    known-issues
+   galaxy
    biblio
 
