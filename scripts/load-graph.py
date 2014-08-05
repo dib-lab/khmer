@@ -39,6 +39,8 @@ def get_parser():
                         nargs='+', help='input FAST[AQ] sequence filename')
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('--write-fp-rate', '-w', action='store_true',
+                        help="Write false positive rate into .info file")
     return parser
 
 
@@ -104,6 +106,10 @@ def main():
 
     fp_rate = khmer.calc_expected_collisions(htable)
     print 'fp rate estimated to be %1.3f' % fp_rate
+    if args.write_fp_rate:
+        print >> info_fp, \
+            '\nfalse positive rate estimated to be %1.3f' % fp_rate
+
     if fp_rate > 0.15:          # 0.18 is ACTUAL MAX. Do not change.
         print >> sys.stderr, "**"
         print >> sys.stderr, ("** ERROR: the graph structure is too small for "
