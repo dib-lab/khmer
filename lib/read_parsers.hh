@@ -124,7 +124,7 @@ struct IStreamReader {
 #ifdef WITH_INTERNAL_METRICS
     StreamReaderPerformanceMetrics  pmetrics;
 #endif
-    IStreamReader( );
+    IStreamReader(int const fd );
     virtual ~IStreamReader( );
 
     size_t const		    get_memory_alignment( ) const;
@@ -143,6 +143,7 @@ protected:
     bool			    _at_eos;
 
     void			    _set_EOS_ATOMIC( );
+    int				    _file_descriptor;
 
 };
 
@@ -155,10 +156,6 @@ struct RawStreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
-protected:
-
-    int			    _stream_handle;
 
 };
 

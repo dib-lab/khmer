@@ -1,3 +1,7 @@
+2014-08-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/read_parsers.{cc,hh}: close file handles. Fixes CID 1222793
+
 2014-08-05  Justin Lippi  <jlippi@gmail.com>
 
   *   khmer/__init__.py: import get_version_cpp method as __version_cpp__.
