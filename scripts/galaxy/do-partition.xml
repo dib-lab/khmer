@@ -26,6 +26,21 @@ mv *.part output/
 
 	<inputs>
 		<expand macro="input_sequences_filenames" />
+		<param	name="ksize"
+			type="integer"
+			value="20"
+			label="ksize"
+			help="k-mer size to use" />
+		<param	name="n_tables"
+			type="integer"
+			min="1"
+			value="4"
+			label="n_tables"
+			help="number of tables to use" />
+		<param	name="tablesize_specific"
+			type="text"
+			label="tablesize"
+			help="lower bound on the tablesize to use" />
 	</inputs>
 	<outputs>
 		<data	name="information"
