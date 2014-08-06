@@ -200,6 +200,7 @@ def info(scriptname, algorithm_list=None):
         sys.stderr.write(_algorithms[alg])
         sys.stderr.write("\n")
 
-    sys.stderr.write("||\n|| Please see the CITATION file for details.\n\n")
+    sys.stderr.write("||\n|| Please see http://khmer.readthedocs.org/en/"
+                     "latest/citations.html for details.\n\n")
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
