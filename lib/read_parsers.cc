@@ -164,7 +164,7 @@ Bz2StreamReader( int const fd )
 IStreamReader::
 ~IStreamReader( )
 {
-    if (0 <= _file_descriptor) {
+    if (0 > _file_descriptor) {
         close( _file_descriptor);
     }
     _file_descriptor = -1;
