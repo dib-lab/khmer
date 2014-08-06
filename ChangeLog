@@ -1,5 +1,3 @@
-2014-07-22  Justin Lippi  <jlippi@gmail.com>
-
 2014-08-05  Justin Lippi  <jlippi@gmail.com>
 
   *   khmer/__init__.py: import get_version_cpp method as __version_cpp__.
