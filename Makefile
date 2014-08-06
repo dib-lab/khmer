@@ -106,7 +106,7 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-.coverage: $(PYSOURCES) $(wildcard tests/*.py)
+.coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
 	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
 
