@@ -6,8 +6,6 @@
 #
 import khmer
 from nose.plugins.attrib import attr
-import versioneer
-import os
 
 
 @attr('jenkins')
