@@ -6,6 +6,15 @@ If you use the khmer software, you must cite:
    Crusoe et al., The khmer software package: enabling efficient
    sequence analysis. 2014. doi: 10.6084/m9.figshare.979190
 
+@article{khmer2014,
+    author = "C. Titus Brown and Michael R. Crusoe",
+    title = "{The khmer software package: enabling efficient sequence
+analysis}",
+    year = "2014",
+    month = "04",
+    url = "http://dx.doi.org/10.6084/m9.figshare.979190"
+}
+
 If you use any of our published scientific methods, you should *also*
 cite the relevant paper(s), as directed below.
 
@@ -21,6 +30,37 @@ representation and partitioning algorithms described in:
    doi: 10.1073/pnas.1121464109.
    PMID: 22847406
 
+@article{Pell2012,
+    author = {Pell, Jason and Hintze, Arend and Canino-Koning, Rosangela and
+Howe, Adina and Tiedje, James M. and Brown, C. Titus}, 
+    title = {Scaling metagenome sequence assembly with probabilistic de Bruijn
+graphs},
+    volume = {109}, 
+    number = {33}, 
+    pages = {13272-13277}, 
+    year = {2012}, 
+    doi = {10.1073/pnas.1121464109}, 
+    abstract ={Deep sequencing has enabled the investigation of a wide range of
+environmental microbial ecosystems, but the high memory requirements for de
+novo assembly of short-read shotgun sequencing data from these complex
+populations are an increasingly large practical barrier. Here we introduce a
+memory-efficient graph representation with which we can analyze the k-mer
+connectivity of metagenomic samples. The graph representation is based on a
+probabilistic data structure, a Bloom filter, that allows us to efficiently
+store assembly graphs in as little as 4 bits per k-mer, albeit inexactly. We
+show that this data structure accurately represents DNA assembly graphs in low
+memory. We apply this data structure to the problem of partitioning assembly
+graphs into components as a prelude to assembly, and show that this reduces the
+overall memory requirements for de novo assembly of metagenomes. On one soil
+metagenome assembly, this approach achieves a nearly 40-fold decrease in the
+maximum memory requirements for assembly. This probabilistic graph
+representation is a significant theoretical advance in storing assembly graphs
+and also yields immediate leverage on metagenomic assembly.}, 
+    URL = {http://www.pnas.org/content/109/33/13272.abstract}, 
+    eprint = {http://www.pnas.org/content/109/33/13272.full.pdf+html}, 
+    journal = {Proceedings of the National Academy of Sciences} 
+}
+
 Digital normalization
 ----------------------
 
@@ -33,13 +73,60 @@ the digital normalization algorithm, described in:
    arXiv:1203.4802 [q-bio.GN]
    http://arxiv.org/abs/1203.4802
 
+@misc{diginorm,
+    Author = {C. Titus Brown and Adina Howe and Qingpeng Zhang and Alexis B.
+Pyrkosz and Timothy H. Brom},
+    Title = {A Reference-Free Algorithm for Computational Normalization of
+Shotgun Sequencing Data},
+    Year = {2012},
+    Eprint = {arXiv:1203.4802},
+}
+
 K-mer counting
 --------------
 
 The abundance-dist.py, filter-abund.py, and load-into-counting.py scripts
 implement the probabilistic k-mer counting described in:
 
-   These are not the k-mers you are looking for: efficient online k-mer counting using a probabilistic data structure
+   These are not the k-mers you are looking for: efficient online k-mer
+counting using a probabilistic data structure
    Zhang Q, Pell J, Canino-Koning R, Howe AC, Brown CT.
-   arXiv:1309.2975 [q-bio.GN]
-   http://arxiv.org/abs/1309.2975
+   doi: 10.1371/journal.pone.0101271
+   
+@article{khmer-counting,
+    author = {Zhang, Qingpeng AND Pell, Jason AND Canino-Koning, Rosangela AND 
+Howe, Adina Chuang AND Brown, C. Titus},
+    journal = {PLoS ONE},
+    publisher = {Public Library of Science},
+    title = {These Are Not the K-mers You Are Looking For: Efficient Online
+K-mer Counting Using a Probabilistic Data Structure},
+    year = {2014},
+    month = {07},
+    volume = {9},
+    url = {http://dx.doi.org/10.1371%2Fjournal.pone.0101271},
+    pages = {e101271},
+    abstract = {<p>K-mer abundance analysis is widely used for many purposes in
+nucleotide sequence analysis, including data preprocessing for de novo
+assembly, repeat detection, and sequencing coverage estimation. We present the
+khmer software package for fast and memory efficient <italic>online</italic>
+counting of k-mers in sequencing data sets. Unlike previous methods based on
+data structures such as hash tables, suffix arrays, and trie structures, khmer
+relies entirely on a simple probabilistic data structure, a Count-Min Sketch.
+The Count-Min Sketch permits online updating and retrieval of k-mer counts in
+memory which is necessary to support online k-mer analysis algorithms. On
+sparse data sets this data structure is considerably more memory efficient than
+any exact data structure. In exchange, the use of a Count-Min Sketch introduces
+a systematic overcount for k-mers; moreover, only the counts, and not the
+k-mers, are stored. Here we analyze the speed, the memory usage, and the
+miscount rate of khmer for generating k-mer frequency distributions and
+retrieving k-mer counts for individual k-mers. We also compare the performance
+of khmer to several other k-mer counting packages, including Tallymer,
+Jellyfish, BFCounter, DSK, KMC, Turtle and KAnalyze. Finally, we examine the
+effectiveness of profiling sequencing error, k-mer abundance trimming, and
+digital normalization of reads in the context of high khmer false positive
+rates. khmer is implemented in C++ wrapped in a Python interface, offers a
+tested and robust API, and is freely available under the BSD license at
+github.com/ged-lab/khmer.</p>},
+    number = {7},
+    doi = {10.1371/journal.pone.0101271}
+}
