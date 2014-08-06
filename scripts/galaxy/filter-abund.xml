@@ -77,6 +77,10 @@ $input_counting_table_filename
                         </output>
                 </test>
         </tests> 
+	<citations>
+		<expand macro="software-citation" />
+		<expand macro="counting-citation" />
+	</citations>
 	<!-- [OPTIONAL] ReST Help displayed in Galaxy -->
     <!--
 	<help>

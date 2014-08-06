@@ -119,4 +119,16 @@
                         checked="true" 
                         help="Output zero count bins" />
 	</xml>
-`</macros>
+	<xml name="software_citation" type="doi">10.6084/m9.figshare.979190</xml>
+	<xml name="diginorm-citation" type="bibtex">@misc{diginorm,
+    Author = {Brown, C Titus and Howe, Adina and Zhang, Qingpeng and Pyrkosz,
+Alexis B and Brom, Timothy H},
+    Title = {A Reference-Free Algorithm for Computational Normalization of
+Shotgun Sequencing Data},
+    Year = {2012},
+    Eprint = {arXiv:1203.4802},
+}</xml>
+	<xml name="graph-citation" type="doi">10.1073/pnas.1121464109</xml>
+	<xml name="counting-citation" type="doi">10.1371/journal.pone.0101271</xml>
+
+</macros>

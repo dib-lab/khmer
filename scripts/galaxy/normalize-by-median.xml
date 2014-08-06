@@ -124,7 +124,10 @@ $input
 		</test>
 
 	</tests>
-    
+	<citations>
+		<expand macro="software-citation" />
+		<expand macro="diginorm-citation" />
+	</citations>
     <!-- [OPTIONAL] Help displayed in Galaxy -->
     <!--
 	<help>

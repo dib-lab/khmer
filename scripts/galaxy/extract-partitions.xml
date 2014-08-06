@@ -67,6 +67,10 @@ mv output.dist $distribution
 		</test>
 
 	</tests>
+	<citations>
+		<expand macro="software-citation" />
+		<expand macro="graph-citation" />
+	</citations>
     <!-- [OPTIONAL] Help displayed in Galaxy -->
     <!--
 	<help>
