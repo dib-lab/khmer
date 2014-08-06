@@ -4643,6 +4643,22 @@ static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 }
 
 //
+// technique for resolving literal below found here:
+// https://gcc.gnu.org/onlinedocs/gcc-4.9.1/cpp/Stringification.html
+//
+
+static
+PyObject *
+get_version_cpp( PyObject * self, PyObject * args )
+{
+#define xstr(s) str(s)
+#define str(s) #s
+    std::string dVersion = xstr(VERSION);
+    return PyString_FromString(dVersion.c_str());
+}
+
+
+//
 // Module machinery.
 //
 
@@ -4693,9 +4709,12 @@ static PyMethodDef KhmerMethods[] = {
     },
     {
         "set_reporting_callback",   set_reporting_callback,
-        METH_VARARGS,       ""
+        METH_VARARGS,       "",
     },
-
+    {
+        "get_version_cpp", get_version_cpp,
+        METH_VARARGS, "return the VERSION c++ compiler option"
+    },
     { NULL, NULL, 0, NULL } // sentinel
 };
 
