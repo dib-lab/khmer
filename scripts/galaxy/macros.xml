@@ -123,7 +123,7 @@
 		<citation type="doi">10.6084/m9.figshare.979190</citation>
 	</xml>
 	<xml name="diginorm-citation">
-		<citation type="bibtex">@misc{diginorm,
+		<citation type="bibtex">@unpublished{diginorm,
     Author = {Brown, C Titus and Howe, Adina and Zhang, Qingpeng and Pyrkosz,
 Alexis B and Brom, Timothy H},
     Title = {A Reference-Free Algorithm for Computational Normalization of
