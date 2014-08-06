@@ -1,3 +1,8 @@
+.. vim: set filetype=rst
+
+.. If you update this file then you may need to update the citations in
+   scripts/galaxy/macro.xml as well
+
 Citations
 ---------
 
@@ -16,10 +21,11 @@ If you use the khmer software, you must cite:
   Adina and McDonald, Eric and Nahum, Joshua and Nanlohy, Kaben and
   Ortiz-Zuazaga, Humberto and Pell, Jason and Simpson, Jared and Scott, Camille
   and Srinivasan, Ramakrishnan Rajaram and Zhang, Qingpeng and Brown, C. Titus",
-      title = "{The khmer software package: enabling efficient sequence
-  analysis}",
+      title = "The khmer software package: enabling efficient sequence
+  analysis",
       year = "2014",
       month = "04",
+      publisher = "Figshare",
       url = "http://dx.doi.org/10.6084/m9.figshare.979190"
   }
 
@@ -42,16 +48,16 @@ representation and partitioning algorithms described in:
 .. code-block:: tex
 
   @article{Pell2012,
-      author = {Pell, Jason and Hintze, Arend and Canino-Koning, Rosangela and
-  Howe, Adina and Tiedje, James M. and Brown, C. Titus}, 
-      title = {Scaling metagenome sequence assembly with probabilistic de Bruijn
-  graphs},
-      volume = {109}, 
-      number = {33}, 
-      pages = {13272-13277}, 
-      year = {2012}, 
-      doi = {10.1073/pnas.1121464109}, 
-      abstract ={Deep sequencing has enabled the investigation of a wide range of
+      author = "Pell, Jason and Hintze, Arend and Canino-Koning, Rosangela and
+  Howe, Adina and Tiedje, James M. and Brown, C. Titus", 
+      title = "Scaling metagenome sequence assembly with probabilistic de Bruijn
+  graphs",
+      volume = "109", 
+      number = "33", 
+      pages = "13272-13277", 
+      year = "2012", 
+      doi = "10.1073/pnas.1121464109", 
+      abstract ="Deep sequencing has enabled the investigation of a wide range of
   environmental microbial ecosystems, but the high memory requirements for de
   novo assembly of short-read shotgun sequencing data from these complex
   populations are an increasingly large practical barrier. Here we introduce a
@@ -66,10 +72,10 @@ representation and partitioning algorithms described in:
   metagenome assembly, this approach achieves a nearly 40-fold decrease in the
   maximum memory requirements for assembly. This probabilistic graph
   representation is a significant theoretical advance in storing assembly graphs
-  and also yields immediate leverage on metagenomic assembly.}, 
-      URL = {http://www.pnas.org/content/109/33/13272.abstract}, 
-      eprint = {http://www.pnas.org/content/109/33/13272.full.pdf+html}, 
-      journal = {Proceedings of the National Academy of Sciences} 
+  and also yields immediate leverage on metagenomic assembly.", 
+      URL = "http://www.pnas.org/content/109/33/13272.abstract", 
+      eprint = "http://www.pnas.org/content/109/33/13272.full.pdf+html", 
+      journal = "Proceedings of the National Academy of Sciences" 
   }
 
 Digital normalization
@@ -86,13 +92,14 @@ the digital normalization algorithm, described in:
 
 .. code-block:: tex
 
-  @misc{diginorm,
-      Author = {C. Titus Brown and Adina Howe and Qingpeng Zhang and Alexis B.
-  Pyrkosz and Timothy H. Brom},
-      Title = {A Reference-Free Algorithm for Computational Normalization of
-  Shotgun Sequencing Data},
-      Year = {2012},
-      Eprint = {arXiv:1203.4802},
+  @unpublished{diginorm,
+      author = "C. Titus Brown and Adina Howe and Qingpeng Zhang and Alexis B.
+  Pyrkosz and Timothy H. Brom",
+      title = "A Reference-Free Algorithm for Computational Normalization of
+  Shotgun Sequencing Data",
+      year = "2012",
+      eprint = "arXiv:1203.4802",
+      url = "http://arxiv.org/abs/1203.4802",
   }
 
 K-mer counting
@@ -109,18 +116,18 @@ implement the probabilistic k-mer counting described in:
 .. code-block:: tex
  
   @article{khmer-counting,
-      author = {Zhang, Qingpeng AND Pell, Jason AND Canino-Koning, Rosangela AND 
-  Howe, Adina Chuang AND Brown, C. Titus},
-      journal = {PLoS ONE},
-      publisher = {Public Library of Science},
-      title = {These Are Not the K-mers You Are Looking For: Efficient Online
-  K-mer Counting Using a Probabilistic Data Structure},
-      year = {2014},
-      month = {07},
-      volume = {9},
-      url = {http://dx.doi.org/10.1371%2Fjournal.pone.0101271},
-      pages = {e101271},
-      abstract = {<p>K-mer abundance analysis is widely used for many purposes in
+      author = "Zhang, Qingpeng AND Pell, Jason AND Canino-Koning, Rosangela AND 
+  Howe, Adina Chuang AND Brown, C. Titus",
+      journal = "PLoS ONE",
+      publisher = "Public Library of Science",
+      title = "These Are Not the K-mers You Are Looking For: Efficient Online
+  K-mer Counting Using a Probabilistic Data Structure",
+      year = "2014",
+      month = "07",
+      volume = "9",
+      url = "http://dx.doi.org/10.1371%2Fjournal.pone.0101271",
+      pages = "e101271",
+      abstract = "<p>K-mer abundance analysis is widely used for many purposes in
   nucleotide sequence analysis, including data preprocessing for de novo
   assembly, repeat detection, and sequencing coverage estimation. We present the
   khmer software package for fast and memory efficient <italic>online</italic>
@@ -141,7 +148,7 @@ implement the probabilistic k-mer counting described in:
   digital normalization of reads in the context of high khmer false positive
   rates. khmer is implemented in C++ wrapped in a Python interface, offers a
   tested and robust API, and is freely available under the BSD license at
-  github.com/ged-lab/khmer.</p>},
-      number = {7},
-      doi = {10.1371/journal.pone.0101271}
+  github.com/ged-lab/khmer.</p>",
+      number = "7",
+      doi = "10.1371/journal.pone.0101271"
   }
