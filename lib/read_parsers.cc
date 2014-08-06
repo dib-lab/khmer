@@ -103,25 +103,26 @@ accumulate_timer_deltas( uint32_t metrics_key )
 #endif
 
 IStreamReader::
-IStreamReader( )
+IStreamReader( int const fd )
     :
 #ifdef WITH_INTERNAL_METRICS
     pmetrics( StreamReaderPerformanceMetrics( ) ),
 #endif
     _alignment( 0 ),
     _max_aligned( SSIZE_MAX ),
-    _at_eos( false )
-{ }
+    _at_eos( false ),
+    _file_descriptor( fd )
+{
+    if (0 > fd) {
+        throw InvalidStreamBuffer( );
+    }
+}
 
 
 RawStreamReader::
 RawStreamReader( int const fd, size_t const alignment )
-    : IStreamReader( )
+    : IStreamReader( fd )
 {
-
-    if (0 > fd) {
-        throw InvalidStreamBuffer( );
-    }
 
 #ifdef __linux__
     if (alignment) {
@@ -130,19 +131,14 @@ RawStreamReader( int const fd, size_t const alignment )
     }
 #endif
 
-    _stream_handle    = fd;
-
 }
 
 
 GzStreamReader::
 GzStreamReader( int const fd )
-    : IStreamReader( )
+    : IStreamReader( fd )
 {
 
-    if (0 > fd) {
-        throw InvalidStreamBuffer( );
-    }
     _stream_handle    = gzdopen( fd, "rb" );
     if (NULL == _stream_handle) {
         throw InvalidStreamBuffer( );
@@ -153,12 +149,9 @@ GzStreamReader( int const fd )
 
 Bz2StreamReader::
 Bz2StreamReader( int const fd )
-    : IStreamReader( )
+    : IStreamReader( fd )
 {
 
-    if (0 > fd) {
-        throw InvalidStreamBuffer( );
-    }
     if (NULL == (_stream_handle = fdopen( fd, "r" ))) {
         throw InvalidStreamBuffer( );
     }
@@ -170,17 +163,18 @@ Bz2StreamReader( int const fd )
 
 IStreamReader::
 ~IStreamReader( )
-{ }
+{
+    if (0 > _file_descriptor) {
+        close( _file_descriptor);
+    }
+    _file_descriptor = -1;
+
+}
 
 
 RawStreamReader::
 ~RawStreamReader( )
 {
-
-    if (0 <= _stream_handle) {
-        close( _stream_handle );
-    }
-    _stream_handle = -1;
 
 }
 
@@ -266,7 +260,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
 #endif
         nbread =
             read(
-                _stream_handle,
+                _file_descriptor,
                 cache + nbread_total,
                 (size_t)(nbrem > _max_aligned ? _max_aligned : nbrem )
             );
