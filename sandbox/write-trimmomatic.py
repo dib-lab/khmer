@@ -16,7 +16,7 @@ for r1 in filelist:
     print """\
 mkdir trim
 cd trim
-java -jar /usr/local/bin/trimmomatic-0.30.jar PE ../%s ../%s s1_pe s1_se s2_pe s2_se ILLUMINACLIP:/usr/local/share/adapters/TruSeq3-PE.fa:2:40:15 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:2 MINLEN:25
+java -jar /usr/local/bin/trimmomatic-0.32.jar PE ../%s ../%s s1_pe s1_se s2_pe s2_se ILLUMINACLIP:/usr/local/share/adapters/TruSeq3-PE.fa:2:40:15 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:2 MINLEN:25
 interleave-reads.py s1_pe s2_pe | gzip -9c > ../%s
 
 cat s1_se s2_se | gzip -9c > ../%s
