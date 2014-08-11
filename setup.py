@@ -61,6 +61,9 @@ EXTRA_COMPILE_ARGS = ['-O3']
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
 
+if "%x" % sys.maxsize != '7fffffffffffffff':
+    raise SystemExit("khmer requires a 64bit architecture")
+
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
