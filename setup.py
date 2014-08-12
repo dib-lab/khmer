@@ -61,9 +61,6 @@ EXTRA_COMPILE_ARGS = ['-O3']
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
 
-if "%x" % sys.maxsize != '7fffffffffffffff':
-    raise SystemExit("khmer requires a 64bit architecture")
-
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
@@ -139,6 +136,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
     """
 
     def run(self):
+        if "%x" % sys.maxsize != '7fffffffffffffff':
+            raise SystemExit("khmer requires a 64-bit operating system")
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
