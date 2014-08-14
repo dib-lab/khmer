@@ -19,6 +19,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 from distutils.spawn import spawn
 from distutils.sysconfig import get_config_vars
 from distutils.dist import Distribution
+from distutils.errors import DistutilsPlatformError
 
 import versioneer
 versioneer.VCS = 'git'
@@ -137,7 +138,7 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "%x" % sys.maxsize != '7fffffffffffffff':
-            raise SystemExit("khmer requires a 64-bit operating system")
+            raise DistutilsPlatformError("khmer requires a 64-bit operating system")
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
