@@ -18,7 +18,6 @@ from __future__ import division
 # Built the test graph using:
 # scripts/load-graph.py -x 4e9 -N 4 --no-build-tagset foo.khmer ../data/16s.fa
 
-import os
 import sys
 
 import khmer
@@ -38,6 +37,29 @@ def get_parser():
                         + khmer.__version__)
     return parser
 
+# http://scipher.wordpress.com/2010/12/02/simple-sliding-window-iterator-in-python/
+def sliding_window_it(sequence, winSize, step=1):
+    """Returns a generator that will iterate through
+    the defined chunks of input sequence.  Input sequence
+    must be iterable."""
+
+    # Verify the inputs
+    try: it = iter(sequence)
+    except TypeError:
+        raise Exception("**ERROR** sequence must be iterable.")
+    if not ((type(0) == type(winSize)) and (type(step) == type(0))):
+        raise Exception("**ERROR** type(winSize) and type(step) must be int.")
+    if step > winSize:
+        raise Exception("**ERROR** step must not be larger than winSize.")
+    if winSize > len(sequence):
+        raise Exception("**ERROR** winSize must not be larger than sequence length.")
+
+    # Pre-compute number of chunks to emit
+    numOfChunks = ((len(sequence)-winSize)/step)+1
+
+    # Do the work
+    for i in range(0, int(numOfChunks*step), step):
+        yield sequence[i:i+winSize]
 
 def main():
     info('filter-contamination.py', ['graph', 'classification'])
@@ -56,7 +78,6 @@ def main():
     print 'loading ht graph %s' % graph
     htable = khmer.load_hashbits(graph)
 
-    # For each read determine % k-mers that are present in the hashbits table
     #
     # Output should resemble:
     # {
@@ -79,10 +100,8 @@ def main():
             contaminant_read_matches = 0
 
             for position in range(read_kmers):
-                contaminant_read_matches += htable.get(r.sequence[position:ksize + 1])
-                print position, r.sequence[position:ksize+1]
-
-                # presencetable.get("kmer-as-string") returns 1 if the kmer is found in the presence table, zero otherwise
+                for kmer in sliding_window_it(r.sequence, ksize):
+                    contaminant_read_matches += htable.get(kmer)
 
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
