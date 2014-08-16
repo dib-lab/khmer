@@ -8,7 +8,11 @@
 # pylint: disable=invalid-name,missing-docstring
 """
 Screen for contamination in a similar way as FACS, fastq_screen or deconseq do.
+The output is in JSON format by default, simplifying parsing/piping for third party programs and pipelines, ie:
 
+{"sample": ["sample.fastq"], "filter": "eschColi_K12.pt", "contamination": 0.3}
+
+Usage:
 % python scripts/filter-contamination.py <htname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
@@ -21,6 +25,8 @@ from __future__ import division
 import sys
 
 import khmer
+import json
+from collections import defaultdict
 import argparse
 
 from khmer.khmer_args import info
@@ -67,6 +73,8 @@ def main():
     graph = args.graph
     data = args.data
 
+    results = defaultdict(dict)
+
     # Get samples to be analyzed against the graph file
     filenames = [data]
     for _ in filenames:
@@ -78,17 +86,9 @@ def main():
     print 'loading ht graph %s' % graph
     htable = khmer.load_hashbits(graph)
 
-    #
-    # Output should resemble:
-    # {
-    # "input": "200_sequenced_reads.fastq"
-    # "filter": "eschColi_K12_reference_genome.pt"
-    # "total_read_count": 201,
-    # "contaminated_reads": 1,
-    # "contamination_rate": 0.004975,
-    #}
 
     for _, filename in enumerate(filenames):
+        print('querying sample {sample} against filter {filt}').format(sample=filename, filt=graph)
         ksize = htable.ksize()
         total_query_kmers = 0
         contaminant_total_matches = 0
@@ -108,11 +108,11 @@ def main():
 
         contam = contaminant_read_matches/total_query_kmers
 
-        print >> sys.stderr, 'Contaminant total matches: {0}'.format(contaminant_total_matches)
-        print >> sys.stderr, 'Total query kmers: {0}'.format(total_query_kmers)
-        print >> sys.stderr, 'Contamination: {0:0.9f}'.format(contam)
+        results['sample'] = filenames
+        results['filter'] = graph
+        results['contamination'] = contam
 
-    # XXX: Make a decision based on a threshold and write to disk in appropriate places
+        print json.dumps(results)
 
 if __name__ == '__main__':
     main()
