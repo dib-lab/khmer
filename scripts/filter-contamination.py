@@ -45,9 +45,6 @@ def main():
     graph = args.graph
     data = args.data
 
-    # XXX: I bet there's a better built-in method to get table.info?
-    total_unique_kmers = int(open(os.path.splitext(graph)[0] + '.info').read().split(' ')[0])
-
     # Get samples to be analyzed against the graph file
     filenames = [data]
     for _ in filenames:
@@ -60,7 +57,6 @@ def main():
     htable = khmer.load_hashbits(graph)
 
     n_reads = 0
-    len_reads = []
 
     # For each read determine % k-mers that are present in the hashbits table
     #
@@ -74,32 +70,27 @@ def main():
     #}
 
     for _, filename in enumerate(filenames):
+        ksize = htable.ksize()
+        total_query_kmers = 0
+        contaminant_total_matches = 0
+
         rparser = khmer.ReadParser(filename, 1)
-        print 'consuming input {0}\n'.format(filename)
 
         for r in rparser:
-            len_reads.append(len(r.sequence))
-            n_reads = n_reads + 1
-            htable.consume(r.sequence)
+            read_kmers = len(r.sequence) - ksize + 1
+            contaminant_read_matches = 0
 
-        # XXX: use htable.consume_fasta_with_reads_parser(rparser) as the documentation states:
-        # http://khmer.readthedocs.org/en/v1.1/design.html
-        # Will this method support fastq? fq.gz? fq.bz2?
+            for position in range(read_kmers):
+                contaminant_read_matches += htable.get(r.sequence[position : ksize+1])
+                # presencetable.get("kmer-as-string") returns 1 if the kmer is found in the presence table, zero otherwise
 
-        # XXX: This should return the proportion of the k-mers in the read that are in the htable, for all reads.
-        # 31 == K - 1 ... how do I query K from python?
-        contam = 1 - float(htable.n_unique_kmers() / (len_reads[0] - 31))
+            contaminant_total_matches += contaminant_read_matches
+            total_query_kmers += read_kmers
 
-        print >> sys.stderr, 'Total number of reads: {0}'.format(n_reads)
-        print >> sys.stderr, 'Average read length: {0}'.format(sum(len_reads)/n_reads)
-        print >> sys.stderr, 'Total unique kmers in graph table: {0}'.format(total_unique_kmers)
+        contam = contaminant_read_matches/total_query_kmers
 
-        # XXX: n_occupied? Are those the k-mers present in the hashbits table? What about "present"? "found"?
-        # (in hashbits table)... *** make khmer more boring! *** ;)
-        # Less surprises, less guessing == more developer happiness :)
-
-        print >> sys.stderr, 'Total number of occupied (already seen?) k-mers: {0}'.format(htable.n_occupied())
-        print >> sys.stderr, 'Total number of unique (newly found?) k-mers: {0}'.format(htable.n_unique_kmers())
+        print >> sys.stderr, 'Contaminant total matches: {0}'.format(contaminant_total_matches)
+        print >> sys.stderr, 'Total query kmers: {0}'.format(total_query_kmers)
         print >> sys.stderr, 'Contamination: {0:0.9f}'.format(contam)
 
     # XXX: Make a decision based on a threshold and write to disk in appropriate places
