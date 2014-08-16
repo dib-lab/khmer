@@ -56,8 +56,6 @@ def main():
     print 'loading ht graph %s' % graph
     htable = khmer.load_hashbits(graph)
 
-    n_reads = 0
-
     # For each read determine % k-mers that are present in the hashbits table
     #
     # Output should resemble:
@@ -81,7 +79,9 @@ def main():
             contaminant_read_matches = 0
 
             for position in range(read_kmers):
-                contaminant_read_matches += htable.get(r.sequence[position : ksize+1])
+                contaminant_read_matches += htable.get(r.sequence[position:ksize + 1])
+                print position, r.sequence[position:ksize+1]
+
                 # presencetable.get("kmer-as-string") returns 1 if the kmer is found in the presence table, zero otherwise
 
             contaminant_total_matches += contaminant_read_matches
