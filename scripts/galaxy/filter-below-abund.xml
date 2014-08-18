@@ -24,7 +24,7 @@ $input_counting_table_filename
 
 	<inputs>
 		<expand macro="input_sequences_filenames" />
-		<expand macro="input_counting_table_filename" />	
+		<expand macro="input_counting_table_filename" />
 	</inputs>
 	<outputs>
 		<!-- <expand macro="output_sequences" /> -->
@@ -61,5 +61,5 @@ $input_counting_table_filename
     <!--
 	<help>
 	</help>
-    -->    
+    -->
 </tool>

@@ -2,7 +2,7 @@
 	name="Extract partitions"
 	version="1.1-1"
 	force_history_refresh="true">
-	
+
 	<description>
 		Separate sequences that are annotated with partitions into
 		grouped files.
@@ -52,7 +52,7 @@ mv output.dist $distribution
 		<expand macro="output_sequences" />
 	</outputs>
 	<expand macro="stdio" />
-	
+
 	<tests>
 		<test interactor="api">
 			<param name="inputs" value="random-20-a.fa.part"/>
@@ -73,5 +73,5 @@ mv output.dist $distribution
     <!--
 	<help>
 	</help>
-    -->    
+    -->
 </tool>

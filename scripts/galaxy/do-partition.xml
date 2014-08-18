@@ -2,7 +2,7 @@
 	name="Sequence partition all-in-one"
 	version="1.1-1"
 	force_history_refresh="true">
-	
+
 	<description>
 		Load, partition, and annotate FAST[AQ] sequences
 	</description>
@@ -103,5 +103,5 @@ mv *.part output/
     <!--
 	<help>
 	</help>
-    -->    
+    --> 
 </tool>

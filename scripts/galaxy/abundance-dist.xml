@@ -2,7 +2,7 @@
 	name="Abundance Distribution"
 	version="1.1-1"
 	force_history_refresh="true">
-	
+
 	<description>
 		Calculate abundance distribution of the k-mers in a given sequence
 		file using a pre-made k-mer counting table.
@@ -20,7 +20,7 @@ mkdir output; cd output;
 --squash
 $input_counting_table_filename
 $input_sequence_filename
-$output_histogram_filename	
+$output_histogram_filename
 	</command>
 
 	<inputs>
@@ -64,5 +64,5 @@ $output_histogram_filename
     <!--
 	<help>
 	</help>
-    -->    
+    -->
 </tool>

@@ -2,10 +2,10 @@
 	name="Abundance Distribution (all-in-one)"
 	version="1.1-1"
 	force_history_refresh="true">
-	
+
 	<description>
-		Calculate abundance distribution of the k-mers in a given sequence 
-		file.
+		Calculate abundance distribution of the k-mers in a given
+		sequence file.
 	</description>
 	<macros>
 		<token name="@BINARY@">abundance-dist-single.py</token>
@@ -27,7 +27,7 @@ $bigcount
 --squash
 @THREADS@
 $input_sequence_filename
-$output_histogram_filename	
+$output_histogram_filename
 	</command>
 
 	<inputs>
@@ -51,7 +51,7 @@ $output_histogram_filename
 			label="${tool.name} k-mer counting table">
 			<filter>save_countingtable == True</filter>
 		</data>
-		<expand macro="abundance-histogram-output" />	
+		<expand macro="abundance-histogram-output" />
 	</outputs>
 	<expand macro="stdio" />
     <tests>
@@ -94,5 +94,5 @@ $output_histogram_filename
     <!--
 	<help>
 	</help>
-    -->    
+    --> 
 </tool>

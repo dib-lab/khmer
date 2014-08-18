@@ -11,8 +11,9 @@
     * scripts/galaxy/test-data: added symlinks to files in tests/test-data or
     added short test files from scratch
     * scripts/galaxy/macros.xml: common configuration moved to central file
-    * scripts/galaxy/gedlab.py: custom Galaxy datatype: it inherits from
-    Binary but isn't sniffable. Written with GalaxyTeam's Dave_B.
+    * scripts/galaxy/gedlab.py: custom Galaxy datatypes for the counting
+    tables and presence tables: it inherits from the Galaxy Binary type but
+    isn't sniffable. Written with GalaxyTeam's Dave_B.
     * scripts/filter-abund.py: fix innacurate parameter description
     * scripts/galaxy/tool_dependencies.xml: document install process
     * scripys/galaxy/filter-below-abund.py: symlink to
@@ -23,8 +24,6 @@
 
     * lib/read_parsers.{cc,hh}: close file handles. Fixes CID 1222793
 
-existing: norm-by-med
-now: norm-be-med,
 2014-08-05  Justin Lippi  <jlippi@gmail.com>
 
     * khmer/__init__.py: import get_version_cpp method as __version_cpp__.

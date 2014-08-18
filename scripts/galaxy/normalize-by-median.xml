@@ -2,7 +2,7 @@
 	name="Normalize By Median"
 	version="1.1-4"
 	force_history_refresh="true">
-	
+
 	<description>
 		Filters a fastq/fasta file using digital normalization via
 	    	median k-mer abundances.
@@ -74,7 +74,7 @@ $input
 		<expand macro="output_sequences_single" />
 	</outputs>
 	<expand macro="stdio" />
-	
+
 	<tests>
 		<test interactor="api">
 			<conditional name="parameters">
@@ -128,5 +128,5 @@ $input
     <!--
 	<help>
 	</help>
-    -->    
+    -->
 </tool>

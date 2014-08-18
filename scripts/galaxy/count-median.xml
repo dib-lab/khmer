@@ -2,7 +2,7 @@
 	name="Count Median"
 	version="1.1-1"
 	force_history_refresh="true">
-	
+
 	<description>
 		Count the median/avg k-mer abundance for each sequence in the
 		input file, based on the k-mer counts in the given k-mer
@@ -54,5 +54,5 @@ $output_summary_filename
     <!--
 	<help>
 	</help>
-    -->    
+    --> 
 </tool>

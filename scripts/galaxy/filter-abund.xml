@@ -2,7 +2,7 @@
 	name="Filter by abundance"
 	version="1.1-1"
 	force_history_refresh="true">
-	
+
 	<description>
 		Trims fastq/fasta sequences at k-mers of a given abundance
 		based on a provided k-mer counting table.
@@ -41,7 +41,7 @@ $input_counting_table_filename
 			value="2"
 			label="cutoff"
 			help="Trim at k-mers below this abundance. (--cutoff)" />
-		<expand macro="input_counting_table_filename" />	
+		<expand macro="input_counting_table_filename" />
 	</inputs>
 	<outputs>
 		<!-- <expand macro="output_sequences" /> -->
@@ -75,7 +75,7 @@ $input_counting_table_filename
 				<!-- </discover_dataset> -->
                         </output>
                 </test>
-        </tests> 
+        </tests>
 	<citations>
 		<expand macro="software-citation" />
 		<expand macro="counting-citation" />
@@ -84,5 +84,5 @@ $input_counting_table_filename
     <!--
 	<help>
 	</help>
-    -->    
+    -->
 </tool>
