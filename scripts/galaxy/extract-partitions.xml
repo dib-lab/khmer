@@ -4,7 +4,8 @@
 	force_history_refresh="true">
 	
 	<description>
-		Separate sequences that are annotated with partitions into grouped files.
+		Separate sequences that are annotated with partitions into
+		grouped files.
 	</description>
         <macros>
                 <token name="@BINARY@">extract-partitions.py</token>
@@ -30,19 +31,19 @@ mv output.dist $distribution
 		<param	name="max_size"
 			type="integer"
 			label="Max group size"
-			help="No more than this many number of sequences will be stored in each output"
+			help="No more than this many number of sequences will be stored in each output (--max-size/-X)"
 			value="1000000" />
 		<param	name="min_partition_size"
 			type="integer"
 			label="Min partition size"
-			help="The minimum partition size worth keeping"
+			help="The minimum partition size worth keeping (--min-partition-size/-m)"
 			value="5" />
 		<param	name="output_unassigned"
 			type="boolean"
 			checked="false"
 			truevalue="--output-unassigned"
 			falsevalue=""
-			label="Output unassigned sequences" />
+			label="Output unassigned sequences (--output-unassigned/-U)" />
 	</inputs>
 	<outputs>
 		<data	name="distribution"
@@ -57,7 +58,8 @@ mv output.dist $distribution
 			<param name="inputs" value="random-20-a.fa.part"/>
 			<output name="distribution">
 				<assert_contents>
-					<has_line_matching expression="'99 1 1 99" />
+					<has_line_matching
+						expression="99 1 1 99" />
 				</assert_contents>
 			</output>
 		</test>

@@ -43,7 +43,8 @@
 						Animal Transcriptome
 					</option>
 					<option value="4e9">
-						Small Animal Genome or Low-Diversity Metagenome
+						Small Animal Genome or
+						Low-Diversity Metagenome
 					</option>
 					<option value="16e9">
 						Large Animal Genome
@@ -117,7 +118,7 @@
                         truevalue=""
                         falsevalue="--no-zero"
                         checked="true" 
-                        help="Output zero count bins" />
+                        help="Output zero count bins (--no-zero)" />
 	</xml>
 	<xml name="software-citation">
 		<citation type="bibtex">@article{khmer2014,

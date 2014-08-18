@@ -35,14 +35,14 @@ $output_histogram_filename
 		<param	name="save_countingtable"
 			type="boolean"
 			label="Save the k-mer counting table(s) in a file"
-			help="" />
+			help="(--savetable)" />
 		<expand macro="input_zero" />
 		<param	name="bigcount"
 			type="boolean"
 			truevalue=""
 			falsevalue="--no-bigcount"
 			checked="true"
-			help="Count k-mers past 255" />
+			help="Count k-mers past 255 (--no-bigcount)" />
 		<expand macro="tableinputs" />
 	</inputs>
 	<outputs>

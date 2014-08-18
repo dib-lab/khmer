@@ -35,12 +35,12 @@ $input_counting_table_filename
 			truevalue="--variable-coverage"
 			falsevalue=""
 			label="Variable coverage"
-			help="Only trim when a sequence has high enough coverage (median abundance > 20)" />
+			help="Only trim when a sequence has high enough coverage; median abundance > 20 (--variable_coverage)" />
 		<param	name="cutoff"
 			type="integer"
 			value="2"
 			label="cutoff"
-			help="Trim at k-mers below this abundance." />
+			help="Trim at k-mers below this abundance. (--cutoff)" />
 		<expand macro="input_counting_table_filename" />	
 	</inputs>
 	<outputs>
@@ -51,7 +51,8 @@ $input_counting_table_filename
 	<tests>
                 <test interactor="api">
                         <param name="inputs" value="test-abund-read-2.fa" />
-                        <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
+			<param name="input_counting_table_filename"
+				value="test-abund-read-2.ct" ftype="ct" />
                         <output name="output">
 				<!-- <discover_dataset name="test-abund-read-2.fa.abundfilt"> -->
                                 	<assert_contents>
@@ -61,8 +62,10 @@ $input_counting_table_filename
                         </output>
                 </test>
                 <test interactor="api">
-                        <param name="input_sequence_filename" value="test-abund-read-2.fa" />
-                        <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
+			<param name="input_sequence_filename"
+				value="test-abund-read-2.fa" />
+			<param name="input_counting_table_filename"
+				value="test-abund-read-2.ct" ftype="ct" />
 			<param name="cutoff" value="1" />
                         <output name="output">
 				<!-- <discover_dataset name="test-abund-read-2.fa.abundfilt"> -->

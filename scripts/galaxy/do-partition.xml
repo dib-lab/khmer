@@ -30,17 +30,17 @@ mv *.part output/
 			type="integer"
 			value="20"
 			label="ksize"
-			help="k-mer size to use" />
+			help="k-mer size to use (--ksize/-k)" />
 		<param	name="n_tables"
 			type="integer"
 			min="1"
 			value="4"
 			label="n_tables"
-			help="number of tables to use" />
+			help="number of tables to use (--n_tables/-N)" />
 		<param	name="tablesize_specific"
 			type="text"
 			label="tablesize"
-			help="lower bound on the tablesize to use" />
+			help="lower bound on the tablesize to use (--min-tablesize/-x)" />
 	</inputs>
 	<outputs>
 		<data	name="information"
