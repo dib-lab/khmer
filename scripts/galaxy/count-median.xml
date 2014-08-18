@@ -30,12 +30,7 @@ mkdir output; cd output;
 	<outputs>
 		<data name="output_summary_filename" format="text" label="${input_sequence_filename} sequence id, median, average, stddev, and seq length" />
 	</outputs>
- 	<stdio>
-        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
-		<exit_code	range="1:"
-				level="fatal" />
-	</stdio>
-
+	<expand macro="stdio" />
 	<tests>
 		<test interactor="api">
                         <param name="input_sequence_filename" value="test-abund-read-2.fa" />

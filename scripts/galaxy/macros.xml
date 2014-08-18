@@ -149,5 +149,11 @@ Shotgun Sequencing Data",
 	<xml name="counting-citation">
 		<citation type="doi">10.1371/journal.pone.0101271</citation>
 	</xml>
-
+	<xml name="stdio">
+	<stdio>
+        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
+		<exit_code	range="1:"
+				level="fatal" />
+	</stdio>
+	</xml>
 </macros>

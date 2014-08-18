@@ -73,11 +73,7 @@ $input
 		<!-- <expand macro="output_sequences" /> -->
 		<expand macro="output_sequences_single" />
 	</outputs>
- 	<stdio>
-        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
-		<exit_code	range="1:"
-				level="fatal" />
-	</stdio>
+	<expand macro="stdio" />
 	
 	<tests>
 		<test interactor="api">

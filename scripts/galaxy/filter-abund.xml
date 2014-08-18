@@ -47,12 +47,8 @@ $input_counting_table_filename
 		<!-- <expand macro="output_sequences" /> -->
 		<expand macro="output_sequences_single" />
 	</outputs>
- 	<stdio>
-        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
-		<exit_code	range="1:"
-				level="fatal" />
-	</stdio>
-        <tests>
+	<expand macro="stdio" />
+	<tests>
                 <test interactor="api">
                         <param name="inputs" value="test-abund-read-2.fa" />
                         <param name="input_counting_table_filename" value="test-abund-read-2.ct" ftype="ct" />
