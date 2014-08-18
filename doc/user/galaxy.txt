@@ -8,7 +8,7 @@ the Galaxy platform.
 
 ----
 
-We are developing the support for running all the khmer scripts in `Galaxy 
+We are developing the support for running all the khmer scripts in `Galaxy
 <http://galaxyproject.org/>`__.
 
 Install the tools & tool description
