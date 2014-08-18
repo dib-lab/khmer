@@ -15,7 +15,7 @@
   --n_tables=$parameters.n_tables
   --min-tablesize=$parameters.tablesize_specific
   #end if</token>
-	<token name="@THREADS@">--threads \$GALAXY_SLOTS</token>
+	<token name="@THREADS@">--threads \${GALAXY_SLOTS:-4}</token>
 	<xml name="tableinputs">
 		<conditional name="parameters">
 			<param	name="type"
