@@ -7,9 +7,9 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Build a graph from the given sequences, save in <htname>.
+Build a graph from the given sequences, save in <ptname>.
 
-% python scripts/load-graph.py <htname> <data1> [ <data2> <...> ]
+% python scripts/load-graph.py <ptname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -51,7 +51,6 @@ def main():
 
     base = args.output_filename
     filenames = args.input_filenames
-    n_threads = int(args.n_threads)
 
     for _ in args.input_filenames:
         check_file_status(_)
@@ -66,6 +65,9 @@ def main():
     else:
         print 'We WILL build the tagset (for partitioning/traversal).'
 
+    config = khmer.get_config()
+    config.set_reads_input_buffer_size(args.n_threads * 64 * 1024)
+
     print 'making k-mer presence table'
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
@@ -74,21 +76,11 @@ def main():
     else:
         target_method = htable.consume_fasta_and_tag_with_reads_parser
 
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(n_threads * 64 * 1024)
-
     for _, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, n_threads)
-        threads = []
+        rparser = khmer.ReadParser(filename, 1)
         print 'consuming input', filename
-        for _ in xrange(n_threads):
-            cur_thrd = threading.Thread(target=target_method, args=(rparser, ))
-            threads.append(cur_thrd)
-            cur_thrd.start()
-
-        for thread in threads:
-            thread.join()
+        target_method(rparser)
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of k-mers: {0}'.format(
