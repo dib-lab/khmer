@@ -1,14 +1,36 @@
+2014-08-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * CITATION: fixed formatting, added BibTeX
+    * Makefile: Python code coverage targets will now compile khmer if needed
+    * doc/dev/galaxy.txt: moved to doc/user/; updated & simplified
+    * doc/{dev,user}/index.txt: galaxy.txt move
+    * scripts/*.xml: moved to scripts/galaxy/; citations added; additional
+    scripts wrapped
+    * scripts/galaxy/README.txt: documented Galaxy codebase requirements
+    * doc/citations.txt: symlink to CITATION
+    * scripts/galaxy/test-data: added symlinks to files in tests/test-data or
+    added short test files from scratch
+    * scripts/galaxy/macros.xml: common configuration moved to central file
+    * scripts/galaxy/gedlab.py: custom Galaxy datatypes for the counting
+    tables and presence tables: it inherits from the Galaxy Binary type but
+    isn't sniffable. Written with GalaxyTeam's Dave_B.
+    * scripts/filter-abund.py: fix inaccurate parameter description
+    * scripts/galaxy/tool_dependencies.xml: document install process
+    * scripts/galaxy/filter-below-abund.py: symlink to
+    sandbox/filter-below-abund.py for now.
+    * khmer/khmer_args.py: point users to online citation file for details
+
 2014-08-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/read_parsers.{cc,hh}: close file handles. Fixes CID 1222793
 
 2014-08-05  Justin Lippi  <jlippi@gmail.com>
 
-  *   khmer/__init__.py: import get_version_cpp method as __version_cpp__.
-  *   khmer/_khmermodule.cc: write get_version_cpp method in C++
-  *   tests/test_version.py: check that version from C++ matches version from
-      versioneer
-  *   setup.cfg: don't run jenkins attr with 'make test'
+    * khmer/__init__.py: import get_version_cpp method as __version_cpp__.
+    * khmer/_khmermodule.cc: added get_version_cpp implementation
+    * tests/test_version.py: check that version from C++ matches version from
+    khmer.__version__
+    * setup.cfg: don't run tests with 'jenkins' @attr with 'make test'
 
 2014-08-04  Michael R. Crusoe  <mcrusoe@msu.edu>
 

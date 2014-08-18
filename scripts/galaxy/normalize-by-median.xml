@@ -1,0 +1,132 @@
+<tool	id="gedlab-khmer-normalize-by-median"
+	name="Normalize By Median"
+	version="1.1-4"
+	force_history_refresh="true">
+
+	<description>
+		Filters a fastq/fasta file using digital normalization via
+	    	median k-mer abundances.
+	</description>
+        <macros>
+                <token name="@BINARY@">normalize-by-median.py</token>
+                <import>macros.xml</import>
+        </macros>
+        <expand macro="requirements" />
+	<command>
+mkdir output;
+cd output;
+normalize-by-median.py
+$paired_switch
+@TABLEPARAMS@
+--cutoff=$cutoff
+#if $save_countingtable
+--savetable=$countingtable
+#end if
+#if $countingtable_to_load
+--loadtable=$countingtable_to_load
+#end if
+--report-total-kmers
+#for entry in $many_inputs
+#for input in $entry.inputs
+$input
+#end for
+#end for
+--out=$output
+	</command>
+
+	<inputs>
+		<repeat name="many_inputs" title="input(s) set" min="1" default="1">
+			<expand macro="input_sequences_filenames" />
+		</repeat>
+		<param	name="paired_switch"
+			type="boolean"
+			checked="false"
+			truevalue="--paired"
+			falsevalue=""
+			label="Are the inputs interleaved paired ends?"
+			help="If so, then selecting this option will process the paired ends together." />
+
+		<param	name="countingtable_to_load"
+			type="data"
+			format="ct"
+			optional="true"
+			label="an optional k-mer counting table to load"
+			help="The inputs file(s) will be processed using the kmer counts in the specified k-mer counting table file as a starting point." />
+
+		<param	name="save_countingtable"
+			type="boolean"
+			label="Save the k-mer counting table(s) in a file"
+			help="" />
+		<param	name="cutoff"
+			type="integer"
+			min="1"
+			value="20"
+			label="cutoff" />
+		<expand macro="tableinputs" />
+	</inputs>
+	<outputs>
+		<data	name="countingtable"
+			format="ct"
+			label="${tool.name} k-mer counting table">
+			<filter>save_countingtable == True</filter>
+		</data>
+		<!-- <expand macro="output_sequences" /> -->
+		<expand macro="output_sequences_single" />
+	</outputs>
+	<expand macro="stdio" />
+
+	<tests>
+		<test interactor="api">
+			<conditional name="parameters">
+				<param name="type" value="specific" />
+				<param name="inputs" value="test-abund-read-2.fa"/>
+				<param name="cutoff" value="1" />
+				<param name="ksize" value="17" />
+			</conditional>
+			<output name="output">
+				<discover_dataset name="test-abund-read-2.fa.keep">
+					<assert_contents>
+						<has_line_matching expression="GGTTGACGGGGCTCAGGGGG" />
+					</assert_contents>
+				</discover_dataset>
+			</output>
+		</test>
+		<test interactor="api">
+			<param name="inputs" value="test-abund-read-2.fa" />
+			<param name="cutoff" value="2" />
+			<param name="ksize" value="17" />
+			<output name="output">
+				<discover_dataset name="test-abund-read-2.fa.keep">
+					<assert_contents>
+						<has_line_matching expression="GGTTGACGGGGCTCAGGGGG" />
+						<has_line_matching expression="GGTTGACGGGGCTCAGGG" />
+					</assert_contents>
+				</discover_dataset>
+			</output>
+		</test>
+		<test interactor="api">
+			<param name="inputs" value="test-abund-read-paired.fa" />
+			<param name="cutoff" value="1" />
+			<param name="ksize" value="17" />
+			<param name="paired" value="true" />
+			<output name="output">
+				<discover_dataset name="test-abund-read-paired.fa.keep">
+					<assert_contents>
+						<has_line_matching expression="GGTTGACGGGGCTCAGGGGG" />
+						<has_line_matching expression="GGTTGACGGGGCTCAGGG" />
+					</assert_contents>
+				</discover_dataset>
+			</output>
+		</test>
+
+	</tests>
+	<citations>
+		<expand macro="software-citation" />
+		<expand macro="diginorm-citation" />
+	</citations>
+    <!-- [OPTIONAL] Help displayed in Galaxy -->
+    <!--
+	<help>
+	</help>
+    -->
+</tool>

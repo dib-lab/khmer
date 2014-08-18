@@ -46,6 +46,7 @@ Contents:
 
    introduction
    contributors
+   citations
 
    user/index
    dev/index

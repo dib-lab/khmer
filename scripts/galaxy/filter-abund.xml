@@ -1,0 +1,88 @@
+<tool	id="gedlab-khmer-filter-abund"
+	name="Filter by abundance"
+	version="1.1-1"
+	force_history_refresh="true">
+
+	<description>
+		Trims fastq/fasta sequences at k-mers of a given abundance
+		based on a provided k-mer counting table.
+	</description>
+	<macros>
+		<token name="@BINARY@">filter-abund.py</token>
+		<import>macros.xml</import>
+	</macros>
+	<expand macro="requirements" />
+	<command>
+mkdir output; cd output;
+@BINARY@
+#if $cutoff != 2
+  --cutoff=$cutoff
+#end if
+$variable_coverage
+@THREADS@
+$input_counting_table_filename
+#for input in $inputs
+ $input
+#end for
+--out $output
+	</command>
+
+	<inputs>
+		<expand macro="input_sequences_filenames" />
+		<param	name="variable_coverage"
+			type="boolean"
+			checked="false"
+			truevalue="--variable-coverage"
+			falsevalue=""
+			label="Variable coverage"
+			help="Only trim when a sequence has high enough coverage; median abundance > 20 (--variable_coverage)" />
+		<param	name="cutoff"
+			type="integer"
+			value="2"
+			label="cutoff"
+			help="Trim at k-mers below this abundance. (--cutoff)" />
+		<expand macro="input_counting_table_filename" />
+	</inputs>
+	<outputs>
+		<!-- <expand macro="output_sequences" /> -->
+		<expand macro="output_sequences_single" />
+	</outputs>
+	<expand macro="stdio" />
+	<tests>
+                <test interactor="api">
+                        <param name="inputs" value="test-abund-read-2.fa" />
+			<param name="input_counting_table_filename"
+				value="test-abund-read-2.ct" ftype="ct" />
+                        <output name="output">
+				<!-- <discover_dataset name="test-abund-read-2.fa.abundfilt"> -->
+                                	<assert_contents>
+                                        	<has_text text="GGTTGACGGGGCTCAGGG" />
+                                	</assert_contents>
+				<!-- </discover_dataset> -->
+                        </output>
+                </test>
+                <test interactor="api">
+			<param name="input_sequence_filename"
+				value="test-abund-read-2.fa" />
+			<param name="input_counting_table_filename"
+				value="test-abund-read-2.ct" ftype="ct" />
+			<param name="cutoff" value="1" />
+                        <output name="output">
+				<!-- <discover_dataset name="test-abund-read-2.fa.abundfilt"> -->
+                                	<assert_contents>
+                                        	<has_text text="GGTTGACGGGGCTCAGGG" />
+                                	</assert_contents>
+				<!-- </discover_dataset> -->
+                        </output>
+                </test>
+        </tests>
+	<citations>
+		<expand macro="software-citation" />
+		<expand macro="counting-citation" />
+	</citations>
+	<!-- [OPTIONAL] ReST Help displayed in Galaxy -->
+    <!--
+	<help>
+	</help>
+    -->
+</tool>

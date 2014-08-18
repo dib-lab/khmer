@@ -1,0 +1,160 @@
+<macros>
+	<xml name="requirements">
+		<requirements>
+			<!-- <requirement type="binary">@BINARY@</requirement> -->
+			<requirement type="package" version="1.1">khmer</requirement>
+		</requirements>
+		<version_command>@BINARY@ --version</version_command>
+	</xml>
+	<token name="@TABLEPARAMS@">#if $parameters.type == "simple"
+  --ksize=20
+  --n_tables=4
+  --min-tablesize=$parameters.tablesize
+#else
+  --ksize=$parameters.ksize
+  --n_tables=$parameters.n_tables
+  --min-tablesize=$parameters.tablesize_specific
+  #end if</token>
+	<token name="@THREADS@">--threads \${GALAXY_SLOTS:-4}</token>
+	<xml name="tableinputs">
+		<conditional name="parameters">
+			<param	name="type"
+				type="select"
+				label="Advanced Parameters"
+				help="ksize, n_tables, a specific tablesize" >
+				<option	value="simple"
+					selected="true">
+					Hide
+				</option>
+				<option value="specific">
+					Show
+				</option>
+            		</param>
+			<when	value="simple">
+				<param	name="tablesize"
+					type="select"
+					label="Sample Type"
+					display="radio">
+					<option	value="1e9"
+						selected="true">
+						Microbial Genome
+					</option>
+					<option value="2e9">
+						Animal Transcriptome
+					</option>
+					<option value="4e9">
+						Small Animal Genome or
+						Low-Diversity Metagenome
+					</option>
+					<option value="16e9">
+						Large Animal Genome
+					</option>
+				</param>
+			</when>
+			<when	value="specific">
+				<param	name="ksize"
+					type="integer"
+					value="20"
+					label="ksize"
+					help="k-mer size to use" />
+				<param	name="n_tables"
+					type="integer"
+					min="1"
+					value="4"
+					label="n_tables"
+					help="number of tables to use" />
+				<param	name="tablesize_specific"
+					type="text"
+					label="tablesize"
+					help="lower bound on the tablesize to use" />
+			</when>
+		</conditional>
+	</xml>
+	<xml name="input_sequences_filenames">
+                <param  name="inputs"
+                        multiple="true"
+                        type="data"
+                        format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
+                        label="FAST[AQ] file(s)"
+                        help="Put in order of precedence such as longest reads first." />
+	</xml>
+	<xml name="input_sequence_filename">
+                <param  name="input_sequence_filename"
+                        type="data"
+                        format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina"
+                        label="FAST[AQ] file(s)" />
+	</xml>
+	<xml name="input_counting_table_filename">
+                <param  name="input_counting_table_filename"
+			type="data"
+			format="ct"
+                        label="the k-mer counting table to query"
+                        help="The abundances of the k-mers in the input nucleotide sequence file will be calculated using the kmer counts in this k-mer counting table." />
+	</xml>
+	<xml name="abundance-histogram-output">
+                <data   name="output_histogram_filename"
+                        format="text"
+                        label="${tool.name} k-mer abundance histogram. The
+                        columns are: (1) k-mer abundance, (2) k-mer count, (3)
+                        cumulative count, (4) fraction of total distinct
+                        k-mers.">
+                </data>
+	</xml>
+	<xml name="output_sequences">
+                <data   name="output"
+                        format="input"
+                        label="${tool.name} processed nucleotide sequence file">
+                        <discover_datasets pattern="__name__" directory="output" visible="true"/>
+                </data>
+	</xml>
+	<xml name="output_sequences_single">
+                <data   name="output"
+                        format="input"
+                        label="${tool.name} processed nucleotide sequence file" />
+	</xml>
+	<xml name="input_zero">
+                <param  name="zero"
+                        type="boolean"
+                        truevalue=""
+                        falsevalue="--no-zero"
+                        checked="true" 
+                        help="Output zero count bins (--no-zero)" />
+	</xml>
+	<xml name="software-citation">
+		<citation type="bibtex">@article{khmer2014,
+      author = "Crusoe, Michael and Edvenson, Greg and Fish, Jordan and Howe,
+  Adina and McDonald, Eric and Nahum, Joshua and Nanlohy, Kaben and
+  Ortiz-Zuazaga, Humberto and Pell, Jason and Simpson, Jared and Scott, Camille
+  and Srinivasan, Ramakrishnan Rajaram and Zhang, Qingpeng and Brown, C. Titus",
+      title = "The khmer software package: enabling efficient sequence
+  analysis",
+      year = "2014",
+      month = "04",
+      publisher = "Figshare",
+      url = "http://dx.doi.org/10.6084/m9.figshare.979190"
+  }</citation>
+	</xml>
+	<xml name="diginorm-citation">
+		<citation type="bibtex">@unpublished{diginorm,
+    author = "Brown, C Titus and Howe, Adina and Zhang, Qingpeng and Pyrkosz,
+Alexis B and Brom, Timothy H",
+    title = "A Reference-Free Algorithm for Computational Normalization of
+Shotgun Sequencing Data",
+    year = "2012",
+    eprint = "arXiv:1203.4802",
+    url = "http://arxiv.org/abs/1203.4802",
+}</citation></xml>
+	<xml name="graph-citation">
+		<citation type="doi">10.1073/pnas.1121464109</citation>
+	</xml>
+	<xml name="counting-citation">
+		<citation type="doi">10.1371/journal.pone.0101271</citation>
+	</xml>
+	<xml name="stdio">
+	<stdio>
+        <!-- [HELP] If no exit code rule is defined, the tool will stop if anything is written to STDERR -->
+		<exit_code	range="1:"
+				level="fatal" />
+	</stdio>
+	</xml>
+</macros>
