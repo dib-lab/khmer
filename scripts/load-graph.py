@@ -7,9 +7,9 @@
 #
 # pylint: disable=invalid-name,missing-docstring
 """
-Build a graph from the given sequences, save in <htname>.
+Build a graph from the given sequences, save in <ptname>.
 
-% python scripts/load-graph.py <htname> <data1> [ <data2> <...> ]
+% python scripts/load-graph.py <ptname> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
