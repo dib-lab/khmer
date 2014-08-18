@@ -14,9 +14,9 @@
     * scripts/galaxy/gedlab.py: custom Galaxy datatypes for the counting
     tables and presence tables: it inherits from the Galaxy Binary type but
     isn't sniffable. Written with GalaxyTeam's Dave_B.
-    * scripts/filter-abund.py: fix innacurate parameter description
+    * scripts/filter-abund.py: fix inaccurate parameter description
     * scripts/galaxy/tool_dependencies.xml: document install process
-    * scripys/galaxy/filter-below-abund.py: symlink to
+    * scripts/galaxy/filter-below-abund.py: symlink to
     sandbox/filter-below-abund.py for now.
     * khmer/khmer_args.py: point users to online citation file for details
 
