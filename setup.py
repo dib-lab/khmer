@@ -21,6 +21,7 @@ from distutils.sysconfig import get_config_vars
 from distutils.dist import Distribution
 
 import versioneer
+versioneer.VCS = 'git'
 versioneer.versionfile_source = 'khmer/_version.py'
 versioneer.versionfile_build = 'khmer/_version.py'
 versioneer.tag_prefix = 'v'  # tags are like v1.2.0

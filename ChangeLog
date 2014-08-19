@@ -1,3 +1,7 @@
+2014-08-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * {setup,versioneer,khmer/_version}.py: upgrade versioneer from 0.10 to 0.11
+
 2014-08-18  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * setup.py: Use the system bz2 and/or zlib libraries if specified in
