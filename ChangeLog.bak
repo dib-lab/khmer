@@ -1,8 +1,3 @@
-2014-08-18  Michael R. Crusoe  <mcrusoe@msu.edu>
-
-    * setup.py: Use the system bz2 and/or zlib libraries if specified in
-    setup.cfg or overridden on the commandline
-
 2014-08-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * CITATION: fixed formatting, added BibTeX
@@ -19,9 +14,9 @@
     * scripts/galaxy/gedlab.py: custom Galaxy datatypes for the counting
     tables and presence tables: it inherits from the Galaxy Binary type but
     isn't sniffable. Written with GalaxyTeam's Dave_B.
-    * scripts/filter-abund.py: fix inaccurate parameter description
+    * scripts/filter-abund.py: fix innacurate parameter description
     * scripts/galaxy/tool_dependencies.xml: document install process
-    * scripts/galaxy/filter-below-abund.py: symlink to
+    * scripys/galaxy/filter-below-abund.py: symlink to
     sandbox/filter-below-abund.py for now.
     * khmer/khmer_args.py: point users to online citation file for details
 
@@ -151,11 +146,6 @@
 2014-07-06  Titus Brown  <t@idyll.org>
 
     * doc/release.txt: fix formatting.
-
-2014-06-25  Michael R. Crusoe <mcrusoe@msu.edu>
-
-    * scripts/load-graph.py: fix #507. Threading doesn't give any advantages
-    to this script right now; the threading parameter is ignored for now.
 
 2014-06-20  Chuck Pepe-Ranney  <chuck.peperanney@gmail.com>
 
