@@ -36,8 +36,8 @@ no.  `2010-65205-20361
 <http://ged.msu.edu/downloads/2009-usda-vertex.pdf>`__ from the USDA
 NIFA, and is now funded by the National Human Genome Research
 Institute of the National Institutes of Health under Award Number
-`R01HG007513 <http://ged.msu.edu/downloads/2012-bigdata-nsf.pdf>`__,
-both to C. Titus Brown.
+`R01HG007513 <http://ged.msu.edu/downloads/2012-bigdata-nsf.pdf>`__ through
+May 2016, both to C. Titus Brown.
 
 Contents:
 
