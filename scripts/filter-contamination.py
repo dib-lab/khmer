@@ -32,25 +32,30 @@ import argparse
 from khmer.khmer_args import info
 from khmer.file import check_file_status, check_space
 
+
 def get_parser():
     parser = argparse.ArgumentParser(
         description="Determine which organisms are present in a given file ",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('graph', help="basename of the input k-mer presence table")
+    parser.add_argument(
+        'graph', help="basename of the input k-mer presence table")
     parser.add_argument('data', help="files to be decontaminated")
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     return parser
 
 # http://scipher.wordpress.com/2010/12/02/simple-sliding-window-iterator-in-python/
+
+
 def sliding_window_it(sequence, winSize, step=1):
     """Returns a generator that will iterate through
     the defined chunks of input sequence.  Input sequence
     must be iterable."""
 
     # Verify the inputs
-    try: it = iter(sequence)
+    try:
+        it = iter(sequence)
     except TypeError:
         raise Exception("**ERROR** sequence must be iterable.")
     if not ((type(0) == type(winSize)) and (type(step) == type(0))):
@@ -58,14 +63,16 @@ def sliding_window_it(sequence, winSize, step=1):
     if step > winSize:
         raise Exception("**ERROR** step must not be larger than winSize.")
     if winSize > len(sequence):
-        raise Exception("**ERROR** winSize must not be larger than sequence length.")
+        raise Exception(
+            "**ERROR** winSize must not be larger than sequence length.")
 
     # Pre-compute number of chunks to emit
-    numOfChunks = ((len(sequence)-winSize)/step)+1
+    numOfChunks = ((len(sequence) - winSize) / step) + 1
 
     # Do the work
-    for i in range(0, int(numOfChunks*step), step):
-        yield sequence[i:i+winSize]
+    for i in range(0, int(numOfChunks * step), step):
+        yield sequence[i:i + winSize]
+
 
 def main():
     info('filter-contamination.py', ['graph', 'classification'])
@@ -80,15 +87,16 @@ def main():
     for _ in filenames:
         check_file_status(_)
 
-    # Is there enough disk space available for input/output files before doing anything?
+    # Is there enough disk space available for input/output files before doing
+    # anything?
     check_space(filenames)
 
     print 'loading ht graph %s' % graph
     htable = khmer.load_hashbits(graph)
 
-
     for _, filename in enumerate(filenames):
-        print('querying sample {sample} against filter {filt}').format(sample=filename, filt=graph)
+        print('querying sample {sample} against filter {filt}').format(
+            sample=filename, filt=graph)
         ksize = htable.ksize()
         total_query_kmers = 0
         contaminant_total_matches = 0
@@ -106,7 +114,7 @@ def main():
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
 
-        contam = contaminant_read_matches/total_query_kmers
+        contam = contaminant_read_matches / total_query_kmers
 
         results['sample'] = filenames
         results['filter'] = graph
