@@ -1,3 +1,7 @@
+2014-08-20  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * test/test_version.py: add Python2.6 compatibility.
+
 2014-08-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * {setup,versioneer,khmer/_version}.py: upgrade versioneer from 0.10 to 0.11
