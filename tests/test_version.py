@@ -12,8 +12,8 @@ from nose.plugins.attrib import attr
 def test_python_and_c_match():
     # checks c++ compiler option version against versioneer version
     # (respectively)
-    print 'c++ version {}:'.format(khmer.__version_cpp__())
-    print 'versioneer (python) version: {}'.format(khmer.__version__)
+    print 'c++ version {0}:'.format(khmer.__version_cpp__())
+    print 'versioneer (python) version: {0}'.format(khmer.__version__)
     assert khmer.__version_cpp__() == khmer.__version__
 
 
@@ -22,8 +22,8 @@ def test_python_and_c_match_base():
     # it's a hash based on git commits which can get out-of-sync too easily
     cppver = '-'.join(khmer.__version_cpp__().split('-')[0:2])
     pyver = '-'.join(khmer.__version__.split('-')[0:2])
-    print 'c++ version {}'.format(cppver)
-    print 'python version: {}'.format(pyver)
+    print 'c++ version {0}'.format(cppver)
+    print 'python version: {0}'.format(pyver)
     print 'if you are seeing this, the version compiled into your cpp'
     print 'objects and your versioneer stuff is out-of-sync.'
     print 'try doing: make clean; make'
