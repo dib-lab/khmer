@@ -8,7 +8,8 @@
 # pylint: disable=invalid-name,missing-docstring
 """
 Screen for contamination in a similar way as FACS, fastq_screen or deconseq do.
-The output is in JSON format by default, simplifying parsing/piping for third party programs and pipelines, ie:
+The output is in JSON format by default, simplifying parsing/piping for third
+party programs and pipelines, ie:
 
 {"sample": ["sample.fastq"], "filter": "eschColi_K12.pt", "contamination": 0.3}
 
@@ -21,8 +22,6 @@ from __future__ import division
 
 # Built the test graph using:
 # scripts/load-graph.py -x 4e9 -N 4 --no-build-tagset foo.khmer ../data/16s.fa
-
-import sys
 
 import khmer
 import json
@@ -55,7 +54,7 @@ def sliding_window_it(sequence, winSize, step=1):
 
     # Verify the inputs
     try:
-        it = iter(sequence)
+        iter(sequence)
     except TypeError:
         raise Exception("**ERROR** sequence must be iterable.")
     if not ((type(0) == type(winSize)) and (type(step) == type(0))):
@@ -107,9 +106,8 @@ def main():
             read_kmers = len(r.sequence) - ksize + 1
             contaminant_read_matches = 0
 
-            for position in range(read_kmers):
-                for kmer in sliding_window_it(r.sequence, ksize):
-                    contaminant_read_matches += htable.get(kmer)
+            for kmer in sliding_window_it(r.sequence, ksize):
+                contaminant_read_matches += htable.get(kmer)
 
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
