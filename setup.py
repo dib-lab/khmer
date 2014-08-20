@@ -138,7 +138,8 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
 
     def run(self):
         if "%x" % sys.maxsize != '7fffffffffffffff':
-            raise DistutilsPlatformError("khmer requires a 64-bit operating system")
+            raise DistutilsPlatformError("%s require 64-bit operating system" %
+                                         SETUP_METADATA["packages"])
 
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
