@@ -19,6 +19,8 @@ doc/_build
 /.Rhistory
 coverage.xml
 coverage-gcovr.xml
+coverage-debug
+khmer-cov.tgz
 cppcheck-result.xml
 MANIFEST
 TAGS
