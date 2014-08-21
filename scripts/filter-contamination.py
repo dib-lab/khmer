@@ -90,13 +90,13 @@ def main():
     # anything?
     check_space(filenames)
 
-    print 'loading ht graph %s' % graph
+    print 'loading presence table graph %s' % graph
     htable = khmer.load_hashbits(graph)
+    ksize = htable.ksize()
 
     for _, filename in enumerate(filenames):
         print('querying sample {sample} against filter {filt}').format(
             sample=filename, filt=graph)
-        ksize = htable.ksize()
         total_query_kmers = 0
         contaminant_total_matches = 0
 
@@ -112,7 +112,7 @@ def main():
             contaminant_total_matches += contaminant_read_matches
             total_query_kmers += read_kmers
 
-        contam = contaminant_read_matches / total_query_kmers
+        contam = contaminant_total_matches / total_query_kmers
 
         results['sample'] = filenames
         results['filter'] = graph
