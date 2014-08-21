@@ -19,6 +19,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 from distutils.spawn import spawn
 from distutils.sysconfig import get_config_vars
 from distutils.dist import Distribution
+from distutils.errors import DistutilsPlatformError
 
 import versioneer
 versioneer.VCS = 'git'
@@ -136,6 +137,10 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
     """
 
     def run(self):
+        if "%x" % sys.maxsize != '7fffffffffffffff':
+            raise DistutilsPlatformError("%s require 64-bit operating system" %
+                                         SETUP_METADATA["packages"])
+
         if "z" not in self.libraries:
             zcmd = ['bash', '-c', 'cd ' + ZLIBDIR + ' && ( test Makefile -nt'
                     ' configure || bash ./configure --static ) && make -f '
