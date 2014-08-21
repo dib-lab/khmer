@@ -2,6 +2,11 @@
 
     * test/test_version.py: add Python2.6 compatibility.
 
+2014-08-20  Rhys Kidd  <rhyskidd@gmail.com>
+
+    * setup.py,README.rst,doc/user/install.txt: Test requirement for a 
+    64-bit operating system, documentation changes. Fixes #529
+
 2014-08-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * {setup,versioneer,khmer/_version}.py: upgrade versioneer from 0.10 to 0.11
