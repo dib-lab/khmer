@@ -89,7 +89,7 @@ class ThreadedSequenceProcessor(object):
             self.done = True
 
             w.join()
-        except:
+        except Exception:
             self.done = True
             raise
 
