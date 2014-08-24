@@ -18,7 +18,6 @@ Use '-h' for parameter help.
 """
 import argparse
 import screed
-import sys
 
 
 def get_parser():
