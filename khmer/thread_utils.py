@@ -68,7 +68,7 @@ class ThreadedSequenceProcessor(object):
             print >>sys.stderr, 'starting threads'
 
         try:
-            for i in range(self.n_workers):
+            for _ in range(self.n_workers):
                 t = threading.Thread(target=self.do_process)
                 self.worker_count += 1
                 t.start()
