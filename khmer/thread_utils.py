@@ -125,7 +125,6 @@ class ThreadedSequenceProcessor(object):
 
     def do_process(self):
         inq = self.inqueue
-        outq = self.outqueue
 
         while not self.done or not inq.empty():
             try:
