@@ -68,7 +68,7 @@ class ThreadedSequenceProcessor(object):
             print >>sys.stderr, 'starting threads'
 
         try:
-            for i in range(self.n_workers):
+            for _ in range(self.n_workers):
                 t = threading.Thread(target=self.do_process)
                 self.worker_count += 1
                 t.start()
@@ -89,7 +89,7 @@ class ThreadedSequenceProcessor(object):
             self.done = True
 
             w.join()
-        except:
+        except Exception:
             self.done = True
             raise
 
@@ -125,7 +125,6 @@ class ThreadedSequenceProcessor(object):
 
     def do_process(self):
         inq = self.inqueue
-        outq = self.outqueue
 
         while not self.done or not inq.empty():
             try:

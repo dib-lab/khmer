@@ -69,6 +69,7 @@ def main():
 
     counter1 = 0
     counter2 = 0
+    index = None
     for index, record in enumerate(screed.open(infile)):
         if index % 100000 == 0:
             print >> sys.stderr, '...', index

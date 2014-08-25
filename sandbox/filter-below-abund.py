@@ -6,7 +6,6 @@
 # Contact: khmer-project@idyll.org
 #
 import sys
-import screed.fasta
 import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
