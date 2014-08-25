@@ -1,3 +1,7 @@
+2014-08-25  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/dev/coding-guidelines-and-review.txt: Clarify pull request checklist
+
 2014-08-30  Rhys Kidd  <rhyskidd@gmail.com>
 
     * khmer/_khmermodule.cc: fix table.get("wrong_length_string") gives core dump
