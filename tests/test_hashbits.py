@@ -552,18 +552,18 @@ def test_simple_median():
 
 
 def test_badget():
-    kh = khmer.new_hashbits(6, 1e6, 1)
+    hbts = khmer.new_hashbits(6, 1e6, 1)
 
-    DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAG"
+    dna = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAG"
 
-    kh.consume(DNA)
+    hbts.consume(dna)
 
-    assert kh.get("AGCTTT") == 1
+    assert hbts.get("AGCTTT") == 1
 
-    assert kh.get("GATGAG") == 0
+    assert hbts.get("GATGAG") == 0
 
     try:
-        kh.get("AGCTT")
+        hbts.get("AGCTT")
         assert 0, "this should fail"
     except ValueError, err:
         print str(err)
