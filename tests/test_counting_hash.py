@@ -827,8 +827,8 @@ def test_badget_2():
 
     try:
         countingtable.get("AGCTT")
-        assert 0, "get should require k-mer size to be equal or greater than"
-    except TypeError, err:
+        assert 0, "this should fail"
+    except ValueError, err:
         print str(err)
 
 

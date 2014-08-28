@@ -570,8 +570,8 @@ def test_badget():
 
     try:
         kh.get("AGCTT")
-        assert 0, "get should require k-mer size to be equal or greater than"
-    except TypeError, err:
+        assert 0, "this should fail"
+    except ValueError, err:
         print str(err)
 
 
