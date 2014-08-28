@@ -557,6 +557,24 @@ def test_simple_median():
     assert stddev == 0.0
 
 
+def test_badget():
+    kh = khmer.Hashbits(6, 1e6, 1)
+
+    DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAG"
+
+    kh.consume(DNA)
+
+    assert kh.get("AGCTTT") == 1
+
+    assert kh.get("GATGAG") == 0
+
+    try:
+        kh.get("AGCTT")
+        assert 0, "get should require k-mer size to be equal or greater than"
+    except TypeError, err:
+        print str(err)
+
+
 def test_bad_primes():
     try:
         countingtable = khmer._Hashbits.__new__(

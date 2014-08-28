@@ -550,6 +550,25 @@ def test_simple_median():
     assert average == 1.0
     assert stddev == 0.0
 
+
+def test_badget():
+    kh = khmer.new_hashbits(6, 1e6, 1)
+
+    DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAG"
+
+    kh.consume(DNA)
+
+    assert kh.get("AGCTTT") == 1
+
+    assert kh.get("GATGAG") == 0
+
+    try:
+        kh.get("AGCTT")
+        assert 0, "get should require k-mer size to be equal or greater than"
+    except TypeError, err:
+        print str(err)
+
+
 ####
 
 
