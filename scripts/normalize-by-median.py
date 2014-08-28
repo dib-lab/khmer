@@ -117,7 +117,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
 
     if report_fp:
         print >> report_fp, total, total - discarded, \
-              1. - (discarded / float(total))
+            1. - (discarded / float(total))
         report_fp.flush()
 
     return total, discarded
