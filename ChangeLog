@@ -1,3 +1,11 @@
+2014-08-28  Titus Brown  <titus@idyll.org>
+
+    * scripts/normalize-by-median.py: added reporting output after main loop
+	exits, in case it hadn't been triggered.
+    * sandbox/saturate-by-median.py: added flag to change reporting frequency,
+	cleaned up leftover code from when it was copied from
+	normalize-by-median.
+
 2014-08-24  Rhys Kidd  <rhyskidd@gmail.com>
 
     * khmer/thread_utils.py, sandbox/filter-below-abund.py,
