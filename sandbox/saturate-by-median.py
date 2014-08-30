@@ -46,7 +46,8 @@ def validpair(read0, read1):
 
 
 # pylint: disable=too-many-locals,too-many-branches
-def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
+def normalize_by_median(input_filename, htable, args, report_fp=None,
+                        report_frequency=100000):
 
     desired_coverage = args.cutoff
     ksize = htable.ksize()
@@ -61,7 +62,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     discarded = 0
     for index, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
-        if index > 0 and index % 100000 == 0:
+        if index > 0 and index % report_frequency == 0:
             print '... kept {kept} of {total} or {perc:2}%'.format(
                 kept=total - discarded, total=total,
                 perc=int(100. - discarded / float(total) * 100.))
@@ -103,19 +104,9 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     return total, discarded
 
 
-def handle_error(error, output_name, input_name, fail_save, htable):
+def handle_error(error, input_name):
     print >> sys.stderr, '** ERROR:', error
     print >> sys.stderr, '** Failed on {name}: '.format(name=input_name)
-    if fail_save:
-        tablename = os.path.basename(input_name) + '.ct.failed'
-        print >> sys.stderr, \
-            '** ...dumping k-mer counting table to {tn}'.format(tn=tablename)
-        htable.save(tablename)
-    try:
-        os.remove(output_name)
-    except:  # pylint: disable=bare-except
-        print >> sys.stderr, '** ERROR: problem removing corrupt filtered file'
-
 
 def get_parser():
     epilog = ("""
@@ -169,15 +160,11 @@ def get_parser():
     parser.add_argument('-s', '--savetable', metavar="filename", default='')
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
+    parser.add_argument('--report-frequency',
+                        metavar='report_frequency', default=100000, type=int)
     parser.add_argument('-f', '--fault-tolerant', dest='force',
                         help='continue on next file if read errors are \
                          encountered', action='store_true')
-    parser.add_argument('--save-on-failure', dest='fail_save',
-                        action='store_false', default=True,
-                        help='Save k-mer counting table when an error occurs')
-    parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
-                        type=int, help='dump k-mer counting table every d '
-                        'files', default=-1)
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_filename',
                         default='', help='only output a single'
@@ -195,6 +182,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_on_config(args)
 
     report_fp = args.report
+    report_frequency = args.report_frequency
 
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames)
@@ -217,23 +205,16 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     discarded = 0
 
     for index, input_filename in enumerate(args.input_filenames):
-        if args.single_output_filename != '':
-            output_name = args.single_output_filename
-            outfp = open(args.single_output_filename, 'a')
-        else:
-            output_name = os.path.basename(input_filename) + '.keepFOO'
-            outfp = open(output_name, 'w')
-
         total_acc = 0
         discarded_acc = 0
 
         try:
             total_acc, discarded_acc = normalize_by_median(input_filename,
-                                                           outfp, htable, args,
-                                                           report_fp)
+                                                           htable, args,
+                                                           report_fp,
+                                                           report_frequency)
         except IOError as err:
-            handle_error(err, output_name, input_filename, args.fail_save,
-                         htable)
+            handle_error(err, input_filename)
             if not args.force:
                 print >> sys.stderr, '** Exiting!'
                 sys.exit(1)
@@ -250,18 +231,6 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                     .format(inp=input_filename,
                             kept=total - discarded, total=total,
                             perc=int(100. - discarded / float(total) * 100.))
-                print 'output in', output_name
-
-        if (args.dump_frequency > 0 and
-                index > 0 and index % args.dump_frequency == 0):
-            print 'Backup: Saving k-mer counting file through', input_filename
-            if args.savetable:
-                hashname = args.savetable
-                print '...saving to', hashname
-            else:
-                hashname = 'backup.ct'
-                print 'Nothing given for savetable, saving to', hashname
-            htable.save(hashname)
 
     if args.savetable:
         print 'Saving k-mer counting table through', input_filename

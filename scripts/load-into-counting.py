@@ -85,6 +85,8 @@ def main():
     config = khmer.get_config()
     config.set_reads_input_buffer_size(args.n_threads * 64 * 1024)
 
+    filename = None
+
     for index, filename in enumerate(filenames):
 
         rparser = khmer.ReadParser(filename, args.n_threads)

@@ -4,7 +4,6 @@ k-mer count and presence
 
 from galaxy.datatypes.binary import Binary
 
-import os
 import logging
 
 log = logging.getLogger(__name__)

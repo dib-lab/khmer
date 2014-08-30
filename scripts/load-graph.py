@@ -15,7 +15,6 @@ Use '-h' for parameter help.
 """
 
 import sys
-import threading
 
 import khmer
 from khmer.khmer_args import build_hashbits_args

@@ -115,6 +115,11 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         else:
             discarded += batch_size
 
+    if report_fp:
+        print >> report_fp, total, total - discarded, \
+            1. - (discarded / float(total))
+        report_fp.flush()
+
     return total, discarded
 
 
@@ -233,6 +238,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     total = 0
     discarded = 0
+    input_filename = None
 
     for index, input_filename in enumerate(args.input_filenames):
         if args.single_output_filename != '':

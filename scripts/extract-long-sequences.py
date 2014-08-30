@@ -18,7 +18,6 @@ Use '-h' for parameter help.
 """
 import argparse
 import screed
-import sys
 
 
 def get_parser():
@@ -40,8 +39,8 @@ def get_parser():
 def main():
     args = get_parser().parse_args()
     outfp = open(args.output, 'w')
-    for file in args.input_filenames:
-        for record in screed.open(file):
+    for filename in args.input_filenames:
+        for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
                 # FASTQ
                 if hasattr(record, 'accuracy'):
