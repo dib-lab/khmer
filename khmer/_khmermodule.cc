@@ -1370,7 +1370,7 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
 
         if (strlen(s.c_str()) < counting->ksize()) {
             PyErr_SetString(PyExc_ValueError,
-                            "string length must >= the hashtable k-mer size");
+                            "string length must >= the counting table k-mer size");
             return NULL;
         }
 
@@ -2338,7 +2338,7 @@ static PyObject * hashbits_get(PyObject * self, PyObject * args)
 
         if (strlen(s.c_str()) < hashbits->ksize()) {
             PyErr_SetString(PyExc_ValueError,
-                            "string length must >= the hashtable k-mer size");
+                            "string length must >= the presence table k-mer size");
             return NULL;
         }
 
