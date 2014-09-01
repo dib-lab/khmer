@@ -243,6 +243,8 @@ struct CacheManager {
         uint8_t const	trace_level =
             khmer:: get_active_config( ).get_input_buffer_trace_level( )
     );
+    CacheManager(const CacheManager& that);
+
     ~CacheManager( );
 
     // Returns true, if current thread has more bytes to consume.
