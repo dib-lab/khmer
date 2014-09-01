@@ -263,8 +263,6 @@ struct CacheManager {
 
     uint64_t const	get_fill_id( );
 
-    // NONCOPYABLE(CacheManager);
-
 private:
 
     struct CacheSegment {
