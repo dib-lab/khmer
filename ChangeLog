@@ -1,3 +1,10 @@
+2015-01-09  Rhys Kidd  <rhyskidd@gmail.com>
+
+    * lib/khmer.hh: implement generic NONCOPYABLE() macro guard
+    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future 
+    modifications to Hashtable that might exposure potential memory corruption 
+    with default copy constructor
+
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
     * tests/test_scripts.py: Attained complete testing coverage for 
