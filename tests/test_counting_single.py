@@ -254,6 +254,24 @@ def test_get_mincount_rc():
     assert x == 2
 
 
+def test_badget():
+    kh = khmer.new_hashtable(6, 4 ** 10)
+
+    DNA = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAG"
+
+    kh.consume(DNA)
+
+    assert kh.get("AGCTTT") == 1
+
+    assert kh.get("GATGAG") == 0
+
+    try:
+        kh.get("AGCTT")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
 def test_64bitshift():
     kh = khmer.new_hashtable(25, 4)
     fullstr = "GTATGCCAGCTCCAACTGGGCCGGTACGAGCAGGCCATTGCCTCTTGCCGCGATGCGTCGGCG"

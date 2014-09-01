@@ -816,6 +816,22 @@ def test_badget():
         print str(err)
 
 
+def test_badget_2():
+    countingtable = khmer.new_counting_hash(6, 1e6)
+
+    countingtable.consume(DNA)
+
+    assert countingtable.get("AGCTTT") == 1
+
+    assert countingtable.get("GATGAG") == 0
+
+    try:
+        countingtable.get("AGCTT")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
 def test_badtrim():
     countingtable = khmer.new_counting_hash(6, 1e6, 2)
 

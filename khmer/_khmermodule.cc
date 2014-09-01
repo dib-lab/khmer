@@ -1367,6 +1367,13 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
         count = counting->get_count((unsigned int) pos);
     } else if (PyString_Check(arg)) {
         std::string s = PyString_AsString(arg);
+
+        if (strlen(s.c_str()) < counting->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "string length must >= the counting table k-mer size");
+            return NULL;
+        }
+
         count = counting->get_count(s.c_str());
     }
 
@@ -2328,6 +2335,13 @@ static PyObject * hashbits_get(PyObject * self, PyObject * args)
         count = hashbits->get_count((unsigned int) pos);
     } else if (PyString_Check(arg)) {
         std::string s = PyString_AsString(arg);
+
+        if (strlen(s.c_str()) < hashbits->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "string length must >= the presence table k-mer size");
+            return NULL;
+        }
+
         count = hashbits->get_count(s.c_str());
     } else {
         PyErr_SetString(PyExc_ValueError, "must pass in an int or string");

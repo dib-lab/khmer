@@ -1,3 +1,10 @@
+2014-08-30  Rhys Kidd  <rhyskidd@gmail.com>
+
+    * khmer/_khmermodule.cc: fix table.get("wrong_length_string") gives core dump
+    * lib/kmer_hash.cc: improve quality of exception error message
+    * tests/{test_counting_hash,test_counting_single,test_hashbits,
+        test_hashbits_obj}.py: add regression unit tests
+
 2014-08-28  Titus Brown  <titus@idyll.org>
 
     * scripts/normalize-by-median.py: added reporting output after main loop
