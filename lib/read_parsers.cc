@@ -569,6 +569,7 @@ CacheManager(
 
 }
 
+
 CacheManager::
 CacheManager(const CacheManager& that)
     : _trace_level( that._trace_level ),
@@ -589,6 +590,33 @@ CacheManager(const CacheManager& that)
     }
 
     std:: map< uint64_t, std:: string > _ca_buffers( that._ca_buffers );
+}
+
+
+const CacheManager&
+CacheManager::
+operator=(const CacheManager& that)
+{
+
+    if (this != &that)
+    {
+        // Tear down the old state first, to prevent memory leaks
+        for (uint32_t i = 0; i < _number_of_threads; ++i) {
+            if (NULL != _segments[ i ]) {
+                delete _segments[ i ];
+                _segments[ i ]	= NULL;
+            }
+        }
+        delete [ ] _segments;
+
+        // Assign to _segments
+        _segments		= new CacheSegment *[ that._number_of_threads ];
+        for (uint32_t i = 0; i < that._number_of_threads; ++i) {
+            _segments[ i ] = that._segments[ i ];
+        }
+
+    }
+    return *this;
 }
 
 
