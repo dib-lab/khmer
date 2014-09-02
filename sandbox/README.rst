@@ -18,8 +18,14 @@ To keep:
 * multi-rename.py - rename sequences from multiple files with a common prefix
 * normalize-by-median-pct.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
 * readstats.py - print out read statistics
+* renumber-partitions.py - systematically renumber partitions
 * saturate-by-median.py - calculate collector's curve on shotgun sequencing; see `khmer-recipes #4 <https://github.com/ged-lab/khmer-recipes/tree/master/004-estimate-sequencing-saturation>`__
+* shuffle-fasta.py - FASTA file shuffler for small FASTA files
+* shuffle-reverse-rotary.py - FASTA file shuffler for larger FASTA files
+* split-fasta.py - break a FASTA file up into smaller chunks
+* to-casava-1.8-fastq.py - convert reads to different Casava format
 * trim-low-abund.py - streaming version of filter-abund.
+* write-trimmomatic.py
 
 Good ideas to rewrite using newer tools/approaches::
 
@@ -27,17 +33,18 @@ Good ideas to rewrite using newer tools/approaches::
 * assembly-diff-2.py - find subsequences that differ between two assemblies
 * bloom_count.py - count # of unique k-mers; should be reimplemented with HyperLogLog
 * bloom_count_intersection.py - look at unique and disjoint #s of k-mers
+* split-sequences-by-length.py - break up short reads by length
 
 To examine:
 
-* build-sparse-graph.py - code for building a sparse graph
-* count-within-radius.py
-* degree-by-position.py
-* do-subset-merge.py
-* ec.py
-* error-correct-pass2.py
-* normalize-by-align.py
-* normalize-by-min.py
+* build-sparse-graph.py - code for building a sparse graph (by Camille Scott)
+* count-within-radius.py - calculating graph density by position with seq
+* degree-by-position.py - calculating graph degree by position in seq
+* ec.py - new error correction foo
+* error-correct-pass2.py - new error correction foo
+* normalize-by-align.py  - new error correction foo
+* read_aligner.py - new error correction foo
+* write-interleave.py - is this used by any protocol etc?
 
 Of unknown utility:
 
@@ -67,43 +74,18 @@ Of unknown utility:
 * print-high-density-kmers.py
 * print-stoptags.py
 * print-tagset.py
-* read_aligner.py
-* reformat.py
-* remove-N.py
-* renumber-partitions.py
-* shuffle-fasta.py
-* shuffle-reverse-rotary.py
-* softmask-high-abund.py
-* split-N.py
-* split-fasta-on-circum.py
-* split-fasta-on-circum2.py
-* split-fasta-on-circum3.py
-* split-fasta-on-circum4.py
-* split-fasta-on-degree-th.py
-* split-fasta-on-degree.py
-* split-fasta-on-density.py
-* split-fasta.py
-* split-reads-on-median-diff.py
-* split-sequences-by-length.py
 * stoptag-abundance-hist.py
 * stoptags-by-position.py
 * strip-partition.py
 * subset-report.py
-* summarize.py
 * sweep-files.py
 * sweep-out-reads-with-contigs.py
 * sweep-reads.py
 * sweep-reads2.py
 * sweep-reads3.py
-* sweep_perf.py
-* test_scripts.py
-* to-casava-1.8-fastq.py
 * traverse-contigs.py
 * traverse-from-reads.py
 * uniqify-sequences.py
-* validate-partitioning.py
-* write-interleave.py
-* write-trimmomatic.py
 
 Present in commit 691b0b3ae but removed thereafter:
 
@@ -138,6 +120,7 @@ Present in commit 691b0b3ae but removed thereafter:
 * do-partition-2.py - replaced by scripts/do-partition.py
 * do-partition-stop.py - replaced by scripts/do-partition.py
 * do-partition.py - moved to scripts/
+* do-subset-merge.py - replaced by scripts/merge-partitions.py
 * do-th-subset-calc.py - unused benchmarking scripts
 * do-th-subset-load.py - unused benchmarking scripts
 * do-th-subset-save.py - unused benchmarking scripts
@@ -160,8 +143,25 @@ Present in commit 691b0b3ae but removed thereafter:
 * make-read-stats.py - see readstats.py
 * multi-stats.py - see readstats.py
 * multi-velvet.py - better done with parallel
+* normalize-by-min.py - normalize by min k-mer abundance in seq; just a bad idea
 * occupy.py - no longer needed utility script
 * parse-bowtie-pe.py - no longer needed utility script
 * parse-stats.py - partition stats
 * quality-trim-pe.py - no longer needed utility script
 * quality-trim.py - no longer needed utility script
+* reformat.py - FASTA sequence description line reformatter for partitioned files
+* remove-N.py - eliminate sequences that have Ns in them
+* softmask-high-abund.py - softmask high abundance sequences (convert ACGT to acgt)
+* split-fasta-on-circum.py - various ways of breaking sequences on graph properties
+* split-fasta-on-circum2.py - various ways of breaking sequences on graph properties
+* split-fasta-on-circum3.py - various ways of breaking sequences on graph properties
+* split-fasta-on-circum4.py - various ways of breaking sequences on graph properties
+* split-fasta-on-degree-th.py - various ways of breaking sequences on graph properties
+* split-fasta-on-degree.py - various ways of breaking sequences on graph properties
+* split-fasta-on-density.py - various ways of breaking sequences on graph properties
+* split-N.py - truncate sequences on N
+* split-reads-on-median-diff.py - various ways of breaking sequences on graph properties
+* summarize.py - sequence stats calculator
+* sweep_perf.py - benchmarking tool
+* test_scripts.py - old test file
+* validate-partitioning.py - unneeded test
