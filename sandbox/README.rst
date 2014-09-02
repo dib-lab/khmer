@@ -3,54 +3,44 @@ Sandbox scripts
 
 To keep:
 
-* assemstats3.py
-* calc-best-assembly.py
-* calc-median-distribution.py
+* abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
+* assemstats3.py - print out assembly statistics
+* calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
+* calc-median-distribution.py - plot coverage distribution; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
 * combine-pe.py - combine partitions based on shared PE reads.
 * compare-partitions.py
-* dn-identify-errors.py
-* extract-single-partition.py
-* filter-median-and-pct.py - see blog post on Trinity in silico norm
-* filter-median.py - see blog post on Trinity in silico norm
-* graph-size.py
-* multi-rename.py
-* readstats.py
-* saturate-by-median.py
-* trim-low-abund.py
+* dn-identify-errors.py - prototype script to identify errors in reads based on diginorm principles
+* extract-single-partition.py - extract all the sequences that belong to a specific partition, from a file with multiple partitions
+* fasta-to-abundance-hist.py - generate abundance of k-mers by position within reads; use with abundance-hist-by-position.py
+* filter-median-and-pct.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
+* filter-median.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
+* graph-size.py - filter reads based on size of connected graph
+* multi-rename.py - rename sequences from multiple files with a common prefix
+* normalize-by-median-pct.py - see blog post on Trinity in silico norm (http://ivory.idyll.org/blog/trinity-in-silico-normalize.html)
+* readstats.py - print out read statistics
+* saturate-by-median.py - calculate collector's curve on shotgun sequencing; see `khmer-recipes #4 <https://github.com/ged-lab/khmer-recipes/tree/master/004-estimate-sequencing-saturation>`__
+* trim-low-abund.py - streaming version of filter-abund.
+
+Good ideas to rewrite using newer tools/approaches::
+
+* assembly-diff.py - find sequences that differ between two assemblies
+* assembly-diff-2.py - find subsequences that differ between two assemblies
+* bloom_count.py - count # of unique k-mers; should be reimplemented with HyperLogLog
+* bloom_count_intersection.py - look at unique and disjoint #s of k-mers
 
 To examine:
 
-* assembly-diff-2.py
-* assembly-diff.py
-* bloom_count.py
-* bloom_count_intersection.py
+* build-sparse-graph.py - code for building a sparse graph
 * count-within-radius.py
 * degree-by-position.py
 * do-subset-merge.py
 * ec.py
 * error-correct-pass2.py
 * normalize-by-align.py
-* normalize-by-median-pct.py
 * normalize-by-min.py
 
 Of unknown utility:
 
-* abundance-hist-by-position.py
-* bowtie-parser.py
-* build-sparse-graph.py
-* calc-degree.py
-* calc-kmer-partition-counts.py
-* calc-kmer-read-abunds.py
-* calc-kmer-read-stats.py
-* calc-kmer-to-partition-ratio.py
-* consume-and-traverse.py
-* contig-coverage.py
-* count-circum-by-position.py
-* count-density-by-position.py
-* count-distance-to-volume.py
-* count-median-abund-by-partition.py
-* count-shared-kmers-btw-assemblies.py
-* fasta-to-abundance-hist.py
 * filter-abund-output-by-length.py
 * filter-area.py
 * filter-below-abund.py
@@ -125,8 +115,21 @@ Present in commit 691b0b3ae but removed thereafter:
 * bench-graphsize-orig.py - benchmarking script for graphsize elimination
 * bench-graphsize-th.py - benchmarking script for graphsize elimination
 * bin-reads-by-abundance.py - see slice-reads-by-coverage.py
+* bowtie-parser.py - parse bowtie map file
+* calc-degree.py - various k-mer statistics
+* calc-kmer-partition-counts.py - various k-mer statistics
+* calc-kmer-read-abunds.py - various k-mer statistics
+* calc-kmer-read-stats.py - various k-mer statistics
+* calc-kmer-to-partition-ratio.py - various k-mer statistics
 * calc-sequence-entropy.py - calculate per-sequence entropy
 * choose-largest-assembly.py - see calc-best-assembly.py
+* consume-and-traverse.py - replaced by load-graph.py
+* contig-coverage.py - calculate coverage of contigs by k-mers
+* count-circum-by-position.py - k-mer graph statistics by position within read
+* count-density-by-position.py - k-mer graph stats by position within read
+* count-distance-to-volume.py - k-mer stats from graph
+* count-median-abund-by-partition.py - count median k-mer abundance by partition;
+* count-shared-kmers-btw-assemblies.py - count shared k-mers between assemblies;
 * ctb-iterative-bench-2-old.py - old benchmarking code
 * ctb-iterative-bench.py - old benchmarking code
 * discard-high-abund.py - discard reads by coverage; see slice-reads-by-coverage.py
