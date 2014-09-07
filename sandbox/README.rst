@@ -51,7 +51,7 @@ To keep, document, and build recipes for:
 * trim-low-abund.py - streaming version of filter-abund.
 * write-trimmomatic.py
 
-Good ideas to rewrite using newer tools/approaches::
+Good ideas to rewrite using newer tools/approaches:
 
 * assembly-diff.py - find sequences that differ between two assemblies
 * assembly-diff-2.py - find subsequences that differ between two assemblies
