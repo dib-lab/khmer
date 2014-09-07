@@ -16,11 +16,9 @@ Use '-h' for parameter help.
 """
 
 import sys
-import threading
 import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info
-from khmer.threading_args import add_threading_args
 from khmer.file import check_file_status, check_space
 from khmer.file import check_space_for_hashtable
 import argparse
@@ -46,7 +44,6 @@ def get_parser():
 
     parser = build_counting_args("Collect reads until a given avg coverage.",
                                  epilog=textwrap.dedent(epilog))
-    add_threading_args(parser)
     parser.add_argument('output_countingtable_filename', help="The name of the"
                         " file to write the k-mer counting table to.")
     parser.add_argument('input_sequence_filename', nargs='+',
@@ -89,8 +86,6 @@ def main():
                                      args.n_tables)
     htable.set_use_bigcount(args.bigcount)
 
-    config = khmer.get_config()
-
     total_coverage = 0.
     n = 0
     for index, filename in enumerate(filenames):
@@ -98,7 +93,7 @@ def main():
             seq = record.sequence.upper()
             if 'N' in seq:
                 seq = seq.replace('N', 'G')
-            med, avg, stdev = htable.get_median_count(seq)
+            med, _, _ = htable.get_median_count(seq)
 
             total_coverage += med
             n += 1
