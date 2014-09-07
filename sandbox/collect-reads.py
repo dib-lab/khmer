@@ -58,6 +58,9 @@ def get_parser():
                         help='Collect reads until this coverage, then exit.')
     parser.add_argument('-o', '--output', type=argparse.FileType('w'),
                         help='Write collect reads into this file.')
+    parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
+                        action='store_false',
+                        help='Do not count k-mers past 255')
     return parser
 
 
@@ -84,7 +87,7 @@ def main():
     print 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables)
-    htable.set_use_bigcount(False)
+    htable.set_use_bigcount(args.bigcount)
 
     config = khmer.get_config()
 
