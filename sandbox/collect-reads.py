@@ -93,7 +93,11 @@ def main():
             seq = record.sequence.upper()
             if 'N' in seq:
                 seq = seq.replace('N', 'G')
-            med, _, _ = htable.get_median_count(seq)
+
+            try:
+                med, _, _ = htable.get_median_count(seq)
+            except ValueError:
+                continue
 
             total_coverage += med
             n += 1

@@ -44,7 +44,10 @@ def main():
         if 'N' in seq:
             seq = seq.replace('N', 'G')
 
-        med, avg, stdev = htable.get_median_count(seq)
+        try:
+            med, _, _ = htable.get_median_count(seq)
+        except ValueError:
+            continue
 
         keep = True
         if args.min_coverage and med < args.min_coverage:

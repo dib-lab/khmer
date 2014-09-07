@@ -41,7 +41,11 @@ def main():
             print '...', n
 
         seq = record.sequence.replace('N', 'A')
-        med, _, _ = ht.get_median_count(seq)
+
+        try:
+            med, _, _ = ht.get_median_count(seq)
+        except ValueError:
+            continue
 
         hist[med] = hist[med] + 1
 
