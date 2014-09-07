@@ -8,7 +8,7 @@
 """
 Build a counting Bloom filter from the given sequences, save in <htname>.
 Stop collecting reads when the average coverage gets above -C (default 50).
-Place reads into 
+Place reads into -o output_file.
 
 % collect-reads.py <htname> <data1> [ <data2> <...> ]
 
@@ -44,8 +44,8 @@ def get_parser():
         collect-reads.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
     """
 
-    parser = build_counting_args("Build a k-mer counting table from the given"
-                                 " sequences.", epilog=textwrap.dedent(epilog))
+    parser = build_counting_args("Collect reads until a given avg coverage.",
+                                 epilog=textwrap.dedent(epilog))
     add_threading_args(parser)
     parser.add_argument('output_countingtable_filename', help="The name of the"
                         " file to write the k-mer counting table to.")
