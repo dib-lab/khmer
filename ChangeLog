@@ -1,9 +1,21 @@
-2014-08-29  Titus Brown  <titus@idyll.org>
+2014-09-07  Titus Brown  <titus@idyll.org>
 
     * sandbox/collect-reads.py: added script to collect reads until specific
 	average cutoff
     * sandbox/slice-reads-by-coverage.py: added script to extract reads with
 	a specific coverage slice (based on median k-mer abundance)
+
+2014-09-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/dev/coding-guidelines-and-review.txt: Clarify pull request checklist
+    * CONTRIBUTING.md: update URL to new dev docs
+
+2014-08-30  Rhys Kidd  <rhyskidd@gmail.com>
+
+    * khmer/_khmermodule.cc: fix table.get("wrong_length_string") gives core dump
+    * lib/kmer_hash.cc: improve quality of exception error message
+    * tests/{test_counting_hash,test_counting_single,test_hashbits,
+        test_hashbits_obj}.py: add regression unit tests
 
 2014-08-28  Titus Brown  <titus@idyll.org>
 

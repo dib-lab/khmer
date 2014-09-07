@@ -557,6 +557,24 @@ def test_simple_median():
     assert stddev == 0.0
 
 
+def test_badget():
+    hbts = khmer.Hashbits(6, 1e6, 1)
+
+    dna = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAG"
+
+    hbts.consume(dna)
+
+    assert hbts.get("AGCTTT") == 1
+
+    assert hbts.get("GATGAG") == 0
+
+    try:
+        hbts.get("AGCTT")
+        assert 0, "this should fail"
+    except ValueError, err:
+        print str(err)
+
+
 def test_bad_primes():
     try:
         countingtable = khmer._Hashbits.__new__(
