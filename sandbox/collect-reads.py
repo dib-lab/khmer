@@ -91,7 +91,7 @@ def main():
 
     config = khmer.get_config()
 
-    coverages = []
+    total_coverage = 0.
     n = 0
     for index, filename in enumerate(filenames):
         for record in screed.open(filename):
@@ -100,21 +100,22 @@ def main():
                 seq = seq.replace('N', 'G')
             med, avg, stdev = htable.get_median_count(seq)
 
-            coverages.append(med)
-            if len(coverages) > 1000:
-                coverages.pop(0)
-            if sum(coverages) / 1000. > args.coverage:
+            total_coverage += med
+            n += 1
+
+            if total_coverage / float(n) > args.coverage:
+                print 'reached target average coverage:', \
+                      total_coverage / float(n)
                 break
 
             htable.consume(seq)
             if args.output:
                 args.output.write(output_single(record))
 
-            n += 1
             if n % 100000 == 0:
-                print '...', index, filename, n
+                print '...', index, filename, n, total_coverage / float(n)
                 
-        if sum(coverages) / 1000. > args.coverage:
+        if total_coverage / float(n) > args.coverage:
             break
 
     print 'Collected %d reads' % (n,)
