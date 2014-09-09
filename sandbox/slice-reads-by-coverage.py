@@ -4,11 +4,13 @@ import screed
 import sys
 import khmer
 
+
 def output_single(read):
     if hasattr(read, 'accuracy'):
         return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
     else:
         return ">%s\n%s\n" % (read.name, read.sequence)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -36,6 +38,7 @@ def main():
     output_fp = open(output_file, 'w')
 
     n_kept = 0
+    n = 0
     for n, record in enumerate(screed.open(args.input_readfile)):
         if n % 100000 == 0:
             print >>sys.stderr, '...', n, n_kept

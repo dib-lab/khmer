@@ -32,9 +32,8 @@ def main():
 
     hist = {}
 
-
     for i in range(65536):
-       hist[i] = 0
+        hist[i] = 0
 
     for n, record in enumerate(screed.open(seqfile)):
         if n > 0 and n % 100000 == 0:

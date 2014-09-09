@@ -88,6 +88,7 @@ def main():
 
     total_coverage = 0.
     n = 0
+
     for index, filename in enumerate(filenames):
         for record in screed.open(filename):
             seq = record.sequence.upper()
@@ -113,12 +114,12 @@ def main():
 
             if n % 100000 == 0:
                 print '...', index, filename, n, total_coverage / float(n)
-                
+
         if total_coverage / float(n) > args.coverage:
             break
 
     print 'Collected %d reads' % (n,)
-                
+
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of k-mers: {0}'.format(
             htable.n_occupied())
@@ -127,7 +128,7 @@ def main():
     htable.save(base)
 
     info_fp = open(base + '.info', 'w')
-    info_fp.write('through end: %s\n' % filename)
+    info_fp.write('through end: %s\n' % filenames[-1])
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(htable)
