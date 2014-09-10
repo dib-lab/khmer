@@ -123,7 +123,8 @@ private:
     std::string _message;
 public:
     _khmer_exception(std::string message) : _message(message) { };
-    inline const std::string get_message() const {
+    inline const std::string get_message() const
+    {
         return _message;
     };
 };
@@ -1991,7 +1992,7 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
 
-    HashIntoType * dist;
+    HashIntoType * dist = NULL;
 
     Py_BEGIN_ALLOW_THREADS
     dist = counting->abundance_distribution(rparser, hashbits);
