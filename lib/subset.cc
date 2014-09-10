@@ -1027,7 +1027,7 @@ PartitionID SubsetPartition::assign_partition_id(
     PartitionID return_val = 0;
 
     // did we find a tagged kmer?
-    if (tagged_kmers.size() >= 1) {
+    if (!tagged_kmers.empty()) {
         PartitionID * pp = _join_partitions_by_tags(tagged_kmers, kmer);
         return_val = *pp;
     } else {

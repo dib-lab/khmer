@@ -92,7 +92,8 @@ typedef std::queue<HashIntoType> NodeQueue;
 typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
 typedef std::map<HashIntoType, unsigned int> TagCountMap;
 typedef std::map<PartitionID, unsigned int> PartitionCountMap;
-typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+typedef std::map<unsigned long long, unsigned long long>
+PartitionCountDistribution;
 
 // types used in @camillescott's sparse labeling extension
 typedef unsigned long long int Label;

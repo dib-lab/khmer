@@ -339,7 +339,8 @@ struct Read {
     // TODO? Add description field.
     uint64_t	    bytes_consumed;
 
-    inline void reset ( ) {
+    inline void reset ( )
+    {
         name.clear( );
         annotations.clear( );
         sequence.clear( );
@@ -395,11 +396,13 @@ struct IParser {
     );
     virtual ~IParser( );
 
-    inline int		uuid( ) {
+    inline int		uuid( )
+    {
         return _uuid;
     }
 
-    inline bool		is_complete( ) {
+    inline bool		is_complete( )
+    {
         return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem;
     }
 
@@ -408,7 +411,8 @@ struct IParser {
     //	     'imprint_next_read'. A potentially costly copy-by-value happens
     //	     upon return.
     // TODO: Eliminate all calls to 'get_next_read'.
-    inline Read		get_next_read( ) {
+    inline Read		get_next_read( )
+    {
         Read the_read;
         imprint_next_read( the_read );
         return the_read;
@@ -482,7 +486,8 @@ protected:
         ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
     );
 
-    inline ParserState	&_get_state( ) {
+    inline ParserState	&_get_state( )
+    {
         uint32_t	thread_id	= _thread_id_map.get_thread_id( );
         ParserState *	state_PTR	= NULL;
 

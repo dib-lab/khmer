@@ -129,11 +129,12 @@ LabelHash::consume_fasta_and_tag_with_labels(
 
 }
 
-void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
-        unsigned int &total_reads,
-        unsigned long long &n_consumed,
-        CallbackFn callback,
-        void * callback_data)
+void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data)
 {
     total_reads = 0;
     n_consumed = 0;
