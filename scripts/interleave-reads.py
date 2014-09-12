@@ -119,6 +119,11 @@ def main():
         args.output.write(output_pair(read1, read2))
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
+    
+    if(type(filename)==str):
+        print('wrote to: ' + filename)
+    else:
+        print('did not write output to file')
 
 if __name__ == '__main__':
     main()

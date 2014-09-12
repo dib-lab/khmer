@@ -143,6 +143,8 @@ def main():
 
     print 'DONE; read %d sequences, %d pairs and %d singletons' % \
           (index + 1, n_pe, n_se)
+    
+    print('wrote to: ' + outfile + '.se' + ' and ' + outfile + '.pe')
 
 if __name__ == '__main__':
     main()

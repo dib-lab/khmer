@@ -107,6 +107,8 @@ def main():
                               "this data set. Increase table size/# tables.")
         print >> sys.stderr, "**"
         sys.exit(1)
+    
+    print('wrote to: ' + base + '.info')
 
 if __name__ == '__main__':
     main()

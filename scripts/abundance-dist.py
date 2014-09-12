@@ -102,6 +102,7 @@ def main():
 
         if sofar == total:
             break
+    print('wrote to: ' + args.output_histogram_filename)
 
 if __name__ == '__main__':
     main()

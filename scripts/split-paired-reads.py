@@ -96,6 +96,8 @@ def main():
         (index + 1, counter1, counter2)
     print >> sys.stderr, "/1 reads in %s" % out1
     print >> sys.stderr, "/2 reads in %s" % out2
+    
+    print('wrote to: ' + out1 + ' and ' + out2)
 
 if __name__ == '__main__':
     main()

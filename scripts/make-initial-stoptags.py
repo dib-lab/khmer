@@ -116,6 +116,7 @@ def main():
 
     print 'saving stop tags'
     htable.save_stop_tags(graphbase + '.stoptags')
+    print('wrote to: ' + graphbase + '.stoptags')
 
 if __name__ == '__main__':
     main()

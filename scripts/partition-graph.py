@@ -171,6 +171,7 @@ def main():
 
     print '---'
     print 'done making subsets! see %s.subset.*.pmap' % (basename,)
+    print('wrote to: ' + basename + '.info')
 
 if __name__ == '__main__':
     main()

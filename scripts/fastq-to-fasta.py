@@ -67,6 +67,11 @@ def main():
 
     else:
         print >> sys.stderr, 'No lines dropped from file.'
+    
+    if args.output:
+        print('wrote to: ' + args.output)
+    else:
+        print('did not write output to file')
 
 if __name__ == '__main__':
     main()
