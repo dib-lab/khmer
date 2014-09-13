@@ -48,7 +48,7 @@ To keep, document, and build recipes for:
 * sweep-reads2.py - various ways to extract reads based on k-mer overlap
 * sweep-reads3.py - various ways to extract reads based on k-mer overlap
 * to-casava-1.8-fastq.py - convert reads to different Casava format
-* trim-low-abund.py - streaming version of filter-abund.
+* trim-low-abund.py - streaming k-mer abundance trimming; see filter-abund for non-streaming, and look to `khmer-recipes #6 <https://github.com/ged-lab/khmer-recipes/blob/master/006-streaming-sequence-trimming/index.rst>`__ for usage.
 * write-trimmomatic.py
 
 Good ideas to rewrite using newer tools/approaches:
