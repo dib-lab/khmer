@@ -1648,6 +1648,40 @@ static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
     return Py_BuildValue("K", n_consumed);
 }
 
+static PyObject * hash_consume_and_tag_with_positions(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * seq;
+
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    SeenSet tagged_kmers;
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long n_consumed = 0;
+    try {
+        // @CTB needs to normalize
+        counting->consume_sequence_and_tag(seq, n_consumed, &tagged_kmers);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_ValueError, e.get_message().c_str());
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(tagged_kmers.size());
+
+    Py_ssize_t i = 0;
+    for (khmer::SeenSet::const_iterator si = tagged_kmers.begin();
+         si != tagged_kmers.end(); si++, i++) {
+      PyObject * ko = PyLong_FromUnsignedLongLong(*si);
+      PyList_SET_ITEM(x, i, ko);
+    }
+    return x;
+}
+
 static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1806,6 +1840,7 @@ static PyMethodDef khmer_counting_methods[] = {
         METH_VARARGS, ""
     },
     { "consume_and_tag", hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
+    { "consume_and_tag_with_positions", hash_consume_and_tag_with_positions, METH_VARARGS, "Consume a sequence and tag it" },
     { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
     { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
