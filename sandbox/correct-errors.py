@@ -15,7 +15,7 @@ Use -h for parameter help.
 TODO: paired support: paired reads should be kept together.
 TODO: load/save counting table.
 TODO: move output_single elsewhere
-TODO: remove -V?
+TODO: add to sandbox/README
 """
 import sys
 import screed
@@ -71,11 +71,6 @@ def main():
                         help='base cutoff on median k-mer abundance of this',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
-    parser.add_argument('--variable-coverage', '-V', action='store_true',
-                        dest='variable_coverage', default=False,
-                        help='Only trim low-abundance k-mers from sequences '
-                        'that have high coverage.')
-    
     parser.add_argument('--tempdir', '-T', type=str, dest='tempdir',
                         default='./')
 
@@ -117,7 +112,7 @@ def main():
             seq = read.sequence.replace('N', 'A')
 
             # build the alignment...
-            score, graph_alignment, read_alignment, truncated = aligner.align(seq)
+            score, graph_alignment, read_alignment, truncated = aligner.align(read.sequence)
 
             # next, decide whether or to keep it.
             keep = False
@@ -146,7 +141,7 @@ def main():
             # has this portion of the graph saturated? if not,
             # consume & save => pass2.
             if keep:
-                ht.consume(seq)
+                ht.consume(keepseq)
                 pass2fp.write(output_single(read, read.sequence))
                 save_pass2 += 1
             else:   # correct!
@@ -167,10 +162,8 @@ def main():
 
             corrfp = open(corrfilename, 'a')
 
-            seq = read.sequence.replace('N', 'A')
-
             # build the alignment...
-            score, graph_alignment, read_alignment, truncated = aligner.align(seq) # @CTB should this just be read.sequence?
+            score, graph_alignment, read_alignment, truncated = aligner.align(read.sequence)
 
             # next, decide whether or to keep it.
             keep = False
