@@ -455,6 +455,13 @@ public:
                                   unsigned long long& n_consumed,
                                   SeenSet * new_tags = 0);
 
+    void consume_sequence_and_tag_with_positions(const std::string& seq,
+                                            std::vector<unsigned int> &posns,
+                                            std::vector<HashIntoType> &tags);
+
+    void retrieve_tags(const std::string& subseq,
+                       std::vector<unsigned int> &posns,
+                       std::vector<HashIntoType> &tags);
 
     void consume_fasta_and_tag_with_stoptags(const std::string &filename,
             unsigned int &total_reads,
