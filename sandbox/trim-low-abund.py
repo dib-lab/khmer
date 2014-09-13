@@ -6,18 +6,23 @@
 # Contact: khmer-project@idyll.org
 #
 """
-Streaming error trimming based on digital normalization.
+Streaming error trimming.
 
 % python sandbox/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]
 
 Use -h for parameter help.
+
+TODO: paired support: paired reads should be kept together.
+TODO: load/save counting table.
+TODO: move output_single elsewhere
 """
 import sys
 import screed
 import os
 import khmer
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 import argparse
+import tempfile
+import shutil
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -25,6 +30,25 @@ DEFAULT_CUTOFF = 2
 DEFAULT_K = 32
 DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
+
+
+def output_single(read, trim_at=None):
+    name = read.name
+    sequence = read.sequence
+
+    accuracy = None
+    if hasattr(read, 'accuracy'):
+        accuracy = read.accuracy
+
+    if trim_at is not None:
+        sequence = sequence[:trim_at]
+        if accuracy:
+            accuracy = accuracy[:trim_at]
+
+    if accuracy:
+        return "@%s\n%s\n+\n%s\n" % (name, sequence, accuracy)
+    else:
+        return ">%s\n%s\n" % (name, sequence)
 
 
 def main():
@@ -52,18 +76,12 @@ def main():
                         help='base cutoff on median k-mer abundance of this',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
-    parser.add_argument('--mrna', '-m', dest='is_mrna',
-                        help='treat as mRNAseq data',
-                        default=True, action='store_true')
-
-    parser.add_argument('--genome', '-g', dest='is_genome',
-                        help='treat as genomic data (uniform coverage)',
-                        default=False, action='store_true')
-
-    parser.add_argument('--metagenomic', '-M',
-                        dest='is_metagenomic',
-                        help='treat as metagenomic data',
-                        default=True, action='store_true')
+    parser.add_argument('--variable-coverage', '-V', action='store_true',
+                        dest='variable_coverage', default=False,
+                        help='Only trim low-abundance k-mers from sequences '
+                        'that have high coverage.')
+    parser.add_argument('--tempdir', '-T', type=str, dest='tempdir',
+                        default='./')
 
     parser.add_argument('input_filenames', nargs='+')
     args = parser.parse_args()
@@ -75,21 +93,23 @@ def main():
     CUTOFF = args.abund_cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
-    is_variable_abundance = True        # conservative
-    if args.is_genome:
-        is_variable_abundance = False
-
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+
+    tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
+    print 'created temporary directory %s; use -T to change location' % tempdir
+
+    ###
 
     save_pass2 = 0
 
     pass2list = []
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
+        pass2filename = os.path.join(tempdir, pass2filename)
         trimfilename = os.path.basename(filename) + '.abundtrim'
 
-        pass2list.append((pass2filename, trimfilename))
+        pass2list.append((filename, pass2filename, trimfilename))
 
         pass2fp = open(pass2filename, 'w')
         trimfp = open(trimfilename, 'w')
@@ -100,38 +120,47 @@ def main():
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
+            # has this portion of the graph saturated? if not,
+            # consume & save => pass2.
             if med < NORMALIZE_LIMIT:
                 ht.consume(seq)
-                pass2fp.write('>%s\n%s\n' % (read.name, read.sequence))
+                pass2fp.write(output_single(read))
                 save_pass2 += 1
-            else:
+            else:                       # trim!!
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
-                    trimfp.write('>%s\n%s\n' % (read.name, trim_seq))
+                    trimfp.write(output_single(read, trim_at))
 
         pass2fp.close()
         trimfp.close()
 
-        print 'saved %d of %d to pass2fp' % (save_pass2, n,)
+        print '%s: kept aside %d of %d from first pass, in %s' % \
+              (filename, save_pass2, n, filename)
 
-    for pass2filename, trimfilename in pass2list:
+    for orig_filename, pass2filename, trimfilename in pass2list:
+        print 'second pass: looking at sequences kept aside in %s' % \
+              pass2filename
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print '... x 2', n, filename
+                print '... x 2', n, pass2filename
 
             trimfp = open(trimfilename, 'a')
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
-            if med >= NORMALIZE_LIMIT or not is_variable_abundance:
+            if med >= NORMALIZE_LIMIT or not args.variable_coverage:
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
-                    trimfp.write('>%s\n%s\n' % (read.name, trim_seq))
+                    trimfp.write(output_single(read, trim_at))
             else:
-                trimfp.write('>%s\n%s\n' % (read.name, read.sequence))
+                trimfp.write(output_single(read))
 
-    os.unlink(pass2filename)
+        print 'removing %s' % pass2filename
+        os.unlink(pass2filename)
+
+    print 'removing temp directory & contents (%s)' % tempdir
+    shutil.rmtree(tempdir)
 
 if __name__ == '__main__':
     main()
