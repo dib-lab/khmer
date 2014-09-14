@@ -16,6 +16,7 @@ TODO: paired support: paired reads should be kept together.
 TODO: load/save counting table.
 TODO: move output_single elsewhere
 TODO: add to sandbox/README
+TODO: change name to correct-reads?
 """
 import sys
 import screed
@@ -64,7 +65,8 @@ def main():
                         default=env_hashsize,
                         help='lower bound on hashsize to use')
 
-    parser.add_argument("--trusted-cov", dest="trusted_cov", type=int, default=2)
+    parser.add_argument("--trusted-cov", dest="trusted_cov", type=int,
+                        default=2)
     parser.add_argument("--theta", dest="bits_theta", type=float, default=1.0)
 
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
@@ -87,13 +89,16 @@ def main():
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     aligner = khmer.new_readaligner(ht, args.trusted_cov, args.bits_theta)
-            
+
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print 'created temporary directory %s; use -T to change location' % tempdir
 
     ###
 
     save_pass2 = 0
+    n_aligned = 0
+    n_corrected = 0
+    total_reads = 0
 
     pass2list = []
     for filename in args.input_filenames:
@@ -107,19 +112,21 @@ def main():
         corrfp = open(corrfilename, 'w')
 
         for n, read in enumerate(screed.open(filename)):
+            total_reads += 1
+
             if n % 10000 == 0:
-                print '...', n, filename, save_pass2
+                print '...', n, filename, n_aligned, n_corrected, save_pass2, \
+                      total_reads
             seq = read.sequence.replace('N', 'A')
 
             # build the alignment...
-            score, graph_alignment, read_alignment, truncated = aligner.align(read.sequence)
+            score, graph_alignment, read_alignment, truncated = \
+                   aligner.align(read.sequence)
 
             # next, decide whether or to keep it.
-            keep = False
-            if truncated:
-                keep = True             # keep all truncated alignments - why?
-                keepseq = read.sequence
-            else:
+            output_corrected = False
+            if not truncated:
+                n_aligned += 1
 
                 # build a better sequence -- this is the corrected one.
                 if True:
@@ -132,45 +139,50 @@ def main():
                         else:
                             graph_seq += graph_alignment[i]
 
+                corrected = graph_seq
+                if graph_seq != read.sequence:
+                    n_corrected += 1
+
                 # get the minimum count for this new sequence
                 mincount = ht.get_min_count(graph_seq)
                 if mincount < args.normalize_to:
-                    keep = True
-                    keepseq = graph_seq
+                    output_corrected = True
 
             # has this portion of the graph saturated? if not,
             # consume & save => pass2.
-            if keep:
-                ht.consume(keepseq)
+            if output_corrected:
+                corrfp.write(output_single(read, corrected))
+            else:  # uncorrected...
+                ht.consume(read.sequence)
                 pass2fp.write(output_single(read, read.sequence))
                 save_pass2 += 1
-            else:   # correct!
-                corrfp.write(output_single(read, keepseq))
 
         pass2fp.close()
         corrfp.close()
 
         print '%s: kept aside %d of %d from first pass, in %s' % \
               (filename, save_pass2, n, filename)
+        print 'aligned %d of %d reads so far' % (n_aligned, total_reads)
+        print 'changed %d of %d reads so far' % (n_corrected, total_reads)
 
     for orig_filename, pass2filename, corrfilename in pass2list:
         print 'second pass: looking at sequences kept aside in %s' % \
               pass2filename
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print '... x 2', n, pass2filename
+                print '... x 2', n, pass2filename, n_aligned, n_corrected, \
+                      total_reads
 
             corrfp = open(corrfilename, 'a')
 
             # build the alignment...
-            score, graph_alignment, read_alignment, truncated = aligner.align(read.sequence)
+            score, graph_alignment, read_alignment, truncated = \
+                   aligner.align(read.sequence)
 
-            # next, decide whether or to keep it.
-            keep = False
-            if truncated:
-                keep = True             # keep all truncated alignments - why?
-                keepseq = read.sequence
+            if truncated:               # no good alignment; output original
+                corrected = read.sequence
             else:
+                n_aligned += 1
                 # build a better sequence -- this is the corrected one.
                 if True:
                     graph_seq = graph_alignment.replace("-", "")
@@ -182,15 +194,20 @@ def main():
                         else:
                             graph_seq += graph_alignment[i]
 
-                keepseq = graph_seq
+                corrected = graph_seq
+                if corrected != read.sequence:
+                    n_corrected += 1
 
-            corrfp.write(output_single(read, keepseq))
+            corrfp.write(output_single(read, corrected))
 
         print 'removing %s' % pass2filename
         os.unlink(pass2filename)
 
     print 'removing temp directory & contents (%s)' % tempdir
     shutil.rmtree(tempdir)
+
+    print 'Aligned %d of %d total' % (n_aligned, total_reads)
+    print 'Changed %d of %d total' % (n_corrected, total_reads)
 
 if __name__ == '__main__':
     main()
