@@ -147,7 +147,7 @@ public:
                                      LabelPtrSet& found_labels);
 
 };
-};
+}
 
 #define ACQUIRE_TAG_COLORS_SPIN_LOCK \
   while(!__sync_bool_compare_and_swap( &_tag_labels_spin_lock, 0, 1));

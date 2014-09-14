@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <stdexcept>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1592,10 +1593,15 @@ _parse_read( ParserState &state, Read &the_read )
     );
 #endif
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('>' != line[ 0 ])
-        throw InvalidFASTAFileFormat(
-            "invalid sequence name indicator", line.c_str( )
-        );
+    try {
+        if ('>' != line.at(0))
+            throw InvalidFASTAFileFormat(
+                "invalid sequence name indicator", line.c_str( )
+            );
+    }
+    catch (std::out_of_range oor) {
+        throw InvalidFASTAFileFormat("invalid sequence name identifiter", line.c_str( ) );
+    }
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.
@@ -1610,8 +1616,11 @@ _parse_read( ParserState &state, Read &the_read )
 #endif
 
         // If a new record is detected, then existing one is complete.
-        if ('>' == line[ 0 ]) {
-            break;
+        try {
+            if ('>' == line.at(0)) {
+                break;
+            }
+        } catch (std::out_of_range oor) {
         }
 
         // TODO? Uppercase and validate entire sequence here.
@@ -1661,10 +1670,15 @@ _parse_read( ParserState &state, Read &the_read )
     );
 #endif
     the_read.bytes_consumed += (line.length( ) + 1);
-    if ('@' != line[ 0 ])
-        throw InvalidFASTQFileFormat(
-            "invalid sequence name indicator", line.c_str( )
-        );
+    try {
+        if ('@' != line.at(0))
+            throw InvalidFASTQFileFormat(
+                "invalid sequence name indicator", line.c_str( )
+            );
+    } catch (std::out_of_range oor) {
+        throw InvalidFASTQFileFormat("invalid sequence name indicator",
+                                     line.c_str() );
+    }
     the_read.name = line.substr( 1 );
 
     // Grab sequence lines until exit conditions are met.

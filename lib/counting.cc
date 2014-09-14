@@ -228,12 +228,12 @@ void CountingHash::fasta_dump_kmers_by_abundance(
             for (unsigned int i = 0; i < seq.length() - _ksize + 1; i++) {
                 string kmer = seq.substr(i, i + _ksize);
                 BoundedCounterType n = get_count(kmer.c_str());
-                char ss[_ksize + 1];
+                char * ss = new char[_ksize + 1];
                 strncpy(ss, kmer.c_str(), _ksize);
                 ss[_ksize] = 0;
 
                 if (n == limit_by_count) {
-                    cout << ss << endl;
+                    cout << &ss << endl;
                 }
             }
         }
