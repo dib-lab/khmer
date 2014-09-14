@@ -229,7 +229,7 @@ public:
         return 1;
     }
 };
-};
+}
 
 #include "counting.hh"
 #include "labelhash.hh"
