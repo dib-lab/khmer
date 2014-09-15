@@ -233,8 +233,9 @@ void CountingHash::fasta_dump_kmers_by_abundance(
                 ss[_ksize] = 0;
 
                 if (n == limit_by_count) {
-                    cout << &ss << endl;
+                    cout << *ss << endl;
                 }
+		delete[] ss;
             }
         }
 

@@ -1598,8 +1598,7 @@ _parse_read( ParserState &state, Read &the_read )
             throw InvalidFASTAFileFormat(
                 "invalid sequence name indicator", line.c_str( )
             );
-    }
-    catch (std::out_of_range oor) {
+    } catch (std::out_of_range& oor) {
         throw InvalidFASTAFileFormat("invalid sequence name identifiter", line.c_str( ) );
     }
     the_read.name = line.substr( 1 );
@@ -1620,7 +1619,7 @@ _parse_read( ParserState &state, Read &the_read )
             if ('>' == line.at(0)) {
                 break;
             }
-        } catch (std::out_of_range oor) {
+        } catch (std::out_of_range& oor) {
         }
 
         // TODO? Uppercase and validate entire sequence here.
@@ -1675,7 +1674,7 @@ _parse_read( ParserState &state, Read &the_read )
             throw InvalidFASTQFileFormat(
                 "invalid sequence name indicator", line.c_str( )
             );
-    } catch (std::out_of_range oor) {
+    } catch (std::out_of_range& oor) {
         throw InvalidFASTQFileFormat("invalid sequence name indicator",
                                      line.c_str() );
     }
