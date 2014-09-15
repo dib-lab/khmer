@@ -57,7 +57,11 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
     "counting", "subset", "read_aligner"])
 
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++0x', '-pedantic' ]
+# Would use '-std=c++11' but GCC 4.4 uses '-std=c++0x'; GCC 4.7+ recognizes the
+# second form as a synonym of the first. Switch to the first form once GCC 4.7
+# is the baseline version (that is: when we are no longer supporting
+# Ubuntu 12.04 LTS and RHEL6)
+EXTRA_COMPILE_ARGS = ['-O3', '-std=c++0x', '-pedantic']
 
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
