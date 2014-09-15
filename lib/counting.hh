@@ -271,7 +271,7 @@ class CountingHashGzFileWriter : public CountingHashFile
 public:
     CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht);
 };
-}
+};
 
 #endif // COUNTING_HH
 
