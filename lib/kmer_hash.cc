@@ -94,4 +94,4 @@ std::string _revhash(HashIntoType hash, WordLength k)
 }
 
 
-}
+};

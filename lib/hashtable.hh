@@ -559,7 +559,7 @@ public:
         return kmer_degree(kmer_f, kmer_r);
     }
 };
-}
+};
 
 
 

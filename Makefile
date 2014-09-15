@@ -4,7 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc) setup.py
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=sphinxcontrib-autoprogram pep8==1.5 diff_cover \
@@ -24,8 +24,7 @@ khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
-	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0 \
-		-D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG"; ./setup.py \
+	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
 		build_ext --debug --inplace --libraries gcov
 	touch coverage-debug
 
@@ -47,8 +46,8 @@ clean: FORCE
 	rm -Rf .coverage || true
 
 debug: FORCE
-	export CFLAGS="-pg -fprofile-arcs -D_GLIBCXX_DEBUG_PEDANTIC \
-		-D_GLIBCXX_DEBUG"; python setup.py build_ext --debug --inplace
+	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
+		--inplace
 
 doc: build/sphinx/html/index.html
 
@@ -69,13 +68,13 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
 cppcheck-result.xml: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=c++11 --xml \
+		--file-list=- -j8 --platform=unix64 --std=posix --xml \
 		--xml-version=2 2> cppcheck-result.xml
 
 cppcheck: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=c++11 --quiet
+		--file-list=- -j8 --platform=unix64 --std=posix --quiet
 
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true

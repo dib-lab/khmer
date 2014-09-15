@@ -1623,11 +1623,11 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 
     // find biggest.
     PartitionCountDistribution::const_iterator di = d.end();
-    if (di == d.begin()) {
+    --di;
+
+    if (d.empty()) {
         throw khmer_exception();
     }
-
-    --di;
 
     for (PartitionCountMap::const_iterator cmi = cm.begin(); cmi != cm.end();
             ++cmi) {
@@ -1641,13 +1641,14 @@ unsigned long long SubsetPartition::repartition_largest_partition(
 
 #if VERBOSE_REPARTITION
     std::cout << "biggest partition: " << di->first << "\n";
+#endif // 0
+    --di;
+
+#if VERBOSE_REPARTITION
     std::cout << "biggest partition ID: " << biggest_p << "\n";
 #endif // 0
 
-    if (di != d.begin()) {
-        --di;
-        next_largest = di->first;
-    }
+    next_largest = di->first;
 
 #if VERBOSE_REPARTITION
     std::cout << "next biggest partition: " << di->first << "\n";
