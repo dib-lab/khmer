@@ -70,7 +70,7 @@ def main():
     else:
         print >> sys.stderr, 'No lines dropped from file.'
     
-    print >> sys.stderr, 'Wrote output to stdout.'
+    print >> sys.stderr, 'Wrote output to stdout'
 
 if __name__ == '__main__':
     main()

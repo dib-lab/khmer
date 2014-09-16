@@ -120,10 +120,10 @@ def main():
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
     
-    if(type(filename)==str):
-        print('wrote to: ' + filename)
+    if(type(args.output) == 'file'):
+        print >> sys.stderr, 'Wrote output to file'
     else:
-        print('did not write output to file')
+        print >> sys.stderr, 'Wrote output to stdout'
 
 if __name__ == '__main__':
     main()
