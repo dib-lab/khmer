@@ -56,7 +56,7 @@ def main():
                         '>{name}\n{seq}\n'.format(name=record.name,
                                                   seq=record.sequence))
 
-
     print('wrote to: ' + args.output)
+
 if __name__ == '__main__':
     main()
