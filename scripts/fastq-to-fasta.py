@@ -37,6 +37,8 @@ def get_parser():
 def main():
     args = get_parser().parse_args()
     print >> sys.stderr, ('fastq from ', args.input_sequence)
+	
+    write_out = sys.stdout
 
     if args.output:
         write_out = open(args.output, 'w')
@@ -68,10 +70,7 @@ def main():
     else:
         print >> sys.stderr, 'No lines dropped from file.'
     
-    if args.output:
-        print('wrote to: ' + args.output)
-    else:
-        print('did not write output to file')
+    print >> sys.stderr, 'Wrote output to stdout.'
 
 if __name__ == '__main__':
     main()
