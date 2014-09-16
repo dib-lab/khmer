@@ -75,7 +75,7 @@ def main():
         print 'removing pmap files'
         for pmap_file in pmap_files:
             os.unlink(pmap_file)
-    
+
     print('wrote to: ' + output_file)
 
 if __name__ == '__main__':

@@ -82,6 +82,6 @@ def main():
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)
             print >> output, record.name, medn, ave, stdev, len(seq)
-    
+
 if __name__ == '__main__':
     main()

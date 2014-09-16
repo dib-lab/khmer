@@ -81,9 +81,9 @@ dataset2: %s
     for i in range(100):
         to_print = str(list_curve[100 + i]) + ' ' + str(list_curve[i]) + '\n'
         f_curve_obj.write(to_print)
-        
+
     print('wrote to: ' + args.report_filename)
-    
+
 if __name__ == '__main__':
     main()
 
