@@ -347,6 +347,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     std::string read_alignment = "";
     std::string graph_alignment = "";
     std::string trusted = "";
+    size_t farthest_seq_idx = node->seq_idx;
     ret->score = node->score;
     ret->truncated = (node->seq_idx != 0)
                      && (node->seq_idx != read.length() - 1);
@@ -407,12 +408,15 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     ret->trusted = trusted;
 
     if(ret->truncated) {
+	    std::string new_graph_alignment;
 	    if (forward) {
-		    ret->read_alignment = read_alignment +
-			    read.substr(read_alignment.length(), read.length() - read_alignment.length());
+		    new_graph_alignment = graph_alignment +
+			    read.substr(farthest_seq_idx, std::string::npos);
 	    } else {
-		    ret->read_alignment = read.substr(ret->read_alignment.length(), read.length() - read_alignment.length()) + read_alignment;
+		    new_graph_alignment = read.substr(0, farthest_seq_idx)
+			    + graph_alignment;
 	    }
+	    ret->graph_alignment = new_graph_alignment;
     } 
 
     return ret;
