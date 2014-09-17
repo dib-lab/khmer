@@ -1,3 +1,36 @@
+2014-09-17 Jacob G. Fenton <bocajnotnef@gmail.com>
+
+    * scripts/abundance-dist-single.py: added output file listing at
+    end of file
+    * scripts/abundance-dist.py: added output file listing at
+    end of file
+    * scripts/count-median.py: added output file listing at
+    end of file
+    * scripts/count-overlap.py: added output file listing at
+    end of file
+    * scripts/extract-long-sequences.py: refactored to set write_out to sys.stdout
+    by default; added output location listing.
+    * scripts/extract-paired-reads.py: added output file listing at
+    end of file
+    * scripts/fastq-to-fasta.py: added output file listing sensitive to optional
+    -o argument
+    * scripts/filter-abund-single.py: added output file listing at
+    end of file
+    * scripts/interleave-reads.py: added output file listing, sensitive to optional
+    -o argument
+    * scripts/load-graph.py: added output file listing at
+    end of file
+    * scripts/load-into-counting.py: added output file listing at
+    end of file
+    * scripts/make-initial-stoptags.py: added output file listing at
+    end of file
+    * scripts/merge-partitions.py: added output file listing at
+    end of file
+    * scripts/partition-graph.py: added output file listing at
+    end of file
+    * scripts/split-paired-reads.py: added output file listing at
+    end of file
+
 2014-09-01  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/dev/coding-guidelines-and-review.txt: Clarify pull request checklist
