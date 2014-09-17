@@ -406,6 +406,15 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     ret->read_alignment = read_alignment;
     ret->trusted = trusted;
 
+    if(ret->truncated) {
+	    if (forward) {
+		    ret->read_alignment = read_alignment +
+			    read.substr(read_alignment.length(), read.length() - read_alignment.length());
+	    } else {
+		    ret->read_alignment = read.substr(ret->read_alignment.length(), read.length() - read_alignment.length()) + read_alignment;
+	    }
+    } 
+
     return ret;
 
 }
