@@ -445,16 +445,16 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     ret->covs = covs;
 
     if(ret->truncated) {
-	    std::string new_graph_alignment;
-	    if (forward) {
-		    new_graph_alignment = graph_alignment +
-			    read.substr(farthest_seq_idx, std::string::npos);
-	    } else {
-		    new_graph_alignment = read.substr(0, farthest_seq_idx)
-			    + graph_alignment;
-	    }
-	    ret->graph_alignment = new_graph_alignment;
-    } 
+        std::string new_graph_alignment;
+        if (forward) {
+            new_graph_alignment = graph_alignment +
+                                  read.substr(node->seq_idx + 2, std::string::npos);
+        } else {
+            new_graph_alignment = read.substr(0, node->seq_idx)
+                                  + graph_alignment;
+        }
+        ret->graph_alignment = new_graph_alignment;
+    }
 
     return ret;
 
