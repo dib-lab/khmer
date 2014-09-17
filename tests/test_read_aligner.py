@@ -209,7 +209,7 @@ queries = [
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT",
         "truncated": True,
         "description": "truncated-alignment-bc-missing-kmers"
-    }
+   }
 ]
 
 def check_query(aligner, query):
