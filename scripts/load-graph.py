@@ -109,10 +109,10 @@ def main():
         sys.exit(1)
 
     if not args.no_build_tagset:
-        print >> sys.stderr, 'wrote to', base, '.info and', base, '.pt and',\
-            base, '.tagset'
+        print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt and',\
+            base + '.tagset'
     else:
-        print >> sys.stderr, 'wrote to', base, '.info and', base, '.pt'
+        print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
 
 if __name__ == '__main__':
     main()
