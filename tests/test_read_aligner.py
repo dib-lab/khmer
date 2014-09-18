@@ -200,12 +200,16 @@ queries = [
         "TAACAACCTCTTTAC",
         "truncated": False
     },
-    { # first 32 bases are identical match to HT seqs, the rest are random
+    { # the middle 32 bases are identical match to HT seqs, the rest are random
+      # "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT" from HT seqs
       # one less nucleotide -> score = 0.880320380109
         "seq":
-        "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTTTAATTTACTGCGGTCACGCGGAACT",
+        #"TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTTTAATTTACTGCGGTCACGCGGAACT",
+        "ACAAGGCCATTTGTTCGCATTCTGAAGCCGGCTTCCACCATGGTACTGGGAAACTGTCGGAATATTAAATGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTTTAATTTACTGCGGTCACGCGGAACT",
         "score": 68.17022311739733,
-        "graph_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT",
+        "graph_aln":
+        "ACAAGGCCATTTGTTCGCATTCTGAAGCCGGCTTCCACCATGGTACTGGGAAACTGTCGGAATATTAAATGCCCAATTTTTCCCTCTTTTCTTCTATCCGCAGTATGGACACTGTTTTCCTGAATTTCATTGACAGTTTAATTTACTGCGGTCACGCGGAACT",
+     #"TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT",
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT",
         "truncated": True,
         "description": "truncated-alignment-bc-missing-kmers"
@@ -214,6 +218,7 @@ queries = [
 
 def check_query(aligner, query):
     score, graphAlign, readAlign, trunc = aligner.align(query["seq"])
+    print query["seq"]
     print graphAlign, query["graph_aln"]
     print readAlign, query["read_aln"]
     print trunc, query["truncated"]
