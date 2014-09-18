@@ -448,7 +448,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
         std::string new_graph_alignment;
         if (forward) {
             new_graph_alignment = graph_alignment +
-                                  read.substr(node->seq_idx + 2, std::string::npos);
+                                  read.substr(farthest_seq_idx + 1, std::string::npos);
         } else {
             new_graph_alignment = read.substr(0, node->seq_idx)
                                   + graph_alignment;
