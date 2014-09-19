@@ -103,6 +103,11 @@ def main():
 
     save_pass2 = 0
 
+    read_bp = 0
+    read_reads = 0
+    wrote_bp = 0
+    wrote_reads = 0
+
     pass2list = []
     for filename in args.input_filenames:
         pass2filename = os.path.basename(filename) + '.pass2'
@@ -116,7 +121,12 @@ def main():
 
         for n, read in enumerate(screed.open(filename)):
             if n % 10000 == 0:
-                print '...', n, filename, save_pass2
+                print '...', n, filename, save_pass2, read_reads, read_bp, \
+                      wrote_reads, wrote_bp
+                
+            read_reads += 1
+            read_bp += len(read.sequence)
+            
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
@@ -130,6 +140,8 @@ def main():
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
                     trimfp.write(output_single(read, trim_at))
+                    wrote_reads += 1
+                    wrote_bp += trim_at
 
         pass2fp.close()
         trimfp.close()
@@ -142,7 +154,8 @@ def main():
               pass2filename
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print '... x 2', n, pass2filename
+                print '... x 2', n, pass2filename, read_reads, read_bp, \
+                      wrote_reads, wrote_bp
 
             trimfp = open(trimfilename, 'a')
 
@@ -153,14 +166,23 @@ def main():
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
                     trimfp.write(output_single(read, trim_at))
+                    wrote_reads += 1
+                    wrote_bp += trim_at
             else:
                 trimfp.write(output_single(read))
+                wrote_reads += 1
+                wrote_bp += trim_at
 
         print 'removing %s' % pass2filename
         os.unlink(pass2filename)
 
     print 'removing temp directory & contents (%s)' % tempdir
     shutil.rmtree(tempdir)
+
+    print 'read %d reads, %d bp' % (read_reads, read_bp,)
+    print 'wrote %d reads, %d bp' % (wrote_reads, wrote_bp,)
+    print 'trimmed or removed %.2f%% of bases' % ((1 - (wrote_bp / float(read_bp))) * 100.)
+    print 'output in *.abundtrim'
 
 if __name__ == '__main__':
     main()
