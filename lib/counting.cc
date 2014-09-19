@@ -375,6 +375,48 @@ const
     return seq.length();
 }
 
+std::vector<unsigned int> CountingHash::find_low_abund_kmers(std::string seq,
+						  BoundedCounterType min_abund)
+  const
+{
+  std::vector<unsigned int> posns;
+  if (!check_and_normalize_read(seq)) {
+    return posns;
+  }
+
+  KMerIterator kmers(seq.c_str(), _ksize);
+
+  HashIntoType kmer = kmers.next();
+  if (kmers.done()) { return posns; }
+
+  while (!kmers.done()) {
+    kmer = kmers.next();
+    if (get_count(kmer) >= min_abund) {
+      break;
+    }
+  }
+
+  while (!kmers.done()) {
+    // find next erroneous
+    while (!kmers.done()) {
+      kmer = kmers.next();
+      if (get_count(kmer) < min_abund) {
+	posns.push_back(kmers.get_end_pos() - 1);
+	break;
+      }
+    }
+    // find next good
+    while (!kmers.done()) {
+      kmer = kmers.next();
+      if (get_count(kmer) >= min_abund) {
+	break;
+      }
+    }
+  }
+
+  return posns;
+}
+
 
 void CountingHashFile::load(
     const std::string   &infilename,

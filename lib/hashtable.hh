@@ -152,6 +152,14 @@ public:
     bool done() {
         return index >= length;
     }
+
+    unsigned int get_start_pos() const {
+        return index - _ksize;
+    }
+
+    unsigned int get_end_pos() const {
+        return index;
+    }
 }; // class KMerIterator
 
 class Hashtable  		// Base class implementation of a Bloom ht.
