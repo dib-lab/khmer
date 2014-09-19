@@ -1104,7 +1104,7 @@ inline
 void
 CacheManager::
 _fill_segment_from_stream( CacheSegment & segment )
-{		
+{
 #ifdef WITH_INTERNAL_METRICS
     uint64_t	nbfilled    = 0;
 #endif
@@ -1160,11 +1160,11 @@ _fill_segment_from_stream( CacheSegment & segment )
         segment.size =
             segment.cursor + (
 #ifdef WITH_INTERNAL_METRICS
-								nbfilled = 
+                nbfilled =
 #endif
                     _stream_reader.read_into_cache(
-                    segment.memory, _segment_size
-                ));
+                        segment.memory, _segment_size
+                    ));
 #ifdef WITH_INTERNAL_METRICS
         segment.pmetrics.stop_timers( );
 #endif
