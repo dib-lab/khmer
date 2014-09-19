@@ -36,18 +36,18 @@ def main():
     if not args.quiet:
         print >>sys.stderr, '\nPARAMETERS:'
         print >>sys.stderr, ' - kmer size =    %d \t\t(-k)' % args.ksize
-        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_hashes
+        print >>sys.stderr, ' - n hashes =     %d \t\t(-N)' % args.n_tables
         print >>sys.stderr, ' - min hashsize = %-5.2g \t(-x)' % \
-            args.min_hashsize
+            args.min_tablesize
         print >>sys.stderr, ''
         print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
             '(n_hashes x min_hashsize)' % (
-            args.n_hashes * args.min_hashsize)
+            args.n_tables * args.min_tablesize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    HT_SIZE = args.min_tablesize
+    N_HT = args.n_tables
     DESIRED_COVERAGE = args.cutoff
 
     filenames = args.input_filenames
@@ -122,7 +122,8 @@ def main():
             else:
                 discarded += 1
 
-        print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
+        if total:
+            print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
             total, 'or', int(100. - discarded / float(total) * 100.), '%'
         print 'output in', output_name
 
