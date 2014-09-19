@@ -261,6 +261,15 @@ def test_filter_stoptags():
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
+def test_normalize_by_mediain_indent():
+    infile = utils.get_test_data('R.pe.qc.fq.gz')
+    hashfile = utils.get_test_data('normC20k20.kh')
+    script = scriptpath('normalize-by-median.py')
+    args = ['--loadtable', hashfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+    assert status == 0, (out, err)
+    print (out, err)
+    assert os.path.exists(hashfile), hashfile
 
 def test_normalize_by_median():
     CUTOFF = '1'
