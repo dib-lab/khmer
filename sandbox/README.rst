@@ -15,6 +15,7 @@ To keep, document, and build recipes for:
 * abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
 * assemstats3.py - print out assembly statistics
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
+* calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference.
 * calc-median-distribution.py - plot coverage distribution; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
 * combine-pe.py - combine partitions based on shared PE reads.
 * compare-partitions.py
