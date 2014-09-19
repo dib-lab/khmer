@@ -3,7 +3,7 @@
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
-# 
+#
 """
 Calculate the mismatch error profile for shotgun data, using a subset of
 reads.
@@ -22,24 +22,27 @@ import os.path
 
 N_HT = 4
 HASHSIZE = 1e8
-K=20
-C=5
+K = 20
+C = 5
 
 MAX_SEQ_LEN = 65535
 MAX_READS = 1e8
 
+
 def exit_condition(n2_consumed, n_consumed):
-    return (n2_consumed >= n_consumed or \
+    return (n2_consumed >= n_consumed or
             n2_consumed > 1e5)
 
+
 def main():
-    parser = argparse.ArgumentParser(\
-     "Calculate read error profile based on k-mer abundances of shotgun data.")
+    parser = argparse.ArgumentParser(
+        "Calculate read error profile based on k-mer "
+        "abundances of shotgun data.")
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='output_file',
                         type=argparse.FileType('w'), default=None)
-    
+
     args = parser.parse_args()
 
     #
@@ -56,7 +59,7 @@ def main():
 
     print 'Error histogram will be in %s' % output_filename
 
-    ## Start!
+    # Start!
 
     # build a small counting hash w/default parameters. In general there
     # should be no need to change these parameters.
@@ -105,7 +108,7 @@ def main():
                     ht.consume(seq)
                     n2_consumed += 1
                     bp2_consumed += len(seq)
-                    
+
                 # for saturated data, find low-abund k-mers
                 posns = ht.find_low_abund_kmers(seq, 2)
                 lengths.append(len(seq))
@@ -120,7 +123,7 @@ def main():
 
     length_count = [0]*max_length
     for j in range(max_length):
-        length_count[j] = sum([ 1 for i in lengths if i >= j ])
+        length_count[j] = sum([1 for i in lengths if i >= j])
 
     # find the last point for which we have any data
     last_zero = len(positions) - 1
