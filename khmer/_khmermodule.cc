@@ -1441,6 +1441,35 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     return ret;
 }
 
+static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
+{
+  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+  khmer::CountingHash * counting = me->counting;
+
+  char * seq = NULL;
+  unsigned int min_count_i = 0;
+
+  if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
+    return NULL;
+  }
+
+  std::vector<unsigned int> posns;
+  Py_BEGIN_ALLOW_THREADS
+
+    khmer::BoundedCounterType min_count = min_count_i;
+
+    posns = counting->find_low_abund_kmers(seq, min_count);
+
+  Py_END_ALLOW_THREADS;
+
+  PyObject * x = PyList_New(posns.size());
+  for (unsigned int i = 0; i < posns.size(); i++) {
+    PyList_SET_ITEM(x, i, PyInt_FromLong(posns[i]));
+  }
+
+  return x;
+}
+
 static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
         PyObject * args)
 {
@@ -1795,6 +1824,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
     { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
+    { "find_low_abund_kmers", count_find_low_abund_kmers, METH_VARARGS, "Identify positions of low-abundance k-mers" },
     { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
     { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
     { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
@@ -2251,6 +2281,7 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
 
     Py_RETURN_NONE;
 }
+
 
 static PyObject * hashbits_save_stop_tags(PyObject * self, PyObject * args)
 {
