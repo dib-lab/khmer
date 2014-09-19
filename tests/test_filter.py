@@ -1,7 +1,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import khmer
 from screed.fasta import fasta_iter
@@ -31,7 +32,22 @@ class Test_Filter(object):
         outname = utils.get_temp_filename('test_abund.out')
 
         ht.consume_fasta(filename)
+        try:
+            ht.consume_fasta()
+            assert 0, "should fail"
+        except TypeError, err:
+            print str(err)
+        try:
+            ht.consume_fasta("nonexistent")
+            assert 0, "should fail"
+        except IOError, err:
+            print str(err)
         ht.output_fasta_kmer_pos_freq(filename, outname)
+        try:
+            ht.output_fasta_kmer_pos_freq()
+            assert 0, "should fail"
+        except TypeError, err:
+            print str(err)
 
         fd = open(outname, "r")
 
@@ -44,30 +60,3 @@ class Test_Filter(object):
         assert ['1'] * (114 - 10 + 1) == output
 
         fd.close()
-
-
-@attr('highmem')
-def test_filter_sodd():
-    K = 32
-    HASHTABLE_SIZE = int(8e7)
-    N_HT = 4
-    MAX_SODD = 3
-
-    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
-    filename = utils.get_test_data('../../data/high-sodd.fa')
-
-    ht.consume_fasta(filename)
-
-    seq = "CGTTAGTTGCGGTGCCGACCGGCAAACTTGGTTTTGCCAAAAATTTTTACAGTTAGAAATTATTC" \
-          "ACAAAGTTGCACCGGAATTCGGTTACAAACGTCATTCTAACTAAT"
-    trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
-    assert trim_seq == "CGTTAGTTGCGGTGCCGACCGGCAAACTTGGT"
-
-    seq = "ACAAAATTCCACATATAGTCATAATTGTGGGCAATTTTCGTCCCAAATTAGTTAGAATGACGTTT" \
-          "GTAACCGAATTCCGGTGCAACTTTGTGAATAATTTCTAACTGTAAAAAT"
-    trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
-    assert trim_seq == "ACAAAATTCCACATATAGTCATAATTGTGGGCAATT"
-
-    seq = "GCACGCAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTG"
-    trim_seq, trim_at = ht.trim_on_sodd(seq, MAX_SODD)
-    assert trim_seq == seq

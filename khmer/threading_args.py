@@ -1,7 +1,8 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
     Provides functions to manage threading arguments for the various scripts.
@@ -14,7 +15,7 @@ def add_threading_args(parser):
 
     parser.add_argument(
         '--threads', '-T', dest='n_threads',
-        default=DEFAULT_N_THREADS,
+        default=DEFAULT_N_THREADS, type=int,
         help='Number of simultaneous threads to execute'
     )
 

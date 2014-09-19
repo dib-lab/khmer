@@ -1,7 +1,8 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// the three-clause BSD license; see doc/LICENSE.txt.
+// Contact: khmer-project@idyll.org
 //
 
 // Simple C++ implementation of the 'load-graph' Python script.
@@ -56,53 +57,62 @@ int main( int argc, char * argv[ ] )
     string		ifile_name;
     // FILE *		ofile		    = NULL;
 
-    while (-1 != (opt = getopt( argc, argv, SHORT_OPTS )))
-    {
+    while (-1 != (opt = getopt( argc, argv, SHORT_OPTS ))) {
 
-	switch (opt)
-	{
+        switch (opt) {
 
-	case 'k':
-	    kmer_length = strtoul( optarg, &conv_residue, 10 );
-	    if (!strcmp( optarg, conv_residue ))
-		error( EINVAL, EINVAL, "Invalid kmer length" );
-	    break;
+        case 'k':
+            kmer_length = strtoul( optarg, &conv_residue, 10 );
+            if (!strcmp( optarg, conv_residue )) {
+                error( EINVAL, EINVAL, "Invalid kmer length" );
+            }
+            break;
 
-	case 'N':
-	    ht_count = strtoul( optarg, &conv_residue, 10 );
-	    if (!strcmp( optarg, conv_residue ))
-		error( EINVAL, EINVAL, "Invalid number of hashtables" );
-	    break;
+        case 'N':
+            ht_count = strtoul( optarg, &conv_residue, 10 );
+            if (!strcmp( optarg, conv_residue )) {
+                error( EINVAL, EINVAL, "Invalid number of hashtables" );
+            }
+            break;
 
-	case 'x':
-	    ht_size_FP = strtof( optarg, &conv_residue );
-	    if (!strcmp( optarg, conv_residue ))
-		error( EINVAL, EINVAL, "Invalid hashtable size" );
-	    break;
-	
-	case 's':
-	    cache_size = strtoull( optarg, &conv_residue, 10 );
-	    if (!strcmp( optarg, conv_residue ))
-		error( EINVAL, EINVAL, "Invalid cache size" );
-	    break;
+        case 'x':
+            ht_size_FP = strtof( optarg, &conv_residue );
+            if (!strcmp( optarg, conv_residue )) {
+                error( EINVAL, EINVAL, "Invalid hashtable size" );
+            }
+            break;
 
-	default:
-	    error( 0, 0, "Skipping unknown arg, '%c'", optopt );
-	}
+        case 's':
+            cache_size = strtoull( optarg, &conv_residue, 10 );
+            if (!strcmp( optarg, conv_residue )) {
+                error( EINVAL, EINVAL, "Invalid cache size" );
+            }
+            break;
+
+        default:
+            error( 0, 0, "Skipping unknown arg, '%c'", optopt );
+        }
 
     }
 
-    if (optind < argc) ofile_name = string( argv[ optind++ ] );
-    else error( EINVAL, 0, "Output file name required" );
+    if (optind < argc) {
+        ofile_name = string( argv[ optind++ ] );
+    } else {
+        error( EINVAL, 0, "Output file name required" );
+    }
 
-    if (optind < argc) ifile_name = string( argv[ optind++ ] );
-    else error( EINVAL, 0, "Input file name required" );
+    if (optind < argc) {
+        ifile_name = string( argv[ optind++ ] );
+    } else {
+        error( EINVAL, 0, "Input file name required" );
+    }
 
     HashIntoType	    ht_size		= (HashIntoType)ht_size_FP;
     Primes primetab( ht_size );
     vector<HashIntoType> ht_sizes;
-    for ( unsigned int i = 0; i < ht_count; ++i )
-	ht_sizes.push_back( primetab.get_next_prime( ) );
+    for ( unsigned int i = 0; i < ht_count; ++i ) {
+        ht_sizes.push_back( primetab.get_next_prime( ) );
+    }
 
     unsigned int	    reads_total		= 0;
     unsigned long long int  n_consumed		= 0;
@@ -113,11 +123,11 @@ int main( int argc, char * argv[ ] )
 #if HASH_TYPE_TO_TEST == 1
     CountingHash ht( kmer_length, ht_sizes );
     IParser * parser = IParser:: get_parser(
-	ifile_name, the_config.get_number_of_threads( ), cache_size
-    );
-#pragma omp parallel shared( reads_total, n_consumed )
+                           ifile_name, the_config.get_number_of_threads( ), cache_size
+                       );
+    #pragma omp parallel shared( reads_total, n_consumed )
     {
-    ht.consume_fasta( parser, reads_total, n_consumed );
+        ht.consume_fasta( parser, reads_total, n_consumed );
     }
 #elif HASH_TYPE_TO_TEST == 2
     Hashbits ht( kmer_length, ht_sizes );

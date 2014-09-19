@@ -1,8 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 """
 Trim sequences at k-mers of the given abundance, based on the given counting
@@ -26,6 +27,7 @@ DEFAULT_CUTOFF = 2
 
 
 class OutputByLength(object):
+
     def __init__(self, base):
         self.base = base
         self.fp_dict = {}

@@ -1,3 +1,5 @@
+.. vim: set filetype=rst
+
 =================================
 Contributors and Acknowledgements
 =================================
@@ -23,9 +25,9 @@ Jared T. Simpson (University of Cambridge, Sanger Institute) contributed
 paired-end support for digital normalization.
 
 Eric McDonald thoroughly revised many aspects of the code base, made
-much of the codebase threadsafe, and otherwise improved performance
+much of the codebase thread safe, and otherwise improved performance
 dramatically.
 
 Michael R. Crusoe is the new maintainer of khmer.
 
-MRC 2013-10-03
+MRC 2014-05-07

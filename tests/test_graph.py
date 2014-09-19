@@ -1,9 +1,11 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
 #
 import khmer
+import screed
 
 import khmer_tst_utils as utils
 
@@ -17,7 +19,7 @@ def teardown():
 class Test_ExactGraphFu(object):
 
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4 ** 12)
+        self.ht = khmer.new_hashbits(12, 1e4)
 
     @attr('highmem')
     def test_counts(self):
@@ -112,7 +114,7 @@ class Test_ExactGraphFu(object):
 class Test_InexactGraphFu(object):
 
     def setup(self):
-        self.ht = khmer.new_hashbits(12, 4 ** 8 + 1)
+        self.ht = khmer.new_hashbits(12, 4 ** 2 + 1)
 
     def test_graph_links_next_a(self):
         ht = self.ht
@@ -197,7 +199,7 @@ class Test_Partitioning(object):
 
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 4, 4)
         ht.consume_fasta_and_tag(filename)
 
         output_file = utils.get_temp_filename('part0test')
@@ -215,7 +217,7 @@ class Test_Partitioning(object):
 
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 4, 4)
         ht.consume_fasta_and_tag(filename)
 
         output_file = utils.get_temp_filename('parttest')
@@ -227,11 +229,27 @@ class Test_Partitioning(object):
         assert len1 > 0
         assert len2 == 0, len2
 
+    def test_output_fq(self):
+        filename = utils.get_test_data('random-20-a.fq')
+
+        ht = khmer.new_hashbits(20, 1e4, 4)
+        ht.consume_fasta_and_tag(filename)
+        subset = ht.do_subset_partition(0, 0)
+        ht.merge_subset(subset)
+
+        output_file = utils.get_temp_filename('parttest')
+        ht.output_partitions(filename, output_file, False)
+
+        print open(output_file).read()
+
+        x = set([r.accuracy for r in screed.open(output_file)])
+        assert x, x
+
     @attr('highmem')
     def test_disconnected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 1e5, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
@@ -242,7 +260,7 @@ class Test_Partitioning(object):
     def test_connected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
-        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht = khmer.new_hashbits(20, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
@@ -253,7 +271,7 @@ class Test_Partitioning(object):
     def test_disconnected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
-        ht = khmer.new_hashbits(21, 1e6, 4)
+        ht = khmer.new_hashbits(21, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
@@ -264,7 +282,7 @@ class Test_Partitioning(object):
     def test_connected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
-        ht = khmer.new_hashbits(20, 1e6, 4)
+        ht = khmer.new_hashbits(20, 1e4, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
@@ -286,7 +304,7 @@ class Test_Partitioning(object):
     def test_connected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
-        ht = khmer.new_hashbits(31, 1e6, 4)
+        ht = khmer.new_hashbits(31, 1e5, 4)
         ht.consume_fasta_and_tag(filename)
 
         subset = ht.do_subset_partition(0, 0)
@@ -299,7 +317,7 @@ class Test_Partitioning(object):
 class Test_PythonAPI(object):
 
     def test_ordered_connect(self):
-        ht = khmer.new_hashbits(20, 4 ** 15 + 1)
+        ht = khmer.new_hashbits(20, 4 ** 4 + 1)
 
         a = "ATTGGGACTCTGGGAGCACTTATCATGGAGAT"
         b = "GAGCACTTTAACCCTGCAGAGTGGCCAAGGCT"

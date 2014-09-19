@@ -1,0 +1,9 @@
+max-line-length: 80
+ignore-paths:
+        - figuregen
+        - sandbox
+        - versioneer.py
+        - khmer/_version.py
+        - ez_setup.py
+        - novelty
+

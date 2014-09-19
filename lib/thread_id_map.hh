@@ -1,13 +1,13 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2013. It is licensed under
-// the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
+// the three-clause BSD license; see doc/LICENSE.txt.
+// Contact: khmer-project@idyll.org
 //
 
 #ifndef THREAD_ID_MAP_HH
 #   define THREAD_ID_MAP_HH
 
-#include <exception>
 #include <map>
 
 // TODO? Just use 'pthread_t' everywhere.
@@ -30,15 +30,14 @@ namespace khmer
 {
 
 
-struct InvalidNumberOfThreadsRequested : public std:: exception
-{ };
+struct InvalidNumberOfThreadsRequested : public khmer_exception {
+};
 
-struct TooManyThreads : public std:: exception
-{ };
+struct TooManyThreads : public khmer_exception {
+};
 
 
-struct ThreadIDMap
-{
+struct ThreadIDMap {
 
     ThreadIDMap( uint32_t number_of_threads );
     ~ThreadIDMap( );

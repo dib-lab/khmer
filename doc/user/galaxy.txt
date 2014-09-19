@@ -1,0 +1,39 @@
+.. vim: set filetype=rst
+
+Deploying the khmer project tools on Galaxy
+===========================================
+
+This document is for people interested in deploying the khmer tools on
+the Galaxy platform.
+
+----
+
+We are developing the support for running all the khmer scripts in `Galaxy
+<http://galaxyproject.org/>`__.
+
+Install the tools & tool description
+------------------------------------
+
+In the administrative interface select "Search and browse tool sheds" under
+the heading "Tool sheds". Click on "Galaxy test tool shed" and search for
+khmer. Click on the "khmer" button and choose "Preview and install". Click the
+"Install to Galaxy" button at the top. At the bottom of the next page click
+the "Install" button.
+
+Single Output Usage
+-------------------
+
+For one or more files into a single file:
+
+#. Choose 'Normalize By Median' from the 'khmer protocols' section of the
+'Tools' menu.
+
+#. Compatible files already uploaded to your Galaxy instance should be listed.
+If not then you may need to `set their datatype manually
+<https://wiki.galaxyproject.org/Learn/Datatypes>`__.
+
+#. After selecting the input files specify if they are paired-interleaved
+or not.
+
+#. Specify the sample type or show the advanced parameters to set the tablesize
+yourself. Consult :doc:`../user/choosing-table-sizes` for assistance.
