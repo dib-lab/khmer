@@ -63,8 +63,7 @@ ready for review::
    - [ ] If it introduces new functionality in scripts/ is it tested?
      Check for code coverage.
    - [ ] Is it well formatted? Look at `make pep8`, `make diff_pylint_report`,
-     `make cppcheck`, and `make doc` output. Use `make autopep8`,
-     `astyle -A10 --max-code-length=80`, and manual fixing as needed.
+     `make cppcheck`, and `make doc` output. Use `make format` and manual fixing as needed.
    - [ ] Is it documented in the ChangeLog?
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
