@@ -396,20 +396,24 @@ std::vector<unsigned int> CountingHash::find_low_abund_kmers(std::string seq,
     }
   }
 
-  while (!kmers.done()) {
-    // find next erroneous
-    while (!kmers.done()) {
-      kmer = kmers.next();
-      if (get_count(kmer) < min_abund) {
-	posns.push_back(kmers.get_end_pos() - 1);
-	break;
-      }
+  if (kmers.get_start_pos() - 1 > 0) {
+    if (kmers.get_start_pos() >= _ksize) {
+      return posns;
     }
-    // find next good
-    while (!kmers.done()) {
-      kmer = kmers.next();
-      if (get_count(kmer) >= min_abund) {
-	break;
+    posns.push_back(kmers.get_start_pos() - 1);
+  }
+      
+  while (!kmers.done()) {
+    kmer = kmers.next();
+    if (get_count(kmer) < min_abund) {
+      posns.push_back(kmers.get_end_pos() - 1);
+
+      // find next good
+      while (!kmers.done()) {
+        kmer = kmers.next();
+        if (get_count(kmer) >= min_abund) {
+          break;
+        }
       }
     }
   }
