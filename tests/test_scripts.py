@@ -1185,6 +1185,29 @@ def test_interleave_reads_2_fa():
         assert r.sequence == q.sequence
     assert n > 0
 
+def test_make_initial_stoptags():
+    # test input file
+    infile = utils.get_temp_filename('test-reads.pt')
+    shutil.copyfile(utils.get_test_data('test-reads.pt'), infile)
+    in_dir = os.path.dirname(infile)
+    infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
+    shutil.copyfile(utils.get_test_data('test-reads.tagset'), infile2)
+
+
+    # get file to compare against
+    ex_outfile = utils.get_test_data('test-reads.stoptags')
+
+    # actual output file
+    outfile1 = utils.get_temp_filename('test-reads.stoptags', in_dir)
+
+
+    script = scriptpath('make-initial-stoptags.py')
+    # make-initial-stoptags has weird file argument syntax
+    # read the code before modifying
+    args = ['test-reads']
+
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile1), outfile1
 
 def test_extract_paired_reads_1_fa():
     # test input file
