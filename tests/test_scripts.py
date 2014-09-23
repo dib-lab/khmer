@@ -32,6 +32,7 @@ def test_check_space():
     # tests of the file.py module.
     khmer.file.check_space(['', utils.get_test_data('test-abund-read-2.fa')])
 
+
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
@@ -262,7 +263,7 @@ def test_filter_stoptags():
 
 
 def test_normalize_by_median_indent():
-    infile = utils.get_test_data('test.fa')
+    infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.kh')
     script = scriptpath('normalize-by-median.py')
     args = ['--loadtable', hashfile, infile]
