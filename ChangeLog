@@ -1,35 +1,17 @@
-2014-09-17 Jacob G. Fenton <bocajnotnef@gmail.com>
+2014-09-23  Jacob G. Fenton  <bocajnotnef@gmail.com>
 
-    * scripts/abundance-dist-single.py: added output file listing at
-    end of file
-    * scripts/abundance-dist.py: added output file listing at
-    end of file
-    * scripts/count-median.py: added output file listing at
-    end of file
-    * scripts/count-overlap.py: added output file listing at
-    end of file
+    * scripts/{abundance-dist-single, abundance-dist, count-median,
+    count-overlap, extract-paired-reads, filter-abund-single,
+    load-graph, load-into-counting, make-initial-stoptags,
+    partition-graph, split-paired-reads}.py: 
+    added output file listing at end of file
     * scripts/extract-long-sequences.py: refactored to set write_out to sys.stdout
     by default; added output location listing.
-    * scripts/extract-paired-reads.py: added output file listing at
-    end of file
-    * scripts/fastq-to-fasta.py: added output file listing sensitive to optional
-    -o argument
-    * scripts/filter-abund-single.py: added output file listing at
-    end of file
-    * scripts/interleave-reads.py: added output file listing, sensitive to optional
-    -o argument
-    * scripts/load-graph.py: added output file listing at
-    end of file
-    * scripts/load-into-counting.py: added output file listing at
-    end of file
-    * scripts/make-initial-stoptags.py: added output file listing at
-    end of file
-    * scripts/merge-partitions.py: added output file listing at
-    end of file
-    * scripts/partition-graph.py: added output file listing at
-    end of file
-    * scripts/split-paired-reads.py: added output file listing at
-    end of file
+    * scripts/{fastq-to-fasta, interleave-reads}.py: 
+    added output file listing sensitive to optional -o argument
+    * tests/test_scripts.py: added test for scripts/make-initial-stoptags.py
+    * tests/test-data/test-reads.{info,pt,stoptags,tagset}: test data
+    for the scripts/make-initial-stoptags.py test
 
 2014-09-10  Titus Brown  <titus@idyll.org>
 

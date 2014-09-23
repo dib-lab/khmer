@@ -76,7 +76,6 @@ def main():
         for pmap_file in pmap_files:
             os.unlink(pmap_file)
 
-    print('wrote to: ' + output_file)
 
 if __name__ == '__main__':
     main()

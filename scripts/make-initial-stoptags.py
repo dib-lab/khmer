@@ -66,7 +66,7 @@ def get_parser():
 
 
 def main():
-   
+
     info('make-initial-stoptags.py', ['graph'])
     args = get_parser().parse_args()
 
