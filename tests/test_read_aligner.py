@@ -481,7 +481,45 @@ queries = [
         "read_aln": "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTAT",
         "truncated": True,
         "description": "truncated-alignment-bc-missing-kmers"
-   }
+   },
+    {   # Testing for min distance between correctable SNPs
+        # 1st SNP is at position 2+K from beginning, 2nd SNP at position 2+K+K
+        "seq":
+     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+     "ATCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+     "CTCTTTAC",
+        "score": 265.608525171,
+        "graph_aln": 
+     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+     "CTCTTTAC",
+       "read_aln":
+     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+     "ATCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+     "CTCTTTAC",
+        "truncated": False,
+        "description": "2 SNPs, one K apart",
+    },
+    {   # Testing for min distance between correctable SNPs
+        # 1st SNP is at position 2+K from beginning, 2nd SNP at position
+     # 2+K+K-1
+        "seq":
+     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACCTTTGATTATCAATTTTGCCGCTTTAACTGG"
+     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+     "CTCTTTAC",
+        "score": 265.608525171,
+        "graph_aln": 
+     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATATGTTTGATTATCAATTTTGCCGCTTTAACTGG"
+     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+     "CTCTTTAC",
+       "read_aln":
+     "TTAAATGCCCAATTTTTCCCTCTTTTCTTCTATACGTTTGATTATCAATTTTGCCGCTTTAACTAG"
+     "GTCTGTTTCTACTGCAAACTTTCCACCAACAAGTTTTTCTGCATCCTGTATTGCAATCTTAACAAC"
+     "CTCTTTAC",
+        "truncated": False,
+        "description": "2 SNPs, K-2 apart",
+    }
+
 ]
 
 def check_query(aligner, query):
@@ -496,7 +534,8 @@ def check_query(aligner, query):
     assert readAlign == query["read_aln"], "\n%r != \n%r" % \
                (readAlign, query["read_aln"])
     eq_(trunc, query["truncated"])
-    assert_almost_equals(score, query["score"])
+    if query["score"] > 0:
+        assert_almost_equals(score, query["score"])
 
 def test_readalign_new():
     return  # DISABLED
