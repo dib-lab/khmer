@@ -1192,20 +1192,16 @@ def test_make_initial_stoptags():
     # or something like that
     # this assumes (obv.) load-graph works properly
     bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
-    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)   
+    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
     in_dir = os.path.dirname(bzinfile)
-    
+
     genscript = scriptpath('load-graph.py')
     genscriptargs = ['-t', 'test-reads', 'test-reads.fq.bz2']
     utils.runscript(genscript, genscriptargs, in_dir)
-    
-    
-    # test input file
+
+    # test input file gen'd by load-graphs
     infile = utils.get_temp_filename('test-reads.pt')
-    #shutil.copyfile(utils.get_test_data('test-reads.pt'), infile)
-    
     infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
-    #shutil.copyfile(utils.get_test_data('test-reads.tagset'), infile2)
 
     # get file to compare against
     ex_outfile = utils.get_test_data('test-reads.stoptags')

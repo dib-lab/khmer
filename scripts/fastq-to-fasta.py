@@ -26,7 +26,8 @@ def get_parser():
 
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
-    parser.add_argument('-o', '--output', help='The name of the output'
+    parser.add_argument('-o', '--output', metavar="filename",
+                        help='The name of the output'
                         ' FASTA sequence file.',
                         type=argparse.FileType('w'),
                         default=sys.stdout)
