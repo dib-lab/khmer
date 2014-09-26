@@ -10,8 +10,6 @@
     * scripts/{fastq-to-fasta, interleave-reads}.py: 
     added output file listing sensitive to optional -o argument
     * tests/test_scripts.py: added test for scripts/make-initial-stoptags.py
-    * tests/test-data/test-reads.{info,pt,stoptags,tagset}: test data
-    for the scripts/make-initial-stoptags.py test
 
 2014-09-10  Titus Brown  <titus@idyll.org>
 
