@@ -18,6 +18,7 @@ Use '-h' for parameter help.
 """
 import argparse
 import screed
+import sys
 
 
 def get_parser():
@@ -56,6 +57,7 @@ def main():
                         '>{name}\n{seq}\n'.format(name=record.name,
                                                   seq=record.sequence))
 
+    print >> sys.stderr, 'wrote to: ' + args.output
 
 if __name__ == '__main__':
     main()
