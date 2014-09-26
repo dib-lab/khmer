@@ -53,12 +53,9 @@ def main():
             if not args.n_keep:
                 n_count += 1
                 continue
-        if args.output:
-            args.output.write('>' + name + '\n')
-            args.output.write(sequence + '\n')
-        else:
-            print '>' + name
-            print sequence
+
+        args.output.write('>' + name + '\n')
+        args.output.write(sequence + '\n')
 
     print >> sys.stderr, '\n' + 'lines from ' + args.input_sequence
 
@@ -68,7 +65,7 @@ def main():
     else:
         print >> sys.stderr, 'No lines dropped from file.'
 
-    print >> sys.stderr, 'Wrote output to stdout'
+    print >> sys.stderr, 'Wrote output to', args.output
 
 if __name__ == '__main__':
     main()
