@@ -1,11 +1,11 @@
 2014-09-19  Ben Taylor  <taylo886@msu.edu>
 
-    * Makefile: add --inline-suppr to cppcheck, cppcheck-result.xml targets
-    * khmer/_khmermodule.cc: Add comments to address cppcheck false positives
+    * Makefile: added --inline-suppr to cppcheck, cppcheck-result.xml targets
+    * khmer/_khmermodule.cc: Added comments to address cppcheck false positives
     * lib/hashtable.cc, lib/hashtable.hh: take args to filter_if_present by
     reference, address scope in destructor
-    * lib/read_parsers.cc: Add comments to address cppcheck false positives
-    * lib/subset.cc, lib/subset.hh: Adjust output_partitioned_file,
+    * lib/read_parsers.cc: Added comments to address cppcheck false positives
+    * lib/subset.cc, lib/subset.hh: Adjusted output_partitioned_file,
     find_unpart to take args by reference, fix assign_partition_id to use
     .empty() instead of .size()
 

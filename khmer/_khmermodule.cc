@@ -746,7 +746,7 @@ _ReadPairIterator_iternext( PyObject * self )
 
     ReadPair    the_read_pair;
     // cppcheck-suppress unreadVariable
-    bool    stop_iteration      = false;  
+    bool    stop_iteration      = false;
     bool    invalid_file_format     = false;
     char    exc_message[ CHAR_MAX ];
     bool    unknown_pair_reading_mode   = false;
