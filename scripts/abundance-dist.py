@@ -103,7 +103,6 @@ def main():
         if sofar == total:
             break
 
-    sys.stderr.write("this is some string")
 
 if __name__ == '__main__':
     main()

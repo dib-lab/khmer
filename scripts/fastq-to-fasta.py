@@ -27,7 +27,9 @@ def get_parser():
     parser.add_argument('input_sequence', help='The name of the input'
                         ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', help='The name of the output'
-                        ' FASTA sequence file.')
+                        ' FASTA sequence file.',
+                        type=argparse.FileType('w'),
+                        default=sys.stdout)
     parser.add_argument('-n', '--n_keep', default=False, action='store_true',
                         help='Option to drop reads containing \'N\'s in ' +
                         'input_sequence file.')
@@ -37,11 +39,6 @@ def get_parser():
 def main():
     args = get_parser().parse_args()
     print >> sys.stderr, ('fastq from ', args.input_sequence)
-
-    write_out = sys.stdout
-
-    if args.output:
-        write_out = open(args.output, 'w')
 
     n_count = 0
     for n, record in enumerate(screed.open(args.input_sequence)):
@@ -56,8 +53,8 @@ def main():
                 n_count += 1
                 continue
         if args.output:
-            write_out.write('>' + name + '\n')
-            write_out.write(sequence + '\n')
+            args.output.write('>' + name + '\n')
+            args.output.write(sequence + '\n')
         else:
             print '>' + name
             print sequence
