@@ -425,6 +425,27 @@ def test_find_low_abund_kmer_5():
     assert posns == [10], posns
 
 
+def test_find_low_abund_kmer_6():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[1:])
+
+    posns = hi.find_low_abund_kmers(DNA, 2)
+    assert posns == [0], posns
+
+
+def test_find_low_abund_kmer_7():
+    K = 8
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[K:])
+
+    posns = hi.find_low_abund_kmers(DNA, 2)
+    assert posns == [8], posns
+
+
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
     kh = khmer.new_counting_hash(4, 4 ** 4, 4)
