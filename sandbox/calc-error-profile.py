@@ -59,8 +59,6 @@ def main():
         output_filename = os.path.basename(filename) + '.errhist'
         output_file = open(output_filename, 'w')
 
-    print >>sys.stderr, 'Error histogram will be in %s' % output_filename
-
     # Start!
 
     # build a small counting hash w/default parameters. In general there
@@ -108,8 +106,8 @@ def main():
             else:
                 # also consume & track up to 2C -- CTB consume only high abnd?
                 if med < 2*C: # @@CTB
-                    #ht.consume(seq)
-                    #n2_consumed += 1
+                    # keep this, because it reassures us that sufficient
+                    # data has been seen.
                     bp2_consumed += len(seq)
 
                 # for saturated data, find low-abund k-mers
@@ -153,11 +151,14 @@ def main():
     print >>sys.stderr, 'error rate: %.1f%%' % \
           (100.0 * sum(positions) / float(bp_consumed))
 
+    print >>sys.stderr, 'Error histogram is in %s' % output_filename
+
     if not exit_condition(n2_consumed, n_consumed):
         print >>sys.stderr, ""
         print >>sys.stderr, "** WARNING: not enough reads to get a good result"
         print >>sys.stderr, "** Is this high diversity sample / small subset?"
         sys.exit(-1)
+
 
 if __name__ == '__main__':
     main()

@@ -1447,18 +1447,18 @@ static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
   khmer::CountingHash * counting = me->counting;
 
   char * seq = NULL;
-  unsigned int min_count_i = 0;
+  unsigned int max_count_i = 0;
 
-  if (!PyArg_ParseTuple(args, "sI", &seq, &min_count_i)) {
+  if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
     return NULL;
   }
 
   std::vector<unsigned int> posns;
   Py_BEGIN_ALLOW_THREADS
 
-    khmer::BoundedCounterType min_count = min_count_i;
+    khmer::BoundedCounterType max_count = max_count_i;
 
-    posns = counting->find_low_abund_kmers(seq, min_count);
+    posns = counting->find_low_abund_kmers(seq, max_count);
 
   Py_END_ALLOW_THREADS;
 

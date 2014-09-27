@@ -381,7 +381,10 @@ def test_find_low_abund_kmer_1():
     hi.consume(DNA)
     hi.consume(DNA[:30])
 
-    posns = hi.find_low_abund_kmers(DNA, 2)
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n+8])
+
+    posns = hi.find_low_abund_kmers(DNA, 1)
     assert posns == [30], posns
 
 
@@ -395,14 +398,17 @@ def test_find_low_abund_kmer_2():
     assert posns == [], posns
 
 
-def test_find_low_abund_kmer_3():
+def test_find_low_abund_kmer_6():
     hi = khmer.new_counting_hash(8, 1e6, 2)
 
     hi.consume(DNA)
     hi.consume(DNA[1:])
 
-    posns = hi.find_low_abund_kmers(DNA, 2)
-    assert posns == [], posns  # cannot find in first k
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n+8])
+
+    posns = hi.find_low_abund_kmers(DNA, 1)
+    assert posns == [0], posns
 
 
 def test_find_low_abund_kmer_4():
@@ -421,29 +427,22 @@ def test_find_low_abund_kmer_5():
     hi.consume(DNA[:10])
     hi.consume(DNA[11:])
 
-    posns = hi.find_low_abund_kmers(DNA, 2)
+    posns = hi.find_low_abund_kmers(DNA, 1)
     assert posns == [10], posns
 
 
 def test_find_low_abund_kmer_6():
-    hi = khmer.new_counting_hash(8, 1e6, 2)
-
-    hi.consume(DNA)
-    hi.consume(DNA[1:])
-
-    posns = hi.find_low_abund_kmers(DNA, 2)
-    assert posns == [0], posns
-
-
-def test_find_low_abund_kmer_7():
     K = 8
     hi = khmer.new_counting_hash(K, 1e6, 2)
 
     hi.consume(DNA)
     hi.consume(DNA[K:])
 
-    posns = hi.find_low_abund_kmers(DNA, 2)
-    assert posns == [8], posns
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n+8])
+
+    posns = hi.find_low_abund_kmers(DNA, 1)
+    assert posns == [7], posns
 
 
 def test_maxcount():
