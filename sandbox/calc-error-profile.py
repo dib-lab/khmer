@@ -132,13 +132,8 @@ def main():
     for j in range(max_length):
         length_count[j] = sum([1 for i in lengths if i >= j])
 
-    # find the last point for which we have any data
-    last_zero = len(positions) - 1
-    while positions[last_zero] == 0:
-        last_zero -= 1
-
     # write!
-    for n, i in enumerate(positions[:last_zero + 1]):
+    for n, i in enumerate(positions[:max_length]):
         print >>output_file, n, i, float(i) / float(length_count[n])
 
     output_file.close()
