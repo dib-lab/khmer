@@ -107,6 +107,7 @@ def main():
     read_reads = 0
     wrote_bp = 0
     wrote_reads = 0
+    trimmed_reads = 0
 
     pass2list = []
     for filename in args.input_filenames:
@@ -142,6 +143,8 @@ def main():
                     trimfp.write(output_single(read, trim_at))
                     wrote_reads += 1
                     wrote_bp += trim_at
+                    if trim_at != len(read.sequence):
+                        trimmed_reads += 1
 
         pass2fp.close()
         trimfp.close()
@@ -168,6 +171,8 @@ def main():
                     trimfp.write(output_single(read, trim_at))
                     wrote_reads += 1
                     wrote_bp += trim_at
+                    if trim_at != len(read.sequence):
+                        trimmed_reads += 1
             else:
                 trimfp.write(output_single(read))
                 wrote_reads += 1
@@ -181,7 +186,9 @@ def main():
 
     print 'read %d reads, %d bp' % (read_reads, read_bp,)
     print 'wrote %d reads, %d bp' % (wrote_reads, wrote_bp,)
-    print 'trimmed or removed %.2f%% of bases' % ((1 - (wrote_bp / float(read_bp))) * 100.)
+    print 'removed %d reads and trimmed %d reads' % (read_reads - wrote_reads,\
+                                                     trimmed_reads,)
+    print 'trimmed or removed %.2f%% of bases (%d total)' % ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
     print 'output in *.abundtrim'
 
 if __name__ == '__main__':

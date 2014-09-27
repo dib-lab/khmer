@@ -74,6 +74,7 @@ def main():
     n_consumed = n2_consumed = 0
     bp_consumed = bp2_consumed = 0
     total = 0
+    n_checked = 0
 
     # run through all the files; pick out reads; once they saturate,
     # look for errors.
@@ -106,9 +107,9 @@ def main():
                 bp_consumed += len(seq)
             else:
                 # also consume & track up to 2C -- CTB consume only high abnd?
-                if med < 2*C and 0: # @@CTB
-                    ht.consume(seq)
-                    n2_consumed += 1
+                if med < 2*C: # @@CTB
+                    #ht.consume(seq)
+                    #n2_consumed += 1
                     bp2_consumed += len(seq)
 
                 # for saturated data, find low-abund k-mers
@@ -122,6 +123,8 @@ def main():
                 # track the positions => errors
                 for p in posns:
                     positions[p] += 1
+
+                n_checked += 1
 
     # normalize for length
     lengths.sort()
@@ -146,6 +149,9 @@ def main():
     print >>sys.stderr, 'total sequences:', total
     print >>sys.stderr, 'n consumed:', n_consumed, n2_consumed
     print >>sys.stderr, 'bp consumed:', bp_consumed, bp_consumed / float(C)
+    print >>sys.stderr, 'n checked:', n_checked
+    print >>sys.stderr, 'error rate: %.1f%%' % \
+          (100.0 * sum(positions) / float(bp_consumed))
 
     if not exit_condition(n2_consumed, n_consumed):
         print >>sys.stderr, ""
