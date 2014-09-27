@@ -129,6 +129,7 @@ def main():
         print 'Saving k-mer counting table filename', args.savetable
         print '...saving to', args.savetable
         htable.save(args.savetable)
+    print('wrote to: ' + outfile)
 
 if __name__ == '__main__':
     main()

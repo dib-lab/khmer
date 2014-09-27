@@ -12,6 +12,7 @@ Find an initial set of highly connected k-mers, to save on repartitioning time.
 % python scripts/make-initial-stoptags.py <base>
 """
 
+import sys
 import textwrap
 import khmer
 from khmer.khmer_args import (build_counting_args, info)
@@ -65,6 +66,7 @@ def get_parser():
 
 
 def main():
+
     info('make-initial-stoptags.py', ['graph'])
     args = get_parser().parse_args()
 
@@ -116,6 +118,7 @@ def main():
 
     print 'saving stop tags'
     htable.save_stop_tags(graphbase + '.stoptags')
+    print >> sys.stderr, 'wrote to:', graphbase + '.stoptags'
 
 if __name__ == '__main__':
     main()
