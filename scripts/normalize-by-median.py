@@ -71,10 +71,14 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
             print '... in file', input_filename
 
             if report_fp:
-                print >> report_fp, total, total - discarded, \
+                floated_total=float(total)
+                if floated_total==0.0: 
+                   print 'Division by zero'
+                   sys.exit(0)
+                else:
+                   print >> report_fp, total, total - discarded, \
                     1. - (discarded / float(total))
-                report_fp.flush()
-
+                   report_fp.flush()
         total += batch_size
 
         # If in paired mode, check that the reads are properly interleaved
@@ -218,8 +222,11 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_on_config(args)
 
     report_fp = args.report
-
-    check_valid_file_exists(args.input_filenames)
+    try:
+       check_valid_file_exists(args.input_filenames)
+    except: 
+       print 'I/O Error: files does not exist'
+       sys.exit(0)
     check_space(args.input_filenames)
     if args.savetable:
         check_space_for_hashtable(args.n_tables * args.min_tablesize)
