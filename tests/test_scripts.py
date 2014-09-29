@@ -1196,6 +1196,38 @@ def test_interleave_reads_2_fa():
     assert n > 0
 
 
+def test_make_initial_stoptags():
+    # gen input files using load-graph.py -t
+    # should keep test_data directory size down
+    # or something like that
+    # this assumes (obv.) load-graph works properly
+    bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
+    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
+    in_dir = os.path.dirname(bzinfile)
+
+    genscript = scriptpath('load-graph.py')
+    genscriptargs = ['-t', 'test-reads', 'test-reads.fq.bz2']
+    utils.runscript(genscript, genscriptargs, in_dir)
+
+    # test input file gen'd by load-graphs
+    infile = utils.get_temp_filename('test-reads.pt')
+    infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
+
+    # get file to compare against
+    ex_outfile = utils.get_test_data('test-reads.stoptags')
+
+    # actual output file
+    outfile1 = utils.get_temp_filename('test-reads.stoptags', in_dir)
+
+    script = scriptpath('make-initial-stoptags.py')
+    # make-initial-stoptags has weird file argument syntax
+    # read the code before modifying
+    args = ['test-reads']
+
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile1), outfile1
+
+
 def test_extract_paired_reads_1_fa():
     # test input file
     infile = utils.get_test_data('paired-mixed.fa')
