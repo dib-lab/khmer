@@ -103,6 +103,7 @@ def main():
         if sofar == total:
             break
 
+
 if __name__ == '__main__':
     main()
 

@@ -133,6 +133,7 @@ def main():
         sys.exit(1)
 
     print 'DONE.'
+    print('wrote to: ' + base + '.info')
 
 if __name__ == '__main__':
     main()

@@ -1,3 +1,16 @@
+2014-09-23  Jacob G. Fenton  <bocajnotnef@gmail.com>
+
+    * scripts/{abundance-dist-single, abundance-dist, count-median,
+    count-overlap, extract-paired-reads, filter-abund-single,
+    load-graph, load-into-counting, make-initial-stoptags,
+    partition-graph, split-paired-reads}.py: 
+    added output file listing at end of file
+    * scripts/extract-long-sequences.py: refactored to set write_out to sys.stdout
+    by default; added output location listing.
+    * scripts/{fastq-to-fasta, interleave-reads}.py: 
+    added output file listing sensitive to optional -o argument
+    * tests/test_scripts.py: added test for scripts/make-initial-stoptags.py
+
 2014-09-19  Ben Taylor  <taylo886@msu.edu>
 
     * Makefile: added --inline-suppr to cppcheck, cppcheck-result.xml targets

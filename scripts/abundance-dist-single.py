@@ -173,6 +173,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         print '...saving to', args.savetable
         counting_hash.save(args.savetable)
 
+    print >> sys.stderr, 'wrote to: ' + args.output_histogram_filename
+
 if __name__ == '__main__':
     main()
 
