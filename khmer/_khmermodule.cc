@@ -123,7 +123,8 @@ private:
     std::string _message;
 public:
     _khmer_exception(std::string message) : _message(message) { };
-    inline const std::string get_message() const {
+    inline const std::string get_message() const
+    {
         return _message;
     };
 };
@@ -744,7 +745,7 @@ _ReadPairIterator_iternext( PyObject * self )
     uint8_t         pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
-
+    // cppcheck-suppress unreadVariable
     bool    stop_iteration      = false;
     bool    invalid_file_format     = false;
     char    exc_message[ CHAR_MAX ];
@@ -1990,8 +1991,9 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
 
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
-
-    HashIntoType * dist;
+		
+		// cppcheck-suppress unreadVariable
+    HashIntoType * dist = NULL;  
 
     Py_BEGIN_ALLOW_THREADS
     dist = counting->abundance_distribution(rparser, hashbits);

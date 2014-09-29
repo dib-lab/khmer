@@ -415,8 +415,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
                 << " while reading tagset from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_TAGS)) {
+        } else if (!(ht_type == SAVED_TAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading tagset from " << infilename;
@@ -445,9 +444,9 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading data from: " + infilename;
-	if (buf != NULL) {
-	  delete[] buf;
-	}
+        if (buf != NULL) {
+            delete[] buf;
+        }
         throw khmer_file_exception(err.c_str());
     }
 }
@@ -1046,8 +1045,8 @@ const
     return neighbors;
 }
 
-void Hashtable::filter_if_present(const std::string infilename,
-                                  const std::string outputfile,
+void Hashtable::filter_if_present(const std::string &infilename,
+                                  const std::string &outputfile,
                                   CallbackFn callback,
                                   void * callback_data)
 {
@@ -1852,8 +1851,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
                 << " while reading stoptags from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_STOPTAGS)) {
+        } else if (!(ht_type == SAVED_STOPTAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading stoptags from " << infilename;

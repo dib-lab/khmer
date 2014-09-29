@@ -635,10 +635,9 @@ CountingHashGzFileReader::CountingHashGzFileReader(
         HashIntoType kmer;
         BoundedCounterType count;
 
-        int read_k, read_c;
         for (HashIntoType n = 0; n < n_counts; n++) {
-            read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
-            read_c = gzread(infile, (char *) &count, sizeof(count));
+            int read_k = gzread(infile, (char *) &kmer, sizeof(kmer));
+            int read_c = gzread(infile, (char *) &count, sizeof(count));
 
             if (read_k <= 0 || read_c <= 0) {
                 std::string err = "K-mer count read error: " + infilename;

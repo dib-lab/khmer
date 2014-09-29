@@ -124,13 +124,12 @@ int main( int argc, char * argv[ ] )
         }
     }
 
-    uint32_t count1, count2;
     printf( "Scanning hash key space....\n" );
     for (i = 0; i < max_ht_size; ++i) {
         // Truncate counts at specified saturation threshold.
         // (This accounts for the sloppy counting used for >1 threads.)
-        count1 = MIN( ht1.get_count( i ), max_count );
-        count2 = MIN( ht2.get_count( i ), max_count );
+        uint32_t count1 = MIN( ht1.get_count( i ), max_count );
+        uint32_t count2 = MIN( ht2.get_count( i ), max_count );
         if (count1 != count2) {
             fprintf(
                 stderr, "Hash key %llu has mismatched counts of %u and %u.\n",
