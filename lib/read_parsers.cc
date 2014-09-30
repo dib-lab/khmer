@@ -571,56 +571,6 @@ CacheManager(
 
 
 CacheManager::
-CacheManager(const CacheManager& that)
-    : _trace_level( that._trace_level ),
-      _stream_reader( that._stream_reader ),
-      _number_of_threads( that._number_of_threads ),
-      _thread_id_map( that._thread_id_map ),
-      _alignment( that._alignment ),
-      _segment_size( that._segment_size ),
-      _segment_ref_count( that._segment_ref_count ),
-      _segment_to_fill( that._segment_to_fill ),
-      _fill_counter( that._fill_counter ),
-      _ca_spin_lock( that._ca_spin_lock )
-{
-
-    _segments		= new CacheSegment *[ that._number_of_threads ];
-    for (uint32_t i = 0; i < that._number_of_threads; ++i) {
-        _segments[ i ] = that._segments[ i ];
-    }
-
-    std:: map< uint64_t, std:: string > _ca_buffers( that._ca_buffers );
-}
-
-
-const CacheManager&
-CacheManager::
-operator=(const CacheManager& that)
-{
-
-    if (this != &that)
-    {
-        // Tear down the old state first, to prevent memory leaks
-        for (uint32_t i = 0; i < _number_of_threads; ++i) {
-            if (NULL != _segments[ i ]) {
-                delete _segments[ i ];
-                _segments[ i ]	= NULL;
-            }
-        }
-        delete [ ] _segments;
-
-        // Assign to _segments
-        _segments		= new CacheSegment *[ that._number_of_threads ];
-        for (uint32_t i = 0; i < that._number_of_threads; ++i) {
-            _segments[ i ] = that._segments[ i ];
-        }
-
-    }
-    return *this;
-}
-
-
-CacheManager::
 ~CacheManager( )
 {
 
