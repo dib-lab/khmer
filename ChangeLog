@@ -1,6 +1,8 @@
 2014-09-16  Michael Wright  <wrig517@msu.edu>
 
-    * tests/test_scipts.py: Attained complete testing coverage for 
+2014-09-16  Michael Wright  <wrig517@msu.edu>
+
+    * tests/test_scripts.py: Attained complete testing coverage for 
     test_filter_abund.
 
 2014-12-30  Brian Wyss  <wyssbria@msu.edu>
