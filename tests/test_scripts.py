@@ -269,7 +269,7 @@ def test_normalize_by_median_indent():
     args = ['--loadtable', hashfile, infile]
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
-    print (out, err)
+    print(out, err)
 
 
 def test_normalize_by_median():
