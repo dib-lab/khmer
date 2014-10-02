@@ -360,10 +360,6 @@ public:
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
 
-    // count every k-mer in the string.
-    unsigned int consume_high_abund_kmers(const std::string &s,
-                                          BoundedCounterType min_count);
-
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
 
@@ -506,21 +502,6 @@ public:
                                            unsigned int radius,
                                            unsigned int max_count,
                                            const SeenSet * seen=0) const;
-    unsigned int count_kmers_within_depth(HashIntoType kmer_f,
-                                          HashIntoType kmer_r,
-                                          unsigned int depth,
-                                          unsigned int max_count,
-                                          SeenSet * seen) const;
-
-    unsigned int find_radius_for_volume(HashIntoType kmer_f,
-                                        HashIntoType kmer_r,
-                                        unsigned int max_count,
-                                        unsigned int max_radius) const;
-
-    unsigned int count_kmers_on_radius(HashIntoType kmer_f,
-                                       HashIntoType kmer_r,
-                                       unsigned int radius,
-                                       unsigned int max_volume) const;
 
     size_t trim_on_stoptags(std::string sequence) const;
 

@@ -1,3 +1,12 @@
+2014-10-01  Ben Taylor  <taylo886@msu.edu>
+
+    * khmer/_khmermodule.cc, lib/hashtable.cc, lib/hashtable.hh,
+    tests/test_counting_hash.py, tests/test_labelhash.py,
+    tests/test_hashbits.py, tests/test_hashbits_obj.py:
+    Removed Hashtable::consume_high_abund_kmers,
+    Hashtable::count_kmers_within_depth, Hashtable::find_radius_for_volume,
+    Hashtable::count_kmers_on_radius
+
 2014-09-29  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * versioneer.py: upgrade versioneer 0.11->0.12

@@ -1222,38 +1222,6 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
     return PyInt_FromLong(n_consumed);
 }
 
-static PyObject * hash_consume_high_abund_kmers(PyObject * self,
-        PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    const char * long_str;
-    unsigned int min_count;
-
-    if (!PyArg_ParseTuple(args, "sI", &long_str, &min_count)) {
-        return NULL;
-    }
-
-    if (strlen(long_str) < counting->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must >= the hashtable k-mer size");
-        return NULL;
-    }
-
-    if (min_count > MAX_COUNT) {
-        PyErr_SetString(PyExc_ValueError,
-                        "min count specified is > maximum possible count");
-        return NULL;
-    }
-
-    unsigned int n_consumed;
-    n_consumed = counting->consume_high_abund_kmers(long_str,
-                 (BoundedCounterType) min_count);
-
-    return PyInt_FromLong(n_consumed);
-}
-
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1782,7 +1750,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
-    { "consume_high_abund_kmers", hash_consume_high_abund_kmers, METH_VARARGS, "Count all k-mers in the given string with abund >= min specified" },
     { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
     {
         "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser,
@@ -3464,61 +3431,6 @@ static PyObject * hashbits_count_kmers_within_radius(PyObject * self,
     return PyLong_FromUnsignedLong(n);
 }
 
-static PyObject * hashbits_count_kmers_on_radius(PyObject * self,
-        PyObject * args)
-{
-    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    Hashbits * hashbits = me->hashbits;
-
-    const char * kmer = NULL;
-    unsigned int radius = 0;
-    unsigned int max_volume = 0;
-
-    if (!PyArg_ParseTuple(args, "sI|I", &kmer, &radius, &max_volume)) {
-        return NULL;
-    }
-
-    unsigned int n;
-
-    Py_BEGIN_ALLOW_THREADS
-
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
-    n = hashbits->count_kmers_on_radius(kmer_f, kmer_r, radius, max_volume);
-
-    Py_END_ALLOW_THREADS
-
-    return PyLong_FromUnsignedLong(n);
-}
-
-static PyObject * hashbits_find_radius_for_volume(PyObject * self,
-        PyObject * args)
-{
-    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
-    Hashbits * hashbits = me->hashbits;
-
-    const char * kmer = NULL;
-    unsigned int max_count = 0;
-    unsigned int max_radius = 0;
-
-    if (!PyArg_ParseTuple(args, "sII", &kmer, &max_count, &max_radius)) {
-        return NULL;
-    }
-
-    unsigned int n;
-
-    Py_BEGIN_ALLOW_THREADS
-
-    HashIntoType kmer_f, kmer_r;
-    _hash(kmer, hashbits->ksize(), kmer_f, kmer_r);
-    n = hashbits->find_radius_for_volume(kmer_f, kmer_r, max_count,
-                                         max_radius);
-
-    Py_END_ALLOW_THREADS
-
-    return PyLong_FromUnsignedLong(n);
-}
-
 static PyObject * hashbits_get_ksize(PyObject * self, PyObject * args)
 {
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -3669,8 +3581,6 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "get_partition_id", hashbits_get_partition_id, METH_VARARGS, "" },
     { "is_single_partition", hashbits_is_single_partition, METH_VARARGS, "" },
     { "count_kmers_within_radius", hashbits_count_kmers_within_radius, METH_VARARGS, "" },
-    { "count_kmers_on_radius", hashbits_count_kmers_on_radius, METH_VARARGS, "" },
-    { "find_radius_for_volume", hashbits_find_radius_for_volume, METH_VARARGS, "" },
     { "traverse_from_tags", hashbits_traverse_from_tags, METH_VARARGS, "" },
     { "repartition_largest_partition", hashbits_repartition_largest_partition, METH_VARARGS, "" },
     { "get_median_count", hashbits_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
