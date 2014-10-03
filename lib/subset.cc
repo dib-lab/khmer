@@ -69,8 +69,8 @@ void SubsetPartition::count_partitions(
 
 
 size_t SubsetPartition::output_partitioned_file(
-    const std::string	infilename,
-    const std::string	outputfile,
+    const std::string	&infilename,
+    const std::string	&outputfile,
     bool		output_unassigned,
     CallbackFn		callback,
     void *		callback_data)
@@ -172,7 +172,7 @@ size_t SubsetPartition::output_partitioned_file(
 }
 
 unsigned int SubsetPartition::find_unpart(
-    const std::string	infilename,
+    const std::string	&infilename,
     bool		traverse,
     bool		stop_big_traversals,
     CallbackFn		callback,
@@ -1027,7 +1027,7 @@ PartitionID SubsetPartition::assign_partition_id(
     PartitionID return_val = 0;
 
     // did we find a tagged kmer?
-    if (tagged_kmers.size() >= 1) {
+    if (!tagged_kmers.empty()) {
         PartitionID * pp = _join_partitions_by_tags(tagged_kmers, kmer);
         return_val = *pp;
     } else {
@@ -1281,8 +1281,7 @@ void SubsetPartition::merge_from_disk(string other_filename)
             err << "Incorrect file format version " << (int) version
                 << " while reading subset pmap from " << other_filename;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_SUBSET)) {
+        } else if (!(ht_type == SAVED_SUBSET)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading subset pmap from " << other_filename;

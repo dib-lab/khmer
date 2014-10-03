@@ -272,32 +272,6 @@ unsigned int Hashtable::consume_string(const std::string &s)
     return n_consumed;
 }
 
-//
-// consume_high_abund_kmers: run through every k-mer in the given string,
-//     and if the k-mer is high enough abundance, add it. Return number
-//     of consumed k-mers.
-//
-
-unsigned int Hashtable::consume_high_abund_kmers(const std::string &s,
-        BoundedCounterType min_count)
-{
-    const char * sp = s.c_str();
-    unsigned int n_consumed = 0;
-
-    KMerIterator kmers(sp, _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        if (get_count(kmer) >= min_count) {
-            count(kmer);
-            n_consumed++;
-        }
-    }
-
-    return n_consumed;
-}
-
 // technically, get medioid count... our "median" is always a member of the
 // population.
 
@@ -415,8 +389,7 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
                 << " while reading tagset from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_TAGS)) {
+        } else if (!(ht_type == SAVED_TAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading tagset from " << infilename;
@@ -445,9 +418,9 @@ void Hashtable::load_tagset(std::string infilename, bool clear_tags)
         delete[] buf;
     } catch (std::ifstream::failure &e) {
         std::string err = "Error reading data from: " + infilename;
-	if (buf != NULL) {
-	  delete[] buf;
-	}
+        if (buf != NULL) {
+            delete[] buf;
+        }
         throw khmer_file_exception(err.c_str());
     }
 }
@@ -1046,8 +1019,8 @@ const
     return neighbors;
 }
 
-void Hashtable::filter_if_present(const std::string infilename,
-                                  const std::string outputfile,
+void Hashtable::filter_if_present(const std::string &infilename,
+                                  const std::string &outputfile,
                                   CallbackFn callback,
                                   void * callback_data)
 {
@@ -1237,371 +1210,6 @@ const
     }
 
     return total;
-}
-
-unsigned int Hashtable::count_kmers_within_depth(HashIntoType kmer_f,
-        HashIntoType kmer_r,
-        unsigned int depth,
-        unsigned int max_count,
-        SeenSet * seen)
-const
-{
-    HashIntoType f, r;
-    unsigned int count = 1;
-
-    if (depth == 0) {
-        return 0;
-    }
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-
-    seen->insert(uniqify_rc(kmer_f, kmer_r));
-
-    // NEXT.
-    f = next_f(kmer_f, 'A');
-    r = next_r(kmer_r, 'A');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth - 1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-    }
-
-    f = next_f(kmer_f, 'C');
-    r = next_r(kmer_r, 'C');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    f = next_f(kmer_f, 'G');
-    r = next_r(kmer_r, 'G');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    f = next_f(kmer_f, 'T');
-    r = next_r(kmer_r, 'T');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    // PREVIOUS.
-    r = prev_r(kmer_r, 'A');
-    f = prev_f(kmer_f, 'A');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    r = prev_r(kmer_r, 'C');
-    f = prev_f(kmer_f, 'C');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    r = prev_r(kmer_r, 'G');
-    f = prev_f(kmer_f, 'G');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    r = prev_r(kmer_r, 'T');
-    f = prev_f(kmer_f, 'T');
-    if (get_count(uniqify_rc(f,r)) && !set_contains(*seen, uniqify_rc(f, r))) {
-        count += count_kmers_within_depth(f, r, depth -1, max_count - count,
-                                          seen);
-        if (count >= max_count) {
-            return count;
-        }
-        ;
-    }
-
-    return count;
-}
-
-unsigned int Hashtable::find_radius_for_volume(HashIntoType kmer_f,
-        HashIntoType kmer_r,
-        unsigned int max_count,
-        unsigned int max_radius)
-const
-{
-    HashIntoType f, r;
-    NodeQueue node_q;
-    std::queue<unsigned int> breadth_q;
-    unsigned int breadth = 0;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-    unsigned int total = 0;
-
-    SeenSet keeper;		// keep track of traversed kmers
-
-    // start breadth-first search.
-
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
-    breadth_q.push(0);
-
-    while(!node_q.empty()) {
-        kmer_f = node_q.front();
-        node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
-        breadth = breadth_q.front();
-        breadth_q.pop();
-
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
-            continue;
-        }
-
-        // keep track of seen kmers
-        keeper.insert(kmer);
-        total++;
-
-        if (total >= max_count || breadth >= max_radius) {
-            break;
-        }
-
-        //
-        // Enqueue next set of nodes.
-        //
-
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        if (node_q.empty()) {
-            breadth = max_radius;
-            break;
-        }
-    }
-
-    return breadth;
-}
-
-unsigned int Hashtable::count_kmers_on_radius(HashIntoType kmer_f,
-        HashIntoType kmer_r,
-        unsigned int radius,
-        unsigned int max_volume)
-const
-{
-    HashIntoType f, r;
-    NodeQueue node_q;
-    std::queue<unsigned int> breadth_q;
-    unsigned int cur_breadth = 0;
-    unsigned int count = 0;
-
-    const unsigned int rc_left_shift = _ksize*2 - 2;
-    unsigned int total = 0;
-
-    SeenSet keeper;		// keep track of traversed kmers
-
-    // start breadth-first search.
-
-    node_q.push(kmer_f);
-    node_q.push(kmer_r);
-    breadth_q.push(0);
-
-    while(!node_q.empty()) {
-        kmer_f = node_q.front();
-        node_q.pop();
-        kmer_r = node_q.front();
-        node_q.pop();
-        unsigned int breadth = breadth_q.front();
-        breadth_q.pop();
-
-        if (breadth > radius) {
-            break;
-        }
-
-        HashIntoType kmer = uniqify_rc(kmer_f, kmer_r);
-        if (set_contains(keeper, kmer)) {
-            continue;
-        }
-
-        if (breadth == radius) {
-            count++;
-        }
-
-        // keep track of seen kmers
-        keeper.insert(kmer);
-        total++;
-
-        if (max_volume && total > max_volume) {
-            break;
-        }
-
-        if (!(breadth >= cur_breadth)) { // keep track of watermark, for debugging.
-            throw khmer_exception();
-        }
-        if (breadth > cur_breadth) {
-            cur_breadth = breadth;
-        }
-
-        //
-        // Enqueue next set of nodes.
-        //
-
-        // NEXT.
-        f = next_f(kmer_f, 'A');
-        r = next_r(kmer_r, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'C');
-        r = next_r(kmer_r, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'G');
-        r = next_r(kmer_r, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        f = next_f(kmer_f, 'T');
-        r = next_r(kmer_r, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        // PREVIOUS.
-        r = prev_r(kmer_r, 'A');
-        f = prev_f(kmer_f, 'A');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'C');
-        f = prev_f(kmer_f, 'C');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'G');
-        f = prev_f(kmer_f, 'G');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-
-        r = prev_r(kmer_r, 'T');
-        f = prev_f(kmer_f, 'T');
-        if (get_count(uniqify_rc(f,r)) && !set_contains(keeper, uniqify_rc(f,r))) {
-            node_q.push(f);
-            node_q.push(r);
-            breadth_q.push(breadth + 1);
-        }
-    }
-
-    return count;
 }
 
 size_t Hashtable::trim_on_stoptags(std::string seq) const
@@ -1852,8 +1460,7 @@ void Hashtable::load_stop_tags(std::string infilename, bool clear_tags)
                 << " while reading stoptags from " << infilename
                 << "; should be " << (int) SAVED_FORMAT_VERSION;
             throw khmer_file_exception(err.str().c_str());
-        }
-        else if (!(ht_type == SAVED_STOPTAGS)) {
+        } else if (!(ht_type == SAVED_STOPTAGS)) {
             std::ostringstream err;
             err << "Incorrect file format type " << (int) ht_type
                 << " while reading stoptags from " << infilename;

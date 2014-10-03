@@ -486,8 +486,8 @@ CCTCGGGCCTTTCCGTTCCGTTGCCGCCCAAGCTCTCTAGCATCGAATCGGTCAAGCGGT\
 
 
 def test_partition_on_abundance_1():
-    print (a,)
-    print (b,)
+    print(a,)
+    print(b,)
     kh = khmer.new_counting_hash(20, 1e3, 4)
     for i in range(10):
         print kh.consume_and_tag(a)

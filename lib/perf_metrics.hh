@@ -28,7 +28,8 @@ struct IPerformanceMetrics {
     IPerformanceMetrics( );
     virtual ~IPerformanceMetrics( );
 
-    inline void	    start_timers( ) {
+    inline void	    start_timers( )
+    {
 #if defined (__linux__)
         clock_gettime( CLOCK_REALTIME, &_temp_clock_start );
         clock_gettime( CLOCK_THREAD_CPUTIME_ID, &_temp_cpu_start );
@@ -38,7 +39,8 @@ struct IPerformanceMetrics {
         memset( &_temp_cpu_start, 0, sizeof( timespec ) );
 #endif
     }
-    inline void	    stop_timers( ) {
+    inline void	    stop_timers( )
+    {
 #if defined (__linux__)
         clock_gettime( CLOCK_THREAD_CPUTIME_ID, &_temp_cpu_stop );
         clock_gettime( CLOCK_REALTIME, &_temp_clock_stop );

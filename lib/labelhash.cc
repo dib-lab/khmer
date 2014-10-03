@@ -129,11 +129,12 @@ LabelHash::consume_fasta_and_tag_with_labels(
 
 }
 
-void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
-        unsigned int &total_reads,
-        unsigned long long &n_consumed,
-        CallbackFn callback,
-        void * callback_data)
+void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data)
 {
     total_reads = 0;
     n_consumed = 0;
@@ -243,7 +244,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     // TODO: MAKE THREADSAFE!
 
                     if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
-printdbg(tag was not labeled: adding to labels...)
+                        printdbg(tag was not labeled: adding to labels...)
                         //ACQUIRE_TAG_COLORS_SPIN_LOCK
                         link_tag_and_label(kmer, current_label);
                         //RELEASE_TAG_COLORS_SPIN_LOCK
@@ -269,7 +270,7 @@ printdbg(tag was not labeled: adding to labels...)
 #endif
             //
             if (since >= _tag_density) {
-printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
+                printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
                 printdbg(in tag spin lock)
                 all_tags.insert(kmer);
@@ -289,7 +290,7 @@ printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
             }
             printdbg(moving to next iter)
         } // iteration over kmers
-printdbg(finished iteration: dropping last tag)
+    printdbg(finished iteration: dropping last tag)
     if (since >= _tag_density/2 - 1) {
         //ACQUIRE_ALL_TAGS_SPIN_LOCK
         all_tags.insert(kmer);	// insert the last k-mer, too.
@@ -359,9 +360,10 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
     }
 }
 
-LabelHash::~LabelHash() {
-	for (LabelPtrMap::iterator itr=label_ptrs.begin();
-			itr!=label_ptrs.end(); itr++) {
-		delete itr->second;
-	}
+LabelHash::~LabelHash()
+{
+    for (LabelPtrMap::iterator itr=label_ptrs.begin();
+            itr!=label_ptrs.end(); ++itr) {
+        delete itr->second;
+    }
 }

@@ -7,7 +7,7 @@
 CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
-DEVPKGS=sphinxcontrib-autoprogram pep8==1.5 diff_cover \
+DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
 autopep8 pylint coverage gcovr nose screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
@@ -69,12 +69,12 @@ cppcheck-result.xml: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
 		--file-list=- -j8 --platform=unix64 --std=posix --xml \
-		--xml-version=2 2> cppcheck-result.xml
+		--inline-suppr --xml-version=2 2> cppcheck-result.xml
 
 cppcheck: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=posix --quiet
+		--file-list=- -j8 --platform=unix64 --std=posix --inline-suppr --quiet
 
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
@@ -86,9 +86,16 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
+astyle: $(CPPSOURCES)
+	astyle -A10 --max-code-length=80 $(CPPSOURCES)
+
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
 		setup.py khmer/ scripts/ tests/
+
+# A command to automatically run astyle and autopep8 on appropriate files
+format: astyle autopep8
+	# Do nothing
 
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \

@@ -19,7 +19,8 @@ class ScoringMatrix
     double scores[4];
 
 public:
-    ScoringMatrix() {
+    ScoringMatrix()
+    {
         /*
         scores[MAT] = .96;
         scores[SNP] = .02;
