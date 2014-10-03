@@ -143,8 +143,8 @@ def main():
     print >>sys.stderr, 'n consumed:', n_consumed, n2_consumed
     print >>sys.stderr, 'bp consumed:', bp_consumed, bp_consumed / float(C)
     print >>sys.stderr, 'n checked:', n_checked
-    print >>sys.stderr, 'error rate: %.1f%%' % \
-          (100.0 * sum(positions) / float(bp_consumed))
+    print >>sys.stderr, 'error rate: %.2f%%' % \
+          (100.0 * sum(positions) / float(sum(lengths)))
 
     print >>sys.stderr, 'Error histogram is in %s' % output_filename
 
