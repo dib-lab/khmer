@@ -81,26 +81,27 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     else:
         hist_fp = open(args.output_histogram_filename, 'w')
 
-    print 'making k-mer counting table'
+    print >>sys.stderr, 'making k-mer counting table'
     counting_hash = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                             args.n_tables,
                                             args.threads)
     counting_hash.set_use_bigcount(args.bigcount)
 
-    print 'building k-mer tracking table'
+    print >> sys.stderr, 'building k-mer tracking table'
     tracking = khmer.new_hashbits(counting_hash.ksize(), args.min_tablesize,
                                   args.n_tables)
 
-    print 'kmer_size:', counting_hash.ksize()
-    print 'k-mer counting table sizes:', counting_hash.hashsizes()
-    print 'outputting to', args.output_histogram_filename
+    print >>sys.stderr, 'kmer_size:', counting_hash.ksize()
+    print >>sys.stderr, 'k-mer counting table sizes:', counting_hash.hashsizes()
+    print >>sys.stderr, 'outputting to', args.output_histogram_filename
 
     khmer.get_config().set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     # start loading
     rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
     threads = []
-    print 'consuming input, round 1 --', args.input_sequence_filename
+    print >>sys.stderr, 'consuming input, round 1 --', \
+	args.input_sequence_filename
     for _ in xrange(args.threads):
         thread = \
             threading.Thread(
@@ -124,10 +125,12 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             read_parser, tracking)
         abundance_lists.append(abundances)
 
-    print 'preparing hist from %s...' % args.input_sequence_filename
+    print >>sys.stderr, 'preparing hist from %s...' % \
+	args.input_sequence_filename
     rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
     threads = []
-    print 'consuming input, round 2 --', args.input_sequence_filename
+    print >>sys.stderr, 'consuming input, round 2 --', \
+	args.input_sequence_filename
     for _ in xrange(args.threads):
         thread = \
             threading.Thread(
@@ -169,8 +172,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             break
 
     if args.savetable:
-        print 'Saving k-mer counting table ', args.savetable
-        print '...saving to', args.savetable
+        print >>sys.stderr, 'Saving k-mer counting table ', args.savetable
+        print >>sys.stderr, '...saving to', args.savetable
         counting_hash.save(args.savetable)
 
     print >> sys.stderr, 'wrote to: ' + args.output_histogram_filename

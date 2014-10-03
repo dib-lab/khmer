@@ -55,7 +55,8 @@ def main():
     for infile in infiles:
         check_file_status(infile)
 
-    print('hashtable from', args.input_counting_table_filename)
+    print ('hashtable from', args.input_counting_table_filename, 
+	file=sys.stderr)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
 
@@ -64,9 +65,9 @@ def main():
     tracking = khmer._new_hashbits(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
-    print('K:', kmer_size)
-    print('HT sizes:', hashsizes)
-    print('outputting to', args.output_histogram_filename)
+    print ('K:', kmer_size, file=sys.stderr)
+    print ('HT sizes:', hashsizes, file=sys.stderr)
+    print ('outputting to', args.output_histogram_filename, file=sys.stderr)
 
     if os.path.exists(args.output_histogram_filename):
         if not args.squash_output:
@@ -75,9 +76,9 @@ def main():
                   file=sys.stderr)
             sys.exit(1)
 
-        print('** squashing existing file %s' % args.output_histogram_filename)
+        print('** squashing existing file %s' % args.output_histogram_filename, 		file=sys.stderr)
 
-    print('preparing hist...')
+    print('preparing hist...', file=sys.stderr)
     abundances = counting_hash.abundance_distribution(
         args.input_sequence_filename, tracking)
     total = sum(abundances)

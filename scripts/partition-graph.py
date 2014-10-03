@@ -30,9 +30,9 @@ import re
 import platform
 if "Linux" == platform.system():
     def __debug_vm_usage(msg):
-        print "===> DEBUG: " + msg
+        print >>sys.stderr, "===> DEBUG: " + msg
         for vmstat in re.findall(r".*Vm.*", file("/proc/self/status").read()):
-            print vmstat
+            print >>sys.stderr, vmstat
 else:
     def __debug_vm_usage(msg):  # pylint: disable=unused-argument
         pass
@@ -46,22 +46,22 @@ def worker(queue, basename, stop_big_traversals):
         try:
             (htable, index, start, stop) = queue.get(False)
         except Queue.Empty:
-            print 'exiting'
+            print >>sys.stderr, 'exiting'
             return
 
         outfile = basename + '.subset.%d.pmap' % (index,)
         if os.path.exists(outfile):
-            print 'SKIPPING', outfile, ' -- already exists'
+            print >>sys.stderr, 'SKIPPING', outfile, ' -- already exists'
             continue
 
-        print 'starting:', basename, index
+        print >>sys.stderr, 'starting:', basename, index
 
         # pay attention to stoptags when partitioning; take command line
         # direction on whether or not to exhaustively traverse.
         subset = htable.do_subset_partition(start, stop, True,
                                             stop_big_traversals)
 
-        print 'saving:', basename, index
+        print >>sys.stderr, 'saving:', basename, index
         htable.save_subset_partitionmap(subset, outfile)
         del subset
         gc.collect()
@@ -104,28 +104,28 @@ def main():
 
     check_space(filenames)
 
-    print '--'
-    print 'SUBSET SIZE', args.subset_size
-    print 'N THREADS', args.threads
+    print >>sys.stderr, '--'
+    print >>sys.stderr, 'SUBSET SIZE', args.subset_size
+    print >>sys.stderr, 'N THREADS', args.threads
     if args.stoptags:
-        print 'stoptag file:', args.stoptags
-    print '--'
+        print >>sys.stderr, 'stoptag file:', args.stoptags
+    print >>sys.stderr, '--'
 
-    print 'loading ht %s.pt' % basename
+    print >>sys.stderr, 'loading ht %s.pt' % basename
     htable = khmer.load_hashbits(basename + '.pt')
     htable.load_tagset(basename + '.tagset')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
-        print 'loading stoptags from', args.stoptags
+        print >>sys.stderr, 'loading stoptags from', args.stoptags
         htable.load_stop_tags(args.stoptags)
 
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
     if stop_big_traversals:
-        print '** This script brakes for lumps: stop_big_traversals is true.'
+        print >>sys.stderr, '** This script brakes for lumps: stop_big_traversals is true.'
     else:
-        print '** Traverse all the things: stop_big_traversals is false.'
+        print >>sys.stderr, '** Traverse all the things: stop_big_traversals is false.'
 
     #
     # now, partition!
@@ -145,7 +145,7 @@ def main():
         end = divvy[_ + 1]
         worker_q.put((htable, _, start, end))
 
-    print 'enqueued %d subset tasks' % n_subsets
+    print >>sys.stderr, 'enqueued %d subset tasks' % n_subsets
     open('%s.info' % basename, 'w').write('%d subsets total\n' % (n_subsets))
 
     n_threads = args.threads
@@ -153,8 +153,8 @@ def main():
         n_threads = n_subsets
 
     # start threads!
-    print 'starting %d threads' % n_threads
-    print '---'
+    print >>sys.stderr, 'starting %d threads' % n_threads
+    print >>sys.stderr, '---'
 
     threads = []
     for _ in range(n_threads):
@@ -163,14 +163,15 @@ def main():
         threads.append(cur_thrd)
         cur_thrd.start()
 
-    print 'done starting threads'
+    print >>sys.stderr, 'done starting threads'
 
     # wait for threads
     for _ in threads:
         _.join()
 
-    print '---'
-    print 'done making subsets! see %s.subset.*.pmap' % (basename,)
+    print >>sys.stderr, '---'
+    print >>sys.stderr, 'done making subsets! see %s.subset.*.pmap' % \
+	(basename,)
 
 if __name__ == '__main__':
     main()

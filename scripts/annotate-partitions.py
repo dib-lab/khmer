@@ -73,15 +73,15 @@ def main():
 
     check_space(filenames)
 
-    print 'loading partition map from:', partitionmap_file
+    print >>sys.stderr, 'loading partition map from:', partitionmap_file
     htable.load_partitionmap(partitionmap_file)
 
     for infile in filenames:
-        print 'outputting partitions for', infile
+        print >>sys.stderr, 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
         part_count = htable.output_partitions(infile, outfile)
-        print 'output %d partitions for %s' % (part_count, infile)
-        print 'partitions are in', outfile
+        print >>sys.stderr, 'output %d partitions for %s' % (part_count, infile)
+        print >>sys.stderr, 'partitions are in', outfile
 
 if __name__ == '__main__':
     main()

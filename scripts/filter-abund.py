@@ -81,11 +81,11 @@ def main():
 
     check_space(infiles)
 
-    print 'loading hashtable'
+    print >>sys.stderr, 'loading hashtable'
     htable = khmer.load_counting_hash(counting_ht)
     ksize = htable.ksize()
 
-    print "K:", ksize
+    print >>sys.stderr, "K:", ksize
 
     # the filtering function.
     def process_fn(record):
@@ -108,7 +108,7 @@ def main():
 
     # the filtering loop
     for infile in infiles:
-        print 'filtering', infile
+        print >>sys.stderr, 'filtering', infile
         if args.single_output_filename != '':
             outfile = args.single_output_filename
             outfp = open(outfile, 'a')
@@ -119,7 +119,7 @@ def main():
         tsp = ThreadedSequenceProcessor(process_fn, n_workers=args.threads)
         tsp.start(verbose_loader(infile), outfp)
 
-        print 'output in', outfile
+        print >>sys.stderr, 'output in', outfile
 
 if __name__ == '__main__':
     main()

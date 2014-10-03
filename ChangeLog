@@ -3,6 +3,16 @@
     * do-partition.py: Add type=int to n_threads arg and assert to check
     number of active threads
 
+2014-10-10  Brian Wyss  <wyssbria@msu.edu>
+
+    * khmer/scripts/{abundance-dist, abundance-dist-single,
+    annotate-partitions, count-median, count-overlap, do-partition,
+    extract-paired-reads, extract-partitions, filter-abund, filter-abund-single,
+    filter-stoptags, find-knots, load-graph, load-into-counting,
+    make-initial-stoptags, merge-partitions, normalize-by-median, 
+    partition-graph, sample-reads-randomly}.py:
+    changed stdout output in scripts to go to stderr.
+
 2014-10-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Doxyfile.in: add links to the stdc++ docs

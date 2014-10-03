@@ -67,11 +67,11 @@ def main():
 
     check_space(infiles)
 
-    print 'loading k-mer counting table from', htfile
+    print >>sys.stderr, 'loading k-mer counting table from', htfile
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
 
-    print 'writing to', output_filename
+    print >>sys.stderr, 'writing to', output_filename
     output = open(output_filename, 'w')
 
     for record in screed.open(input_filename):
