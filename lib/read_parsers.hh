@@ -120,6 +120,8 @@ struct StreamReaderPerformanceMetrics : public IPerformanceMetrics {
 };
 #endif
 
+struct IParser;
+
 struct IStreamReader {
 #ifdef WITH_INTERNAL_METRICS
     StreamReaderPerformanceMetrics  pmetrics;
@@ -135,7 +137,7 @@ struct IStreamReader {
         uint8_t * const cache, uint64_t const cache_size
     ) = 0;
     
-    virtual IParser * const  get_parser(
+    virtual IParser * const get_parser(
             uint32_t const		number_of_threads,
             uint64_t const		cache_size,
             uint8_t const		trace_level

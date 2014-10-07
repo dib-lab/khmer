@@ -121,34 +121,44 @@ IStreamReader( int const fd )
     }
 }
 
-virtual IParser * const IStreamReader::get_parser() {
+virtual IParser * const IStreamReader::get_parser(
+        uint32_t const number_of_threads,
+        uint64_t const cache_size,
+        uint8_t const trace_level) {
 
     char fastx[1];
-    read(_file_descriptor, fastx, 1);
+    int status = read(_file_descriptor, fastx, 1);
+    if(status > 0)
+    {
+        //nobody cares
+    }
     lseek(_file_descriptor, -1, SEEK_CUR);
 
-    parser = NULL;
+    //IParser *parser = NULL;
 
     if(fastx[1] == '@')
     {
-        parser =
+        return
             new FastqParser(
-            *stream_reader,
+            this,
             number_of_threads,
             cache_size,
             trace_level);
-    };
+    }
     if(fastx[1] == '>')
     {
-        parser =
+        return 
             new FastaParser(
-            *stream_reader,
+            this,
             number_of_threads,
             cache_size,
             trace_level);
-    };
-
-    return parser;
+    }
+    else
+    {
+        throw std::exception();
+    }
+    return NULL;
 }
 
 
@@ -1436,7 +1446,7 @@ get_parser(
     
     // stream readers are now in place && we check to see what type of sequence
     // file we're dealing with
-    fastype = static_cast<char> (stream_reader->peek());
+    fastype = 'Z';
 
     if (rechop) {
         ext_pos		    = ifile_name_chopped.find_last_of( "." );
@@ -1446,7 +1456,10 @@ get_parser(
 
     //if (("fq" == ext) || ("fastq" == ext))
     //debug fputs(fastype[0] + " is the first char", stderr);
-    parser = stream_reader.get_parser();
+    parser = stream_reader->get_parser(
+            number_of_threads,
+            cache_size,
+            trace_level);
 
     return parser;
 }
