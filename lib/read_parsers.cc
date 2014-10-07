@@ -140,7 +140,7 @@ virtual IParser * const IStreamReader::get_parser(
     {
         return
             new FastqParser(
-            this,
+            *this,
             number_of_threads,
             cache_size,
             trace_level);
@@ -149,7 +149,7 @@ virtual IParser * const IStreamReader::get_parser(
     {
         return 
             new FastaParser(
-            this,
+            *this,
             number_of_threads,
             cache_size,
             trace_level);
