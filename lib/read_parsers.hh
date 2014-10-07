@@ -134,9 +134,42 @@ struct IStreamReader {
     virtual uint64_t const	    read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     ) = 0;
+    
+    virtual IParser * const  get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
 
-protected:
+    
+        )
+    {
+        char fastx[1];
+        read(_file_descriptor, fastx, 1);
+        lseek(_file_descriptor, -1, SEEK_CUR);
+        
+        parser = NULL;
 
+        if(fastx[1] == '@')
+        {
+            parser = 
+                new FastqParser(
+                *stream_reader,
+                number_of_threads,
+                cache_size,
+                trace_level);
+        };
+        if(fastx[1] == '>')
+        {
+            parser = new FastaParser{
+                *stream_reader,
+                number_of_threads,
+                cache_size,
+                trace_level);
+        };
+
+        return parser;
+    }
+       
     size_t			    _alignment;
     size_t			    _max_aligned;
 
@@ -384,7 +417,6 @@ struct IParser {
         uint8_t const		trace_level	    =
             khmer:: get_active_config( ).get_reads_parser_trace_level( )
     );
-
     IParser(
         IStreamReader	&stream_reader,
         uint32_t const	number_of_threads   =

@@ -8,6 +8,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <fstream>
+#include <string>
+#include <vector>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1279,6 +1282,46 @@ get_parser(
     IStreamReader * stream_reader   = NULL;
     IParser *	    parser	    = NULL;
 
+	// magikeys for gz, bz2, and zip, in that order
+	std::vector<std::string> magikeys;
+    magikeys.push_back("\x1f\x8b\x08");
+    magikeys.push_back("\x42\x5a\x68");
+    magikeys.push_back("\x50\x4b\x03\x04");
+	// comptype vals: -1 == unmodified, 0 == gz, 1 == bz2, 2 == zip
+	int comptype  = -1;
+	char fileread[4];
+	std::ifstream ifile;
+    ifile.open(ifile_name.c_str(), std::ios::binary);
+	// length  of read manually set to longest 'magic' key we have
+	ifile.read(fileread, 4);
+	// inefficient but functional
+	bool isthisthing = true;
+    for(std::vector<std::string>::size_type i = 0; i < magikeys.size() && comptype < 0; i++)
+	{
+        // bool to track things
+        isthisthing = true;
+		for(std::string::size_type j = 0; j < magikeys.at(i).length() && isthisthing; j++)
+		{
+			isthisthing = (magikeys[i][j] == fileread[j]);
+		}
+        
+        if(isthisthing)
+        {
+            comptype = i;
+        }
+	}
+
+    // compression type determined; either it's nothing or something defined
+    // in our magic list. now determine fasta or fastq.
+    char fastype;
+    ifile.close();
+    /*std::ifstream ifile2; // horrible coding I know, I'm sorry
+    ifile2.open(ifile_name.c_str(), std::ios::in);
+    // fasta files begin with '>'
+    // fastq files begin with '@'
+    ifile2.read(fastype, 1);
+    ifile2.close();
+    */
     std:: string    ext	    = "";
     std:: string    ifile_name_chopped( ifile_name );
     size_t	    ext_pos = ifile_name.find_last_of( "." );
@@ -1295,7 +1338,8 @@ get_parser(
         ifile_name_chopped  = ifile_name.substr( 0, ext_pos );
     }
 
-    if	    ("gz" == ext) {
+    // handle compressed files
+    if	    (comptype == 0) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
         if (-1 == ifile_handle) {
             throw InvalidStreamHandle( );
@@ -1311,7 +1355,7 @@ get_parser(
         stream_reader	= new GzStreamReader( ifile_handle );
         rechop		= true;
     } // gz
-    else if ("bz2" == ext) {
+    else if (comptype == 1) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
         if (-1 == ifile_handle) {
             throw InvalidStreamHandle( );
@@ -1359,6 +1403,10 @@ get_parser(
 #endif
         stream_reader	= new RawStreamReader( ifile_handle, alignment );
     } // uncompressed
+    
+    // stream readers are now in place && we check to see what type of sequence
+    // file we're dealing with
+    fastype = static_cast<char> (stream_reader->peek());
 
     if (rechop) {
         ext_pos		    = ifile_name_chopped.find_last_of( "." );
@@ -1366,22 +1414,9 @@ get_parser(
         ifile_name_chopped  = ifile_name_chopped.substr( 0, ext_pos );
     }
 
-    if (("fq" == ext) || ("fastq" == ext))
-        parser =
-            new FastqParser(
-            *stream_reader,
-            number_of_threads,
-            cache_size,
-            trace_level
-        );
-    else
-        parser =
-            new FastaParser(
-            *stream_reader,
-            number_of_threads,
-            cache_size,
-            trace_level
-        );
+    //if (("fq" == ext) || ("fastq" == ext))
+    //debug fputs(fastype[0] + " is the first char", stderr);
+    parser = stream_reader.get_parser();
 
     return parser;
 }
