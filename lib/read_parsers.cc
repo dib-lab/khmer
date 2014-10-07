@@ -121,7 +121,23 @@ IStreamReader( int const fd )
     }
 }
 
-virtual IParser * const IStreamReader::get_parser(
+
+RawStreamReader::
+RawStreamReader( int const fd, size_t const alignment )
+    : IStreamReader( fd )
+{
+
+#ifdef __linux__
+    if (alignment) {
+        _alignment	= alignment;
+        _max_aligned	= _alignment * (SSIZE_MAX / _alignment);
+    }
+#endif
+
+
+}
+
+IParser * const RawStreamReader::get_parser(
         uint32_t const number_of_threads,
         uint64_t const cache_size,
         uint8_t const trace_level) {
@@ -136,7 +152,7 @@ virtual IParser * const IStreamReader::get_parser(
 
     //IParser *parser = NULL;
 
-    if(fastx[1] == '@')
+    if(fastx[0] == '@')
     {
         return
             new FastqParser(
@@ -145,7 +161,7 @@ virtual IParser * const IStreamReader::get_parser(
             cache_size,
             trace_level);
     }
-    if(fastx[1] == '>')
+    if(fastx[0] == '>')
     {
         return 
             new FastaParser(
@@ -161,21 +177,85 @@ virtual IParser * const IStreamReader::get_parser(
     return NULL;
 }
 
+IParser * const GzStreamReader::get_parser(
+        uint32_t const number_of_threads,
+        uint64_t const cache_size,
+        uint8_t const trace_level) {
 
-RawStreamReader::
-RawStreamReader( int const fd, size_t const alignment )
-    : IStreamReader( fd )
-{
-
-#ifdef __linux__
-    if (alignment) {
-        _alignment	= alignment;
-        _max_aligned	= _alignment * (SSIZE_MAX / _alignment);
+    char fastx[1];
+    int status = read(_file_descriptor, fastx, 1);
+    if(status > 0)
+    {
+        //nobody cares
     }
-#endif
+    lseek(_file_descriptor, -1, SEEK_CUR);
 
+    //IParser *parser = NULL;
+
+    if(fastx[0] == '@')
+    {
+        return
+            new FastqParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    if(fastx[0] == '>')
+    {
+        return 
+            new FastaParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    else
+    {
+        throw khmer_exception("That's not a thing:"  +  std::string(1,fastx[0]));
+    }
+    return NULL;
 }
 
+IParser * const Bz2StreamReader::get_parser(
+        uint32_t const number_of_threads,
+        uint64_t const cache_size,
+        uint8_t const trace_level) {
+
+    char fastx[1];
+    int status = read(_file_descriptor, fastx, 1);
+    if(status > 0)
+    {
+        //nobody cares
+    }
+    lseek(_file_descriptor, -1, SEEK_CUR);
+
+    //IParser *parser = NULL;
+
+    if(fastx[0] == '@')
+    {
+        return
+            new FastqParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    if(fastx[0] == '>')
+    {
+        return 
+            new FastaParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    else
+    {
+        throw std::exception();
+    }
+    return NULL;
+}
 
 GzStreamReader::
 GzStreamReader( int const fd )

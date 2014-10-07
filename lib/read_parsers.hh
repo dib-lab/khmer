@@ -141,8 +141,8 @@ struct IStreamReader {
             uint32_t const		number_of_threads,
             uint64_t const		cache_size,
             uint8_t const		trace_level
-    );
-        
+    ) = 0;
+
     protected:
        
     size_t			    _alignment;
@@ -164,7 +164,11 @@ struct RawStreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
+    IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    );
 };
 
 
@@ -176,7 +180,11 @@ struct GzStreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
+    IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    );
 private:
 
     gzFile		    _stream_handle;
@@ -192,7 +200,11 @@ struct Bz2StreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
+IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    );
 private:
 
     FILE *		    _stream_handle;
