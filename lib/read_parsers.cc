@@ -121,6 +121,36 @@ IStreamReader( int const fd )
     }
 }
 
+virtual IParser * const IStreamReader::get_parser() {
+
+    char fastx[1];
+    read(_file_descriptor, fastx, 1);
+    lseek(_file_descriptor, -1, SEEK_CUR);
+
+    parser = NULL;
+
+    if(fastx[1] == '@')
+    {
+        parser =
+            new FastqParser(
+            *stream_reader,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    };
+    if(fastx[1] == '>')
+    {
+        parser =
+            new FastaParser(
+            *stream_reader,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    };
+
+    return parser;
+}
+
 
 RawStreamReader::
 RawStreamReader( int const fd, size_t const alignment )

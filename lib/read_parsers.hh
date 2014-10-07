@@ -139,36 +139,9 @@ struct IStreamReader {
             uint32_t const		number_of_threads,
             uint64_t const		cache_size,
             uint8_t const		trace_level
-
-    
-        )
-    {
-        char fastx[1];
-        read(_file_descriptor, fastx, 1);
-        lseek(_file_descriptor, -1, SEEK_CUR);
+    );
         
-        parser = NULL;
-
-        if(fastx[1] == '@')
-        {
-            parser = 
-                new FastqParser(
-                *stream_reader,
-                number_of_threads,
-                cache_size,
-                trace_level);
-        };
-        if(fastx[1] == '>')
-        {
-            parser = new FastaParser{
-                *stream_reader,
-                number_of_threads,
-                cache_size,
-                trace_level);
-        };
-
-        return parser;
-    }
+    protected:
        
     size_t			    _alignment;
     size_t			    _max_aligned;
