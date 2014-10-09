@@ -681,7 +681,11 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     } catch (InvalidStreamHandle &exc) {
         PyErr_SetString( PyExc_ValueError, "invalid input file name" );
         return NULL;
+    } catch (StreamReadError &exc) {
+        PyErr_SetString( PyExc_ValueError, "empty file");
+        return NULL;
     }
+
     return self;
 }
 

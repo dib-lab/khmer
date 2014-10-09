@@ -15,8 +15,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <zlib.h>
-#include <bzlib.h>
 #ifdef __linux__
 #   include <sys/ioctl.h>
 #   include <linux/fs.h>
@@ -155,6 +153,10 @@ IParser * const RawStreamReader::get_parser(
         //read failed, probably because of the should-fail tests
         throw StreamReadError( );
     }
+    if(status == 0)
+    {
+        throw StreamReadError("Cannot determine filetype: empty file");
+    }
     lseek(_file_descriptor, -1, SEEK_CUR);
 
     //IParser *parser = NULL;
@@ -181,7 +183,7 @@ IParser * const RawStreamReader::get_parser(
     {
         //throw khmer_exception("Raw get_parser failure: That's not a thing: " 
         //        + std::string(fastx));
-        throw InvalidStreamHandle();
+        throw InvalidStreamHandle("Unknown filetype");
     }
     return NULL;
 }
@@ -203,6 +205,10 @@ IParser * const GzStreamReader::get_parser(
     {
         //read failed, probably because of the should-fail tests
         throw StreamReadError( );
+    }
+    if(status == 0)
+    {
+        throw StreamReadError("Cannot determine filetype: empty file");
     }
     lseek(_file_descriptor, -1, SEEK_CUR);
 
@@ -230,7 +236,7 @@ IParser * const GzStreamReader::get_parser(
     {
         //throw khmer_exception("GZ get_parser failure: That's not a thing:"  
         //        +  std::string(1,fastx[0]));
-        throw InvalidStreamHandle();
+        throw InvalidStreamHandle("Unknown filetype");
     }
     return NULL;
 }
@@ -250,6 +256,10 @@ IParser * const Bz2StreamReader::get_parser(
     {
         //read failed, probably because of the should-fail tests
         throw StreamReadError( );
+    }
+    if(status==0)
+    {
+        throw StreamReadError("Cannot determine filetype: empty file");
     }
     lseek(_file_descriptor, -1, SEEK_CUR);
 
@@ -277,7 +287,7 @@ IParser * const Bz2StreamReader::get_parser(
     {
         //throw StreamReadError("BZ get_parser failure: That's not a thing: " 
         //        + std::string(fastx));
-        throw InvalidStreamHandle();
+        throw InvalidStreamHandle("Uknown filetype");
     }
     return NULL;
 }
