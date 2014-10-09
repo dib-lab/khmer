@@ -15,6 +15,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <zlib.h>
+#include <bzlib.h>
 #ifdef __linux__
 #   include <sys/ioctl.h>
 #   include <linux/fs.h>
@@ -172,7 +174,8 @@ IParser * const RawStreamReader::get_parser(
     }
     else
     {
-        throw std::exception();
+        throw khmer_exception("Raw get_parser failure: That's not a thing: " 
+                + std::string(fastx));
     }
     return NULL;
 }
@@ -183,7 +186,9 @@ IParser * const GzStreamReader::get_parser(
         uint8_t const trace_level) {
 
     char fastx[1];
-    int status = read(_file_descriptor, fastx, 1);
+    gzFile * gzfile;
+    //gzfile = gzopen(_stream_handle, "r");
+    int status = gzread(_stream_handle, fastx, 1);
     if(status > 0)
     {
         //nobody cares
@@ -212,7 +217,8 @@ IParser * const GzStreamReader::get_parser(
     }
     else
     {
-        throw khmer_exception("That's not a thing:"  +  std::string(1,fastx[0]));
+        throw khmer_exception("GZ get_parser failure: That's not a thing:"  
+                +  std::string(1,fastx[0]));
     }
     return NULL;
 }
@@ -252,7 +258,8 @@ IParser * const Bz2StreamReader::get_parser(
     }
     else
     {
-        throw std::exception();
+        throw khmer_exception("BZ get_parser failure: That's not a thing: " 
+                + std::string(fastx));
     }
     return NULL;
 }
