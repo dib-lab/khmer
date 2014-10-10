@@ -249,7 +249,7 @@ IParser * const Bz2StreamReader::get_parser(
     
     char fastx[1];
     //int status = read(_file_descriptor, fastx, 1);
-    int status = BZ2_bzRead(&bz2_error, _stream_handle, &fastx, 1);
+    int status = BZ2_bzRead(&bz2_error, &_stream_handle, &fastx, 1);
     
     //bz2ungetc(int(fastx[0], _file_descriptor));
     if(status > 0)
@@ -265,7 +265,7 @@ IParser * const Bz2StreamReader::get_parser(
     {
         throw StreamReadError("Cannot determine filetype: empty file");
     }
-    lseek(_file_descriptor, -1, SEEK_CUR);
+    //lseek(_file_descriptor, -1, SEEK_CUR);
 
     //IParser *parser = NULL;
 
