@@ -246,9 +246,10 @@ IParser * const Bz2StreamReader::get_parser(
         uint64_t const cache_size,
         uint8_t const trace_level) {
     int bz2_error;
+    
     char fastx[1];
     //int status = read(_file_descriptor, fastx, 1);
-    int status = BZ2_bzRead(&bz2_error, _stream_handle, fastx, 1);
+    int status = BZ2_bzRead(&bz2_error, _stream_handle, &fastx, 1);
     
     //bz2ungetc(int(fastx[0], _file_descriptor));
     if(status > 0)
@@ -1471,7 +1472,7 @@ get_parser(
 
     // compression type determined; either it's nothing or something defined
     // in our magic list. now determine fasta or fastq.
-    char fastype;
+    
     ifile.close();
     /*std::ifstream ifile2; // horrible coding I know, I'm sorry
     ifile2.open(ifile_name.c_str(), std::ios::in);
@@ -1480,21 +1481,12 @@ get_parser(
     ifile2.read(fastype, 1);
     ifile2.close();
     */
-    std:: string    ext	    = "";
-    std:: string    ifile_name_chopped( ifile_name );
-    size_t	    ext_pos = ifile_name.find_last_of( "." );
-    bool	    rechop  = false;
 
     int		    ifile_handle    = -1;
     int		    ifile_flags	    = O_RDONLY;
 #ifdef __linux__
     int             retval = 0;
 #endif
-
-    if (0 < ext_pos) {
-        ext		    = ifile_name.substr( ext_pos + 1 );
-        ifile_name_chopped  = ifile_name.substr( 0, ext_pos );
-    }
 
     // handle compressed files
     if	    (comptype == 0) {
@@ -1511,7 +1503,6 @@ get_parser(
         }
 #endif
         stream_reader	= new GzStreamReader( ifile_handle );
-        rechop		= true;
     } // gz
     else if (comptype == 1) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
@@ -1527,7 +1518,6 @@ get_parser(
         }
 #endif
         stream_reader	= new Bz2StreamReader( ifile_handle );
-        rechop		= true;
     } // bz2
     else { // Uncompressed file.
         size_t	alignment   = 0;	// 512 bytes is Chaotic Good?
@@ -1561,16 +1551,6 @@ get_parser(
 #endif
         stream_reader	= new RawStreamReader( ifile_handle, alignment );
     } // uncompressed
-    
-    // stream readers are now in place && we check to see what type of sequence
-    // file we're dealing with
-    fastype = 'Z';
-
-    if (rechop) {
-        ext_pos		    = ifile_name_chopped.find_last_of( "." );
-        ext		    = ifile_name_chopped.substr( ext_pos + 1 );
-        ifile_name_chopped  = ifile_name_chopped.substr( 0, ext_pos );
-    }
 
     //if (("fq" == ext) || ("fastq" == ext))
     //debug fputs(fastype[0] + " is the first char", stderr);
