@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -157,9 +158,7 @@ IParser * const RawStreamReader::get_parser(
     {
         throw StreamReadError("Cannot determine filetype: empty file");
     }
-    lseek(_file_descriptor, -1, SEEK_CUR);
-
-    //IParser *parser = NULL;
+    gzungetc(fastx[0], _file_descriptor);
 
     if(fastx[0] == '@')
     {
@@ -181,8 +180,6 @@ IParser * const RawStreamReader::get_parser(
     }
     else
     {
-        //throw khmer_exception("Raw get_parser failure: That's not a thing: " 
-        //        + std::string(fastx));
         throw InvalidStreamHandle("Unknown filetype");
     }
     return NULL;
@@ -194,8 +191,6 @@ IParser * const GzStreamReader::get_parser(
         uint8_t const trace_level) {
 
     char fastx[1];
-    //gzFile * gzfile;
-    //gzfile = gzopen(_stream_handle, "r");
     int status = gzread(_stream_handle, fastx, 1);
     gzungetc(int(fastx[0]), _stream_handle);
     if(status > 0)
@@ -211,8 +206,6 @@ IParser * const GzStreamReader::get_parser(
     {
         throw StreamReadError("Cannot determine filetype: empty file");
     }
-    //std::istream::seekg(_stream_handle, -1, SEEK_CUR);
-    //IParser *parser = NULL;
 
     if(fastx[0] == '@')
     {
@@ -234,8 +227,6 @@ IParser * const GzStreamReader::get_parser(
     }
     else
     {
-        //throw khmer_exception("GZ get_parser failure: That's not a thing:"  
-        //        +  std::string(1,fastx[0]));
         throw InvalidStreamHandle("Unknown filetype");
     }
     return NULL;
@@ -248,7 +239,6 @@ IParser * const Bz2StreamReader::get_parser(
     int bz2_error;
     
     char fastx[1];
-    //int status = read(_file_descriptor, fastx, 1);
     int status = BZ2_bzRead(&bz2_error, &_stream_handle, &fastx, 1);
     
     //bz2ungetc(int(fastx[0], _file_descriptor));
@@ -265,9 +255,6 @@ IParser * const Bz2StreamReader::get_parser(
     {
         throw StreamReadError("Cannot determine filetype: empty file");
     }
-    //lseek(_file_descriptor, -1, SEEK_CUR);
-
-    //IParser *parser = NULL;
 
     if(fastx[0] == '@')
     {
@@ -289,8 +276,6 @@ IParser * const Bz2StreamReader::get_parser(
     }
     else
     {
-        //throw StreamReadError("BZ get_parser failure: That's not a thing: " 
-        //        + std::string(fastx));
         throw InvalidStreamHandle("Uknown filetype");
     }
     return NULL;
@@ -1474,13 +1459,6 @@ get_parser(
     // in our magic list. now determine fasta or fastq.
     
     ifile.close();
-    /*std::ifstream ifile2; // horrible coding I know, I'm sorry
-    ifile2.open(ifile_name.c_str(), std::ios::in);
-    // fasta files begin with '>'
-    // fastq files begin with '@'
-    ifile2.read(fastype, 1);
-    ifile2.close();
-    */
 
     int		    ifile_handle    = -1;
     int		    ifile_flags	    = O_RDONLY;
