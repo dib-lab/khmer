@@ -158,7 +158,7 @@ IParser * const RawStreamReader::get_parser(
     {
         throw StreamReadError("Cannot determine filetype: empty file");
     }
-    gzungetc(fastx[0], _file_descriptor);
+    ungetc(fastx[0], _stream_handle);
 
     if(fastx[0] == '@')
     {
