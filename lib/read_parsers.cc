@@ -1407,6 +1407,7 @@ IParser(
 {
     while (!(_uuid = rand( )));
 
+
     for (uint32_t i = 0; i < number_of_threads; ++i) {
         _states[ i ] = NULL;
     }
