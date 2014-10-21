@@ -73,6 +73,9 @@ EXTENSION_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
+if sys.platform != 'darwin':
+    EXTENSION_MOD_DICT['extra_link_args'] = ['-lgomp']
+
 EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
                           ** EXTENSION_MOD_DICT)
 SCRIPTS = []
