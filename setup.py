@@ -61,6 +61,8 @@ EXTRA_COMPILE_ARGS = ['-O3']
 
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
+else:
+    EXTRA_COMPILE_ARGS.append('-fopenmp')
 
 EXTENSION_MOD_DICT = \
     {

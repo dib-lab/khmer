@@ -13,6 +13,10 @@
 #include <algorithm>
 #include <sstream>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 using namespace std;
 using namespace khmer;
 using namespace khmer:: read_parsers;
@@ -260,15 +264,22 @@ unsigned int Hashtable::consume_string(const std::string &s)
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
+    printf("%d threads in use\n", omp_get_num_threads());
+
     KMerIterator kmers(sp, _ksize);
+    std::vector<HashIntoType> hashes;
 
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        count(kmer);
-        n_consumed++;
+    while(!kmers.done()) { 
+        hashes.push_back(kmers.next());
     }
 
+    #pragma omp parallel for
+    for (int i=0; i<hashes.size(); ++i) {
+        count(hashes[i]);
+        #pragma omp atomic
+        n_consumed++;
+    }
+    
     return n_consumed;
 }
 
