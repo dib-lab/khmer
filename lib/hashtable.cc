@@ -264,20 +264,31 @@ unsigned int Hashtable::consume_string(const std::string &s)
     const char * sp = s.c_str();
     unsigned int n_consumed = 0;
 
-    printf("%d threads in use\n", omp_get_num_threads());
+    //printf("%d threads in use\n", omp_get_num_threads());
 
     KMerIterator kmers(sp, _ksize);
+    /*
+    while(!kmers.done()) {
+        test_and_set_bits(kmers.next());
+        n_consumed++;
+    }
+    
+    for (unsigned int i=0; i<s.length()-_ksize; ++i) {
+        
+    }
+    */
     std::vector<HashIntoType> hashes;
-
     while(!kmers.done()) { 
         hashes.push_back(kmers.next());
     }
-
-    #pragma omp parallel for
-    for (int i=0; i<hashes.size(); ++i) {
-        count(hashes[i]);
-        #pragma omp atomic
-        n_consumed++;
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (int i=0; i<hashes.size(); ++i) {
+            test_and_set_bits(hashes[i]);
+            #pragma omp atomic
+            n_consumed++;
+        }
     }
     
     return n_consumed;

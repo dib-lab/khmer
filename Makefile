@@ -156,7 +156,7 @@ lib:
 	$(MAKE)
 
 test:
-	./setup.py nosetests
+	./setup.py test -s nose.collector
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
