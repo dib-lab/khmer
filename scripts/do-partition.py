@@ -89,7 +89,7 @@ def get_parser():
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',
                         action='store_true', default=False,
                         help='Truncate graph joins at big traversals')
-    parser.add_argument('--threads', '-T', dest='n_threads',
+    parser.add_argument('--threads', '-T', dest='n_threads', type=int,
                         default=DEFAULT_N_THREADS,
                         help='Number of simultaneous threads to execute')
     parser.add_argument('--keep-subsets', dest='remove_subsets',
