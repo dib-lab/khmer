@@ -1289,13 +1289,27 @@ get_parser(
 #ifdef __linux__
     int             retval = 0;
 #endif
+    std::string fa_ext = ".fa", fq_ext = ".fq", fasta_ext = ".fasta",
+     fastq_ext = ".fastq", gz_ext = ".gz", bz2_ext = ".bz2";
+    int fa_here = ifile_name.find(fa_ext);
+    int fq_here = ifile_name.find(fq_ext);
+    int fasta_here = ifile_name.find(fasta_ext);
+    int fastq_here = ifile_name.find(fastq_ext);
+    int gz_here = ifile_name.find(gz_ext);
+    int bz2_here = ifile_name.find(bz2_ext);
+    
+    if(!(fa_here > 0 || fq_here > 0 || fasta_here > 0 || fastq_here > 0
+                || gz_here > 0 || bz2_here > 0))
+    {
+        throw InvalidStreamHandle();
+    }
 
     if (0 < ext_pos) {
         ext		    = ifile_name.substr( ext_pos + 1 );
         ifile_name_chopped  = ifile_name.substr( 0, ext_pos );
     }
 
-    if	    ("gz" == ext) {
+    if	    (gz_here > 0) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
         if (-1 == ifile_handle) {
             throw InvalidStreamHandle( );
@@ -1311,7 +1325,7 @@ get_parser(
         stream_reader	= new GzStreamReader( ifile_handle );
         rechop		= true;
     } // gz
-    else if ("bz2" == ext) {
+    else if (bz2_here > 0) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
         if (-1 == ifile_handle) {
             throw InvalidStreamHandle( );
@@ -1366,7 +1380,7 @@ get_parser(
         ifile_name_chopped  = ifile_name_chopped.substr( 0, ext_pos );
     }
 
-    if (("fq" == ext) || ("fastq" == ext))
+    if ( (fq_here > 0 || fastq_here > 0))
         parser =
             new FastqParser(
             *stream_reader,
@@ -1374,7 +1388,7 @@ get_parser(
             cache_size,
             trace_level
         );
-    else
+    if( (fa_here > 0 && fastq_here < 0) || fasta_here > 0)
         parser =
             new FastaParser(
             *stream_reader,
