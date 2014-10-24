@@ -1,3 +1,8 @@
+2014-10-24  Camille Scott  <camille.scott.w@gmail.com>
+
+    * do-partition.py: Add type=int to n_threads arg and assert to check
+    number of active threads
+
 2014-10-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Doxyfile.in: add links to the stdc++ docs

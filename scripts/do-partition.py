@@ -89,7 +89,7 @@ def get_parser():
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',
                         action='store_true', default=False,
                         help='Truncate graph joins at big traversals')
-    parser.add_argument('--threads', '-T', dest='n_threads',
+    parser.add_argument('--threads', '-T', dest='n_threads', type=int,
                         default=DEFAULT_N_THREADS,
                         help='Number of simultaneous threads to execute')
     parser.add_argument('--keep-subsets', dest='remove_subsets',
@@ -185,6 +185,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
                                             stop_big_traversals))
         threads.append(cur_thread)
         cur_thread.start()
+
+    assert threading.active_count() == args.n_threads+1
 
     print 'done starting threads'
 
