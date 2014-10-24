@@ -359,6 +359,7 @@ public:
 
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
+    unsigned int consume_string_parallel(const std::string &s, const unsigned int n_threads);
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
@@ -384,6 +385,25 @@ public:
         read_parsers:: IParser *	    parser,
         unsigned int	    &total_reads,
         unsigned long long  &n_consumed,
+        CallbackFn	    callback	    = NULL,
+        void *		    callback_data   = NULL
+    );
+    
+    void consume_fasta_parallel(
+        std::string const   &filename,
+        unsigned int	    &total_reads,
+        unsigned long long  &n_consumed,
+        unsigned int n_threads,
+        CallbackFn	    callback	    = NULL,
+        void *		    callback_data   = NULL
+    );
+    // Count every k-mer from a stream of FASTA or FASTQ reads,
+    // using the supplied parser.
+    void consume_fasta_parallel(
+        read_parsers:: IParser *	    parser,
+        unsigned int	    &total_reads,
+        unsigned long long  &n_consumed,
+        unsigned int n_threads,
         CallbackFn	    callback	    = NULL,
         void *		    callback_data   = NULL
     );

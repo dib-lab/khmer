@@ -1155,6 +1155,44 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static PyObject * hash_consume_fasta_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
+    CountingHash * counting  = me->counting;
+
+    const char * filename;
+    PyObject * callback_obj = NULL;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(
+                args, "s|IO", &filename, &n_threads, &callback_obj
+            )) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+
+    std::cout << "consume_fasta_parallel " << n_threads << " threads" << std::endl;
+
+    try {
+        Py_BEGIN_ALLOW_THREADS
+        counting->consume_fasta_parallel(filename, total_reads, n_consumed,
+                                         n_threads, _report_fn, callback_obj);
+        Py_END_ALLOW_THREADS 
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
 static PyObject * hash_consume_fasta_with_reads_parser(
     PyObject * self, PyObject * args
 )
@@ -1221,6 +1259,34 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
 
     return PyInt_FromLong(n_consumed);
 }
+
+static PyObject * hash_consume_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * long_str;\
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "s|I", &long_str, &n_threads)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < counting->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    unsigned int n_consumed;
+    Py_BEGIN_ALLOW_THREADS
+    n_consumed = counting->consume_string_parallel(long_str, n_threads);
+    Py_END_ALLOW_THREADS
+
+    return PyInt_FromLong(n_consumed);
+}
+
+
 
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
@@ -1750,7 +1816,9 @@ static PyMethodDef khmer_counting_methods[] = {
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+    { "consume_parallel", hash_consume_parallel, METH_VARARGS, "Count all k-mers in the given string in parallel" },
     { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+    { "consume_fasta_parallel", hash_consume_fasta_parallel, METH_VARARGS, "Count all k-mers in the given file in parallel" },
     {
         "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser,
         METH_VARARGS, "Count all k-mers using a given reads parser"
@@ -2161,6 +2229,31 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
     return PyInt_FromLong(n_consumed);
 }
 
+static PyObject * hashbits_consume_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+    Hashbits * hashbits = me->hashbits;
+    
+    const char * long_str;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "s|I", &long_str, &n_threads)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashbits->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+    unsigned int n_consumed;
+    Py_BEGIN_ALLOW_THREADS
+    n_consumed = hashbits->consume_string_parallel(long_str, n_threads);
+    Py_END_ALLOW_THREADS
+
+    return PyInt_FromLong(n_consumed);
+}
+
 static PyObject * hashbits_print_stop_tags(PyObject * self, PyObject * args)
 {
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2550,6 +2643,42 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
+
+static PyObject * hashbits_consume_fasta_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+    Hashbits * hashbits = me->hashbits;
+
+    const char * filename;
+    PyObject * callback_obj = NULL;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(
+                args, "s|IO", &filename, &n_threads, &callback_obj
+            )) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        hashbits->consume_fasta_parallel(filename, total_reads, n_consumed,
+                                         n_threads, _report_fn, callback_obj);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+    Py_END_ALLOW_THREADS
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+
 
 static PyObject * hashbits_consume_fasta_with_reads_parser(
     PyObject * self, PyObject * args
@@ -3527,6 +3656,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
     { "count_overlap", hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
     { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
+    { "consume_parallel", hashbits_consume_parallel, METH_VARARGS, "Count all k-mers in a given string in parallel" },
     { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
     { "save_stop_tags", hashbits_save_stop_tags, METH_VARARGS, "" },
     { "print_stop_tags", hashbits_print_stop_tags, METH_VARARGS, "" },
@@ -3558,6 +3688,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "_get_tag_density", hashbits__get_tag_density, METH_VARARGS, "" },
     { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
     { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+    { "consume_fasta_parallel", hashbits_consume_fasta_parallel, METH_VARARGS, "Count all k-mers in the given file in parallel" },
     { "consume_fasta_with_reads_parser", hashbits_consume_fasta_with_reads_parser, METH_VARARGS, "Count all k-mers in a given file" },
     { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     {
