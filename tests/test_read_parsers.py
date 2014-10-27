@@ -80,13 +80,13 @@ def test_badbzip2():
 
 @attr('multithread')
 @attr('highmem')
-def test_with_multiple_threads():
+def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     import operator
     import threading
 
     reads_count_1thr = 0
-    rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"))
+    rparser = ReadParser(utils.get_test_data(testfile))
     for read in rparser:
         reads_count_1thr += 1
 
@@ -99,7 +99,7 @@ def test_with_multiple_threads():
     config.set_reads_input_buffer_size(N_THREADS * 64 * 1024)
     threads = []
     reads_counts_per_thread = [0] * N_THREADS
-    rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"), N_THREADS)
+    rparser = ReadParser(utils.get_test_data(testfile), N_THREADS)
     for tnum in xrange(N_THREADS):
         t = \
             threading.Thread(
@@ -114,6 +114,10 @@ def test_with_multiple_threads():
 
     assert reads_count_1thr == sum(reads_counts_per_thread)
 
+@attr('multithread')
+@attr('highmem')
+def test_with_multiple_threads_big():
+    test_with_multiple_threads(testfile="test-large.fa")
 
 def test_with_zero_threads():
     N_THREADS = 0
