@@ -355,6 +355,7 @@ consume_fasta_parallel(
             }
 #endif // 0
         } // while reads left in parser LOCAL
+        std::cout << "Thread " << thread << " consumed " << n_consumed << std::endl;
     } // for each THREAD
 
 } // consume_fasta
