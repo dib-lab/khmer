@@ -1290,16 +1290,16 @@ get_parser(
     int             retval = 0;
 #endif
     std::string fa_ext = ".fa", fq_ext = ".fq", fasta_ext = ".fasta",
-     fastq_ext = ".fastq", gz_ext = ".gz", bz2_ext = ".bz2";
+     fastq_ext = ".fastq", gz_ext = ".gz", bz2_ext = ".bz2", fp_ext=".fp";
     int fa_here = ifile_name.find(fa_ext);
     int fq_here = ifile_name.find(fq_ext);
     int fasta_here = ifile_name.find(fasta_ext);
     int fastq_here = ifile_name.find(fastq_ext);
     int gz_here = ifile_name.find(gz_ext);
     int bz2_here = ifile_name.find(bz2_ext);
-    
+    int fp_here = ifile_name.find(fp_ext); 
     if(!(fa_here > 0 || fq_here > 0 || fasta_here > 0 || fastq_here > 0
-                || gz_here > 0 || bz2_here > 0))
+                || gz_here > 0 || bz2_here > 0 || fp_here > 0))
     {
         throw InvalidStreamHandle();
     }
@@ -1388,7 +1388,7 @@ get_parser(
             cache_size,
             trace_level
         );
-    if( (fa_here > 0 && fastq_here < 0) || fasta_here > 0)
+    if( (fa_here > 0 && fastq_here < 0) || fasta_here > 0 || fp_here> 0)
         parser =
             new FastaParser(
             *stream_reader,

@@ -699,10 +699,10 @@ def test_consume_absentfasta_with_reads_parser():
         assert 0, "this should fail"
     except ValueError, err:
         print str(err)
-    #try:
+    # try:
     #    countingtable.consume_fasta_with_reads_parser(readparser)
     #    assert 0, "this should fail"
-    #except IOError, err:
+    # except IOError, err:
     #    print str(err)
 
 
