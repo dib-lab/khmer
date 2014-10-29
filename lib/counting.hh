@@ -190,6 +190,10 @@ public:
 
     } // count
 
+    virtual void count_async(HashIntoType khash) {
+        async_hash->enqueue(khash);
+    }
+
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const
     {
