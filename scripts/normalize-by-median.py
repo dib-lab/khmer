@@ -62,6 +62,11 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     index = -1
     total = 0
     discarded = 0
+
+    consume = htable.consume
+    if args.async:
+        consume = htable.consume_async
+
     for index, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if index > 0 and index % 100000 == 0:
@@ -96,7 +101,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
             med, _, _ = htable.get_median_count(seq)
 
             if med < desired_coverage:
-                htable.consume(seq)
+                consume(seq)
                 passed_filter = True
 
         # Emit records if any passed
@@ -207,6 +212,8 @@ def get_parser():
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers"
                         " post-normalization to stderr")
+    parser.add_argument('--async', action='store_true',
+                        help='Consume k-mers asynchronously with threading (EXPERIMENTAOL)')
     add_loadhash_args(parser)
     return parser
 
