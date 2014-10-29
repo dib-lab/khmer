@@ -69,12 +69,14 @@ def test_bzip2_decompression():
 
 
 def test_badbzip2():
-    rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
     try:
+        rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
         for read in rparser:
             pass
         assert 0, "this should fail"
     except IOError, err:
+        print str(err)
+    except ValueError, err:
         print str(err)
 
 
@@ -292,12 +294,14 @@ def test_constructor():
 
 
 def test_iternext():
-    rparser = ReadParser(utils.get_test_data("fakelump.fa.stoptags.txt"))
-    read_pairs = []
     try:
+        rparser = ReadParser(utils.get_test_data("fakelump.fa.stoptags.txt"))
+        read_pairs = []
         for read_1, read_2 in rparser.iter_read_pairs():
             read_pairs.append(read_1, read_2)
         assert 0, "Shouldn't be able to iterate over non FASTA file"
     except IOError, err:
+        print str(err)
+    except ValueError, err:
         print str(err)
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

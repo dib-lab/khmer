@@ -121,6 +121,9 @@ IStreamReader( int const fd )
 */
 SeqAnParser::SeqAnParser( char const * filename ) : IParser( ) {
     seqan::open(_stream, filename);
+    if (!seqan::isGood(_stream) || seqan::atEnd(_stream)) {
+	throw InvalidStreamHandle();
+    }
 }
 
 bool SeqAnParser::is_complete() {
