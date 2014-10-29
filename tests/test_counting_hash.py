@@ -715,6 +715,17 @@ def test_badconsume():
     except ValueError, err:
         print str(err)
 
+def test_consume_async():
+    import screed
+
+    ht = khmer.new_counting_hash(20, 1e7, 4, 2)
+    infile = utils.get_test_data('test-reads.fa')
+    try:
+        for record in screed.open(infile):
+            ht.consume_async(record.sequence)
+    except Exception as e:
+        print e
+        assert False
 
 def test_get_badmin_count():
     countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
