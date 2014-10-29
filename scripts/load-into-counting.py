@@ -90,17 +90,14 @@ def main():
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables, args.threads)
+                                     args.n_tables)
     htable.set_use_bigcount(args.bigcount)
-
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     filename = None
 
     for index, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, args.threads)
+        rparser = khmer.ReadParser(filename)
         threads = []
         print >>sys.stderr, 'consuming input', filename
         for _ in xrange(args.threads):
