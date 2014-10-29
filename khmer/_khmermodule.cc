@@ -1260,6 +1260,30 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
     return PyInt_FromLong(n_consumed);
 }
 
+
+static PyObject * hash_consume_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < counting->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    unsigned int n_consumed;
+    n_consumed = counting->consume_string_async(long_str);
+
+    return PyInt_FromLong(n_consumed);
+}
+
 static PyObject * hash_consume_parallel(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1817,6 +1841,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
     { "consume_parallel", hash_consume_parallel, METH_VARARGS, "Count all k-mers in the given string in parallel" },
+    { "consume_async", hash_consume_async, METH_VARARGS, "Enquee all k-mers in the given string for consumption" },
     { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
     { "consume_fasta_parallel", hash_consume_fasta_parallel, METH_VARARGS, "Count all k-mers in the given file in parallel" },
     {
