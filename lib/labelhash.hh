@@ -8,12 +8,11 @@
 #ifndef LABELHASH_HH
 #define LABELHASH_HH
 
-#include <string>
-
-#include "khmer.hh"
 #include "hashbits.hh"
 #include "hashtable.hh"
 #include "read_parsers.hh"
+#include <string>
+#include "khmer.hh"
 
 namespace khmer
 {

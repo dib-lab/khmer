@@ -1,3 +1,31 @@
+2014-11-17  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
+    newly found read dropping issue
+    https://github.com/ged-lab/khmer/issues/249
+    https://github.com/ged-lab/khmer/pull/641
+
+    * lib/{read_parsers}.{cc,hh},setup.py,third-party/seqan: replaced parsers
+    with Seqan implementation. Removed unused exception classes.
+    * lib/{counting,hashtable,labelhash,read_aligner}.{cc,hh}: removed
+    Hashtable::Hasher (was for tracing only); removed refs to Config;
+    corrected scope, removed unused lines; adopted API changes
+    * khmer/{__init__.py,_khmermodule.cc}: removed the Config object, the
+    threads argument to new_counting_hash, and adapted to other changes in API.
+    Droped the unused _dump_report_fn method.
+    * lib/{bittest,consume_prof,error,khmer_config,scoringmatrix,thread_id_map}
+    .{cc,hh},tests/test_khmer_config.py: deleted unused files
+    * sandbox/collect-reads.py,scripts/{abundance-dist-single,do-partition,
+    filter-abund-single,load-into-counting}.py: adapted to Python API changes:
+    no threads argument to ReadParser, no more config
+    * tests/test_{counting_hash,counting_single,hashbits,hashbits_obj,
+    test_read_parsers}.py: updated tests to new error pattern (upon object
+    creation, not first access) and the same API change as above. Thanks to
+    Camille for her enhanced multi-thread test.
+    * lib/{counting,hashtable,ht-diff}.cc,khmer.hh: renamed MAX_COUNT define to
+    MAX_KCOUNT; avoids naming conflict with SeqAn
+    * Makefile: refreshed cppcheck{,-result.xml} targets
+
 2014-11-15  Jacob Fenton  <bocajnotnef@gmail.com>
 
     * tests/test_scripts.py: added screed/read_parsers stream testing
