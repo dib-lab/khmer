@@ -207,7 +207,8 @@ consume_fasta(
         unsigned int  this_n_consumed;
         bool	  is_valid;
 
-        read = parser->get_next_read( );
+        try {
+	  read = parser->get_next_read( );
 
         this_n_consumed =
             check_and_process_read(read.sequence, is_valid);
@@ -252,6 +253,8 @@ consume_fasta(
             }
         }
 #endif // 0
+	} catch (read_parsers::NoMoreReadsAvailable) { 
+	}
 
     } // while reads left for parser
 
