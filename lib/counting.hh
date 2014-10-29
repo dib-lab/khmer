@@ -8,9 +8,9 @@
 #ifndef COUNTING_HH
 #define COUNTING_HH
 
+#include "hashtable.hh"
 #include <vector>
 #include "khmer_config.hh"
-#include "hashtable.hh"
 
 namespace khmer
 {

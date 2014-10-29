@@ -5,8 +5,8 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "khmer.hh"
 #include "hashtable.hh"
+#include "khmer.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
 
@@ -187,16 +187,20 @@ consume_fasta(
     CallbackFn		    callback,	  void *	      callback_data
 )
 {
-    Hasher		  &hasher		=
+/*
+   Hasher		  &hasher		=
         _get_hasher( parser->uuid( ) );
+*/
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
 #endif
     Read			  read;
 
+    /*
     hasher.trace_logger(
         TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
     );
+    */
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
@@ -224,13 +228,15 @@ consume_fasta(
         );
 #endif
 
-        if (0 == (total_reads_LOCAL % 10000))
-            hasher.trace_logger(
+        if (0 == (total_reads_LOCAL % 10000)) {
+/*
+             hasher.trace_logger(
                 TraceLogger:: TLVL_DEBUG3,
                 "Total number of reads processed: %llu\n",
                 (unsigned long long int)total_reads_LOCAL
             );
-
+*/
+	}
         // TODO: Figure out alternative to callback into Python VM
         //       Cannot use in multi-threaded operation.
 #if (0)
@@ -539,8 +545,10 @@ consume_fasta_and_tag(
     CallbackFn		    callback,	    void *		callback_data
 )
 {
+  /*
     Hasher		  &hasher		=
         _get_hasher( parser->uuid( ) );
+      */
     unsigned int		  total_reads_LOCAL	= 0;
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
@@ -551,10 +559,12 @@ consume_fasta_and_tag(
     total_reads = 0;
     n_consumed = 0;
 
+    /*
     hasher.trace_logger(
         TraceLogger:: TLVL_DEBUG2,
         "Starting trace of 'consume_fasta_and_tag'....\n"
     );
+    */
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
@@ -582,12 +592,15 @@ consume_fasta_and_tag(
 #endif
         }
 
-        if (0 == (total_reads_LOCAL % 10000))
+        if (0 == (total_reads_LOCAL % 10000)) {
+	  /*
             hasher.trace_logger(
                 TraceLogger:: TLVL_DEBUG3,
                 "Total number of reads processed: %llu\n",
                 (unsigned long long int)total_reads_LOCAL
             );
+	    */
+	}
 
         // TODO: Figure out alternative to callback into Python VM
         //       Cannot use in multi-threaded operation.

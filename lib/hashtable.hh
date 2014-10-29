@@ -8,6 +8,8 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
+#include "read_parsers.hh"
+
 #include <vector>
 #include <iostream>
 #include <list>
@@ -21,7 +23,6 @@
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
-#include "read_parsers.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
 

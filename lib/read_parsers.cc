@@ -5,6 +5,8 @@
 // Contact: khmer-project@idyll.org
 //
 
+#include "read_parsers.hh"
+
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
@@ -17,7 +19,6 @@
 #   include <linux/fs.h>
 #endif
 
-#include "read_parsers.hh"
 #include "khmer_exception.hh"
 
 namespace khmer
@@ -101,7 +102,7 @@ accumulate_timer_deltas( uint32_t metrics_key )
 
 }
 #endif
-
+/*
 IStreamReader::
 IStreamReader( int const fd )
     :
@@ -117,8 +118,30 @@ IStreamReader( int const fd )
         throw InvalidStreamBuffer( );
     }
 }
+*/
+SeqAnParser::SeqAnParser( char const * filename ) : IParser( ) {
+    seqan::open(_stream, filename);
+}
 
+bool SeqAnParser::is_complete() {
+    return !seqan::isGood(_stream) || seqan::atEnd(_stream);
+}
 
+void SeqAnParser::imprint_next_read(Read &the_read) {
+    the_read.reset();
+    _imprint_mutex.lock();
+    int ret = seqan::readRecord(the_read.name, the_read.sequence, the_read.accuracy,
+	    _stream);
+    _imprint_mutex.unlock();
+    if (ret != 0) {
+	throw NoMoreReadsAvailable();
+    }
+}
+
+SeqAnParser::~SeqAnParser() {
+    seqan::close(_stream);
+}
+/*
 RawStreamReader::
 RawStreamReader( int const fd, size_t const alignment )
     : IStreamReader( fd )
@@ -1264,7 +1287,7 @@ ParserPerformanceMetrics::
 accumulate_timer_deltas( uint32_t metrics_key )
 { }
 #endif
-
+*/
 IParser * const
 IParser::
 get_parser(
@@ -1274,6 +1297,9 @@ get_parser(
     uint8_t const	    trace_level
 )
 {
+
+    return new SeqAnParser(ifile_name.c_str());
+/*
     // TODO: Replace file extension detection with header magic detection.
 
     IStreamReader * stream_reader   = NULL;
@@ -1384,17 +1410,20 @@ get_parser(
         );
 
     return parser;
+*/
 }
 
 
 IParser::
 IParser(
+/*
     IStreamReader   &stream_reader,
     uint32_t const  number_of_threads,
     uint64_t const  cache_size,
     uint8_t const   trace_level
+*/
 )
-    :   _trace_level( trace_level ),
+/*    :   _trace_level( trace_level ),
         _cache_manager(
             CacheManager(
                 stream_reader, number_of_threads, cache_size, trace_level
@@ -1404,13 +1433,15 @@ IParser(
         _thread_id_map( ThreadIDMap( number_of_threads ) ),
         _unithreaded( 1 == number_of_threads ),
         _states( new ParserState *[ number_of_threads ] )
+*/
 {
+    /*
     while (!(_uuid = rand( )));
 
     for (uint32_t i = 0; i < number_of_threads; ++i) {
         _states[ i ] = NULL;
     }
-
+    */
     int regex_rc =
         regcomp(
             &_re_read_2_nosub,
@@ -1439,10 +1470,10 @@ IParser(
     }
 }
 
-
 IParser::
 ~IParser( )
 {
+    /*
     if (_states != NULL) {
         for (uint32_t i = 0; i < _number_of_threads; i++) {
             if (_states[i] != NULL) {
@@ -1451,13 +1482,13 @@ IParser::
         }
         delete[] _states;
     }
-
+*/
     regfree( &_re_read_2_nosub );
     regfree( &_re_read_1 );
     regfree( &_re_read_2 );
 }
 
-
+/*
 IParser:: ParserState::
 ParserState( uint32_t const thread_id, uint8_t const trace_level )
     :   at_start( true ),
@@ -1632,7 +1663,7 @@ _parse_read( ParserState &state, Read &the_read )
     );
 #endif
 }
-
+*/
 
 /* WARNING!
  * Under the following extremely rare condition,
@@ -1651,6 +1682,7 @@ _parse_read( ParserState &state, Read &the_read )
  * This potential bug cannot occur if only one thread is being used to parse.
  */
 // TODO? Write a simpler FASTQ parser.
+/*
 inline
 void
 FastqParser::
@@ -1916,7 +1948,7 @@ imprint_next_read( Read &the_read )
         throw NoMoreReadsAvailable( );
     }
 } // imprint_next_read
-
+*/
 
 void
 IParser::

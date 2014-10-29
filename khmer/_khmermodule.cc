@@ -11,13 +11,13 @@
 
 // Must be first.
 #include <Python.h>
+#include "hashtable.hh"
 
 #include <iostream>
 
 #include "khmer.hh"
 #include "khmer_config.hh"
 #include "kmer_hash.hh"
-#include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
 #include "read_aligner.hh"
@@ -707,7 +707,9 @@ _ReadParser_iternext( PyObject * self )
                 parser->imprint_next_read( *the_read_PTR );
             } catch (InvalidReadFileFormat &e) {
                 exc = e.what( );
-            }
+            } catch (NoMoreReadsAvailable &e) {
+		stop_iteration = true;
+	    }
     } catch (StreamReadError &e) {
         exc = e.what();
     }

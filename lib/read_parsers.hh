@@ -8,12 +8,15 @@
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
-
-#include <cstdarg>
 #include <iostream>
+#include <seqan/sequence.h>
+#include <seqan/seq_io.h>
+#include <seqan/stream.h>
+#include <cstdarg>
 #include <string>
 #include <utility>
 #include <stdlib.h>
+#include <mutex>
 
 extern "C"
 {
@@ -100,7 +103,7 @@ struct UnknownPairReadingMode : public  khmer_exception {
 
 struct InvalidReadPair : public  khmer_exception {
 };
-
+/*
 #ifdef WITH_INTERNAL_METRICS
 struct StreamReaderPerformanceMetrics : public IPerformanceMetrics {
 
@@ -329,7 +332,7 @@ private:
     uint32_t const	_get_segment_ref_count_ATOMIC( );
 
 }; // struct CacheManager
-
+*/
 
 struct Read {
     std:: string    name;
@@ -386,6 +389,7 @@ struct IParser {
     );
 
     IParser(
+	    /*
         IStreamReader	&stream_reader,
         uint32_t const	number_of_threads   =
             khmer:: get_active_config( ).get_number_of_threads( ),
@@ -393,18 +397,21 @@ struct IParser {
             khmer:: get_active_config( ).get_reads_input_buffer_size( ),
         uint8_t const	trace_level	    =
             khmer:: get_active_config( ).get_reads_parser_trace_level( )
+	    */
     );
     virtual ~IParser( );
-
+/*
     inline int		uuid( )
     {
         return _uuid;
     }
-
-    inline bool		is_complete( )
+*/
+    virtual bool		is_complete( ) = 0;
+/*
     {
         return !_cache_manager.has_more_data( ) && !_get_state( ).buffer_rem;
     }
+*/
 
     // Note: 'get_next_read' exists for legacy reasons.
     //	     In the long term, it should be eliminated in favor of direct use of
@@ -417,7 +424,7 @@ struct IParser {
         imprint_next_read( the_read );
         return the_read;
     }
-    virtual void	imprint_next_read( Read &the_read );
+    virtual void	imprint_next_read( Read &the_read ) = 0;
 
     virtual void	imprint_next_read_pair(
         ReadPair &the_read_pair,
@@ -425,7 +432,7 @@ struct IParser {
     );
 
 protected:
-
+/*
     struct ParserState {
 
         // TODO: Set buffer size from Config.
@@ -455,18 +462,18 @@ protected:
 
     uint8_t		_trace_level;
 
-    CacheManager	_cache_manager;
+//    CacheManager	_cache_manager;
 
     uint32_t		_number_of_threads;
-    ThreadIDMap		_thread_id_map;
+//    ThreadIDMap		_thread_id_map;
     bool		_unithreaded;
 
     ParserState **	_states;
-
+*/
     regex_t		_re_read_2_nosub;
     regex_t		_re_read_1;
     regex_t		_re_read_2;
-
+/*
     void		_copy_line( ParserState &state );
 
     virtual void	_parse_read( ParserState &, Read & )	    = 0;
@@ -476,6 +483,7 @@ protected:
         ReadPair &the_read_pair
     );
 #endif
+*/
     void		_imprint_next_read_pair_in_ignore_mode(
         ReadPair &the_read_pair
     );
@@ -485,7 +493,7 @@ protected:
     bool		_is_valid_read_pair(
         ReadPair &the_read_pair, regmatch_t &match_1, regmatch_t &match_2
     );
-
+/*
     inline ParserState	&_get_state( )
     {
         uint32_t	thread_id	= _thread_id_map.get_thread_id( );
@@ -504,10 +512,25 @@ protected:
 
         return *state_PTR;
     }
+*/
 
 }; // struct IParser
 
+class SeqAnParser : public IParser {
 
+public:
+    SeqAnParser( const char * filename );
+    ~SeqAnParser( );
+
+    bool is_complete( );
+    void imprint_next_read(Read &the_read);
+
+private:
+    seqan::SequenceStream _stream;
+    std::mutex _imprint_mutex;
+
+};
+/*
 struct FastaParser : public IParser {
 
     FastaParser(
@@ -536,7 +559,7 @@ struct FastqParser : public IParser {
     virtual void    _parse_read( ParserState &, Read &);
 
 };
-
+*/
 inline PartitionID _parse_partition_id(std::string name)
 {
     PartitionID p = 0;
