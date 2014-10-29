@@ -9,6 +9,7 @@
 #include "hashtable.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
+#include "async_hash.hh"
 
 #include <algorithm>
 #include <sstream>
@@ -406,6 +407,23 @@ unsigned int Hashtable::consume_string(const std::string &s)
         HashIntoType kmer = kmers.next();
 
         count(kmer);
+        n_consumed++;
+    }
+
+    return n_consumed;
+}
+
+unsigned int Hashtable::consume_string_async(const std::string &s)
+{
+    const char * sp = s.c_str();
+    unsigned int n_consumed = 0;
+
+    KMerIterator kmers(sp, _ksize);
+
+    while(!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+
+        count_async(kmer);
         n_consumed++;
     }
 

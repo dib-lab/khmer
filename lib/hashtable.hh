@@ -24,6 +24,7 @@
 #include "read_parsers.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
+#include "async_hash.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -62,6 +63,7 @@ struct HashTablePerformanceMetrics : public IPerformanceMetrics {
 
 };
 #endif
+
 
 //
 // Sequence iterator class, test.  Not really a C++ iterator yet.
@@ -163,6 +165,7 @@ public:
 class Hashtable  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
+    friend class AsyncHashWriter;
 protected:
     unsigned int _tag_density;
 
@@ -223,7 +226,8 @@ protected:
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
-
+        async_hash = new AsyncHashWriter(this, 1);
+        async_hash->start();
     }
 
     virtual ~Hashtable( )
@@ -250,6 +254,8 @@ protected:
         }
 
         delete partition;
+        async_hash->stop();
+        delete async_hash;
     }
 
     void _init_bitstuff()
@@ -337,6 +343,7 @@ protected:
     uint32_t _all_tags_spin_lock;
 public:
     SubsetPartition * partition;
+    AsyncHashWriter * async_hash;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
@@ -349,6 +356,7 @@ public:
 
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
+    virtual void count_async(HashIntoType khash) = 0;
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;
@@ -360,6 +368,7 @@ public:
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
     unsigned int consume_string_parallel(const std::string &s, const unsigned int n_threads);
+    unsigned int consume_string_async(const std::string &s);
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;

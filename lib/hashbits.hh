@@ -182,6 +182,11 @@ public:
         }
     }
 
+    virtual void count_async(HashIntoType khash)
+    {
+        async_hash->enqueue(khash);
+    }
+
     virtual bool check_overlap(HashIntoType khash, Hashbits &ht2)
     {
 
