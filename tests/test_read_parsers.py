@@ -116,6 +116,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     assert reads_count_1thr == sum(reads_counts_per_thread)
 
+
 @attr('multithread')
 @attr('highmem')
 def test_with_multiple_threads_big():

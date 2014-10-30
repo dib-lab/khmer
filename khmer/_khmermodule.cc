@@ -646,8 +646,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 
     const char *      ifile_name_CSTR;
 
-    if (!PyArg_ParseTuple(
-                args, "s", &ifile_name_CSTR )) {
+    if (!PyArg_ParseTuple(args, "s", &ifile_name_CSTR )) {
         return NULL;
     }
     std:: string    ifile_name( ifile_name_CSTR );
@@ -731,7 +730,6 @@ _ReadPairIterator_iternext( PyObject * self )
     uint8_t         pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
-    // cppcheck-suppress unreadVariable
     bool    stop_iteration      = false;
     bool    invalid_file_format     = false;
     char    exc_message[ CHAR_MAX ];
@@ -1913,7 +1911,6 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
 
-    // cppcheck-suppress unreadVariable
     HashIntoType * dist = NULL;
 
     Py_BEGIN_ALLOW_THREADS
