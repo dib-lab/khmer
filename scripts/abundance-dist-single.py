@@ -98,7 +98,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     khmer.get_config().set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     # start loading
-    rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
+    rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
     print 'consuming input, round 1 --', args.input_sequence_filename
     for _ in xrange(args.threads):
@@ -125,7 +125,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         abundance_lists.append(abundances)
 
     print 'preparing hist from %s...' % args.input_sequence_filename
-    rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
+    rparser = khmer.ReadParser(args.input_sequence_filename)
     threads = []
     print 'consuming input, round 2 --', args.input_sequence_filename
     for _ in xrange(args.threads):

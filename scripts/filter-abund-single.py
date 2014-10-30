@@ -77,7 +77,7 @@ def main():
                                      args.threads)
 
     # first, load reads into hash table
-    rparser = khmer.ReadParser(args.datafile, args.threads)
+    rparser = khmer.ReadParser(args.datafile)
     threads = []
     print 'consuming input, round 1 --', args.datafile
     for _ in xrange(args.threads):

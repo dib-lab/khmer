@@ -101,7 +101,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
     config.set_reads_input_buffer_size(N_THREADS * 64 * 1024)
     threads = []
     reads_counts_per_thread = [0] * N_THREADS
-    rparser = ReadParser(utils.get_test_data(testfile), N_THREADS)
+    rparser = ReadParser(utils.get_test_data(testfile))
     for tnum in xrange(N_THREADS):
         t = \
             threading.Thread(
@@ -121,16 +121,6 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 def test_with_multiple_threads_big():
     test_with_multiple_threads(testfile="test-large.fa")
 
-def test_with_zero_threads():
-    N_THREADS = 0
-    try:
-        rparser = \
-            ReadParser(utils.get_test_data("test-reads.fq.bz2"), N_THREADS)
-        assert 0, "should fail"
-    except ValueError as e:
-        assert str(e) == \
-            'Invalid thread number, must be integer greater than zero.'
-
 
 @attr('multithread')
 def test_old_illumina_pair_mating():
@@ -143,7 +133,7 @@ def test_old_illumina_pair_mating():
     # Note: This file, when used in conjunction with a 65600 byte per-thread
     #       prefetch buffer, tests the paired read mating logic with the
     #       old Illumina read name format.
-    rparser = ReadParser(utils.get_test_data("test-reads.fa"), 2)
+    rparser = ReadParser(utils.get_test_data("test-reads.fa"))
 
     def thread_1_runtime(rparser):
         for read in rparser:
@@ -178,7 +168,7 @@ def test_casava_1_8_pair_mating():
     # Note: This file, when used in conjunction with a 64 KiB per-thread
     #       prefetch buffer, tests the paired read mating logic with the
     #       Casava >= 1.8 read name format.
-    rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"), 2)
+    rparser = ReadParser(utils.get_test_data("test-reads.fq.bz2"))
 
     def thread_1_runtime(rparser):
         for read in rparser:

@@ -645,25 +645,11 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     using namespace read_parsers;
 
     const char *      ifile_name_CSTR;
-    Config  &the_config   = get_active_config( );
-    uint32_t    number_of_threads = the_config.get_number_of_threads( );
-    uint64_t    cache_size    = the_config.get_reads_input_buffer_size( );
-    uint8_t     trace_level   = the_config.get_reads_parser_trace_level( );
 
     if (!PyArg_ParseTuple(
-                args, "s|IKH",
-                &ifile_name_CSTR, &number_of_threads, &cache_size, &trace_level
-            )) {
+                args, "s", &ifile_name_CSTR )) {
         return NULL;
     }
-    if (number_of_threads < 1) {
-        PyErr_SetString(
-            PyExc_ValueError,
-            "Invalid thread number, must be integer greater than zero."
-        );
-        return NULL;
-    }
-    // TODO: Handle keyword arguments.
     std:: string    ifile_name( ifile_name_CSTR );
 
     PyObject * self     = subtype->tp_alloc( subtype, 1 );
@@ -675,9 +661,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     // Wrap the low-level parser object.
     try {
         myself->parser =
-            IParser:: get_parser(
-                ifile_name, number_of_threads, cache_size, trace_level
-            );
+            IParser:: get_parser( ifile_name );
     } catch (InvalidStreamHandle &exc) {
         PyErr_SetString( PyExc_ValueError, "invalid input file name" );
         return NULL;
@@ -708,8 +692,8 @@ _ReadParser_iternext( PyObject * self )
             } catch (InvalidReadFileFormat &e) {
                 exc = e.what( );
             } catch (NoMoreReadsAvailable &e) {
-		stop_iteration = true;
-	    }
+                stop_iteration = true;
+            }
     } catch (StreamReadError &e) {
         exc = e.what();
     }
@@ -1488,38 +1472,6 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self,
     Py_RETURN_NONE;
 }
 
-// callback function to pass into dump function
-
-void _dump_report_fn(const char * info, unsigned int count, void * data)
-{
-    // handle signals etc. (like CTRL-C)
-    if (PyErr_CheckSignals() != 0) {
-        throw _khmer_signal("PyErr_CheckSignals received a signal");
-    }
-
-    // if 'data' is set, it is a Python callable
-    if (data) {
-        PyObject * obj = (PyObject *) data;
-        if (obj != Py_None) {
-            PyObject * args = Py_BuildValue("sI", info, count);
-            if (args != NULL) {
-                PyObject * r = PyObject_Call(obj, args, NULL);
-                Py_XDECREF(r);
-            }
-            Py_XDECREF(args);
-        }
-    }
-
-    if (PyErr_Occurred()) {
-        throw _khmer_signal("PyErr_Occurred is set");
-    }
-
-    // ...allow other Python threads to do stuff...
-    Py_BEGIN_ALLOW_THREADS;
-    Py_END_ALLOW_THREADS;
-}
-
-
 static PyObject * hash_load(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1960,9 +1912,9 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
 
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
-		
-		// cppcheck-suppress unreadVariable
-    HashIntoType * dist = NULL;  
+
+    // cppcheck-suppress unreadVariable
+    HashIntoType * dist = NULL;
 
     Py_BEGIN_ALLOW_THREADS
     dist = counting->abundance_distribution(rparser, hashbits);

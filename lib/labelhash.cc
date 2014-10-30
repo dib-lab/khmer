@@ -26,15 +26,8 @@ LabelHash::consume_fasta_and_tag_with_labels(
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    khmer:: Config    &the_config	  = khmer:: get_active_config( );
-
-    // Note: Always assume only 1 thread if invoked this way.
     IParser *	  parser =
-        IParser::get_parser(
-            filename, 1, the_config.get_reads_input_buffer_size( ),
-            the_config.get_reads_parser_trace_level( )
-        );
-
+        IParser::get_parser( filename );
 
     consume_fasta_and_tag_with_labels(
         parser,
@@ -52,11 +45,6 @@ LabelHash::consume_fasta_and_tag_with_labels(
     CallbackFn		    callback,	    void *		callback_data
 )
 {
-	/*
-    Hasher		  &hasher		=
-        _get_hasher( parser->uuid( ) );
-	*/
-    unsigned int		  total_reads_LOCAL	= 0;
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
 #endif
@@ -65,13 +53,6 @@ LabelHash::consume_fasta_and_tag_with_labels(
     // TODO? Delete the following assignments.
     total_reads = 0;
     n_consumed = 0;
-
-    /*
-    hasher.trace_logger(
-        TraceLogger:: TLVL_DEBUG2,
-        "Starting trace of 'consume_fasta_and_tag_with_labels'....\n"
-    );
-    */
 
     Label _tag_label = 0;
 
@@ -89,32 +70,13 @@ LabelHash::consume_fasta_and_tag_with_labels(
                                                   *the_label );
             _tag_label++;
 
-#ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.start_timers( );
-#endif
 #if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #else
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #endif
-            total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
-#ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.stop_timers( );
-            hasher.pmetrics.accumulate_timer_deltas(
-                (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
-            );
-#endif
+            __sync_add_and_fetch( &total_reads, 1 );
         }
-
-        if (0 == (total_reads_LOCAL % 10000)) {
-		/*
-            hasher.trace_logger(
-                TraceLogger:: TLVL_DEBUG3,
-                "Total number of reads processed: %llu\n",
-                (unsigned long long int)total_reads_LOCAL
-            );
-	    */
-	}
 
         // TODO: Figure out alternative to callback into Python VM
         //       Cannot use in multi-threaded operation.

@@ -42,8 +42,6 @@ struct ThreadIDMap {
     ThreadIDMap( uint32_t number_of_threads );
     ~ThreadIDMap( );
 
-    uint32_t const get_thread_id( );
-
 private:
 
     uint32_t				_number_of_threads;

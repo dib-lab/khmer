@@ -89,7 +89,7 @@ def main():
 
     for index, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, args.n_threads)
+        rparser = khmer.ReadParser(filename)
         threads = []
         print 'consuming input', filename
         for _ in xrange(args.n_threads):

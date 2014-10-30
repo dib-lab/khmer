@@ -17,20 +17,11 @@ namespace khmer
 // Create default config at initialization.
 static Config	    the_config	      = Config( );
 
-
 Config &
 get_active_config( void )
 {
     return the_config;
 }
-
-
-void
-set_active_config( Config &config )
-{
-    the_config = config;
-}
-
 
 Config::
 Config( )

@@ -167,24 +167,6 @@ class Hashtable  		// Base class implementation of a Bloom ht.
 protected:
     unsigned int _tag_density;
 
-    struct Hasher {
-
-        uint32_t			pool_id;
-        uint32_t			thread_id;
-#ifdef WITH_INTERNAL_METRICS
-        HashTablePerformanceMetrics	pmetrics;
-#endif
-        TraceLogger			trace_logger;
-
-        Hasher(
-            uint32_t const  pool_id,
-            uint32_t const  thread_id,
-            uint8_t const   trace_level = TraceLogger:: TLVL_NONE
-        );
-        ~Hasher( );
-
-    }; // struct Hasher
-
     uint8_t	    _trace_level;
 
     uint32_t	    _number_of_threads;
@@ -194,8 +176,6 @@ protected:
     _thread_pool_id_map;
     std:: map< uint32_t, ThreadIDMap * >
     _thread_id_maps;
-    std:: map< uint32_t, Hasher ** >
-    _hashers_map;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -239,15 +219,6 @@ protected:
             delete _thread_id_maps[ thread_pool_id ];
             _thread_id_maps[ thread_pool_id ] = NULL;
 
-            Hasher ** hashers = _hashers_map[ thread_pool_id ];
-            for (uint32_t i = 0; i < _number_of_threads; ++i) {
-                if (NULL != hashers[ i ]) {
-                    delete hashers[ i ];
-                    hashers[ i ] = NULL;
-                }
-            }
-            delete [ ] hashers;
-            _hashers_map[ thread_pool_id ] = NULL;
         }
 
         delete partition;
@@ -261,54 +232,6 @@ protected:
         }
         _nbits_sub_1 = (_ksize*2 - 2);
     }
-
-
-    inline Hasher   &_get_hasher( int uuid = 0 )
-    {
-        std:: map< int, uint32_t >:: iterator	match;
-        uint32_t				thread_pool_id;
-        ThreadIDMap *				thread_id_map	= NULL;
-        uint32_t				thread_id;
-        Hasher **				hashers		= NULL;
-        Hasher *				hasher_PTR	= NULL;
-
-        while (!__sync_bool_compare_and_swap( &_tpool_map_spin_lock, 0, 1 ));
-
-        match = _thread_pool_id_map.find( uuid );
-        if (match == _thread_pool_id_map.end( )) {
-
-            // TODO: Handle 'std:: bad_alloc' exceptions.
-            thread_pool_id			= _thread_pool_counter++;
-            _thread_pool_id_map[ uuid ]		= thread_pool_id;
-            _thread_id_maps[ thread_pool_id ]	=
-                new ThreadIDMap( _number_of_threads );
-            _hashers_map[ thread_pool_id ]	=
-                new Hasher *[ _number_of_threads ];
-            hashers				=
-                _hashers_map[ thread_pool_id ];
-            for (uint32_t i = 0; i < _number_of_threads; ++i) {
-                hashers[ i ] = NULL;
-            }
-
-            match = _thread_pool_id_map.find( uuid );
-        } // no thread pool for UUID
-
-        __sync_bool_compare_and_swap( &_tpool_map_spin_lock, 1, 0 );
-
-        thread_pool_id	    = match->second;
-        thread_id_map	    = _thread_id_maps[ thread_pool_id ];
-        thread_id	    = thread_id_map->get_thread_id( );
-        hashers		    = _hashers_map[ thread_pool_id ];
-        hasher_PTR	    = hashers[ thread_id ];
-        if (NULL == hasher_PTR) {
-            hashers[ thread_id ]    =
-                new Hasher( thread_pool_id, thread_id, _trace_level );
-            hasher_PTR		    = hashers[ thread_id ];
-        }
-
-        return *hasher_PTR;
-    }
-
 
     HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
     {

@@ -50,7 +50,6 @@ private:
 
 // Get and set default configuration instance.
 Config & get_active_config( void );
-void set_active_config( Config & );
 
 } // namespace khmer
 

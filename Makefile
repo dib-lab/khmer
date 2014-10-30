@@ -68,13 +68,14 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
 cppcheck-result.xml: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=posix --xml \
+		--file-list=- -j8 --platform=unix64 --std=c++11 --xml \
 		--inline-suppr --xml-version=2 2> cppcheck-result.xml
 
 cppcheck: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=posix --inline-suppr --quiet
+		--file-list=- --platform=unix64 --std=c++11 --inline-suppr \
+		--quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib
 
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
