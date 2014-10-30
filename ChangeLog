@@ -1,3 +1,24 @@
+2014-10-30  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{read_parsers}.{cc,hh},setup.py,third-party/seqan: replaced parsers
+    with Seqan implementation. Removed unused exception classes.
+    * lib/{counting,hashtable,labelhash,read_aligner}.{cc,hh}: removed
+    Hashtable::Hasher (was for tracing only); removed refs to Config;
+    corrected scope, removed unused lines; adopted API changes
+    * khmer/{__init__.py,_khmermodule.cc}: removed the Config object, the
+    threads argument to new_counting_hash, and adapted to other changes in API.
+    Droped the unused _dump_report_fn method.
+    * lib/{bittest,consume_prof,error,khmer_config,scoringmatrix,thread_id_map}
+    .{cc,hh},tests/test_khmer_config.py: deleted unused files
+    * sandbox/collect-reads.py,scripts/{abundance-dist-single,do-partition,
+    filter-abund-single,load-into-counting}.py: adapted to Python API changes:
+    no threads argument to ReadParser, no more config
+    * tests/test_{counting_hash,counting_single,hashbits,hashbits_obj,
+    test_read_parsers}.py: updated tests to new error pattern (upon object
+    creation, not first access) and the same API change as above. Thanks to
+    Camille for her enhanced multi-thread test.
+    * Makefile: refreshed cppcheck{,-result.xml} targets
+
 2014-10-24  Camille Scott  <camille.scott.w@gmail.com>
 
     * do-partition.py: Add type=int to n_threads arg and assert to check
