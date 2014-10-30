@@ -167,7 +167,6 @@ class Hashtable  		// Base class implementation of a Bloom ht.
 protected:
     unsigned int _tag_density;
 
-    uint32_t	    _tpool_map_spin_lock;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -176,9 +175,8 @@ protected:
     unsigned int    _nbits_sub_1;
 
     Hashtable( WordLength ksize )
-        :   _tpool_map_spin_lock( 0 ),
-            _max_count(MAX_COUNT),
-            _max_bigcount(MAX_BIGCOUNT),
+	    : _max_count( MAX_COUNT ),
+	    _max_bigcount( MAX_BIGCOUNT ),
             _ksize( ksize )
     {
         _tag_density = DEFAULT_TAG_DENSITY;
@@ -193,7 +191,6 @@ protected:
 
     virtual ~Hashtable( )
     {
-        std:: map< int, uint32_t >:: iterator it;
         delete partition;
     }
 

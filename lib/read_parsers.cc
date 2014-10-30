@@ -46,7 +46,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     the_read.reset();
     _imprint_mutex.lock();
     int ret = seqan::readRecord(the_read.name, the_read.sequence,
-	    the_read.accuracy, _stream);
+                                the_read.accuracy, _stream);
     _imprint_mutex.unlock();
     if (ret != 0) {
         throw NoMoreReadsAvailable();
