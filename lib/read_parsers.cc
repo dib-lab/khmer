@@ -28,47 +28,6 @@ namespace khmer
 namespace read_parsers
 {
 
-
-char const *
-InvalidReadFileFormat::
-what( ) const throw( )
-{
-    return (char const *)_reason;
-}
-
-
-InvalidReadFileFormat::
-InvalidReadFileFormat(
-    char const * exc_name, char const * reason, char const * evidence
-) : khmer_file_exception(reason)
-{
-
-    if (reason) {
-        if (evidence)
-            snprintf(
-                _reason, CHAR_MAX, "%s: %s: %s", exc_name, reason, evidence
-            );
-        else {
-            snprintf( _reason, CHAR_MAX, "%s: %s", exc_name, reason );
-        }
-    } else {
-        snprintf( _reason, CHAR_MAX, "%s", exc_name );
-    }
-
-}
-
-
-InvalidFASTAFileFormat::
-InvalidFASTAFileFormat( char const * reason, char const * evidence )
-    : InvalidReadFileFormat( "InvalidFASTAFileFormat", reason, evidence )
-{ }
-
-
-InvalidFASTQFileFormat::
-InvalidFASTQFileFormat( char const * reason, char const * evidence )
-    : InvalidReadFileFormat( "InvalidFASTQFileFormat", reason, evidence )
-{ }
-
 SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 {
     seqan::open(_stream, filename);
@@ -86,8 +45,8 @@ void SeqAnParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
     _imprint_mutex.lock();
-    int ret = seqan::readRecord(the_read.name, the_read.sequence, the_read.accuracy,
-                                _stream);
+    int ret = seqan::readRecord(the_read.name, the_read.sequence,
+	    the_read.accuracy, _stream);
     _imprint_mutex.unlock();
     if (ret != 0) {
         throw NoMoreReadsAvailable();

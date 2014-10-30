@@ -34,61 +34,6 @@ namespace khmer
 namespace read_parsers
 {
 
-
-class InvalidReadFileFormat: public khmer:: khmer_file_exception
-{
-
-public:
-
-    InvalidReadFileFormat(
-        char const * exc_name,
-        char const * reason	= NULL,
-        char const * evidence	= NULL
-    );
-
-    virtual char const *    what( ) const throw( );
-
-protected:
-
-    char		    _reason[ CHAR_MAX ];
-
-};
-
-class InvalidFASTAFileFormat: public InvalidReadFileFormat
-{
-
-public:
-
-public:
-    InvalidFASTAFileFormat(
-        char const * reason	= NULL,
-        char const * evidence	= NULL
-    );
-
-};
-
-class InvalidFASTQFileFormat: public InvalidReadFileFormat
-{
-
-public:
-
-public:
-    InvalidFASTQFileFormat(
-        char const * reason	= NULL,
-        char const * evidence	= NULL
-    );
-
-};
-
-struct CacheSegmentUnavailable : public  khmer_exception {
-};
-
-struct CacheSegmentBoundaryViolation : public  khmer_exception {
-};
-
-struct InvalidCacheSizeRequested : public  khmer_exception {
-};
-
 struct NoMoreReadsAvailable : public  khmer_exception {
 };
 

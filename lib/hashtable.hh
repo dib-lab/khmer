@@ -171,9 +171,6 @@ protected:
 
     uint32_t	    _number_of_threads;
     uint32_t	    _tpool_map_spin_lock;
-    uint32_t	    _thread_pool_counter;
-    std:: map< int, uint32_t >
-    _thread_pool_id_map;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -183,7 +180,6 @@ protected:
 
     Hashtable( WordLength ksize )
         :   _tpool_map_spin_lock( 0 ),
-            _thread_pool_counter( 0 ),
             _max_count(MAX_COUNT),
             _max_bigcount(MAX_BIGCOUNT),
             _ksize( ksize )

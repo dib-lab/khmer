@@ -401,8 +401,6 @@ _ReadParser_iternext( PyObject * self )
         if (!stop_iteration)
             try {
                 parser->imprint_next_read( *the_read_PTR );
-            } catch (InvalidReadFileFormat &e) {
-                exc = e.what( );
             } catch (NoMoreReadsAvailable &e) {
                 stop_iteration = true;
             }
@@ -453,9 +451,6 @@ _ReadPairIterator_iternext( PyObject * self )
     if (!stop_iteration)
         try {
             parser->imprint_next_read_pair( the_read_pair, pair_mode );
-        } catch (InvalidReadFileFormat &exc) {
-            invalid_file_format = true;
-            strncpy( exc_message, exc.what( ), CHAR_MAX );
         } catch (UnknownPairReadingMode &exc) {
             unknown_pair_reading_mode = true;
         } catch (InvalidReadPair &exc) {
@@ -882,9 +877,6 @@ static PyObject * hash_consume_fasta_with_reads_parser(
                                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
-        exc_raised = true;
-    } catch (read_parsers::InvalidReadFileFormat &e) {
-        exc = e.what();
         exc_raised = true;
     }
     Py_END_ALLOW_THREADS
@@ -2241,8 +2233,6 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
                                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
-    } catch (read_parsers::InvalidReadFileFormat &e) {
-        exc = e.what();
     }
 
     Py_END_ALLOW_THREADS
@@ -2344,8 +2334,6 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
         );
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
-    } catch (read_parsers::InvalidReadFileFormat &e) {
-        exc = e.what();
     }
     Py_END_ALLOW_THREADS
     if (exc != NULL) {
