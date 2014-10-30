@@ -204,11 +204,13 @@ consume_fasta(
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
+        unsigned int  this_n_consumed;
+        bool	  is_valid;
+
         try {
-	  bool is_valid;
 	  read = parser->get_next_read( );
 
-	  unsigned int this_n_consumed =
+        this_n_consumed =
             check_and_process_read(read.sequence, is_valid);
 
 #ifdef WITH_INTERNAL_METRICS

@@ -73,9 +73,8 @@ cppcheck-result.xml: $(CPPSOURCES)
 
 cppcheck: $(CPPSOURCES)
 	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -DSEQAN_HAS_ZLIB -DSEQAN_HAS_BZIP2 \
-		-UNO_UNIQUE_RC --enable=all --file-list=- --platform=unix64
-		--std=posix --inline-suppr --quiet
+		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
+		--file-list=- -j8 --platform=unix64 --std=posix --inline-suppr --quiet
 
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true

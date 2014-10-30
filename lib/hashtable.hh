@@ -25,8 +25,6 @@
 #include "khmer_exception.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
-#include "trace_logger.hh"
-#include "thread_id_map.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -215,7 +213,7 @@ protected:
             _number_of_threads( number_of_threads ),
             _tpool_map_spin_lock( 0 ),
             _thread_pool_counter( 0 ),
-            _max_count( KMAX_COUNT - number_of_threads + 1 ),
+            _max_count( MAX_COUNT - number_of_threads + 1 ),
             _max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
             _ksize( ksize )
     {
