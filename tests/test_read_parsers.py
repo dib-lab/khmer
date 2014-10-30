@@ -96,9 +96,6 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         counters[tnum] = reduce(operator.add, (1 for read in rparser))
 
     N_THREADS = 4
-    config = khmer.get_config()
-    bufsz = config.get_reads_input_buffer_size()
-    config.set_reads_input_buffer_size(N_THREADS * 64 * 1024)
     threads = []
     reads_counts_per_thread = [0] * N_THREADS
     rparser = ReadParser(utils.get_test_data(testfile))
@@ -112,7 +109,6 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         t.start()
     for t in threads:
         t.join()
-    config.set_reads_input_buffer_size(bufsz)
 
     assert reads_count_1thr == sum(reads_counts_per_thread)
 
@@ -128,9 +124,6 @@ def test_old_illumina_pair_mating():
 
     import threading
 
-    config = khmer.get_config()
-    bufsz = config.get_reads_input_buffer_size()
-    config.set_reads_input_buffer_size(65600 * 2)
     # Note: This file, when used in conjunction with a 65600 byte per-thread
     #       prefetch buffer, tests the paired read mating logic with the
     #       old Illumina read name format.
@@ -155,17 +148,12 @@ def test_old_illumina_pair_mating():
     t1.join()
     t2.join()
 
-    config.set_reads_input_buffer_size(bufsz)
-
 
 @attr('multithread')
 def test_casava_1_8_pair_mating():
 
     import threading
 
-    config = khmer.get_config()
-    bufsz = config.get_reads_input_buffer_size()
-    config.set_reads_input_buffer_size(128 * 1024)
     # Note: This file, when used in conjunction with a 64 KiB per-thread
     #       prefetch buffer, tests the paired read mating logic with the
     #       Casava >= 1.8 read name format.
@@ -189,8 +177,6 @@ def test_casava_1_8_pair_mating():
 
     t1.join()
     t2.join()
-
-    config.set_reads_input_buffer_size(bufsz)
 
 
 def test_iterator_identities():

@@ -82,8 +82,7 @@ def main():
         print 'Outputting sequences to', args.output
 
     print 'making k-mer counting table'
-    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables)
+    htable = khmer.new_counting_hash(args.ksize, args.min_tablesize)
     htable.set_use_bigcount(args.bigcount)
 
     total_coverage = 0.

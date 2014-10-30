@@ -181,18 +181,11 @@ protected:
     HashIntoType    bitmask;
     unsigned int    _nbits_sub_1;
 
-    Hashtable(
-        WordLength	ksize,
-        uint32_t const	number_of_threads   =
-            get_active_config( ).get_number_of_threads( ),
-        uint8_t const	trace_level	    = TraceLogger:: TLVL_NONE
-    )
-        :	_trace_level( trace_level ),
-            _number_of_threads( number_of_threads ),
-            _tpool_map_spin_lock( 0 ),
+    Hashtable( WordLength ksize )
+        :   _tpool_map_spin_lock( 0 ),
             _thread_pool_counter( 0 ),
-            _max_count( MAX_COUNT - number_of_threads + 1 ),
-            _max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
+            _max_count(MAX_COUNT),
+            _max_bigcount(MAX_BIGCOUNT),
             _ksize( ksize )
     {
         _tag_density = DEFAULT_TAG_DENSITY;

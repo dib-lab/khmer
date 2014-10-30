@@ -23,13 +23,8 @@ extern "C"
 #include <regex.h>
 }
 
-#include "zlib.h"
-#include "bzlib.h"
 
 #include "khmer.hh"
-#include "khmer_config.hh"
-#include "trace_logger.hh"
-#include "perf_metrics.hh"
 
 namespace khmer
 {

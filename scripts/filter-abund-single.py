@@ -68,13 +68,9 @@ def main():
         check_space_for_hashtable(args.n_tables * args.min_tablesize)
     report_on_config(args)
 
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
-
     print 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables,
-                                     args.threads)
+                                     args.n_tables)
 
     # first, load reads into hash table
     rparser = khmer.ReadParser(args.datafile)

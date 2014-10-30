@@ -64,9 +64,6 @@ def main():
     else:
         print 'We WILL build the tagset (for partitioning/traversal).'
 
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.n_threads * 64 * 1024)
-
     print 'making k-mer presence table'
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 

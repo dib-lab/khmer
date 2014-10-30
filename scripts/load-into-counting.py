@@ -79,11 +79,8 @@ def main():
 
     print 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables, args.n_threads)
+                                     args.n_tables)
     htable.set_use_bigcount(args.bigcount)
-
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.n_threads * 64 * 1024)
 
     filename = None
 
