@@ -174,8 +174,6 @@ protected:
     uint32_t	    _thread_pool_counter;
     std:: map< int, uint32_t >
     _thread_pool_id_map;
-    std:: map< uint32_t, ThreadIDMap * >
-    _thread_id_maps;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
 
@@ -210,17 +208,6 @@ protected:
     virtual ~Hashtable( )
     {
         std:: map< int, uint32_t >:: iterator it;
-
-        for (it = _thread_pool_id_map.begin( );
-                it != _thread_pool_id_map.end( );
-                ++it) {
-            uint32_t thread_pool_id = it->second;
-
-            delete _thread_id_maps[ thread_pool_id ];
-            _thread_id_maps[ thread_pool_id ] = NULL;
-
-        }
-
         delete partition;
     }
 

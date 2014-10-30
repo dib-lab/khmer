@@ -28,7 +28,6 @@ extern "C"
 
 #include "khmer.hh"
 #include "khmer_config.hh"
-#include "thread_id_map.hh"
 #include "trace_logger.hh"
 #include "perf_metrics.hh"
 
