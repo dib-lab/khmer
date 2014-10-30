@@ -167,9 +167,6 @@ class Hashtable  		// Base class implementation of a Bloom ht.
 protected:
     unsigned int _tag_density;
 
-    uint8_t	    _trace_level;
-
-    uint32_t	    _number_of_threads;
     uint32_t	    _tpool_map_spin_lock;
     unsigned int    _max_count;
     unsigned int    _max_bigcount;
