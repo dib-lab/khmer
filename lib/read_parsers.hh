@@ -8,29 +8,23 @@
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <iostream>
-#include <seqan/sequence.h>
-#include <seqan/seq_io.h>
-#include <seqan/stream.h>
-#include <cstdarg>
+#include <mutex>
 #include <string>
 #include <utility>
-#include <stdlib.h>
-#include <mutex>
+
+#include "khmer.hh"
+#include "khmer_config.hh"
+#include "khmer_exception.hh"
+#include "seqan/seq_io.h"
+
 
 extern "C"
 {
 #include <regex.h>
 }
-
-#include "zlib.h"
-#include "bzlib.h"
-
-#include "khmer.hh"
-#include "khmer_config.hh"
-#include "thread_id_map.hh"
-#include "trace_logger.hh"
-#include "perf_metrics.hh"
 
 namespace khmer
 {

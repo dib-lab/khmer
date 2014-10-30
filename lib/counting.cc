@@ -5,15 +5,21 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "hashtable.hh"
-#include "counting.hh"
-#include "hashbits.hh"
-#include "read_parsers.hh"
-
-#include "zlib.h"
-#include <math.h>
+#include <stdio.h>
+#include <string.h>
 #include <algorithm>
+#include <iostream>
 #include <sstream>
+
+#include "counting.hh"
+#include "hashtable.hh"
+#include "khmer_exception.hh"
+#include "read_parsers.hh"
+#include "zlib.h"
+
+namespace khmer {
+class Hashbits;
+}  // namespace khmer
 
 using namespace std;
 using namespace khmer;
@@ -55,7 +61,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KMerIterator kmers(s.c_str(), _ksize);
 
-    BoundedCounterType min_count = MAX_COUNT;
+    BoundedCounterType min_count = KMAX_COUNT;
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();

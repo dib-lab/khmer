@@ -5,21 +5,8 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "read_parsers.hh"
-
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#ifdef __linux__
-#   include <sys/ioctl.h>
-#   include <linux/fs.h>
-#endif
-
 #include "khmer_exception.hh"
+#include "read_parsers.hh"
 
 namespace khmer
 {

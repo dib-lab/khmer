@@ -40,7 +40,7 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 
 #include "khmer_exception.hh"
 
-#   define MAX_COUNT 255
+#   define KMAX_COUNT 255
 #   define MAX_BIGCOUNT 65535
 #   define DEFAULT_TAG_DENSITY 40   // must be even
 
