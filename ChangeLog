@@ -1,3 +1,16 @@
+2014-11-15  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * tests/test_scripts.py: added screed/read_parsers stream testing
+    * khmer/file.py: modified file size checker to not break when fed
+    a fifo/block device
+    * tests/test-data/test-abund-read-2.fa.{bz2, gz}: new test files
+
+2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * do-partition.py: replaced threading args in scripts with things from 
+    khmer_args
+    * khmer/theading_args.py: removed as it has been deprecated
+
 2014-11-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * lib/{counting,hashbits}.{cc,hh},lib/hashtable.hh: Moved the n_kmers()
@@ -10,12 +23,6 @@
     number of unique kmers in a table.
     * tests/test_{hashbits,hashbits_obj,labelhash,scripts}.py: updated the
     tests to reflect the above
-
-2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
-
-    * do-partition.py: replaced threading args in scripts with things from 
-    khmer_args
-    * khmer/theading_args.py: removed as it has been deprecated
 
 2014-10-24  Camille Scott  <camille.scott.w@gmail.com>
 

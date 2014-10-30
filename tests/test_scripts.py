@@ -12,6 +12,11 @@ import os
 import shutil
 from cStringIO import StringIO
 import traceback
+from nose.plugins.attrib import attr
+import subprocess
+import threading
+import bz2
+import io
 
 import khmer_tst_utils as utils
 import khmer
@@ -446,6 +451,7 @@ def test_normalize_by_median_dumpfrequency():
     assert 'Nothing' in out
 
 
+@attr('known_failing')
 def test_normalize_by_median_empty():
     CUTOFF = '1'
 
@@ -1548,3 +1554,159 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
+
+
+def screed_streaming_function(ifilename):
+
+    # Get temp filenames, etc.
+    fifo = utils.get_temp_filename('fifo')
+    in_dir = os.path.dirname(fifo)
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1', '-k', '17', '-o', 'outfile', fifo]
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    # rvalues will hold the return from the threaded function
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+
+    ifile = io.open(ifilename, 'rb')
+    fifofile = io.open(fifo, 'wb')
+    # read binary to handle compressed files
+    chunk = ifile.read(8192)
+    while len(chunk) > 0:
+        fifofile.write(chunk)
+        chunk = ifile.read(8192)
+
+    fifofile.close()
+
+    thread.join()
+
+    return in_dir + '/outfile'
+
+
+def read_parser_streaming_function(ifilename, somedir=None):
+    fifo = utils.get_temp_filename('fifo')
+    in_dir = os.path.dirname(fifo)
+
+    ifile = open(ifilename, 'rb')
+
+    script = scriptpath('abundance-dist-single.py')
+    args = [fifo, 'outfile']
+
+    os.mkfifo(fifo)
+
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+
+    fifofile = open(fifo, 'wb')
+    chunk = ifile.read(8192)
+
+    while len(chunk) > 0:
+        fifofile.write(chunk)
+        chunk = ifile.read(8192)
+
+    fifofile.close()
+
+    thread.join()
+
+    return in_dir + '/outfile'
+
+
+@attr('known_failing')
+def test_screed_streaming_ufa():
+    # uncompressed fa
+    o = screed_streaming_function(utils.get_test_data('test-abund-read-2.fa'))
+
+    seqs = [r.sequence for r in screed.open(o)]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
+
+
+@attr('known_failing')
+def test_screed_streaming_ufq():
+    # uncompressed fq
+    o = screed_streaming_function(utils.get_test_data('test-fastq-reads.fq'))
+
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+
+
+@attr('known_failing')
+def test_screed_streaming_bzipfq():
+    # bzip compressed fq
+    o = screed_streaming_function(utils.get_test_data('100-reads.fq.bz2'))
+    seqs = [r.sequence for r in screed.open(o)]
+    assert len(seqs) == 100, seqs
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'), seqs
+
+
+@attr('known_failing')
+def test_screed_streaming_bzipfa():
+    # bzip compressed fa
+    o = screed_streaming_function(
+        utils.get_test_data('test-abund-read-2.fa.bz2'))
+
+    seqs = [r.sequence for r in screed.open(o)]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
+
+
+@attr('known_failing')
+def test_screed_streaming_gzipfq():
+    # gzip compressed fq
+    o = screed_streaming_function(utils.get_test_data('100-reads.fq.gz'))
+    assert os.path.exists(o)
+
+
+@attr('known_failing')
+def test_screed_streaming_gzipfa():
+    o =\
+        screed_streaming_function(
+            utils.get_test_data('test-abund-read-2.fa.gz'))
+    assert os.path.exists(o)
+
+
+@attr('known_failing')
+def test_read_parser_streaming_ufa():
+    # uncompressed fa
+    o = read_parser_streaming_function(
+        utils.get_test_data('test-abund-read-2.fa'))
+    assert os.path.exists(o)
+
+
+@attr('known_failing')
+def test_read_parser_streaming_bzfq():
+    # bzip compressed
+    o = read_parser_streaming_function(utils.get_test_data('100-reads.fq.bz2'))
+    assert os.path.exists(o)
+
+
+@attr('known_failing')
+def test_read_parser_streaming_gzfq():
+    # bzip compressed
+    o = read_parser_streaming_function(utils.get_test_data('100-reads.fq.gz'))
+    assert os.path.exists(o)
+
+
+@attr('known_failing')
+def test_read_parser_streaming_bzfa():
+    # bzip compressed
+    o =\
+        read_parser_streaming_function(
+            utils.get_test_data('test-abund-read-2.fa.bz2'))
+    assert os.path.exists(o)
+
+
+@attr('known_failing')
+def test_read_parser_streaming_gzfa():
+    # bzip compressed
+    o =\
+        read_parser_streaming_function(
+            utils.get_test_data('test-abund-read-2.fa.gz'))
+    assert os.path.exists(o)

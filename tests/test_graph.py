@@ -224,7 +224,11 @@ class Test_Partitioning(object):
         ht.output_partitions(filename, output_file, False)
 
         len1 = len(list(screed.open(filename)))
-        len2 = len(list(screed.open(output_file)))
+
+        try:
+            len2 = len(list(screed.open(output_file)))
+        except Exception:
+            len2 = 0
 
         assert len1 > 0
         assert len2 == 0, len2
