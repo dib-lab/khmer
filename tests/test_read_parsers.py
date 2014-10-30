@@ -167,7 +167,7 @@ def test_casava_1_8_pair_mating():
         for readnum, read in enumerate(rparser):
             if 0 == readnum:
                 pass
-                # assert "895:1:1:1761:13189 2:N:0:NNNNN" == read.name, read.name
+            # assert "895:1:1:1761:13189 2:N:0:NNNNN" == read.name, read.name
 
     t1 = threading.Thread(target=thread_1_runtime, args=[rparser])
     t2 = threading.Thread(target=thread_2_runtime, args=[rparser])
