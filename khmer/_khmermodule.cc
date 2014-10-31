@@ -1193,6 +1193,23 @@ static PyObject * hash_consume_fasta_parallel(PyObject * self, PyObject * args)
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static PyObject * hash_consume_fasta_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
+    CountingHash * counting  = me->counting;
+
+    const char * filename;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    counting->consume_fasta_async(filename);
+    Py_RETURN_NONE;
+}
+
+
+
 static PyObject * hash_consume_fasta_with_reads_parser(
     PyObject * self, PyObject * args
 )
@@ -1870,6 +1887,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "consume_async", hash_consume_async, METH_VARARGS, "Enquee all k-mers in the given string for consumption" },
     { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
     { "consume_fasta_parallel", hash_consume_fasta_parallel, METH_VARARGS, "Count all k-mers in the given file in parallel" },
+    { "consume_fasta_async", hash_consume_fasta_async, METH_VARARGS, "" },
     {
         "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser,
         METH_VARARGS, "Count all k-mers using a given reads parser"

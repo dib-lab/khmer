@@ -421,11 +421,37 @@ unsigned int Hashtable::consume_string(const std::string &s)
     return n_consumed;
 }
 
-unsigned int Hashtable::consume_string_async(const std::string &s)
-{
+unsigned int Hashtable::consume_string_async(const std::string &s) {
     unsigned int n_consumed = 0;
     async_hash->enqueue_string(s);
     return n_consumed;
+}
+
+void Hashtable::consume_fasta_async(std::string const &filename) {
+    khmer:: Config    &the_config	  = khmer:: get_active_config( );
+
+    IParser *	  parser =
+        IParser::get_parser(
+            filename, the_config.get_number_of_threads(), the_config.get_reads_input_buffer_size( ),
+            the_config.get_reads_parser_trace_level( )
+        );
+
+    consume_fasta_async(parser);
+
+    delete parser;
+}
+
+void Hashtable::consume_fasta_async(read_parsers::IParser * parser) {
+    
+    Read read;
+
+    // Iterate through the reads and consume their k-mers.
+    while (!parser->is_complete( )) {
+        bool is_valid;
+
+        read = parser->get_next_read( );
+        async_hash->enqueue_string(read.sequence);
+    } // while reads left for parser
 }
 
 // technically, get medioid count... our "median" is always a member of the

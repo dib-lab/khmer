@@ -253,7 +253,6 @@ protected:
         }
 
         delete partition;
-        async_hash->stop();
         delete async_hash;
     }
 
@@ -409,6 +408,10 @@ public:
         CallbackFn	    callback	    = NULL,
         void *		    callback_data   = NULL
     );
+
+    void consume_fasta_async(std::string const &filename);
+    void consume_fasta_async(read_parsers::IParser * parser);
+
     // Count every k-mer from a stream of FASTA or FASTQ reads,
     // using the supplied parser.
     void consume_fasta_parallel(

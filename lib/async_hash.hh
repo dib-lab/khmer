@@ -37,10 +37,13 @@ class AsyncHashWriter {
 
         AsyncHashWriter (khmer::Hashtable * ht):
                         _ht(ht) {
+            writers_running = false;
+            hashers_running = false;
             n_writers = 1;
         }
 
         ~AsyncHashWriter() {
+            if (writers_running || hashers_running) stop();
         }
 
         void start(unsigned int n_hasher_threads);
