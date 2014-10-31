@@ -1261,6 +1261,7 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
 }
 
 
+
 static PyObject * hash_consume_async(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1310,7 +1311,30 @@ static PyObject * hash_consume_parallel(PyObject * self, PyObject * args)
     return PyInt_FromLong(n_consumed);
 }
 
+static PyObject * hash_start_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
 
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "I", &n_threads)) {
+        return NULL;
+    }
+    counting->start_async(n_threads);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject * hash_stop_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    counting->stop_async();
+
+    Py_RETURN_NONE;
+}
 
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
@@ -1838,6 +1862,8 @@ static PyMethodDef khmer_counting_methods[] = {
     { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
+    { "start_async", hash_start_async, METH_VARARGS, "Start up the asynchronous hasher-writer with the given number of threads for hashing" },
+    { "stop_async", hash_stop_async, METH_VARARGS, "Stop the asynchronous hasher-writer" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
     { "consume_parallel", hash_consume_parallel, METH_VARARGS, "Count all k-mers in the given string in parallel" },

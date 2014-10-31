@@ -2,9 +2,10 @@
 #define ASYNC_HASH_HH
 
 #include "hashtable.hh"
-#include "cqueue.hh"
+//#include "cqueue.hh"
 #include <iostream>
 #include <thread>
+#include <boost/lockfree/queue.hpp>
 
 namespace khmer {
 
@@ -17,36 +18,39 @@ class AsyncHashWriter {
     friend class Hashtable; 
     
     khmer::Hashtable * _ht;
-    uint32_t _n_writer_threads;
-    CQueue<HashIntoType> hash_q;
-    std::thread * consume_hash_thread;
-    HashIntoType _stop_sig = -1;
+
+    //CQueue<HashIntoType> hash_q;
+    //CQueue<const char*> kmer_q;
+    boost::lockfree::queue<HashIntoType> hash_q;
+    boost::lockfree::queue<const char *> kmer_q;
+
+    std::thread * writer_thread;
+    std::vector<std::thread> hasher_threads;
+    //HashIntoType _stop_sig = -1;
+
+    bool writers_running, hashers_running;
+
+    unsigned int n_writers;
+    unsigned int n_hashers;
 
     public:
 
-        AsyncHashWriter (khmer::Hashtable * ht, uint32_t n_writer_threads):
-                        _ht(ht),
-                        _n_writer_threads(n_writer_threads) {
+        AsyncHashWriter (khmer::Hashtable * ht):
+                        _ht(ht) {
+            n_writers = 1;
         }
 
         ~AsyncHashWriter() {
         }
 
-        void start();
+        void start(unsigned int n_hasher_threads);
         void stop();
-        void enqueue(HashIntoType khash);
-        void consume_hash(CQueue<HashIntoType>& q);
+        void enqueue_kmer(const char * kmer);
+        void consume_kmer(boost::lockfree::queue<const char *>& q);
+        void enqueue_string(const std::string &s);
+        void enqueue_hash(HashIntoType khash);
+        void consume_hash(boost::lockfree::queue<HashIntoType>& q);
 
-        /*
-        void write_table(HashIntoType khash, unsigned int table, HashIntoType table_size) {
-            const HashIntoType bin = khash % table_size;
-            if (_ht->_max_count > _ht->_counts[table][bin]) {
-                _ht->_counts[table][bin] += 1;
-            } else {
-
-            }
-        }
-        */
 };
 }; // namspace khmer
 

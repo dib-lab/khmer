@@ -96,6 +96,14 @@ Hashtable:: Hasher::
 { }
 
 
+void Hashtable::start_async(unsigned int n_hasher_threads) {
+    async_hash->start(n_hasher_threads);
+}
+
+void Hashtable::stop_async() {
+    async_hash->stop();
+}
+
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
 //
@@ -415,18 +423,8 @@ unsigned int Hashtable::consume_string(const std::string &s)
 
 unsigned int Hashtable::consume_string_async(const std::string &s)
 {
-    const char * sp = s.c_str();
     unsigned int n_consumed = 0;
-
-    KMerIterator kmers(sp, _ksize);
-
-    while(!kmers.done()) {
-        HashIntoType kmer = kmers.next();
-
-        count_async(kmer);
-        n_consumed++;
-    }
-
+    async_hash->enqueue_string(s);
     return n_consumed;
 }
 

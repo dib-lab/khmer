@@ -226,8 +226,7 @@ protected:
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
-        async_hash = new AsyncHashWriter(this, 1);
-        async_hash->start();
+        async_hash = new AsyncHashWriter(this);
     }
 
     virtual ~Hashtable( )
@@ -357,6 +356,7 @@ public:
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
     virtual void count_async(HashIntoType khash) = 0;
+    virtual void count_async(const char * kmer) = 0;
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;
@@ -369,6 +369,9 @@ public:
     unsigned int consume_string(const std::string &s);
     unsigned int consume_string_parallel(const std::string &s, const unsigned int n_threads);
     unsigned int consume_string_async(const std::string &s);
+
+    void start_async(unsigned int n_hasher_threads);
+    void stop_async();
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;

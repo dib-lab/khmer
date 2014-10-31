@@ -65,6 +65,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
 
     consume = htable.consume
     if args.async:
+        htable.start_async(args.n_hasher_threads)
         consume = htable.consume_async
 
     for index, batch in enumerate(batchwise(screed.open(
@@ -213,7 +214,8 @@ def get_parser():
                         help="Prints the total number of k-mers"
                         " post-normalization to stderr")
     parser.add_argument('--async', action='store_true',
-                        help='Consume k-mers asynchronously with threading (EXPERIMENTAOL)')
+                        help='Consume k-mers asynchronously with threading (EXPERIMENTAL)')
+    parser.add_argument('--n_hashers', dest='n_hasher_threads', type=int, default=1)
     add_loadhash_args(parser)
     return parser
 

@@ -49,7 +49,7 @@ BZIP2DIR = 'third-party/bzip2'
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
     "khmer", "khmer_config", "kmer_hash", "hashtable", "counting",
-    "hashbits", "labelhash", "cqueue", "async_hash"])
+    "hashbits", "labelhash", "async_hash"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
@@ -62,7 +62,7 @@ EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
 if sys.platform == 'darwin':
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
 else:
-    EXTRA_COMPILE_ARGS.append('-fopenmp')
+    EXTRA_COMPILE_ARGS.extend(['-fopenmp', '-lboost'])
 
 EXTENSION_MOD_DICT = \
     {
