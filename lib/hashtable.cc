@@ -104,6 +104,22 @@ void Hashtable::stop_async() {
     async_hash->stop();
 }
 
+void Hashtable::start_async_diginorm(unsigned int cutoff, unsigned int n_threads) {
+    async_diginorm->start(cutoff, n_threads);
+}
+
+void Hashtable::stop_async_diginorm() {
+    async_diginorm->stop();
+}
+
+void Hashtable::push_diginorm(Read * read) {
+    async_diginorm->push(read);
+}
+
+bool Hashtable::pop_diginorm(Read * read) {
+    return async_diginorm->pop(read);
+}
+
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
 //
@@ -447,8 +463,6 @@ void Hashtable::consume_fasta_async(read_parsers::IParser * parser) {
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-        bool is_valid;
-
         read = parser->get_next_read( );
         async_hash->enqueue_string(read.sequence);
     } // while reads left for parser

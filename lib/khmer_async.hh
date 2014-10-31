@@ -1,16 +1,20 @@
 #ifndef KHMER_ASYNC_HH
 #define KHMER_ASYNC_HH
 
+#include "khmer.hh"
 #include "hashtable.hh"
+#include "read_parsers.hh"
 #include <iostream>
 #include <thread>
 #include <boost/lockfree/queue.hpp>
 
-typedef boost::lockfree::queue<HashIntoType> HashQueue;
-typedef boost::lockfree::queue<const char *> CharQueue;
-typedef boost::lockfree::queue<khmer::Read> ReadQueue;
+using namespace boost::lockfree;
 
-typedef boost::lockfree::queue Queue;
+typedef khmer::read_parsers::Read Read;
+
+typedef queue<khmer::HashIntoType> HashQueue;
+typedef queue<const char *> CharQueue;
+typedef queue<Read*> ReadQueue;
 
 namespace khmer {
 
@@ -28,23 +32,45 @@ template <class T> class Async {
 
     public:
 
-        Queue<T> _in_queue; 
+        queue<T> * _in_queue; 
 
         Async() {
             _workers_running = false;
+            _in_queue = new queue<T>;
         }
 
         ~Async() {
             if(_workers_running) stop();
         }
 
-        void start(unsigned int n_threads);
-        void stop();
+        virtual void consume(queue<T>* q) = 0;
 
-        void push(T item);
-        virtual void consume(Queue<T>& q) = 0;
-        
-        void set_input(Queue<T>& new_q);
+        void start(unsigned int n_threads) {
+            _n_workers = n_threads;
+
+            _workers_running = true;
+            for (unsigned int t=0; t<_n_workers; ++t) {
+                std::cout << "Async spawn worker" << std::endl;
+                _worker_threads.push_back(std::thread(&Async<T>::consume, this, _in_queue));
+            }
+        }
+
+        void stop() {
+            _workers_running = false;
+            auto wthread = _worker_threads.begin();
+            while (wthread != _worker_threads.end()) {
+                wthread->join();
+                wthread++;
+            }
+        }
+
+        void push(T& item) {
+            _in_queue->push(item);
+        }
+
+        void set_input(queue<T>* new_q) {
+            _in_queue = new_q;
+        }
 };
 
 class AsyncWriter: public Async<HashIntoType> {
@@ -59,12 +85,12 @@ class AsyncWriter: public Async<HashIntoType> {
     public:
 
         AsyncWriter (khmer::Hashtable * ht):
-                     _ht(ht),
-                     khmer::Async() {
+                     khmer::Async<HashIntoType>(), 
+                     _ht(ht) {
         }
 
-        void push(HashIntoType item);
-        void consume(HashQueue& q);
+        void start();
+        virtual void consume(HashQueue * q);
 
 
 };
@@ -79,49 +105,58 @@ class AsyncHasher: public Async<const char *> {
 
     public:
 
-        HashQueue _out_queue;
+        HashQueue * _out_queue;
 
-        AsyncHasher (unsigned int ksize): 
-                     _ksize(ksize),
-                     khmer::Async() {
+        AsyncHasher (unsigned int ksize):
+                     khmer::Async<const char *>(),
+                     _ksize(ksize) {
+            _out_queue = new HashQueue();
         }
 
-        void push(const char * item);
-        void consume(CharQueue& q);
+        virtual void consume(CharQueue * q);
 
         bool pop(HashIntoType& khash);
-        void set_output(HashQueue& new_q);
-}
+        void set_output(HashQueue* new_q);
+};
 
-class AsyncSequenceProcessor {
+class AsyncSequenceProcessor: public Async<Read*> {
 
-    private:
+    protected:
 
-        khmer::Hashtable _ht;
-        khmer::AsyncHashWriter _hasher;
-        ReadQueue _in_queue;
-        ReadQueue _out_queue;
-        std::vector<std::thread> _processor_threads;
-        bool _processors_running;
+        khmer::Hashtable * _ht;
+        khmer::AsyncWriter * _writer;
+
 
     public:
 
+        ReadQueue * _out_queue;
+
         AsyncSequenceProcessor (khmer::Hashtable * ht):
+                                khmer::Async<Read*>(),
                                 _ht(ht) {
-            _processors_running = false;
+            _writer = new AsyncWriter(_ht);
+            _out_queue = new ReadQueue();
         }
 
-        ~AsyncSequenceProcessor() {
-            if (processors_running) stop();
-        }
-
-        void start(unsigned int n_processor_threads);
+        void start(unsigned int n_threads);
         void stop();
 
-        void push(khmer::Read read);
-        bool pop(khmer::Read read);
-
-        virtual void processor(ReadQueue q);
+        bool pop(Read* read);
+        virtual void consume(ReadQueue* q) = 0;
+        void set_output(ReadQueue* new_q);
 };
 
+
+class AsyncDiginorm: public AsyncSequenceProcessor {
+
+    protected:
+
+        unsigned int _cutoff;
+
+    public:
+
+        void start(unsigned int cutoff, unsigned int n_threads);
+        virtual void consume(ReadQueue* q);
+};
+};
 #endif

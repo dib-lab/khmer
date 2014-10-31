@@ -1353,6 +1353,53 @@ static PyObject * hash_stop_async(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
+
+static PyObject * hash_start_async_diginorm(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    unsigned int cutoff = 20;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "|II", &cutoff, &n_threads)) {
+        return NULL;
+    }
+    counting->start_async_diginorm(cutff, n_threads);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject * hash_stop_async_diginorm(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    counting->stop_async_diginorm();
+
+    Py_RETURN_NONE;
+}
+
+static PyObject * hash_push_diginorm(PyObject * self)
+{
+
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    PyObject * read;
+    if (!PyArg_ParseTuple(args, "O", &read)) {
+        return NULL;
+    }
+
+    counting->push_diginorm(read);
+}
+
+
+    PyObject * the_read_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
+    ((Read_Object *)the_read_OBJECT)->read = the_read_PTR;
+    return the_read_OBJECT;
+}
+
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
