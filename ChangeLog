@@ -1,5 +1,10 @@
 2014-10-30  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+    New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
+    newly found read dropping issue
+    https://github.com/ged-lab/khmer/issues/249
+    https://github.com/ged-lab/khmer/pull/641
+
     * lib/{read_parsers}.{cc,hh},setup.py,third-party/seqan: replaced parsers
     with Seqan implementation. Removed unused exception classes.
     * lib/{counting,hashtable,labelhash,read_aligner}.{cc,hh}: removed
