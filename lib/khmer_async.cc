@@ -16,6 +16,10 @@ void AsyncWriter::start() {
     Async<HashIntoType>::start(1);
 }
 
+unsigned int AsyncWriter::ksize() {
+    return _ht->ksize();
+}
+
 void AsyncWriter::consume(HashQueue * q) {
     HashIntoType khash;
     unsigned long long total_consumed = 0;
@@ -109,12 +113,20 @@ void AsyncDiginorm::consume(ReadQueue * q) {
     Read* read;
     BoundedCounterType median;
     float average, stddev;
+    unsigned int ksize = _writer->ksize();
+    HashIntoType khash;
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
     while(1) {
         if (q->pop(read)) {
             _ht->get_median_count(read->sequence, median, average, stddev);
-            if (median < _cutoff)
+            if (median < _cutoff) {
                 _out_queue->push(read);
+                khmer::KMerIterator kmers(read->sequence.c_str(), ksize);
+                while(!kmers.done()) {
+                    khash = kmers.next();
+                    _writer->push(khash);
+                }
+            }
         } else {
             if (!_workers_running) return;
         }

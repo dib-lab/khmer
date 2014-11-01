@@ -1365,7 +1365,7 @@ static PyObject * hash_start_async_diginorm(PyObject * self, PyObject * args)
     if (!PyArg_ParseTuple(args, "|II", &cutoff, &n_threads)) {
         return NULL;
     }
-    counting->start_async_diginorm(cutff, n_threads);
+    counting->start_async_diginorm(cutoff, n_threads);
 
     Py_RETURN_NONE;
 }
@@ -1380,9 +1380,8 @@ static PyObject * hash_stop_async_diginorm(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyObject * hash_push_diginorm(PyObject * self)
+static PyObject * hash_push_diginorm(PyObject * self, PyObject * args)
 {
-
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
@@ -1391,13 +1390,25 @@ static PyObject * hash_push_diginorm(PyObject * self)
         return NULL;
     }
 
-    counting->push_diginorm(read);
+    counting->push_diginorm(((khmer::python::Read_Object *)read)->read);
+
+    Py_DECREF(read);    
+    Py_RETURN_NONE;
 }
 
+static PyObject * hash_pop_diginorm(PyObject * self, PyObject * args) 
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
 
-    PyObject * the_read_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
-    ((Read_Object *)the_read_OBJECT)->read = the_read_PTR;
-    return the_read_OBJECT;
+    Read * read;
+    if (counting->pop_diginorm(read)) {
+        PyObject * the_read_OBJECT = khmer::python::Read_Type.tp_alloc( &khmer::python::Read_Type, 1 );
+        ((khmer::python::Read_Object *)the_read_OBJECT)->read = read;
+        return the_read_OBJECT;
+    } else {
+        Py_RETURN_NONE;
+    }
 }
 
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
@@ -1928,6 +1939,10 @@ static PyMethodDef khmer_counting_methods[] = {
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "start_async", hash_start_async, METH_VARARGS, "Start up the asynchronous hasher-writer with the given number of threads for hashing" },
     { "stop_async", hash_stop_async, METH_VARARGS, "Stop the asynchronous hasher-writer" },
+    { "start_async_diginorm", hash_start_async_diginorm, METH_VARARGS, "Start up asynchronous diginorm with the given coverage and number of threads" },
+    { "stop_async_diginorm", hash_stop_async_diginorm, METH_VARARGS, "Stop asynchronous diginorm" },
+    { "push_diginorm", hash_push_diginorm, METH_VARARGS, "Push onto async diginorm queue" },
+    { "pop_diginorm", hash_pop_diginorm, METH_VARARGS, "Pop from the async diginorm output queue" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
     { "consume_parallel", hash_consume_parallel, METH_VARARGS, "Count all k-mers in the given string in parallel" },

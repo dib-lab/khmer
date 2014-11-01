@@ -89,6 +89,7 @@ class AsyncWriter: public Async<HashIntoType> {
                      _ht(ht) {
         }
 
+        unsigned int ksize();
         void start();
         virtual void consume(HashQueue * q);
 
@@ -155,6 +156,8 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
 
     public:
 
+        AsyncDiginorm (khmer::Hashtable * ht):
+                        khmer::AsyncSequenceProcessor(ht) {}
         void start(unsigned int cutoff, unsigned int n_threads);
         virtual void consume(ReadQueue* q);
 };

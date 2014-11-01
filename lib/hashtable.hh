@@ -25,6 +25,7 @@
 #include "subset.hh"
 #include "kmer_hash.hh"
 #include "async_hash.hh"
+#include "khmer_async.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -343,7 +344,7 @@ protected:
 public:
     SubsetPartition * partition;
     AsyncHashWriter * async_hash;
-    AsyncDiginorm * diginorm;
+    AsyncDiginorm * async_diginorm;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
@@ -378,6 +379,7 @@ public:
     void stop_async_diginorm();
 
     void push_diginorm(Read * read);
+    bool pop_diginorm(Read * read);
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
