@@ -37,6 +37,9 @@
 #ifndef SEQAN_HEADER_SYSTEM_SEMAPHORE_H
 #define SEQAN_HEADER_SYSTEM_SEMAPHORE_H
 
+#include <semaphore.h>
+#include <fcntl.h>
+
 namespace SEQAN_NAMESPACE_MAIN
 {
 
@@ -90,7 +93,6 @@ namespace SEQAN_NAMESPACE_MAIN
     };
 
 #else
-
     struct Semaphore
     {
         typedef unsigned int Type;
