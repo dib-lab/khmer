@@ -36,7 +36,7 @@
 // ==========================================================================
 
 #ifndef SEQAN_SEQUENCE_STRING_SET_DEPENDENT_GENEROUS_H_
-#define SEQAN_SEQUENCE_STRING_SET_DEPENDENT_GENEROUSH_
+#define SEQAN_SEQUENCE_STRING_SET_DEPENDENT_GENEROUS_H_
 
 namespace seqan {
 

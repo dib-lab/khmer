@@ -34,7 +34,7 @@
 // Positional iterator implementation.
 // ==========================================================================
 
-#ifndef SEQAN_CORE_INCLUDE_SEQAN_BASIC_ITERATOR_POSITION_H_x
+#ifndef SEQAN_CORE_INCLUDE_SEQAN_BASIC_ITERATOR_POSITION_H_
 #define SEQAN_CORE_INCLUDE_SEQAN_BASIC_ITERATOR_POSITION_H_
 
 namespace seqan {
