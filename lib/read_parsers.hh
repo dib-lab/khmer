@@ -8,20 +8,11 @@
 #ifndef READ_PARSERS_HH
 #define READ_PARSERS_HH
 
-#include <iostream>
 #include <seqan/sequence.h>
 #include <seqan/seq_io.h>
 #include <seqan/stream.h>
-#include <cstdarg>
-#include <string>
-#include <utility>
-#include <stdlib.h>
-#include <mutex>
-
-extern "C"
-{
+#include <pthread.h>
 #include <regex.h>
-}
 
 
 #include "khmer.hh"
@@ -133,7 +124,7 @@ public:
 
 private:
     seqan::SequenceStream _stream;
-    std::mutex _imprint_mutex;
+    pthread_mutex_t _imprint_mutex;
 
 };
 

@@ -7,18 +7,7 @@
 
 #include "read_parsers.hh"
 
-#include <cstdlib>
 #include <cstring>
-#include <cstdio>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#ifdef __linux__
-#   include <sys/ioctl.h>
-#   include <linux/fs.h>
-#endif
-
 #include "khmer_exception.hh"
 
 namespace khmer
@@ -34,6 +23,7 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
     if (!seqan::isGood(_stream) || seqan::atEnd(_stream)) {
         throw InvalidStreamHandle();
     }
+    pthread_mutex_init(&_imprint_mutex, NULL);
 }
 
 bool SeqAnParser::is_complete()
@@ -44,10 +34,10 @@ bool SeqAnParser::is_complete()
 void SeqAnParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
-    _imprint_mutex.lock();
+    pthread_mutex_lock(&_imprint_mutex);
     int ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.accuracy, _stream);
-    _imprint_mutex.unlock();
+    pthread_mutex_unlock(&_imprint_mutex);
     if (ret != 0) {
         throw NoMoreReadsAvailable();
     }
@@ -55,6 +45,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
 
 SeqAnParser::~SeqAnParser()
 {
+    pthread_mutex_destroy(&_imprint_mutex);
     seqan::close(_stream);
 }
 
