@@ -535,11 +535,11 @@ def test_badget():
     try:
         hbts.get("AGCTT")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
-####
+#
 
 
 def test_load_notexist_should_fail():
@@ -573,7 +573,7 @@ def test_load_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -584,7 +584,7 @@ def test_save_load_tagset_notexist():
     try:
         ht.load_tagset(outfile)
         assert 0, "this test should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -666,7 +666,7 @@ def test_hashbits_file_version_check():
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -680,7 +680,7 @@ def test_hashbits_file_type_check():
     try:
         ht.load(savepath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -692,7 +692,7 @@ def test_stoptags_file_version_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -703,7 +703,7 @@ def test_stoptags_ksize_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -714,7 +714,7 @@ def test_stop_tags_filetype_check():
     try:
         ht.load_stop_tags(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -726,7 +726,7 @@ def test_tagset_file_version_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -737,7 +737,7 @@ def test_tagset_ksize_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -748,7 +748,7 @@ def test_tagset_filetype_check():
     try:
         ht.load_tagset(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -756,7 +756,7 @@ def test_bad_primes_list():
     try:
         coutingtable = khmer._new_hashbits(31, ["a", "b", "c"], 1)
         assert 0, "Bad primes list should fail"
-    except TypeError, e:
+    except TypeError as e:
         print str(e)
 
 
@@ -765,13 +765,13 @@ def test_consume_absentfasta_with_reads_parser():
     try:
         presencetable.consume_fasta_with_reads_parser()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         readparser = ReadParser(utils.get_test_data('empty-file'))
         presencetable.consume_fasta_with_reads_parser(readparser)
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
     except ValueError, err:
         print str(err)

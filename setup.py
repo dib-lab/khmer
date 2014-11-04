@@ -126,6 +126,7 @@ SETUP_METADATA = \
 
 
 class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
+
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.

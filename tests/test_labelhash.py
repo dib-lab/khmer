@@ -37,7 +37,7 @@ def test_get_label_dict():
     lb.consume_fasta_and_tag_with_labels(filename)
 
     labels = lb.get_label_dict()
-    expected = [0L, 1L, 2L, 3L]
+    expected = [0, 1, 2, 3]
     for e_label in expected:
         assert e_label in labels
     for a_label in labels:
@@ -48,11 +48,11 @@ def test_get_tag_labels():
     lb = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('single-read.fq')
     lb.consume_fasta_and_tag_with_labels(filename)
-    tag = 173473779682L
+    tag = 173473779682
 
     labels = lb.get_tag_labels(tag)
     assert len(labels) == 1
-    assert labels.pop() == 0L
+    assert labels.pop() == 0
 
 
 def test_consume_fasta_and_tag_with_labels():
@@ -93,13 +93,13 @@ def test_consume_partitioned_fasta_and_tag_with_labels():
     # print lb.n_labels()
     # print labels
     assert len(labels) == 1
-    assert labels.pop() == 2L
+    assert labels.pop() == 2
     assert lb.n_labels() == 1
 
 
 def test_consume_sequence_and_tag_with_labels():
     lb = LabelHash(20, 1e6, 4)
-    label = 0L
+    label = 0
     sequence = 'ATGCATCGATCGATCGATCGATCGATCGATCGATCGATCG'
 
     n_consumed = lb.consume_sequence_and_tag_with_labels(sequence, label)
@@ -117,7 +117,7 @@ def test_sweep_tag_neighborhood():
 
     tags = lb.sweep_tag_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(tags) == 1
-    assert tags.pop() == 173473779682L
+    assert tags.pop() == 173473779682
 
 
 def test_sweep_label_neighborhood():
@@ -127,7 +127,7 @@ def test_sweep_label_neighborhood():
 
     labels = lb.sweep_label_neighborhood('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
     assert len(labels) == 1
-    assert labels.pop() == 0L
+    assert labels.pop() == 0
 
 '''
 * The test data set as four reads: A, B, C, and D
@@ -153,8 +153,8 @@ def test_label_tag_correctness():
     print labels
     print len('ATCGTGTAAGCTATCGTAATCGTAAGCTCTGCCTAGAGCTAGGCTAG') - 19
     assert len(labels) == 2
-    assert 0L in labels
-    assert 1L in labels
+    assert 0 in labels
+    assert 1 in labels
 
     # read B
     labels = lb.sweep_label_neighborhood(
@@ -162,9 +162,9 @@ def test_label_tag_correctness():
         'ATAGATAGATGACCTAGAGCTAGGCTAGGTGTTGGGGATAGATAGATAGATGA')
     print labels
     assert len(labels) == 3
-    assert 0L in labels
-    assert 1L in labels
-    assert 2L in labels
+    assert 0 in labels
+    assert 1 in labels
+    assert 2 in labels
 
     # read C
     labels = lb.sweep_label_neighborhood(
@@ -173,15 +173,15 @@ def test_label_tag_correctness():
         'ACAACACATACA')
     print labels
     assert len(labels) == 2
-    assert 1L in labels
-    assert 2L in labels
+    assert 1 in labels
+    assert 2 in labels
 
     # read D
     labels = lb.sweep_label_neighborhood(
         'TATATATATAGCTAGCTAGCTAACTAGCTAGCATCGATCGATCGATC')
     print labels
     assert len(labels) == 1
-    assert 3L in labels
+    assert 3 in labels
 
 #
 # Begin Hashbits tests
@@ -694,5 +694,5 @@ def test_bad_primes():
     try:
         hi = khmer._LabelHash.__new__(khmer.LabelHash, 6, ["a", "b", "c"])
         assert 0, "Non number prime list should fail"
-    except TypeError, e:
+    except TypeError as e:
         print str(e)

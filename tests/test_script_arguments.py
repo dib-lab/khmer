@@ -22,7 +22,7 @@ def test_check_space():
     try:
         khmer.file.check_space([fakelump_fa], _testhook_free_space=0)
         assert 0, "this should fail"
-    except SystemExit, e:
+    except SystemExit as e:
         print str(e)
     finally:
         sys.stderr = save_stderr
@@ -33,7 +33,7 @@ def test_check_tablespace():
     try:
         khmer.file.check_space_for_hashtable(1e9, _testhook_free_space=0)
         assert 0, "this should fail"
-    except SystemExit, e:
+    except SystemExit as e:
         print str(e)
     finally:
         sys.stderr = save_stderr

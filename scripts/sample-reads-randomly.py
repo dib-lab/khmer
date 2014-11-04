@@ -67,8 +67,8 @@ def get_parser():
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
-    parser.add_argument('-f','-force', default=False, action='store_true',
-			help='Overwrite output file if it exits')
+    parser.add_argument('-f', '-force', default=False, action='store_true',
+                        help='Overwrite output file if it exits')
     return parser
 
 
@@ -104,7 +104,7 @@ def main():
         if num_samples > 1:
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
-	    if not args.force:
+            if not args.force:
                 sys.exit(-1)
         output_filename = output_file.name
     else:

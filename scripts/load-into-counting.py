@@ -62,8 +62,8 @@ def get_parser():
                         "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
-    parser.add_argument('-f','-force', default=False, action='store_true',
-			help='Overwrite output file if it exists')
+    parser.add_argument('-f', '-force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -164,7 +164,7 @@ def main():
         print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
         print >> sys.stderr, "for this data set. Increase tablesize/# tables."
         print >> sys.stderr, "**"
-	#if not args.force:
+        # if not args.force:
         sys.exit(1)
 
     print >>sys.stderr, 'DONE.'
