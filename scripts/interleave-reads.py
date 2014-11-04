@@ -63,6 +63,8 @@ def get_parser():
                         default=sys.stdout)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f','-force', default=False, action='store_true',
+			help='Overwrite output file if it exists')
     return parser
 
 
@@ -93,7 +95,8 @@ def main():
         fail = True
 
     if fail:
-        sys.exit(1)
+	if not args.force:
+            sys.exit(1)
 
     print >> sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
 

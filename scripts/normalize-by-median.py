@@ -313,7 +313,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                               "tables.")
         print >> sys.stderr, "**"
         print >> sys.stderr, "** Do not use these results!!"
-        sys.exit(1)
+	if not args.force:
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()
