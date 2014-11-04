@@ -22,6 +22,7 @@
 #include "counting.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
+#include "khmer_async.hh"
 #include "khmer_exception.hh"
 
 using namespace khmer;
@@ -1353,64 +1354,6 @@ static PyObject * hash_stop_async(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
-
-static PyObject * hash_start_async_diginorm(PyObject * self, PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    unsigned int cutoff = 20;
-    unsigned int n_threads = 1;
-
-    if (!PyArg_ParseTuple(args, "|II", &cutoff, &n_threads)) {
-        return NULL;
-    }
-    counting->start_async_diginorm(cutoff, n_threads);
-
-    Py_RETURN_NONE;
-}
-
-static PyObject * hash_stop_async_diginorm(PyObject * self, PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    counting->stop_async_diginorm();
-
-    Py_RETURN_NONE;
-}
-
-static PyObject * hash_push_diginorm(PyObject * self, PyObject * args)
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    PyObject * read;
-    if (!PyArg_ParseTuple(args, "O", &read)) {
-        return NULL;
-    }
-
-    counting->push_diginorm(((khmer::python::Read_Object *)read)->read);
-
-    Py_DECREF(read);    
-    Py_RETURN_NONE;
-}
-
-static PyObject * hash_pop_diginorm(PyObject * self, PyObject * args) 
-{
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-    CountingHash * counting = me->counting;
-
-    Read * read;
-    if (counting->pop_diginorm(read)) {
-        PyObject * the_read_OBJECT = khmer::python::Read_Type.tp_alloc( &khmer::python::Read_Type, 1 );
-        ((khmer::python::Read_Object *)the_read_OBJECT)->read = read;
-        return the_read_OBJECT;
-    } else {
-        Py_RETURN_NONE;
-    }
-}
-
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1939,10 +1882,6 @@ static PyMethodDef khmer_counting_methods[] = {
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "start_async", hash_start_async, METH_VARARGS, "Start up the asynchronous hasher-writer with the given number of threads for hashing" },
     { "stop_async", hash_stop_async, METH_VARARGS, "Stop the asynchronous hasher-writer" },
-    { "start_async_diginorm", hash_start_async_diginorm, METH_VARARGS, "Start up asynchronous diginorm with the given coverage and number of threads" },
-    { "stop_async_diginorm", hash_stop_async_diginorm, METH_VARARGS, "Stop asynchronous diginorm" },
-    { "push_diginorm", hash_push_diginorm, METH_VARARGS, "Push onto async diginorm queue" },
-    { "pop_diginorm", hash_pop_diginorm, METH_VARARGS, "Pop from the async diginorm output queue" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
     { "consume_parallel", hash_consume_parallel, METH_VARARGS, "Count all k-mers in the given string in parallel" },
@@ -4099,6 +4038,177 @@ khmer_subset_getattr(PyObject * obj, char * name)
     return Py_FindMethod(khmer_subset_methods, obj, name);
 }
 
+////////////////////
+// AsyncDiginorm
+////////////////////
+
+typedef struct {
+    PyObject_HEAD
+    AsyncDiginorm * async_diginorm;
+} khmer_AsyncDiginormObject;
+
+static void khmer_asyncdiginorm_dealloc(PyObject *);
+static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject * args,
+                                PyObject * kwds);
+static PyObject * khmer_asyncdiginorm_new(PyTypeObject * type, PyObject * args,
+                                PyObject * kwds);
+
+static PyObject * asyncdiginorm_start(PyObject * self, PyObject * args)
+{
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+
+    const char * filename;
+    unsigned int cutoff = 20;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "s|II", &filename, &cutoff, &n_threads)) {
+        return NULL;
+    }
+    async_diginorm->start(filename, cutoff, n_threads);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject * asyncdiginorm_stop(PyObject * self, PyObject * args)
+{
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+    
+    std::cout << "Call stop()" << std::endl;
+
+    async_diginorm->stop();
+
+    Py_RETURN_NONE;
+}
+
+PyObject * asyncdiginorm_processed_iter(PyObject * self) {
+    return PyObject_SelfIter(self);
+}
+
+PyObject * asyncdiginorm_processed_iternext(PyObject * self) {
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+   
+    khmer::read_parsers::Read * read_ptr = new Read();
+
+
+
+    //std::cout << "is_processing(): " << async_diginorm->is_processing() << std::endl;
+    //std::cout << "has_output(): " << async_diginorm->has_output() << std::endl;
+
+    // Relatively strict conditions to stop iteraton:
+    //   1) Parsing is done (otherwise, this can get tripped before any reads have passed)
+    //   2) The number of reads_popped
+
+
+
+    while(!(async_diginorm->pop(read_ptr))) {
+        if(!(async_diginorm->is_processing()) && 
+            (async_diginorm->reads_popped() >= async_diginorm->reads_kept()))
+        {
+            std::cout << "STOP_ITER: (kept, popped): " << async_diginorm->reads_kept() << " " << async_diginorm->reads_popped() << std::endl;
+            delete read_ptr;
+            PyErr_SetNone(PyExc_StopIteration);
+            return NULL;
+        }
+    }
+    if (async_diginorm->reads_kept() % 50000 == 0)
+        std::cout << "ITER: (kept, popped): " << async_diginorm->reads_kept() << " " << async_diginorm->reads_popped() << std::endl;
+    
+    PyObject * read_obj = khmer::python::Read_Type.tp_alloc(&khmer::python::Read_Type, 1);
+    ((khmer::python::Read_Object *) read_obj)->read = read_ptr;
+    return read_obj;
+}
+
+static PyMethodDef khmer_asyncdiginorm_methods[] = {
+    { "processed", (PyCFunction)asyncdiginorm_processed_iter, 
+            METH_NOARGS, "Iterator over processed reads" },
+    { "start", asyncdiginorm_start, METH_VARARGS, "Start processing" },
+    { "stop", asyncdiginorm_stop, METH_VARARGS, "Stop processors, join threads" },
+
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+
+
+static PyTypeObject khmer_AsyncDiginormType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                       /* ob_size */
+    "_AsyncDiginorm",            /* tp_name */
+    sizeof(khmer_AsyncDiginormObject), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_asyncdiginorm_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,  /* khmer_labelhash_getattr, tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_ITER,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    PyObject_SelfIter,                       /* tp_iter */
+    (iternextfunc) asyncdiginorm_processed_iternext,                       /* tp_iternext */
+    khmer_asyncdiginorm_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    (initproc)khmer_asyncdiginorm_init,   /* tp_init */
+    0,                       /* tp_alloc */
+};
+
+static void khmer_asyncdiginorm_dealloc(PyObject* obj)
+{
+    khmer_AsyncDiginormObject * self = (khmer_AsyncDiginormObject *) obj;
+
+    self->async_diginorm->stop();
+    //delete self->async_diginorm;
+    self->async_diginorm = NULL;
+
+    obj->ob_type->tp_free((PyObject*)self);
+}
+
+static PyObject * khmer_asyncdiginorm_new(PyTypeObject *type, PyObject *args,
+                                      PyObject *kwds)
+{
+    khmer_AsyncDiginormObject *self;
+    self = (khmer_AsyncDiginormObject*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        khmer_KCountingHashObject * counting_o;
+
+        if (!PyArg_ParseTuple(args, "O!", &khmer_KCountingHashType, &counting_o)) {
+            return NULL;
+        }
+        
+        self->async_diginorm = new AsyncDiginorm(counting_o->counting);
+    }
+
+    return (PyObject *) self;
+}
+
+static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject *args,
+                                PyObject *kwds)
+{
+    return 0;
+}
+
 /////////////////
 // LabelHash
 /////////////////
@@ -4929,6 +5039,11 @@ init_khmer(void)
         return;
     }
 
+    khmer_AsyncDiginormType.tp_new = khmer_asyncdiginorm_new;
+    if (PyType_Ready(&khmer_AsyncDiginormType) < 0) {
+        return;
+    }
+
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
                         "interface for the khmer module low-level extensions" );
@@ -4955,6 +5070,9 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+
+    Py_INCREF(&khmer_AsyncDiginormType);
+    PyModule_AddObject(m, "_AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:

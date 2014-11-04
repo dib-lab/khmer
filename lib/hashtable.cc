@@ -104,22 +104,6 @@ void Hashtable::stop_async() {
     async_hash->stop();
 }
 
-void Hashtable::start_async_diginorm(unsigned int cutoff, unsigned int n_threads) {
-    async_diginorm->start(cutoff, n_threads);
-}
-
-void Hashtable::stop_async_diginorm() {
-    async_diginorm->stop();
-}
-
-void Hashtable::push_diginorm(Read * read) {
-    async_diginorm->push(read);
-}
-
-bool Hashtable::pop_diginorm(Read * read) {
-    return async_diginorm->pop(read);
-}
-
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
 //

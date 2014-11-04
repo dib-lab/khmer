@@ -25,7 +25,6 @@
 #include "subset.hh"
 #include "kmer_hash.hh"
 #include "async_hash.hh"
-#include "khmer_async.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -228,7 +227,6 @@ protected:
         _init_bitstuff();
         _all_tags_spin_lock = 0;
         async_hash = new AsyncHashWriter(this);
-        async_diginorm = new AsyncDiginorm(this);
     }
 
     virtual ~Hashtable( )
@@ -344,7 +342,6 @@ protected:
 public:
     SubsetPartition * partition;
     AsyncHashWriter * async_hash;
-    AsyncDiginorm * async_diginorm;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
@@ -374,12 +371,6 @@ public:
 
     void start_async(unsigned int n_hasher_threads);
     void stop_async();
-
-    void start_async_diginorm(unsigned int cutoff, unsigned int n_threads);
-    void stop_async_diginorm();
-
-    void push_diginorm(Read * read);
-    bool pop_diginorm(Read * read);
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
