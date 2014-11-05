@@ -55,7 +55,7 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner"])
 
-EXTRA_COMPILE_ARGS = ['-O3', '-std=c++0x']
+EXTRA_COMPILE_ARGS = ['-O3', ]
 
 if sys.platform == 'darwin':
     # force 64bit only builds, use llvm's libc++ for full c++11 support
