@@ -61,13 +61,13 @@ template <class T> class Async {
             _workers_running = false;
             auto wthread = _worker_threads.begin();
             while (wthread != _worker_threads.end()) {
-                wthread->join();
+                if(wthread->joinable()) wthread->join();
                 wthread++;
             }
         }
 
-        void push(T& item) {
-            _in_queue->push(item);
+        bool push(T& item) {
+            return _in_queue->push(item);
         }
 
         void set_input(queue<T, Cap>* new_q) {
@@ -83,6 +83,8 @@ class AsyncWriter: public Async<HashIntoType> {
     protected:
 
         khmer::Hashtable * _ht;
+        unsigned int _n_written;
+        unsigned int _n_pushed;
 
     public:
 
@@ -94,6 +96,9 @@ class AsyncWriter: public Async<HashIntoType> {
         unsigned int ksize();
         void start();
         virtual void consume(HashQueue * q);
+        bool push(HashIntoType &khash);
+        unsigned int n_pushed();
+        unsigned int n_written();
 
 
 };
@@ -163,6 +168,8 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
         unsigned int _processed_count;
         unsigned int _n_kept;
         unsigned int _n_popped;
+
+        unsigned int _n_hashes_pushed;
 
     public:
 

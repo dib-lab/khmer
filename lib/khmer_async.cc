@@ -14,6 +14,8 @@ using namespace boost::lockfree;
 /////
 
 void AsyncWriter::start() {
+    _n_pushed = 0;
+    _n_written = 0;
     Async<HashIntoType>::start(1);
 }
 
@@ -23,16 +25,31 @@ unsigned int AsyncWriter::ksize() {
 
 void AsyncWriter::consume(HashQueue * q) {
     HashIntoType khash;
-    unsigned long long total_consumed = 0;
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
     while(1) {
         if (q->pop(khash)) {
             _ht->count(khash);
-            total_consumed++;
+            _n_written++;
         } else {
-            if(!_workers_running) return;
+            if(!_workers_running && (_n_written >= _n_pushed)) return;
         }
     }
+}
+
+bool AsyncWriter::push(HashIntoType &khash) {
+    if(_in_queue->push(khash)) {
+        __sync_fetch_and_add(&_n_pushed, 1);
+        return true;
+    }
+    return false;
+}
+
+unsigned int AsyncWriter::n_pushed() {
+    return _n_pushed;
+}
+
+unsigned int AsyncWriter::n_written() {
+    return _n_written;
 }
 
 /////
@@ -123,6 +140,7 @@ void AsyncDiginorm::read_iparser(const std::string &filename) {
     // When we're done, set our status to false to notify the other threads
     _parsing_reads = false;
     std::cout << "Finished parsing..." << std::endl;
+    delete parser;
 }
 
 void AsyncDiginorm::start(const std::string &filename,
@@ -137,6 +155,7 @@ void AsyncDiginorm::start(const std::string &filename,
     _processed_count = 0;
     _n_kept = 0;
     _processing_reads = true;
+    _n_hashes_pushed = 0;
     AsyncSequenceProcessor::start(n_threads);
     _n_popped = 0;
 }
@@ -196,13 +215,19 @@ void AsyncDiginorm::consume(ReadQueue * q) {
                 khmer::KMerIterator kmers(read->sequence.c_str(), ksize);
                 while(!kmers.done()) {
                     khash = kmers.next();
-                    _writer->push(khash);
+                    while(!(_writer->push(khash)));
+                    __sync_fetch_and_add(&_n_hashes_pushed, 1);
                 }
+            } else {
+                delete read;
             }
             __sync_fetch_and_add(&_processed_count, 1);
         } else {
             if (!is_parsing() && _processed_count >= _parsed_count) {
                 std::cout << "Finished processing..." << std::endl;
+                std::cout << "(hashes pushed, hashes written): " << _writer->n_pushed() <<
+                    ", " << _writer->n_written() << std::endl;
+                while(_n_hashes_pushed > _writer->n_written());
                 _processing_reads = false;
                 _workers_running = false;
                 return;
