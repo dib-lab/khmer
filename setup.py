@@ -58,8 +58,8 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
 EXTRA_COMPILE_ARGS = ['-O3', ]
 
 if sys.platform == 'darwin':
-    # force 64bit only builds, use llvm's libc++ for full c++11 support
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64', '-stdlib=libc++'])
+    # force 64bit only builds
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
