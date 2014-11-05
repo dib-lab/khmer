@@ -96,7 +96,17 @@ void AsyncHasher::consume(CharQueue * q) {
 //
 /////
 
-void AsyncSequenceProcessor::start(unsigned int n_threads) {
+void AsyncSequenceProcessor::start(const std::string &filename,
+                                    unsigned int n_threads) {
+
+    _parsed_count = 0;
+    _parsing_reads = true;
+    _reader_thread = new std::thread(&AsyncSequenceProcessor::read_iparser, 
+                                    this, filename);
+
+    _processed_count = 0;
+    _n_popped = 0;
+
     _writer->start();
     Async<Read*>::start(n_threads);
 }
@@ -108,21 +118,7 @@ void AsyncSequenceProcessor::stop() {
     _writer->stop();
 }
 
-bool AsyncSequenceProcessor::pop(Read* read) {
-    return _out_queue->pop(read);
-}
-
-void AsyncSequenceProcessor::set_output(ReadQueue* new_q) {
-    _out_queue = new_q;
-}
-
-/////
-//
-// AsyncDiginorm
-//
-/////
-
-void AsyncDiginorm::read_iparser(const std::string &filename) {
+void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
     std::cout << "Spawned iparser thread..." << std::endl;
 
     khmer:: Config &the_config = khmer::get_active_config();
@@ -143,50 +139,47 @@ void AsyncDiginorm::read_iparser(const std::string &filename) {
     delete parser;
 }
 
-void AsyncDiginorm::start(const std::string &filename,
-                            unsigned int cutoff,
-                            unsigned int n_threads) {
-    _cutoff = cutoff;
-
-    _parsed_count = 0;
-    _parsing_reads = true;
-    reader_thread = new std::thread(&AsyncDiginorm::read_iparser, this, filename);
-
-    _processed_count = 0;
-    _n_kept = 0;
-    _processing_reads = true;
-    _n_hashes_pushed = 0;
-    AsyncSequenceProcessor::start(n_threads);
-    _n_popped = 0;
+void AsyncSequenceProcessor::set_output(ReadQueue* new_q) {
+    _out_queue = new_q;
 }
 
-bool AsyncDiginorm::is_parsing() {
+bool AsyncSequenceProcessor::is_parsing() {
     return _parsing_reads;
 }
 
-bool AsyncDiginorm::is_processing() {
-    return _processing_reads;
-}
-
-unsigned int AsyncDiginorm::reads_kept() {
-    return _n_kept;
-}
-
-bool AsyncDiginorm::has_output() {
+bool AsyncSequenceProcessor::has_output() {
     return !_out_queue->empty();
 }
 
-bool AsyncDiginorm::pop(Read* &read) {
+bool AsyncSequenceProcessor::pop(Read* &read) {
     if(_out_queue->pop(read)) {
-        //std::cout << "POP " << read->sequence << std::endl;
         _n_popped++;
         return true;
     }
     return false;
 }
 
-unsigned int AsyncDiginorm::reads_popped() {
+unsigned int AsyncSequenceProcessor::n_popped() {
     return _n_popped;
+}
+
+/////
+//
+// AsyncDiginorm
+//
+/////
+
+void AsyncDiginorm::start(const std::string &filename,
+                            unsigned int cutoff,
+                            unsigned int n_threads) {
+    _cutoff = cutoff;
+    _n_kept = 0;
+    _n_hashes_pushed = 0;
+    AsyncSequenceProcessor::start(filename, n_threads);
+}
+
+unsigned int AsyncDiginorm::n_kept() {
+    return _n_kept;
 }
 
 void AsyncDiginorm::consume(ReadQueue * q) {
@@ -211,7 +204,6 @@ void AsyncDiginorm::consume(ReadQueue * q) {
             if (median < _cutoff) {
                 __sync_fetch_and_add(&_n_kept, 1);
                 while(!(_out_queue->push(read)));
-                //if (_n_kept % 1000 == 0) std::cout << tid << " kept " << read->sequence << std::endl;
                 khmer::KMerIterator kmers(read->sequence.c_str(), ksize);
                 while(!kmers.done()) {
                     khash = kmers.next();
@@ -225,14 +217,15 @@ void AsyncDiginorm::consume(ReadQueue * q) {
         } else {
             if (!is_parsing() && _processed_count >= _parsed_count) {
                 std::cout << "Finished processing..." << std::endl;
-                std::cout << "(hashes pushed, hashes written): " << _writer->n_pushed() <<
-                    ", " << _writer->n_written() << std::endl;
+                std::cout << "(hashes pushed, hashes written): " << 
+                    _writer->n_pushed() << ", " << _writer->n_written() << std::endl;
                 while(_n_hashes_pushed > _writer->n_written());
-                _processing_reads = false;
                 _workers_running = false;
+            }
+            if (!_workers_running) {
+                std::cout << "Returning from AsyncDiginorm worker..." << std::endl;
                 return;
             }
-            if (!_workers_running) return;
         }
     }
 }

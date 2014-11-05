@@ -4075,8 +4075,6 @@ static PyObject * asyncdiginorm_stop(PyObject * self, PyObject * args)
     khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
     AsyncDiginorm * async_diginorm = me->async_diginorm;
     
-    std::cout << "Call stop()" << std::endl;
-
     async_diginorm->stop();
 
     Py_RETURN_NONE;
@@ -4092,29 +4090,20 @@ PyObject * asyncdiginorm_processed_iternext(PyObject * self) {
    
     khmer::read_parsers::Read * read_ptr = new Read();
 
-
-
-    //std::cout << "is_processing(): " << async_diginorm->is_processing() << std::endl;
-    //std::cout << "has_output(): " << async_diginorm->has_output() << std::endl;
-
-    // Relatively strict conditions to stop iteraton:
-    //   1) Parsing is done (otherwise, this can get tripped before any reads have passed)
-    //   2) The number of reads_popped
-
-
-
     while(!(async_diginorm->pop(read_ptr))) {
-        if(!(async_diginorm->is_processing()) && 
-            (async_diginorm->reads_popped() >= async_diginorm->reads_kept()))
+        if(!(async_diginorm->workers_running()) && 
+            (async_diginorm->n_popped() >= async_diginorm->n_kept()))
         {
-            std::cout << "STOP_ITER: (kept, popped): " << async_diginorm->reads_kept() << " " << async_diginorm->reads_popped() << std::endl;
+            std::cout << "STOP_ITER: (kept, popped): " << async_diginorm->n_kept() 
+                << " " << async_diginorm->n_popped() << std::endl;
             delete read_ptr;
             PyErr_SetNone(PyExc_StopIteration);
             return NULL;
         }
     }
-    if (async_diginorm->reads_kept() % 50000 == 0)
-        std::cout << "ITER: (kept, popped): " << async_diginorm->reads_kept() << " " << async_diginorm->reads_popped() << std::endl;
+    if (async_diginorm->n_kept() % 50000 == 0)
+        std::cout << "ITER: (kept, popped): " << async_diginorm->n_kept() 
+            << " " << async_diginorm->n_popped() << std::endl;
     
     PyObject * read_obj = khmer::python::Read_Type.tp_alloc(&khmer::python::Read_Type, 1);
     ((khmer::python::Read_Object *) read_obj)->read = read_ptr;

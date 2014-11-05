@@ -73,6 +73,10 @@ template <class T> class Async {
         void set_input(queue<T, Cap>* new_q) {
             _in_queue = new_q;
         }
+
+        bool workers_running() {
+            return _workers_running;
+        }
 };
 
 class AsyncWriter: public Async<HashIntoType> {
@@ -134,6 +138,14 @@ class AsyncSequenceProcessor: public Async<Read*> {
         khmer::Hashtable * _ht;
         khmer::AsyncWriter * _writer;
 
+        std::thread * _reader_thread;
+
+        unsigned int _parsed_count;
+        unsigned int _processed_count;
+        unsigned int _n_popped;
+
+        bool _parsing_reads;
+        bool _processing_reads;
 
     public:
 
@@ -146,12 +158,20 @@ class AsyncSequenceProcessor: public Async<Read*> {
             _out_queue = new ReadQueue();
         }
 
-        void start(unsigned int n_threads);
+        void start(const std::string &filename,
+                    unsigned int n_threads);
         void stop();
 
-        bool pop(Read* read);
         virtual void consume(ReadQueue* q) = 0;
+
+        bool pop(Read * &read);
+        unsigned int n_popped();
+        bool has_output();
         void set_output(ReadQueue* new_q);
+
+        bool is_parsing();
+        void read_iparser(const std::string &filename);
+
 };
 
 
@@ -159,37 +179,21 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
 
     protected:
 
-        bool _parsing_reads;
-        bool _processing_reads;
         unsigned int _cutoff;
-        std::thread * reader_thread;
-
-        unsigned int _parsed_count;
-        unsigned int _processed_count;
-        unsigned int _n_kept;
-        unsigned int _n_popped;
-
         unsigned int _n_hashes_pushed;
+        unsigned int _n_kept;
 
     public:
 
         AsyncDiginorm (khmer::Hashtable * ht):
                         khmer::AsyncSequenceProcessor(ht) {
         }
+
         void start(const std::string &filename,
                     unsigned int cutoff,
                     unsigned int n_threads);
 
-        bool pop(Read * &read);
-        bool has_output();
-
-        bool is_processing();
-        bool is_parsing();
-
-        unsigned int reads_kept();
-        unsigned int reads_popped();
-
-        void read_iparser(const std::string &filename);
+        unsigned int n_kept();
         virtual void consume(ReadQueue* q);
 };
 };
