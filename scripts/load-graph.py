@@ -40,7 +40,7 @@ def get_parser():
                         help="Prints the total number of k-mers to stderr")
     parser.add_argument('--write-fp-rate', '-w', action='store_true',
                         help="Write false positive rate into .info file")
-    parser.add_argument('-f', '-force', default=False, action='store_true',
+    parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     return parser
 
@@ -113,8 +113,8 @@ def main():
         print >> sys.stderr, ("** ERROR: the graph structure is too small for "
                               "this data set. Increase table size/# tables.")
         print >> sys.stderr, "**"
-        # if not args.force:
-        sys.exit(1)
+        if not args.force:
+            sys.exit(1)
 
     print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
     if not args.no_build_tagset:
