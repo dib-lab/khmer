@@ -66,6 +66,28 @@ def test_load_into_counting_fail():
     assert "ERROR:" in err
 
 
+def test_load_into_counting_tsv():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-m']
+
+    outfile = utils.get_temp_filename('out.kh')
+    tabfile = outfile + '.info.tsv'
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+    assert os.path.exists(tabfile)
+    with open(tabfile) as tabfh:
+        tabfile_lines = tabfh.readlines()
+    assert len(tabfile_lines) == 2
+    outbase = os.path.basename(outfile)
+    expected_tsv_line = '\t'.join([outbase, '0.000', '95', infile]) + '\n'
+    assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
+
+
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     script = scriptpath('load-into-counting.py')
     args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]

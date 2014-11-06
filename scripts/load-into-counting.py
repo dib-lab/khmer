@@ -55,6 +55,9 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
+    parser.add_argument('--machine-readable-info', '-m', action='store_true',
+                        help="Should we also create a .info.tsv file "
+                        "containing a machine readable run summary?")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
     return parser
@@ -114,14 +117,14 @@ def main():
             check_space_for_hashtable(args.n_tables * args.min_tablesize)
             print >>sys.stderr, 'mid-save', base
             htable.save(base)
-            with open(base + '.info', 'a') as info_fh:
-                print >> info_fh, 'through', filename
+        with open(base + '.info', 'a') as info_fh:
+            print >> info_fh, 'through', filename
 
     n_kmers = htable.n_occupied()
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of k-mers:', n_kmers
-        with open(base + '.info', 'a') as fh:
-            print >>fh, 'total distinct k-mers:', n_kmers
+        with open(base + '.info', 'a') as info_fp:
+            print >>info_fp, 'total distinct k-mers:', n_kmers
 
     print >>sys.stderr, 'saving', base
     htable.save(base)
@@ -130,13 +133,23 @@ def main():
 
     with open(base + '.info', 'a') as info_fp:
         print >> sys.stderr, "Writing run information to", base + '.info'
-        print >> info_fp, 'through end:', filename
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
 
-    # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(htable)
+
+    if args.machine_readable_info:
+        tsv_file = base + '.info.tsv'
+        print >> sys.stderr, "Writing machine-readable stats to", tsv_file
+        if os.path.exists(tsv_file):
+            os.remove(tsv_file)
+        with open(tsv_file, 'a') as tsv_fh:
+            tsv_fh.write("name\tfpr\tkmers\tfiles\n")
+            tsv_fh.write("{base:s}\t{fpr:1.3f}\t{kmers:d}\t{files:s}\n".format(
+                base=os.path.basename(base), fpr=fp_rate, kmers=n_kmers,
+                files=";".join(filenames)))
+
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
+    # Change 0.2 only if you really grok it.  HINT: You don't.
     if fp_rate > 0.20:
         print >> sys.stderr, "**"
         print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
