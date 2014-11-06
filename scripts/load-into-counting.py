@@ -135,7 +135,6 @@ def main():
         print >> sys.stderr, "Writing run information to", base + '.info'
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
 
-
     if args.machine_readable_info:
         tsv_file = base + '.info.tsv'
         print >> sys.stderr, "Writing machine-readable stats to", tsv_file
