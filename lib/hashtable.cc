@@ -5,8 +5,8 @@
 // Contact: khmer-project@idyll.org
 //
 
-#include "khmer.hh"
 #include "hashtable.hh"
+#include "khmer.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
 #include "async_hash.hh"
@@ -71,31 +71,6 @@ accumulate_timer_deltas( uint32_t metrics_key )
 }
 #endif
 
-Hashtable:: Hasher::
-Hasher(
-    uint32_t const  pool_id,
-    uint32_t const  thread_id,
-    uint8_t const	  trace_level
-)
-    : pool_id( pool_id ),
-      thread_id( thread_id ),
-#ifdef WITH_INTERNAL_METRICS
-      pmetrics( HashTablePerformanceMetrics( ) ),
-#endif
-      trace_logger(
-          TraceLogger(
-              trace_level, "hashtable-%lu-%lu.log",
-              (unsigned long int)pool_id, (unsigned long int)thread_id
-          )
-      )
-{ }
-
-
-Hashtable:: Hasher::
-~Hasher( )
-{ }
-
-
 void Hashtable::start_async(unsigned int n_hasher_threads) {
     async_hash->start(n_hasher_threads);
 }
@@ -133,17 +108,11 @@ unsigned int Hashtable::check_and_process_read(std::string &read,
 bool Hashtable::check_and_normalize_read(std::string &read) const
 {
     bool rc = true;
-#if (0)  // TODO: WITH_INTERNAL_TRACING < some_threshold
-    Hasher		  &hasher		= _get_hasher( );
-#endif
 
     if (read.length() < _ksize) {
         return false;
     }
 
-#if (0)   // TODO: WITH_INTERNAL_TRACING < some_threshold
-    hasher.pmetrics.start_timers( );
-#endif
     for (unsigned int i = 0; i < read.length(); i++)  {
         read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
         if (!is_valid_dna( read[ i ] )) {
@@ -151,12 +120,6 @@ bool Hashtable::check_and_normalize_read(std::string &read) const
             break;
         }
     }
-#if (0)  // TODO: WITH_INTERNAL_TRACING < some_threshold
-    hasher.pmetrics.stop_timers( );
-    hasher.pmetrics.accumulate_timer_deltas(
-        (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_NORM_READ
-    );
-#endif
 
     return rc;
 }
@@ -174,44 +137,12 @@ consume_fasta(
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    khmer:: Config    &the_config	  = khmer:: get_active_config( );
-
-    // Note: Always assume only 1 thread if invoked this way.
     IParser *	  parser =
-        IParser::get_parser(
-            filename, 1, the_config.get_reads_input_buffer_size( ),
-            the_config.get_reads_parser_trace_level( )
-        );
+        IParser::get_parser( filename );
 
     consume_fasta(
         parser,
         total_reads, n_consumed,
-        callback, callback_data
-    );
-
-    delete parser;
-}
-
-void
-Hashtable::
-consume_fasta_parallel(
-    std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed,
-    unsigned int n_threads,
-    CallbackFn	      callback,	    void *		callback_data
-)
-{
-    khmer:: Config    &the_config	  = khmer:: get_active_config( );
-
-    IParser *	  parser =
-        IParser::get_parser(
-            filename, n_threads, the_config.get_reads_input_buffer_size( ),
-            the_config.get_reads_parser_trace_level( )
-        );
-
-    consume_fasta_parallel(
-        parser,
-        total_reads, n_consumed, n_threads,
         callback, callback_data
     );
 
@@ -226,131 +157,31 @@ consume_fasta(
     CallbackFn		    callback,	  void *	      callback_data
 )
 {
-    Hasher		  &hasher		=
-        _get_hasher( parser->uuid( ) );
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
 #endif
     Read			  read;
 
-    hasher.trace_logger(
-        TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
-    );
-
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
-        unsigned int  this_n_consumed;
-        bool	  is_valid;
 
-        read = parser->get_next_read( );
+        try {
+            bool is_valid;
+            read = parser->get_next_read( );
 
-        this_n_consumed =
-            check_and_process_read(read.sequence, is_valid);
-
-#ifdef WITH_INTERNAL_METRICS
-        hasher.pmetrics.start_timers( );
-#endif
-#if (0) // Note: Used with callback - currently disabled.
-        n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#else
-        __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#endif
-        unsigned int total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
-#ifdef WITH_INTERNAL_METRICS
-        hasher.pmetrics.stop_timers( );
-        hasher.pmetrics.accumulate_timer_deltas(
-            (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
-        );
-#endif
-
-        if (0 == (total_reads_LOCAL % 10000))
-            hasher.trace_logger(
-                TraceLogger:: TLVL_DEBUG3,
-                "Total number of reads processed: %llu\n",
-                (unsigned long long int)total_reads_LOCAL
-            );
-
-        // TODO: Figure out alternative to callback into Python VM
-        //       Cannot use in multi-threaded operation.
-#if (0)
-        // run callback, if specified
-        if (callback && (0 == (total_reads_LOCAL % CALLBACK_PERIOD))) {
-            try {
-                callback(
-                    "consume_fasta", callback_data,
-                    total_reads_LOCAL, n_consumed_LOCAL
-                );
-            } catch (...) {
-                throw;
-            }
-        }
-#endif // 0
-
-    } // while reads left for parser
-
-} // consume_fasta
-
-void
-Hashtable::
-consume_fasta_parallel(
-    read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads, unsigned long long  &n_consumed,
-    unsigned int n_threads,
-    CallbackFn		    callback,	  void *	      callback_data
-)
-{
-    Hasher		  &hasher		=
-        _get_hasher( parser->uuid( ) );
-#if (0) // Note: Used with callback - currently disabled.
-    unsigned long long int  n_consumed_LOCAL	= 0;
-#endif
-
-
-    hasher.trace_logger(
-        TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
-    );
-
-    omp_set_num_threads(n_threads);
-    #pragma omp parallel for
-    for (unsigned int thread=0; thread<n_threads; ++thread) {
-        std::cout << "consume_fasta_parallel " << omp_get_num_threads() << " active threads" << std::endl;
-    // This is schvery hacky. Because our iterator isn't a real iterator, OpenMP can't use it
-    // But it *is* thread-safe, so I give omp an arbitrary for loop and pull off the parser within that
-        Read read;
-        while(!parser->is_complete()) {
-            unsigned int  this_n_consumed;
-            bool	  is_valid;
-            read = parser->get_next_read();
-
-            this_n_consumed =
+            unsigned int this_n_consumed =
                 check_and_process_read(read.sequence, is_valid);
 
-    #ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.start_timers( );
-    #endif
-    #if (0) // Note: Used with callback - currently disabled.
+#if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
-    #else
+#else
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
-    #endif
-            unsigned int total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
-    #ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.stop_timers( );
-            hasher.pmetrics.accumulate_timer_deltas(
-                (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
-            );
-    #endif
-
-            if (0 == (total_reads_LOCAL % 10000))
-                hasher.trace_logger(
-                    TraceLogger:: TLVL_DEBUG3,
-                    "Total number of reads processed: %llu\n",
-                    (unsigned long long int)total_reads_LOCAL
-                );
+#endif
+            __sync_add_and_fetch( &total_reads, 1 );
 
             // TODO: Figure out alternative to callback into Python VM
             //       Cannot use in multi-threaded operation.
-    #if (0)
+#if (0)
             // run callback, if specified
             if (callback && (0 == (total_reads_LOCAL % CALLBACK_PERIOD))) {
                 try {
@@ -363,42 +194,12 @@ consume_fasta_parallel(
                 }
             }
 #endif // 0
-        } // while reads left in parser LOCAL
-        std::cout << "Thread " << thread << " consumed " << n_consumed << std::endl;
-    } // for each THREAD
+        } catch (read_parsers::NoMoreReadsAvailable) {
+        }
+
+    } // while reads left for parser
 
 } // consume_fasta
-
-
-//
-// consume_string_parallel: run through every k-mer in the given string & hash it in parallel.
-//
-
-unsigned int Hashtable::consume_string_parallel(const std::string &s, const unsigned int n_threads)
-{
-    const char * sp = s.c_str();
-    unsigned int n_consumed = 0;
-
-    KMerIterator kmers(sp, _ksize);
-
-    std::vector<HashIntoType> hashes;
-    while(!kmers.done()) { 
-        hashes.push_back(kmers.next());
-    }
-
-    omp_set_num_threads(n_threads);
-    #pragma omp parallel
-    {
-        #pragma omp for
-        for (unsigned int i=0; i<hashes.size(); ++i) {
-            test_and_set_bits(hashes[i]);
-            #pragma omp atomic
-            n_consumed++;
-        }
-    }
-    
-    return n_consumed;
-}
 
 //
 // consume_string: run through every k-mer in the given string, & hash it.
@@ -428,13 +229,9 @@ unsigned int Hashtable::consume_string_async(const std::string &s) {
 }
 
 void Hashtable::consume_fasta_async(std::string const &filename) {
-    khmer:: Config    &the_config	  = khmer:: get_active_config( );
 
     IParser *	  parser =
-        IParser::get_parser(
-            filename, the_config.get_number_of_threads(), the_config.get_reads_input_buffer_size( ),
-            the_config.get_reads_parser_trace_level( )
-        );
+        IParser::get_parser(filename);
 
     consume_fasta_async(parser);
 
@@ -692,15 +489,8 @@ consume_fasta_and_tag(
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    khmer:: Config    &the_config	  = khmer:: get_active_config( );
-
-    // Note: Always assume only 1 thread if invoked this way.
     IParser *	  parser =
-        IParser::get_parser(
-            filename, 1, the_config.get_reads_input_buffer_size( ),
-            the_config.get_reads_parser_trace_level( )
-        );
-
+        IParser::get_parser( filename );
 
     consume_fasta_and_tag(
         parser,
@@ -719,9 +509,6 @@ consume_fasta_and_tag(
     CallbackFn		    callback,	    void *		callback_data
 )
 {
-    Hasher		  &hasher		=
-        _get_hasher( parser->uuid( ) );
-    unsigned int		  total_reads_LOCAL	= 0;
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
 #endif
@@ -730,11 +517,6 @@ consume_fasta_and_tag(
     // TODO? Delete the following assignments.
     total_reads = 0;
     n_consumed = 0;
-
-    hasher.trace_logger(
-        TraceLogger:: TLVL_DEBUG2,
-        "Starting trace of 'consume_fasta_and_tag'....\n"
-    );
 
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
@@ -745,29 +527,13 @@ consume_fasta_and_tag(
             unsigned long long this_n_consumed = 0;
             consume_sequence_and_tag( read.sequence, this_n_consumed );
 
-#ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.start_timers( );
-#endif
 #if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #else
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #endif
-            total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
-#ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.stop_timers( );
-            hasher.pmetrics.accumulate_timer_deltas(
-                (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
-            );
-#endif
+            __sync_add_and_fetch( &total_reads, 1 );
         }
-
-        if (0 == (total_reads_LOCAL % 10000))
-            hasher.trace_logger(
-                TraceLogger:: TLVL_DEBUG3,
-                "Total number of reads processed: %llu\n",
-                (unsigned long long int)total_reads_LOCAL
-            );
 
         // TODO: Figure out alternative to callback into Python VM
         //       Cannot use in multi-threaded operation.

@@ -7,8 +7,8 @@
 #ifndef READ_ALIGNER_HH
 #define READ_ALIGNER_HH
 
-#include "khmer.hh"
 #include "counting.hh"
+#include "khmer.hh"
 
 #include <limits>
 #include <algorithm>

@@ -24,6 +24,37 @@ class CountingHash;
 class Hashtable;
 class Hashbits;
 
+template <class T> class Delete {
+    void operator()(T ptr) { delete ptr; }    
+};
+
+template <typename T> void flush_queue(queue<T, Cap>* q) {
+    q->consume_all([](T ptr){delete ptr;});
+}
+
+class CountFunc {
+    public:
+
+    khmer::Hashtable * _ht;
+    unsigned int _ksize;
+
+    CountFunc(khmer::Hashtable * ht, unsigned int ksize): _ht(ht), _ksize(ksize) {}
+
+    void operator()(const char * sequence) {
+        HashIntoType kmer;
+        khmer::KMerIterator kmers(sequence, _ksize);
+        try {
+            while(!kmers.done()) {
+                kmer = kmers.next();
+                _ht->count(kmer);
+            }
+        } catch (khmer_exception &e) {
+            std::cout << e.what() << " " << std::endl;
+            std::cout << "ERROR in AsyncSequenceWriter: " << sequence << std::endl;
+        }
+    }
+};
+
 template <class T> class Async {
 
     protected:
@@ -69,7 +100,7 @@ template <class T> class Async {
         }
 
         bool push(T& item) {
-            return _in_queue->push(item);
+            return _in_queue->bounded_push(item);
         }
 
         void set_input(queue<T, Cap>* new_q) {
@@ -214,7 +245,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
         bool is_parsing();
         void read_iparser(const std::string &filename);
         unsigned int n_parsed();
-
+        unsigned int n_written();
 };
 
 

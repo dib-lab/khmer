@@ -5,6 +5,8 @@
 #include <time.h>
 #include <boost/lockfree/queue.hpp>
 
+#define VERBOSITY 1
+
 using namespace khmer;
 using namespace khmer::read_parsers;
 using namespace boost::lockfree;
@@ -52,7 +54,7 @@ void AsyncWriter::consume(HashQueue * q) {
 }
 
 bool AsyncWriter::push(HashIntoType &khash) {
-    if(_in_queue->push(khash)) {
+    if(_in_queue->bounded_push(khash)) {
         __sync_fetch_and_add(&_n_pushed, 1);
         return true;
     }
@@ -88,8 +90,9 @@ unsigned int AsyncSequenceWriter::ksize() {
 void AsyncSequenceWriter::consume(CharQueue * q) {
     const char * sequence;
     HashIntoType kmer;
+    CountFunc kmer_counter(_ht, _ksize);
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
-    while(1) {
+    while(_workers_running) {
         if (q->pop(sequence)) {
             khmer::KMerIterator kmers(sequence, _ksize);
             try {
@@ -103,18 +106,17 @@ void AsyncSequenceWriter::consume(CharQueue * q) {
                 exit(1);
             }
             _n_written++;
-        } else {
-            if (!_workers_running && (_n_written >= _n_pushed)) {
-                std::cout << "Exit AsyncSequenceWriter consume thread." << std::endl;
-                return;
-            }
         }
     }
+    #if(VERBOSITY)
+    std::cout << "Exit AsyncSequenceWriter consume thread." << std::endl;
+    #endif
+    q->consume_all(kmer_counter);
 }
 
 
 bool AsyncSequenceWriter::push(const char * &sequence) {
-    if(_in_queue->push(sequence)) {
+    if(_in_queue->bounded_push(sequence)) {
         __sync_fetch_and_add(&_n_pushed, 1);
         return true;
     }
@@ -153,15 +155,13 @@ void AsyncHasher::consume(CharQueue * q) {
     const char * kmer;
     unsigned long long total_consumed = 0;
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
-    while(1) {
+    while(_workers_running) {
         if (q->pop(kmer)) {
             khmer::KMerIterator kmers(kmer, _ksize);
             while(!kmers.done()) {
-                _out_queue->push(kmers.next());
+                _out_queue->bounded_push(kmers.next());
                 total_consumed++;
             }
-        } else {
-            if (!_workers_running) return;
         }
     }
 }
@@ -187,34 +187,44 @@ void AsyncSequenceProcessor::start(const std::string &filename,
 }
 
 void AsyncSequenceProcessor::stop() {
+    _parsing_reads = false;
     // First stop the sequence processor, flushing its queue
     Async<Read*>::stop();
     // Then stop the writer, writing out all the flushed hashes
     _writer->stop();
+    flush_queue<Read*>(_out_queue);
 }
 
 void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
+    #if(VERBOSITY)
     std::cout << "Spawned iparser thread..." << std::endl;
-
+    #endif
     _n_parsed = 0;
     _parsing_reads = true;
 
-    khmer:: Config &the_config = khmer::get_active_config();
-    IParser * parser = IParser::get_parser(filename, 1, 
-            the_config.get_reads_input_buffer_size(), 
-            the_config.get_reads_parser_trace_level());
+    IParser * parser = IParser::get_parser(filename);
 
-    while(!parser->is_complete()) {
+    while(!parser->is_complete() && _parsing_reads) {
         Read * read = new Read();
         parser->imprint_next_read(*read);
         __sync_fetch_and_add(&_n_parsed, 1);
-        while(!(_in_queue->push(read)));
+        while(!(_in_queue->bounded_push(read))) {
+            if (!_parsing_reads) {
+                flush_queue<Read*>(_in_queue);
+                return;
+            }
+        }
+        #if(VERBOSITY)
         if (_n_parsed % 10000 == 0) std::cout << "...parsed " << _n_parsed << std::endl;
+        #endif
     }
     // When we're done, set our status to false to notify the other threads
     _parsing_reads = false;
+    #if(VERBOSITY)
     lock_stdout();
     std::cout << "Finished parsing " << _n_parsed << " reads." << std::endl;
+    unlock_stdout();
+    #endif
     delete parser;
 }
 
@@ -250,6 +260,10 @@ unsigned int AsyncSequenceProcessor::n_processed() {
     return _n_processed;
 }
 
+unsigned int AsyncSequenceProcessor::n_written() {
+    return _writer->n_written();
+}
+
 /////
 //
 // AsyncDiginorm
@@ -271,21 +285,25 @@ unsigned int AsyncDiginorm::n_kept() {
 
 void AsyncDiginorm::consume(ReadQueue * q) {
 
-    timespec start_t, end_t;
-    double output_push_wait = 0.0, hash_push_wait = 0.0;
-
     Read* read;
     BoundedCounterType median;
     float average, stddev;
 
-    unsigned int ksize = _writer->ksize();
-    const char * sequence;
+    #if(VERBOSITY)
+    timespec start_t, end_t;
+    double output_push_wait = 0.0, hash_push_wait = 0.0;
 
+    lock_stdout();
     std::thread::id tid = std::this_thread::get_id();
     std::cout << "Thread " << tid << " : " << std::endl 
-        << "\tCUTOFF: " << _cutoff << "\tK: " << ksize << std::endl;
+        << "\tCUTOFF: " << _cutoff << "\tK: " << _ht->ksize() << std::endl;
+    unlock_stdout();
+    #endif
 
-    while(1) {
+    std::string sequence;
+    const char * sp;
+
+    while(_workers_running) {
         if (q->pop(read)) {
             _ht->get_median_count(read->sequence, median, average, stddev);
             //std::cout << "Read " << read->sequence << "\n\tMED: " << median << 
@@ -293,40 +311,53 @@ void AsyncDiginorm::consume(ReadQueue * q) {
             if (median < _cutoff) {
                 __sync_fetch_and_add(&_n_kept, 1);
 
+                std::string sequence(read->sequence);
+                sp = sequence.c_str();
+
+                #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
-                while(!(_out_queue->push(read)));
+                #endif
+                while(!(_out_queue->bounded_push(read))) if (!_workers_running) return;
+                #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &end_t);
                 output_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
-
-                sequence = read->sequence.c_str();
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
-                while(!(_writer->push(sequence)));
+                #endif
+                while(!(_writer->push(sp))) if (!_workers_running) return;;
                 __sync_fetch_and_add(&_n_hashes_pushed, 1);
+                #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &end_t);
                 hash_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
+                #endif
             } else {
                 delete read;
             }
             __sync_fetch_and_add(&_n_processed, 1);
         } else {
-            if (!is_parsing() && _n_processed >= _n_parsed) {
-                while(_n_hashes_pushed > _writer->n_written());
-                _workers_running = false;
-            }
-            if (!_workers_running) {
+            if (!is_parsing() && (_n_processed >= _n_parsed)) {
+                #if(VERBOSITY)
                 lock_stdout();
-                std::cout << "\nReturning from AsyncDiginorm worker..." << std::endl;
-                std::cout << "\t(hashes pushed, hashes written): " << 
-                    _writer->n_pushed() << ", " << _writer->n_written() << std::endl;
-                std::cout << "\tOutput push wait: " << 
-                    output_push_wait << 
-                    "s" << std::endl;
-                std::cout << "\tHash push wait: " << 
-                    hash_push_wait << 
-                    "s" << std::endl;
+                std::cout << "Done processing (" << _n_processed 
+                    << " reads). Waiting for writeout" << std::endl;
                 unlock_stdout();
-                return;
+                #endif
+                while(_n_hashes_pushed > _writer->n_written()) if (!_workers_running) return;
+                _workers_running = false;
             }
         }
     }
+
+    #if(VERBOSITY)
+    lock_stdout();
+    std::cout << "\nReturning from AsyncDiginorm worker..." << std::endl;
+    std::cout << "\t(hashes pushed, hashes written): " << 
+        _writer->n_pushed() << ", " << _writer->n_written() << std::endl;
+    std::cout << "\tOutput push wait: " << 
+        output_push_wait << 
+        "s" << std::endl;
+    std::cout << "\tHash push wait: " << 
+        hash_push_wait << 
+        "s" << std::endl;
+    unlock_stdout();
+    #endif
 }
