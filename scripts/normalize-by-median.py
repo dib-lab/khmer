@@ -291,7 +291,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+            htable.n_kmers())
 
     if args.savetable:
         print 'Saving k-mer counting table through', input_filename

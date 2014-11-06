@@ -512,7 +512,7 @@ def test_load_graph():
 
     (status, out, err) = utils.runscript(script, args)
 
-    assert 'Total number of k-mers: 3959' in err, err
+    assert 'Total number of k-mers: 3960' in err, err
 
     ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file

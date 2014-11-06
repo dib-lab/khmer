@@ -112,7 +112,7 @@ def main():
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+            htable.n_kmers())
 
     print >>sys.stderr, 'saving', base
     htable.save(base)

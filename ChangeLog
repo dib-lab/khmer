@@ -1,3 +1,17 @@
+2014-11-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{counting,hashbits}.{cc,hh},lib/hashtable.hh: Moved the n_kmers()
+    function into the parent Hashtable class, adding it to CountingHash along
+    the way. Removed the unused start and stop parameters.
+    * khmer/_khmermodule.cc: Added Python wrapping for CountingHash::n_kmers();
+    renamed the Python function for Hashbits::n_kmers() to match; adapted to
+    the dropped start and stop parameters.
+    * scripts/{load-graph,load-into-counting,normalize-by-median}.py: used the
+    n_kmers() function instead of the n_occupied() function to get the number
+    of unique kmers in a table.
+    * tests/test_{hashbits,hashbits_obj,labelhash,scripts}.py: updated the
+    tests to reflect the above
+
 2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
 
     * do-partition.py: replaced threading args in scripts with things from 
