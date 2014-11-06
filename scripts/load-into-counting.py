@@ -124,7 +124,7 @@ def main():
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of k-mers:', n_kmers
         with open(base + '.info', 'a') as info_fp:
-            print >>info_fp, 'total distinct k-mers:', n_kmers
+            print >>info_fp, 'Total number of k-mers:', n_kmers
 
     print >>sys.stderr, 'saving', base
     htable.save(base)
