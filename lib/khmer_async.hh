@@ -27,7 +27,8 @@ class Hashbits;
 template <class T> class Async {
 
     protected:
-    
+   
+        uint32_t _stdout_spin_lock; 
         unsigned int _n_workers;
         std::vector<std::thread> _worker_threads;
         bool _workers_running;
@@ -37,6 +38,7 @@ template <class T> class Async {
         queue<T, Cap> * _in_queue; 
 
         Async() {
+            _stdout_spin_lock = 0;
             _workers_running = false;
             _in_queue = new queue<T, Cap>();
         }
@@ -77,6 +79,16 @@ template <class T> class Async {
         bool workers_running() {
             return _workers_running;
         }
+
+        // Define a lock for writing to standard out
+
+        void lock_stdout() {
+            while(!__sync_bool_compare_and_swap( &_stdout_spin_lock, 0, 1 ));
+        }
+
+        void unlock_stdout() {
+            __sync_bool_compare_and_swap( &_stdout_spin_lock, 1, 0 );
+        }
 };
 
 class AsyncWriter: public Async<HashIntoType> {
@@ -101,6 +113,34 @@ class AsyncWriter: public Async<HashIntoType> {
         void start();
         virtual void consume(HashQueue * q);
         bool push(HashIntoType &khash);
+        unsigned int n_pushed();
+        unsigned int n_written();
+
+
+};
+
+class AsyncSequenceWriter: public Async<const char *> {
+    
+    friend class AsyncHasher;
+    
+    protected:
+
+        khmer::Hashtable * _ht;
+        unsigned int _n_written;
+        unsigned int _n_pushed;
+        unsigned int _ksize;
+
+    public:
+
+        AsyncSequenceWriter (khmer::Hashtable * ht):
+                     khmer::Async<const char *>(), 
+                     _ht(ht) {
+        }
+
+        unsigned int ksize();
+        void start();
+        virtual void consume(CharQueue * q);
+        bool push(const char * &sequence);
         unsigned int n_pushed();
         unsigned int n_written();
 
@@ -136,12 +176,13 @@ class AsyncSequenceProcessor: public Async<Read*> {
     protected:
 
         khmer::Hashtable * _ht;
-        khmer::AsyncWriter * _writer;
+        khmer::AsyncSequenceWriter * _writer;
 
         std::thread * _reader_thread;
 
-        unsigned int _parsed_count;
-        unsigned int _processed_count;
+        unsigned int _n_parsed;
+        unsigned int _n_processed;
+        // Number popped from output queue
         unsigned int _n_popped;
 
         bool _parsing_reads;
@@ -154,7 +195,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
         AsyncSequenceProcessor (khmer::Hashtable * ht):
                                 khmer::Async<Read*>(),
                                 _ht(ht) {
-            _writer = new AsyncWriter(_ht);
+            _writer = new AsyncSequenceWriter(_ht);
             _out_queue = new ReadQueue();
         }
 
@@ -163,6 +204,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
         void stop();
 
         virtual void consume(ReadQueue* q) = 0;
+        unsigned int n_processed();
 
         bool pop(Read * &read);
         unsigned int n_popped();
@@ -171,6 +213,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
 
         bool is_parsing();
         void read_iparser(const std::string &filename);
+        unsigned int n_parsed();
 
 };
 

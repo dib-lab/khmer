@@ -4094,8 +4094,12 @@ PyObject * asyncdiginorm_processed_iternext(PyObject * self) {
         if(!(async_diginorm->workers_running()) && 
             (async_diginorm->n_popped() >= async_diginorm->n_kept()))
         {
-            std::cout << "STOP_ITER: (kept, popped): " << async_diginorm->n_kept() 
-                << " " << async_diginorm->n_popped() << std::endl;
+            async_diginorm->lock_stdout();
+            std::cout << "\nITER STOP: kept " << async_diginorm->n_kept() 
+                << " of " << async_diginorm->n_processed()
+                << " processed (" << async_diginorm->n_parsed()
+                << " parsed)" << std::endl;
+            async_diginorm->unlock_stdout();
             delete read_ptr;
             PyErr_SetNone(PyExc_StopIteration);
             return NULL;
