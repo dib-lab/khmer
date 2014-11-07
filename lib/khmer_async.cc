@@ -5,7 +5,6 @@
 #include <time.h>
 #include <boost/lockfree/queue.hpp>
 
-#define VERBOSITY 1
 
 using namespace khmer;
 using namespace khmer::read_parsers;

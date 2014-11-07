@@ -720,7 +720,7 @@ def test_badconsume():
 def test_consume_async():
     import screed
 
-    ht = khmer.new_counting_hash(20, 1e7, 4, 2)
+    ht = khmer.new_counting_hash(20, 1e7, 4)
     infile = utils.get_test_data('test-reads.fa')
     try:
         for record in screed.open(infile):

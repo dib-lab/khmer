@@ -8,6 +8,8 @@
 #include <thread>
 #include <boost/lockfree/queue.hpp>
 
+#define VERBOSITY 0
+
 using namespace boost::lockfree;
 
 typedef khmer::read_parsers::Read Read;
@@ -85,7 +87,9 @@ template <class T> class Async {
 
             _workers_running = true;
             for (unsigned int t=0; t<_n_workers; ++t) {
+                #if(VERBOSITY)
                 std::cout << "Async spawn worker" << std::endl;
+                #endif
                 _worker_threads.push_back(std::thread(&Async<T>::consume, this, _in_queue));
             }
         }
