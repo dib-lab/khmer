@@ -7,6 +7,7 @@
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
+import json
 import sys
 import os
 import shutil
@@ -68,7 +69,7 @@ def test_load_into_counting_fail():
 
 def test_load_into_counting_tsv():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-m']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-m', 'tsv']
 
     outfile = utils.get_temp_filename('out.kh')
     tabfile = outfile + '.info.tsv'
@@ -86,6 +87,46 @@ def test_load_into_counting_tsv():
     outbase = os.path.basename(outfile)
     expected_tsv_line = '\t'.join([outbase, '0.000', '95', infile]) + '\n'
     assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
+
+
+def test_load_into_counting_json():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-m', 'json']
+
+    outfile = utils.get_temp_filename('out.kh')
+    jsonfile = outfile + '.info.json'
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+    assert os.path.exists(jsonfile)
+    with open(jsonfile) as jsonfh:
+        got_json = json.load(jsonfh)
+    outbase = os.path.basename(outfile)
+    expected_json = {
+        "files": [infile],
+        "ht_name": outbase,
+        "num_kmers": 95,
+        "fpr": 9.024965705097741e-11
+    }
+    assert got_json == expected_json, got_json
+
+
+def test_load_into_counting_bad_machine_readable_fmt():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-m', 'badfmt']
+
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status == -1, status
+    assert "Invalid machine readable format" in err
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
