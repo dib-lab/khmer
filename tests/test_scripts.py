@@ -103,6 +103,7 @@ def test_load_into_counting_json():
     assert 'Total number of k-mers: 95' in err, err
     assert os.path.exists(outfile)
     assert os.path.exists(jsonfile)
+
     with open(jsonfile) as jsonfh:
         got_json = json.load(jsonfh)
     outbase = os.path.basename(outfile)
@@ -110,8 +111,10 @@ def test_load_into_counting_json():
         "files": [infile],
         "ht_name": outbase,
         "num_kmers": 95,
-        "fpr": 9.024965705097741e-11
+        "fpr": 9.024965705097741e-11,
+        "mrinfo_version": "0.1.0",
     }
+
     assert got_json == expected_json, got_json
 
 

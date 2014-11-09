@@ -142,13 +142,14 @@ def main():
         mr_file = base + '.info.' + mr_fmt
         print >> sys.stderr, "Writing machine-readable stats to", mr_file
         with open(mr_file, 'w') as mr_fh:
-            mr_data = {
-                "ht_name": os.path.basename(base),
-                "fpr": fp_rate,
-                "num_kmers": n_kmers,
-                "files": filenames,
-            }
             if mr_fmt == 'json':
+                mr_data = {
+                    "ht_name": os.path.basename(base),
+                    "fpr": fp_rate,
+                    "num_kmers": n_kmers,
+                    "files": filenames,
+                    "mrinfo_version": "0.1.0",
+                }
                 json.dump(mr_data, mr_fh)
                 mr_fh.write('\n')
             elif mr_fmt == 'tsv':
