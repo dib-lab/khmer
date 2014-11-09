@@ -13,6 +13,7 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 Use '-h' for parameter help.
 """
 
+import json
 import os
 import sys
 import threading
@@ -55,9 +56,10 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
-    parser.add_argument('--machine-readable-info', '-m', action='store_true',
-                        help="Should we also create a .info.tsv file "
-                        "containing a machine readable run summary?")
+    parser.add_argument('--machine-readable-info', '-m', default=None,
+                        metavar="FORMAT", help="What format should the machine"
+                        " readable run summary be in? (json or tsv, disabled "
+                        "by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
     return parser
@@ -136,15 +138,24 @@ def main():
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
 
     if args.machine_readable_info:
-        tsv_file = base + '.info.tsv'
-        print >> sys.stderr, "Writing machine-readable stats to", tsv_file
-        if os.path.exists(tsv_file):
-            os.remove(tsv_file)
-        with open(tsv_file, 'a') as tsv_fh:
-            tsv_fh.write("name\tfpr\tkmers\tfiles\n")
-            tsv_fh.write("{base:s}\t{fpr:1.3f}\t{kmers:d}\t{files:s}\n".format(
-                base=os.path.basename(base), fpr=fp_rate, kmers=n_kmers,
-                files=";".join(filenames)))
+        mr_fmt = args.machine_readable_info.lower()
+        mr_file = base + '.info.' + mr_fmt
+        print >> sys.stderr, "Writing machine-readable stats to", mr_file
+        with open(mr_file, 'w') as mr_fh:
+            mr_data = {
+                "ht_name": os.path.basename(base),
+                "fpr": fp_rate,
+                "num_kmers": n_kmers,
+                "files": filenames,
+            }
+            if mr_fmt == 'json':
+                json.dump(mr_data, mr_fh)
+                mr_fh.write('\n')
+            elif mr_fmt == 'tsv':
+                mr_fh.write("ht_name\tfpr\tnum_kmers\tfiles\n")
+                mr_fh.write("{b:s}\t{fpr:1.3f}\t{k:d}\t{fls:s}\n".format(
+                    b=os.path.basename(base), fpr=fp_rate, k=n_kmers,
+                    fls=";".join(filenames)))
 
     print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
