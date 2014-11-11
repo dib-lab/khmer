@@ -1,7 +1,7 @@
 2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
 
     * do-partition.py: replaced threading args in scripts  with things from 
-	khmer_args
+    khmer_args
 
 2014-10-24  Camille Scott  <camille.scott.w@gmail.com>
 
