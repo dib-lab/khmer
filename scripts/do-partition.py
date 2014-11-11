@@ -22,7 +22,8 @@ import gc
 import os.path
 import os
 import textwrap
-from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
+from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
+                              add_threading_args)
 import glob
 from khmer.file import check_file_status, check_space
 
@@ -83,15 +84,13 @@ def get_parser():
     parser = build_hashbits_args(
         descr='Load, partition, and annotate FAST[AQ] sequences',
         epilog=textwrap.dedent(epilog))
+    add_threading_args(parser)
     parser.add_argument('--subset-size', '-s', default=DEFAULT_SUBSET_SIZE,
                         dest='subset_size', type=float,
                         help='Set subset size (usually 1e5-1e6 is good)')
     parser.add_argument('--no-big-traverse', dest='no_big_traverse',
                         action='store_true', default=False,
                         help='Truncate graph joins at big traversals')
-    parser.add_argument('--threads', '-T', dest='n_threads', type=int,
-                        default=DEFAULT_N_THREADS,
-                        help='Number of simultaneous threads to execute')
     parser.add_argument('--keep-subsets', dest='remove_subsets',
                         default=True, action='store_false',
                         help='Keep individual subsets (default: False)')
@@ -118,7 +117,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         repr(args.input_filenames)
     print >>sys.stderr, '--'
     print >>sys.stderr, 'SUBSET SIZE', args.subset_size
-    print >>sys.stderr, 'N THREADS', args.n_threads
+    print >>sys.stderr, 'N THREADS', args.threads
     print >>sys.stderr, '--'
 
     # load-graph
@@ -173,22 +172,22 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     open('%s.info' % args.graphbase, 'w').write('%d subsets total\n'
                                                 % (n_subsets))
 
-    if n_subsets < args.n_threads:
-        args.n_threads = n_subsets
+    if n_subsets < args.threads:
+        args.threads = n_subsets
 
     # start threads!
-    print >>sys.stderr, 'starting %d threads' % args.n_threads
+    print >>sys.stderr, 'starting %d threads' % args.threads
     print >>sys.stderr, '---'
 
     threads = []
-    for _ in range(args.n_threads):
+    for _ in range(args.threads):
         cur_thread = threading.Thread(target=worker,
                                       args=(worker_q, args.graphbase,
                                             stop_big_traversals))
         threads.append(cur_thread)
         cur_thread.start()
 
-    assert threading.active_count() == args.n_threads + 1
+    assert threading.active_count() == args.threads + 1
 
     print >>sys.stderr, 'done starting threads'
 
