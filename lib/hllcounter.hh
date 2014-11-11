@@ -9,7 +9,9 @@
 
 #include <vector>
 #include <string>
+
 #include "khmer_config.hh"
+#include "read_parsers.hh"
 
 
 namespace khmer
@@ -18,18 +20,36 @@ namespace khmer
 class HLLCounter
 {
 public:
-    HLLCounter(double error_rate);
+    HLLCounter(double error_rate, WordLength ksize);
+    HLLCounter(int p, WordLength ksize);
 
     void add(const std::string &);
-    unsigned int consume_string(const std::string &, unsigned int);
+    unsigned int consume_string(const std::string &);
+    void consume_fasta(std::string const &,
+                       unsigned int &,
+                       unsigned long long &,
+                       CallbackFn callback = NULL,
+                       void * callback_data = NULL);
+    void consume_fasta(read_parsers::IParser *,
+                       unsigned int &,
+                       unsigned long long &,
+                       CallbackFn callback = NULL,
+                       void *callback_data = NULL);
+    unsigned int check_and_process_read(std::string &,
+                                        bool &);
+    bool check_and_normalize_read(std::string &) const;
     HashIntoType estimate_cardinality();
+    void merge(HLLCounter &);
     virtual ~HLLCounter() {}
 private:
     double _Ep();
     double alpha;
     int p;
     int m;
+    WordLength _ksize;
     std::vector<int> M;
+
+    void init(int p, WordLength ksize);
 };
 
 };

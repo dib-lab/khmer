@@ -4249,8 +4249,9 @@ static PyTypeObject khmer_KHLLCounterType = {
 static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
 {
     double error_rate = 0;
+    WordLength ksize = 0;
 
-    if (!PyArg_ParseTuple(args, "d", &error_rate)) {
+    if (!PyArg_ParseTuple(args, "db", &error_rate, &ksize)) {
         return NULL;
     }
 
@@ -4261,7 +4262,7 @@ static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate);
+    khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate, ksize);
 
     return (PyObject *) khllcounter_obj;
 }
@@ -4320,20 +4321,51 @@ hllcounter_consume_string( PyObject * self, PyObject * args )
     khmer::HLLCounter * hllcounter = me->hllcounter;
 
     const char * kmer_str;
-    WordLength ksize = 0;
 
-    if (!PyArg_ParseTuple(args, "sb", &kmer_str, &ksize)) {
+    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
         return NULL;
     }
 
     /* TODO: handle errors */
-    return PyLong_FromLong(hllcounter->consume_string(kmer_str, ksize));
+    return PyLong_FromLong(hllcounter->consume_string(kmer_str));
+}
+
+static PyObject * hllcounter_consume_fasta(PyObject * self, PyObject * args)
+{
+    khmer_KHLLCounterObject * me = (khmer_KHLLCounterObject *) self;
+    khmer::HLLCounter * hllcounter = me->hllcounter;
+
+    const char * filename;
+    PyObject * callback_obj = NULL;
+
+    if (!PyArg_ParseTuple(
+                args, "s|O", &filename, &callback_obj
+            )) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+    try {
+        hllcounter->consume_fasta(filename, total_reads, n_consumed,
+                                _report_fn, callback_obj);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
 static PyMethodDef khmer_hllcounter_methods[] = {
     {"add", hllcounter_add, METH_VARARGS, ""},
     {"estimate_cardinality", hllcounter_estimate_cardinality, METH_VARARGS, ""},
     {"consume_string", hllcounter_consume_string, METH_VARARGS, ""},
+    {"consume_fasta", hllcounter_consume_fasta, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 

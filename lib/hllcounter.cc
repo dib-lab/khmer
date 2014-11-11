@@ -13,6 +13,7 @@
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
+#include "read_parsers.hh"
 
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
@@ -213,10 +214,18 @@ int get_rho(HashIntoType w, int max_width)
     return rho;
 }
 
-HLLCounter::HLLCounter(double error_rate)
+HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
     // TODO: check if 0 < error_rate < 1
     int p = ceil(log2(pow(1.04 / error_rate, 2)));
+    this->init(p, ksize);
+}
+
+HLLCounter::HLLCounter(int p, WordLength ksize) {
+    this->init(p, ksize);
+}
+
+void HLLCounter::init(int p, WordLength ksize) {
     int m = 1 << p;
     vector<int> M(m, 0.0);
 
@@ -224,6 +233,7 @@ HLLCounter::HLLCounter(double error_rate)
     this->p = p;
     this->m = 1 << p;
     this->M = M;
+    this->_ksize = ksize;
 
     init_raw_estimate_data();
     init_bias_data();
@@ -258,24 +268,22 @@ void HLLCounter::add(const string &value)
 {
     //HashIntoType x = khmer::_hash(value.c_str(), value.size());
     //HashIntoType x = khmer::_hash_forward(value.c_str(), value.size());
-
-    //HashIntoType x = khmer::_hash_murmur(value);
     //HashIntoType x = khmer::_hash_murmur_forward(value);
-
-    HashIntoType x = khmer::_hash_sha1(value);
+    //HashIntoType x = khmer::_hash_sha1(value);
     //HashIntoType x = khmer::_hash_sha1_forward(value);
 
+    HashIntoType x = khmer::_hash_murmur(value);
     HashIntoType j = x & (this->m - 1);
     this->M[j] = max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 
-unsigned int HLLCounter::consume_string(const std::string &s, unsigned int ksize) {
+unsigned int HLLCounter::consume_string(const std::string &s) {
     unsigned int n_consumed = 0;
     std::string kmer = "";
 
     for(std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
         kmer.push_back(*it);
-        if (kmer.size() < ksize) {
+        if (kmer.size() < _ksize) {
             continue;
         }
         this->add(kmer);
@@ -284,4 +292,102 @@ unsigned int HLLCounter::consume_string(const std::string &s, unsigned int ksize
         n_consumed++;
     }
     return n_consumed;
+}
+
+void HLLCounter::consume_fasta(
+        std::string const &filename,
+        unsigned int &total_reads,
+        unsigned long long &n_consumed,
+        CallbackFn callback,
+        void * callback_data) {
+    read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
+
+    consume_fasta(
+        parser,
+        total_reads, n_consumed,
+        callback, callback_data);
+
+    delete parser;
+}
+
+void HLLCounter::consume_fasta(
+        read_parsers::IParser *parser,
+        unsigned int &      total_reads,
+        unsigned long long &    n_consumed,
+        CallbackFn      callback,
+        void *      callback_data) {
+
+    read_parsers::Read read;
+
+    #pragma omp parallel
+    {
+        #pragma omp single nowait
+        {
+            while (!parser->is_complete()) {
+                // Iterate through the reads and consume their k-mers.
+                try {
+                    bool is_valid;
+                    read = parser->get_next_read();
+
+                    #pragma omp task default(none) firstprivate(read) \
+                                     shared(n_consumed) private(is_valid)
+                    {
+                        HLLCounter task_hll = HLLCounter(this->p, this->_ksize);
+                        unsigned int this_n_consumed =
+                            task_hll.check_and_process_read(read.sequence, is_valid);
+
+                        #pragma omp atomic
+                        n_consumed += this_n_consumed;
+
+                        #pragma omp critical(hll_merge)
+                        this->merge(task_hll);
+                    }
+                    total_reads += 1;
+
+                } catch (read_parsers::NoMoreReadsAvailable) {
+                }
+            } // while reads left for parser
+        }
+    }
+}
+
+unsigned int HLLCounter::check_and_process_read(std::string &read,
+                                                bool &is_valid) {
+    is_valid = check_and_normalize_read(read);
+
+    if (!is_valid) {
+        return 0;
+    }
+
+    return consume_string(read);
+}
+
+bool HLLCounter::check_and_normalize_read(std::string &read) const {
+    bool is_valid = true;
+
+    if (read.length() < _ksize) {
+        return false;
+    }
+
+    for (unsigned int i = 0; i < read.length(); i++) {
+        read[ i ] &= 0xdf; // toupper - knock out the "lowercase bit"
+        if (!is_valid_dna( read[ i ] )) {
+            is_valid = false;
+            break;
+        }
+    }
+
+    return is_valid;
+}
+
+void HLLCounter::merge(HLLCounter &other) {
+    std::transform(this->M.begin(), this->M.end(),
+                   other.M.begin(),
+                   this->M.begin(),
+                   std::max<int>);
+    /*
+    for(unsigned int i=0; i < this->M.size(); ++i) {
+        this->M[i] = std::max(other.M[i], this->M[i]);
+    }
+    */
 }
