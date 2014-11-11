@@ -9,7 +9,7 @@
 #include "khmer.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
-#include "async_hash.hh"
+#include "khmer_async.hh"
 
 #include <algorithm>
 #include <sstream>
@@ -71,8 +71,8 @@ accumulate_timer_deltas( uint32_t metrics_key )
 }
 #endif
 
-void Hashtable::start_async(unsigned int n_hasher_threads) {
-    async_hash->start(n_hasher_threads);
+void Hashtable::start_async() {
+    async_hash->start();
 }
 
 void Hashtable::stop_async() {
@@ -224,7 +224,7 @@ unsigned int Hashtable::consume_string(const std::string &s)
 
 unsigned int Hashtable::consume_string_async(const std::string &s) {
     unsigned int n_consumed = 0;
-    async_hash->enqueue_string(s);
+    async_writer->push(s);
     return n_consumed;
 }
 
@@ -245,7 +245,7 @@ void Hashtable::consume_fasta_async(read_parsers::IParser * parser) {
     // Iterate through the reads and consume their k-mers.
     while (!parser->is_complete( )) {
         read = parser->get_next_read( );
-        async_hash->enqueue_string(read.sequence);
+        async_writer->push(read.sequence);
     } // while reads left for parser
 }
 

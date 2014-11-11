@@ -959,12 +959,7 @@ static PyObject * hash_start_async(PyObject * self, PyObject * args)
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
-    unsigned int n_threads = 1;
-
-    if (!PyArg_ParseTuple(args, "I", &n_threads)) {
-        return NULL;
-    }
-    counting->start_async(n_threads);
+    counting->start_async();
 
     Py_RETURN_NONE;
 }

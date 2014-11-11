@@ -25,21 +25,21 @@ timespec timediff(timespec start, timespec end)
 
 /////
 //
-// class AsyncWriter methods
+// class AsyncHashWriter methods
 //
 /////
 
-void AsyncWriter::start() {
+void AsyncHashWriter::start() {
     _n_pushed = 0;
     _n_written = 0;
     Async<HashIntoType>::start(1);
 }
 
-unsigned int AsyncWriter::ksize() {
+unsigned int AsyncHashWriter::ksize() {
     return _ht->ksize();
 }
 
-void AsyncWriter::consume(HashQueue * q) {
+void AsyncHashWriter::consume(HashQueue * q) {
     HashIntoType khash;
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
     while(1) {
@@ -52,7 +52,7 @@ void AsyncWriter::consume(HashQueue * q) {
     }
 }
 
-bool AsyncWriter::push(HashIntoType &khash) {
+bool AsyncHashWriter::push(HashIntoType &khash) {
     if(_in_queue->bounded_push(khash)) {
         __sync_fetch_and_add(&_n_pushed, 1);
         return true;
@@ -60,11 +60,11 @@ bool AsyncWriter::push(HashIntoType &khash) {
     return false;
 }
 
-unsigned int AsyncWriter::n_pushed() {
+unsigned int AsyncHashWriter::n_pushed() {
     return _n_pushed;
 }
 
-unsigned int AsyncWriter::n_written() {
+unsigned int AsyncHashWriter::n_written() {
     return _n_written;
 }
 

@@ -126,7 +126,7 @@ template <class T> class Async {
         }
 };
 
-class AsyncWriter: public Async<HashIntoType> {
+class AsyncHashWriter: public Async<HashIntoType> {
     
     friend class Hashtable;
     friend class AsyncHasher;
@@ -139,7 +139,7 @@ class AsyncWriter: public Async<HashIntoType> {
 
     public:
 
-        AsyncWriter (khmer::Hashtable * ht):
+        AsyncHashWriter (khmer::Hashtable * ht):
                      khmer::Async<HashIntoType>(), 
                      _ht(ht) {
         }
@@ -184,7 +184,7 @@ class AsyncSequenceWriter: public Async<const char *> {
 
 class AsyncHasher: public Async<const char *> {
 
-    friend class AsyncWriter;
+    friend class AsyncHashWriter;
 
     protected:
     

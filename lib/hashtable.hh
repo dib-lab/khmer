@@ -25,7 +25,7 @@
 #include "khmer_exception.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
-#include "async_hash.hh"
+#include "khmer_async.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -166,7 +166,7 @@ public:
 class Hashtable  		// Base class implementation of a Bloom ht.
 {
     friend class SubsetPartition;
-    friend class AsyncHashWriter;
+
 protected:
     unsigned int _tag_density;
 
@@ -189,13 +189,13 @@ protected:
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
-        async_hash = new AsyncHashWriter(this);
+        async_writer = new AsyncSequenceWriter(this);
     }
 
     virtual ~Hashtable( )
     {
         delete partition;
-        delete async_hash;
+        delete async_writer;
     }
 
     void _init_bitstuff()
@@ -235,7 +235,7 @@ protected:
     uint32_t _all_tags_spin_lock;
 public:
     SubsetPartition * partition;
-    AsyncHashWriter * async_hash;
+    AsyncSequenceWriter * async_writer;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
@@ -295,17 +295,6 @@ public:
     
     void consume_fasta_async(std::string const &filename);
     void consume_fasta_async(read_parsers::IParser * parser);
-
-    // Count every k-mer from a stream of FASTA or FASTQ reads,
-    // using the supplied parser.
-    void consume_fasta_parallel(
-        read_parsers:: IParser *	    parser,
-        unsigned int	    &total_reads,
-        unsigned long long  &n_consumed,
-        unsigned int n_threads,
-        CallbackFn	    callback	    = NULL,
-        void *		    callback_data   = NULL
-    );
 
     void get_median_count(const std::string &s,
                           BoundedCounterType &median,
