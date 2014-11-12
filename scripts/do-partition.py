@@ -186,7 +186,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         threads.append(cur_thread)
         cur_thread.start()
 
-    assert threading.active_count() == args.n_threads+1
+    assert threading.active_count() == args.n_threads + 1
 
     print 'done starting threads'
 
