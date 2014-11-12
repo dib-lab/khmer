@@ -53,14 +53,14 @@ LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner", "khmer_async"]]
 
-KHMER_SOURCES = ["khmer/_khmermodule.cc"]
+KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/_khmerasyncmodule.cc"]
 KHMER_SOURCES.extend(LIB_SOURCES)
 KHMER_DEPENDS = ["khmer/_khmermodule.hh"]
 KHMER_DEPENDS.extend(LIB_DEPENDS)
 
-KHMER_ASYNC_SOURCES = ["khmer/_khmerasyncmodule.cc"]
+KHMER_ASYNC_SOURCES = ["khmer/_khmerasyncmodule.cc", "khmer/_khmermodule.cc"]
 KHMER_ASYNC_SOURCES.extend(LIB_SOURCES)
-KHMER_ASYNC_DEPENDS = ["khmer/_khmerasyncmodule.hh"]
+KHMER_ASYNC_DEPENDS = ["khmer/_khmerasyncmodule.hh", "khmer/_khmermodule.hh"]
 KHMER_ASYNC_DEPENDS.extend(LIB_DEPENDS)
 
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
@@ -92,10 +92,10 @@ if sys.platform != 'darwin':
     KHMER_MOD_DICT['extra_link_args'] = ['-lgomp']
     KHMER_ASYNC_MOD_DICT['extra_link_args'] = ['-lgomp']
 
-EXTENSION_MODS = [ Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          ** KHMER_MOD_DICT),
-                   Extension("khmer.async",
-                          ** KHMER_ASYNC_MOD_DICT) ]
+EXTENSION_MODS = [  Extension("khmer._khmermodule",  # pylint: disable=W0142
+                          ** KHMER_MOD_DICT),]
+#                    Extension("khmer._khmer_async",
+#                          ** KHMER_ASYNC_MOD_DICT), ]
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -169,8 +169,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
                     ' configure || bash ./configure --static ) && make -f '
                     'Makefile.pic PIC']
             spawn(cmd=zcmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "zlib", bn + ".lo") for bn in [
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "zlib", bn + ".lo") for bn in [
                     "adler32", "compress", "crc32", "deflate", "gzclose",
                     "gzlib", "gzread", "gzwrite", "infback", "inffast",
                     "inflate", "inftrees", "trees", "uncompr", "zutil"])
@@ -178,8 +179,9 @@ class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
             bz2cmd = ['bash', '-c', 'cd ' + BZIP2DIR + ' && make -f '
                       'Makefile-libbz2_so all']
             spawn(cmd=bz2cmd, dry_run=self.dry_run)
-            self.extensions[0].extra_objects.extend(
-                path_join("third-party", "bzip2", bn + ".o") for bn in [
+            for ext in self.extensions:
+                ext.extra_objects.extend(
+                    path_join("third-party", "bzip2", bn + ".o") for bn in [
                     "blocksort", "huffman", "crctable", "randtable",
                     "compress", "decompress", "bzlib"])
         _build_ext.run(self)

@@ -6,6 +6,7 @@
 #
 # pylint: disable=missing-docstring,protected-access
 import khmer
+from khmer import async
 import time
 
 from screed.fasta import fasta_iter
@@ -21,7 +22,7 @@ def test_n_processed():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
-    asd = khmer.AsyncDiginorm(ht)
+    asd = async.AsyncDiginorm(ht)
     asd.start(filename, 1000, 1)
     time.sleep(1)
     asd.stop()
@@ -32,7 +33,7 @@ def test_n_kept():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
-    asd = khmer.AsyncDiginorm(ht)
+    asd = async.AsyncDiginorm(ht)
     asd.start(filename, 1000, 1)
     time.sleep(1)
     asd.stop()
@@ -43,7 +44,7 @@ def test_n_parsed():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
-    asd = khmer.AsyncDiginorm(ht)
+    asd = async.AsyncDiginorm(ht)
     asd.start(filename, 1000, 1)
     time.sleep(1)
     asd.stop()
@@ -54,7 +55,7 @@ def test_async_diginorm():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
-    asd = khmer.AsyncDiginorm(ht)
+    asd = async.AsyncDiginorm(ht)
     asd.start(filename, 5, 1)
     time.sleep(1)
     asd.stop()

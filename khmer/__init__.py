@@ -13,7 +13,6 @@ from khmer._khmer import _new_hashbits
 from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
-from khmer._khmer import _AsyncDiginorm
 from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
 
 from khmer._khmer import forward_hash  # figuregen/*.py
@@ -35,6 +34,7 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
+from khmer._khmer import async
 
 from struct import pack, unpack
 
@@ -242,11 +242,13 @@ factory methods to the constructors defined over in cpython land.
 Additional functionality can be added to these classes as appropriate.
 '''
 
+'''
 class AsyncDiginorm(_AsyncDiginorm):
 
     def __new__(cls, ht):
         c = _AsyncDiginorm.__new__(cls, ht)
         return c
+'''
 
 class LabelHash(_LabelHash):
 
