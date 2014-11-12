@@ -9,7 +9,6 @@
 #include "khmer.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
-#include "khmer_async.hh"
 
 #include <algorithm>
 #include <sstream>
@@ -70,14 +69,6 @@ accumulate_timer_deltas( uint32_t metrics_key )
 
 }
 #endif
-
-void Hashtable::start_async() {
-    async_hash->start();
-}
-
-void Hashtable::stop_async() {
-    async_hash->stop();
-}
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -220,33 +211,6 @@ unsigned int Hashtable::consume_string(const std::string &s)
     }
 
     return n_consumed;
-}
-
-unsigned int Hashtable::consume_string_async(const std::string &s) {
-    unsigned int n_consumed = 0;
-    async_writer->push(s);
-    return n_consumed;
-}
-
-void Hashtable::consume_fasta_async(std::string const &filename) {
-
-    IParser *	  parser =
-        IParser::get_parser(filename);
-
-    consume_fasta_async(parser);
-
-    delete parser;
-}
-
-void Hashtable::consume_fasta_async(read_parsers::IParser * parser) {
-    
-    Read read;
-
-    // Iterate through the reads and consume their k-mers.
-    while (!parser->is_complete( )) {
-        read = parser->get_next_read( );
-        async_writer->push(read.sequence);
-    } // while reads left for parser
 }
 
 // technically, get medioid count... our "median" is always a member of the

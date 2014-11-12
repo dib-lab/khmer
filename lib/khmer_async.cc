@@ -282,6 +282,12 @@ unsigned int AsyncDiginorm::n_kept() {
     return _n_kept;
 }
 
+bool AsyncDiginorm::iter_stop() {
+    if (!workers_running() && (n_popped() >= n_kept()))
+        return true;
+    return false;
+}
+
 void AsyncDiginorm::consume(ReadQueue * q) {
 
     Read* read;

@@ -25,7 +25,6 @@
 #include "khmer_exception.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
-#include "khmer_async.hh"
 
 #define MAX_KEEPER_SIZE int(1e6)
 
@@ -189,13 +188,11 @@ protected:
         partition = new SubsetPartition(this);
         _init_bitstuff();
         _all_tags_spin_lock = 0;
-        async_writer = new AsyncSequenceWriter(this);
     }
 
     virtual ~Hashtable( )
     {
         delete partition;
-        delete async_writer;
     }
 
     void _init_bitstuff()
@@ -235,7 +232,6 @@ protected:
     uint32_t _all_tags_spin_lock;
 public:
     SubsetPartition * partition;
-    AsyncSequenceWriter * async_writer;
     SeenSet all_tags;
     SeenSet stop_tags;
     SeenSet repart_small_tags;
@@ -248,8 +244,6 @@ public:
 
     virtual void count(const char * kmer) = 0;
     virtual void count(HashIntoType khash) = 0;
-    virtual void count_async(HashIntoType khash) = 0;
-    virtual void count_async(const char * kmer) = 0;
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const = 0;
@@ -260,10 +254,6 @@ public:
 
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
-    unsigned int consume_string_async(const std::string &s);
-
-    void start_async(unsigned int n_hasher_threads);
-    void stop_async();
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
@@ -293,8 +283,6 @@ public:
         void *		    callback_data   = NULL
     );
     
-    void consume_fasta_async(std::string const &filename);
-    void consume_fasta_async(read_parsers::IParser * parser);
 
     void get_median_count(const std::string &s,
                           BoundedCounterType &median,

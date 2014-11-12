@@ -245,6 +245,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
         unsigned int n_popped();
         bool has_output();
         void set_output(ReadQueue* new_q);
+        virtual bool iter_stop() = 0;
 
         bool is_parsing();
         void read_iparser(const std::string &filename);
@@ -273,6 +274,7 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
 
         unsigned int n_kept();
         virtual void consume(ReadQueue* q);
+        bool iter_stop();
 };
 };
 #endif
