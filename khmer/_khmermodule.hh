@@ -26,14 +26,6 @@
 
 using namespace khmer;
 
-//
-// Function necessary for Python loading:
-//
-
-extern "C" {
-    void init_khmer();
-}
-
 // Configure module logging.
 //#define WITH_INTERNAL_TRACING
 namespace khmer
@@ -44,31 +36,25 @@ namespace python
 
 template < typename OBJECT >
 void
-_common_init_Type(
-    PyTypeObject &tobj, char const * name, char const * doc
-)
-{
-    if (!name) {
-        throw khmer_exception();
-    }
-    if (!doc) {
-        throw khmer_exception();
-    }
+_common_init_Type(PyTypeObject &tobj, char const * name, char const * doc);
 
-    tobj.ob_size        = 0;
-    tobj.ob_type        = &PyType_Type;
-    tobj.tp_name        = name;
-    tobj.tp_basicsize       = sizeof( OBJECT );
-    tobj.tp_alloc       = PyType_GenericAlloc;
-    tobj.tp_free        = PyObject_Free;
-    tobj.tp_getattro        = PyObject_GenericGetAttr;
-    tobj.tp_flags       = Py_TPFLAGS_DEFAULT;
-    tobj.tp_doc         = doc;
-}
 
 } // namespace python
 
 } // namespace khmer
+
+
+class _khmer_exception
+{
+private:
+    std::string _message;
+public:
+    _khmer_exception(std::string message) : _message(message) { };
+    inline const std::string get_message() const
+    {
+        return _message;
+    };
+};
 
 class _khmer_signal : public _khmer_exception
 {
@@ -84,40 +70,7 @@ static PyObject *_callback_obj = NULL;
 // callback function to pass into C++ functions
 
 void _report_fn(const char * info, void * data, unsigned long long n_reads,
-                unsigned long long other)
-{
-    // handle signals etc. (like CTRL-C)
-    if (PyErr_CheckSignals() != 0) {
-        throw _khmer_signal("PyErr_CheckSignals received a signal");
-    }
-
-    // set data to default?
-    if (!data && _callback_obj) {
-        data = _callback_obj;
-    }
-
-    // if 'data' is set, it is None, or a Python callable
-    if (data) {
-        PyObject * obj = (PyObject *) data;
-        if (obj != Py_None) {
-            PyObject * args = Py_BuildValue("sKK", info, n_reads, other);
-            if (args != NULL) {
-                PyObject * r = PyObject_Call(obj, args, NULL);
-                Py_XDECREF(r);
-            }
-            Py_XDECREF(args);
-        }
-    }
-
-    if (PyErr_Occurred()) {
-        throw _khmer_signal("PyErr_Occurred is set");
-    }
-
-    // ...allow other Python threads to do stuff...
-    Py_BEGIN_ALLOW_THREADS;
-    Py_END_ALLOW_THREADS;
-}
-
+                unsigned long long other);
 /***********************************************************************/
 
 //
@@ -143,14 +96,7 @@ typedef struct {
 
 static
 void
-_Read_dealloc( PyObject * self )
-{
-    Read_Object * myself = (Read_Object *)self;
-    delete myself->read;
-    myself->read = NULL;
-    Read_Type.tp_free( self );
-}
-
+_Read_dealloc( PyObject * self );
 
 #define KHMER_READ_STRING_GETTER( SELF, ATTR_NAME ) \
     PyString_FromString( \
