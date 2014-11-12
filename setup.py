@@ -46,14 +46,22 @@ os.environ['OPT'] = " ".join(
 ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
-BUILD_DEPENDS = []
-BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash", "khmer_async"])
+LIB_DEPENDS = [path_join("lib", bn + ".hh") for bn in [
+    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash", "khmer_async"]]
 
-SOURCES = ["khmer/_khmermodule.cc", "khmer/_khmerasyncmodule.cc"]
-SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
+LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner", "khmer_async"])
+    "hashbits", "labelhash", "counting", "subset", "read_aligner", "khmer_async"]]
+
+KHMER_SOURCES = ["khmer/_khmermodule.cc"]
+KHMER_SOURCES.extend(LIB_SOURCES)
+KHMER_DEPENDS = ["khmer/_khmermodule.hh"]
+KHMER_DEPENDS.extend(LIB_DEPENDS)
+
+KHMER_ASYNC_SOURCES = ["khmer/_khmerasyncmodule.cc"]
+KHMER_ASYNC_SOURCES.extend(LIB_SOURCES)
+KHMER_ASYNC_DEPENDS = ["khmer/_khmerasyncmodule.hh"]
+KHMER_ASYNC_DEPENDS.extend(LIB_DEPENDS)
 
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
 
@@ -61,20 +69,33 @@ if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
 
-EXTENSION_MOD_DICT = \
+KHMER_MOD_DICT = \
     {
-        "sources": SOURCES,
+        "sources": KHMER_SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
-        "depends": BUILD_DEPENDS,
+        "depends": KHMER_DEPENDS,
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-if sys.platform != 'darwin':
-    EXTENSION_MOD_DICT['extra_link_args'] = ['-lgomp']
+KHMER_ASYNC_MOD_DICT = \
+    {
+        "sources": KHMER_ASYNC_SOURCES,
+        "extra_compile_args": EXTRA_COMPILE_ARGS,
+        "depends": KHMER_ASYNC_DEPENDS,
+        "language": "c++",
+        "define_macros": [("VERSION", versioneer.get_version()), ],
+    }
 
-EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          ** EXTENSION_MOD_DICT)
+
+if sys.platform != 'darwin':
+    KHMER_MOD_DICT['extra_link_args'] = ['-lgomp']
+    KHMER_ASYNC_MOD_DICT['extra_link_args'] = ['-lgomp']
+
+EXTENSION_MODS = [ Extension("khmer._khmermodule",  # pylint: disable=W0142
+                          ** KHMER_MOD_DICT),
+                   Extension("khmer.async",
+                          ** KHMER_ASYNC_MOD_DICT) ]
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
@@ -120,7 +141,7 @@ SETUP_METADATA = \
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
         "scripts": SCRIPTS,
-        "ext_modules": [EXTENSION_MOD, ],
+        "ext_modules": EXTENSION_MODS,
         # "platforms": '', # empty as is conveyed by the classifiers below
         # "license": '', # empty as is conveyed by the classifier below
         "include_package_data": True,

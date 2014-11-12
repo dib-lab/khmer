@@ -11,14 +11,8 @@
 
 // Must be first.
 #include <Python.h>
-#include "hashtable.hh"
 
-#include <iostream>
-
-#include "khmer.hh"
-#include "counting.hh"
-#include "khmer_async.hh"
-#include "khmer_exception.hh"
+#include "_khmerasyncmodule.hh"
 
 using namespace khmer;
 
@@ -32,18 +26,6 @@ extern "C" {
 // AsyncSequenceProcessor
 //
 ////////////////////
-
-
-typedef struct {
-    PyObject_HEAD
-    AsyncSequenceProcessor * async_sp;
-} khmer_AsyncSequenceProcessorObject;
-
-static void khmer_asyncseqproc_dealloc(PyObject *);
-static int khmer_asyncseqproc_init(khmer_AsyncSequenceProcessorObject * self, PyObject * args,
-                                PyObject * kwds);
-static PyObject * khmer_asyncseqproc_new(PyTypeObject * type, PyObject * args,
-                                PyObject * kwds);
 
 static PyObject * asyncseqproc_stop(PyObject * self, PyObject * args)
 {
@@ -90,76 +72,26 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
     return read_obj;
 }
 
-static PyObject * asyncsecproc_n_parsed(PyObject * self, PyObject * args)
+static PyObject * asyncseqproc_n_parsed(PyObject * self, PyObject * args)
 {
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
-    AsyncDiginorm * async_sp = me->async_sp;
+    AsyncSequenceProcessor * async_sp = me->async_sp;
 
     unsigned int n = async_sp->n_parsed();
 
     return PyLong_FromUnsignedLongLong(n);
 }
-static PyObject * asyncsecproc_n_processed(PyObject * self, PyObject * args)
+static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args)
 {
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
-    AsyncDiginorm * async_sp = me->async_sp;
+    AsyncSequenceProcessor * async_sp = me->async_sp;
 
     unsigned int n = async_sp->n_processed();
 
     return PyLong_FromUnsignedLongLong(n);
 }
 
-static PyMethodDef khmer_asyncsecproc_methods[] = {
-    { "processed", (PyCFunction)asyncdiginorm_processed_iter, METH_NOARGS, "Iterator over processed reads" },
-    { "stop", asyncsecproc_stop, METH_VARARGS, "Stop processors, join threads" },
-    { "n_processed", asyncsecproc_n_processed, METH_NOARGS, "Number of reads processed" },
-    { "n_parsed", asyncsecproc_n_parsed, METH_NOARGS, "Number of reads parsed" },
-
-    {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static PyTypeObject khmer_AsyncSequenceProcessorType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                       /* ob_size */
-    "AsyncSequenceProcessor",            /* tp_name */
-    sizeof(khmer_AsyncSequenceProcessorObject), /* tp_basicsize */
-    0,                       /* tp_itemsize */
-    (destructor)khmer_asyncsecproc_dealloc, /* tp_dealloc */
-    0,                       /* tp_print */
-    0,                       /* tp_getattr */
-    0,                       /* tp_setattr */
-    0,                       /* tp_compare */
-    0,                       /* tp_repr */
-    0,                       /* tp_as_number */
-    0,                       /* tp_as_sequence */
-    0,                       /* tp_as_mapping */
-    0,                       /* tp_hash */
-    0,                       /* tp_call */
-    0,                       /* tp_str */
-    0,                       /* tp_getattro */
-    0,                       /* tp_setattro */
-    0,                       /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_ITER,   /* tp_flags */
-    0,                       /* tp_doc */
-    0,                       /* tp_traverse */
-    0,                       /* tp_clear */
-    0,                       /* tp_richcompare */
-    0,                       /* tp_weaklistoffset */
-    PyObject_SelfIter,                       /* tp_iter */
-    (iternextfunc) asyncsecproc_processed_iternext,                       /* tp_iternext */
-    khmer_asyncsecproc_methods, /* tp_methods */
-    0,                       /* tp_members */
-    0,                       /* tp_getset */
-    0,                       /* tp_base */
-    0,                       /* tp_dict */
-    0,                       /* tp_descr_get */
-    0,                       /* tp_descr_set */
-    0,                       /* tp_dictoffset */
-    (initproc)khmer_asyncsecproc_init,   /* tp_init */
-    0,                       /* tp_alloc */
-};
-
-static void khmer_asyncsecproc_dealloc(PyObject* obj)
+static void khmer_asyncseqproc_dealloc(PyObject* obj)
 {
     khmer_AsyncSequenceProcessorObject * self = (khmer_AsyncSequenceProcessorObject *) obj;
 
@@ -170,7 +102,7 @@ static void khmer_asyncsecproc_dealloc(PyObject* obj)
     obj->ob_type->tp_free((PyObject*)self);
 }
 
-static PyObject * khmer_asyncsecproc_new(PyTypeObject *type, PyObject *args,
+static PyObject * khmer_asyncseqproc_new(PyTypeObject *type, PyObject *args,
                                       PyObject *kwds)
 {
     khmer_AsyncSequenceProcessorObject *self;
@@ -183,13 +115,13 @@ static PyObject * khmer_asyncsecproc_new(PyTypeObject *type, PyObject *args,
             return NULL;
         }
         
-        self->async_sp = new AsyncSequenceProcessor(counting_o->counting);
+        //self->async_sp = new AsyncSequenceProcessor(counting_o->counting);
     }
 
     return (PyObject *) self;
 }
 
-static int khmer_asyncsecproc_init(khmer_AsyncSequenceProcessorObject * self, PyObject *args,
+static int khmer_asyncseqproc_init(khmer_AsyncSequenceProcessorObject * self, PyObject *args,
                                 PyObject *kwds)
 {
     return 0;
@@ -198,11 +130,6 @@ static int khmer_asyncsecproc_init(khmer_AsyncSequenceProcessorObject * self, Py
 ////////////////////
 // AsyncDiginorm
 ////////////////////
-
-typedef struct {
-    khmer_AsyncSequenceProcessorObject async_sp;
-    AsyncDiginorm * async_diginorm;
-} khmer_AsyncDiginormObject;
 
 static void khmer_asyncdiginorm_dealloc(PyObject *);
 static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject * args,
@@ -236,54 +163,6 @@ static PyObject * asyncdiginorm_n_kept(PyObject * self, PyObject * args)
 
     return PyLong_FromUnsignedLongLong(n);
 }
-
-static PyMethodDef khmer_asyncdiginorm_methods[] = {
-    { "start", asyncdiginorm_start, METH_VARARGS, "Start processing" },
-    { "n_kept", asyncdiginorm_n_kept, METH_NOARGS, "Number of reads kept" },
-
-    {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static PyTypeObject khmer_AsyncDiginormType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                       /* ob_size */
-    "AsyncDiginorm",            /* tp_name */
-    sizeof(khmer_AsyncDiginormObject), /* tp_basicsize */
-    0,                       /* tp_itemsize */
-    (destructor)khmer_asyncdiginorm_dealloc, /* tp_dealloc */
-    0,                       /* tp_print */
-    0,  /* khmer_labelhash_getattr, tp_getattr */
-    0,                       /* tp_setattr */
-    0,                       /* tp_compare */
-    0,                       /* tp_repr */
-    0,                       /* tp_as_number */
-    0,                       /* tp_as_sequence */
-    0,                       /* tp_as_mapping */
-    0,                       /* tp_hash */
-    0,                       /* tp_call */
-    0,                       /* tp_str */
-    0,                       /* tp_getattro */
-    0,                       /* tp_setattro */
-    0,                       /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_ITER,   /* tp_flags */
-    0,                       /* tp_doc */
-    0,                       /* tp_traverse */
-    0,                       /* tp_clear */
-    0,                       /* tp_richcompare */
-    0,                       /* tp_weaklistoffset */
-    PyObject_SelfIter,                       /* tp_iter */
-    (iternextfunc) asyncsecproc_processed_iternext,                       /* tp_iternext */
-    khmer_asyncsecproc_methods, /* tp_methods */
-    0,                       /* tp_members */
-    0,                       /* tp_getset */
-    0,                       /* tp_base */
-    0,                       /* tp_dict */
-    0,                       /* tp_descr_get */
-    0,                       /* tp_descr_set */
-    0,                       /* tp_dictoffset */
-    (initproc)khmer_asyncdiginorm_init,   /* tp_init */
-    0,                       /* tp_alloc */
-};
 
 static void khmer_asyncdiginorm_dealloc(PyObject* obj)
 {
@@ -326,13 +205,12 @@ static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject *
 }
 
 
-
 PyMODINIT_FUNC
 init_khmer_async(void)
 {
     using namespace python;
 
-    khmer_AsyncSequenceProcessorType.tp_new = khmer_asyncsecproc_new;
+    khmer_AsyncSequenceProcessorType.tp_new = khmer_asyncseqproc_new;
     if (PyType_Ready(&khmer_AsyncSequenceProcessorType) < 0) {
         return;
     }
