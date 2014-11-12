@@ -53,12 +53,12 @@ LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner", "khmer_async"]]
 
-KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/_khmerasyncmodule.cc"]
+KHMER_SOURCES = ["khmer/_khmermodule.cc"]
 KHMER_SOURCES.extend(LIB_SOURCES)
 KHMER_DEPENDS = ["khmer/_khmermodule.hh"]
 KHMER_DEPENDS.extend(LIB_DEPENDS)
 
-KHMER_ASYNC_SOURCES = ["khmer/_khmerasyncmodule.cc", "khmer/_khmermodule.cc"]
+KHMER_ASYNC_SOURCES = ["khmer/_khmerasyncmodule.cc"]
 KHMER_ASYNC_SOURCES.extend(LIB_SOURCES)
 KHMER_ASYNC_DEPENDS = ["khmer/_khmerasyncmodule.hh", "khmer/_khmermodule.hh"]
 KHMER_ASYNC_DEPENDS.extend(LIB_DEPENDS)
@@ -93,9 +93,9 @@ if sys.platform != 'darwin':
     KHMER_ASYNC_MOD_DICT['extra_link_args'] = ['-lgomp']
 
 EXTENSION_MODS = [  Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          ** KHMER_MOD_DICT),]
-#                    Extension("khmer._khmer_async",
-#                          ** KHMER_ASYNC_MOD_DICT), ]
+                          ** KHMER_MOD_DICT),
+                    Extension("khmer._khmer_async",
+                          ** KHMER_ASYNC_MOD_DICT), ]
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")

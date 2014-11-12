@@ -19,11 +19,9 @@
 
 using namespace khmer;
 
-/*
 extern "C" {
     void init_khmer_async();
 }
-*/
 
 ////////////////////
 //
@@ -329,7 +327,6 @@ static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject *
     return 0;
 }
 
-/*
 PyMODINIT_FUNC
 init_khmer_async(void)
 {
@@ -360,5 +357,4 @@ init_khmer_async(void)
     Py_INCREF(&khmer_AsyncDiginormType);
     PyModule_AddObject(m, "AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
 }
-*/
 

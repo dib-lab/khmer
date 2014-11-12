@@ -4261,33 +4261,6 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
-
-    // async submodule
-
-    if (PyType_Ready(&khmer_AsyncSequenceProcessorType) < 0) {
-        return;
-    }
-
-    if (PyType_Ready(&khmer_AsyncDiginormType) < 0) {
-        return;
-    }
-
-    PyObject * asyncm;
-    asyncm = Py_InitModule3( "_khmer_async", NULL,
-                        "interface for the khmer_async module low-level extensions" );
-    if (asyncm == NULL) {
-        return;
-    }
-
-    Py_INCREF(&khmer_AsyncSequenceProcessorType);
-    PyModule_AddObject(asyncm, "AsyncSequenceProcessor", 
-        (PyObject *)&khmer_AsyncSequenceProcessorType);
-
-    Py_INCREF(&khmer_AsyncDiginormType);
-    PyModule_AddObject(asyncm, "AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
-
-    Py_INCREF(&asyncm);
-    PyModule_AddObject(m, "async", (PyObject *) asyncm);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:
