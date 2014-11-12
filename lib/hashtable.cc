@@ -9,9 +9,14 @@
 #include "hashtable.hh"
 #include "read_parsers.hh"
 #include "counting.hh"
+#include "async_hash.hh"
 
 #include <algorithm>
 #include <sstream>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 using namespace std;
 using namespace khmer;
@@ -90,6 +95,14 @@ Hashtable:: Hasher::
 ~Hasher( )
 { }
 
+
+void Hashtable::start_async(unsigned int n_hasher_threads) {
+    async_hash->start(n_hasher_threads);
+}
+
+void Hashtable::stop_async() {
+    async_hash->stop();
+}
 
 //
 // check_and_process_read: checks for non-ACGT characters before consuming
@@ -181,6 +194,32 @@ consume_fasta(
 
 void
 Hashtable::
+consume_fasta_parallel(
+    std:: string const  &filename,
+    unsigned int	      &total_reads, unsigned long long	&n_consumed,
+    unsigned int n_threads,
+    CallbackFn	      callback,	    void *		callback_data
+)
+{
+    khmer:: Config    &the_config	  = khmer:: get_active_config( );
+
+    IParser *	  parser =
+        IParser::get_parser(
+            filename, n_threads, the_config.get_reads_input_buffer_size( ),
+            the_config.get_reads_parser_trace_level( )
+        );
+
+    consume_fasta_parallel(
+        parser,
+        total_reads, n_consumed, n_threads,
+        callback, callback_data
+    );
+
+    delete parser;
+}
+
+void
+Hashtable::
 consume_fasta(
     read_parsers:: IParser *  parser,
     unsigned int		    &total_reads, unsigned long long  &n_consumed,
@@ -251,6 +290,116 @@ consume_fasta(
 
 } // consume_fasta
 
+void
+Hashtable::
+consume_fasta_parallel(
+    read_parsers:: IParser *  parser,
+    unsigned int		    &total_reads, unsigned long long  &n_consumed,
+    unsigned int n_threads,
+    CallbackFn		    callback,	  void *	      callback_data
+)
+{
+    Hasher		  &hasher		=
+        _get_hasher( parser->uuid( ) );
+#if (0) // Note: Used with callback - currently disabled.
+    unsigned long long int  n_consumed_LOCAL	= 0;
+#endif
+
+
+    hasher.trace_logger(
+        TraceLogger:: TLVL_DEBUG2, "Starting trace of 'consume_fasta'....\n"
+    );
+
+    omp_set_num_threads(n_threads);
+    #pragma omp parallel for
+    for (unsigned int thread=0; thread<n_threads; ++thread) {
+        std::cout << "consume_fasta_parallel " << omp_get_num_threads() << " active threads" << std::endl;
+    // This is schvery hacky. Because our iterator isn't a real iterator, OpenMP can't use it
+    // But it *is* thread-safe, so I give omp an arbitrary for loop and pull off the parser within that
+        Read read;
+        while(!parser->is_complete()) {
+            unsigned int  this_n_consumed;
+            bool	  is_valid;
+            read = parser->get_next_read();
+
+            this_n_consumed =
+                check_and_process_read(read.sequence, is_valid);
+
+    #ifdef WITH_INTERNAL_METRICS
+            hasher.pmetrics.start_timers( );
+    #endif
+    #if (0) // Note: Used with callback - currently disabled.
+            n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
+    #else
+            __sync_add_and_fetch( &n_consumed, this_n_consumed );
+    #endif
+            unsigned int total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
+    #ifdef WITH_INTERNAL_METRICS
+            hasher.pmetrics.stop_timers( );
+            hasher.pmetrics.accumulate_timer_deltas(
+                (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
+            );
+    #endif
+
+            if (0 == (total_reads_LOCAL % 10000))
+                hasher.trace_logger(
+                    TraceLogger:: TLVL_DEBUG3,
+                    "Total number of reads processed: %llu\n",
+                    (unsigned long long int)total_reads_LOCAL
+                );
+
+            // TODO: Figure out alternative to callback into Python VM
+            //       Cannot use in multi-threaded operation.
+    #if (0)
+            // run callback, if specified
+            if (callback && (0 == (total_reads_LOCAL % CALLBACK_PERIOD))) {
+                try {
+                    callback(
+                        "consume_fasta", callback_data,
+                        total_reads_LOCAL, n_consumed_LOCAL
+                    );
+                } catch (...) {
+                    throw;
+                }
+            }
+#endif // 0
+        } // while reads left in parser LOCAL
+        std::cout << "Thread " << thread << " consumed " << n_consumed << std::endl;
+    } // for each THREAD
+
+} // consume_fasta
+
+
+//
+// consume_string_parallel: run through every k-mer in the given string & hash it in parallel.
+//
+
+unsigned int Hashtable::consume_string_parallel(const std::string &s, const unsigned int n_threads)
+{
+    const char * sp = s.c_str();
+    unsigned int n_consumed = 0;
+
+    KMerIterator kmers(sp, _ksize);
+
+    std::vector<HashIntoType> hashes;
+    while(!kmers.done()) { 
+        hashes.push_back(kmers.next());
+    }
+
+    omp_set_num_threads(n_threads);
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (unsigned int i=0; i<hashes.size(); ++i) {
+            test_and_set_bits(hashes[i]);
+            #pragma omp atomic
+            n_consumed++;
+        }
+    }
+    
+    return n_consumed;
+}
+
 //
 // consume_string: run through every k-mer in the given string, & hash it.
 //
@@ -270,6 +419,37 @@ unsigned int Hashtable::consume_string(const std::string &s)
     }
 
     return n_consumed;
+}
+
+unsigned int Hashtable::consume_string_async(const std::string &s) {
+    unsigned int n_consumed = 0;
+    async_hash->enqueue_string(s);
+    return n_consumed;
+}
+
+void Hashtable::consume_fasta_async(std::string const &filename) {
+    khmer:: Config    &the_config	  = khmer:: get_active_config( );
+
+    IParser *	  parser =
+        IParser::get_parser(
+            filename, the_config.get_number_of_threads(), the_config.get_reads_input_buffer_size( ),
+            the_config.get_reads_parser_trace_level( )
+        );
+
+    consume_fasta_async(parser);
+
+    delete parser;
+}
+
+void Hashtable::consume_fasta_async(read_parsers::IParser * parser) {
+    
+    Read read;
+
+    // Iterate through the reads and consume their k-mers.
+    while (!parser->is_complete( )) {
+        read = parser->get_next_read( );
+        async_hash->enqueue_string(read.sequence);
+    } // while reads left for parser
 }
 
 // technically, get medioid count... our "median" is always a member of the

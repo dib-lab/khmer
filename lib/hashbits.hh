@@ -182,6 +182,15 @@ public:
         }
     }
 
+    virtual void count_async(HashIntoType khash)
+    {
+        async_hash->enqueue_hash(khash);
+    }
+
+    virtual void count_async(const char * kmer) {
+        async_hash->enqueue_kmer(kmer);
+    }
+
     virtual bool check_overlap(HashIntoType khash, Hashbits &ht2)
     {
 

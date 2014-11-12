@@ -22,6 +22,7 @@
 #include "counting.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
+#include "khmer_async.hh"
 #include "khmer_exception.hh"
 
 using namespace khmer;
@@ -1155,6 +1156,61 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static PyObject * hash_consume_fasta_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
+    CountingHash * counting  = me->counting;
+
+    const char * filename;
+    PyObject * callback_obj = NULL;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(
+                args, "s|IO", &filename, &n_threads, &callback_obj
+            )) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+
+    std::cout << "consume_fasta_parallel " << n_threads << " threads" << std::endl;
+
+    try {
+        Py_BEGIN_ALLOW_THREADS
+        counting->consume_fasta_parallel(filename, total_reads, n_consumed,
+                                         n_threads, _report_fn, callback_obj);
+        Py_END_ALLOW_THREADS 
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+static PyObject * hash_consume_fasta_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
+    CountingHash * counting  = me->counting;
+
+    const char * filename;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    counting->consume_fasta_async(filename);
+    Py_RETURN_NONE;
+}
+
+
+
 static PyObject * hash_consume_fasta_with_reads_parser(
     PyObject * self, PyObject * args
 )
@@ -1220,6 +1276,82 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
     n_consumed = counting->consume_string(long_str);
 
     return PyInt_FromLong(n_consumed);
+}
+
+
+
+static PyObject * hash_consume_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * long_str;
+
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < counting->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    unsigned int n_consumed;
+    n_consumed = counting->consume_string_async(long_str);
+
+    return PyInt_FromLong(n_consumed);
+}
+
+static PyObject * hash_consume_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * long_str;\
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "s|I", &long_str, &n_threads)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < counting->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+
+    unsigned int n_consumed;
+    Py_BEGIN_ALLOW_THREADS
+    n_consumed = counting->consume_string_parallel(long_str, n_threads);
+    Py_END_ALLOW_THREADS
+
+    return PyInt_FromLong(n_consumed);
+}
+
+static PyObject * hash_start_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "I", &n_threads)) {
+        return NULL;
+    }
+    counting->start_async(n_threads);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject * hash_stop_async(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    counting->stop_async();
+
+    Py_RETURN_NONE;
 }
 
 static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
@@ -1748,9 +1880,15 @@ static PyMethodDef khmer_counting_methods[] = {
     { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
+    { "start_async", hash_start_async, METH_VARARGS, "Start up the asynchronous hasher-writer with the given number of threads for hashing" },
+    { "stop_async", hash_stop_async, METH_VARARGS, "Stop the asynchronous hasher-writer" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
     { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+    { "consume_parallel", hash_consume_parallel, METH_VARARGS, "Count all k-mers in the given string in parallel" },
+    { "consume_async", hash_consume_async, METH_VARARGS, "Enquee all k-mers in the given string for consumption" },
     { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+    { "consume_fasta_parallel", hash_consume_fasta_parallel, METH_VARARGS, "Count all k-mers in the given file in parallel" },
+    { "consume_fasta_async", hash_consume_fasta_async, METH_VARARGS, "" },
     {
         "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser,
         METH_VARARGS, "Count all k-mers using a given reads parser"
@@ -2161,6 +2299,31 @@ static PyObject * hashbits_consume(PyObject * self, PyObject * args)
     return PyInt_FromLong(n_consumed);
 }
 
+static PyObject * hashbits_consume_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+    Hashbits * hashbits = me->hashbits;
+    
+    const char * long_str;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "s|I", &long_str, &n_threads)) {
+        return NULL;
+    }
+
+    if (strlen(long_str) < hashbits->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }
+    unsigned int n_consumed;
+    Py_BEGIN_ALLOW_THREADS
+    n_consumed = hashbits->consume_string_parallel(long_str, n_threads);
+    Py_END_ALLOW_THREADS
+
+    return PyInt_FromLong(n_consumed);
+}
+
 static PyObject * hashbits_print_stop_tags(PyObject * self, PyObject * args)
 {
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
@@ -2550,6 +2713,42 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
 
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
+
+static PyObject * hashbits_consume_fasta_parallel(PyObject * self, PyObject * args)
+{
+    khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
+    Hashbits * hashbits = me->hashbits;
+
+    const char * filename;
+    PyObject * callback_obj = NULL;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(
+                args, "s|IO", &filename, &n_threads, &callback_obj
+            )) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int          total_reads   = 0;
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        hashbits->consume_fasta_parallel(filename, total_reads, n_consumed,
+                                         n_threads, _report_fn, callback_obj);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+    Py_END_ALLOW_THREADS
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+
 
 static PyObject * hashbits_consume_fasta_with_reads_parser(
     PyObject * self, PyObject * args
@@ -3527,6 +3726,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
     { "count_overlap", hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
     { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },
+    { "consume_parallel", hashbits_consume_parallel, METH_VARARGS, "Count all k-mers in a given string in parallel" },
     { "load_stop_tags", hashbits_load_stop_tags, METH_VARARGS, "" },
     { "save_stop_tags", hashbits_save_stop_tags, METH_VARARGS, "" },
     { "print_stop_tags", hashbits_print_stop_tags, METH_VARARGS, "" },
@@ -3558,6 +3758,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "_get_tag_density", hashbits__get_tag_density, METH_VARARGS, "" },
     { "_set_tag_density", hashbits__set_tag_density, METH_VARARGS, "" },
     { "consume_fasta", hashbits_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+    { "consume_fasta_parallel", hashbits_consume_fasta_parallel, METH_VARARGS, "Count all k-mers in the given file in parallel" },
     { "consume_fasta_with_reads_parser", hashbits_consume_fasta_with_reads_parser, METH_VARARGS, "Count all k-mers in a given file" },
     { "consume_fasta_and_tag", hashbits_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     {
@@ -3835,6 +4036,166 @@ static PyObject *
 khmer_subset_getattr(PyObject * obj, char * name)
 {
     return Py_FindMethod(khmer_subset_methods, obj, name);
+}
+
+////////////////////
+// AsyncDiginorm
+////////////////////
+
+typedef struct {
+    PyObject_HEAD
+    AsyncDiginorm * async_diginorm;
+} khmer_AsyncDiginormObject;
+
+static void khmer_asyncdiginorm_dealloc(PyObject *);
+static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject * args,
+                                PyObject * kwds);
+static PyObject * khmer_asyncdiginorm_new(PyTypeObject * type, PyObject * args,
+                                PyObject * kwds);
+
+static PyObject * asyncdiginorm_start(PyObject * self, PyObject * args)
+{
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+
+    const char * filename;
+    unsigned int cutoff = 20;
+    unsigned int n_threads = 1;
+
+    if (!PyArg_ParseTuple(args, "s|II", &filename, &cutoff, &n_threads)) {
+        return NULL;
+    }
+    async_diginorm->start(filename, cutoff, n_threads);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject * asyncdiginorm_stop(PyObject * self, PyObject * args)
+{
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+    
+    async_diginorm->stop();
+
+    Py_RETURN_NONE;
+}
+
+PyObject * asyncdiginorm_processed_iter(PyObject * self) {
+    return PyObject_SelfIter(self);
+}
+
+PyObject * asyncdiginorm_processed_iternext(PyObject * self) {
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+   
+    khmer::read_parsers::Read * read_ptr = new Read();
+
+    while(!(async_diginorm->pop(read_ptr))) {
+        if(!(async_diginorm->workers_running()) && 
+            (async_diginorm->n_popped() >= async_diginorm->n_kept()))
+        {
+            std::cout << "STOP_ITER: (kept, popped): " << async_diginorm->n_kept() 
+                << " " << async_diginorm->n_popped() << std::endl;
+            delete read_ptr;
+            PyErr_SetNone(PyExc_StopIteration);
+            return NULL;
+        }
+    }
+    if (async_diginorm->n_kept() % 50000 == 0)
+        std::cout << "ITER: (kept, popped): " << async_diginorm->n_kept() 
+            << " " << async_diginorm->n_popped() << std::endl;
+    
+    PyObject * read_obj = khmer::python::Read_Type.tp_alloc(&khmer::python::Read_Type, 1);
+    ((khmer::python::Read_Object *) read_obj)->read = read_ptr;
+    return read_obj;
+}
+
+static PyMethodDef khmer_asyncdiginorm_methods[] = {
+    { "processed", (PyCFunction)asyncdiginorm_processed_iter, 
+            METH_NOARGS, "Iterator over processed reads" },
+    { "start", asyncdiginorm_start, METH_VARARGS, "Start processing" },
+    { "stop", asyncdiginorm_stop, METH_VARARGS, "Stop processors, join threads" },
+
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+
+
+static PyTypeObject khmer_AsyncDiginormType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                       /* ob_size */
+    "_AsyncDiginorm",            /* tp_name */
+    sizeof(khmer_AsyncDiginormObject), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_asyncdiginorm_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,  /* khmer_labelhash_getattr, tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_ITER,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    PyObject_SelfIter,                       /* tp_iter */
+    (iternextfunc) asyncdiginorm_processed_iternext,                       /* tp_iternext */
+    khmer_asyncdiginorm_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    (initproc)khmer_asyncdiginorm_init,   /* tp_init */
+    0,                       /* tp_alloc */
+};
+
+static void khmer_asyncdiginorm_dealloc(PyObject* obj)
+{
+    khmer_AsyncDiginormObject * self = (khmer_AsyncDiginormObject *) obj;
+
+    self->async_diginorm->stop();
+    //delete self->async_diginorm;
+    self->async_diginorm = NULL;
+
+    obj->ob_type->tp_free((PyObject*)self);
+}
+
+static PyObject * khmer_asyncdiginorm_new(PyTypeObject *type, PyObject *args,
+                                      PyObject *kwds)
+{
+    khmer_AsyncDiginormObject *self;
+    self = (khmer_AsyncDiginormObject*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        khmer_KCountingHashObject * counting_o;
+
+        if (!PyArg_ParseTuple(args, "O!", &khmer_KCountingHashType, &counting_o)) {
+            return NULL;
+        }
+        
+        self->async_diginorm = new AsyncDiginorm(counting_o->counting);
+    }
+
+    return (PyObject *) self;
+}
+
+static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject *args,
+                                PyObject *kwds)
+{
+    return 0;
 }
 
 /////////////////
@@ -4667,6 +5028,11 @@ init_khmer(void)
         return;
     }
 
+    khmer_AsyncDiginormType.tp_new = khmer_asyncdiginorm_new;
+    if (PyType_Ready(&khmer_AsyncDiginormType) < 0) {
+        return;
+    }
+
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
                         "interface for the khmer module low-level extensions" );
@@ -4693,6 +5059,9 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+
+    Py_INCREF(&khmer_AsyncDiginormType);
+    PyModule_AddObject(m, "_AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:

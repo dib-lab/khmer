@@ -159,7 +159,6 @@ public:
     {
 
         unsigned int  n_full	  = 0;
-
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
             // NOTE: Technically, multiple threads can cause the bin to spill
@@ -168,11 +167,13 @@ public:
             //	 However, do we actually care if there is a little
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
-            if ( _max_count > _counts[ i ][ bin ] ) {
-                __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+            //while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
+            if ( _max_count > _counts[i][bin]) {
+                __sync_add_and_fetch(&(_counts[i][bin]), 1);
             } else {
                 n_full++;
             }
+            //__sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
         } // for each table
 
         if (n_full == _n_tables && _use_bigcount) {
@@ -188,6 +189,14 @@ public:
         }
 
     } // count
+
+    virtual void count_async(HashIntoType khash) {
+        async_hash->enqueue_hash(khash);
+    }
+
+    virtual void count_async(const char * kmer) {
+        async_hash->enqueue_kmer(kmer);
+    }
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const
