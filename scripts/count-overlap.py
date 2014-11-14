@@ -58,7 +58,7 @@ def main():
 
     check_space([args.ptfile, args.fafile])
 
-    print 'loading k-mer presence table from', args.ptfile
+    print >>sys.stderr, 'loading k-mer presence table from', args.ptfile
     ht1 = khmer.load_hashbits(args.ptfile)
     kmer_size = ht1.ksize()
 

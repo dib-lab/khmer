@@ -65,10 +65,11 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
     for index, batch in enumerate(batchwise(screed.open(
             input_filename), batch_size)):
         if index > 0 and index % 100000 == 0:
-            print '... kept {kept} of {total} or {perc:2}%'.format(
-                kept=total - discarded, total=total,
-                perc=int(100. - discarded / float(total) * 100.))
-            print '... in file', input_filename
+            print >>sys.stderr, '... kept {kept} of {total} or'\
+                ' {perc:2}%'.format(kept=total - discarded, total=total,
+                                    perc=int(100. - discarded /
+                                             float(total) * 100.))
+            print >>sys.stderr, '... in file', input_filename
 
             if report_fp:
                 print >> report_fp, total, total - discarded, \

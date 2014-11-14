@@ -22,6 +22,7 @@ NOTE: All 'N's in the input sequences are converted to 'G's.
 import screed
 import argparse
 import khmer
+import sys
 from khmer.file import check_file_status, check_space
 from khmer.khmer_args import info
 import textwrap
@@ -67,11 +68,11 @@ def main():
 
     check_space(infiles)
 
-    print 'loading k-mer counting table from', htfile
+    print >>sys.stderr, 'loading k-mer counting table from', htfile
     htable = khmer.load_counting_hash(htfile)
     ksize = htable.ksize()
 
-    print 'writing to', output_filename
+    print >>sys.stderr, 'writing to', output_filename
     output = open(output_filename, 'w')
 
     for record in screed.open(input_filename):

@@ -20,6 +20,7 @@ import glob
 import os
 import textwrap
 import khmer
+import sys
 from khmer.file import check_file_status, check_space
 from khmer.khmer_args import info
 
@@ -53,8 +54,8 @@ def main():
     output_file = args.graphbase + '.pmap.merged'
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
-    print 'loading %d pmap files (first one: %s)' % (len(pmap_files),
-                                                     pmap_files[0])
+    print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
+        (len(pmap_files), pmap_files[0])
 
     ksize = args.ksize
     htable = khmer.new_hashbits(ksize, 1, 1)
@@ -65,14 +66,14 @@ def main():
     check_space(pmap_files)
 
     for pmap_file in pmap_files:
-        print 'merging', pmap_file
+        print >>sys.stderr, 'merging', pmap_file
         htable.merge_subset_from_disk(pmap_file)
 
-    print 'saving merged to', output_file
+    print >>sys.stderr, 'saving merged to', output_file
     htable.save_partitionmap(output_file)
 
     if args.remove_subsets:
-        print 'removing pmap files'
+        print >>sys.stderr, 'removing pmap files'
         for pmap_file in pmap_files:
             os.unlink(pmap_file)
 
