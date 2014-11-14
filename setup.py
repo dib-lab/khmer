@@ -58,11 +58,6 @@ KHMER_SOURCES.extend(LIB_SOURCES)
 KHMER_DEPENDS = ["khmer/_khmermodule.hh", "khmer/_khmerasyncmodule.hh"]
 KHMER_DEPENDS.extend(LIB_DEPENDS)
 
-KHMER_ASYNC_SOURCES = ["khmer/_khmerasyncmodule.cc"]
-KHMER_ASYNC_SOURCES.extend(LIB_SOURCES)
-KHMER_ASYNC_DEPENDS = ["khmer/_khmerasyncmodule.hh", "khmer/_khmermodule.hh"]
-KHMER_ASYNC_DEPENDS.extend(LIB_DEPENDS)
-
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']
 
 if sys.platform == 'darwin':
@@ -78,24 +73,12 @@ KHMER_MOD_DICT = \
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
 
-KHMER_ASYNC_MOD_DICT = \
-    {
-        "sources": KHMER_ASYNC_SOURCES,
-        "extra_compile_args": EXTRA_COMPILE_ARGS,
-        "depends": KHMER_ASYNC_DEPENDS,
-        "language": "c++",
-        "define_macros": [("VERSION", versioneer.get_version()), ],
-    }
-
-
 if sys.platform != 'darwin':
-    KHMER_MOD_DICT['extra_link_args'] = ['-lgomp']
-    KHMER_ASYNC_MOD_DICT['extra_link_args'] = ['-lgomp']
+    KHMER_MOD_DICT['extra_link_args'] = []
 
 EXTENSION_MODS = [  Extension("khmer._khmermodule",  # pylint: disable=W0142
-                          ** KHMER_MOD_DICT),]
-#                    Extension("khmer._khmer_async",
-#                          ** KHMER_ASYNC_MOD_DICT), ]
+                          ** KHMER_MOD_DICT) ]
+
 SCRIPTS = []
 SCRIPTS.extend([path_join("scripts", script)
                 for script in os_listdir("scripts")
