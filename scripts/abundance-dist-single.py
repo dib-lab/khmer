@@ -92,7 +92,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                                   args.n_tables)
 
     print >>sys.stderr, 'kmer_size:', counting_hash.ksize()
-    print >>sys.stderr, 'k-mer counting table sizes:', counting_hash.hashsizes()
+    print >>sys.stderr, 'k-mer counting table sizes:', \
+        counting_hash.hashsizes()
     print >>sys.stderr, 'outputting to', args.output_histogram_filename
 
     khmer.get_config().set_reads_input_buffer_size(args.threads * 64 * 1024)
@@ -101,7 +102,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
     threads = []
     print >>sys.stderr, 'consuming input, round 1 --', \
-	args.input_sequence_filename
+        args.input_sequence_filename
     for _ in xrange(args.threads):
         thread = \
             threading.Thread(
@@ -126,11 +127,11 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         abundance_lists.append(abundances)
 
     print >>sys.stderr, 'preparing hist from %s...' % \
-	args.input_sequence_filename
+        args.input_sequence_filename
     rparser = khmer.ReadParser(args.input_sequence_filename, args.threads)
     threads = []
     print >>sys.stderr, 'consuming input, round 2 --', \
-	args.input_sequence_filename
+        args.input_sequence_filename
     for _ in xrange(args.threads):
         thread = \
             threading.Thread(

@@ -102,18 +102,19 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     print >>sys.stderr, 'reading partitioned files:', repr(args.part_filenames)
     if args.output_groups:
         print >>sys.stderr, 'outputting to files named "%s.groupN.fa"' % \
-		args.prefix
-        print >>sys.stderr, 'min reads to keep a partition:', args.min_part_size
+            args.prefix
+        print >>sys.stderr, 'min reads to keep a partition:', \
+            args.min_part_size
         print >>sys.stderr, 'max size of a group file:', args.max_size
     else:
         print >>sys.stderr, 'NOT outputting groups! Beware!'
 
     if args.output_unassigned:
         print >>sys.stderr, \
-		'outputting unassigned reads to "%s.unassigned.fa"' % \
-		args.prefix
-
-    print >>sys.stderr, 'partition size distribution will go to %s' % distfilename
+            'outputting unassigned reads to "%s.unassigned.fa"' % \
+            args.prefix
+    print >>sys.stderr, 'partition size distribution will go to %s' \
+        % distfilename
     print >>sys.stderr, '---'
 
     #
@@ -248,17 +249,17 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     print >>sys.stderr, '---'
     print >>sys.stderr, 'Of %d total seqs,' % total_seqs
     print >>sys.stderr, 'extracted %d partitioned seqs into group files,' % \
-	part_seqs
+        part_seqs
     print >>sys.stderr, \
-	'discarded %d sequences from small partitions (see -m),' % \
+        'discarded %d sequences from small partitions (see -m),' % \
         toosmall_parts
     print >>sys.stderr, 'and found %d unpartitioned sequences (see -U).' % \
-	n_unassigned
+        n_unassigned
     print >>sys.stderr, ''
     print >>sys.stderr, 'Created %d group files named %s.groupXXXX.%s' % \
-	(len(group_fps),
-                                                            args.prefix,
-                                                            suffix)
+        (len(group_fps),
+         args.prefix,
+         suffix)
 
 if __name__ == '__main__':
     main()

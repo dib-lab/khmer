@@ -107,12 +107,12 @@ def main():
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
     print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
-	(len(pmap_files), pmap_files[0])
+        (len(pmap_files), pmap_files[0])
     print >>sys.stderr, '---'
     print >>sys.stderr, 'output stoptags will be in', graphbase + '.stoptags'
     if initial_stoptags:
         print >>sys.stderr, \
-		'(these output stoptags will include the already-loaded set)'
+            '(these output stoptags will include the already-loaded set)'
     print >>sys.stderr, '---'
 
     # create counting hash

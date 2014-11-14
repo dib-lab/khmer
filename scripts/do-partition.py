@@ -115,7 +115,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     print >>sys.stderr, 'Saving k-mer presence table to %s' % args.graphbase
     print >>sys.stderr, 'Loading kmers from sequences in %s' % \
-	repr(args.input_filenames)
+        repr(args.input_filenames)
     print >>sys.stderr, '--'
     print >>sys.stderr, 'SUBSET SIZE', args.subset_size
     print >>sys.stderr, 'N THREADS', args.n_threads
@@ -145,9 +145,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
     if stop_big_traversals:
-        print >>sys.stderr, '** This script brakes for lumps: stop_big_traversals is true.'
+        print >>sys.stderr, '** This script brakes for lumps: ', \
+                            'stop_big_traversals is true.'
     else:
-        print >>sys.stderr, '** Traverse all the things: stop_big_traversals is false.'
+        print >>sys.stderr, '** Traverse all the things:', \
+                            ' stop_big_traversals is false.'
 
     #
     # now, partition!
@@ -186,7 +188,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         threads.append(cur_thread)
         cur_thread.start()
 
-    assert threading.active_count() == args.n_threads+1
+    assert threading.active_count() == args.n_threads + 1
 
     print >>sys.stderr, 'done starting threads'
 
@@ -196,14 +198,14 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     print >>sys.stderr, '---'
     print >>sys.stderr, 'done making subsets! see %s.subset.*.pmap' % \
-	(args.graphbase,)
+        (args.graphbase,)
 
     # merge-partitions
 
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
     print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
-	(len(pmap_files), pmap_files[0])
+        (len(pmap_files), pmap_files[0])
 
     htable = khmer.new_hashbits(args.ksize, 1, 1)
 
@@ -222,7 +224,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         print >>sys.stderr, 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
         part_count = htable.output_partitions(infile, outfile)
-        print >>sys.stderr, 'output %d partitions for %s' % (part_count, infile)
+        print >>sys.stderr, 'output %d partitions for %s' % (
+            part_count, infile)
         print >>sys.stderr, 'partitions are in', outfile
 
 if __name__ == '__main__':

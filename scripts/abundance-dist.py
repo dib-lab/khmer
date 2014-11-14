@@ -55,8 +55,8 @@ def main():
     for infile in infiles:
         check_file_status(infile)
 
-    print ('hashtable from', args.input_counting_table_filename, 
-	file=sys.stderr)
+    print ('hashtable from', args.input_counting_table_filename,
+           file=sys.stderr)
     counting_hash = khmer.load_counting_hash(
         args.input_counting_table_filename)
 
@@ -76,7 +76,8 @@ def main():
                   file=sys.stderr)
             sys.exit(1)
 
-        print('** squashing existing file %s' % args.output_histogram_filename, 		file=sys.stderr)
+        print('** squashing existing file %s' %
+              args.output_histogram_filename, file=sys.stderr)
 
     print('preparing hist...', file=sys.stderr)
     abundances = counting_hash.abundance_distribution(

@@ -80,7 +80,8 @@ def main():
         print >>sys.stderr, 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
         part_count = htable.output_partitions(infile, outfile)
-        print >>sys.stderr, 'output %d partitions for %s' % (part_count, infile)
+        print >>sys.stderr, 'output %d partitions for %s' % (
+            part_count, infile)
         print >>sys.stderr, 'partitions are in', outfile
 
 if __name__ == '__main__':

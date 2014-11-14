@@ -54,7 +54,7 @@ def main():
     pmap_files = glob.glob(args.graphbase + '.subset.*.pmap')
 
     print >>sys.stderr, 'loading %d pmap files (first one: %s)' % \
-	(len(pmap_files), pmap_files[0])
+        (len(pmap_files), pmap_files[0])
 
     ksize = args.ksize
     htable = khmer.new_hashbits(ksize, 1, 1)

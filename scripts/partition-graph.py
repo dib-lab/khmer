@@ -123,9 +123,11 @@ def main():
     # do we want to exhaustively traverse the graph?
     stop_big_traversals = args.no_big_traverse
     if stop_big_traversals:
-        print >>sys.stderr, '** This script brakes for lumps: stop_big_traversals is true.'
+        print >>sys.stderr, '** This script brakes for lumps:', \
+                            ' stop_big_traversals is true.'
     else:
-        print >>sys.stderr, '** Traverse all the things: stop_big_traversals is false.'
+        print >>sys.stderr, '** Traverse all the things:', \
+                            ' stop_big_traversals is false.'
 
     #
     # now, partition!
@@ -171,7 +173,7 @@ def main():
 
     print >>sys.stderr, '---'
     print >>sys.stderr, 'done making subsets! see %s.subset.*.pmap' % \
-	(basename,)
+        (basename,)
 
 if __name__ == '__main__':
     main()

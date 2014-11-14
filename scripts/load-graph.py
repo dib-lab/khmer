@@ -62,7 +62,8 @@ def main():
     if args.no_build_tagset:
         print >>sys.stderr, 'We WILL NOT build the tagset.'
     else:
-        print >>sys.stderr, 'We WILL build the tagset (for partitioning/traversal).'
+        print >>sys.stderr, 'We WILL build the tagset', \
+                            ' (for partitioning/traversal).'
 
     config = khmer.get_config()
     config.set_reads_input_buffer_size(args.n_threads * 64 * 1024)

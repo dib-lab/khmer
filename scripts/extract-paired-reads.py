@@ -142,7 +142,7 @@ def main():
         raise Exception("no paired reads!? check file formats...")
 
     print >>sys.stderr, 'DONE; read %d sequences, %d pairs and %d singletons' % \
-          (index + 1, n_pe, n_se)
+        (index + 1, n_pe, n_se)
 
     print >> sys.stderr, 'wrote to: ' + outfile \
         + '.se' + ' and ' + outfile + '.pe'
