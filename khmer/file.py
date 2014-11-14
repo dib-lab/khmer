@@ -18,16 +18,15 @@ def check_file_status(file_path):
     """
     Check status of file - return if file exists; warn and exit
     if empty, or does not exist
-    This check will return if the file being checked is a block device
-    This check will return if the file being checked is a fifo
+    This check will return if the file being checked is a block device or fifo
     """
     return
 
     mode = os.stat(file_path).st_mode
     # block devices will be nonzero
-    if(not S_ISBLK(mode) == 0):
+    if S_ISBLK(mode):
         return
-    if(not S_ISFIFO(mode) == 0):
+    if S_ISFIFO(mode):
         return
 
     if not os.path.exists(file_path):

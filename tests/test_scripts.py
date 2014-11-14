@@ -1556,8 +1556,11 @@ def test_count_overlap():
     assert '752053 238627' in data
 
 
-def screed_streaming_function(ifilename):
-
+def execute_streaming_diginorm(ifilename):
+    '''Helper function for the matrix of streaming tests
+    i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    uncompressed fastq, etc.
+    This is not directly executed but is run by the tests themselves'''
     # Get temp filenames, etc.
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
@@ -1573,7 +1576,6 @@ def screed_streaming_function(ifilename):
     thread = threading.Thread(target=utils.runscript,
                               args=(script, args, in_dir))
     thread.start()
-
     ifile = io.open(ifilename, 'rb')
     fifofile = io.open(fifo, 'wb')
     # read binary to handle compressed files
@@ -1589,7 +1591,12 @@ def screed_streaming_function(ifilename):
     return in_dir + '/outfile'
 
 
-def read_parser_streaming_function(ifilename, somedir=None):
+def execute_abund_dist_single_streaming(ifilename, somedir=None):
+    '''Helper function for the matrix of streaming tests
+    i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    uncompressed fastq, etc.
+    This is not directly executed but is run by the tests themselves'''
+
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
 
@@ -1621,8 +1628,9 @@ def read_parser_streaming_function(ifilename, somedir=None):
 @attr('known_failing')
 def test_screed_streaming_ufa():
     # uncompressed fa
-    o = screed_streaming_function(utils.get_test_data('test-abund-read-2.fa'))
+    o = execute_streaming_diginorm(utils.get_test_data('test-abund-read-2.fa'))
 
+    pathstat = os.stat(o)
     seqs = [r.sequence for r in screed.open(o)]
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
@@ -1631,7 +1639,7 @@ def test_screed_streaming_ufa():
 @attr('known_failing')
 def test_screed_streaming_ufq():
     # uncompressed fq
-    o = screed_streaming_function(utils.get_test_data('test-fastq-reads.fq'))
+    o = execute_streaming_diginorm(utils.get_test_data('test-fastq-reads.fq'))
 
     seqs = [r.sequence for r in screed.open(o)]
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
@@ -1640,7 +1648,7 @@ def test_screed_streaming_ufq():
 @attr('known_failing')
 def test_screed_streaming_bzipfq():
     # bzip compressed fq
-    o = screed_streaming_function(utils.get_test_data('100-reads.fq.bz2'))
+    o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.bz2'))
     seqs = [r.sequence for r in screed.open(o)]
     assert len(seqs) == 100, seqs
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'), seqs
@@ -1649,7 +1657,7 @@ def test_screed_streaming_bzipfq():
 @attr('known_failing')
 def test_screed_streaming_bzipfa():
     # bzip compressed fa
-    o = screed_streaming_function(
+    o = execute_streaming_diginorm(
         utils.get_test_data('test-abund-read-2.fa.bz2'))
 
     seqs = [r.sequence for r in screed.open(o)]
@@ -1660,22 +1668,21 @@ def test_screed_streaming_bzipfa():
 @attr('known_failing')
 def test_screed_streaming_gzipfq():
     # gzip compressed fq
-    o = screed_streaming_function(utils.get_test_data('100-reads.fq.gz'))
+    o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.gz'))
     assert os.path.exists(o)
 
 
 @attr('known_failing')
 def test_screed_streaming_gzipfa():
-    o =\
-        screed_streaming_function(
-            utils.get_test_data('test-abund-read-2.fa.gz'))
+    o = execute_streaming_diginorm(
+        utils.get_test_data('test-abund-read-2.fa.gz'))
     assert os.path.exists(o)
 
 
 @attr('known_failing')
 def test_read_parser_streaming_ufa():
     # uncompressed fa
-    o = read_parser_streaming_function(
+    o = execute_abund_dist_single_streaming(
         utils.get_test_data('test-abund-read-2.fa'))
     assert os.path.exists(o)
 
@@ -1683,30 +1690,30 @@ def test_read_parser_streaming_ufa():
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
     # bzip compressed
-    o = read_parser_streaming_function(utils.get_test_data('100-reads.fq.bz2'))
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('100-reads.fq.bz2'))
     assert os.path.exists(o)
 
 
 @attr('known_failing')
 def test_read_parser_streaming_gzfq():
     # bzip compressed
-    o = read_parser_streaming_function(utils.get_test_data('100-reads.fq.gz'))
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('100-reads.fq.gz'))
     assert os.path.exists(o)
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
     # bzip compressed
-    o =\
-        read_parser_streaming_function(
-            utils.get_test_data('test-abund-read-2.fa.bz2'))
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('test-abund-read-2.fa.bz2'))
     assert os.path.exists(o)
 
 
 @attr('known_failing')
 def test_read_parser_streaming_gzfa():
     # bzip compressed
-    o =\
-        read_parser_streaming_function(
-            utils.get_test_data('test-abund-read-2.fa.gz'))
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('test-abund-read-2.fa.gz'))
     assert os.path.exists(o)
