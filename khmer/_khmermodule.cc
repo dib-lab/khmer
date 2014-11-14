@@ -16,7 +16,6 @@
 #include "_khmermodule.hh"
 #include "_khmerasyncmodule.hh"
 
-
 using namespace khmer;
 
 //
@@ -4261,6 +4260,21 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+
+    if (PyType_Ready(&khmer_AsyncSequenceProcessorType) < 0) {
+        return;
+    }
+
+    if (PyType_Ready(&khmer_AsyncDiginormType) < 0) {
+        return;
+    }
+
+    Py_INCREF(&khmer_AsyncSequenceProcessorType);
+    PyModule_AddObject(m, "AsyncSequenceProcessor", 
+        (PyObject *)&khmer_AsyncSequenceProcessorType);
+
+    Py_INCREF(&khmer_AsyncDiginormType);
+    PyModule_AddObject(m, "AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:
