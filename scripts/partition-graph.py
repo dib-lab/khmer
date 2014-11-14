@@ -22,6 +22,7 @@ import gc
 import os.path
 import argparse
 import khmer
+import sys
 from khmer.khmer_args import (add_threading_args, info)
 from khmer.file import check_file_status, check_space
 

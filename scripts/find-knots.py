@@ -18,6 +18,7 @@ import glob
 import os
 import textwrap
 import khmer
+import sys
 from khmer.file import check_file_status, check_space
 from khmer.khmer_args import info
 

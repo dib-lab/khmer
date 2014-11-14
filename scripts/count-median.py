@@ -22,6 +22,7 @@ NOTE: All 'N's in the input sequences are converted to 'G's.
 import screed
 import argparse
 import khmer
+import sys
 from khmer.file import check_file_status, check_space
 from khmer.khmer_args import info
 import textwrap

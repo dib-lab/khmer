@@ -18,6 +18,7 @@ import os
 import khmer
 import textwrap
 import argparse
+import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
 from khmer.file import check_file_status, check_space
