@@ -17,7 +17,7 @@ CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc khmer/_khmerasyncmodule.cc | grep -v 
 	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
 	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib
 
-all: khmer/_khmermodule.so khmer/_khmerasyncmodule.so
+all: khmer/_khmermodule.so
 
 install-dependencies:
 	pip2 install --user --upgrade $(DEVPKGS) || pip2 install --upgrade \
@@ -25,9 +25,6 @@ install-dependencies:
 		install --upgrade $(DEVPKGS)
 
 khmer/_khmermodule.so: $(CPPSOURCES)
-	./setup.py build_ext --inplace
-
-khmer/_khmerasyncmodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
 coverage-debug: $(CPPSOURCES)
