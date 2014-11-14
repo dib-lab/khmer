@@ -20,17 +20,12 @@
 
 using namespace khmer;
 
-
 typedef struct {
     PyObject_HEAD
     AsyncSequenceProcessor * async_sp;
 } khmer_AsyncSequenceProcessorObject;
 
 PyAPI_DATA(PyTypeObject) khmer_AsyncSequenceProcessorType;
-
-////////////////////
-// AsyncDiginorm
-////////////////////
 
 typedef struct {
     khmer_AsyncSequenceProcessorObject async_sp;

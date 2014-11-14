@@ -717,6 +717,7 @@ def test_badconsume():
     except ValueError, err:
         print str(err)
 
+
 def test_get_badmin_count():
     countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
     try:

@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include "_khmermodule.hh"
-#include "_khmerasyncmodule.hh"
+#include "async/_khmerasyncmodule.hh"
 
 using namespace khmer;
 

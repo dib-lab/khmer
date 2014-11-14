@@ -53,9 +53,9 @@ LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
     "hashbits", "labelhash", "counting", "subset", "read_aligner", "khmer_async"]]
 
-KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/_khmerasyncmodule.cc"]
+KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/async/_khmerasyncmodule.cc"]
 KHMER_SOURCES.extend(LIB_SOURCES)
-KHMER_DEPENDS = ["khmer/_khmermodule.hh", "khmer/_khmerasyncmodule.hh"]
+KHMER_DEPENDS = ["khmer/_khmermodule.hh", "khmer/async/_khmerasyncmodule.hh"]
 KHMER_DEPENDS.extend(LIB_DEPENDS)
 
 EXTRA_COMPILE_ARGS = ['-O3', '-std=c++11']

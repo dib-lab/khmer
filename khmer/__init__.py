@@ -34,10 +34,6 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
-#from khmer import _khmer_async as async
-
-from khmer._khmer import AsyncDiginorm
-
 from struct import pack, unpack
 
 from ._version import get_versions
@@ -242,14 +238,6 @@ Expose the cpython objects with __new__ implementations.
 These constructors add the functionality provided by the existing
 factory methods to the constructors defined over in cpython land.
 Additional functionality can be added to these classes as appropriate.
-'''
-
-'''
-class AsyncDiginorm(_AsyncDiginorm):
-
-    def __new__(cls, ht):
-        c = _AsyncDiginorm.__new__(cls, ht)
-        return c
 '''
 
 class LabelHash(_LabelHash):

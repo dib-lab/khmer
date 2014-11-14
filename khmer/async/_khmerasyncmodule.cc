@@ -15,13 +15,9 @@
 #include "hashtable.hh"
 
 #include "_khmerasyncmodule.hh"
-#include "_khmermodule.hh"
+#include "../_khmermodule.hh"
 
 using namespace khmer;
-
-//extern "C" {
-//    void init_khmer_async();
-//}
 
 ////////////////////
 //
@@ -326,35 +322,3 @@ static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject *
     }
     return 0;
 }
-/*
-PyMODINIT_FUNC
-init_khmer_async(void)
-{
-    using namespace python;
-
-    khmer_AsyncSequenceProcessorType.tp_new = khmer_asyncseqproc_new;
-    if (PyType_Ready(&khmer_AsyncSequenceProcessorType) < 0) {
-        return;
-    }
-
-    khmer_AsyncDiginormType.tp_new = khmer_asyncdiginorm_new;
-    khmer_AsyncDiginormType.tp_base = &khmer_AsyncSequenceProcessorType;
-    if (PyType_Ready(&khmer_AsyncDiginormType) < 0) {
-        return;
-    }
-
-    PyObject * m;
-    m = Py_InitModule3( "_khmer_async", NULL,
-                        "interface for the khmer_async module low-level extensions" );
-    if (m == NULL) {
-        return;
-    }
-
-    Py_INCREF(&khmer_AsyncSequenceProcessorType);
-    PyModule_AddObject(m, "AsyncSequenceProcessor", 
-        (PyObject *)&khmer_AsyncSequenceProcessorType);
-
-    Py_INCREF(&khmer_AsyncDiginormType);
-    PyModule_AddObject(m, "AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);
-}
-*/
