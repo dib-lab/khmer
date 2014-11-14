@@ -24,9 +24,7 @@ def check_file_status(file_path):
 
     mode = os.stat(file_path).st_mode
     # block devices will be nonzero
-    if S_ISBLK(mode):
-        return
-    if S_ISFIFO(mode):
+    if S_ISBLK(mode) or S_ISFIFO(mode):
         return
 
     if not os.path.exists(file_path):

@@ -1560,7 +1560,8 @@ def execute_streaming_diginorm(ifilename):
     '''Helper function for the matrix of streaming tests
     i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
-    This is not directly executed but is run by the tests themselves'''
+    This is not directly executed but is run by the tests themselves
+    '''
     # Get temp filenames, etc.
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
@@ -1595,7 +1596,8 @@ def execute_abund_dist_single_streaming(ifilename, somedir=None):
     '''Helper function for the matrix of streaming tests
     i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
-    This is not directly executed but is run by the tests themselves'''
+    This is not directly executed but is run by the tests themselves
+    '''
 
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
