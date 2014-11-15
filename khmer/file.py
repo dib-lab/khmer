@@ -15,10 +15,9 @@ from stat import *
 
 
 def check_file_status(file_path):
-    """
-    Check status of file - return if file exists; warn and exit
-    if empty, or does not exist
-    This check will return if the file being checked is a block device or fifo
+    """Check the status of the file; if the file is empty or doesn't exist
+    AND if the file is NOT a fifo/block/named pipe then a warning is printed
+    and sys.exit(1) is called
     """
     return
 
