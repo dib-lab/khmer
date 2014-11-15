@@ -17,8 +17,8 @@ import sys
 import threading
 import textwrap
 import khmer
-from khmer.khmer_args import build_counting_args, report_on_config, info
-from khmer.threading_args import add_threading_args
+from khmer.khmer_args import build_counting_args, report_on_config, info,\
+    add_threading_args
 from khmer.file import check_file_status, check_space
 from khmer.file import check_space_for_hashtable
 
@@ -79,20 +79,20 @@ def main():
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables, args.n_threads)
+                                     args.n_tables, args.threads)
     htable.set_use_bigcount(args.bigcount)
 
     config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.n_threads * 64 * 1024)
+    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     filename = None
 
     for index, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, args.n_threads)
+        rparser = khmer.ReadParser(filename, args.threads)
         threads = []
         print >>sys.stderr, 'consuming input', filename
-        for _ in xrange(args.n_threads):
+        for _ in xrange(args.threads):
             cur_thrd = \
                 threading.Thread(
                     target=htable.consume_fasta_with_reads_parser,

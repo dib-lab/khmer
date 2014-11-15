@@ -1,3 +1,9 @@
+2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * do-partition.py: replaced threading args in scripts with things from 
+    khmer_args
+    * khmer/theading_args.py: removed as it has been deprecated
+
 2014-10-24  Camille Scott  <camille.scott.w@gmail.com>
 
     * do-partition.py: Add type=int to n_threads arg and assert to check
