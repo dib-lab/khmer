@@ -57,9 +57,9 @@ def get_parser():
                         action='store_false',
                         help='Do not count k-mers past 255')
     parser.add_argument('--machine-readable-info', '-m', default=None,
-                        metavar="FORMAT", help="What format should the machine"
-                        " readable run summary be in? (json or tsv, disabled "
-                        "by default)")
+                        metavar="FORMAT", choices=['json', 'tsv'],
+                        help="What format should the machine readable run "
+                        "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
     return parser

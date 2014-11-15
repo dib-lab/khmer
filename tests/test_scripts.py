@@ -128,8 +128,8 @@ def test_load_into_counting_bad_machine_readable_fmt():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
-    assert status == -1, status
-    assert "Invalid machine readable format" in err
+    assert status != 0, status
+    assert "invalid choice: 'badfmt'" in err, err
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
