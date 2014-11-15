@@ -1,6 +1,6 @@
 2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
 
-    * do-partition.py: replaced threading args in scripts  with things from 
+    * do-partition.py: replaced threading args in scripts with things from 
     khmer_args
     * khmer/theading_args.py: removed as it has been deprecated
 

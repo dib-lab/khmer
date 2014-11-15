@@ -176,13 +176,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         args.threads = n_subsets
 
     # start threads!
-<<<<<<< HEAD
     print >>sys.stderr, 'starting %d threads' % args.threads
     print >>sys.stderr, '---'
-=======
-    print 'starting %d threads' % args.threads
-    print '---'
->>>>>>> 786e62281b6f309ca276d86771de26bdaa09a0eb
 
     threads = []
     for _ in range(args.threads):
