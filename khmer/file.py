@@ -11,13 +11,20 @@ File handling/checking utilities for command-line scripts.
 
 import os
 import sys
+from stat import S_ISBLK, S_ISFIFO
 
 
 def check_file_status(file_path):
+    """Check the status of the file; if the file is empty or doesn't exist
+    AND if the file is NOT a fifo/block/named pipe then a warning is printed
+    and sys.exit(1) is called
     """
-    Check status of file - return if file exists; warn and exit
-    if empty, or does not exist
-    """
+    
+    mode = os.stat(file_path).st_mode
+    # block devices will be nonzero
+    if S_ISBLK(mode) or S_ISFIFO(mode):
+        return
+
     if not os.path.exists(file_path):
         print >>sys.stderr, "ERROR: Input file %s does not exist; exiting" % \
                             file_path
