@@ -392,6 +392,7 @@ public:
                           BoundedCounterType &median,
                           float &average,
                           float &stddev);
+    virtual const HashIntoType n_unique_kmers() const = 0;
 
     // partitioning stuff
     void _validate_pmap()

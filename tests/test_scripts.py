@@ -43,7 +43,7 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of k-mers: 95' in err, err
+    assert 'Total number of unique k-mers: 95' in err, err
     assert os.path.exists(outfile)
 
 
@@ -152,7 +152,7 @@ def test_filter_abund_1_singlefile():
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 98' in err, err
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
@@ -284,7 +284,7 @@ def test_normalize_by_median():
     args = ['-C', CUTOFF, '-k', '17', '-t', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 98' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -512,7 +512,7 @@ def test_load_graph():
 
     (status, out, err) = utils.runscript(script, args)
 
-    assert 'Total number of k-mers: 3959' in err, err
+    assert 'Total number of unique k-mers: 3960' in err, err
 
     ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
@@ -1084,7 +1084,7 @@ def test_abundance_dist_single():
             outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 98' in err, err
 
     fp = iter(open(outfile))
     line = fp.next().strip()

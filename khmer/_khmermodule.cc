@@ -1072,6 +1072,16 @@ static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(n);
 }
 
+static PyObject * hash_n_unique_kmers(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    HashIntoType n = counting->n_unique_kmers();
+
+    return PyLong_FromUnsignedLongLong(n);
+}
+
 static PyObject * hash_n_entries(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1746,6 +1756,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
     { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
     { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
+    { "n_unique_kmers", hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
@@ -2029,13 +2040,7 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
 
-    HashIntoType start = 0, stop = 0;
-
-    if (!PyArg_ParseTuple(args, "|KK", &start, &stop)) {
-        return NULL;
-    }
-
-    HashIntoType n = hashbits->n_kmers(start, stop);
+    HashIntoType n = hashbits->n_unique_kmers();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -2072,10 +2077,8 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    HashIntoType start = 0, stop = 0;
-
-    HashIntoType n = hashbits->n_kmers(start, stop);
-    HashIntoType n_overlap = hashbits->n_overlap_kmers(start, stop);
+    HashIntoType n = hashbits->n_unique_kmers();
+    HashIntoType n_overlap = hashbits->n_overlap_kmers();
 
     PyObject * x = PyList_New(200);
 

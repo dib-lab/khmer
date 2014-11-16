@@ -82,8 +82,8 @@ def main():
         target_method(rparser)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
     print >>sys.stderr, 'saving k-mer presence table in', base + '.pt'
     htable.save(base + '.pt')
