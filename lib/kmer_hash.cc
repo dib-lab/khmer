@@ -95,26 +95,33 @@ std::string _revhash(HashIntoType hash, WordLength k)
     return s;
 }
 
-char op_complement (char i)
-{ 
-  switch(i) {
-    case 'A':
-      return 'T';
-    case 'C':
-      return 'G';
-    case 'G':
-      return 'C';
-    case 'T':
-      return 'A';
-    default:
-      return i; /* TODO: raise exception */
-  }
-}
-
 std::string _revcomp(const std::string kmer)
 {
     std::string out = kmer;
-    std::transform(kmer.rbegin(), kmer.rend(), out.begin(), op_complement);
+    int ksize = out.size();
+
+    for (int i=0; i < ksize; ++i) {
+      char complement;
+
+      switch(kmer[i]) {
+        case 'A':
+          complement = 'T';
+          break;
+        case 'C':
+          complement = 'G';
+          break;
+        case 'G':
+          complement = 'C';
+          break;
+        case 'T':
+          complement = 'A';
+          break;
+        default:
+          complement = kmer[i];
+          break;
+      }
+      out[ksize - i - 1] = complement;
+    }
     return out;
 }
 
