@@ -451,7 +451,6 @@ def test_normalize_by_median_dumpfrequency():
     assert 'Nothing' in out
 
 
-@attr('known_failing')
 def test_normalize_by_median_empty():
     CUTOFF = '1'
 
@@ -1557,8 +1556,8 @@ def test_count_overlap():
 
 
 def execute_streaming_diginorm(ifilename):
-    '''Helper function for the matrix of streaming tests
-    i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    '''Helper function for the matrix of streaming tests for read_parser
+    using diginorm, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
@@ -1593,8 +1592,8 @@ def execute_streaming_diginorm(ifilename):
 
 
 def execute_abund_dist_single_streaming(ifilename, somedir=None):
-    '''Helper function for the matrix of streaming tests
-    i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    '''Helper function for the matrix of streaming tests using screed via
+    filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
