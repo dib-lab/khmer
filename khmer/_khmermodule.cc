@@ -1072,12 +1072,12 @@ static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(n);
 }
 
-static PyObject * hash_n_kmers(PyObject * self, PyObject * args)
+static PyObject * hash_n_unique_kmers(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
-    HashIntoType n = counting->n_kmers();
+    HashIntoType n = counting->n_unique_kmers();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -1756,7 +1756,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
     { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
     { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
-    { "n_kmers", hash_n_kmers, METH_VARARGS, "Count the number of unique kmers" },
+    { "n_unique_kmers", hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
     { "count", hash_count, METH_VARARGS, "Count the given kmer" },
@@ -2040,7 +2040,7 @@ static PyObject * hashbits_n_unique_kmers(PyObject * self, PyObject * args)
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
 
-    HashIntoType n = hashbits->n_kmers();
+    HashIntoType n = hashbits->n_unique_kmers();
 
     return PyLong_FromUnsignedLongLong(n);
 }
@@ -2077,7 +2077,7 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    HashIntoType n = hashbits->n_kmers();
+    HashIntoType n = hashbits->n_unique_kmers();
     HashIntoType n_overlap = hashbits->n_overlap_kmers();
 
     PyObject * x = PyList_New(200);
@@ -3526,7 +3526,7 @@ static PyMethodDef khmer_hashbits_methods[] = {
     { "ksize", hashbits_get_ksize, METH_VARARGS, "" },
     { "hashsizes", hashbits_get_hashsizes, METH_VARARGS, "" },
     { "n_occupied", hashbits_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
-    { "n_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
+    { "n_unique_kmers", hashbits_n_unique_kmers,  METH_VARARGS, "Count the number of unique kmers" },
     { "count", hashbits_count, METH_VARARGS, "Count the given kmer" },
     { "count_overlap", hashbits_count_overlap, METH_VARARGS, "Count overlap kmers in two datasets" },
     { "consume", hashbits_consume, METH_VARARGS, "Count all k-mers in the given string" },

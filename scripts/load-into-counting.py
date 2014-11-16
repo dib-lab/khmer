@@ -111,8 +111,8 @@ def main():
             open(base + '.info', 'w').write('through %s' % filename)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_kmers())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
     print >>sys.stderr, 'saving', base
     htable.save(base)

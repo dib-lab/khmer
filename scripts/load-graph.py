@@ -82,8 +82,8 @@ def main():
         target_method(rparser)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_kmers())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
     print >>sys.stderr, 'saving k-mer presence table in', base + '.pt'
     htable.save(base + '.pt')
@@ -93,7 +93,7 @@ def main():
         htable.save_tagset(base + '.tagset')
 
     info_fp = open(base + '.info', 'w')
-    info_fp.write('%d unique k-mers' % htable.n_kmers())
+    info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(htable)
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate

@@ -116,8 +116,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         thread.join()
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            counting_hash.n_kmers())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            counting_hash.n_unique_kmers())
 
     abundance_lists = []
 

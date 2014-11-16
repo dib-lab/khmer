@@ -67,7 +67,7 @@ def test_bloom_python_1():
 
     assert n_unique == 3960
     assert ht2.n_occupied() == 3882
-    assert ht2.n_kmers() == 3960  # this number equals to n_unique
+    assert ht2.n_unique_kmers() == 3960  # this number equals to n_unique
 
 
 def test_bloom_c_1():
@@ -85,7 +85,7 @@ def test_bloom_c_1():
         ht3.consume(record['sequence'])
 
     assert ht3.n_occupied() == 3882
-    assert ht3.n_kmers() == 3960
+    assert ht3.n_unique_kmers() == 3960
 
 
 def test_n_occupied_2():  # simple one
@@ -117,24 +117,24 @@ def test_bloom_c_2():  # simple one
     ht1 = khmer.new_hashbits(K, HT_SIZE, N_HT1)
     ht1.count('AAAA')  # 00 00 00 00 = 0
     ht1.count('ACTG')  # 00 10 01 11 =
-    assert ht1.n_kmers() == 2
+    assert ht1.n_unique_kmers() == 2
     ht1.count('AACG')  # 00 00 10 11 = 11  # collision  with 1st kmer
-    assert ht1.n_kmers() == 2
+    assert ht1.n_unique_kmers() == 2
     ht1.count('AGAC')   # 00  11 00 10 # collision  with 2nd kmer
-    assert ht1.n_kmers() == 2
+    assert ht1.n_unique_kmers() == 2
 
     # use two hashtables with 11,13
     ht2 = khmer.new_hashbits(K, HT_SIZE, N_HT2)
     ht2.count('AAAA')  # 00 00 00 00 = 0
 
     ht2.count('ACTG')  # 00 10 01 11 = 2*16 +4 +3 = 39
-    assert ht2.n_kmers() == 2
+    assert ht2.n_unique_kmers() == 2
     ht2.count('AACG')  # 00 00 10 11 = 11  # collision with only 1st kmer
-    assert ht2.n_kmers() == 3
+    assert ht2.n_unique_kmers() == 3
     ht2.count('AGAC')   # 00  11 00 10  3*16 +2 = 50
     # collision with both 2nd and 3rd kmers
 
-    assert ht2.n_kmers() == 3
+    assert ht2.n_unique_kmers() == 3
 
 
 @attr('highmem')

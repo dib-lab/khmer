@@ -116,7 +116,7 @@ public:
         return _tablesizes;
     }
 
-    virtual const HashIntoType n_kmers() const;
+    virtual const HashIntoType n_unique_kmers() const;
 
     void set_use_bigcount(bool b)
     {

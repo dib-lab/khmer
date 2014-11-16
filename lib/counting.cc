@@ -51,7 +51,7 @@ void CountingHash::output_fasta_kmer_pos_freq(
     outfile.close();
 }
 
-const HashIntoType CountingHash::n_kmers() const {
+const HashIntoType CountingHash::n_unique_kmers() const {
 	return _n_unique_kmers;
 }
 

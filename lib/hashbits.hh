@@ -103,7 +103,7 @@ public:
         return _occupied_bins/_n_tables;
     }
 
-    virtual const HashIntoType n_kmers() const
+    virtual const HashIntoType n_unique_kmers() const
     {
         return _n_unique_kmers;	// @@ CTB need to be able to *save* this...
     }

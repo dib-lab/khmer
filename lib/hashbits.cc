@@ -222,7 +222,7 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
 
         if (total_reads%block_size == 0) {
             curve[0][total_reads/block_size-1] = n_overlap_kmers();
-            curve[1][total_reads/block_size-1] = n_kmers();
+            curve[1][total_reads/block_size-1] = n_unique_kmers();
         }
         // run callback, if specified
         if (total_reads % CALLBACK_PERIOD == 0 && callback) {
