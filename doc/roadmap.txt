@@ -28,12 +28,10 @@ their command line interfaces.
 v2.x series
 ===========
 
-`oxli` command is now the preffered entry point to the project and its command
-line interface is now part of semantic versioning. Scripts are
-kept for backwards compatibility. New functionality is added to both the
-scripts and the `oxli` command.
-
-Protocols and workflows should switch to the `oxli` command at this time.
+`oxli` command is now under semantic versioning. Scripts are still the
+advertised and preferred entry point for users. Developers and workflow systems
+can start to trial `oxli` but need not switch until 3.0. New functionality is
+added to both the scripts and the `oxli` command.
 
 v3.0 and project renaming
 =========================
