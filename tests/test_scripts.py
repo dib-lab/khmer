@@ -1572,7 +1572,6 @@ def execute_streaming_diginorm(ifilename):
 
     # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
     # If this isn't done, they will BLOCK and things will hang.
-    # rvalues will hold the return from the threaded function
     thread = threading.Thread(target=utils.runscript,
                               args=(script, args, in_dir))
     thread.start()
@@ -1600,27 +1599,22 @@ def execute_abund_dist_single_streaming(ifilename, somedir=None):
 
     fifo = utils.get_temp_filename('fifo')
     in_dir = os.path.dirname(fifo)
-
     ifile = open(ifilename, 'rb')
-
     script = scriptpath('abundance-dist-single.py')
-    args = [fifo, 'outfile']
-
+    args = ['-x', '1e7','-N','2','-k','6','-t' ,fifo, 'outfile']
     os.mkfifo(fifo)
-
+    
     thread = threading.Thread(target=utils.runscript,
                               args=(script, args, in_dir))
     thread.start()
-
+    
     fifofile = open(fifo, 'wb')
     chunk = ifile.read(8192)
-
     while len(chunk) > 0:
         fifofile.write(chunk)
         chunk = ifile.read(8192)
 
     fifofile.close()
-
     thread.join()
 
     return in_dir + '/outfile'
@@ -1671,13 +1665,16 @@ def test_screed_streaming_gzipfq():
     # gzip compressed fq
     o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.gz'))
     assert os.path.exists(o)
-
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 @attr('known_failing')
 def test_screed_streaming_gzipfa():
     o = execute_streaming_diginorm(
         utils.get_test_data('test-abund-read-2.fa.gz'))
     assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
 
 
 @attr('known_failing')
@@ -1686,6 +1683,8 @@ def test_read_parser_streaming_ufa():
     o = execute_abund_dist_single_streaming(
         utils.get_test_data('test-abund-read-2.fa'))
     assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
 
 
 @attr('known_failing')
@@ -1694,6 +1693,8 @@ def test_read_parser_streaming_bzfq():
     o = execute_abund_dist_single_streaming(
         utils.get_test_data('100-reads.fq.bz2'))
     assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 
 @attr('known_failing')
@@ -1702,6 +1703,8 @@ def test_read_parser_streaming_gzfq():
     o = execute_abund_dist_single_streaming(
         utils.get_test_data('100-reads.fq.gz'))
     assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
 
 @attr('known_failing')
@@ -1710,6 +1713,8 @@ def test_read_parser_streaming_bzfa():
     o = execute_abund_dist_single_streaming(
         utils.get_test_data('test-abund-read-2.fa.bz2'))
     assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
 
 
 @attr('known_failing')
@@ -1718,3 +1723,7 @@ def test_read_parser_streaming_gzfa():
     o = execute_abund_dist_single_streaming(
         utils.get_test_data('test-abund-read-2.fa.gz'))
     assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+
+

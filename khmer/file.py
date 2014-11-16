@@ -19,8 +19,7 @@ def check_file_status(file_path):
     AND if the file is NOT a fifo/block/named pipe then a warning is printed
     and sys.exit(1) is called
     """
-    return
-
+    
     mode = os.stat(file_path).st_mode
     # block devices will be nonzero
     if S_ISBLK(mode) or S_ISFIFO(mode):
