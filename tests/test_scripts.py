@@ -1601,13 +1601,13 @@ def execute_abund_dist_single_streaming(ifilename, somedir=None):
     in_dir = os.path.dirname(fifo)
     ifile = open(ifilename, 'rb')
     script = scriptpath('abundance-dist-single.py')
-    args = ['-x', '1e7','-N','2','-k','6','-t' ,fifo, 'outfile']
+    args = ['-x', '1e7', '-N', '2', '-k', '6', '-t', fifo, 'outfile']
     os.mkfifo(fifo)
-    
+
     thread = threading.Thread(target=utils.runscript,
                               args=(script, args, in_dir))
     thread.start()
-    
+
     fifofile = open(fifo, 'wb')
     chunk = ifile.read(8192)
     while len(chunk) > 0:
@@ -1668,6 +1668,7 @@ def test_screed_streaming_gzipfq():
     seqs = [r.sequence for r in screed.open(o)]
     assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
 
+
 @attr('known_failing')
 def test_screed_streaming_gzipfa():
     o = execute_streaming_diginorm(
@@ -1725,5 +1726,3 @@ def test_read_parser_streaming_gzfa():
     assert os.path.exists(o)
     seqs = [r.sequence for r in screed.open(o)]
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
-
-
