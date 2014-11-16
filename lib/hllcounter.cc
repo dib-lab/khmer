@@ -15,6 +15,13 @@
 #include "kmer_hash.hh"
 #include "read_parsers.hh"
 
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_thread_num() 0
+   #define omp_get_num_threads() 1
+#endif
+
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
 using namespace std;
@@ -318,35 +325,65 @@ void HLLCounter::consume_fasta(
         void *      callback_data) {
 
     read_parsers::Read read;
+    HLLCounter** counters;
+    unsigned int *n_consumed_partial;
+    unsigned int *total_reads_partial;
+
+    n_consumed = 0;
 
     #pragma omp parallel
     {
-        #pragma omp single nowait
+        #pragma omp single
+        {
+            counters = (HLLCounter**)calloc(omp_get_num_threads(),
+                                            sizeof(HLLCounter*));
+            n_consumed_partial = (unsigned int*)calloc(omp_get_num_threads(),
+                                            sizeof(unsigned int));
+            total_reads_partial = (unsigned int*)calloc(omp_get_num_threads(),
+                                            sizeof(unsigned int));
+
+            for (int i=0; i < omp_get_num_threads(); i++) {
+                HLLCounter *newc = new HLLCounter(this->p, this->_ksize);
+                counters[i] = newc;
+            }
+        }
+
+        #pragma omp single
         {
             while (!parser->is_complete()) {
                 // Iterate through the reads and consume their k-mers.
                 try {
-                    bool is_valid;
                     read = parser->get_next_read();
 
                     #pragma omp task default(none) firstprivate(read) \
-                                     shared(n_consumed) private(is_valid)
+                     shared(counters, n_consumed_partial, total_reads_partial)
                     {
-                        HLLCounter task_hll = HLLCounter(this->p, this->_ksize);
-                        unsigned int this_n_consumed =
-                            task_hll.check_and_process_read(read.sequence, is_valid);
-
-                        #pragma omp atomic
-                        n_consumed += this_n_consumed;
-
-                        #pragma omp critical(hll_merge)
-                        this->merge(task_hll);
+                        bool is_valid;
+                        int n, t = omp_get_thread_num();
+                        n = counters[t]->check_and_process_read(read.sequence,
+                                                                is_valid);
+                        n_consumed_partial[t] += n;
+                        if (is_valid)
+                            total_reads_partial[t] += 1;
                     }
-                    total_reads += 1;
-
                 } catch (read_parsers::NoMoreReadsAvailable) {
                 }
+
             } // while reads left for parser
+        }
+        #pragma omp taskwait
+
+        #pragma omp single
+        {
+            for (int i=0; i < omp_get_num_threads(); ++i) {
+                this->merge(*counters[i]);
+                delete counters[i];
+                n_consumed += n_consumed_partial[i];
+                total_reads += total_reads_partial[i];;
+            }
+            free(counters);
+            free(n_consumed_partial);
+            free(total_reads_partial);
         }
     }
 }
@@ -365,7 +402,7 @@ unsigned int HLLCounter::check_and_process_read(std::string &read,
 bool HLLCounter::check_and_normalize_read(std::string &read) const {
     bool is_valid = true;
 
-    if (read.length() < _ksize) {
+    if (read.length() < this->_ksize) {
         return false;
     }
 
