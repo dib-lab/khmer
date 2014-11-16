@@ -35,13 +35,14 @@ static PyObject * asyncseqproc_processed_iter(PyObject * self);
 static PyObject * asyncseqproc_processed_iternext(PyObject * self);
 static PyObject * asyncseqproc_n_parsed(PyObject * self, PyObject * args);
 static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args);
+static PyObject * asyncseqproc_check_exception(PyObject * self, PyObject * args);
 
 static PyMethodDef khmer_asyncseqproc_methods[] = {
     { "processed", (PyCFunction)asyncseqproc_processed_iter, METH_NOARGS, "Iterator over processed reads" },
     { "stop", asyncseqproc_stop, METH_VARARGS, "Stop processors, join threads" },
     { "n_processed", asyncseqproc_n_processed, METH_NOARGS, "Number of reads processed" },
     { "n_parsed", asyncseqproc_n_parsed, METH_NOARGS, "Number of reads parsed" },
-
+    { "check_exception", asyncseqproc_check_exception, METH_NOARGS, "Check async exception state" },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
@@ -149,6 +150,22 @@ static PyObject * asyncseqproc_n_parsed(PyObject * self, PyObject * args)
 
     return PyLong_FromUnsignedLongLong(n);
 }
+
+static PyObject * asyncseqproc_check_exception(PyObject * self, PyObject * args)
+{
+    khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
+    AsyncSequenceProcessor * async_sp = me->async_sp;
+
+    try {
+        async_sp->check_exc();
+    } catch (...) {
+        PyErr_SetString(PyExc_IOError, "Exception thrown from AsyncSequenceProcessor");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args)
 {
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
@@ -264,11 +281,12 @@ static PyObject * asyncdiginorm_start(PyObject * self, PyObject * args)
     const char * filename;
     unsigned int cutoff = 20;
     unsigned int n_threads = 1;
+    PyObject * paired;
 
-    if (!PyArg_ParseTuple(args, "s|II", &filename, &cutoff, &n_threads)) {
+    if (!PyArg_ParseTuple(args, "s|IOI", &filename, &cutoff, &paired, &n_threads)) {
         return NULL;
     }
-    async_diginorm->start(filename, cutoff, n_threads);
+    async_diginorm->start(filename, cutoff, PyObject_IsTrue(paired), n_threads);
 
     Py_RETURN_NONE;
 }

@@ -1,10 +1,11 @@
+#include <Python.h>
+
 #include "hashtable.hh"
 #include "khmer_async.hh"
 #include <atomic>
 #include <chrono>
 #include <time.h>
 #include <boost/lockfree/queue.hpp>
-
 
 using namespace khmer;
 using namespace khmer::read_parsers;
@@ -173,8 +174,10 @@ void AsyncHasher::consume(CharQueue * q) {
 /////
 
 void AsyncSequenceProcessor::start(const std::string &filename,
+                                    bool paired,
                                     unsigned int n_threads) {
 
+    this->paired = paired;
     _reader_thread = new std::thread(&AsyncSequenceProcessor::read_iparser, 
                                     this, filename);
 
@@ -194,19 +197,47 @@ void AsyncSequenceProcessor::stop() {
     flush_queue<Read*>(_out_queue);
 }
 
+inline Read * imprint_paired(IParser * parser) {
+    ReadPair read_pair;
+    PairedRead * read;
+    parser->imprint_next_read_pair(read_pair);
+    read = new PairedRead(&read_pair.first, &read_pair.second);
+    return read;
+}
+
+inline Read * imprint_single(IParser * parser) {
+    Read * read = new Read();
+    parser->imprint_next_read(*read);
+    return read;
+}
+
 void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
     #if(VERBOSITY)
     std::cout << "Spawned iparser thread..." << std::endl;
     #endif
     _n_parsed = 0;
     _parsing_reads = true;
+    unsigned int inc = 1;
 
     IParser * parser = IParser::get_parser(filename);
+    
+    Read * (*imprint) (IParser *);
+    if (paired) {
+        inc = 2;
+        imprint = &imprint_paired;
+    } else {
+        imprint = &imprint_single;
+    }
 
+    Read * read;
     while(!parser->is_complete() && _parsing_reads) {
-        Read * read = new Read();
-        parser->imprint_next_read(*read);
-        __sync_fetch_and_add(&_n_parsed, 1);
+        try {
+            read = imprint(parser);
+        } catch (...) {
+            shared_exc = std::current_exception();
+            continue;
+        }
+        __sync_fetch_and_add(&_n_parsed, inc);
         while(!(_in_queue->bounded_push(read))) {
             if (!_parsing_reads) {
                 flush_queue<Read*>(_in_queue);
@@ -225,6 +256,10 @@ void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
     unlock_stdout();
     #endif
     delete parser;
+}
+
+bool AsyncSequenceProcessor::is_paired() {
+    return paired;
 }
 
 void AsyncSequenceProcessor::set_output(ReadQueue* new_q) {
@@ -271,11 +306,12 @@ unsigned int AsyncSequenceProcessor::n_written() {
 
 void AsyncDiginorm::start(const std::string &filename,
                             unsigned int cutoff,
+                            bool paired,
                             unsigned int n_threads) {
     _cutoff = cutoff;
     _n_kept = 0;
     _n_hashes_pushed = 0;
-    AsyncSequenceProcessor::start(filename, n_threads);
+    AsyncSequenceProcessor::start(filename, paired, n_threads);
 }
 
 unsigned int AsyncDiginorm::n_kept() {

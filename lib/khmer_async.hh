@@ -6,6 +6,8 @@
 #include "read_parsers.hh"
 #include <iostream>
 #include <thread>
+#include <exception>
+#include <stdexcept>
 #include <boost/lockfree/queue.hpp>
 
 #define VERBOSITY 0
@@ -34,6 +36,26 @@ template <typename T> void flush_queue(queue<T, Cap>* q) {
     q->consume_all([](T ptr){delete ptr;});
 }
 
+// Subclass read_parsers::Read for paired reads;
+// avoids needing to define two processors for paired
+// and unpaired reads by pushing both types to the same
+// input queue
+class PairedRead : public Read {
+    public:
+
+    Read * second;
+    PairedRead (Read * first, Read * second) {
+        name = first->name;
+        annotations = first->annotations;
+        sequence = first->sequence;
+        accuracy = first->accuracy;
+        this->second = second;
+    }
+};
+
+// Functor to call count() on the give sequence's k-mers
+// Used to either consume all sequences on a queue (with consume_all) or
+// to consume_one instead of pop
 class CountFunc {
     public:
 
@@ -65,6 +87,7 @@ template <class T> class Async {
         unsigned int _n_workers;
         std::vector<std::thread> _worker_threads;
         bool _workers_running;
+        std::exception_ptr shared_exc;
 
     public:
 
@@ -123,6 +146,17 @@ template <class T> class Async {
 
         void unlock_stdout() {
             __sync_bool_compare_and_swap( &_stdout_spin_lock, 1, 0 );
+        }
+
+        void check_exc() {
+            try {
+                if (shared_exc)
+                    std::rethrow_exception(shared_exc);
+            } catch (const std::exception & e) {
+                lock_stdout();
+                std::cout << "Caught exception in Async: \"" << e.what() << "\"\n";
+                unlock_stdout();
+            }
         }
 };
 
@@ -214,6 +248,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
         khmer::AsyncSequenceWriter * _writer;
 
         std::thread * _reader_thread;
+        bool paired = false;
 
         unsigned int _n_parsed;
         unsigned int _n_processed;
@@ -235,6 +270,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
         }
 
         void start(const std::string &filename,
+                    bool paired,
                     unsigned int n_threads);
         void stop();
 
@@ -249,6 +285,7 @@ class AsyncSequenceProcessor: public Async<Read*> {
 
         bool is_parsing();
         void read_iparser(const std::string &filename);
+        bool is_paired();
         unsigned int n_parsed();
         unsigned int n_written();
 };
@@ -270,6 +307,7 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
 
         void start(const std::string &filename,
                     unsigned int cutoff,
+                    bool paired,
                     unsigned int n_threads);
 
         unsigned int n_kept();

@@ -29,7 +29,7 @@ def test_n_processed():
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
     asd = khmer.async.AsyncDiginorm(ht)
-    asd.start(filename, 1000, 1)
+    asd.start(filename, 1000, False, 1)
     time.sleep(1)
     asd.stop()
 
@@ -40,7 +40,7 @@ def test_n_kept():
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
     asd = khmer.async.AsyncDiginorm(ht)
-    asd.start(filename, 1000, 1)
+    asd.start(filename, 1000, False, 1)
     time.sleep(1)
     asd.stop()
 
@@ -51,18 +51,36 @@ def test_n_parsed():
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
     asd = khmer.async.AsyncDiginorm(ht)
-    asd.start(filename, 1000, 1)
+    asd.start(filename, 1000, False, 1)
     time.sleep(1)
     asd.stop()
 
     assert asd.n_parsed() == 25000L
+
+def test_pair_fail():
+    filename = utils.get_test_data('paired-mixed.fa')
+    ht = khmer.new_counting_hash(20, 1e7, 4)
+    
+    asd = khmer.async.AsyncDiginorm(ht)
+    asd.start(filename, 1000, True, 1)
+    time.sleep(1)
+
+    try:
+        asd.check_exception()
+    except Exception as e:
+        print e
+        asd.stop()
+        assert False
+    else:
+        asd.stop()
+        assert False
 
 def test_async_diginorm():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
     asd = khmer.async.AsyncDiginorm(ht)
-    asd.start(filename, 5, 1)
+    asd.start(filename, 5, False, 1)
     time.sleep(1)
     asd.stop()
 
