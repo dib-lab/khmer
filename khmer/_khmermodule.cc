@@ -4508,8 +4508,8 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((char)ksize != ksize) {
-        PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
+    if (ksize > KSIZE_MAX) {
+        PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 
@@ -4525,8 +4525,8 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((unsigned char)ksize != ksize) {
-        PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
+    if (ksize > KSIZE_MAX) {
+        PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 
@@ -4548,8 +4548,8 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((char)ksize != ksize) {
-        PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
+    if (ksize > KSIZE_MAX) {
+        PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 
