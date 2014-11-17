@@ -463,7 +463,7 @@ def test_nobigcount_save():
     kh = khmer.new_counting_hash(1, 1, 1)
     kh.load(savepath)
 
-    # set_use_bigcount should still be True after load (i.e. should be saved)
+    # set_use_bigcount should still be False after load (i.e. should be saved)
 
     assert kh.get('AAAA') == 0
 
