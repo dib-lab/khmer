@@ -5,6 +5,9 @@ This section of the documentation is for people who are contributing
 (or would like to contribute to) the khmer project codebase, either by
 contributing code or by helping improve the documentation.
 
+Please note that this project is released with a :doc:`CODE_OF_CONDUCT`.
+By participating in this project you agree to abide by its terms.
+
 Contents:
 
 .. toctree::
@@ -20,3 +23,4 @@ Contents:
    details
    development
    crazy-ideas
+   CODE_OF_CONDUCT
