@@ -78,7 +78,7 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name)
+	check_file_status(name)
 
     check_space(args.input_sequence_filename)
     check_space_for_hashtable(args.n_tables * args.min_tablesize)
@@ -164,8 +164,7 @@ def main():
         print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
         print >> sys.stderr, "for this data set. Increase tablesize/# tables."
         print >> sys.stderr, "**"
-        if not args.force:
-            sys.exit(1)
+        sys.exit(1)
 
     print >>sys.stderr, 'DONE.'
     print >>sys.stderr, 'wrote to:', base + '.info'

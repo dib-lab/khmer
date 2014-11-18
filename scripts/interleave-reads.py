@@ -94,9 +94,8 @@ def main():
         print >> sys.stderr, "Error! R2 file %s does not exist" % s2_file
         fail = True
 
-    if fail:
-        if not args.force:
-            sys.exit(1)
+    if fail and not args.force:
+        sys.exit(1)
 
     print >> sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
 
