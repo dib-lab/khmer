@@ -101,9 +101,12 @@ void AsyncSequenceWriter::consume(CharQueue * q) {
                     _ht->count(kmer);
                 }
             } catch (khmer_exception &e) {
-                std::cout << e.what() << " " << std::endl;
-                std::cout << "ERROR in AsyncSequenceWriter: " << sequence << std::endl;
-                exit(1);
+                _exc_handler.push(std::make_exception_ptr(e));
+                //std::cout << e.what() << " " << std::endl;
+                //std::cout << "ERROR in AsyncSequenceWriter: " << sequence << std::endl;
+                //exit(1);
+                flush_queue<const char *>(q);
+                return;
             }
             _n_written++;
         }
@@ -234,16 +237,23 @@ void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
         try {
             read = imprint(parser);
         } catch (...) {
-            shared_exc = std::current_exception();
-            continue;
+            // Exception, probably from read pairing; by default, we
+            // just transfer the exception and die
+            _exc_handler.push( std::current_exception() );
+            // Should probably flush queue here
+            return;
         }
         __sync_fetch_and_add(&_n_parsed, inc);
+
         while(!(_in_queue->bounded_push(read))) {
+            // Somebody turned us off; flush the queue and return gracefully
             if (!_parsing_reads) {
+                delete parser;
                 flush_queue<Read*>(_in_queue);
                 return;
             }
         }
+
         #if(VERBOSITY)
         if (_n_parsed % 10000 == 0) std::cout << "...parsed " << _n_parsed << std::endl;
         #endif

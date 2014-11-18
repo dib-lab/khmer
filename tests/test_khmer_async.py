@@ -30,9 +30,10 @@ def test_n_processed():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, False, 1)
-    time.sleep(1)
+    time.sleep(.4)
     asd.stop()
 
+    print asd.n_processed()
     assert asd.n_processed() == 25000L
 
 def test_n_kept():
@@ -41,9 +42,10 @@ def test_n_kept():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, False, 1)
-    time.sleep(1)
+    time.sleep(.4)
     asd.stop()
 
+    print asd.n_kept()
     assert asd.n_kept() == 25000L
 
 def test_n_parsed():
@@ -52,9 +54,10 @@ def test_n_parsed():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, False, 1)
-    time.sleep(1)
+    time.sleep(.4)
     asd.stop()
 
+    print asd.n_parsed()
     assert asd.n_parsed() == 25000L
 
 def test_pair_fail():
@@ -63,16 +66,17 @@ def test_pair_fail():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, True, 1)
-    time.sleep(1)
+    time.sleep(.4)
 
     try:
         asd.check_exception()
-    except Exception as e:
+    except IOError as e:
+        print "Caught an exception"
         print e
-        asd.stop()
-        assert False
+        #asd.stop()
     else:
-        asd.stop()
+        print "Failed to catch exception"
+        #asd.stop()
         assert False
 
 def test_async_diginorm():

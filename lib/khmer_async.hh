@@ -8,6 +8,7 @@
 #include <thread>
 #include <exception>
 #include <stdexcept>
+#include <mutex>
 #include <boost/lockfree/queue.hpp>
 
 #define VERBOSITY 0
@@ -28,10 +29,49 @@ class CountingHash;
 class Hashtable;
 class Hashbits;
 
+
+// Keeps a vector of exceptions which are transferred from other threads
+// This is accessed from either a Python-facing function or a main C thread,
+// using check_and_rethrow, which throws the most recent exception.
+// TODO: Define better behavior for multiple exceptions
+class AsyncExceptionHandler {
+    
+    protected:
+
+    std::vector<std::exception_ptr> exceptions;
+    std::mutex exceptions_mutex;
+
+    public:
+
+    AsyncExceptionHandler() {};
+
+    void push(std::exception_ptr exc) {
+        std::lock_guard<std::mutex> lock(exceptions_mutex);
+        exceptions.push_back(exc);
+    }
+
+    void reset() {
+        std::lock_guard<std::mutex> lock(exceptions_mutex);
+        exceptions.clear();
+    }
+
+    void check_and_rethrow() {
+        std::lock_guard<std::mutex> lock(exceptions_mutex);
+        if (exceptions.size() > 0) {
+            auto exc = exceptions.back();
+            exceptions.pop_back();
+            std::rethrow_exception(exc);
+        }
+    }
+};
+
+
+// General deletion functor
 template <class T> class Delete {
     void operator()(T ptr) { delete ptr; }    
 };
 
+// Destroy all objects on a queue
 template <typename T> void flush_queue(queue<T, Cap>* q) {
     q->consume_all([](T ptr){delete ptr;});
 }
@@ -79,6 +119,7 @@ class CountFunc {
     }
 };
 
+// General Async class
 template <class T> class Async {
 
     protected:
@@ -87,13 +128,14 @@ template <class T> class Async {
         unsigned int _n_workers;
         std::vector<std::thread> _worker_threads;
         bool _workers_running;
-        std::exception_ptr shared_exc;
+        AsyncExceptionHandler _exc_handler;
 
     public:
 
         queue<T, Cap> * _in_queue; 
 
         Async() {
+            //_exc_handler();
             _stdout_spin_lock = 0;
             _workers_running = false;
             _in_queue = new queue<T, Cap>();
@@ -139,7 +181,6 @@ template <class T> class Async {
         }
 
         // Define a lock for writing to standard out
-
         void lock_stdout() {
             while(!__sync_bool_compare_and_swap( &_stdout_spin_lock, 0, 1 ));
         }
@@ -148,15 +189,13 @@ template <class T> class Async {
             __sync_bool_compare_and_swap( &_stdout_spin_lock, 1, 0 );
         }
 
-        void check_exc() {
-            try {
-                if (shared_exc)
-                    std::rethrow_exception(shared_exc);
-            } catch (const std::exception & e) {
-                lock_stdout();
-                std::cout << "Caught exception in Async: \"" << e.what() << "\"\n";
-                unlock_stdout();
-            }
+        void check_and_rethrow() {
+            _exc_handler.check_and_rethrow();
+        }
+
+        // Register a new AsyncExceptionHandler
+        void register_exception_handler(AsyncExceptionHandler &exc_handler) {
+            _exc_handler = exc_handler;
         }
 };
 
@@ -215,6 +254,33 @@ class AsyncSequenceWriter: public Async<const char *> {
 
 
 };
+
+/*
+class AsyncSequenceParser: public Async<Read *> {
+    
+    protected:
+
+        khmer::Hashtable * _ht;
+        unsigned int _n_written;
+        unsigned int _n_pushed;
+        unsigned int _ksize;
+
+    public:
+
+        AsyncSequenceParser ():
+                     khmer::Async<Read *>()
+        {
+        }
+
+        void start();
+        virtual void consume(ReadQueue * q);
+        bool push(Read * &read);
+        unsigned int n_pushed();
+        unsigned int n_written();
+
+
+};
+*/
 
 class AsyncHasher: public Async<const char *> {
 

@@ -88,6 +88,7 @@ PyTypeObject khmer_AsyncSequenceProcessorType = {
     khmer_asyncseqproc_new,
 };
 
+
 static void khmer_asyncseqproc_dealloc(PyObject* obj);
 
 static PyObject * khmer_asyncseqproc_new(PyTypeObject *type, 
@@ -102,6 +103,8 @@ static PyObject * asyncseqproc_stop(PyObject * self, PyObject * args)
     AsyncSequenceProcessor * async_sp = me->async_sp;
     
     async_sp->stop();
+
+    handle_exceptions(async_sp)
 
     Py_RETURN_NONE;
 }
@@ -128,6 +131,7 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
             PyErr_SetNone(PyExc_StopIteration);
             return NULL;
         }
+        handle_exceptions(async_sp)
     }
     /*
     if (async_diginorm->n_kept() % 50000 == 0)
@@ -155,14 +159,8 @@ static PyObject * asyncseqproc_check_exception(PyObject * self, PyObject * args)
 {
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
     AsyncSequenceProcessor * async_sp = me->async_sp;
-
-    try {
-        async_sp->check_exc();
-    } catch (...) {
-        PyErr_SetString(PyExc_IOError, "Exception thrown from AsyncSequenceProcessor");
-        return NULL;
-    }
-
+    
+    handle_exceptions(async_sp)
     Py_RETURN_NONE;
 }
 
