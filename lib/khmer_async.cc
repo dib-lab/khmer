@@ -31,38 +31,25 @@ timespec timediff(timespec start, timespec end)
 /////
 
 void AsyncHashWriter::start() {
-    _n_pushed = 0;
     _n_written = 0;
-    Async<HashIntoType>::start(1);
+    AsyncConsumer<HashIntoType>::start(1);
 }
 
 unsigned int AsyncHashWriter::ksize() {
     return _ht->ksize();
 }
 
-void AsyncHashWriter::consume(HashQueue * q) {
+void AsyncHashWriter::consume() {
     HashIntoType khash;
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
     while(1) {
-        if (q->pop(khash)) {
+        if (_in_queue->pop(khash)) {
             _ht->count(khash);
             _n_written++;
         } else {
             if(!_workers_running && (_n_written >= _n_pushed)) return;
         }
     }
-}
-
-bool AsyncHashWriter::push(HashIntoType &khash) {
-    if(_in_queue->bounded_push(khash)) {
-        __sync_fetch_and_add(&_n_pushed, 1);
-        return true;
-    }
-    return false;
-}
-
-unsigned int AsyncHashWriter::n_pushed() {
-    return _n_pushed;
 }
 
 unsigned int AsyncHashWriter::n_written() {
@@ -77,23 +64,22 @@ unsigned int AsyncHashWriter::n_written() {
 
 
 void AsyncSequenceWriter::start() {
-    _n_pushed = 0;
     _n_written = 0;
     _ksize = _ht->ksize();
-    Async<const char *>::start(1);
+    AsyncConsumer<const char *>::start(1);
 }
 
 unsigned int AsyncSequenceWriter::ksize() {
     return _ht->ksize();
 }
 
-void AsyncSequenceWriter::consume(CharQueue * q) {
+void AsyncSequenceWriter::consume() {
     const char * sequence;
     HashIntoType kmer;
     CountFunc kmer_counter(_ht, _ksize);
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
     while(_workers_running) {
-        if (q->pop(sequence)) {
+        if (_in_queue->pop(sequence)) {
             khmer::KMerIterator kmers(sequence, _ksize);
             try {
                 while(!kmers.done()) {
@@ -101,11 +87,11 @@ void AsyncSequenceWriter::consume(CharQueue * q) {
                     _ht->count(kmer);
                 }
             } catch (khmer_exception &e) {
-                _exc_handler.push(std::make_exception_ptr(e));
+                _exc_handler->push(std::make_exception_ptr(e));
                 //std::cout << e.what() << " " << std::endl;
                 //std::cout << "ERROR in AsyncSequenceWriter: " << sequence << std::endl;
                 //exit(1);
-                flush_queue<const char *>(q);
+                flush_queue<const char *>(_in_queue);
                 return;
             }
             _n_written++;
@@ -114,20 +100,7 @@ void AsyncSequenceWriter::consume(CharQueue * q) {
     #if(VERBOSITY)
     std::cout << "Exit AsyncSequenceWriter consume thread." << std::endl;
     #endif
-    q->consume_all(kmer_counter);
-}
-
-
-bool AsyncSequenceWriter::push(const char * &sequence) {
-    if(_in_queue->bounded_push(sequence)) {
-        __sync_fetch_and_add(&_n_pushed, 1);
-        return true;
-    }
-    return false;
-}
-
-unsigned int AsyncSequenceWriter::n_pushed() {
-    return _n_pushed;
+    _in_queue->consume_all(kmer_counter);
 }
 
 unsigned int AsyncSequenceWriter::n_written() {
@@ -140,13 +113,6 @@ unsigned int AsyncSequenceWriter::n_written() {
 //
 /////
 
-bool AsyncHasher::pop(HashIntoType& khash) {
-    return _out_queue->pop(khash);
-}
-
-void AsyncHasher::set_output(HashQueue* new_q) {
-    _out_queue = new_q;
-}
 
 // Warning: this method will always consume the entire
 // character array as decomposed k-mers! So, if you want to consume
@@ -154,15 +120,15 @@ void AsyncHasher::set_output(HashQueue* new_q) {
 // onto the queue. You shouldn't do this though, because more queue
 // accesses is more overhead.
 
-void AsyncHasher::consume(CharQueue * q) {
+void AsyncHasher::consume() {
     const char * kmer;
     unsigned long long total_consumed = 0;
     //std::cout << "Thread " << std::this_thread::get_id() << " waiting on hashes" << std::endl;
     while(_workers_running) {
-        if (q->pop(kmer)) {
+        if (_in_queue->pop(kmer)) {
             khmer::KMerIterator kmers(kmer, _ksize);
             while(!kmers.done()) {
-                _out_queue->bounded_push(kmers.next());
+                while(!(_out_queue->bounded_push(kmers.next()))) if (!_workers_running) return;
                 total_consumed++;
             }
         }
@@ -185,16 +151,15 @@ void AsyncSequenceProcessor::start(const std::string &filename,
                                     this, filename);
 
     _n_processed = 0;
-    _n_popped = 0;
 
     _writer->start();
-    Async<Read*>::start(n_threads);
+    AsyncConsumerProducer<Read*,Read*>::start(n_threads);
 }
 
 void AsyncSequenceProcessor::stop() {
     _parsing_reads = false;
     // First stop the sequence processor, flushing its queue
-    Async<Read*>::stop();
+    AsyncConsumerProducer<Read*,Read*>::stop();
     // Then stop the writer, writing out all the flushed hashes
     _writer->stop();
     flush_queue<Read*>(_out_queue);
@@ -239,7 +204,7 @@ void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
         } catch (...) {
             // Exception, probably from read pairing; by default, we
             // just transfer the exception and die
-            _exc_handler.push( std::current_exception() );
+            _exc_handler->push( std::current_exception() );
             // Should probably flush queue here
             return;
         }
@@ -272,28 +237,8 @@ bool AsyncSequenceProcessor::is_paired() {
     return paired;
 }
 
-void AsyncSequenceProcessor::set_output(ReadQueue* new_q) {
-    _out_queue = new_q;
-}
-
 bool AsyncSequenceProcessor::is_parsing() {
     return _parsing_reads;
-}
-
-bool AsyncSequenceProcessor::has_output() {
-    return !_out_queue->empty();
-}
-
-bool AsyncSequenceProcessor::pop(Read* &read) {
-    if(_out_queue->pop(read)) {
-        _n_popped++;
-        return true;
-    }
-    return false;
-}
-
-unsigned int AsyncSequenceProcessor::n_popped() {
-    return _n_popped;
 }
 
 unsigned int AsyncSequenceProcessor::n_parsed() {
@@ -334,7 +279,7 @@ bool AsyncDiginorm::iter_stop() {
     return false;
 }
 
-void AsyncDiginorm::consume(ReadQueue * q) {
+void AsyncDiginorm::consume() {
 
     Read* read;
     BoundedCounterType median;
@@ -355,7 +300,7 @@ void AsyncDiginorm::consume(ReadQueue * q) {
     const char * sp;
 
     while(_workers_running) {
-        if (q->pop(read)) {
+        if (_in_queue->pop(read)) {
             _ht->get_median_count(read->sequence, median, average, stddev);
             //std::cout << "Read " << read->sequence << "\n\tMED: " << median << 
             //    " (kept " << _n_kept << " thus far)" << std::endl;
@@ -375,7 +320,7 @@ void AsyncDiginorm::consume(ReadQueue * q) {
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
                 #endif
                 while(!(_writer->push(sp))) if (!_workers_running) return;;
-                __sync_fetch_and_add(&_n_hashes_pushed, 1);
+                //__sync_fetch_and_add(&_n_hashes_pushed, 1);
                 #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &end_t);
                 hash_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
@@ -392,7 +337,7 @@ void AsyncDiginorm::consume(ReadQueue * q) {
                     << " reads). Waiting for writeout" << std::endl;
                 unlock_stdout();
                 #endif
-                while(_n_hashes_pushed > _writer->n_written()) if (!_workers_running) return;
+                while(_writer->n_pushed() > _writer->n_written()) if (!_workers_running) return;
                 _workers_running = false;
             }
         }

@@ -45,6 +45,11 @@ class AsyncExceptionHandler {
 
     AsyncExceptionHandler() {};
 
+    ~AsyncExceptionHandler() {
+        std::lock_guard<std::mutex> lock(exceptions_mutex);
+        exceptions.clear();
+    }
+
     void push(std::exception_ptr exc) {
         std::lock_guard<std::mutex> lock(exceptions_mutex);
         exceptions.push_back(exc);
@@ -76,7 +81,6 @@ template <typename T> void flush_queue(queue<T, Cap>* q) {
     q->consume_all([](T ptr){delete ptr;});
 }
 
-// Subclass read_parsers::Read for paired reads;
 // avoids needing to define two processors for paired
 // and unpaired reads by pushing both types to the same
 // input queue
@@ -119,8 +123,10 @@ class CountFunc {
     }
 };
 
-// General Async class
-template <class T> class Async {
+// Generic Async class
+// Manage thread state such as exceptions
+// This should be the base for all async operations
+class Async {
 
     protected:
    
@@ -128,24 +134,22 @@ template <class T> class Async {
         unsigned int _n_workers;
         std::vector<std::thread> _worker_threads;
         bool _workers_running;
-        AsyncExceptionHandler _exc_handler;
+        AsyncExceptionHandler * _exc_handler;
 
     public:
-
-        queue<T, Cap> * _in_queue; 
 
         Async() {
             //_exc_handler();
             _stdout_spin_lock = 0;
             _workers_running = false;
-            _in_queue = new queue<T, Cap>();
+            _exc_handler = new AsyncExceptionHandler();
         }
 
         ~Async() {
             if(_workers_running) stop();
         }
 
-        virtual void consume(queue<T, Cap>* q) = 0;
+        virtual void consume() = 0;
 
         void start(unsigned int n_threads) {
             _n_workers = n_threads;
@@ -155,7 +159,7 @@ template <class T> class Async {
                 #if(VERBOSITY)
                 std::cout << "Async spawn worker" << std::endl;
                 #endif
-                _worker_threads.push_back(std::thread(&Async<T>::consume, this, _in_queue));
+                _worker_threads.push_back(std::thread(&Async::consume, this));
             }
         }
 
@@ -166,14 +170,6 @@ template <class T> class Async {
                 if(wthread->joinable()) wthread->join();
                 wthread++;
             }
-        }
-
-        bool push(T& item) {
-            return _in_queue->bounded_push(item);
-        }
-
-        void set_input(queue<T, Cap>* new_q) {
-            _in_queue = new_q;
         }
 
         bool workers_running() {
@@ -190,66 +186,153 @@ template <class T> class Async {
         }
 
         void check_and_rethrow() {
-            _exc_handler.check_and_rethrow();
+            _exc_handler->check_and_rethrow();
         }
 
         // Register a new AsyncExceptionHandler
-        void register_exception_handler(AsyncExceptionHandler &exc_handler) {
+        void register_exception_handler(AsyncExceptionHandler * &exc_handler) {
             _exc_handler = exc_handler;
         }
 };
 
-class AsyncHashWriter: public Async<HashIntoType> {
+// Consumer model: draws items off an input queue and does stuff
+template <class T> class AsyncConsumer: public virtual Async {
+
+    protected:
+
+        queue<T, Cap> * _in_queue;
+        unsigned int _n_pushed;
+
+    public:
+        AsyncConsumer(): 
+            Async() {
+            _in_queue = new queue<T, Cap>();
+        }
+
+        void start(unsigned int n_threads) {
+            _n_pushed = 0;
+            Async::start(n_threads);
+        }
+
+        bool push(T& item) {
+            if( _in_queue->bounded_push(item)) {
+                __sync_add_and_fetch(&_n_pushed, 1);
+                return true;
+            }
+            return false;
+        }
+
+        unsigned int n_pushed() {
+            return _n_pushed;
+        }   
+
+        void set_input(queue<T, Cap>* new_q) {
+            _in_queue = new_q;
+        }
+};
+
+// Producer model: draw stuff from <something> and push it to an output queue
+template <class T> class AsyncProducer: public virtual Async {
+
+    protected:
     
-    friend class Hashtable;
-    friend class AsyncHasher;
+        queue<T, Cap> * _out_queue;
+        unsigned int _n_popped;
+
+    public:
+        AsyncProducer(): 
+            Async() {
+            _out_queue = new queue<T, Cap>();
+        }
+
+        void start(unsigned int n_threads) {
+            _n_popped = 0;
+            Async::start(n_threads);
+        }
+
+        bool pop(T& item) {
+            if(_out_queue->pop(item)) {
+                _n_popped++;
+                return true;
+            }
+            return false;
+        }
+
+        unsigned int n_popped() {
+            return _n_popped;
+        }
+
+        void set_output(queue<T, Cap>* new_q) {
+            _out_queue = new_q;
+        }
+
+        bool has_output() {
+            return !_out_queue->empty();
+        }
+
+};
+
+// ConsumerProducer model: draw from an input queue, do stuff
+// push to an output queue
+template <class T, class V> class AsyncConsumerProducer:
+    public AsyncConsumer<T>, public AsyncProducer<V> {
+
+    public:
+        AsyncConsumerProducer<T,V>() :
+            Async(),
+            AsyncConsumer<T>(),
+            AsyncProducer<V>()
+        {
+        }
+
+        void start(unsigned int n_threads) {
+            AsyncProducer<V>::_n_popped = 0;
+            AsyncConsumer<T>::_n_pushed = 0;
+            Async::start(n_threads);
+        }
+};
+
+
+class AsyncHashWriter: public AsyncConsumer<HashIntoType> {
     
     protected:
 
         khmer::Hashtable * _ht;
         unsigned int _n_written;
-        unsigned int _n_pushed;
 
     public:
 
         AsyncHashWriter (khmer::Hashtable * ht):
-                     khmer::Async<HashIntoType>(), 
+                     khmer::AsyncConsumer<HashIntoType>(), 
                      _ht(ht) {
         }
 
         unsigned int ksize();
         void start();
-        virtual void consume(HashQueue * q);
-        bool push(HashIntoType &khash);
-        unsigned int n_pushed();
+        virtual void consume();
         unsigned int n_written();
 
 
 };
 
-class AsyncSequenceWriter: public Async<const char *> {
-    
-    friend class AsyncHasher;
+class AsyncSequenceWriter: public AsyncConsumer<const char *> {
     
     protected:
 
         khmer::Hashtable * _ht;
         unsigned int _n_written;
-        unsigned int _n_pushed;
         unsigned int _ksize;
 
     public:
 
         AsyncSequenceWriter (khmer::Hashtable * ht):
-                     khmer::Async<const char *>(), 
+                     khmer::AsyncConsumer<const char *>(), 
                      _ht(ht) {
         }
 
         unsigned int ksize();
         void start();
-        virtual void consume(CharQueue * q);
-        bool push(const char * &sequence);
-        unsigned int n_pushed();
+        virtual void consume();
         unsigned int n_written();
 
 
@@ -282,9 +365,7 @@ class AsyncSequenceParser: public Async<Read *> {
 };
 */
 
-class AsyncHasher: public Async<const char *> {
-
-    friend class AsyncHashWriter;
+class AsyncHasher: public AsyncConsumerProducer<const char *, HashIntoType> {
 
     protected:
     
@@ -292,21 +373,17 @@ class AsyncHasher: public Async<const char *> {
 
     public:
 
-        HashQueue * _out_queue;
-
         AsyncHasher (unsigned int ksize):
-                     khmer::Async<const char *>(),
+                     khmer::AsyncConsumerProducer<const char *, HashIntoType>(),
                      _ksize(ksize) {
-            _out_queue = new HashQueue();
         }
 
-        virtual void consume(CharQueue * q);
-
-        bool pop(HashIntoType& khash);
-        void set_output(HashQueue* new_q);
+        virtual void consume();
 };
 
-class AsyncSequenceProcessor: public Async<Read*> {
+// General read processing model
+// TODO: Split off the read_iparser functionality into its own AsyncParser class
+class AsyncSequenceProcessor: public AsyncConsumerProducer<Read*, Read*> {
 
     protected:
 
@@ -318,21 +395,16 @@ class AsyncSequenceProcessor: public Async<Read*> {
 
         unsigned int _n_parsed;
         unsigned int _n_processed;
-        // Number popped from output queue
-        unsigned int _n_popped;
 
         bool _parsing_reads;
         bool _processing_reads;
 
     public:
 
-        ReadQueue * _out_queue;
-
         AsyncSequenceProcessor (khmer::Hashtable * ht):
-                                khmer::Async<Read*>(),
+                                khmer::AsyncConsumerProducer<Read*,Read*>(),
                                 _ht(ht) {
             _writer = new AsyncSequenceWriter(_ht);
-            _out_queue = new ReadQueue();
         }
 
         void start(const std::string &filename,
@@ -340,13 +412,9 @@ class AsyncSequenceProcessor: public Async<Read*> {
                     unsigned int n_threads);
         void stop();
 
-        virtual void consume(ReadQueue* q) = 0;
+        virtual void consume() = 0;
         unsigned int n_processed();
 
-        bool pop(Read * &read);
-        unsigned int n_popped();
-        bool has_output();
-        void set_output(ReadQueue* new_q);
         virtual bool iter_stop() = 0;
 
         bool is_parsing();
@@ -377,7 +445,7 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
                     unsigned int n_threads);
 
         unsigned int n_kept();
-        virtual void consume(ReadQueue* q);
+        virtual void consume();
         bool iter_stop();
 };
 };
