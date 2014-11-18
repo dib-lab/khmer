@@ -1,4 +1,4 @@
-2014-11-18 Jonathan Gluck <jdg@cs.umd.edu>
+2014-11-18  Jonathan Gluck  <jdg@cs.umd.edu>
 
     * tests/test_counting_hash.py: Fixed copy paste error in comments, True to False.
 
