@@ -60,7 +60,7 @@ def test_n_parsed():
     print asd.n_parsed()
     assert asd.n_parsed() == 25000L
 
-def test_pair_fail():
+def test_async_diginorm_pair_fail():
     filename = utils.get_test_data('paired-mixed.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
@@ -78,6 +78,33 @@ def test_pair_fail():
         print "Failed to catch exception"
         #asd.stop()
         assert False
+
+def test_async_diginorm_paired():
+    filename = utils.get_test_data('paired.fa')
+    ht = khmer.new_counting_hash(20, 1e7, 4)
+    
+    asd = khmer.async.AsyncDiginorm(ht)
+    asd.start(filename, 1000, True, 1)
+    time.sleep(.4)
+
+    try:
+        asd.check_exception()
+    except IOError as e:
+        print e
+        assert False
+    else:
+        rcount = 0
+        for r1, r2 in asd.processed():
+            assert r1.name
+            assert r2.name
+            assert r1.sequence
+            assert r2.sequence
+            assert "895:1:37:17593:9954/1" in r1.name
+            assert "895:1:37:17593:9954/2" in r2.name
+            rcount += 2
+        assert rcount == 6 
+
+
 
 def test_async_diginorm():
     filename = utils.get_test_data('test-reads.fa')
