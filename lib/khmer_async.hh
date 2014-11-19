@@ -88,37 +88,39 @@ class ReadBatch {
     
     protected:
 
-        std::vector<Read*> * batch;
+        Read ** batch;
+        bool _size;
 
     public:
 
         ReadBatch (Read * first, Read * second) {
-            batch = new std::vector<Read*>();
-            batch->push_back(first);
-            batch->push_back(second);
+            batch = new Read*[2];
+            batch[0] = first;
+            batch[1] = second;
+            _size = true;
         }
         ReadBatch (Read * read) {
-            batch = new std::vector<Read*>();
-            batch->push_back(read);
+            batch = new Read*[1];
+            batch[0] = read;
+            _size = false;
         }
 
         ~ReadBatch () {
-            delete batch->front();
-            if (batch->size() == 2) delete batch->back();
-            batch->clear();
+            delete batch[0];
+            if (_size) delete batch[1];
             delete batch;
         }
 
         Read * first() {
-            return batch->front();
+            return batch[0];
         }
 
         Read * second() {
-            return batch->back();
+            return batch[_size];
         }
 
         unsigned int size() {
-            return batch->size();
+            return (unsigned int) _size + 1;
         }
 };
 
