@@ -84,17 +84,42 @@ template <typename T> void flush_queue(queue<T, Cap>* q) {
 // avoids needing to define two processors for paired
 // and unpaired reads by pushing both types to the same
 // input queue
-class PairedRead : public Read {
+class ReadBatch {
+    
+    protected:
+
+        std::vector<Read*> * batch;
+
     public:
 
-    Read * second;
-    PairedRead (Read * first, Read * second) {
-        name = first->name;
-        annotations = first->annotations;
-        sequence = first->sequence;
-        accuracy = first->accuracy;
-        this->second = second;
-    }
+        ReadBatch (Read * first, Read * second) {
+            batch = new std::vector<Read*>();
+            batch->push_back(first);
+            batch->push_back(second);
+        }
+        ReadBatch (Read * read) {
+            batch = new std::vector<Read*>();
+            batch->push_back(read);
+        }
+
+        ~ReadBatch () {
+            delete batch->front();
+            if (batch->size() == 2) delete batch->back();
+            batch->clear();
+            delete batch;
+        }
+
+        Read * first() {
+            return batch->front();
+        }
+
+        Read * second() {
+            return batch->back();
+        }
+
+        unsigned int size() {
+            return batch->size();
+        }
 };
 
 // Functor to call count() on the give sequence's k-mers
@@ -135,6 +160,7 @@ class Async {
         std::vector<std::thread> _worker_threads;
         bool _workers_running;
         AsyncExceptionHandler * _exc_handler;
+        unsigned int _batchsize;
 
     public:
 
@@ -142,6 +168,7 @@ class Async {
             //_exc_handler();
             _stdout_spin_lock = 0;
             _workers_running = false;
+            _batchsize = 1;
             _exc_handler = new AsyncExceptionHandler();
         }
 
@@ -153,7 +180,6 @@ class Async {
 
         void start(unsigned int n_threads) {
             _n_workers = n_threads;
-
             _workers_running = true;
             for (unsigned int t=0; t<_n_workers; ++t) {
                 #if(VERBOSITY)
@@ -216,7 +242,7 @@ template <class T> class AsyncConsumer: public virtual Async {
 
         bool push(T& item) {
             if( _in_queue->bounded_push(item)) {
-                __sync_add_and_fetch(&_n_pushed, 1);
+                __sync_add_and_fetch(&_n_pushed, _batchsize);
                 return true;
             }
             return false;
@@ -252,7 +278,7 @@ template <class T> class AsyncProducer: public virtual Async {
 
         bool pop(T& item) {
             if(_out_queue->pop(item)) {
-                _n_popped++;
+                __sync_fetch_and_add(&_n_popped, _batchsize);
                 return true;
             }
             return false;
@@ -383,7 +409,7 @@ class AsyncHasher: public AsyncConsumerProducer<const char *, HashIntoType> {
 
 // General read processing model
 // TODO: Split off the read_iparser functionality into its own AsyncParser class
-class AsyncSequenceProcessor: public AsyncConsumerProducer<Read*, Read*> {
+class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch*> {
 
     protected:
 
@@ -402,7 +428,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<Read*, Read*> {
     public:
 
         AsyncSequenceProcessor (khmer::Hashtable * ht):
-                                khmer::AsyncConsumerProducer<Read*,Read*>(),
+                                khmer::AsyncConsumerProducer<ReadBatch*,ReadBatch*>(),
                                 _ht(ht) {
             _writer = new AsyncSequenceWriter(_ht);
         }
@@ -423,7 +449,6 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<Read*, Read*> {
         unsigned int n_parsed();
         unsigned int n_written();
 };
-
 
 class AsyncDiginorm: public AsyncSequenceProcessor {
 
@@ -447,6 +472,9 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
         unsigned int n_kept();
         virtual void consume();
         bool iter_stop();
+
+        bool filter_single(Read * read);
+        bool filter_paired(ReadBatch * read);
 };
 };
 #endif

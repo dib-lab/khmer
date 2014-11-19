@@ -147,36 +147,37 @@ void AsyncSequenceProcessor::start(const std::string &filename,
                                     unsigned int n_threads) {
 
     this->paired = paired;
+    _batchsize = paired ? 2 : 1;
     _reader_thread = new std::thread(&AsyncSequenceProcessor::read_iparser, 
                                     this, filename);
-
     _n_processed = 0;
-
     _writer->start();
-    AsyncConsumerProducer<Read*,Read*>::start(n_threads);
+    AsyncConsumerProducer<ReadBatch*,ReadBatch*>::start(n_threads);
 }
 
 void AsyncSequenceProcessor::stop() {
     _parsing_reads = false;
     // First stop the sequence processor, flushing its queue
-    AsyncConsumerProducer<Read*,Read*>::stop();
+    AsyncConsumerProducer<ReadBatch*,ReadBatch*>::stop();
     // Then stop the writer, writing out all the flushed hashes
     _writer->stop();
-    flush_queue<Read*>(_out_queue);
+    flush_queue<ReadBatch*>(_out_queue);
 }
 
-inline Read * imprint_paired(IParser * parser) {
+inline ReadBatch * imprint_paired(IParser * parser) {
     ReadPair read_pair;
-    PairedRead * read;
+    ReadBatch * batch;
     parser->imprint_next_read_pair(read_pair);
-    read = new PairedRead(&read_pair.first, &read_pair.second);
-    return read;
+    batch = new ReadBatch(new Read(read_pair.first), new Read(read_pair.second));
+    return batch;
 }
 
-inline Read * imprint_single(IParser * parser) {
+inline ReadBatch * imprint_single(IParser * parser) {
     Read * read = new Read();
+    ReadBatch * batch;
     parser->imprint_next_read(*read);
-    return read;
+    batch = new ReadBatch(read);
+    return batch;
 }
 
 void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
@@ -185,22 +186,20 @@ void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
     #endif
     _n_parsed = 0;
     _parsing_reads = true;
-    unsigned int inc = 1;
 
     IParser * parser = IParser::get_parser(filename);
     
-    Read * (*imprint) (IParser *);
+    ReadBatch * (*imprint) (IParser *);
     if (paired) {
-        inc = 2;
         imprint = &imprint_paired;
     } else {
         imprint = &imprint_single;
     }
 
-    Read * read;
+    ReadBatch * batch;
     while(!parser->is_complete() && _parsing_reads) {
         try {
-            read = imprint(parser);
+            batch = imprint(parser);
         } catch (...) {
             // Exception, probably from read pairing; by default, we
             // just transfer the exception and die
@@ -208,13 +207,18 @@ void AsyncSequenceProcessor::read_iparser(const std::string &filename) {
             // Should probably flush queue here
             return;
         }
-        __sync_fetch_and_add(&_n_parsed, inc);
+        __sync_fetch_and_add(&_n_parsed, _batchsize);
 
-        while(!(_in_queue->bounded_push(read))) {
+        while(!(_in_queue->bounded_push(batch))) {
             // Somebody turned us off; flush the queue and return gracefully
             if (!_parsing_reads) {
+                #if(VERBOSITY)
+                lock_stdout();
+                std::cout << "Flush readparser queue" << std::endl;
+                unlock_stdout();
+                #endif
                 delete parser;
-                flush_queue<Read*>(_in_queue);
+                flush_queue<ReadBatch*>(_in_queue);
                 return;
             }
         }
@@ -279,11 +283,25 @@ bool AsyncDiginorm::iter_stop() {
     return false;
 }
 
+bool AsyncDiginorm::filter_single(Read* read) {
+    BoundedCounterType median = 0;
+    float average = 0, stddev = 0;
+    _ht->get_median_count(read->sequence, median, average, stddev);
+    if (median < _cutoff) return false;
+    return true;
+}
+
+bool AsyncDiginorm::filter_paired(ReadBatch * batch) {
+    bool filter_first = false;
+    filter_first = filter_single(batch->first());
+    if (filter_first && filter_single(batch->second())) return true;
+    return false;
+}
+
 void AsyncDiginorm::consume() {
 
-    Read* read;
-    BoundedCounterType median;
-    float average, stddev;
+    ReadBatch* batch;
+    bool keep;
 
     #if(VERBOSITY)
     timespec start_t, end_t;
@@ -296,39 +314,55 @@ void AsyncDiginorm::consume() {
     unlock_stdout();
     #endif
 
+    Read * first;
+    Read * second;
     std::string sequence;
     const char * sp;
 
     while(_workers_running) {
-        if (_in_queue->pop(read)) {
-            _ht->get_median_count(read->sequence, median, average, stddev);
-            //std::cout << "Read " << read->sequence << "\n\tMED: " << median << 
-            //    " (kept " << _n_kept << " thus far)" << std::endl;
-            if (median < _cutoff) {
-                __sync_fetch_and_add(&_n_kept, 1);
+        if (_in_queue->pop(batch)) {
+            if (paired) {
+                keep = filter_paired(batch);
+            } else {
+                keep = filter_single(batch->first());
+            }
 
-                std::string sequence(read->sequence);
-                sp = sequence.c_str();
+            if (!keep) {
+                __sync_fetch_and_add(&_n_kept, _batchsize);
 
                 #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
                 #endif
-                while(!(_out_queue->bounded_push(read))) if (!_workers_running) return;
+
+                while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
+
                 #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &end_t);
                 output_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
                 #endif
-                while(!(_writer->push(sp))) if (!_workers_running) return;;
-                //__sync_fetch_and_add(&_n_hashes_pushed, 1);
+
+                first = batch->first();
+                std::string sequence(first->sequence);
+                sp = sequence.c_str();
+
+                while(!(_writer->push(sp))) if (!_workers_running) return;
+                if (paired) {
+                    second = batch->second();
+                    std::string sequence(second->sequence);
+                    sp = sequence.c_str();
+                    while(!(_writer->push(sp))) if (!_workers_running) return;
+                }
+
                 #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &end_t);
                 hash_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
                 #endif
+
             } else {
-                delete read;
+                delete batch;
             }
-            __sync_fetch_and_add(&_n_processed, 1);
+            __sync_fetch_and_add(&_n_processed, _batchsize);
         } else {
             if (!is_parsing() && (_n_processed >= _n_parsed)) {
                 #if(VERBOSITY)
