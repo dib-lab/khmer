@@ -1,3 +1,7 @@
+2014-11-18  Jonathan Gluck  <jdg@cs.umd.edu>
+
+    * tests/test_counting_hash.py: Fixed copy paste error in comments, True to False.
+
 2014-11-15  Jacob Fenton  <bocajnotnef@gmail.com>
 
     * tests/test_scripts.py: added screed/read_parsers stream testing
