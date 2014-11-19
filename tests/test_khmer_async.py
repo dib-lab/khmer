@@ -70,7 +70,7 @@ def test_async_diginorm_pair_fail():
 
     try:
         asd.check_exception()
-    except IOError as e:
+    except (IOError, RuntimeError) as e:
         print "Caught an exception"
         print e
         #asd.stop()
@@ -89,7 +89,7 @@ def test_async_diginorm_paired():
 
     try:
         asd.check_exception()
-    except IOError as e:
+    except (IOError, RuntimeError) as e:
         print e
         assert False
     else:
@@ -104,9 +104,33 @@ def test_async_diginorm_paired():
             rcount += 2
         assert rcount == 6 
 
+def test_async_diginorm_paired_culling():
+    CUTOFF = 10
 
+    infile = utils.get_test_data('test-async-reads-paired.fa')
 
-def test_async_diginorm():
+    ht = khmer.new_counting_hash(17, 1e6, 4)
+    ht.consume_fasta(infile)
+    assert ht.get('GGTTGACGGGGCTCAGGGGGCG') == 149
+    asd = khmer.async.AsyncDiginorm(ht)
+    asd.start(infile, CUTOFF, True, 1)
+    time.sleep(.4)
+
+    seqs = []
+    for r1, r2 in asd:
+        seqs.append(r1.sequence)
+        seqs.append(r2.sequence)
+
+    print 'n_processed, n_kept', asd.n_processed(), asd.n_kept()
+    seq = 'GACAATAGGGCTCGCAATACACAGTTTACCGCATCTTGCCCTAACTGACAAACTGTGATCGACCACTAGCCATGCCATTGCCTCTTAGACACCCCGATAC'
+    print 'median count of outgroup', ht.get_median_count(seq)
+    assert asd.n_processed() == 150
+    assert asd.n_kept() == 2
+    assert len(seqs) == 2
+    assert ht.get('GGTTGACGGGGCTCAGGGGGCG') == 150
+    
+
+def test_async_diginorm_single_culling():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     

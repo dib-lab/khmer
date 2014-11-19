@@ -294,14 +294,13 @@ bool AsyncDiginorm::filter_single(Read* read) {
 bool AsyncDiginorm::filter_paired(ReadBatch * batch) {
     bool filter_first = false;
     filter_first = filter_single(batch->first());
-    if (filter_first && filter_single(batch->second())) return true;
-    return false;
+    return filter_first && filter_single(batch->second());
 }
 
 void AsyncDiginorm::consume() {
 
     ReadBatch* batch;
-    bool keep;
+    bool filter;
 
     #if(VERBOSITY)
     timespec start_t, end_t;
@@ -322,12 +321,12 @@ void AsyncDiginorm::consume() {
     while(_workers_running) {
         if (_in_queue->pop(batch)) {
             if (paired) {
-                keep = filter_paired(batch);
+                filter = filter_paired(batch);
             } else {
-                keep = filter_single(batch->first());
+                filter = filter_single(batch->first());
             }
 
-            if (!keep) {
+            if (!filter) {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
                 #if(VERBOSITY)
