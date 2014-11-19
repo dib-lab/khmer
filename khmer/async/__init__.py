@@ -8,4 +8,4 @@
 This is khmer; please see http://khmer.readthedocs.org/.
 """
 
-from .._khmer import AsyncSequenceProcessor, AsyncDiginorm
+from .._khmer import AsyncSequenceProcessor, AsyncSequenceProcessorTester, AsyncDiginorm

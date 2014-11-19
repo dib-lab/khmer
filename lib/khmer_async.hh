@@ -452,6 +452,18 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
         unsigned int n_written();
 };
 
+class AsyncSequenceProcessorTester: public AsyncSequenceProcessor {
+
+    public:
+
+        AsyncSequenceProcessorTester (khmer::Hashtable * ht):
+                        khmer::AsyncSequenceProcessor(ht) {
+        }
+
+        virtual void consume();
+        virtual bool iter_stop();
+};
+
 class AsyncDiginorm: public AsyncSequenceProcessor {
 
     protected:

@@ -4269,9 +4269,17 @@ init_khmer(void)
         return;
     }
 
+    if (PyType_Ready(&khmer_AsyncSequenceProcessorTesterType) < 0) {
+        return;
+    }
+
     Py_INCREF(&khmer_AsyncSequenceProcessorType);
     PyModule_AddObject(m, "AsyncSequenceProcessor", 
         (PyObject *)&khmer_AsyncSequenceProcessorType);
+
+    Py_INCREF(&khmer_AsyncSequenceProcessorTesterType);
+    PyModule_AddObject(m, "AsyncSequenceProcessorTester", 
+        (PyObject *)&khmer_AsyncSequenceProcessorTesterType);
 
     Py_INCREF(&khmer_AsyncDiginormType);
     PyModule_AddObject(m, "AsyncDiginorm", (PyObject *)&khmer_AsyncDiginormType);

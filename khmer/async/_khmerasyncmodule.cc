@@ -30,6 +30,7 @@ static int khmer_asyncseqproc_init(khmer_AsyncSequenceProcessorObject * self,
         PyObject * args, PyObject * kwds);
 static PyObject * khmer_asyncseqproc_new(PyTypeObject * type, 
         PyObject * args, PyObject * kwds);
+static PyObject * asyncseqproc_start(PyObject * self, PyObject * args);
 static PyObject * asyncseqproc_stop(PyObject * self, PyObject * args);
 static PyObject * asyncseqproc_processed_iter(PyObject * self);
 static PyObject * asyncseqproc_processed_iternext(PyObject * self);
@@ -40,6 +41,7 @@ static PyObject * asyncseqproc_check_exception(PyObject * self, PyObject * args)
 static PyMethodDef khmer_asyncseqproc_methods[] = {
     { "processed", (PyCFunction)asyncseqproc_processed_iter, METH_NOARGS, "Iterator over processed reads" },
     { "stop", asyncseqproc_stop, METH_VARARGS, "Stop processors, join threads" },
+    { "start", asyncseqproc_start, METH_VARARGS, "Start processors" },
     { "n_processed", asyncseqproc_n_processed, METH_NOARGS, "Number of reads processed" },
     { "n_parsed", asyncseqproc_n_parsed, METH_NOARGS, "Number of reads parsed" },
     { "check_exception", asyncseqproc_check_exception, METH_NOARGS, "Check async exception state" },
@@ -96,6 +98,23 @@ static PyObject * khmer_asyncseqproc_new(PyTypeObject *type,
 
 static int khmer_asyncseqproc_init(khmer_AsyncSequenceProcessorObject * self, 
         PyObject *args, PyObject *kwds);
+
+static PyObject * asyncseqproc_start(PyObject * self, PyObject * args)
+{
+    khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
+    AsyncSequenceProcessor * async_sp = me->async_sp;
+
+    const char * filename;
+    unsigned int n_threads = 1;
+    PyObject * paired;
+
+    if (!PyArg_ParseTuple(args, "s|OI", &filename, &paired, &n_threads)) {
+        return NULL;
+    }
+    async_sp->start(filename, PyObject_IsTrue(paired), n_threads);
+
+    Py_RETURN_NONE;
+}
 
 static PyObject * asyncseqproc_stop(PyObject * self, PyObject * args)
 {
@@ -340,6 +359,103 @@ static PyObject * khmer_asyncdiginorm_new(PyTypeObject *type, PyObject *args,
 }
 
 static int khmer_asyncdiginorm_init(khmer_AsyncDiginormObject * self, PyObject *args,
+                                PyObject *kwds)
+{
+    if (khmer_AsyncSequenceProcessorType.tp_init((PyObject *)self, args, kwds) < 0) {
+        return -1;
+    }
+    return 0;
+}
+
+////////////////////
+// AsyncSequenceProcessorTester
+////////////////////
+
+static void khmer_asyncsptester_dealloc(PyObject *);
+static int khmer_asyncsptester_init(khmer_AsyncSequenceProcessorTesterObject * self, 
+        PyObject * args, PyObject * kwds);
+static PyObject * khmer_asyncsptester_new(PyTypeObject * type, 
+        PyObject * args, PyObject * kwds);
+
+static PyMethodDef khmer_asyncsptester_methods[] = {
+
+    {NULL, NULL, 0, NULL}           /* sentinel */
+};
+
+PyTypeObject khmer_AsyncSequenceProcessorTesterType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                       /* ob_size */
+    "AsyncSequenceProcessorTester",            /* tp_name */
+    sizeof(khmer_AsyncSequenceProcessorTesterObject), /* tp_basicsize */
+    0,                       /* tp_itemsize */
+    (destructor)khmer_asyncsptester_dealloc, /* tp_dealloc */
+    0,                       /* tp_print */
+    0,  /* khmer_labelhash_getattr, tp_getattr */
+    0,                       /* tp_setattr */
+    0,                       /* tp_compare */
+    0,                       /* tp_repr */
+    0,                       /* tp_as_number */
+    0,                       /* tp_as_sequence */
+    0,                       /* tp_as_mapping */
+    0,                       /* tp_hash */
+    0,                       /* tp_call */
+    0,                       /* tp_str */
+    0,                       /* tp_getattro */
+    0,                       /* tp_setattro */
+    0,                       /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_ITER,   /* tp_flags */
+    0,                       /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    PyObject_SelfIter,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    khmer_asyncsptester_methods, /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    &khmer_AsyncSequenceProcessorType,   /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    (initproc)khmer_asyncsptester_init,   /* tp_init */
+    0,                       /* tp_alloc */
+    khmer_asyncsptester_new,
+};
+
+static void khmer_asyncsptester_dealloc(PyObject* obj)
+{
+    khmer_AsyncSequenceProcessorTesterObject * self = (khmer_AsyncSequenceProcessorTesterObject *) obj;
+
+    self->async_sptester->stop();
+    //delete self->async_sptester;
+    self->async_sptester = NULL;
+
+    obj->ob_type->tp_free((PyObject*)self);
+}
+
+static PyObject * khmer_asyncsptester_new(PyTypeObject *type, PyObject *args,
+                                      PyObject *kwds)
+{
+    khmer_AsyncSequenceProcessorTesterObject *self;
+    self = (khmer_AsyncSequenceProcessorTesterObject*)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        khmer_KCountingHashObject * counting_o;
+
+        if (!PyArg_ParseTuple(args, "O!", &khmer_KCountingHashType, &counting_o)) {
+            return NULL;
+        }
+        
+        self->async_sptester = new AsyncSequenceProcessorTester(counting_o->counting);
+        self->async_sp.async_sp = (AsyncSequenceProcessor *)self->async_sptester;
+    }
+
+    return (PyObject *) self;
+}
+
+static int khmer_asyncsptester_init(khmer_AsyncSequenceProcessorTesterObject * self, PyObject *args,
                                 PyObject *kwds)
 {
     if (khmer_AsyncSequenceProcessorType.tp_init((PyObject *)self, args, kwds) < 0) {

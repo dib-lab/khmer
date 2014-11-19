@@ -47,4 +47,11 @@ typedef struct {
 
 PyAPI_DATA(PyTypeObject) khmer_AsyncDiginormType;
 
+typedef struct {
+    khmer_AsyncSequenceProcessorObject async_sp;
+    AsyncSequenceProcessorTester * async_sptester;
+} khmer_AsyncSequenceProcessorTesterObject;
+
+PyAPI_DATA(PyTypeObject) khmer_AsyncSequenceProcessorTesterType;
+
 #endif

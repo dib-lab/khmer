@@ -24,7 +24,43 @@ def test_async_submodule():
         print e
         assert False
 
-def test_n_processed():
+def test_aync_processor_n_processed():
+    filename = utils.get_test_data('test-reads.fa')
+    ht = khmer.new_counting_hash(20, 1e7, 4)
+    
+    asd = khmer.async.AsyncSequenceProcessorTester(ht)
+    asd.start(filename, False, 1)
+    time.sleep(.4)
+    asd.stop()
+
+    print asd.n_processed()
+    assert asd.n_processed() == 25000L
+
+def test_async_processor_n_parsed():
+    filename = utils.get_test_data('test-reads.fa')
+    ht = khmer.new_counting_hash(20, 1e7, 4)
+    
+    asd = khmer.async.AsyncSequenceProcessorTester(ht)
+    asd.start(filename, False, 1)
+    time.sleep(.4)
+    asd.stop()
+
+    print asd.n_parsed()
+    assert asd.n_parsed() == 25000L
+
+def test_aync_processor_writer():
+    filename = utils.get_test_data('test-reads.fa')
+    ht = khmer.new_counting_hash(20, 1e7, 4)
+    
+    asd = khmer.async.AsyncSequenceProcessorTester(ht)
+    asd.start(filename, False, 1)
+    time.sleep(.4)
+    asd.stop()
+
+    for r in screed.open(filename):
+        assert ht.get_median_count(r.sequence) > 0
+
+def test_async_diginorm_n_processed():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
@@ -36,7 +72,7 @@ def test_n_processed():
     print asd.n_processed()
     assert asd.n_processed() == 25000L
 
-def test_n_kept():
+def test_async_diginorm_n_kept():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
@@ -48,7 +84,7 @@ def test_n_kept():
     print asd.n_kept()
     assert asd.n_kept() == 25000L
 
-def test_n_parsed():
+def test_async_diginorm_n_parsed():
     filename = utils.get_test_data('test-reads.fa')
     ht = khmer.new_counting_hash(20, 1e7, 4)
     
