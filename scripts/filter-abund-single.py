@@ -68,14 +68,14 @@ def main():
         check_space_for_hashtable(args.n_tables * args.min_tablesize)
     report_on_config(args)
 
-    print 'making k-mer counting table'
+    print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables)
 
     # first, load reads into hash table
     rparser = khmer.ReadParser(args.datafile)
     threads = []
-    print 'consuming input, round 1 --', args.datafile
+    print >>sys.stderr, 'consuming input, round 1 --', args.datafile
     for _ in xrange(args.threads):
         cur_thread = \
             threading.Thread(
@@ -89,11 +89,11 @@ def main():
         _.join()
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
     # now, trim.
 
@@ -112,20 +112,21 @@ def main():
         return None, None
 
     # the filtering loop
-    print 'filtering', args.datafile
+    print >>sys.stderr, 'filtering', args.datafile
     outfile = os.path.basename(args.datafile) + '.abundfilt'
     outfp = open(outfile, 'w')
 
     tsp = ThreadedSequenceProcessor(process_fn)
     tsp.start(verbose_loader(args.datafile), outfp)
 
-    print 'output in', outfile
+    print >>sys.stderr, 'output in', outfile
 
     if args.savetable:
-        print 'Saving k-mer counting table filename', args.savetable
-        print '...saving to', args.savetable
+        print >>sys.stderr, 'Saving k-mer counting table filename', \
+            args.savetable
+        print >>sys.stderr, '...saving to', args.savetable
         htable.save(args.savetable)
-    print('wrote to: ' + outfile)
+    print >>sys.stderr, 'wrote to: ', outfile
 
 if __name__ == '__main__':
     main()

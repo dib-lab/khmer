@@ -17,8 +17,8 @@ import sys
 import threading
 import textwrap
 import khmer
-from khmer.khmer_args import build_counting_args, report_on_config, info
-from khmer.threading_args import add_threading_args
+from khmer.khmer_args import build_counting_args, report_on_config, info,\
+    add_threading_args
 from khmer.file import check_file_status, check_space
 from khmer.file import check_space_for_hashtable
 
@@ -74,10 +74,10 @@ def main():
     check_space(args.input_sequence_filename)
     check_space_for_hashtable(args.n_tables * args.min_tablesize)
 
-    print 'Saving k-mer counting table to %s' % base
-    print 'Loading kmers from sequences in %s' % repr(filenames)
+    print >>sys.stderr, 'Saving k-mer counting table to %s' % base
+    print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
 
-    print 'making k-mer counting table'
+    print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                      args.n_tables)
     htable.set_use_bigcount(args.bigcount)
@@ -88,8 +88,8 @@ def main():
 
         rparser = khmer.ReadParser(filename)
         threads = []
-        print 'consuming input', filename
-        for _ in xrange(args.n_threads):
+        print >>sys.stderr, 'consuming input', filename
+        for _ in xrange(args.threads):
             cur_thrd = \
                 threading.Thread(
                     target=htable.consume_fasta_with_reads_parser,
@@ -103,15 +103,15 @@ def main():
 
         if index > 0 and index % 10 == 0:
             check_space_for_hashtable(args.n_tables * args.min_tablesize)
-            print 'mid-save', base
+            print >>sys.stderr, 'mid-save', base
             htable.save(base)
             open(base + '.info', 'w').write('through %s' % filename)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
-    print 'saving', base
+    print >>sys.stderr, 'saving', base
     htable.save(base)
 
     info_fp = open(base + '.info', 'w')
@@ -119,7 +119,7 @@ def main():
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
     print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
 
     if fp_rate > 0.20:
@@ -129,8 +129,8 @@ def main():
         print >> sys.stderr, "**"
         sys.exit(1)
 
-    print 'DONE.'
-    print('wrote to: ' + base + '.info')
+    print >>sys.stderr, 'DONE.'
+    print>>sys.stderr, 'wrote to: ' + base + '.info'
 
 if __name__ == '__main__':
     main()

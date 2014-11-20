@@ -8,8 +8,6 @@
 #ifndef HASHTABLE_HH
 #define HASHTABLE_HH
 
-#include "read_parsers.hh"
-
 #include <vector>
 #include <iostream>
 #include <list>
@@ -23,6 +21,7 @@
 
 #include "khmer.hh"
 #include "khmer_exception.hh"
+#include "read_parsers.hh"
 #include "subset.hh"
 #include "kmer_hash.hh"
 
@@ -175,7 +174,7 @@ protected:
     unsigned int    _nbits_sub_1;
 
     Hashtable( WordLength ksize )
-	    : _max_count( MAX_COUNT ),
+	    : _max_count( MAX_KCOUNT ),
 	    _max_bigcount( MAX_BIGCOUNT ),
             _ksize( ksize )
     {
@@ -286,6 +285,7 @@ public:
                           BoundedCounterType &median,
                           float &average,
                           float &stddev);
+    virtual const HashIntoType n_unique_kmers() const = 0;
 
     // partitioning stuff
     void _validate_pmap()

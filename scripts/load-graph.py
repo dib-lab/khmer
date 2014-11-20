@@ -18,8 +18,7 @@ import sys
 
 import khmer
 from khmer.khmer_args import build_hashbits_args
-from khmer.khmer_args import (report_on_config, info)
-from khmer.threading_args import add_threading_args
+from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.file import check_file_status, check_space
 from khmer.file import check_space_for_hashtable
 
@@ -57,14 +56,15 @@ def main():
     check_space(args.input_filenames)
     check_space_for_hashtable(float(args.n_tables * args.min_tablesize) / 8.)
 
-    print 'Saving k-mer presence table to %s' % base
-    print 'Loading kmers from sequences in %s' % repr(filenames)
+    print >>sys.stderr, 'Saving k-mer presence table to %s' % base
+    print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
     if args.no_build_tagset:
-        print 'We WILL NOT build the tagset.'
+        print >>sys.stderr, 'We WILL NOT build the tagset.'
     else:
-        print 'We WILL build the tagset (for partitioning/traversal).'
+        print >>sys.stderr, 'We WILL build the tagset', \
+                            ' (for partitioning/traversal).'
 
-    print 'making k-mer presence table'
+    print >>sys.stderr, 'making k-mer presence table'
     htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
 
     if args.no_build_tagset:
@@ -75,25 +75,25 @@ def main():
     for _, filename in enumerate(filenames):
 
         rparser = khmer.ReadParser(filename)
-        print 'consuming input', filename
+        print >>sys.stderr, 'consuming input', filename
         target_method(rparser)
 
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of k-mers: {0}'.format(
-            htable.n_occupied())
+        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
+            htable.n_unique_kmers())
 
-    print 'saving k-mer presence table in', base + '.pt'
+    print >>sys.stderr, 'saving k-mer presence table in', base + '.pt'
     htable.save(base + '.pt')
 
     if not args.no_build_tagset:
-        print 'saving tagset in', base + '.tagset'
+        print >>sys.stderr, 'saving tagset in', base + '.tagset'
         htable.save_tagset(base + '.tagset')
 
     info_fp = open(base + '.info', 'w')
     info_fp.write('%d unique k-mers' % htable.n_unique_kmers())
 
     fp_rate = khmer.calc_expected_collisions(htable)
-    print 'fp rate estimated to be %1.3f' % fp_rate
+    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
     if args.write_fp_rate:
         print >> info_fp, \
             '\nfalse positive rate estimated to be %1.3f' % fp_rate

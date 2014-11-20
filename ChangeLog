@@ -1,4 +1,4 @@
-2014-10-30  Michael R. Crusoe  <mcrusoe@msu.edu>
+2014-11-17  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
     newly found read dropping issue
@@ -22,12 +22,50 @@
     test_read_parsers}.py: updated tests to new error pattern (upon object
     creation, not first access) and the same API change as above. Thanks to
     Camille for her enhanced multi-thread test.
+    * lib/{counting,hashtable,ht-diff}.cc,khmer.hh: renamed MAX_COUNT define to
+    MAX_KCOUNT; avoids naming conflict with SeqAn
     * Makefile: refreshed cppcheck{,-result.xml} targets
+
+2014-11-15  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * tests/test_scripts.py: added screed/read_parsers stream testing
+    * khmer/file.py: modified file size checker to not break when fed
+    a fifo/block device
+    * tests/test-data/test-abund-read-2.fa.{bz2, gz}: new test files
+
+2014-11-11  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * do-partition.py: replaced threading args in scripts with things from 
+    khmer_args
+    * khmer/theading_args.py: removed as it has been deprecated
+
+2014-11-06  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * lib/{counting,hashbits}.{cc,hh},lib/hashtable.hh: Moved the n_kmers()
+    function into the parent Hashtable class as n_unique_kmers(), adding it to
+    CountingHash along the way. Removed the unused start and stop parameters.
+    * khmer/_khmermodule.cc: Added Python wrapping for CountingHash::
+    n_unique_kmers(); adapted to the dropped start and stop parameters.
+    * scripts/{load-graph,load-into-counting,normalize-by-median}.py: used the
+    n_unique_kmers() function instead of the n_occupied() function to get the
+    number of unique kmers in a table.
+    * tests/test_{hashbits,hashbits_obj,labelhash,scripts}.py: updated the
+    tests to reflect the above
 
 2014-10-24  Camille Scott  <camille.scott.w@gmail.com>
 
     * do-partition.py: Add type=int to n_threads arg and assert to check
     number of active threads
+
+2014-10-10  Brian Wyss  <wyssbria@msu.edu>
+
+    * khmer/scripts/{abundance-dist, abundance-dist-single,
+    annotate-partitions, count-median, count-overlap, do-partition,
+    extract-paired-reads, extract-partitions, filter-abund, filter-abund-single,
+    filter-stoptags, find-knots, load-graph, load-into-counting,
+    make-initial-stoptags, merge-partitions, normalize-by-median, 
+    partition-graph, sample-reads-randomly}.py:
+    changed stdout output in scripts to go to stderr.
 
 2014-10-06  Michael R. Crusoe  <mcrusoe@msu.edu>
 

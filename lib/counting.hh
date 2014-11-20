@@ -36,6 +36,7 @@ protected:
     uint32_t _bigcount_spin_lock;
     std::vector<HashIntoType> _tablesizes;
     size_t _n_tables;
+    HashIntoType _n_unique_kmers;
 
     Byte ** _counts;
 
@@ -54,7 +55,7 @@ public:
 
     CountingHash( WordLength ksize, HashIntoType single_tablesize ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false)
+        _bigcount_spin_lock(false), _n_unique_kmers(0)
     {
         _tablesizes.push_back(single_tablesize);
 
@@ -63,7 +64,7 @@ public:
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
         khmer::Hashtable(ksize), _use_bigcount(false),
-        _bigcount_spin_lock(false), _tablesizes(tablesizes)
+        _bigcount_spin_lock(false), _tablesizes(tablesizes), _n_unique_kmers(0)
     {
 
         _allocate_counters();
@@ -104,6 +105,8 @@ public:
     {
         return _tablesizes;
     }
+
+    virtual const HashIntoType n_unique_kmers() const;
 
     void set_use_bigcount(bool b)
     {
@@ -147,23 +150,26 @@ public:
 
     virtual void count(HashIntoType khash)
     {
-
+        bool is_new_kmer = true;
         unsigned int  n_full	  = 0;
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
+	    Byte current_count = _counts[ i ][ bin ];
+	    if (is_new_kmer && current_count != 0) {
+	      is_new_kmer = false;
+	    }
             // NOTE: Technically, multiple threads can cause the bin to spill
             //	 over max_count a little, if they all read it as less than
             //	 max_count before any of them increment it.
             //	 However, do we actually care if there is a little
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
-            //while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
-            if ( _max_count > _counts[i][bin]) {
-                __sync_add_and_fetch(&(_counts[i][bin]), 1);
+
+            if ( _max_count > current_count ) {
+                __sync_add_and_fetch( *(_counts + i) + bin, 1 );
             } else {
                 n_full++;
             }
-            //__sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
         } // for each table
 
         if (n_full == _n_tables && _use_bigcount) {
@@ -177,6 +183,10 @@ public:
             }
             __sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
         }
+
+	if (is_new_kmer) {
+	  __sync_add_and_fetch(&_n_unique_kmers, 1);
+	}
 
     } // count
 
