@@ -30,7 +30,8 @@ def test_aync_processor_n_processed():
     
     asd = khmer.async.AsyncSequenceProcessorTester(ht)
     asd.start(filename, False, 1)
-    time.sleep(.4)
+    for r in asd:
+        pass
     asd.stop()
 
     print asd.n_processed()
@@ -42,7 +43,8 @@ def test_async_processor_n_parsed():
     
     asd = khmer.async.AsyncSequenceProcessorTester(ht)
     asd.start(filename, False, 1)
-    time.sleep(.4)
+    for r in asd:
+        pass
     asd.stop()
 
     print asd.n_parsed()
@@ -54,7 +56,8 @@ def test_aync_processor_writer():
     
     asd = khmer.async.AsyncSequenceProcessorTester(ht)
     asd.start(filename, False, 1)
-    time.sleep(.4)
+    for r in asd:
+        pass
     asd.stop()
 
     for r in screed.open(filename):
@@ -66,7 +69,8 @@ def test_async_diginorm_n_processed():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, False, 1)
-    time.sleep(.4)
+    for r in asd:
+        pass
     asd.stop()
 
     print asd.n_processed()
@@ -78,7 +82,8 @@ def test_async_diginorm_n_kept():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, False, 1)
-    time.sleep(.4)
+    for r in asd:
+        pass
     asd.stop()
 
     print asd.n_kept()
@@ -90,7 +95,8 @@ def test_async_diginorm_n_parsed():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, False, 1)
-    time.sleep(.4)
+    for r in asd:
+        pass
     asd.stop()
 
     print asd.n_parsed()
@@ -102,17 +108,18 @@ def test_async_diginorm_pair_fail():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, True, 1)
-    time.sleep(.4)
 
     try:
+        for r in asd:
+            pass
         asd.check_exception()
     except (IOError, RuntimeError) as e:
         print "Caught an exception"
         print e
-        #asd.stop()
+        asd.stop()
     else:
         print "Failed to catch exception"
-        #asd.stop()
+        asd.stop()
         assert False
 
 def test_async_diginorm_paired():
@@ -121,7 +128,6 @@ def test_async_diginorm_paired():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 1000, True, 1)
-    time.sleep(.4)
 
     try:
         asd.check_exception()
@@ -150,7 +156,6 @@ def test_async_diginorm_paired_culling():
     assert ht.get('GGTTGACGGGGCTCAGGGGGCG') == 149
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(infile, CUTOFF, True, 1)
-    time.sleep(.4)
 
     seqs = []
     for r1, r2 in asd:
@@ -172,7 +177,8 @@ def test_async_diginorm_single_culling():
     
     asd = khmer.async.AsyncDiginorm(ht)
     asd.start(filename, 5, False, 1)
-    time.sleep(1)
+    for r in asd:
+        pass
     asd.stop()
 
     assert asd.n_kept() < 24995L

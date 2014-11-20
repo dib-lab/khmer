@@ -271,24 +271,18 @@ bool AsyncSequenceProcessorTester::iter_stop() {
 
 void AsyncSequenceProcessorTester::consume() {
     ReadBatch * batch;
-    Read * first;
-    Read * second;
-    std::string sequence;
     const char * sp;
     while(_workers_running) {
         if(_in_queue->pop(batch)) {
-            __sync_fetch_and_add(&_n_processed, _batchsize);
-            first = batch->first();
-            std::string equence(first->sequence);
-            sp = sequence.c_str();
+
+            sp = copy_seq(batch->first());
             while(!(_writer->push(sp))) if (!_workers_running) return;
             if (paired) {
-                second = batch->second();
-                std::string sequence(second->sequence);
-                sp = sequence.c_str();
+                sp = copy_seq(batch->second());
                 while(!(_writer->push(sp))) if (!_workers_running) return;
-            while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
             }
+            while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
+            __sync_fetch_and_add(&_n_processed, _batchsize); 
         } else {
             if (!is_parsing() && (_n_processed >= _n_parsed)) {
                 while(_writer->n_pushed() > _writer->n_written()) if (!_workers_running) return;
