@@ -78,7 +78,7 @@ def test_load_into_counting_tsv():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of k-mers: 95' in err, err
+    assert 'Total number of unique k-mers: 95' in err, err
     assert os.path.exists(outfile)
     assert os.path.exists(tabfile)
     with open(tabfile) as tabfh:
@@ -100,7 +100,7 @@ def test_load_into_counting_json():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of k-mers: 95' in err, err
+    assert 'Total number of unique k-mers: 95' in err, err
     assert os.path.exists(outfile)
     assert os.path.exists(jsonfile)
 
