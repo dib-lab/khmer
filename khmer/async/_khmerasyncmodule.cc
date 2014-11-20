@@ -139,6 +139,8 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
     AsyncSequenceProcessor * async_sp = me->async_sp;
    
     khmer::ReadBatch * batch_ptr;
+    Read * read_1_ptr;
+    Read * read_2_ptr;
 
     while(!(async_sp->pop(batch_ptr))) {
         if(async_sp->iter_stop()) {
@@ -154,22 +156,26 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
         }
         handle_exceptions(async_sp)
     }
-    /*
-    if (async_diginorm->n_kept() % 50000 == 0)
-        std::cout << "ITER: (kept, processed, written): " 
-            << async_diginorm->n_kept() << ", " 
-            << async_diginorm->n_processed() << ", "
-            << async_diginorm->n_written() << std::endl;
-    */
+
     if(async_sp->is_paired()) {
+        
+        read_1_ptr = new Read ( * batch_ptr->first() );
+        read_2_ptr = new Read ( * batch_ptr->second() );
+
+        delete batch_ptr;
+
         PyObject * read_1_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
-        ((Read_Object *)read_1_OBJECT)->read = batch_ptr->first();
+        ((Read_Object *)read_1_OBJECT)->read = read_1_ptr;
         PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
-        ((Read_Object *)read_2_OBJECT)->read = batch_ptr->second();
+        ((Read_Object *)read_2_OBJECT)->read = read_2_ptr;
         return PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
     }
+
+    read_1_ptr = new Read ( * batch_ptr->first() );
+    delete batch_ptr;
+
     PyObject * read_obj = khmer::python::Read_Type.tp_alloc(&khmer::python::Read_Type, 1);
-    ((khmer::python::Read_Object *) read_obj)->read = batch_ptr->first();
+    ((khmer::python::Read_Object *) read_obj)->read = read_1_ptr;
     return read_obj;
 }
 

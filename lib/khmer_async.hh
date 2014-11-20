@@ -29,7 +29,6 @@ class CountingHash;
 class Hashtable;
 class Hashbits;
 
-
 // Keeps a vector of exceptions which are transferred from other threads
 // This is accessed from either a Python-facing function or a main C thread,
 // using check_and_rethrow, which throws the most recent exception.
@@ -79,6 +78,12 @@ template <class T> class Delete {
 // Destroy all objects on a queue
 template <typename T> void flush_queue(queue<T, Cap>* q) {
     q->consume_all([](T ptr){delete ptr;});
+}
+
+inline char * copy_seq(Read * read) {
+    char * buffer = new char [read->sequence.size() + 1];
+    memcpy(buffer, read->sequence.c_str(), read->sequence.size() + 1);
+    return buffer;
 }
 
 // avoids needing to define two processors for paired

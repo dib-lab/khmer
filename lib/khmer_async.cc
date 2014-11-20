@@ -354,9 +354,6 @@ void AsyncDiginorm::consume() {
     unlock_stdout();
     #endif
 
-    Read * first;
-    Read * second;
-    std::string sequence;
     const char * sp;
 
     while(_workers_running) {
@@ -370,6 +367,19 @@ void AsyncDiginorm::consume() {
             if (!filter) {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
+                sp = copy_seq(batch->first());
+
+                while(!(_writer->push(sp))) if (!_workers_running) return;
+                if (paired) {
+                    sp = copy_seq(batch->second());
+                    while(!(_writer->push(sp))) if (!_workers_running) return;
+                }
+
+                #if(VERBOSITY)
+                clock_gettime(CLOCK_MONOTONIC, &end_t);
+                hash_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
+                #endif
+
                 #if(VERBOSITY)
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
                 #endif
@@ -380,23 +390,6 @@ void AsyncDiginorm::consume() {
                 clock_gettime(CLOCK_MONOTONIC, &end_t);
                 output_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
                 clock_gettime(CLOCK_MONOTONIC, &start_t);
-                #endif
-
-                first = batch->first();
-                std::string sequence(first->sequence);
-                sp = sequence.c_str();
-
-                while(!(_writer->push(sp))) if (!_workers_running) return;
-                if (paired) {
-                    second = batch->second();
-                    std::string sequence(second->sequence);
-                    sp = sequence.c_str();
-                    while(!(_writer->push(sp))) if (!_workers_running) return;
-                }
-
-                #if(VERBOSITY)
-                clock_gettime(CLOCK_MONOTONIC, &end_t);
-                hash_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
                 #endif
 
             } else {
