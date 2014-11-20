@@ -106,9 +106,7 @@ class ReadBatch {
         }
 
         ~ReadBatch () {
-            delete batch[0];
-            if (_size) delete batch[1];
-            delete batch;
+            delete [] batch;
         }
 
         Read * first() {
@@ -242,7 +240,7 @@ template <class T> class AsyncConsumer: public virtual Async {
             Async::start(n_threads);
         }
 
-        bool push(T& item) {
+        bool push(T item) {
             if( _in_queue->bounded_push(item)) {
                 __sync_add_and_fetch(&_n_pushed, _batchsize);
                 return true;

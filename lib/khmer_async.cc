@@ -88,10 +88,10 @@ void AsyncSequenceWriter::consume() {
                 }
             } catch (khmer_exception &e) {
                 _exc_handler->push(std::make_exception_ptr(e));
-                //std::cout << e.what() << " " << std::endl;
-                //std::cout << "ERROR in AsyncSequenceWriter: " << sequence << std::endl;
-                //exit(1);
-                flush_queue<const char *>(_in_queue);
+                std::cout << e.what() << " " << std::endl;
+                std::cout << "ERROR in AsyncSequenceWriter: " << sequence << std::endl;
+                exit(1);
+                //flush_queue<const char *>(_in_queue);
                 return;
             }
             _n_written++;
