@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# figure out where this script is
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# determine its name
+EXE="$(basename $0)"
+
+# show help if no <command>
+
+if [[ ($# -eq 0) || (${1:0:1} == '-') ]]; then
+
+  echo "Synopsis:"
+  echo -e "\t$EXE - k-mer counting, filtering and graph traversal - https://github.com/ged-lab/khmer"
+
+  echo "Usage:"
+  echo -e "\t$EXE <command> [options]"
+
+  echo "Commands:"
+  for CMD in $(find "$DIR" -maxdepth 1 -name '*.py' -type f); do   # find all .py scripts
+          CMD=$(basename $CMD)                                     # remove path
+          CMD=${CMD:0:(-3)}                                        # remove .py extension
+          echo -e "\t$CMD"                                         # print
+  done
+
+# try and run the command
+
+else
+
+  CMD="$1"
+  SCRIPT="$DIR/$CMD.py"
+
+  if [ -r "$SCRIPT" -a -x "$SCRIPT" ]; then
+    # run the python script for this <command>
+    exec "$SCRIPT" "$@"
+  else
+    # crap out
+    echo "ERROR: '$CMD' is not a valid $EXE <command>"
+    exit 1
+  fi
+
+fi
