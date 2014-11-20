@@ -19,8 +19,8 @@ conduct.
 Project maintainers have the right and responsibility to remove, edit,
 or reject comments, commits, code, wiki edits, issues, and other
 contributions that are not aligned to this Code of Conduct. Project
-maintainers who do not follow the Code of Conduct may be removed from
-the project team.
+maintainers or contributors who do not follow the Code of Conduct may be
+removed from the project team.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may
 be reported by emailing `khmer-project@idyll.org
