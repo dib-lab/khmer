@@ -69,12 +69,10 @@ def test_bzip2_decompression():
 
 
 def test_badbzip2():
-    rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
     try:
-        for read in rparser:
-            pass
+        rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
         assert 0, "this should fail"
-    except IOError, err:
+    except ValueError, err:
         print str(err)
 
 

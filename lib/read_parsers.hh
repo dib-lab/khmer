@@ -120,6 +120,8 @@ struct StreamReaderPerformanceMetrics : public IPerformanceMetrics {
 };
 #endif
 
+struct IParser;
+
 struct IStreamReader {
 #ifdef WITH_INTERNAL_METRICS
     StreamReaderPerformanceMetrics  pmetrics;
@@ -134,9 +136,15 @@ struct IStreamReader {
     virtual uint64_t const	    read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     ) = 0;
+    
+    virtual IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    ) = 0;
 
-protected:
-
+    protected:
+       
     size_t			    _alignment;
     size_t			    _max_aligned;
 
@@ -156,7 +164,11 @@ struct RawStreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
+    IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    );
 };
 
 
@@ -168,7 +180,11 @@ struct GzStreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
+    IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    );
 private:
 
     gzFile		    _stream_handle;
@@ -184,7 +200,11 @@ struct Bz2StreamReader : public IStreamReader {
     virtual uint64_t const  read_into_cache(
         uint8_t * const cache, uint64_t const cache_size
     );
-
+IParser * const get_parser(
+            uint32_t const		number_of_threads,
+            uint64_t const		cache_size,
+            uint8_t const		trace_level
+    );
 private:
 
     FILE *		    _stream_handle;
@@ -384,7 +404,6 @@ struct IParser {
         uint8_t const		trace_level	    =
             khmer:: get_active_config( ).get_reads_parser_trace_level( )
     );
-
     IParser(
         IStreamReader	&stream_reader,
         uint32_t const	number_of_threads   =

@@ -8,6 +8,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -131,8 +135,151 @@ RawStreamReader( int const fd, size_t const alignment )
     }
 #endif
 
+
 }
 
+IParser * const RawStreamReader::get_parser(
+        uint32_t const number_of_threads,
+        uint64_t const cache_size,
+        uint8_t const trace_level) {
+
+    char fastx[1];
+    int status = read(_file_descriptor, fastx, 1);
+    if(status > 0)
+    {
+        //nobody cares
+    }
+    if(status < 0)
+    {
+        //read failed, probably because of the should-fail tests
+        throw StreamReadError( );
+    }
+    if(status == 0)
+    {
+        throw StreamReadError("Cannot determine filetype: empty file");
+    }
+    ungetc(fastx[0], _stream_handle);
+
+    if(fastx[0] == '@')
+    {
+        return
+            new FastqParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    if(fastx[0] == '>')
+    {
+        return 
+            new FastaParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    else
+    {
+        throw InvalidStreamHandle("Unknown filetype");
+    }
+    return NULL;
+}
+
+IParser * const GzStreamReader::get_parser(
+        uint32_t const number_of_threads,
+        uint64_t const cache_size,
+        uint8_t const trace_level) {
+
+    char fastx[1];
+    int status = gzread(_stream_handle, fastx, 1);
+    gzungetc(int(fastx[0]), _stream_handle);
+    if(status > 0)
+    {
+        //nobody cares
+    }
+    if(status < 0)
+    {
+        //read failed, probably because of the should-fail tests
+        throw StreamReadError( );
+    }
+    if(status == 0)
+    {
+        throw StreamReadError("Cannot determine filetype: empty file");
+    }
+
+    if(fastx[0] == '@')
+    {
+        return
+            new FastqParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    if(fastx[0] == '>')
+    {
+        return 
+            new FastaParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    else
+    {
+        throw InvalidStreamHandle("Unknown filetype");
+    }
+    return NULL;
+}
+
+IParser * const Bz2StreamReader::get_parser(
+        uint32_t const number_of_threads,
+        uint64_t const cache_size,
+        uint8_t const trace_level) {
+    int bz2_error;
+    
+    char fastx[1];
+    int status = BZ2_bzRead(&bz2_error, &_stream_handle, &fastx, 1);
+    
+    //bz2ungetc(int(fastx[0], _file_descriptor));
+    if(status > 0)
+    {
+        //nobody cares
+    }
+    if(status < 0)
+    {
+        //read failed, probably because of the should-fail tests
+        throw StreamReadError( );
+    }
+    if(status==0)
+    {
+        throw StreamReadError("Cannot determine filetype: empty file");
+    }
+
+    if(fastx[0] == '@')
+    {
+        return
+            new FastqParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    if(fastx[0] == '>')
+    {
+        return 
+            new FastaParser(
+            *this,
+            number_of_threads,
+            cache_size,
+            trace_level);
+    }
+    else
+    {
+        throw InvalidStreamHandle("Uknown filetype");
+    }
+    return NULL;
+}
 
 GzStreamReader::
 GzStreamReader( int const fd )
@@ -1279,10 +1426,39 @@ get_parser(
     IStreamReader * stream_reader   = NULL;
     IParser *	    parser	    = NULL;
 
-    std:: string    ext	    = "";
-    std:: string    ifile_name_chopped( ifile_name );
-    size_t	    ext_pos = ifile_name.find_last_of( "." );
-    bool	    rechop  = false;
+	// magikeys for gz, bz2, and zip, in that order
+	std::vector<std::string> magikeys;
+    magikeys.push_back("\x1f\x8b\x08");
+    magikeys.push_back("\x42\x5a\x68");
+    magikeys.push_back("\x50\x4b\x03\x04");
+	// comptype vals: -1 == unmodified, 0 == gz, 1 == bz2, 2 == zip
+	int comptype  = -1;
+	char fileread[4];
+	std::ifstream ifile;
+    ifile.open(ifile_name.c_str(), std::ios::binary);
+	// length  of read manually set to longest 'magic' key we have
+	ifile.read(fileread, 4);
+	// inefficient but functional
+	bool isthisthing = true;
+    for(std::vector<std::string>::size_type i = 0; i < magikeys.size() && comptype < 0; i++)
+	{
+        // bool to track things
+        isthisthing = true;
+		for(std::string::size_type j = 0; j < magikeys.at(i).length() && isthisthing; j++)
+		{
+			isthisthing = (magikeys[i][j] == fileread[j]);
+		}
+        
+        if(isthisthing)
+        {
+            comptype = i;
+        }
+	}
+
+    // compression type determined; either it's nothing or something defined
+    // in our magic list. now determine fasta or fastq.
+    
+    ifile.close();
 
     int		    ifile_handle    = -1;
     int		    ifile_flags	    = O_RDONLY;
@@ -1290,12 +1466,8 @@ get_parser(
     int             retval = 0;
 #endif
 
-    if (0 < ext_pos) {
-        ext		    = ifile_name.substr( ext_pos + 1 );
-        ifile_name_chopped  = ifile_name.substr( 0, ext_pos );
-    }
-
-    if	    ("gz" == ext) {
+    // handle compressed files
+    if	    (comptype == 0) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
         if (-1 == ifile_handle) {
             throw InvalidStreamHandle( );
@@ -1309,9 +1481,8 @@ get_parser(
         }
 #endif
         stream_reader	= new GzStreamReader( ifile_handle );
-        rechop		= true;
     } // gz
-    else if ("bz2" == ext) {
+    else if (comptype == 1) {
         ifile_handle    = open( ifile_name.c_str( ), ifile_flags );
         if (-1 == ifile_handle) {
             throw InvalidStreamHandle( );
@@ -1325,7 +1496,6 @@ get_parser(
         }
 #endif
         stream_reader	= new Bz2StreamReader( ifile_handle );
-        rechop		= true;
     } // bz2
     else { // Uncompressed file.
         size_t	alignment   = 0;	// 512 bytes is Chaotic Good?
@@ -1360,28 +1530,12 @@ get_parser(
         stream_reader	= new RawStreamReader( ifile_handle, alignment );
     } // uncompressed
 
-    if (rechop) {
-        ext_pos		    = ifile_name_chopped.find_last_of( "." );
-        ext		    = ifile_name_chopped.substr( ext_pos + 1 );
-        ifile_name_chopped  = ifile_name_chopped.substr( 0, ext_pos );
-    }
-
-    if (("fq" == ext) || ("fastq" == ext))
-        parser =
-            new FastqParser(
-            *stream_reader,
+    //if (("fq" == ext) || ("fastq" == ext))
+    //debug fputs(fastype[0] + " is the first char", stderr);
+    parser = stream_reader->get_parser(
             number_of_threads,
             cache_size,
-            trace_level
-        );
-    else
-        parser =
-            new FastaParser(
-            *stream_reader,
-            number_of_threads,
-            cache_size,
-            trace_level
-        );
+            trace_level);
 
     return parser;
 }

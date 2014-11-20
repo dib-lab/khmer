@@ -678,10 +678,11 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
             IParser:: get_parser(
                 ifile_name, number_of_threads, cache_size, trace_level
             );
-    } catch (InvalidStreamHandle &exc) {
-        PyErr_SetString( PyExc_ValueError, "invalid input file name" );
+    } catch (khmer_exception &exc) {
+        PyErr_SetString( PyExc_ValueError, exc.what() );
         return NULL;
-    }
+    };
+
     return self;
 }
 

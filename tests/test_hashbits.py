@@ -767,9 +767,8 @@ def test_consume_absentfasta_with_reads_parser():
         assert 0, "this should fail"
     except TypeError, err:
         print str(err)
-    readparser = ReadParser(utils.get_test_data('empty-file'))
     try:
-        presencetable.consume_fasta_with_reads_parser(readparser)
+        readparser = ReadParser(utils.get_test_data('empty-file'))
         assert 0, "this should fail"
-    except IOError, err:
+    except ValueError, err:
         print str(err)
