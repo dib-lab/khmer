@@ -406,36 +406,6 @@ def test_count_kmer_degree():
     assert ht.kmer_degree('TAAA') == 1
 
 
-@attr('highmem')
-def test_find_radius_for_volume():
-    inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.LabelHash(4, 1e6, 2)
-    ht.consume_fasta(inpfile)
-
-    assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
-    assert ht.find_radius_for_volume('AAAA', 1, 100) == 0
-    assert ht.find_radius_for_volume('AAAA', 2, 100) == 100
-
-
-def test_circumference():
-    ht = khmer.LabelHash(4, 1e6, 2)
-
-    ht.count('ATGC')
-    ht.count('GATG')
-    ht.count('ATGG')
-
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 2
-
-    ht.count('ATGA')
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 3, x
-
-    ht.count('TGAT')
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 4, x
-
-
 def test_save_load_tagset():
     ht = khmer.LabelHash(32, 1, 1)
 

@@ -12,6 +12,11 @@ import os
 import shutil
 from cStringIO import StringIO
 import traceback
+from nose.plugins.attrib import attr
+import subprocess
+import threading
+import bz2
+import io
 
 import khmer_tst_utils as utils
 import khmer
@@ -43,7 +48,7 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of k-mers: 95' in err, err
+    assert 'Total number of unique k-mers: 95' in err, err
     assert os.path.exists(outfile)
 
 
@@ -152,7 +157,7 @@ def test_filter_abund_1_singlefile():
     args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 98' in err, err
 
     outfile = infile + '.abundfilt'
     assert os.path.exists(outfile), outfile
@@ -262,6 +267,16 @@ def test_filter_stoptags():
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
 
+def test_normalize_by_median_indent():
+    infile = utils.get_test_data('paired-mixed.fa.pe')
+    hashfile = utils.get_test_data('normC20k20.kh')
+    script = scriptpath('normalize-by-median.py')
+    args = ['--loadtable', hashfile, infile]
+    (status, out, err) = utils.runscript(script, args)
+    assert status == 0, (out, err)
+    print(out, err)
+
+
 def test_normalize_by_median():
     CUTOFF = '1'
 
@@ -274,7 +289,7 @@ def test_normalize_by_median():
     args = ['-C', CUTOFF, '-k', '17', '-t', infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 98' in err, err
 
     outfile = infile + '.keep'
     assert os.path.exists(outfile), outfile
@@ -399,7 +414,7 @@ def test_normalize_by_median_no_bigcount():
 
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert status == 0, (out, err)
-    print (out, err)
+    print(out, err)
 
     assert os.path.exists(hashfile), hashfile
     kh = khmer.load_counting_hash(hashfile)
@@ -502,7 +517,7 @@ def test_load_graph():
 
     (status, out, err) = utils.runscript(script, args)
 
-    assert 'Total number of k-mers: 3959' in err, err
+    assert 'Total number of unique k-mers: 3960' in err, err
 
     ht_file = outfile + '.pt'
     assert os.path.exists(ht_file), ht_file
@@ -1074,7 +1089,7 @@ def test_abundance_dist_single():
             outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
-    assert 'Total number of k-mers: 98' in err, err
+    assert 'Total number of unique k-mers: 98' in err, err
 
     fp = iter(open(outfile))
     line = fp.next().strip()
@@ -1184,6 +1199,38 @@ def test_interleave_reads_2_fa():
         assert r.name == q.name
         assert r.sequence == q.sequence
     assert n > 0
+
+
+def test_make_initial_stoptags():
+    # gen input files using load-graph.py -t
+    # should keep test_data directory size down
+    # or something like that
+    # this assumes (obv.) load-graph works properly
+    bzinfile = utils.get_temp_filename('test-reads.fq.bz2')
+    shutil.copyfile(utils.get_test_data('test-reads.fq.bz2'), bzinfile)
+    in_dir = os.path.dirname(bzinfile)
+
+    genscript = scriptpath('load-graph.py')
+    genscriptargs = ['-t', 'test-reads', 'test-reads.fq.bz2']
+    utils.runscript(genscript, genscriptargs, in_dir)
+
+    # test input file gen'd by load-graphs
+    infile = utils.get_temp_filename('test-reads.pt')
+    infile2 = utils.get_temp_filename('test-reads.tagset', in_dir)
+
+    # get file to compare against
+    ex_outfile = utils.get_test_data('test-reads.stoptags')
+
+    # actual output file
+    outfile1 = utils.get_temp_filename('test-reads.stoptags', in_dir)
+
+    script = scriptpath('make-initial-stoptags.py')
+    # make-initial-stoptags has weird file argument syntax
+    # read the code before modifying
+    args = ['test-reads']
+
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile1), outfile1
 
 
 def test_extract_paired_reads_1_fa():
@@ -1506,3 +1553,176 @@ def test_count_overlap():
     assert '178633 1155' in data
     assert '496285 2970' in data
     assert '752053 238627' in data
+
+
+def execute_streaming_diginorm(ifilename):
+    '''Helper function for the matrix of streaming tests for read_parser
+    using diginorm, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    uncompressed fastq, etc.
+    This is not directly executed but is run by the tests themselves
+    '''
+    # Get temp filenames, etc.
+    fifo = utils.get_temp_filename('fifo')
+    in_dir = os.path.dirname(fifo)
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', '1', '-k', '17', '-o', 'outfile', fifo]
+
+    # make a fifo to simulate streaming
+    os.mkfifo(fifo)
+
+    # FIFOs MUST BE OPENED FOR READING BEFORE THEY ARE WRITTEN TO
+    # If this isn't done, they will BLOCK and things will hang.
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+    ifile = io.open(ifilename, 'rb')
+    fifofile = io.open(fifo, 'wb')
+    # read binary to handle compressed files
+    chunk = ifile.read(8192)
+    while len(chunk) > 0:
+        fifofile.write(chunk)
+        chunk = ifile.read(8192)
+
+    fifofile.close()
+
+    thread.join()
+
+    return in_dir + '/outfile'
+
+
+def execute_abund_dist_single_streaming(ifilename, somedir=None):
+    '''Helper function for the matrix of streaming tests using screed via
+    filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
+    uncompressed fastq, etc.
+    This is not directly executed but is run by the tests themselves
+    '''
+
+    fifo = utils.get_temp_filename('fifo')
+    in_dir = os.path.dirname(fifo)
+    ifile = open(ifilename, 'rb')
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '6', '-t', fifo, 'outfile']
+    os.mkfifo(fifo)
+
+    thread = threading.Thread(target=utils.runscript,
+                              args=(script, args, in_dir))
+    thread.start()
+
+    fifofile = open(fifo, 'wb')
+    chunk = ifile.read(8192)
+    while len(chunk) > 0:
+        fifofile.write(chunk)
+        chunk = ifile.read(8192)
+
+    fifofile.close()
+    thread.join()
+
+    return in_dir + '/outfile'
+
+
+@attr('known_failing')
+def test_screed_streaming_ufa():
+    # uncompressed fa
+    o = execute_streaming_diginorm(utils.get_test_data('test-abund-read-2.fa'))
+
+    pathstat = os.stat(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
+
+
+@attr('known_failing')
+def test_screed_streaming_ufq():
+    # uncompressed fq
+    o = execute_streaming_diginorm(utils.get_test_data('test-fastq-reads.fq'))
+
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT')
+
+
+@attr('known_failing')
+def test_screed_streaming_bzipfq():
+    # bzip compressed fq
+    o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.bz2'))
+    seqs = [r.sequence for r in screed.open(o)]
+    assert len(seqs) == 100, seqs
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT'), seqs
+
+
+@attr('known_failing')
+def test_screed_streaming_bzipfa():
+    # bzip compressed fa
+    o = execute_streaming_diginorm(
+        utils.get_test_data('test-abund-read-2.fa.bz2'))
+
+    seqs = [r.sequence for r in screed.open(o)]
+    assert len(seqs) == 1, seqs
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG')
+
+
+@attr('known_failing')
+def test_screed_streaming_gzipfq():
+    # gzip compressed fq
+    o = execute_streaming_diginorm(utils.get_test_data('100-reads.fq.gz'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+
+
+@attr('known_failing')
+def test_screed_streaming_gzipfa():
+    o = execute_streaming_diginorm(
+        utils.get_test_data('test-abund-read-2.fa.gz'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+
+
+@attr('known_failing')
+def test_read_parser_streaming_ufa():
+    # uncompressed fa
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('test-abund-read-2.fa'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+
+
+@attr('known_failing')
+def test_read_parser_streaming_bzfq():
+    # bzip compressed
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('100-reads.fq.bz2'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+
+
+@attr('known_failing')
+def test_read_parser_streaming_gzfq():
+    # bzip compressed
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('100-reads.fq.gz'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+
+
+@attr('known_failing')
+def test_read_parser_streaming_bzfa():
+    # bzip compressed
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('test-abund-read-2.fa.bz2'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+
+
+@attr('known_failing')
+def test_read_parser_streaming_gzfa():
+    # bzip compressed
+    o = execute_abund_dist_single_streaming(
+        utils.get_test_data('test-abund-read-2.fa.gz'))
+    assert os.path.exists(o)
+    seqs = [r.sequence for r in screed.open(o)]
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')

@@ -80,7 +80,8 @@ protected:
     size_t length;
     bool initialized;
 public:
-    KMerIterator(const char * seq, unsigned char k) : _seq(seq), _ksize(k) {
+    KMerIterator(const char * seq, unsigned char k) : _seq(seq), _ksize(k)
+    {
         bitmask = 0;
         for (unsigned char i = 0; i < _ksize; i++) {
             bitmask = (bitmask << 2) | 3;
@@ -95,7 +96,8 @@ public:
         initialized = false;
     }
 
-    HashIntoType first(HashIntoType& f, HashIntoType& r) {
+    HashIntoType first(HashIntoType& f, HashIntoType& r)
+    {
         HashIntoType x;
         x = _hash(_seq, _ksize, _kmer_f, _kmer_r);
 
@@ -107,7 +109,8 @@ public:
         return x;
     }
 
-    HashIntoType next(HashIntoType& f, HashIntoType& r) {
+    HashIntoType next(HashIntoType& f, HashIntoType& r)
+    {
         if (done()) {
             throw khmer_exception();
         }
@@ -142,14 +145,17 @@ public:
         return uniqify_rc(_kmer_f, _kmer_r);
     }
 
-    HashIntoType first() {
+    HashIntoType first()
+    {
         return first(_kmer_f, _kmer_r);
     }
-    HashIntoType next() {
+    HashIntoType next()
+    {
         return next(_kmer_f, _kmer_r);
     }
 
-    bool done() {
+    bool done()
+    {
         return index >= length;
     }
 }; // class KMerIterator
@@ -208,7 +214,8 @@ protected:
             _thread_pool_counter( 0 ),
             _max_count( MAX_COUNT - number_of_threads + 1 ),
             _max_bigcount( MAX_BIGCOUNT - number_of_threads + 1 ),
-            _ksize( ksize ) {
+            _ksize( ksize )
+    {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
             throw khmer_exception();
@@ -219,14 +226,14 @@ protected:
 
     }
 
-    virtual ~Hashtable( ) {
+    virtual ~Hashtable( )
+    {
         std:: map< int, uint32_t >:: iterator it;
-        uint32_t thread_pool_id;
 
         for (it = _thread_pool_id_map.begin( );
                 it != _thread_pool_id_map.end( );
                 ++it) {
-            thread_pool_id = it->second;
+            uint32_t thread_pool_id = it->second;
 
             delete _thread_id_maps[ thread_pool_id ];
             _thread_id_maps[ thread_pool_id ] = NULL;
@@ -245,7 +252,8 @@ protected:
         delete partition;
     }
 
-    void _init_bitstuff() {
+    void _init_bitstuff()
+    {
         bitmask = 0;
         for (unsigned int i = 0; i < _ksize; i++) {
             bitmask = (bitmask << 2) | 3;
@@ -254,7 +262,8 @@ protected:
     }
 
 
-    inline Hasher   &_get_hasher( int uuid = 0 ) {
+    inline Hasher   &_get_hasher( int uuid = 0 )
+    {
         std:: map< int, uint32_t >:: iterator	match;
         uint32_t				thread_pool_id;
         ThreadIDMap *				thread_id_map	= NULL;
@@ -300,7 +309,8 @@ protected:
     }
 
 
-    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const {
+    HashIntoType _next_hash(char ch, HashIntoType &h, HashIntoType &r) const
+    {
         // left-shift the previous hash over
         h = h << 2;
 
@@ -317,7 +327,8 @@ protected:
         return uniqify_rc(h, r);
     }
 
-    void _clear_all_partitions() {
+    void _clear_all_partitions()
+    {
         if (partition != NULL) {
             partition->_clear_all_partitions();
         }
@@ -331,7 +342,8 @@ public:
     SeenSet repart_small_tags;
 
     // accessor to get 'k'
-    const WordLength ksize() const {
+    const WordLength ksize() const
+    {
         return _ksize;
     }
 
@@ -347,10 +359,6 @@ public:
 
     // count every k-mer in the string.
     unsigned int consume_string(const std::string &s);
-
-    // count every k-mer in the string.
-    unsigned int consume_high_abund_kmers(const std::string &s,
-                                          BoundedCounterType min_count);
 
     // checks each read for non-ACGT characters
     bool check_and_normalize_read(std::string &read) const;
@@ -384,9 +392,11 @@ public:
                           BoundedCounterType &median,
                           float &average,
                           float &stddev);
+    virtual const HashIntoType n_unique_kmers() const = 0;
 
     // partitioning stuff
-    void _validate_pmap() {
+    void _validate_pmap()
+    {
         if (partition) {
             partition->_validate_pmap();
         }
@@ -396,37 +406,44 @@ public:
     virtual void load_tagset(std::string, bool clear_tags=true);
 
     // for debugging/testing purposes only!
-    void _set_tag_density(unsigned int d) {
+    void _set_tag_density(unsigned int d)
+    {
         if (!(d % 2 == 0) || !all_tags.empty()) { // must be even and tags must exist
             throw khmer_exception();
         }
         _tag_density = d;
     }
 
-    unsigned int _get_tag_density() const {
+    unsigned int _get_tag_density() const
+    {
         return _tag_density;
     }
 
-    void add_tag(HashIntoType tag) {
+    void add_tag(HashIntoType tag)
+    {
         all_tags.insert(tag);
     }
-    void add_stop_tag(HashIntoType tag) {
+    void add_stop_tag(HashIntoType tag)
+    {
         stop_tags.insert(tag);
     }
 
     // Partitioning stuff.
 
-    size_t n_tags() const {
+    size_t n_tags() const
+    {
         return all_tags.size();
     }
 
     void divide_tags_into_subsets(unsigned int subset_size, SeenSet& divvy);
 
-    void add_kmer_to_tags(HashIntoType kmer) {
+    void add_kmer_to_tags(HashIntoType kmer)
+    {
         all_tags.insert(kmer);
     }
 
-    void clear_tags() {
+    void clear_tags()
+    {
         all_tags.clear();
     }
 
@@ -476,8 +493,8 @@ public:
     virtual BoundedCounterType test_and_set_bits(const char * kmer) = 0;
     virtual BoundedCounterType test_and_set_bits(HashIntoType khash) = 0;
 
-    void filter_if_present(const std::string infilename,
-                           const std::string outputfilename,
+    void filter_if_present(const std::string &infilename,
+                           const std::string &outputfilename,
                            CallbackFn callback=0,
                            void * callback_data=0);
 
@@ -486,21 +503,6 @@ public:
                                            unsigned int radius,
                                            unsigned int max_count,
                                            const SeenSet * seen=0) const;
-    unsigned int count_kmers_within_depth(HashIntoType kmer_f,
-                                          HashIntoType kmer_r,
-                                          unsigned int depth,
-                                          unsigned int max_count,
-                                          SeenSet * seen) const;
-
-    unsigned int find_radius_for_volume(HashIntoType kmer_f,
-                                        HashIntoType kmer_r,
-                                        unsigned int max_count,
-                                        unsigned int max_radius) const;
-
-    unsigned int count_kmers_on_radius(HashIntoType kmer_f,
-                                       HashIntoType kmer_r,
-                                       unsigned int radius,
-                                       unsigned int max_volume) const;
 
     size_t trim_on_stoptags(std::string sequence) const;
 
@@ -535,7 +537,8 @@ public:
                                    unsigned long long& count,
                                    SeenSet& keeper,
                                    const unsigned long long threshold=0,
-                                   bool break_on_circum=false) const {
+                                   bool break_on_circum=false) const
+    {
         HashIntoType r, f;
         _hash(kmer, _ksize, f, r);
         calc_connected_graph_size(f, r, count, keeper, threshold, break_on_circum);
@@ -552,7 +555,8 @@ public:
 
 
     unsigned int kmer_degree(HashIntoType kmer_f, HashIntoType kmer_r) const;
-    unsigned int kmer_degree(const char * kmer_s) const {
+    unsigned int kmer_degree(const char * kmer_s) const
+    {
         HashIntoType kmer_f, kmer_r;
         _hash(kmer_s, _ksize, kmer_f, kmer_r);
 

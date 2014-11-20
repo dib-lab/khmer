@@ -120,5 +120,7 @@ def main():
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
 
+    print >> sys.stderr, 'output written to', args.output
+
 if __name__ == '__main__':
     main()

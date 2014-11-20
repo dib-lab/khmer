@@ -463,7 +463,7 @@ def test_nobigcount_save():
     kh = khmer.new_counting_hash(1, 1, 1)
     kh.load(savepath)
 
-    # set_use_bigcount should still be True after load (i.e. should be saved)
+    # set_use_bigcount should still be False after load (i.e. should be saved)
 
     assert kh.get('AAAA') == 0
 
@@ -535,22 +535,6 @@ def test_get_hashsizes():
 #    kh = khmer.new_counting_hash(18, 1e6, 4)
 #    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
 
-
-def test_consume_high_abund_kmers():
-    kh = khmer.new_counting_hash(4, 100, 4)
-
-    # count AAAA/TTTT 5x.
-    c = kh.consume("AAAAAAAA")
-    assert c == 5
-
-    c = kh.consume_high_abund_kmers("AAAA", 6)
-    assert c == 0
-
-    c = kh.consume_high_abund_kmers("AAAA", 5)
-    assert c == 1
-
-    c = kh.consume_high_abund_kmers("AAAT", 1)
-    assert c == 0
 
 ####
 
@@ -727,25 +711,6 @@ def test_badconsume():
         print str(err)
     try:
         countingtable.consume("AAA")
-        assert 0, "this should fail"
-    except ValueError, err:
-        print str(err)
-
-
-def test_badconsume_high_abund_kmers():
-    countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
-    try:
-        countingtable.consume_high_abund_kmers()
-        assert 0, "this should fail"
-    except TypeError, err:
-        print str(err)
-    try:
-        countingtable.consume_high_abund_kmers("AAA", 2)
-        assert 0, "this should fail"
-    except ValueError, err:
-        print str(err)
-    try:
-        countingtable.consume_high_abund_kmers("AAAAA", 256)
         assert 0, "this should fail"
     except ValueError, err:
         print str(err)

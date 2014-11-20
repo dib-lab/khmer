@@ -37,10 +37,12 @@ protected:
     uint32_t _bigcount_spin_lock;
     std::vector<HashIntoType> _tablesizes;
     size_t _n_tables;
+    HashIntoType _n_unique_kmers;
 
     Byte ** _counts;
 
-    virtual void _allocate_counters() {
+    virtual void _allocate_counters()
+    {
         _n_tables = _tablesizes.size();
 
         _counts = new Byte*[_n_tables];
@@ -58,7 +60,8 @@ public:
             get_active_config( ).get_number_of_threads( )
     ) :
         khmer::Hashtable(ksize, number_of_threads),
-        _use_bigcount(false), _bigcount_spin_lock(false) {
+        _use_bigcount(false), _bigcount_spin_lock(false), _n_unique_kmers(0)
+    {
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
@@ -71,12 +74,14 @@ public:
     ) :
         khmer::Hashtable(ksize, number_of_threads),
         _use_bigcount(false), _bigcount_spin_lock(false),
-        _tablesizes(tablesizes) {
+        _tablesizes(tablesizes), _n_unique_kmers(0)
+    {
 
         _allocate_counters();
     }
 
-    virtual ~CountingHash() {
+    virtual ~CountingHash()
+    {
         if (_counts) {
             for (size_t i = 0; i < _n_tables; i++) {
                 if (_counts[i]) {
@@ -92,26 +97,33 @@ public:
         }
     }
 
-    virtual BoundedCounterType test_and_set_bits(const char * kmer) {
+    virtual BoundedCounterType test_and_set_bits(const char * kmer)
+    {
         BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
         count(kmer);
         return !x;
     }
 
-    virtual BoundedCounterType test_and_set_bits(HashIntoType khash) {
+    virtual BoundedCounterType test_and_set_bits(HashIntoType khash)
+    {
         BoundedCounterType x = get_count(khash);
         count(khash);
         return !x;
     }
 
-    std::vector<HashIntoType> get_tablesizes() const {
+    std::vector<HashIntoType> get_tablesizes() const
+    {
         return _tablesizes;
     }
 
-    void set_use_bigcount(bool b) {
+    virtual const HashIntoType n_unique_kmers() const;
+
+    void set_use_bigcount(bool b)
+    {
         _use_bigcount = b;
     }
-    bool get_use_bigcount() {
+    bool get_use_bigcount()
+    {
         return _use_bigcount;
     }
 
@@ -119,13 +131,15 @@ public:
     virtual void load(std::string);
 
     // accessors to get table info
-    const HashIntoType n_entries() const {
+    const HashIntoType n_entries() const
+    {
         return _tablesizes[0];
     }
 
     // count number of occupied bins
     virtual const HashIntoType n_occupied(HashIntoType start=0,
-                                          HashIntoType stop=0) const {
+                                          HashIntoType stop=0) const
+    {
         HashIntoType n = 0;
         if (stop == 0) {
             stop = _tablesizes[0];
@@ -138,24 +152,30 @@ public:
         return n;
     }
 
-    virtual void count(const char * kmer) {
+    virtual void count(const char * kmer)
+    {
         HashIntoType hash = _hash(kmer, _ksize);
         count(hash);
     }
 
-    virtual void count(HashIntoType khash) {
-
+    virtual void count(HashIntoType khash)
+    {
+        bool is_new_kmer = true;
         unsigned int  n_full	  = 0;
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
+	    Byte current_count = _counts[ i ][ bin ];
+	    if (is_new_kmer && current_count != 0) {
+	      is_new_kmer = false;
+	    }
             // NOTE: Technically, multiple threads can cause the bin to spill
             //	 over max_count a little, if they all read it as less than
             //	 max_count before any of them increment it.
             //	 However, do we actually care if there is a little
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
-            if ( _max_count > _counts[ i ][ bin ] ) {
+            if ( _max_count > current_count ) {
                 __sync_add_and_fetch( *(_counts + i) + bin, 1 );
             } else {
                 n_full++;
@@ -174,16 +194,22 @@ public:
             __sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
         }
 
+	if (is_new_kmer) {
+	  __sync_add_and_fetch(&_n_unique_kmers, 1);
+	}
+
     } // count
 
     // get the count for the given k-mer.
-    virtual const BoundedCounterType get_count(const char * kmer) const {
+    virtual const BoundedCounterType get_count(const char * kmer) const
+    {
         HashIntoType hash = _hash(kmer, _ksize);
         return get_count(hash);
     }
 
     // get the count for the given k-mer hash.
-    virtual const BoundedCounterType get_count(HashIntoType khash) const {
+    virtual const BoundedCounterType get_count(HashIntoType khash) const
+    {
         unsigned int	  max_count	= _max_count;
         BoundedCounterType  min_count	= max_count;
         for (unsigned int i = 0; i < _n_tables; i++) {
@@ -269,7 +295,8 @@ public:
 class CountingHashGzFileWriter : public CountingHashFile
 {
 public:
-    CountingHashGzFileWriter(const std::string &outfilename, const CountingHash &ht);
+    CountingHashGzFileWriter(const std::string &outfilename,
+                             const CountingHash &ht);
 };
 };
 

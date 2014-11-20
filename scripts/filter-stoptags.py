@@ -19,6 +19,7 @@ import os
 import khmer
 import argparse
 import textwrap
+import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.file import check_file_status, check_space
 from khmer.khmer_args import info
@@ -58,7 +59,7 @@ def main():
 
     check_space(infiles)
 
-    print 'loading stop tags, with K', args.ksize
+    print >>sys.stderr, 'loading stop tags, with K', args.ksize
     htable = khmer.new_hashbits(args.ksize, 1, 1)
     htable.load_stop_tags(stoptags)
 
@@ -77,7 +78,7 @@ def main():
 
     # the filtering loop
     for infile in infiles:
-        print 'filtering', infile
+        print >>sys.stderr, 'filtering', infile
         outfile = os.path.basename(infile) + '.stopfilt'
 
         outfp = open(outfile, 'w')
@@ -85,7 +86,7 @@ def main():
         tsp = ThreadedSequenceProcessor(process_fn)
         tsp.start(verbose_loader(infile), outfp)
 
-        print 'output in', outfile
+        print >>sys.stderr, 'output in', outfile
 
 if __name__ == '__main__':
     main()

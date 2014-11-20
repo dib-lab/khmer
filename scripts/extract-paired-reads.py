@@ -92,9 +92,9 @@ def main():
     single_fp = open(outfile + '.se', 'w')
     paired_fp = open(outfile + '.pe', 'w')
 
-    print 'reading file "%s"' % args.infile
-    print 'outputting interleaved pairs to "%s.pe"' % outfile
-    print 'outputting orphans to "%s.se"' % outfile
+    print >>sys.stderr, 'reading file "%s"' % args.infile
+    print >>sys.stderr, 'outputting interleaved pairs to "%s.pe"' % outfile
+    print >>sys.stderr, 'outputting orphans to "%s.se"' % outfile
 
     last_record = None
     last_name = None
@@ -141,8 +141,12 @@ def main():
     if n_pe == 0:
         raise Exception("no paired reads!? check file formats...")
 
-    print 'DONE; read %d sequences, %d pairs and %d singletons' % \
-          (index + 1, n_pe, n_se)
+    print >>sys.stderr, 'DONE; read %d sequences,' \
+        ' %d pairs and %d singletons' % \
+        (index + 1, n_pe, n_se)
+
+    print >> sys.stderr, 'wrote to: ' + outfile \
+        + '.se' + ' and ' + outfile + '.pe'
 
 if __name__ == '__main__':
     main()

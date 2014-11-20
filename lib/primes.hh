@@ -22,7 +22,8 @@ private:
     HashIntoType n;
 
     /* Returns true if n is prime, false otherwise */
-    bool is_prime() {
+    bool is_prime()
+    {
         if (n < 2) {
             return false;
         }
@@ -42,7 +43,8 @@ private:
     }
 
 public:
-    Primes(HashIntoType num) {
+    Primes(HashIntoType num)
+    {
         /* Make sure that the initial number to start from is odd
          * and strictly greater than num */
         n = ++num;
@@ -52,7 +54,8 @@ public:
     }
 
     /* Returns the next prime >= n */
-    HashIntoType get_next_prime() {
+    HashIntoType get_next_prime()
+    {
         for (;;) {
             if (is_prime()) {
                 /* If n is prime, we need to make sure to increment

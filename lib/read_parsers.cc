@@ -390,7 +390,7 @@ read_into_cache( uint8_t * const cache, uint64_t const cache_size )
             nbread_total += nbread;
             break;
 
-            // TODO: Inject BZ2 error code or error string into exception.
+        // TODO: Inject BZ2 error code or error string into exception.
         default:
             throw StreamReadError( );
 
@@ -1105,7 +1105,9 @@ void
 CacheManager::
 _fill_segment_from_stream( CacheSegment & segment )
 {
+#ifdef WITH_INTERNAL_METRICS
     uint64_t	nbfilled    = 0;
+#endif
 
     // Wait while segment not selected and not end of stream.
 #ifdef WITH_INTERNAL_METRICS
@@ -1154,12 +1156,15 @@ _fill_segment_from_stream( CacheSegment & segment )
 #ifdef WITH_INTERNAL_METRICS
         segment.pmetrics.start_timers( );
 #endif
+
         segment.size =
-            segment.cursor
-            +   (	nbfilled =
-                        _stream_reader.read_into_cache(
-                            segment.memory, _segment_size
-                        ));
+            segment.cursor + (
+#ifdef WITH_INTERNAL_METRICS
+                nbfilled =
+#endif
+                    _stream_reader.read_into_cache(
+                        segment.memory, _segment_size
+                    ));
 #ifdef WITH_INTERNAL_METRICS
         segment.pmetrics.stop_timers( );
 #endif
