@@ -69,7 +69,7 @@ def test_load_into_counting_fail():
 
 def test_load_into_counting_tsv():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-m', 'tsv']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
 
     outfile = utils.get_temp_filename('out.kh')
     tabfile = outfile + '.info.tsv'
@@ -91,7 +91,7 @@ def test_load_into_counting_tsv():
 
 def test_load_into_counting_json():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-m', 'json']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
 
     outfile = utils.get_temp_filename('out.kh')
     jsonfile = outfile + '.info.json'
@@ -118,9 +118,9 @@ def test_load_into_counting_json():
     assert got_json == expected_json, got_json
 
 
-def test_load_into_counting_bad_machine_readable_fmt():
+def test_load_into_counting_bad_summary_fmt():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-m', 'badfmt']
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')

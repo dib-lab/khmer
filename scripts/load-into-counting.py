@@ -56,8 +56,8 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
-    parser.add_argument('--machine-readable-info', '-m', default=None,
-                        metavar="FORMAT", choices=['json', 'tsv'],
+    parser.add_argument('--summary-info', '-s', default=None, metavar="FORMAT",
+                        choices=['json', 'tsv'],
                         help="What format should the machine readable run "
                         "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
@@ -137,10 +137,10 @@ def main():
         print >> sys.stderr, "Writing run information to", base + '.info'
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
 
-    if args.machine_readable_info:
-        mr_fmt = args.machine_readable_info.lower()
+    if args.summary_info:
+        mr_fmt = args.summary_info.lower()
         mr_file = base + '.info.' + mr_fmt
-        print >> sys.stderr, "Writing machine-readable stats to", mr_file
+        print >> sys.stderr, "Writing summmary info to", mr_file
         with open(mr_file, 'w') as mr_fh:
             if mr_fmt == 'json':
                 mr_data = {
