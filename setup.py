@@ -117,7 +117,7 @@ SETUP_METADATA = \
         # http://docs.python.org/2/distutils/setupscript.html
         # additiona-meta-data note #3
         "url": 'http://ged.msu.edu/',
-        "packages": ['khmer', 'khmer.tests'],
+        "packages": ['khmer', 'khmer.tests', 'khmer.async'],
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.7.1'],
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],

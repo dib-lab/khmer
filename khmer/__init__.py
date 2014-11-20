@@ -40,7 +40,7 @@ from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-from khmer import async
+import khmer.async as async
 
 def new_hashbits(k, starting_size, n_tables=2):
     """Return a new hashbits object. Deprecated.
