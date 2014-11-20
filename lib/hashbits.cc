@@ -192,7 +192,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
     }
 
     total_reads = 0;
-    HashIntoType start = 0, stop = 0;
 
     delete parser;
     parser = IParser::get_parser(filename.c_str());
@@ -222,8 +221,8 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
         total_reads++;
 
         if (total_reads%block_size == 0) {
-            curve[0][total_reads/block_size-1] = n_overlap_kmers(start,stop);
-            curve[1][total_reads/block_size-1] = n_kmers(start,stop);
+            curve[0][total_reads/block_size-1] = n_overlap_kmers();
+            curve[1][total_reads/block_size-1] = n_unique_kmers();
         }
         // run callback, if specified
         if (total_reads % CALLBACK_PERIOD == 0 && callback) {
