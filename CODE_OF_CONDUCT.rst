@@ -23,8 +23,12 @@ maintainers who do not follow the Code of Conduct may be removed from
 the project team.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may
-be reported by opening an issue or contacting one or more of the project
-maintainers.
+be reported by emailing `khmer-project@idyll.org
+<mailto:khmer-project@idyll.org>`__ which only goes to C. Titus Brown and
+Michael R. Crusoe. To report an issue involving either of them please email
+`Judi Brown Clarke, Ph.D. <mailto:jbc@egr.msu.edu>`__ the Diversity Director
+at the BEACON Center for the Study of Evolution in Action, an NSF Center for
+Science and Technology.
 
 This Code of Conduct is adapted from the `Contributor
 Covenant <http:contributor-covenant.org>`__, version 1.0.0, available at
