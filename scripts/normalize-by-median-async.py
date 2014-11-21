@@ -162,7 +162,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         print >>sys.stderr, 'loading k-mer counting table from', args.loadtable
         htable = khmer.load_counting_hash(args.loadtable)
     else:
-        print >sys.stderr, 'making k-mer counting table'
+        print >>sys.stderr, 'making k-mer counting table'
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
