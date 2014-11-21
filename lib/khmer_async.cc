@@ -332,15 +332,19 @@ bool AsyncDiginorm::filter_paired(ReadBatch * batch) {
     return filter_first && filter_single(batch->second());
 }
 
+
+
 void AsyncDiginorm::consume() {
 
     ReadBatch* batch;
     bool filter;
 
-    #if(VERBOSITY)
+    #if(TIMING)
     timespec start_t, end_t;
-    double output_push_wait = 0.0, hash_push_wait = 0.0;
+    double output_push_wait = 0.0, writer_push_wait = 0.0, reader_pop_wait = 0.0;
+    #endif
 
+    #if(VERBOSITY)
     lock_stdout();
     std::thread::id tid = std::this_thread::get_id();
     std::cout << "Thread " << tid << " : " << std::endl 
@@ -351,7 +355,9 @@ void AsyncDiginorm::consume() {
     const char * sp;
 
     while(_workers_running) {
+        TSTART()
         if (_in_queue->pop(batch)) {
+            TEND(reader_pop_wait)
             if (paired) {
                 filter = filter_paired(batch);
             } else {
@@ -362,29 +368,20 @@ void AsyncDiginorm::consume() {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
                 sp = copy_seq(batch->first());
-
+                
+                TSTART()
                 while(!(_writer->push(sp))) if (!_workers_running) return;
+                TEND(writer_push_wait)
                 if (paired) {
                     sp = copy_seq(batch->second());
+                    TSTART()
                     while(!(_writer->push(sp))) if (!_workers_running) return;
+                    TEND(writer_push_wait)
                 }
 
-                #if(VERBOSITY)
-                clock_gettime(CLOCK_MONOTONIC, &end_t);
-                hash_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
-                #endif
-
-                #if(VERBOSITY)
-                clock_gettime(CLOCK_MONOTONIC, &start_t);
-                #endif
-
+                TSTART()
                 while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
-
-                #if(VERBOSITY)
-                clock_gettime(CLOCK_MONOTONIC, &end_t);
-                output_push_wait += (timediff(start_t,end_t).tv_nsec / 1000000000.0);
-                clock_gettime(CLOCK_MONOTONIC, &start_t);
-                #endif
+                TEND(output_push_wait)
 
             } else {
                 delete batch;
@@ -398,6 +395,11 @@ void AsyncDiginorm::consume() {
                     << " reads). Waiting for writeout" << std::endl;
                 unlock_stdout();
                 #endif
+                #if(TIMING)
+                lock_stdout();
+                std::cout << reader_pop_wait << "\t" << writer_push_wait << "\t" << output_push_wait << std::endl;
+                unlock_stdout();
+                #endif
                 while(_writer->n_pushed() > _writer->n_written()) if (!_workers_running) return;
                 _workers_running = false;
             }
@@ -409,12 +411,6 @@ void AsyncDiginorm::consume() {
     std::cout << "\nReturning from AsyncDiginorm worker..." << std::endl;
     std::cout << "\t(hashes pushed, hashes written): " << 
         _writer->n_pushed() << ", " << _writer->n_written() << std::endl;
-    std::cout << "\tOutput push wait: " << 
-        output_push_wait << 
-        "s" << std::endl;
-    std::cout << "\tHash push wait: " << 
-        hash_push_wait << 
-        "s" << std::endl;
     unlock_stdout();
     #endif
 }
