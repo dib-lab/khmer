@@ -1,9 +1,8 @@
-2014-11-20  Kevin Murray  <spam@kdmurray.id.au>
+2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * load-into-counting.py: Add a CLI parameter to output a machine-readable
     summary of the run, including number of k-mers, FPR, input files etc in
     json or TSV format.
-
 
 2014-12-01  Titus Brown  <t@idyll.org>
 
