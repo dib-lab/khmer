@@ -336,11 +336,12 @@ def test_filter_stoptags():
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.kh')
+    outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = scriptpath('normalize-by-median.py')
-    args = ['--loadtable', hashfile, infile]
+    args = ['--loadtable', hashfile, '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
-    print(out, err)
+    assert os.path.exists(outfile)
 
 
 def test_normalize_by_median():
