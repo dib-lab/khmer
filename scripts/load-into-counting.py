@@ -81,8 +81,8 @@ def main():
     check_space(args.input_sequence_filename)
     check_space_for_hashtable(args.n_tables * args.min_tablesize)
 
-    print >>sys.stderr, 'Saving k-mer counting table',  base
-    print >>sys.stderr, 'Loading kmers from sequences in', repr(filenames)
+    print >>sys.stderr, 'Saving k-mer counting table to %s' %  base
+    print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
 
     # clobber the '.info' file now, as we always open in append mode below
     if os.path.exists(base + '.info'):
@@ -134,7 +134,6 @@ def main():
     fp_rate = khmer.calc_expected_collisions(htable)
 
     with open(base + '.info', 'a') as info_fp:
-        print >> sys.stderr, "Writing run information to", base + '.info'
         print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
 
     if args.summary_info:
