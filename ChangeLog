@@ -1,3 +1,8 @@
+2014-11-20  Kevin Murray  <spam@kdmurray.id.au>
+
+    * tests/test_scripts.py: Stop a test from making a temporary output file
+    in the current dir by explictly specifying an output file.
+
 2014-11-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * CODE_OF_CONDUT.RST,doc/dev/{index,CODE_OF_CONDUCT}.txt: added a code of
