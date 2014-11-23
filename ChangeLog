@@ -1,3 +1,10 @@
+2014-11-23  Phillip Garland  <pgarland@gmail.com>
+
+	* lib/khmer.hh (khmer): define KSIZE_MAX
+	* khmer/_khmermodule.cc (forward_hash, forward_hash_no_rc)
+	(reverse_hash): Use KSIZE_MAX to check whether the user-supplied k
+	is larger than khmer supports
+
 2014-11-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * CODE_OF_CONDUT.RST,doc/dev/{index,CODE_OF_CONDUCT}.txt: added a code of
