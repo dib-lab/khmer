@@ -693,24 +693,10 @@ hash_get_raw_tables(khmer_KCountingHash_Object * self, PyObject * args)
 
     PyObject * raw_tables = PyList_New(sizes.size());
     for (unsigned int i=0; i<sizes.size(); ++i) {
-        /*
-        Py_buffer * buf = (Py_buffer * ) table_ptrs[i];
-        buf->obj = NULL;
-        buf->len = sizes[i];
-        buf->readonly = 1;
-        buf->ndim = 1;
-        buf->format = NULL;
-        buf->shape = NULL;
-        buf->strides = NULL;
-        buf->suboffsets = NULL;
-        buf->internal = NULL;
-        bufs.push_back(buf);
-        */
         PyObject * buf = PyBuffer_FromMemory(table_ptrs[i], sizes[i]);
         if(!PyBuffer_Check(buf))
             return NULL;
         PyList_SET_ITEM(raw_tables, i, buf);
-        //Py_XDECREF(buf);
     }
 
     return raw_tables;
