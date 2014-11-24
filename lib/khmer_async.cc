@@ -136,6 +136,8 @@ void AsyncBundledHashWriter::count(std::vector<HashIntoType> * bundle) {
     } catch (khmer_exception &e) {
         _exc_handler->push(std::make_exception_ptr(e));
     }
+    bundle->clear();
+    delete bundle;
 }
 
 void AsyncBundledHashWriter::consume() {
