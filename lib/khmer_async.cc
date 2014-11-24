@@ -109,6 +109,50 @@ unsigned int AsyncSequenceWriter::n_written() {
 
 /////
 //
+// class AynscBundledHashWriter
+//
+/////
+
+void AsyncBundledHashWriter::start() {
+    _n_written = 0;
+    _ksize = _ht->ksize();
+    AsyncConsumer<std::vector<HashIntoType>*>::start(1);
+}
+
+
+unsigned int AsyncBundledHashWriter::ksize() {
+    return _ht->ksize();
+}
+
+unsigned int AsyncBundledHashWriter::n_written() {
+    return _n_written;
+}
+
+void AsyncBundledHashWriter::count(std::vector<HashIntoType> * bundle) {
+    try {
+        for (std::vector<HashIntoType>::iterator it=bundle->begin(); it!=bundle->end(); ++it) {
+            _ht->count(*it);
+        }
+    } catch (khmer_exception &e) {
+        _exc_handler->push(std::make_exception_ptr(e));
+    }
+}
+
+void AsyncBundledHashWriter::consume() {
+    
+    std::vector<HashIntoType> * bundle;
+    while(_workers_running) {
+        if(_in_queue->pop(bundle)) {
+            count(bundle);
+            _n_written++;
+        }
+    }
+    _in_queue->consume_all( [this](std::vector<HashIntoType> * bundle){ count(bundle); });
+}
+
+
+/////
+//
 // class AsyncHasher methods
 //
 /////
@@ -257,6 +301,18 @@ unsigned int AsyncSequenceProcessor::n_written() {
     return _writer->n_written();
 }
 
+
+std::vector<HashIntoType> * AsyncSequenceProcessor::get_bundle(Read * read) {
+    std::vector<HashIntoType> * bundle = new std::vector<HashIntoType>();
+    HashIntoType kmer;
+    khmer::KMerIterator kmers(read->sequence.c_str(), _ht->ksize());
+    while(!kmers.done()) {
+        kmer = kmers.next();
+        bundle->push_back(kmer);
+    }
+    return bundle;
+}
+
 /////
 //
 // AsyncSequenceProcessorTester
@@ -271,15 +327,15 @@ bool AsyncSequenceProcessorTester::iter_stop() {
 
 void AsyncSequenceProcessorTester::consume() {
     ReadBatch * batch;
-    const char * sp;
+    std::vector<HashIntoType> * bundle;
     while(_workers_running) {
         if(_in_queue->pop(batch)) {
 
-            sp = copy_seq(batch->first());
-            while(!(_writer->push(sp))) if (!_workers_running) return;
+            bundle = get_bundle(batch->first());
+            while(!(_writer->push(bundle))) if (!_workers_running) return;
             if (paired) {
-                sp = copy_seq(batch->second());
-                while(!(_writer->push(sp))) if (!_workers_running) return;
+                bundle = get_bundle(batch->second());
+                while(!(_writer->push(bundle))) if (!_workers_running) return;
             }
             while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
             __sync_fetch_and_add(&_n_processed, _batchsize); 
@@ -291,7 +347,6 @@ void AsyncSequenceProcessorTester::consume() {
         }
     }
 }
-
 /////
 //
 // AsyncDiginorm
@@ -333,7 +388,6 @@ bool AsyncDiginorm::filter_paired(ReadBatch * batch) {
 }
 
 
-
 void AsyncDiginorm::consume() {
 
     ReadBatch* batch;
@@ -352,7 +406,8 @@ void AsyncDiginorm::consume() {
     unlock_stdout();
     #endif
 
-    const char * sp;
+    //const char * sp;
+    std::vector<HashIntoType> * bundle;
 
     while(_workers_running) {
         TSTART()
@@ -367,15 +422,18 @@ void AsyncDiginorm::consume() {
             if (!filter) {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
-                sp = copy_seq(batch->first());
+                //sp = copy_seq(batch->first());
+
+                bundle = get_bundle(batch->first());
                 
                 TSTART()
-                while(!(_writer->push(sp))) if (!_workers_running) return;
+                while(!(_writer->push(bundle))) if (!_workers_running) return;
                 TEND(writer_push_wait)
                 if (paired) {
-                    sp = copy_seq(batch->second());
+                    //sp = copy_seq(batch->second());
+                    bundle = get_bundle(batch->second());
                     TSTART()
-                    while(!(_writer->push(sp))) if (!_workers_running) return;
+                    while(!(_writer->push(bundle))) if (!_workers_running) return;
                     TEND(writer_push_wait)
                 }
 

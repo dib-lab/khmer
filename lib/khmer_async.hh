@@ -378,6 +378,28 @@ class AsyncSequenceWriter: public AsyncConsumer<const char *> {
 
 };
 
+class AsyncBundledHashWriter: public AsyncConsumer<std::vector<HashIntoType>*> {
+
+    protected:
+
+        khmer::Hashtable * _ht;
+        unsigned int _n_written;
+        unsigned int _ksize;
+
+    public:
+
+        AsyncBundledHashWriter (khmer:: Hashtable *ht):
+                        khmer::AsyncConsumer<std::vector<HashIntoType> *>(),
+                        _ht(ht) {
+        }
+
+        unsigned int ksize();
+        void start();
+        virtual void consume();
+        void count(std::vector<HashIntoType> * bundle);
+        unsigned int n_written();
+};
+
 /*
 class AsyncSequenceParser: public Async<Read *> {
     
@@ -428,7 +450,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
     protected:
 
         khmer::Hashtable * _ht;
-        khmer::AsyncSequenceWriter * _writer;
+        khmer::AsyncBundledHashWriter * _writer;
 
         std::thread * _reader_thread;
         bool paired = false;
@@ -444,7 +466,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
         AsyncSequenceProcessor (khmer::Hashtable * ht):
                                 khmer::AsyncConsumerProducer<ReadBatch*,ReadBatch*>(),
                                 _ht(ht) {
-            _writer = new AsyncSequenceWriter(_ht);
+            _writer = new AsyncBundledHashWriter(_ht);
         }
 
         void start(const std::string &filename,
@@ -453,6 +475,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
         void stop();
 
         virtual void consume() = 0;
+        std::vector<HashIntoType> * get_bundle(Read * read);
         unsigned int n_processed();
 
         virtual bool iter_stop() = 0;
