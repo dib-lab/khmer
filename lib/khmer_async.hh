@@ -485,6 +485,8 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
         bool is_paired();
         unsigned int n_parsed();
         unsigned int n_written();
+        unsigned int writer_queue_load();
+        unsigned int reader_queue_load();
 };
 
 class AsyncSequenceProcessorTester: public AsyncSequenceProcessor {
@@ -524,6 +526,7 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
 
         bool filter_single(Read * read);
         bool filter_paired(ReadBatch * read);
+        unsigned int output_queue_load();
 };
 };
 #endif

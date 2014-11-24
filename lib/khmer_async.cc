@@ -303,6 +303,13 @@ unsigned int AsyncSequenceProcessor::n_written() {
     return _writer->n_written();
 }
 
+unsigned int AsyncSequenceProcessor::writer_queue_load() {
+    return _writer->n_pushed() - _writer->n_written();
+}
+
+unsigned int AsyncSequenceProcessor::reader_queue_load() {
+    return _n_parsed - _n_processed;
+}
 
 std::vector<HashIntoType> * AsyncSequenceProcessor::get_bundle(Read * read) {
     std::vector<HashIntoType> * bundle = new std::vector<HashIntoType>();
@@ -367,6 +374,10 @@ void AsyncDiginorm::start(const std::string &filename,
 
 unsigned int AsyncDiginorm::n_kept() {
     return _n_kept;
+}
+
+unsigned int AsyncDiginorm::output_queue_load() {
+    return _n_kept - _n_popped;
 }
 
 bool AsyncDiginorm::iter_stop() {

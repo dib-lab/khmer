@@ -37,6 +37,7 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self);
 static PyObject * asyncseqproc_n_parsed(PyObject * self, PyObject * args);
 static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args);
 static PyObject * asyncseqproc_check_exception(PyObject * self, PyObject * args);
+static PyObject * asyncseqproc_queue_load(PyObject * self, PyObject * args);
 
 static PyMethodDef khmer_asyncseqproc_methods[] = {
     { "processed", (PyCFunction)asyncseqproc_processed_iter, METH_NOARGS, "Iterator over processed reads" },
@@ -44,6 +45,7 @@ static PyMethodDef khmer_asyncseqproc_methods[] = {
     { "start", asyncseqproc_start, METH_VARARGS, "Start processors" },
     { "n_processed", asyncseqproc_n_processed, METH_NOARGS, "Number of reads processed" },
     { "n_parsed", asyncseqproc_n_parsed, METH_NOARGS, "Number of reads parsed" },
+    { "queue_load", asyncseqproc_queue_load, METH_NOARGS, "Apprx. items on writer, reader, output queues" },
     { "check_exception", asyncseqproc_check_exception, METH_NOARGS, "Check async exception state" },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -198,6 +200,16 @@ static PyObject * asyncseqproc_check_exception(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
+static PyObject * asyncseqproc_queue_load(PyObject * self, PyObject * args)
+{
+    khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
+    AsyncSequenceProcessor * async_sp = me->async_sp;
+
+    return PyTuple_Pack(3,
+                        PyLong_FromUnsignedLongLong(async_sp->writer_queue_load()),
+                        PyLong_FromUnsignedLongLong(async_sp->reader_queue_load()));
+}
+
 static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args)
 {
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
@@ -207,6 +219,8 @@ static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args)
 
     return PyLong_FromUnsignedLongLong(n);
 }
+
+
 
 static void khmer_asyncseqproc_dealloc(PyObject* obj)
 {
@@ -255,10 +269,12 @@ static PyObject * khmer_asyncdiginorm_new(PyTypeObject * type,
         PyObject * args, PyObject * kwds);
 static PyObject * asyncdiginorm_start(PyObject * self, PyObject * args);
 static PyObject * asyncdiginorm_n_kept(PyObject * self, PyObject * args);
+static PyObject * asyncdiginorm_queue_load(PyObject * self, PyObject * args);
 
 static PyMethodDef khmer_asyncdiginorm_methods[] = {
     { "start", asyncdiginorm_start, METH_VARARGS, "Start processing" },
     { "n_kept", asyncdiginorm_n_kept, METH_NOARGS, "Number of reads kept" },
+    { "queue_load", asyncdiginorm_queue_load, METH_NOARGS, "Queue loads" },
 
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
@@ -332,6 +348,19 @@ static PyObject * asyncdiginorm_n_kept(PyObject * self, PyObject * args)
 
     return PyLong_FromUnsignedLongLong(n);
 }
+
+static PyObject * asyncdiginorm_queue_load(PyObject * self, PyObject * args)
+{
+    khmer_AsyncDiginormObject * me = (khmer_AsyncDiginormObject *) self;
+    AsyncDiginorm * async_diginorm = me->async_diginorm;
+
+    return PyTuple_Pack(3,
+                        PyLong_FromUnsignedLongLong(async_diginorm->writer_queue_load()),
+                        PyLong_FromUnsignedLongLong(async_diginorm->reader_queue_load()),
+                        PyLong_FromUnsignedLongLong(async_diginorm->output_queue_load()));
+}
+
+
 
 static void khmer_asyncdiginorm_dealloc(PyObject* obj)
 {
