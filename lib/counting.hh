@@ -87,6 +87,12 @@ public:
         }
     }
 
+    // Writing to the tables outside of defined methods has undefined behavior!
+    // As such, this should only be used to return read-only interfaces
+    Byte ** get_raw_tables() {
+        return _counts;
+    }
+
     virtual BoundedCounterType test_and_set_bits(const char * kmer)
     {
         BoundedCounterType x = get_count(kmer); // @CTB just hash it, yo.
