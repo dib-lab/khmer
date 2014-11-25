@@ -375,7 +375,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
         myself->parser =
             IParser:: get_parser( ifile_name );
     } catch (InvalidStreamHandle &exc) {
-        PyErr_SetString( PyExc_ValueError, "invalid input file name" );
+        PyErr_SetString( PyExc_ValueError, exc.what() );
         return NULL;
     }
     return self;
@@ -1627,9 +1627,19 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
 
     HashIntoType * dist = NULL;
 
+    const char * exception = NULL;
     Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(rparser, hashbits);
+    try {
+        dist = counting->abundance_distribution(rparser, hashbits);
+    } catch (khmer::read_parsers::NoMoreReadsAvailable &exc ) {
+        exception = exc.what();
+    }
     Py_END_ALLOW_THREADS
+    if (exception != NULL) {
+        delete[] dist;
+        PyErr_SetString(PyExc_IOError, exception);
+        return NULL;
+    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {

@@ -20,8 +20,14 @@ namespace read_parsers
 SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 {
     seqan::open(_stream, filename);
-    if (!seqan::isGood(_stream) || seqan::atEnd(_stream)) {
-        throw InvalidStreamHandle();
+    if (!seqan::isGood(_stream)) {
+        std::string message = "Could not open ";
+        message = message + filename + " for reading.";
+        throw InvalidStreamHandle(message.c_str());
+    } else if (seqan::atEnd(_stream)) {
+	std::string message = "File ";
+	message = message + filename + " does not contain any sequences!";
+	throw InvalidStreamHandle(message.c_str());
     }
     pthread_mutex_init(&_imprint_mutex, NULL);
 }

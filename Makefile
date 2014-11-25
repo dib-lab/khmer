@@ -155,6 +155,7 @@ lib:
 	$(MAKE)
 
 test:
+	./setup.py develop
 	./setup.py nosetests
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
