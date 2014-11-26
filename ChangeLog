@@ -1,3 +1,10 @@
+2014-11-26  Phillip Garland  <pgarland@gmail.com>
+
+	* khmer/file.py (check_file_writable): New function.
+
+	* scripts/load-into-counting.py (main): check if output and info
+	files are writable.
+
 2014-11-23  Phillip Garland  <pgarland@gmail.com>
 
 	* lib/khmer.hh (khmer): define KSIZE_MAX
