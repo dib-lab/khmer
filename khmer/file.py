@@ -11,8 +11,8 @@ File handling/checking utilities for command-line scripts.
 
 import os
 import sys
+import errno
 from stat import S_ISBLK, S_ISFIFO
-
 
 def check_file_status(file_path):
     """Check the status of the file; if the file is empty or doesn't exist
@@ -36,6 +36,22 @@ def check_file_status(file_path):
             sys.exit(1)
 
 
+def check_file_writable(file_path):
+    """Returns if file_path is writable, exits out if it's not"""
+    try:
+        f = open(file_path, "a")
+    except IOError as e:
+        if e.errno == errno.EACCES:
+            print >>sys.stderr, "ERROR: File %s does not have write " \
+                % file_path + "permission; exiting"
+            sys.exit(1)
+        else:
+            print >>sys.stderr, "ERROR: " + e.strerror
+    else:
+        f.close()
+        return
+
+   
 def check_space(in_files, _testhook_free_space=None):
     """
     Estimate size of input files passed, then calculate
