@@ -14,6 +14,7 @@ import sys
 import errno
 from stat import S_ISBLK, S_ISFIFO
 
+
 def check_file_status(file_path):
     """Check the status of the file; if the file is empty or doesn't exist
     AND if the file is NOT a fifo/block/named pipe then a warning is printed
@@ -51,7 +52,7 @@ def check_file_writable(file_path):
         f.close()
         return
 
-   
+
 def check_space(in_files, _testhook_free_space=None):
     """
     Estimate size of input files passed, then calculate

@@ -77,7 +77,7 @@ def main():
 
     check_file_writable(base)
     check_file_writable(base + ".info")
-    
+
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
 
