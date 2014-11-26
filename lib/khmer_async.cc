@@ -383,14 +383,14 @@ void AsyncDiginorm::consume() {
             if (!filter) {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
-                sp = copy_seq(batch->first());
+                //sp = copy_seq(batch->first());
                 TSTART()
-                write(sp);
+                write(batch->first()->sequence.c_str());
                 TEND(write_wait)
                 if (paired) {
-                    sp = copy_seq(batch->second());
+                    //sp = copy_seq(batch->second());
                     TSTART()
-                    write(sp);
+                    write(batch->second()->sequence.c_str());
                     TEND(write_wait)
                 }
 
