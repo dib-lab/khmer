@@ -357,7 +357,7 @@ void AsyncDiginorm::consume() {
 
     #if(TIMING)
     timespec start_t, end_t;
-    double output_push_wait = 0.0, reader_pop_wait = 0.0;
+    double output_push_wait = 0.0, reader_pop_wait = 0.0, write_wait = 0.0;
     #endif
 
     #if(VERBOSITY)
@@ -384,10 +384,14 @@ void AsyncDiginorm::consume() {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
                 sp = copy_seq(batch->first());
+                TSTART()
                 write(sp);
+                TEND(write_wait)
                 if (paired) {
                     sp = copy_seq(batch->second());
+                    TSTART()
                     write(sp);
+                    TEND(write_wait)
                 }
 
                 TSTART()
@@ -408,7 +412,7 @@ void AsyncDiginorm::consume() {
                 #endif
                 #if(TIMING)
                 lock_stdout();
-                std::cout << reader_pop_wait << "\t" << output_push_wait << std::endl;
+                std::cout << reader_pop_wait << "\t" << output_push_wait << "\t" << write_wait << std::endl;
                 unlock_stdout();
                 #endif
                 _workers_running = false;
