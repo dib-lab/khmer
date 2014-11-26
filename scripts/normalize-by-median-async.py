@@ -198,7 +198,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                                             perc=int(float(n) /
                                                      float(diginorm.n_processed()) * 100.))
                     print >>sys.stderr, '... in file', input_filename
-                    print >>sys.stderr, 'loads (writer, reader, output):', diginorm.queue_load()
+                    print >>sys.stderr, 'loads (reader, output):', diginorm.queue_load()
                 handle_record(record, outfp)
             diginorm.stop()
             

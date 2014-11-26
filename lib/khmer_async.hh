@@ -428,7 +428,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
     protected:
 
         khmer::Hashtable * _ht;
-        khmer::AsyncSequenceWriter * _writer;
+        unsigned int _ksize;
 
         std::thread * _reader_thread;
         bool paired = false;
@@ -444,7 +444,6 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
         AsyncSequenceProcessor (khmer::Hashtable * ht):
                                 khmer::AsyncConsumerProducer<ReadBatch*,ReadBatch*>(),
                                 _ht(ht) {
-            _writer = new AsyncSequenceWriter(_ht);
         }
 
         void start(const std::string &filename,
@@ -454,6 +453,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
 
         virtual void consume() = 0;
         unsigned int n_processed();
+        void write(const char * sequence);
 
         virtual bool iter_stop() = 0;
 
@@ -461,8 +461,6 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatch*, ReadBatch
         void read_iparser(const std::string &filename);
         bool is_paired();
         unsigned int n_parsed();
-        unsigned int n_written();
-        unsigned int writer_queue_load();
         unsigned int reader_queue_load();
 };
 

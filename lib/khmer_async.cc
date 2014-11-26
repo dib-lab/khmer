@@ -142,16 +142,31 @@ void AsyncHasher::consume() {
 //
 /////
 
+void AsyncSequenceProcessor::write(const char * sequence) {
+    khmer::KMerIterator kmers(sequence, _ksize);
+    HashIntoType kmer;
+    try {
+        while(!kmers.done()) {
+            kmer = kmers.next();
+            _ht->count_ts(kmer);
+        }
+    } catch (khmer_exception &e) {
+        _exc_handler->push(std::make_exception_ptr(e));
+        std::cout << e.what() << " " << std::endl;
+        std::cout << "ERROR in AsyncCounter: " << sequence << std::endl;
+        return;
+    }
+}
+
 void AsyncSequenceProcessor::start(const std::string &filename,
                                     bool paired,
                                     unsigned int n_threads) {
-
+    _ksize = _ht->ksize();
     this->paired = paired;
     _batchsize = paired ? 2 : 1;
     _reader_thread = new std::thread(&AsyncSequenceProcessor::read_iparser, 
                                     this, filename);
     _n_processed = 0;
-    _writer->start();
     AsyncConsumerProducer<ReadBatch*,ReadBatch*>::start(n_threads);
 }
 
@@ -159,9 +174,7 @@ void AsyncSequenceProcessor::stop() {
     _parsing_reads = false;
     // First stop the sequence processor, flushing its queue
     AsyncConsumerProducer<ReadBatch*,ReadBatch*>::stop();
-    // Then stop the writer, writing out all the flushed hashes
-    _writer->stop();
-    flush_queue<ReadBatch*>(_out_queue);
+    //flush_queue<ReadBatch*>(_out_queue);
 }
 
 inline ReadBatch * imprint_paired(IParser * parser) {
@@ -253,14 +266,6 @@ unsigned int AsyncSequenceProcessor::n_processed() {
     return _n_processed;
 }
 
-unsigned int AsyncSequenceProcessor::n_written() {
-    return _writer->n_written();
-}
-
-unsigned int AsyncSequenceProcessor::writer_queue_load() {
-    return _writer->n_pushed() - _writer->n_written();
-}
-
 unsigned int AsyncSequenceProcessor::reader_queue_load() {
     return _n_parsed - _n_processed;
 }
@@ -284,16 +289,15 @@ void AsyncSequenceProcessorTester::consume() {
         if(_in_queue->pop(batch)) {
 
             sp = copy_seq(batch->first());
-            while(!(_writer->push(sp))) if (!_workers_running) return;
+            write(sp);            
             if (paired) {
                 sp = copy_seq(batch->second());
-                while(!(_writer->push(sp))) if (!_workers_running) return;
+                write(sp);
             }
             while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
             __sync_fetch_and_add(&_n_processed, _batchsize); 
         } else {
             if (!is_parsing() && (_n_processed >= _n_parsed)) {
-                while(_writer->n_pushed() > _writer->n_written()) if (!_workers_running) return;
                 _workers_running = false;
             }
         }
@@ -353,7 +357,7 @@ void AsyncDiginorm::consume() {
 
     #if(TIMING)
     timespec start_t, end_t;
-    double output_push_wait = 0.0, writer_push_wait = 0.0, reader_pop_wait = 0.0;
+    double output_push_wait = 0.0, reader_pop_wait = 0.0;
     #endif
 
     #if(VERBOSITY)
@@ -380,15 +384,10 @@ void AsyncDiginorm::consume() {
                 __sync_fetch_and_add(&_n_kept, _batchsize);
 
                 sp = copy_seq(batch->first());
-                
-                TSTART()
-                while(!(_writer->push(sp))) if (!_workers_running) return;
-                TEND(writer_push_wait)
+                write(sp);
                 if (paired) {
                     sp = copy_seq(batch->second());
-                    TSTART()
-                    while(!(_writer->push(sp))) if (!_workers_running) return;
-                    TEND(writer_push_wait)
+                    write(sp);
                 }
 
                 TSTART()
@@ -409,10 +408,9 @@ void AsyncDiginorm::consume() {
                 #endif
                 #if(TIMING)
                 lock_stdout();
-                std::cout << reader_pop_wait << "\t" << writer_push_wait << "\t" << output_push_wait << std::endl;
+                std::cout << reader_pop_wait << "\t" << output_push_wait << std::endl;
                 unlock_stdout();
                 #endif
-                while(_writer->n_pushed() > _writer->n_written()) if (!_workers_running) return;
                 _workers_running = false;
             }
         }
@@ -421,8 +419,6 @@ void AsyncDiginorm::consume() {
     #if(VERBOSITY)
     lock_stdout();
     std::cout << "\nReturning from AsyncDiginorm worker..." << std::endl;
-    std::cout << "\t(hashes pushed, hashes written): " << 
-        _writer->n_pushed() << ", " << _writer->n_written() << std::endl;
     unlock_stdout();
     #endif
 }
