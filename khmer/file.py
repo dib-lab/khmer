@@ -40,16 +40,16 @@ def check_file_status(file_path):
 def check_file_writable(file_path):
     """Returns if file_path is writable, exits out if it's not"""
     try:
-        f = open(file_path, "a")
-    except IOError as e:
-        if e.errno == errno.EACCES:
+        file_obj = open(file_path, "a")
+    except IOError as error:
+        if error.errno == errno.EACCES:
             print >>sys.stderr, "ERROR: File %s does not have write " \
                 % file_path + "permission; exiting"
             sys.exit(1)
         else:
-            print >>sys.stderr, "ERROR: " + e.strerror
+            print >>sys.stderr, "ERROR: " + error.strerror
     else:
-        f.close()
+        file_obj.close()
         return
 
 
