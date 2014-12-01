@@ -9,11 +9,29 @@
 #include <exception>
 #include <stdexcept>
 #include <mutex>
-#include <ctime>
+#include <time.h>
 #include <boost/lockfree/queue.hpp>
 
 #define VERBOSITY 0
-#define TIMING 1
+
+using namespace boost::lockfree;
+
+namespace khmer {
+
+static inline timespec timediff(timespec start, timespec end)
+{
+    timespec temp;
+    if ((end.tv_nsec-start.tv_nsec)<0) {
+	temp.tv_sec = end.tv_sec-start.tv_sec-1;
+	temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+    } else {
+	temp.tv_sec = end.tv_sec-start.tv_sec;
+	temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+    }
+    return temp;
+}
+
+#define TIMING 0
 #if TIMING
 #define TSTART() clock_gettime(CLOCK_MONOTONIC, &start_t);
 #define TEND(dest) clock_gettime(CLOCK_MONOTONIC, &end_t); \
@@ -22,10 +40,6 @@
 #define TSTART()
 #define TEND(dest)
 #endif
-
-using namespace boost::lockfree;
-
-namespace khmer {
 
 typedef khmer::read_parsers::Read Read;
 
@@ -38,19 +52,6 @@ typedef queue<const char *, Cap> CharQueue;
 typedef queue<ReadPtr, Cap> ReadQueue;
 
 class Hashtable;
-
-timespec timediff(timespec start, timespec end)
-{
-    timespec temp;
-    if ((end.tv_nsec-start.tv_nsec)<0) {
-	temp.tv_sec = end.tv_sec-start.tv_sec-1;
-	temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-    } else {
-	temp.tv_sec = end.tv_sec-start.tv_sec;
-	temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-    }
-    return temp;
-}
 
 // General deletion functor
 template <class T> class Delete {
