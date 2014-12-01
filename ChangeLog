@@ -1,4 +1,4 @@
-2014-11-20  Kevin Murray  <spam@kdmurray.id.au>
+2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * tests/test_scripts.py: Stop a test from making a temporary output file
     in the current dir by explictly specifying an output file.
