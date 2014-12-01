@@ -13,6 +13,8 @@ Build a counting Bloom filter from the given sequences, save in <htname>.
 Use '-h' for parameter help.
 """
 
+import json
+import os
 import sys
 import threading
 import textwrap
@@ -41,7 +43,7 @@ def get_parser():
 
     Example::
 
-        load_into_counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer counting table from the given"
@@ -55,6 +57,10 @@ def get_parser():
     parser.add_argument('-b', '--no-bigcount', dest='bigcount', default=True,
                         action='store_false',
                         help='Do not count k-mers past 255')
+    parser.add_argument('--summary-info', '-s', default=None, metavar="FORMAT",
+                        choices=['json', 'tsv'],
+                        help="What format should the machine readable run "
+                        "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
     return parser
@@ -63,6 +69,7 @@ def get_parser():
 def main():
 
     info('load-into-counting.py', ['counting'])
+
     args = get_parser().parse_args()
     report_on_config(args)
 
@@ -80,6 +87,10 @@ def main():
 
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
+
+    # clobber the '.info' file now, as we always open in append mode below
+    if os.path.exists(base + '.info'):
+        os.remove(base + '.info')
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
@@ -112,32 +123,56 @@ def main():
             check_space_for_hashtable(args.n_tables * args.min_tablesize)
             print >>sys.stderr, 'mid-save', base
             htable.save(base)
-            open(base + '.info', 'w').write('through %s' % filename)
+        with open(base + '.info', 'a') as info_fh:
+            print >> info_fh, 'through', filename
 
+    n_kmers = htable.n_unique_kmers()
     if args.report_total_kmers:
-        print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
-            htable.n_unique_kmers())
+        print >> sys.stderr, 'Total number of unique k-mers:', n_kmers
+        with open(base + '.info', 'a') as info_fp:
+            print >>info_fp, 'Total number of unique k-mers:', n_kmers
 
     print >>sys.stderr, 'saving', base
     htable.save(base)
 
-    info_fp = open(base + '.info', 'w')
-    info_fp.write('through end: %s\n' % filename)
+    fp_rate = khmer.calc_expected_collisions(htable)
+
+    with open(base + '.info', 'a') as info_fp:
+        print >> info_fp, 'fp rate estimated to be %1.3f\n' % fp_rate
+
+    if args.summary_info:
+        mr_fmt = args.summary_info.lower()
+        mr_file = base + '.info.' + mr_fmt
+        print >> sys.stderr, "Writing summmary info to", mr_file
+        with open(mr_file, 'w') as mr_fh:
+            if mr_fmt == 'json':
+                mr_data = {
+                    "ht_name": os.path.basename(base),
+                    "fpr": fp_rate,
+                    "num_kmers": n_kmers,
+                    "files": filenames,
+                    "mrinfo_version": "0.1.0",
+                }
+                json.dump(mr_data, mr_fh)
+                mr_fh.write('\n')
+            elif mr_fmt == 'tsv':
+                mr_fh.write("ht_name\tfpr\tnum_kmers\tfiles\n")
+                mr_fh.write("{b:s}\t{fpr:1.3f}\t{k:d}\t{fls:s}\n".format(
+                    b=os.path.basename(base), fpr=fp_rate, k=n_kmers,
+                    fls=";".join(filenames)))
+
+    print >> sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
 
     # Change 0.2 only if you really grok it.  HINT: You don't.
-    fp_rate = khmer.calc_expected_collisions(htable)
-    print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
-    print >> info_fp, 'fp rate estimated to be %1.3f' % fp_rate
-
     if fp_rate > 0.20:
         print >> sys.stderr, "**"
-        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
-                              " this data set.  Increase tablesize/# tables.")
+        print >> sys.stderr, "** ERROR: the k-mer counting table is too small",
+        print >> sys.stderr, "for this data set. Increase tablesize/# tables."
         print >> sys.stderr, "**"
         sys.exit(1)
 
     print >>sys.stderr, 'DONE.'
-    print>>sys.stderr, 'wrote to: ' + base + '.info'
+    print >>sys.stderr, 'wrote to:', base + '.info'
 
 if __name__ == '__main__':
     main()
