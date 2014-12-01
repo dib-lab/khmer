@@ -13,7 +13,6 @@
 #include <Python.h>
 
 #include "_khmermodule.hh"
-#include "async/_khmerasyncmodule.hh"
 #include "hashtable.hh"
 
 #include <iostream>

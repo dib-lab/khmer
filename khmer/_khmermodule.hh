@@ -21,7 +21,8 @@
 #include "counting.hh"
 #include "read_aligner.hh"
 #include "labelhash.hh"
-#include "khmer_async.hh"
+
+#include "async/_khmerasyncmodule.hh"
 #include "khmer_exception.hh"
 
 using namespace khmer;

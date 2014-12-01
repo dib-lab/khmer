@@ -4,7 +4,7 @@
 #include "khmer_async.hh"
 #include "async_models.hh"
 
-typedef ReadBatch * ReadBatchPtr;
+namespace khmer {
 
 // General read processing model
 // TODO: Split off the read_iparser functionality into its own AsyncParser class
@@ -60,5 +60,5 @@ class AsyncSequenceProcessorTester: public AsyncSequenceProcessor {
         virtual void consume();
         virtual bool iter_stop();
 };
-
+}; // namespace khmer
 #endif

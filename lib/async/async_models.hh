@@ -4,18 +4,6 @@
 #include "khmer.hh"
 #include "khmer_async.hh"
 
-#include "hashtable.hh"
-#include "read_parsers.hh"
-#include <iostream>
-#include <thread>
-#include <exception>
-#include <stdexcept>
-#include <mutex>
-#include <boost/lockfree/queue.hpp>
-
-
-using namespace boost::lockfree;
-
 namespace khmer {
 
 // Keeps a vector of exceptions which are transferred from other threads
@@ -228,3 +216,6 @@ template <class T, class V> class AsyncConsumerProducer:
         }
 };
 
+}; //namespace khmer
+
+#endif

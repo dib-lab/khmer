@@ -4,7 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc khmer/async/_khmerasyncmodule.cc)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh lib/async/*.cc lib/async/*.hh khmer/_khmermodule.cc khmer/async/_khmerasyncmodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
@@ -44,7 +44,7 @@ clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
 	rm -f khmer/_khmermodule.so khmer/_khmer_async.so || true
-	rm khmer/*.pyc lib/*.pyc || true
+	rm khmer/*.pyc khmer/async/*.pyc lib/*.pyc || true
 	./setup.py clean --all || true
 	rm coverage-debug || true
 	rm -Rf .coverage || true

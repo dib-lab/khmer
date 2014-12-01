@@ -9,6 +9,7 @@
 #include <exception>
 #include <stdexcept>
 #include <mutex>
+#include <ctime>
 #include <boost/lockfree/queue.hpp>
 
 #define VERBOSITY 0
@@ -24,17 +25,17 @@
 
 using namespace boost::lockfree;
 
+namespace khmer {
+
 typedef khmer::read_parsers::Read Read;
 
 typedef std::shared_ptr<Read> ReadPtr;
 
-typedef boost::lockfree::capacity<50000> Cap;
+typedef capacity<50000> Cap;
 
 typedef queue<khmer::HashIntoType, Cap> HashQueue;
 typedef queue<const char *, Cap> CharQueue;
 typedef queue<ReadPtr, Cap> ReadQueue;
-
-namespace khmer {
 
 class Hashtable;
 
@@ -108,6 +109,8 @@ class ReadBatch {
             return (unsigned int) _size + 1;
         }
 };
+
+typedef ReadBatch * ReadBatchPtr;
 
 // Functor to call count() on the give sequence's k-mers
 // Used to either consume all sequences on a queue (with consume_all) or

@@ -1,5 +1,7 @@
-#include "khmer_async.hh"
 #include "async_sequence_processor.hh"
+
+using namespace khmer;
+using namespace khmer::read_parsers;
 
 /////
 //
@@ -42,7 +44,7 @@ void AsyncSequenceProcessor::stop() {
     //flush_queue<ReadBatchPtr>(_out_queue);
 }
 
-inline  imprint_paired(IParser * parser) {
+inline ReadBatchPtr imprint_paired(IParser * parser) {
     ReadPair read_pair;
     //ReadBatchPtr batch;
     //ReadPtr first = new Read();

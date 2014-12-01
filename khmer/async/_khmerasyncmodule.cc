@@ -140,7 +140,7 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
     AsyncSequenceProcessor * async_sp = me->async_sp;
    
-    khmer::ReadBatch * batch_ptr;
+    ReadBatchPtr batch_ptr;
     Read * read_1_ptr;
     Read * read_2_ptr;
 

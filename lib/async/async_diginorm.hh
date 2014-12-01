@@ -1,5 +1,10 @@
+#ifndef KHMER_ASYNC_DIGINORM_HH
+#define KHMER_ASYNC_DIGINORM_HH
+
 #include "khmer_async.hh"
 #include "async_sequence_processor.hh"
+
+namespace khmer {
 
 class AsyncDiginorm: public AsyncSequenceProcessor {
 
@@ -28,3 +33,7 @@ class AsyncDiginorm: public AsyncSequenceProcessor {
         bool filter_paired(ReadBatchPtr read);
         unsigned int output_queue_load();
 };
+
+}; //namespace khmer
+
+#endif

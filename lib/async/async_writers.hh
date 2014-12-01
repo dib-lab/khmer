@@ -95,3 +95,5 @@ class AsyncHasher: public AsyncConsumerProducer<const char *, HashIntoType> {
 };
 
 }; //namespace khmer
+
+#endif

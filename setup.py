@@ -47,11 +47,17 @@ ZLIBDIR = 'third-party/zlib'
 BZIP2DIR = 'third-party/bzip2'
 
 LIB_DEPENDS = [path_join("lib", bn + ".hh") for bn in [
-    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash", "khmer_async"]]
+    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash", ]]
+
+LIB_DEPENDS.extend(path_join("lib/async", bn+ ".hh") for bn in [
+    "khmer_async", "async_models", "async_sequence_processor", "async_diginorm", "async_writers"])
 
 LIB_SOURCES = [path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner", "khmer_async"]]
+    "hashbits", "labelhash", "counting", "subset", "read_aligner", ]]
+
+LIB_SOURCES.extend(path_join("lib/async", bn + ".cc") for bn in [
+    "async_sequence_processor", "async_diginorm", "async_writers"])
 
 KHMER_SOURCES = ["khmer/_khmermodule.cc", "khmer/async/_khmerasyncmodule.cc"]
 KHMER_SOURCES.extend(LIB_SOURCES)

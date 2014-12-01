@@ -6,6 +6,8 @@
 //
 /////
 
+using namespace khmer;
+
 void AsyncDiginorm::start(const std::string &filename,
                             unsigned int cutoff,
                             bool paired,

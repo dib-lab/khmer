@@ -1,5 +1,6 @@
 #include "async_writers.hh"
 
+using namespace khmer;
 
 /////
 //
