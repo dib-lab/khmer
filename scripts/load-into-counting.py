@@ -81,7 +81,7 @@ def main():
     check_space(args.input_sequence_filename)
     check_space_for_hashtable(args.n_tables * args.min_tablesize)
 
-    print >>sys.stderr, 'Saving k-mer counting table to %s' %  base
+    print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
 
     # clobber the '.info' file now, as we always open in append mode below

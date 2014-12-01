@@ -51,8 +51,9 @@ void CountingHash::output_fasta_kmer_pos_freq(
     outfile.close();
 }
 
-const HashIntoType CountingHash::n_unique_kmers() const {
-	return _n_unique_kmers;
+const HashIntoType CountingHash::n_unique_kmers() const
+{
+    return _n_unique_kmers;
 }
 
 BoundedCounterType CountingHash::get_min_count(const std::string &s)
