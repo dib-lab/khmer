@@ -99,7 +99,8 @@ def check_space_for_hashtable(hash_size, _testhook_free_space=None):
                             % (float(hash_size) / 1e9,)
         print >>sys.stderr, "       Free space: %.1f GB" \
                             % (float(free_space) / 1e9,)
-        sys.exit(1)
+        if not force:
+            sys.exit(1)
 
 
 def check_valid_file_exists(in_files):

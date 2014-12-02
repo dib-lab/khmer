@@ -105,7 +105,7 @@ def main():
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
             if not args.force:
-                sys.exit(-1)
+                sys.exit(1)
         output_filename = output_file.name
     else:
         filename = args.filenames[0]
