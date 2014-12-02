@@ -108,6 +108,7 @@ public:
     std::auto_ptr<Stream<BZ2File> > _bz2Stream;
 #endif  // #if SEQAN_HAS_BZIP2
     std::auto_ptr<String<char, MMap<> > > _mmapString;
+    std::auto_ptr<std::ifstream> _plainStream;
 
     // TODO(holtgrew): We could get rid of some of these with type erasure on streams and record readers. Would this be enough?
 
@@ -120,6 +121,7 @@ public:
     std::auto_ptr<RecordReader<String<char, MMap<> >, SinglePass<StringReader> > > _mmapReaderSinglePass;
     std::auto_ptr<RecordReader<String<char, MMap<> >, DoublePass<StringReader> > > _mmapReaderDoublePass;
     std::auto_ptr<RecordReader<std::istream, SinglePass<> > > _istreamReader;
+    std::auto_ptr<RecordReader<std::ifstream, SinglePass<> > > _ifstreamReader;
 
     CharString _filename;
     SeqIOFileFormat_::Type _fileFormat;
@@ -245,24 +247,9 @@ public:
         {
         case SeqIOFileType_::FILE_TYPE_TEXT:
         {
-            _mmapString.reset(new String<char, MMap<> >());
-            if (!open(*_mmapString, toCString(_filename), OPEN_RDONLY))
-            {
-                _isGood = false;
-            }
-            else
-            {
-                if (!_hintDoublePass)
-                {
-                    _mmapReaderSinglePass.reset(new RecordReader<String<char, MMap<> >, SinglePass<StringReader> >(*_mmapString));
-                    _fileFormat = this->_checkFormat(*_mmapReaderSinglePass);
-                }
-                else
-                {
-                    _mmapReaderDoublePass.reset(new RecordReader<String<char, MMap<> >, DoublePass<StringReader> >(*_mmapString));
-                    _fileFormat = this->_checkFormat(*_mmapReaderDoublePass);
-                }
-            }
+		_plainStream.reset(new std::ifstream(toCString(_filename), std::ios::binary | std::ios::in));
+	        _ifstreamReader.reset(new RecordReader<std::ifstream, SinglePass<> >(*_plainStream));
+                _fileFormat = this->_checkFormat(*_ifstreamReader);
         }
         break;
 
@@ -416,9 +403,8 @@ public:
 #endif  // #if SEQAN_HAS_BZIP2
             case SeqIOFileType_::FILE_TYPE_TEXT:
                 {
-                    _mmapString.reset(new String<char, MMap<> >());
-                    if (!open(*_mmapString, toCString(_filename), OPEN_CREATE | OPEN_RDWR))
-                        _isGood = false;
+		    _plainStream.reset(new std::ifstream(toCString(_filename), std::ios::binary | std::ios::in));
+		    _ifstreamReader.reset(new RecordReader<std::ifstream, SinglePass<> >(*_plainStream));
                 }
                 break;
 
@@ -447,16 +433,8 @@ public:
         switch (_fileType)
         {
         case SeqIOFileType_::FILE_TYPE_TEXT:
-            if (!_hintDoublePass)
-            {
-                res = seqan::readRecord(id, seq, qual, *_mmapReaderSinglePass, tag);
-                _atEnd = seqan::atEnd(*_mmapReaderSinglePass);
-            }
-            else
-            {
-                res = seqan::readRecord(id, seq, qual, *_mmapReaderDoublePass, tag);
-                _atEnd = seqan::atEnd(*_mmapReaderDoublePass);
-            }
+                res = seqan::readRecord(id, seq, qual, *_ifstreamReader , tag);
+                _atEnd = seqan::atEnd(*_ifstreamReader);
             break;      // end of case
 
 #if SEQAN_HAS_ZLIB
@@ -490,16 +468,8 @@ public:
         switch (_fileType)
         {
         case SeqIOFileType_::FILE_TYPE_TEXT:
-            if (!_hintDoublePass)
-            {
-                res = seqan::readRecord(id, seq, *_mmapReaderSinglePass, tag);
-                _atEnd = seqan::atEnd(*_mmapReaderSinglePass);
-            }
-            else
-            {
-                res = seqan::readRecord(id, seq, *_mmapReaderDoublePass, tag);
-                _atEnd = seqan::atEnd(*_mmapReaderDoublePass);
-            }
+                res = seqan::readRecord(id, seq, *_ifstreamReader, tag);
+                _atEnd = seqan::atEnd(*_ifstreamReader);
             break;      // end of case
 
 #if SEQAN_HAS_ZLIB
@@ -1038,7 +1008,7 @@ public:
         switch (_fileType)
         {
         case SeqIOFileType_::FILE_TYPE_TEXT:
-            seqan::close(*_mmapString);
+            _plainStream->close();
             break;      // end of case
 
 #if SEQAN_HAS_ZLIB
