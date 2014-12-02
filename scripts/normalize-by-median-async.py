@@ -36,7 +36,7 @@ MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
 # pylint: disable=too-many-locals,too-many-branches
 
 def write_read(record, outfp):
-    if hasattr(record, 'accuracy'):
+    if record.accuracy:
         outfp.write(
             '@{name}\n{seq}\n'
             '+\n{acc}\n'.format(name=record.name,
