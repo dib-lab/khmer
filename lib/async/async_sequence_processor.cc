@@ -50,8 +50,8 @@ inline ReadBatchPtr imprint_paired(IParser * parser) {
     //ReadPtr first = new Read();
     //ReadPtr second = new Read();
     parser->imprint_next_read_pair(read_pair);
-    std::shared_ptr<Read> first( new Read(read_pair.first) );
-    std::shared_ptr<Read> second( new Read(read_pair.second) );
+    ReadPtr first( new Read(read_pair.first) );
+    ReadPtr second( new Read(read_pair.second) );
     ReadBatchPtr batch = new ReadBatch(first, second);
     return batch;
 }
