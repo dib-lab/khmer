@@ -108,6 +108,7 @@ public:
     std::auto_ptr<Stream<BZ2File> > _bz2Stream;
 #endif  // #if SEQAN_HAS_BZIP2
     std::auto_ptr<String<char, MMap<> > > _mmapString;
+    std::auto_ptr<std::ifstream> _plainStream;
 
     // TODO(holtgrew): We could get rid of some of these with type erasure on streams and record readers. Would this be enough?
 
@@ -120,6 +121,7 @@ public:
     std::auto_ptr<RecordReader<String<char, MMap<> >, SinglePass<StringReader> > > _mmapReaderSinglePass;
     std::auto_ptr<RecordReader<String<char, MMap<> >, DoublePass<StringReader> > > _mmapReaderDoublePass;
     std::auto_ptr<RecordReader<std::istream, SinglePass<> > > _istreamReader;
+    std::auto_ptr<RecordReader<std::ifstream, SinglePass<> > > _ifstreamReader;
 
     CharString _filename;
     SeqIOFileFormat_::Type _fileFormat;
@@ -259,8 +261,9 @@ public:
                 }
                 else
                 {
-                    _mmapReaderDoublePass.reset(new RecordReader<String<char, MMap<> >, DoublePass<StringReader> >(*_mmapString));
-                    _fileFormat = this->_checkFormat(*_mmapReaderDoublePass);
+		    _plainStream.reset(new std::ifstream(toCString(_filename), std::ios::binary | std::ios::in));
+	            _ifstreamReader.reset(new RecordReader<std::ifstream, SinglePass<> >(*_plainStream));
+                    _fileFormat = this->_checkFormat(*_ifstreamReader);
                 }
             }
         }
