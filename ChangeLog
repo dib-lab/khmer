@@ -1,3 +1,8 @@
+2014-12-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/roadmap.txt: Explain the roadmap to v2 through v4
+
+
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
     * tests/test_scripts.py: Stop a test from making a temporary output file
