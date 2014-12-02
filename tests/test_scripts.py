@@ -67,6 +67,20 @@ def test_load_into_counting_fail():
     assert "ERROR:" in err
 
 
+def test_load_into_counting_multifile():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+
+
 def test_load_into_counting_tsv():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
@@ -79,7 +93,7 @@ def test_load_into_counting_tsv():
 
     (status, out, err) = utils.runscript(script, args)
     assert 'Total number of unique k-mers: 95' in err, err
-    assert os.path.exists(outfile)
+    assert os.path.exists(outfile)=======
     assert os.path.exists(tabfile)
     with open(tabfile) as tabfh:
         tabfile_lines = tabfh.readlines()
@@ -232,10 +246,31 @@ def test_filter_abund_1_singlefile():
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
-# test that the -V option does not trim sequences that are low abundance
+
+def test_filter_abund_2_singlefile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    tabfile = utils.get_temp_filename('test-savetable.ct')
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', '--savetable',\
+	tabfile,  infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
 def test_filter_abund_4_retain_low_abund():
+# test that the -V option does not trim sequences that are low abundance
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -1181,6 +1216,44 @@ def test_abundance_dist_single_nobigcount():
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '255 2 98 1.0', line
+
+
+def test_abundance_dist_single_nosquash():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile, outfile]
+    utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+
+def test_abundance_dist_single_savetable():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    tabfile = utils.get_temp_filename('test-savetable.ct')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--savetable',\
+	 tabfile, infile, outfile]
+    utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
 
 
 def test_do_partition():
