@@ -29,7 +29,7 @@ from khmer.file import (check_space, check_space_for_hashtable,
 from khmer.async import AsyncDiginorm
 
 DEFAULT_DESIRED_COVERAGE = 10
-
+DEFAULT_BLOCK_SIZE = 10000
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
 # http://arxiv.org/abs/1309.2975
 
@@ -127,6 +127,8 @@ def get_parser():
     parser.add_argument('-d', '--dump-frequency', dest='dump_frequency',
                         type=int, help='dump k-mer counting table every d '
                         'files', default=-1)
+    parser.add_argument('-b', '--lock_block_size', dest='block_size',
+                        type=int, default=DEFAULT_BLOCK_SIZE)
     parser.add_argument('-o', '--out', metavar="filename",
                         dest='single_output_filename',
                         default='', help='only output a single'
@@ -166,6 +168,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
                                          args.n_tables)
 
+    htable.init_threadsafe(args.block_size)
     diginorm = AsyncDiginorm(htable)
 
     if args.paired:

@@ -60,7 +60,7 @@ public:
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
-        init_threadstuff();
+        //init_threadstuff();
     }
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
@@ -69,7 +69,7 @@ public:
     {
 
         _allocate_counters();
-        init_threadstuff();
+        //init_threadstuff();
     }
 
     virtual ~CountingHash()
@@ -89,11 +89,11 @@ public:
         }
     }
 
-    virtual void init_threadstuff() {
+    virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {
         _threadsafe = true;
         HashIntoType _max_size = _tablesizes.back();
-        _n_table_blocks = (_max_size < TABLE_BLOCK_SIZE) ? 1 : (_max_size / TABLE_BLOCK_SIZE);
-        //std::cout << "Table blocks: " << _n_table_blocks << std::endl;
+        _n_table_blocks = (_max_size < block_size) ? 1 : (_max_size / block_size);
+        std::cout << "Table lock blocks: " << _n_table_blocks << std::endl;
         _table_spinlocks = new uint32_t[_n_table_blocks];
         for (unsigned int i=0; i<_n_table_blocks; ++i) {
             _table_spinlocks[i] = 0;

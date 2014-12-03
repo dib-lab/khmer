@@ -31,7 +31,7 @@ static inline timespec timediff(timespec start, timespec end)
     return temp;
 }
 
-#define TIMING 0
+#define TIMING 1
 #if TIMING
 #define TSTART() clock_gettime(CLOCK_MONOTONIC, &start_t);
 #define TEND(dest) clock_gettime(CLOCK_MONOTONIC, &end_t); \

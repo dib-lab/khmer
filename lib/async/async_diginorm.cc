@@ -108,7 +108,7 @@ void AsyncDiginorm::consume() {
                 #endif
                 #if(TIMING)
                 lock_stdout();
-                std::cout << reader_pop_wait << "\t" << output_push_wait << "\t" << write_wait << std::endl;
+                std::cout << "\tRead time: " << reader_pop_wait << "\n\tOutput time: " << output_push_wait << "\n\tWrite time: " << write_wait << std::endl;
                 unlock_stdout();
                 #endif
                 _workers_running = false;

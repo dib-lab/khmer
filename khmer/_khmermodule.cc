@@ -653,6 +653,20 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
     PyObject * self,
     PyObject * args);
 
+static PyObject * hash_init_threadsafe(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    unsigned int block_size;
+    if(!PyArg_ParseTuple(args, "I", &block_size)) {
+        return NULL;
+    }
+    counting->init_threadstuff(block_size);
+
+    Py_RETURN_NONE;
+}
+
 static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1350,6 +1364,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
     { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
     { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
+    { "init_threadsafe", hash_init_threadsafe, METH_VARARGS, "" },
     { "n_unique_kmers", hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
     { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
     { "n_entries", hash_n_entries, METH_VARARGS, "" },
