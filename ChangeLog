@@ -1,4 +1,4 @@
-2014-12-02  Michael R. Crusoe  <mcrusoe@msu.edu>
+2014-12-09  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
     newly found read dropping issue
