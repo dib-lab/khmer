@@ -15,7 +15,23 @@ void AsyncDiginorm::start(const std::string &filename,
     _cutoff = cutoff;
     _n_kept = 0;
     _n_hashes_pushed = 0;
+
     AsyncSequenceProcessor::start(filename, paired, n_threads);
+}
+
+void AsyncDiginorm::stop() {
+    #if(VERBOSITY)
+    lock_stdout();
+    std::cout << "Done processing (" << _n_processed 
+        << " reads). Waiting for writeout" << std::endl;
+    unlock_stdout();
+    #endif
+    #if(TIMING)
+    lock_stdout();
+    std::cout << "\n** TIMINGS **\n\tRead time: " << reader_pop_wait_global << "\n\tOutput time: " << output_push_wait_global << "\n\tWrite time: " << write_wait_global << std::endl << std::endl;
+    unlock_stdout();
+    #endif
+    AsyncSequenceProcessor::stop();
 }
 
 unsigned int AsyncDiginorm::n_kept() {
@@ -45,8 +61,6 @@ bool AsyncDiginorm::filter_paired(ReadBatchPtr batch) {
     filter_first = filter_single(batch->first());
     return filter_first && filter_single(batch->second());
 }
-
-
 
 void AsyncDiginorm::consume() {
 
@@ -100,17 +114,6 @@ void AsyncDiginorm::consume() {
             __sync_fetch_and_add(&_n_processed, _batchsize);
         } else {
             if (!is_parsing() && (_n_processed >= _n_parsed)) {
-                #if(VERBOSITY)
-                lock_stdout();
-                std::cout << "Done processing (" << _n_processed 
-                    << " reads). Waiting for writeout" << std::endl;
-                unlock_stdout();
-                #endif
-                #if(TIMING)
-                lock_stdout();
-                std::cout << "\tRead time: " << reader_pop_wait << "\n\tOutput time: " << output_push_wait << "\n\tWrite time: " << write_wait << std::endl << std::endl;
-                unlock_stdout();
-                #endif
                 _workers_running = false;
             }
         }
@@ -120,5 +123,13 @@ void AsyncDiginorm::consume() {
     lock_stdout();
     std::cout << "\nReturning from AsyncDiginorm worker..." << std::endl;
     unlock_stdout();
+    #endif
+
+    #if(TIMING)
+    while(!__sync_bool_compare_and_swap( &_timing_lock, 0, 1));
+    output_push_wait_global += output_push_wait;
+    reader_pop_wait_global += reader_pop_wait;
+    write_wait_global += write_wait;
+    __sync_bool_compare_and_swap( &_timing_lock, 1, 0);
     #endif
 }

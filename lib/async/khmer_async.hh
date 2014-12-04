@@ -35,7 +35,7 @@ static inline timespec timediff(timespec start, timespec end)
 #if TIMING
 #define TSTART() clock_gettime(CLOCK_MONOTONIC, &start_t);
 #define TEND(dest) clock_gettime(CLOCK_MONOTONIC, &end_t); \
-                   dest+= (timediff(start_t, end_t).tv_nsec / 1000000000.0);
+                   dest += (timediff(start_t, end_t).tv_nsec / 1000000000.0);
 #else
 #define TSTART()
 #define TEND(dest)
