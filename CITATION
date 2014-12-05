@@ -108,8 +108,8 @@ K-mer counting
 The abundance-dist.py, filter-abund.py, and load-into-counting.py scripts
 implement the probabilistic k-mer counting described in:
 
-   These are not the k-mers you are looking for: efficient online k-mer
-   counting using a probabilistic data structure
+   These Are Not the K-mers You Are Looking For: Efficient Online K-mer
+   Counting Using a Probabilistic Data Structure
    Zhang Q, Pell J, Canino-Koning R, Howe AC, Brown CT.
    doi: 10.1371/journal.pone.0101271
 
