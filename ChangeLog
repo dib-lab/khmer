@@ -1,3 +1,9 @@
+2014-12-05  Brian Wyss  <wyssbria@msu.edu>
+
+    * tests/test_scripts.py: added four new tests:
+    load_into_counting_multifile(), test_abundance_dist_single_nosquash(),
+    test_abundance_dist_single_savehash, test_filter_abund_2_singlefile
+
 2014-12-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * CITATIONS,khmer/khmer_args.py: update citations for Qingpeng's paper
