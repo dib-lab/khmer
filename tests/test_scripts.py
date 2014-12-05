@@ -74,7 +74,8 @@ def test_load_into_counting_multifile():
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
-    args.extend([outfile, infile])
+    args.extend([outfile, infile, infile, infile, infile, infile, \
+            infile, infile, infile, infile, infile, infile])
 
     (status, out, err) = utils.runscript(script, args)
     assert 'Total number of unique k-mers: 95' in err, err
