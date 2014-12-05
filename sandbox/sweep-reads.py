@@ -191,7 +191,8 @@ def get_parser():
     parser.add_argument(dest='input_fastp', help='Reference fasta or fastp')
     parser.add_argument('input_files', nargs='+',
                         help='Reads to be swept and sorted')
-
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -224,13 +225,13 @@ def main():
     buf_size = args.buffer_size
     max_reads = args.max_reads
 
-    check_file_status(args.input_fastp)
+    check_file_status(args.input_fastp, args.force)
     check_valid_file_exists(args.input_files)
     all_input_files = [input_fastp]
     all_input_files.extend(args.input_files)
 
     # Check disk space availability
-    check_space(all_input_files)
+    check_space(all_input_files, args.force)
 
     # figure out input file type (FA/FQ) -- based on first file
     ix = iter(screed.open(args.input_files[0]))

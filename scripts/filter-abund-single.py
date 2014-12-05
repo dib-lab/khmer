@@ -56,16 +56,18 @@ def get_parser():
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
 def main():
     info('filter-abund-single.py', ['counting'])
     args = get_parser().parse_args()
-    check_file_status(args.datafile)
-    check_space([args.datafile])
+    check_file_status(args.datafile, args.force)
+    check_space([args.datafile],args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
     report_on_config(args)
 
     print >>sys.stderr, 'making k-mer counting table'

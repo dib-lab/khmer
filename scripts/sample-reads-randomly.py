@@ -84,9 +84,9 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.filenames)
+    check_space(args.filenames, args.force)
 
     # seed the random number generator?
     if args.random_seed:

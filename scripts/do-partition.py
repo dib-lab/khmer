@@ -110,9 +110,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     report_on_config(args, hashtype='hashbits')
 
     for infile in args.input_filenames:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    check_space(args.input_filenames)
+    check_space(args.input_filenames, args.force)
 
     print >>sys.stderr, 'Saving k-mer presence table to %s' % args.graphbase
     print >>sys.stderr, 'Loading kmers from sequences in %s' % \

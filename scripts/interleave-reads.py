@@ -73,9 +73,9 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.infiles)
+    check_space(args.infiles, args.force)
 
     s1_file = args.infiles[0]
     if len(args.infiles) == 2:

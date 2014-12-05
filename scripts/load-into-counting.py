@@ -78,10 +78,10 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-	check_file_status(name)
+	check_file_status(name, args.force)
 
-    check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize)
+    check_space(args.input_sequence_filename, args.force)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
 
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)

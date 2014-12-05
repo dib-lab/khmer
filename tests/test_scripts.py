@@ -36,7 +36,7 @@ def teardown():
 def test_check_space():
     # @CTB this probably belongs in a new test file, along with other
     # tests of the file.py module.
-    khmer.file.check_space(['', utils.get_test_data('test-abund-read-2.fa')])
+    khmer.file.check_space(['', utils.get_test_data('test-abund-read-2.fa')], False)
 
 
 def test_load_into_counting():
@@ -1555,7 +1555,7 @@ def test_sample_reads_randomly_S():
     badargs = list(args)
     badargs.extend(['-o', 'test', 'test.fq', 'test.fq'])
     (status, out, err) = utils.runscript(script, badargs, in_dir, fail_ok=True)
-    assert status == -1, (status, out, err)
+    assert status == 1, (status, out, err)
 
     args.append('test.fq')
 

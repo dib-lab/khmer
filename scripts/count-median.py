@@ -51,6 +51,8 @@ def get_parser():
                         help='output summary filename')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -64,9 +66,9 @@ def main():
 
     infiles = [htfile, input_filename]
     for infile in infiles:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     print >>sys.stderr, 'loading k-mer counting table from', htfile
     htable = khmer.load_counting_hash(htfile)

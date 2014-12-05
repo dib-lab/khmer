@@ -42,6 +42,8 @@ def get_parser():
     parser.add_argument('infile')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -51,9 +53,9 @@ def main():
 
     infile = args.infile
 
-    check_file_status(infile)
+    check_file_status(infile, args.force)
     filenames = [infile]
-    check_space(filenames)
+    check_space(filenames, args.force)
 
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'
