@@ -75,8 +75,8 @@ def test_load_into_counting_multifile():
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
-    args.extend([outfile, infile, infile, infile, infile, infile, \
-            infile, infile, infile, infile, infile, infile])
+    args.extend([outfile, infile, infile, infile, infile, infile,
+                 infile, infile, infile, infile, infile, infile])
 
     (status, out, err) = utils.runscript(script, args)
     assert 'Total number of unique k-mers: 95' in err, err
@@ -257,8 +257,8 @@ def test_filter_abund_2_singlefile():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('filter-abund-single.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', '--savetable',\
-	tabfile,  infile]
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', '--savetable',
+            tabfile, infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
 
     assert 'Total number of unique k-mers: 98' in err, err
@@ -272,7 +272,7 @@ def test_filter_abund_2_singlefile():
 
 
 def test_filter_abund_4_retain_low_abund():
-# test that the -V option does not trim sequences that are low abundance
+    # test that the -V option does not trim sequences that are low abundance
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -1247,8 +1247,8 @@ def test_abundance_dist_single_savetable():
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
 
     script = scriptpath('abundance-dist-single.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--savetable',\
-	 tabfile, infile, outfile]
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--savetable',
+            tabfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     fp = iter(open(outfile))
