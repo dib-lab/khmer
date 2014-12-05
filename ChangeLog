@@ -1,7 +1,10 @@
+2014-12-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * CITATIONS,khmer/khmer_args.py: update citations for Qingpeng's paper
+
 2014-12-01  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/roadmap.txt: Explain the roadmap to v2 through v4
-
 
 2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
 
