@@ -31,6 +31,8 @@ DEFAULT_K = 32
 DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
+# see Zhang et al., http://arxiv.org/abs/1309.2975
+MAX_FALSE_POSITIVE_RATE = 0.8             
 
 def output_single(read, trim_at=None):
     name = read.name
@@ -152,6 +154,8 @@ def main():
         print '%s: kept aside %d of %d from first pass, in %s' % \
               (filename, save_pass2, n, filename)
 
+    skipped_n = 0
+    skipped_bp = 0
     for orig_filename, pass2filename, trimfilename in pass2list:
         print 'second pass: looking at sequences kept aside in %s' % \
               pass2filename
@@ -176,7 +180,9 @@ def main():
             else:
                 trimfp.write(output_single(read))
                 wrote_reads += 1
-                wrote_bp += trim_at
+                wrote_bp += len(read)
+                skipped_n += 1
+                skipped_bp += len(read)
 
         print 'removing %s' % pass2filename
         os.unlink(pass2filename)
@@ -189,7 +195,24 @@ def main():
     print 'removed %d reads and trimmed %d reads' % (read_reads - wrote_reads,\
                                                      trimmed_reads,)
     print 'trimmed or removed %.2f%% of bases (%d total)' % ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
-    print 'output in *.abundtrim'
+    if args.variable_coverage:
+        print 'skipped %d reads/%d bases because of low coverage' % \
+              (skipped_n, skipped_bp)
+        print 'output in *.abundtrim'
+
+    fp_rate = khmer.calc_expected_collisions(ht)
+    print >>sys.stderr, \
+          'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+
+    if fp_rate > MAX_FALSE_POSITIVE_RATE:
+        print >> sys.stderr, "**"
+        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
+                              " for this data set. Increase tablesize/# "
+                              "tables.")
+        print >> sys.stderr, "**"
+        print >> sys.stderr, "** Do not use these results!!"
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
