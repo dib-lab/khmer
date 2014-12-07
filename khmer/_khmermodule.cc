@@ -1999,9 +1999,9 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
 
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
-		
-		// cppcheck-suppress unreadVariable
-    HashIntoType * dist = NULL;  
+
+    // cppcheck-suppress unreadVariable
+    HashIntoType * dist = NULL;
 
     Py_BEGIN_ALLOW_THREADS
     dist = counting->abundance_distribution(rparser, hashbits);

@@ -165,10 +165,10 @@ public:
 
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
-	    Byte current_count = _counts[ i ][ bin ];
-	    if (is_new_kmer && current_count != 0) {
-	      is_new_kmer = false;
-	    }
+            Byte current_count = _counts[ i ][ bin ];
+            if (is_new_kmer && current_count != 0) {
+                is_new_kmer = false;
+            }
             // NOTE: Technically, multiple threads can cause the bin to spill
             //	 over max_count a little, if they all read it as less than
             //	 max_count before any of them increment it.
@@ -194,9 +194,9 @@ public:
             __sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
         }
 
-	if (is_new_kmer) {
-	  __sync_add_and_fetch(&_n_unique_kmers, 1);
-	}
+        if (is_new_kmer) {
+            __sync_add_and_fetch(&_n_unique_kmers, 1);
+        }
 
     } // count
 

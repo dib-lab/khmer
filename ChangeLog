@@ -1,9 +1,32 @@
+2014-12-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * CITATIONS,khmer/khmer_args.py: update citations for Qingpeng's paper
+
+2014-12-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/roadmap.txt: Explain the roadmap to v2 through v4
+
+2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
+
+    * tests/test_scripts.py: Stop a test from making a temporary output file
+    in the current dir by explictly specifying an output file.
+
+2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
+
+    * load-into-counting.py: Add a CLI parameter to output a machine-readable
+    summary of the run, including number of k-mers, FPR, input files etc in
+    json or TSV format.
+
+2014-12-01  Titus Brown  <t@idyll.org>
+
+    * Update sandbox docs: some scripts now used in recipes
+
 2014-11-23  Phillip Garland  <pgarland@gmail.com>
 
-	* lib/khmer.hh (khmer): define KSIZE_MAX
-	* khmer/_khmermodule.cc (forward_hash, forward_hash_no_rc)
-	(reverse_hash): Use KSIZE_MAX to check whether the user-supplied k
-	is larger than khmer supports
+    * lib/khmer.hh (khmer): define KSIZE_MAX
+    * khmer/_khmermodule.cc (forward_hash, forward_hash_no_rc) (reverse_hash):
+    Use KSIZE_MAX to check whether the user-supplied k is larger than khmer
+    supports.
 
 2014-11-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
@@ -12,7 +35,8 @@
 
 2014-11-18  Jonathan Gluck  <jdg@cs.umd.edu>
 
-    * tests/test_counting_hash.py: Fixed copy paste error in comments, True to False.
+    * tests/test_counting_hash.py: Fixed copy paste error in comments, True to
+    False.
 
 2014-11-15  Jacob Fenton  <bocajnotnef@gmail.com>
 

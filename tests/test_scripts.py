@@ -7,6 +7,7 @@
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
+import json
 import sys
 import os
 import shutil
@@ -64,6 +65,71 @@ def test_load_into_counting_fail():
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert status == 1, status
     assert "ERROR:" in err
+
+
+def test_load_into_counting_tsv():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
+
+    outfile = utils.get_temp_filename('out.kh')
+    tabfile = outfile + '.info.tsv'
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+    assert os.path.exists(tabfile)
+    with open(tabfile) as tabfh:
+        tabfile_lines = tabfh.readlines()
+    assert len(tabfile_lines) == 2
+    outbase = os.path.basename(outfile)
+    expected_tsv_line = '\t'.join([outbase, '0.000', '95', infile]) + '\n'
+    assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
+
+
+def test_load_into_counting_json():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
+
+    outfile = utils.get_temp_filename('out.kh')
+    jsonfile = outfile + '.info.json'
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+    assert os.path.exists(jsonfile)
+
+    with open(jsonfile) as jsonfh:
+        got_json = json.load(jsonfh)
+    outbase = os.path.basename(outfile)
+    expected_json = {
+        "files": [infile],
+        "ht_name": outbase,
+        "num_kmers": 95,
+        "fpr": 9.024965705097741e-11,
+        "mrinfo_version": "0.1.0",
+    }
+
+    assert got_json == expected_json, got_json
+
+
+def test_load_into_counting_bad_summary_fmt():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
+
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0, status
+    assert "invalid choice: 'badfmt'" in err, err
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
@@ -270,11 +336,12 @@ def test_filter_stoptags():
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.kh')
+    outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = scriptpath('normalize-by-median.py')
-    args = ['--loadtable', hashfile, infile]
+    args = ['--loadtable', hashfile, '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
-    print(out, err)
+    assert os.path.exists(outfile)
 
 
 def test_normalize_by_median():
