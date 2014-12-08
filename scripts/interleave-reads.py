@@ -30,10 +30,10 @@ from khmer.khmer_args import info
 
 
 def output_pair(read1, read2):
-    if hasattr(read1, 'accuracy'):
+    if hasattr(read1, 'quality'):
         return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
-            (read1.name, read1.sequence, read1.accuracy,
-             read2.name, read2.sequence, read2.accuracy)
+            (read1.name, read1.sequence, read1.quality,
+             read2.name, read2.sequence, read2.quality)
     else:
         return ">%s\n%s\n>%s\n%s\n" % (read1.name, read1.sequence, read2.name,
                                        read2.sequence)

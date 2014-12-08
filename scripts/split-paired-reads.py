@@ -64,7 +64,7 @@ def main():
     is_fastq = False
     record = iter(screed.open(infile)).next()
 
-    if hasattr(record, 'accuracy'):
+    if hasattr(record, 'quality'):
         is_fastq = True
 
     counter1 = 0
@@ -79,7 +79,7 @@ def main():
             if is_fastq:
                 print >> fp_out1, '@%s\n%s\n+\n%s' % (record.name,
                                                       record.sequence,
-                                                      record.accuracy)
+                                                      record.quality)
             else:
                 print >> fp_out1, '>%s\n%s' % (record.name, record.sequence,)
             counter1 += 1
@@ -87,7 +87,7 @@ def main():
             if is_fastq:
                 print >> fp_out2, '@%s\n%s\n+\n%s' % (record.name,
                                                       record.sequence,
-                                                      record.accuracy)
+                                                      record.quality)
             else:
                 print >> fp_out2, '>%s\n%s' % (record.name, record.sequence,)
             counter2 += 1

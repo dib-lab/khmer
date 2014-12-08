@@ -44,12 +44,12 @@ def main():
         for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
                 # FASTQ
-                if hasattr(record, 'accuracy'):
+                if hasattr(record, 'quality'):
                     outfp.write(
                         '@{name}\n{seq}\n'
                         '+\n{acc}\n'.format(name=record.name,
                                             seq=record.sequence,
-                                            acc=record.accuracy))
+                                            acc=record.quality))
 
                 # FASTA
                 else:

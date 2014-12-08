@@ -52,10 +52,10 @@ def fmt_fasta(name, seq, labels=[]):
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq)
 
 
-def fmt_fastq(name, seq, accuracy, labels=[]):
+def fmt_fastq(name, seq, quality, labels=[]):
     return '@{name}\t{labels}\n{seq}\n+\n{acc}\n'.format(
         name=name, labels='\t'.join([str(l) for l in labels]), seq=seq,
-        acc=accuracy)
+        acc=quality)
 
 
 class ReadBuffer(object):
@@ -238,7 +238,7 @@ def main():
     del ix
 
     extension = 'fa'
-    if hasattr(record, 'accuracy'):      # fastq!
+    if hasattr(record, 'quality'):      # fastq!
         extension = 'fq'
 
     output_buffer = ReadBufferManager(
@@ -283,11 +283,11 @@ def main():
                     ht.consume_sequence_and_tag_with_labels(record.sequence,
                                                             label)
 
-                    if hasattr(record, 'accuracy'):
-                        outfp.write('@{name}\n{seq}+{accuracy}\n'.format(
+                    if hasattr(record, 'quality'):
+                        outfp.write('@{name}\n{seq}+{quality}\n'.format(
                             name=record.name,
                             seq=record.sequence,
-                            accuracy=record.accuracy))
+                            quality=record.quality))
                     else:
                         outfp.write('>{name}\n{seq}\n'.format(
                             name=record.name,
@@ -345,8 +345,8 @@ def main():
                 except ValueError as e:
                     pass
                 else:
-                    if hasattr(record, 'accuracy'):
-                        seq_str = fmt_fastq(name, seq, record.accuracy, labels)
+                    if hasattr(record, 'quality'):
+                        seq_str = fmt_fastq(name, seq, record.quality, labels)
                     else:
                         seq_str = fmt_fasta(name, seq, labels)
                     label_number_dist.append(len(labels))

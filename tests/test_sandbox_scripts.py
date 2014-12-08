@@ -113,10 +113,10 @@ def test_sweep_reads_fq():
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
 
-    seqs1 = set([r.accuracy for r in screed.open(out1)])
-    seqs2 = set([r.accuracy for r in screed.open(out2)])
-    seqsm = set([r.accuracy for r in screed.open(mout)])
-    seqso = set([r.accuracy for r in screed.open(oout)])
+    seqs1 = set([r.quality for r in screed.open(out1)])
+    seqs2 = set([r.quality for r in screed.open(out2)])
+    seqsm = set([r.quality for r in screed.open(mout)])
+    seqso = set([r.quality for r in screed.open(oout)])
 
 
 def test_sweep_reads_2():
