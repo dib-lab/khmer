@@ -1,3 +1,8 @@
+2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/user/known_issues.txt: Document that multithreading leads to dropped
+    reads.
+
 2014-12-07  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     This is khmer v1.2
