@@ -20,6 +20,8 @@ def check_file_status(file_path):
     and sys.exit(1) is called
     """
 
+    if file_path is '-':
+        return
     mode = os.stat(file_path).st_mode
     # block devices will be nonzero
     if S_ISBLK(mode) or S_ISFIFO(mode):

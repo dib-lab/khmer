@@ -60,7 +60,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KMerIterator kmers(s.c_str(), _ksize);
 
-    BoundedCounterType min_count = MAX_COUNT;
+    BoundedCounterType min_count = MAX_KCOUNT;
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();

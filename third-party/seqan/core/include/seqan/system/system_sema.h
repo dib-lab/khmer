@@ -37,6 +37,9 @@
 #ifndef SEQAN_HEADER_SYSTEM_SEMAPHORE_H
 #define SEQAN_HEADER_SYSTEM_SEMAPHORE_H
 
+#include <semaphore.h>
+#include <fcntl.h>
+
 namespace SEQAN_NAMESPACE_MAIN
 {
 
@@ -90,7 +93,6 @@ namespace SEQAN_NAMESPACE_MAIN
     };
 
 #else
-
     struct Semaphore
     {
         typedef unsigned int Type;
@@ -101,13 +103,16 @@ namespace SEQAN_NAMESPACE_MAIN
         Semaphore(Type init = 0):
             hSemaphore(&data)
         {
-            bool res = !sem_init(hSemaphore, 0, init);
+            hSemaphore = sem_open("/hSemaphore", O_CREAT);
+            bool res = (hSemaphore == SEM_FAILED);
             (void)res;  // Only used in assertion.
             SEQAN_ASSERT(res);
         }
 
         ~Semaphore() {
-            bool res = sem_destroy(hSemaphore);
+            int closed = sem_close(hSemaphore);
+            int unlinked = sem_unlink("/hSemaphore");
+            bool res = (!closed ||! unlinked);
             (void)res;  // Only used in assertion.
             SEQAN_ASSERT(res);
         }

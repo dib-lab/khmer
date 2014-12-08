@@ -122,12 +122,18 @@ public:
         GFF,
         GTF
     };
-
+#if __cplusplus <= 199711L
+    // C++98
     std::auto_ptr<std::fstream> _stream;
+    std::auto_ptr<TReader_> _reader;
+#else  // #if __cplusplus <= 199711L
+    // C++11
+    std::unique_ptr<std::fstream> _stream;
+    std::unique_ptr<TReader_> _reader;
+#endif  // #if __cplusplus <= 199711L
     std::ostream * _outStream;
     std::istream * _inStream;
     CharString _filename;
-    std::auto_ptr<TReader_> _reader;
     Mode _mode;
     FileFormat fileFormat;
     int _error;

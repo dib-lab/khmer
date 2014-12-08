@@ -94,9 +94,9 @@ template <typename TSequence>
 inline typename Value<TSequence>::Type
 sum(TSequence const &seq, Serial)
 {
-    register typename Iterator<TSequence const>::Type it = begin(seq, Standard());
-    register typename Iterator<TSequence const>::Type itEnd = end(seq, Standard());
-    register typename Value<TSequence>::Type sum = 0;
+    typename Iterator<TSequence const>::Type it = begin(seq, Standard());
+    typename Iterator<TSequence const>::Type itEnd = end(seq, Standard());
+    typename Value<TSequence>::Type sum = 0;
     for (; it != itEnd; ++it)
         sum += *it;
     return sum;
@@ -108,7 +108,7 @@ sum(TSequence const &seq, Tag<TParallelTag> parallelTag)
 {
     Splitter<typename Size<TSequence>::Type> splitter(0, length(seq), parallelTag);
 
-    register typename Value<TSequence>::Type threadSum = 0;
+    typename Value<TSequence>::Type threadSum = 0;
     SEQAN_OMP_PRAGMA(parallel for reduction(+:threadSum))
     for (int job = 0; job < (int)length(splitter); ++job)
         threadSum += sum(infix(seq, splitter[job], splitter[job + 1]), Serial());
@@ -175,10 +175,10 @@ partialSum(TTarget &target, TSource const &source, Tag<TParallelTag> parallelTag
     SEQAN_OMP_PRAGMA(parallel for)
     for (int job = 0; job < (int)length(splitter); ++job)
     {
-        register TConstIterator it = begin(source, Standard()) + splitter[job];
-        register TConstIterator itEnd = begin(source, Standard()) + splitter[job + 1];
-        register TIterator dstIt = begin(target, Standard()) + splitter[job];
-        register TValue sum = localSums[job];
+        TConstIterator it = begin(source, Standard()) + splitter[job];
+        TConstIterator itEnd = begin(source, Standard()) + splitter[job + 1];
+        TIterator dstIt = begin(target, Standard()) + splitter[job];
+        TValue sum = localSums[job];
         for (; it != itEnd; ++it, ++dstIt)
         {
             sum += *it;
