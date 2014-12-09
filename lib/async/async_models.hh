@@ -119,6 +119,25 @@ class Async {
         }
 };
 
+/*
+template <class T> class AsyncRRProducer: public virtual Async {
+
+    protected:
+        std::vector<queue<T, Cap> * > _out_queues;
+        bool _open_slots;
+    
+    public:
+        AsyncRRProducer():
+            Async() {
+            _open_slots = 0;
+        }
+
+        void start(unsigned int n_threads) {
+            _out_queues.clear();
+            for (unsigned int q=0; q<n_threads; 
+        }
+*/
+
 // Consumer model: draws items off an input queue and does stuff
 template <class T> class AsyncConsumer: public virtual Async {
 
