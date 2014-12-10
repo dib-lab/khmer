@@ -346,10 +346,7 @@ void HLLCounter::consume_fasta(
                 HLLCounter *newc = new HLLCounter(this->p, this->_ksize);
                 counters[i] = newc;
             }
-        }
 
-        #pragma omp single
-        {
             while (!parser->is_complete()) {
                 // Iterate through the reads and consume their k-mers.
                 try {
