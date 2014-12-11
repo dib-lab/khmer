@@ -980,7 +980,7 @@ def test_extract_partitions_fq():
     parts = set(parts)
     assert len(parts) == 1, len(parts)
 
-    quals = set([r.accuracy for r in screed.open(partfile)])
+    quals = set([r.quality for r in screed.open(partfile)])
     quals = list(quals)
     assert quals[0], quals
 
@@ -1359,7 +1359,7 @@ def test_extract_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1367,7 +1367,7 @@ def test_extract_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1431,7 +1431,7 @@ def test_split_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1439,7 +1439,7 @@ def test_split_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
