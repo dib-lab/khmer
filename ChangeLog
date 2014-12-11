@@ -9,7 +9,7 @@
 
     * khmer/{__init__.py,_khmermodule.cc}: removed the Config object, the
     threads argument to new_counting_hash, and adapted to other changes in API.
-    Droped the unused _dump_report_fn method. Enhanced error reporting.
+    Dropped the unused _dump_report_fn method. Enhanced error reporting.
     * lib/{bittest,consume_prof,error,khmer_config,scoringmatrix,thread_id_map}
     .{cc,hh},tests/test_khmer_config.py: deleted unused files
     * sandbox/collect-reads.py,scripts/{abundance-dist-single,do-partition,
