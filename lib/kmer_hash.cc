@@ -138,13 +138,11 @@ HashIntoType _hash_murmur(const std::string kmer,
 {
     HashIntoType out[2];
     uint32_t seed = 0;
-
-    khmer::_hash(kmer.c_str(), kmer.size(), h, r);
-
-    MurmurHash3_x64_128(&h, sizeof(h), seed, &out);
+    MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
     h = out[0];
 
-    MurmurHash3_x64_128(&r, sizeof(r), seed, &out);
+    std::string rev = khmer::_revcomp(kmer);
+    MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
     r = out[0];
 
     return h ^ r;
