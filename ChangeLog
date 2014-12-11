@@ -1,9 +1,17 @@
+2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/user/known_issues.txt: Document that multithreading leads to dropped
+    reads.
+
 2014-12-07  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    This is khmer v1.2
 
     * Makefile: add sandbox scripts to the pylint_report.txt target
     * doc/dev/coding-guidelines-and-review.txt: Add question about command
     line API to the checklist
     * doc/dev/release.txt: refresh release procedure
+    * doc/release-notes/release-1.2.md
 
 2014-12-05  Michael R. Crusoe  <mcrusoe@msu.edu>
 
