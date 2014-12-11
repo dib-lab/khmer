@@ -11,12 +11,12 @@
 
 // Must be first.
 #include <Python.h>
-#include "hashtable.hh"
 
 #include <iostream>
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
+#include "hashtable.hh"
 #include "hashbits.hh"
 #include "counting.hh"
 #include "read_aligner.hh"
