@@ -3,6 +3,12 @@
 Known Issues
 ============
 
+Multithreaded reading will drop reads. This major issue has been present for
+several khmer releases and was only found via a much larger test case that we
+had been previously using. Credit to @camillescott. Workaround: disable
+threading. The next release will fix this and the other FAST[AQ] parsing
+issues. https://github.com/ged-lab/khmer/issues/681
+
 Some users have reported that normalize-by-median.py will utilize more
 memory than it was configured for. This is being investigated in
 https://github.com/ged-lab/khmer/issues/266
