@@ -5,7 +5,6 @@
 # three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
 
 """
 Single entry point script for khmer
@@ -13,9 +12,14 @@ Single entry point script for khmer
 
 import argparse
 import sys
+from oxli import test
+from oxli import fq2fa
 
 
 def get_parser():
+    """
+    returns the parser object for the oxli subcommand handler
+    """
     parser = argparse.ArgumentParser(
         description='Single entry point script for khmer',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -33,26 +37,30 @@ def get_parser():
                               ' FASTA sequence file.',
                               type=argparse.FileType('w'),
                               default=sys.stdout)
-    parser_fq2fa.add_argument('-n', '--n_keep', default=False, action='store_true',
-                              help='Option to drop reads containing \'N\'s in ' +
-                              'input_sequence file.')
+    parser_fq2fa.add_argument('-n', '--n_keep', default=False,
+                              action='store_true', help='Option to drop reads containing \'N\'s \
+            in input_sequence file.')
     parser_fq2fa.set_defaults(func=fastq_to_fasta)
 
     return parser
 
 
 def fastq_to_fasta(args):
-    from oxli import test
-    from oxli import fq2fa
-    print(args)
-    print("Hello from fastq!")
+    """
+    fastq_to_fasta subcommand handler function
+    """
+    print args
+    print "Hello from fastq!"
     test.do_test()
     fq2fa.do_fastq_to_fasta(args)
 
 
 def main():
+    """
+    main function; does the parsing and kicks off the subcommand
+    """
     args = get_parser().parse_args()
-    print("Hello from main!")
+    print "Hello from main!"
     args.func(args)
 
 if __name__ == '__main__':

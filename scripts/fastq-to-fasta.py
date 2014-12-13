@@ -17,6 +17,7 @@ Use '-h' for parameter help.
 import sys
 import argparse
 import screed
+from oxli import fq2fa
 
 
 def get_parser():
@@ -39,33 +40,7 @@ def get_parser():
 
 def main():
     args = get_parser().parse_args()
-    print >> sys.stderr, ('fastq from ', args.input_sequence)
-
-    n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence)):
-        if n % 10000 == 0:
-            print>>sys.stderr, '...', n
-
-        sequence = record['sequence']
-        name = record['name']
-
-        if 'N' in sequence:
-            if not args.n_keep:
-                n_count += 1
-                continue
-
-        args.output.write('>' + name + '\n')
-        args.output.write(sequence + '\n')
-
-    print >> sys.stderr, '\n' + 'lines from ' + args.input_sequence
-
-    if not args.n_keep:
-        print >> sys.stderr, str(n_count) + ' lines dropped.'
-
-    else:
-        print >> sys.stderr, 'No lines dropped from file.'
-
-    print >> sys.stderr, 'Wrote output to', args.output
+    fq2fa.do_fastq_to_fasta(args)
 
 if __name__ == '__main__':
     main()
