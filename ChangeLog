@@ -1,3 +1,11 @@
+2014-12-13  Titus Brown  <titus@idyll.org>
+
+    * sandbox/{calc-error-profile.py,collect-variants.py,correct-errors.py,
+    trim-low-abund.py}: Support for k-mer spectral error analysis, sublinear
+    error profile calculations from shotgun data sets, adaptive variant
+    collection based on graphalign, streaming error correction, and streaming
+    error trimming.
+
 2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/user/known_issues.txt: Document that multithreading leads to dropped

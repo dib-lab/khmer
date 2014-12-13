@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -32,7 +32,8 @@ DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
 # see Zhang et al., http://arxiv.org/abs/1309.2975
-MAX_FALSE_POSITIVE_RATE = 0.8             
+MAX_FALSE_POSITIVE_RATE = 0.8
+
 
 def output_single(read, trim_at=None):
     name = read.name
@@ -125,11 +126,11 @@ def main():
         for n, read in enumerate(screed.open(filename)):
             if n % 10000 == 0:
                 print '...', n, filename, save_pass2, read_reads, read_bp, \
-                      wrote_reads, wrote_bp
-                
+                    wrote_reads, wrote_bp
+
             read_reads += 1
             read_bp += len(read.sequence)
-            
+
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
@@ -192,9 +193,10 @@ def main():
 
     print 'read %d reads, %d bp' % (read_reads, read_bp,)
     print 'wrote %d reads, %d bp' % (wrote_reads, wrote_bp,)
-    print 'removed %d reads and trimmed %d reads' % (read_reads - wrote_reads,\
+    print 'removed %d reads and trimmed %d reads' % (read_reads - wrote_reads,
                                                      trimmed_reads,)
-    print 'trimmed or removed %.2f%% of bases (%d total)' % ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
+    print 'trimmed or removed %.2f%% of bases (%d total)' % \
+        ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
     if args.variable_coverage:
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
@@ -202,7 +204,7 @@ def main():
 
     fp_rate = khmer.calc_expected_collisions(ht)
     print >>sys.stderr, \
-          'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+        'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
     if fp_rate > MAX_FALSE_POSITIVE_RATE:
         print >> sys.stderr, "**"

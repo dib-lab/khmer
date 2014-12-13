@@ -1,4 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
+#
+# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2013-2014. It is licensed under
+# the three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+#
 """
 % python scripts/collect-variants.py [ -C <cutoff> ] <data1> <data2> ...
 
@@ -18,8 +24,11 @@ DEFAULT_NORMALIZE_LIMIT = 20
 
 def main():
     parser = build_counting_args()
-    parser.add_argument("-t", "--trusted-cutoff", dest="trusted_cutoff", type=int, default=3)
-    parser.add_argument("--bits-theta", help="Tuning parameter controlling trade off of speed vs alignment sensitivity", default=1.0, type=float, dest="bits_theta")
+    parser.add_argument("-t", "--trusted-cutoff", dest="trusted_cutoff",
+                        type=int, default=3)
+    parser.add_argument("--bits-theta", help="Tuning parameter controlling"
+                        trade off of speed vs alignment sensitivity",
+                        default=1.0, type=float, dest="bits_theta")
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
                         help='base cutoff on abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
@@ -39,8 +48,8 @@ def main():
             args.min_tablesize
         print >>sys.stderr, ''
         print >>sys.stderr, 'Estimated memory usage is %.2g bytes ' \
-            '(n_hashes x min_hashsize)' % (
-            args.n_tables * args.min_tablesize)
+            '(n_hashes x min_hashsize)' % \
+            (args.n_tables * args.min_tablesize)
         print >>sys.stderr, '-' * 8
 
     K = args.ksize
@@ -57,8 +66,8 @@ def main():
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     aligner = khmer.new_readaligner(ht, args.trusted_cutoff, args.bits_theta)
-            
-    if args.details_out != None:
+
+    if args.details_out is not None:
         details_out = open(args.details_out, "w")
     else:
         details_out = None
@@ -85,7 +94,8 @@ def main():
             ##
 
             # build the alignment...
-            score, graph_alignment, read_alignment, truncated = aligner.align(record.sequence)
+            score, graph_alignment, read_alignment, truncated = \
+                aligner.align(record.sequence)
 
             # next, decide whether or to keep it.
             keep = False
@@ -107,14 +117,13 @@ def main():
                 # get the minimum count for this new sequence
                 mincount = ht.get_min_count(graph_seq)
                 if mincount < args.normalize_to:
-#                    print 'mincount is', mincount
                     keep = True
-#                else:
-#                    print 'discard; mincount is', mincount
 
-
-            if details_out != None:
-                details_out.write("+{7}\t{0:0.2f}\t{3}\t{4}\nread:      {6}\ngraph_aln: {1}\nread_aln:  {2}\nstored_seq:{5}\n".format(score, graph_alignment, read_alignment, truncated, keep, seq, record.sequence, record.name))
+            if details_out is not None:
+                details_out.write("+{7}\t{0:0.2f}\t{3}\t{4}\nread:      "
+                     "{6}\ngraph_aln: {1}\nread_aln:  {2}\nstored_seq:{5}\n"
+                     "".format(score, graph_alignment, read_alignment,
+                     truncated, keep, seq, record.sequence, record.name))
 
             if keep:
                 ht.consume(seq)

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 """
@@ -23,7 +23,7 @@ import os.path
 N_HT = 4
 HASHSIZE = 1e7
 K = 20
-C =20
+C = 20
 
 MAX_SEQ_LEN = 65535
 MAX_READS = 1e8
@@ -105,7 +105,7 @@ def main():
                 bp_consumed += len(seq)
             else:
                 # also consume & track up to 2C -- CTB consume only high abnd?
-                if med < 2*C: # @@CTB
+                if med < 2*C:   # @@CTB
                     # keep this, because it reassures us that sufficient
                     # data has been seen.
                     bp2_consumed += len(seq)
@@ -116,7 +116,7 @@ def main():
 
                 if args.errors_per_read:
                     print >>args.errors_per_read, record.name, \
-                          ",".join(map(str, posns))
+                        ",".join(map(str, posns))
 
                 # track the positions => errors
                 for p in posns:
@@ -144,7 +144,7 @@ def main():
     print >>sys.stderr, 'bp consumed:', bp_consumed, bp_consumed / float(C)
     print >>sys.stderr, 'n checked:', n_checked
     print >>sys.stderr, 'error rate: %.2f%%' % \
-          (100.0 * sum(positions) / float(sum(lengths)))
+        (100.0 * sum(positions) / float(sum(lengths)))
 
     print >>sys.stderr, 'Error histogram is in %s' % output_filename
 
