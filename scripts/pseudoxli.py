@@ -11,7 +11,6 @@ Single entry point script for khmer
 """
 
 import argparse
-import sys
 from oxli import fq2fa
 
 
@@ -29,16 +28,7 @@ def get_parser():
     parser_fq2fa = subparsers.add_parser('fastq-to-fasta', help="Converts \
             FASTQ format(.fq) files to FASTA format(.fa)")
 
-    parser_fq2fa.add_argument('input_sequence', help='The name of the input'
-                              ' FASTQ sequence file.')
-    parser_fq2fa.add_argument('-o', '--output', metavar="filename",
-                              help='The name of the output'
-                              ' FASTA sequence file.',
-                              type=argparse.FileType('w'),
-                              default=sys.stdout)
-    parser_fq2fa.add_argument('-n', '--n_keep', default=False,
-                              action='store_true', help='Option to drop reads containing \'N\'s \
-            in input_sequence file.')
+    fq2fa.add_args(parser_fq2fa)
     parser_fq2fa.set_defaults(func=fastq_to_fasta)
 
     return parser

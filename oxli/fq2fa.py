@@ -14,6 +14,19 @@ import argparse
 import screed
 
 
+def add_args(parser):
+    parser.add_argument('input_sequence', help='The name of the input'
+                              ' FASTQ sequence file.')
+    parser.add_argument('-o', '--output', metavar="filename",
+                              help='The name of the output'
+                              ' FASTA sequence file.',
+                              type=argparse.FileType('w'),
+                              default=sys.stdout)
+    parser.add_argument('-n', '--n_keep', default=False,
+                              action='store_true', help='Option to drop reads containing \'N\'s \
+            in input_sequence file.')
+
+
 def do_fastq_to_fasta(args):
     #args = get_parser().parse_args()
     print >> sys.stderr, ('fastq from ', args.input_sequence)

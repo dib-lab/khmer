@@ -24,16 +24,7 @@ def get_parser():
         description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input_sequence', help='The name of the input'
-                        ' FASTQ sequence file.')
-    parser.add_argument('-o', '--output', metavar="filename",
-                        help='The name of the output'
-                        ' FASTA sequence file.',
-                        type=argparse.FileType('w'),
-                        default=sys.stdout)
-    parser.add_argument('-n', '--n_keep', default=False, action='store_true',
-                        help='Option to drop reads containing \'N\'s in ' +
-                        'input_sequence file.')
+    fq2fa.add_args(parser)
     return parser
 
 
