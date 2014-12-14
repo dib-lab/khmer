@@ -1797,7 +1797,7 @@ def test_read_parser_streaming_gzfa():
 
 def test_oxli_fastq_to_fasta():
 
-    script = scriptpath('pseudoxli.py')
+    script = scriptpath('oxli')
     clean_infile = utils.get_temp_filename('test-clean.fq')
     n_infile = utils.get_temp_filename('test-n.fq')
 
