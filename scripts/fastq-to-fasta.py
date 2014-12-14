@@ -16,7 +16,6 @@ Use '-h' for parameter help.
 """
 import sys
 import argparse
-import screed
 from oxli import fq2fa
 
 

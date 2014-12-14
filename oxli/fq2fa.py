@@ -8,10 +8,6 @@
 
 """
 Convert FASTQ files to FASTA format.
-
-% python scripts/fastq-to-fasta.py [ -n -o ] <fastq_name>
-
-Use '-h' for parameter help.
 """
 import sys
 import argparse
@@ -48,5 +44,3 @@ def do_fastq_to_fasta(args):
 
     print >> sys.stderr, 'Wrote output to', args.output
 
-if __name__ == '__main__':
-    main()
