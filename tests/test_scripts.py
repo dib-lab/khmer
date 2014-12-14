@@ -1810,32 +1810,32 @@ def test_oxli_fastq_to_fasta():
     in_dir = os.path.dirname(clean_infile)
     in_dir_n = os.path.dirname(n_infile)
 
-    args = ['fastq-to-fasta', clean_infile, '-n', '-o', clean_outfile]
+    args = ['fastq_to_fasta', clean_infile, '-n', '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert len(out.splitlines()) == 2, len(out.splitlines())
     assert "No lines dropped" in err, err
 
-    args = ['fastq-to-fasta', n_infile, '-n', '-o', n_outfile]
+    args = ['fastq_to_fasta', n_infile, '-n', '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
     assert len(out.splitlines()) == 2
     assert "No lines dropped" in err, err
 
-    args = ['fastq-to-fasta', clean_infile, '-o', clean_outfile]
+    args = ['fastq_to_fasta', clean_infile, '-o', clean_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert len(out.splitlines()) == 2
     assert "0 lines dropped" in err, err
 
-    args = ['fastq-to-fasta', n_infile, '-o', n_outfile]
+    args = ['fastq_to_fasta', n_infile, '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
     assert len(out.splitlines()) == 2, out
     assert "4 lines dropped" in err, err
 
-    args = ['fastq-to-fasta', clean_infile]
+    args = ['fastq_to_fasta', clean_infile]
     (status, out, err) = utils.runscript(script, args, in_dir)
     assert len(out.splitlines()) > 2
     assert "0 lines dropped" in err, err
 
-    args = ['fastq-to-fasta', n_infile]
+    args = ['fastq_to_fasta', n_infile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
     assert len(out.splitlines()) > 2
     assert "4 lines dropped" in err, err

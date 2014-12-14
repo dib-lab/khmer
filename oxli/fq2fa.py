@@ -27,12 +27,12 @@ def add_args(parser):
             in input_sequence file.')
 
 
-def do_fastq_to_fasta(args):
-    #args = get_parser().parse_args()
-    print >> sys.stderr, ('fastq from ', args.input_sequence)
+def do_fastq_to_fasta(input_sequence, output, n_keep):
+    #= get_parser().parse_)
+    print >> sys.stderr, ('fastq from ', input_sequence)
 
     n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence)):
+    for n, record in enumerate(screed.open(input_sequence)):
         if n % 10000 == 0:
             print>>sys.stderr, '...', n
 
@@ -40,20 +40,20 @@ def do_fastq_to_fasta(args):
         name = record['name']
 
         if 'N' in sequence:
-            if not args.n_keep:
+            if not n_keep:
                 n_count += 1
                 continue
 
-        args.output.write('>' + name + '\n')
-        args.output.write(sequence + '\n')
+        output.write('>' + name + '\n')
+        output.write(sequence + '\n')
 
-    print >> sys.stderr, '\n' + 'lines from ' + args.input_sequence
+    print >> sys.stderr, '\n' + 'lines from ' + input_sequence
 
-    if not args.n_keep:
+    if not n_keep:
         print >> sys.stderr, str(n_count) + ' lines dropped.'
 
     else:
         print >> sys.stderr, 'No lines dropped from file.'
 
-    print >> sys.stderr, 'Wrote output to', args.output
+    print >> sys.stderr, 'Wrote output to', output
 

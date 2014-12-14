@@ -22,11 +22,11 @@ def get_parser():
         description='Single entry point script for khmer',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    subparsers = parser.add_subparsers(help='foo')
+    subparsers = parser.add_subparsers()
 
     # sub parser for fastq-to-fasta
-    parser_fq2fa = subparsers.add_parser('fastq-to-fasta', help="Converts \
-            FASTQ format(.fq) files to FASTA format(.fa)")
+    parser_fq2fa = subparsers.add_parser('fastq_to_fasta', help="Converts \
+            FASTQ format (.fq) files to FASTA format (.fa)")
 
     fq2fa.add_args(parser_fq2fa)
     parser_fq2fa.set_defaults(func=fastq_to_fasta)
@@ -38,7 +38,7 @@ def fastq_to_fasta(args):
     """
     fastq_to_fasta subcommand handler function
     """
-    fq2fa.do_fastq_to_fasta(args)
+    fq2fa.do_fastq_to_fasta(args.input_sequence, args.output, args.n_keep)
 
 
 def main():

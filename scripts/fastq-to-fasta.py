@@ -30,7 +30,7 @@ def get_parser():
 
 def main():
     args = get_parser().parse_args()
-    fq2fa.do_fastq_to_fasta(args)
+    fq2fa.do_fastq_to_fasta(args.input_sequence, args.output, args.n_keep)
 
 if __name__ == '__main__':
     main()
