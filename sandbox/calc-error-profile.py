@@ -66,7 +66,7 @@ def main():
     ht = khmer.new_counting_hash(K, HASHSIZE, N_HT)
 
     # initialize list to contain counts of errors by position
-    positions = [0]*MAX_SEQ_LEN
+    positions = [0] * MAX_SEQ_LEN
     lengths = []                  # keep track of sequence lengths
 
     n_consumed = n2_consumed = 0
@@ -105,7 +105,7 @@ def main():
                 bp_consumed += len(seq)
             else:
                 # also consume & track up to 2C -- CTB consume only high abnd?
-                if med < 2*C:   # @@CTB
+                if med < 2 * C:   # @@CTB
                     # keep this, because it reassures us that sufficient
                     # data has been seen.
                     bp2_consumed += len(seq)
@@ -128,7 +128,7 @@ def main():
     lengths.sort()
     max_length = lengths[-1]
 
-    length_count = [0]*max_length
+    length_count = [0] * max_length
     for j in range(max_length):
         length_count[j] = sum([1 for i in lengths if i >= j])
 
