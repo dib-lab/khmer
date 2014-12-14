@@ -1440,11 +1440,13 @@ static PyObject * count_find_spectral_error_positions(PyObject * self,
 
     Py_END_ALLOW_THREADS;
 
-    PyObject * x = PyList_New(posns.size());
+    Py_ssize_t posns_size = posns.size();
+
+    PyObject * x = PyList_New(posns_size);
     if (x == NULL) {
         return NULL;
     }
-    for (Py_ssize_t i = 0; i < posns.size(); i++) {
+    for (Py_ssize_t i = 0; i < posns_size; i++) {
         PyList_SET_ITEM(x, i, PyInt_FromLong(posns[i]));
     }
 
