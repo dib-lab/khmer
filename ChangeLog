@@ -5,6 +5,7 @@
     error profile calculations from shotgun data sets, adaptive variant
     collection based on graphalign, streaming error correction, and streaming
     error trimming.
+    * tests/test_sandbox_scripts.py: added tests for sandbox/trim-low-abund.py.
 
 2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 

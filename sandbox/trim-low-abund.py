@@ -6,7 +6,8 @@
 # Contact: khmer-project@idyll.org
 #
 """
-Streaming error trimming.
+Trim sequences at k-mers of the given abundance, using a streaming algorithm.
+Output sequences will be placed in 'infile.abundtrim'.
 
 % python sandbox/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]
 
@@ -88,6 +89,15 @@ def main():
 
     parser.add_argument('input_filenames', nargs='+')
     args = parser.parse_args()
+
+    ###
+
+    if len(set(args.input_filenames)) != len(args.input_filenames):
+        print >>sys.stderr, \
+            "Error: Cannot input the same filename multiple times."
+        sys.exit(1)
+
+    ###
 
     K = args.ksize
     HT_SIZE = args.min_hashsize
