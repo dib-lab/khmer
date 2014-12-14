@@ -104,15 +104,14 @@ def main():
             else:
 
                 # build a better sequence -- this is the corrected one.
-                if True:
-                    graph_seq = graph_alignment.replace("-", "")
-                else:
-                    graph_seq = ""
-                    for i in range(len(graph_alignment)):
-                        if graph_alignment[i] == "-":
-                            graph_seq += read_alignment[i]
-                        else:
-                            graph_seq += graph_alignment[i]
+                graph_seq = graph_alignment.replace("-", "")
+                # OR?
+                #graph_seq = ""
+                #for i in range(len(graph_alignment)):
+                #    if graph_alignment[i] == "-":
+                #        graph_seq += read_alignment[i]
+                #    else:
+                #        graph_seq += graph_alignment[i]
 
                 # get the minimum count for this new sequence
                 mincount = ht.get_min_count(graph_seq)
