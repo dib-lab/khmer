@@ -1793,3 +1793,49 @@ def test_read_parser_streaming_gzfa():
     assert os.path.exists(o)
     seqs = [r.sequence for r in screed.open(o)]
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+
+def test_oxli_fastq_to_fasta():
+    
+    script = scriptpath('pseudoxli.py')
+    clean_infile = utils.get_temp_filename('test-clean.fq')
+    n_infile = utils.get_temp_filename('test-n.fq')
+
+    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), clean_infile)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
+
+    clean_outfile = clean_infile + '.keep.fa'
+    n_outfile = n_infile + '.keep.fa'
+
+    in_dir = os.path.dirname(clean_infile)
+    in_dir_n = os.path.dirname(n_infile)
+
+    args = ['fastq-to-fasta', clean_infile, '-n', '-o', clean_outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2, len(out.splitlines())
+    assert "No lines dropped" in err
+
+    args = ['fastq-to-fasta', n_infile, '-n', '-o', n_outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) == 2
+    assert "No lines dropped" in err
+
+    args = ['fastq-to-fasta', clean_infile, '-o', clean_outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) == 2
+    assert "0 lines dropped" in err
+
+    args = ['fastq-to-fasta', n_infile, '-o', n_outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) == 2, out
+    assert "4 lines dropped" in err, err
+
+    args = ['fastq-to-fasta', clean_infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert len(out.splitlines()) > 2
+    assert "0 lines dropped" in err
+
+    args = ['fastq-to-fasta', n_infile]
+    (status, out, err) = utils.runscript(script, args, in_dir_n)
+    assert len(out.splitlines()) > 2
+    assert "4 lines dropped" in err
+

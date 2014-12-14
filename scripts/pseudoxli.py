@@ -12,7 +12,6 @@ Single entry point script for khmer
 
 import argparse
 import sys
-from oxli import test
 from oxli import fq2fa
 
 
@@ -49,9 +48,6 @@ def fastq_to_fasta(args):
     """
     fastq_to_fasta subcommand handler function
     """
-    print args
-    print "Hello from fastq!"
-    test.do_test()
     fq2fa.do_fastq_to_fasta(args)
 
 
@@ -60,7 +56,6 @@ def main():
     main function; does the parsing and kicks off the subcommand
     """
     args = get_parser().parse_args()
-    print "Hello from main!"
     args.func(args)
 
 if __name__ == '__main__':
