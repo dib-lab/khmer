@@ -381,56 +381,58 @@ const
 }
 
 std::vector<unsigned int> CountingHash::find_low_abund_kmers(std::string seq,
-						  BoundedCounterType max_abund)
-  const
+        BoundedCounterType max_abund)
+const
 {
-  std::vector<unsigned int> posns;
-  if (!check_and_normalize_read(seq)) {
-    return posns;
-  }
-
-  KMerIterator kmers(seq.c_str(), _ksize);
-
-  HashIntoType kmer = kmers.next();
-  if (kmers.done()) { return posns; }
-
-  // find the first trusted k-mer
-  while (!kmers.done()) {
-    if (get_count(kmer) > max_abund) {
-      break;
+    std::vector<unsigned int> posns;
+    if (!check_and_normalize_read(seq)) {
+        return posns;
     }
-    kmer = kmers.next();
-  }
 
-  if (kmers.done()) {
-    return posns;
-  }
+    KMerIterator kmers(seq.c_str(), _ksize);
 
-  // did we bypass some erroneous k-mers? call the last one.
-  if (kmers.get_start_pos() > 0) {
-    // if we are well past the first k, forget the whole thing (!? @CTB)
-    if (kmers.get_start_pos() >= _ksize && 0) {
-      return posns;
+    HashIntoType kmer = kmers.next();
+    if (kmers.done()) {
+        return posns;
     }
-    posns.push_back(kmers.get_start_pos() - 1);
-  }
-      
-  while (!kmers.done()) {
-    kmer = kmers.next();
-    if (get_count(kmer) <= max_abund) { // error!
-      posns.push_back(kmers.get_end_pos() - 1);
 
-      // find next good
-      while (!kmers.done()) {
-        kmer = kmers.next();
-        if (get_count(kmer) > max_abund) { // a good stretch again.
-          break;
+    // find the first trusted k-mer
+    while (!kmers.done()) {
+        if (get_count(kmer) > max_abund) {
+            break;
         }
-      }
+        kmer = kmers.next();
     }
-  }
 
-  return posns;
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // did we bypass some erroneous k-mers? call the last one.
+    if (kmers.get_start_pos() > 0) {
+        // if we are well past the first k, forget the whole thing (!? @CTB)
+        if (kmers.get_start_pos() >= _ksize && 0) {
+            return posns;
+        }
+        posns.push_back(kmers.get_start_pos() - 1);
+    }
+
+    while (!kmers.done()) {
+        kmer = kmers.next();
+        if (get_count(kmer) <= max_abund) { // error!
+            posns.push_back(kmers.get_end_pos() - 1);
+
+            // find next good
+            while (!kmers.done()) {
+                kmer = kmers.next();
+                if (get_count(kmer) > max_abund) { // a good stretch again.
+                    break;
+                }
+            }
+        }
+    }
+
+    return posns;
 }
 
 

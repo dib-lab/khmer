@@ -27,7 +27,7 @@ def main():
     parser.add_argument("-t", "--trusted-cutoff", dest="trusted_cutoff",
                         type=int, default=3)
     parser.add_argument("--bits-theta", help="Tuning parameter controlling"
-                        trade off of speed vs alignment sensitivity",
+                        "trade off of speed vs alignment sensitivity",
                         default=1.0, type=float, dest="bits_theta")
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
                         help='base cutoff on abundance',
@@ -120,10 +120,12 @@ def main():
                     keep = True
 
             if details_out is not None:
-                details_out.write("+{7}\t{0:0.2f}\t{3}\t{4}\nread:      "
-                     "{6}\ngraph_aln: {1}\nread_aln:  {2}\nstored_seq:{5}\n"
-                     "".format(score, graph_alignment, read_alignment,
-                     truncated, keep, seq, record.sequence, record.name))
+                details_out.write(
+                    "+{7}\t{0:0.2f}\t{3}\t{4}\nread:      "
+                    "{6}\ngraph_aln: {1}\nread_aln:  {2}\nstored_seq:{5}\n"
+                    "".format(
+                        score, graph_alignment, read_alignment, truncated,
+                        keep, seq, record.sequence, record.name))
 
             if keep:
                 ht.consume(seq)
@@ -132,8 +134,9 @@ def main():
                 discarded += 1
 
         if total:
-            print 'DONE with', input_filename, '; kept', total - discarded, 'of',\
-            total, 'or', int(100. - discarded / float(total) * 100.), '%'
+            print 'DONE with', input_filename, \
+                '; kept', total - discarded, 'of', total, 'or', \
+                int(100. - discarded / float(total) * 100.), '%'
         print 'output in', output_name
 
     if args.savehash:

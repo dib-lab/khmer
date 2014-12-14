@@ -382,7 +382,7 @@ def test_find_low_abund_kmer_1():
     hi.consume(DNA[:30])
 
     for n in range(len(DNA) - 8 + 1):
-        print n, hi.get(DNA[n:n+8])
+        print n, hi.get(DNA[n:n + 8])
 
     posns = hi.find_low_abund_kmers(DNA, 1)
     assert posns == [30], posns
@@ -405,7 +405,7 @@ def test_find_low_abund_kmer_6():
     hi.consume(DNA[1:])
 
     for n in range(len(DNA) - 8 + 1):
-        print n, hi.get(DNA[n:n+8])
+        print n, hi.get(DNA[n:n + 8])
 
     posns = hi.find_low_abund_kmers(DNA, 1)
     assert posns == [0], posns
@@ -439,7 +439,7 @@ def test_find_low_abund_kmer_6():
     hi.consume(DNA[K:])
 
     for n in range(len(DNA) - 8 + 1):
-        print n, hi.get(DNA[n:n+8])
+        print n, hi.get(DNA[n:n + 8])
 
     posns = hi.find_low_abund_kmers(DNA, 1)
     assert posns == [7], posns

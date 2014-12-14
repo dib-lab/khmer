@@ -1422,31 +1422,32 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
 
 static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
 {
-  khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
-  khmer::CountingHash * counting = me->counting;
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    khmer::CountingHash * counting = me->counting;
 
-  char * seq = NULL;
-  unsigned int max_count_i = 0;
+    char * seq = NULL;
+    khmer::BoundedCounterType max_count = 0; // unsigned short int
 
-  if (!PyArg_ParseTuple(args, "sI", &seq, &max_count_i)) {
-    return NULL;
-  }
+    if (!PyArg_ParseTuple(args, "sI", &seq, &max_count)) {
+        return NULL;
+    }
 
-  std::vector<unsigned int> posns;
-  Py_BEGIN_ALLOW_THREADS
-
-    khmer::BoundedCounterType max_count = max_count_i;
+    std::vector<unsigned int> posns;
+    Py_BEGIN_ALLOW_THREADS
 
     posns = counting->find_low_abund_kmers(seq, max_count);
 
-  Py_END_ALLOW_THREADS;
+    Py_END_ALLOW_THREADS;
 
-  PyObject * x = PyList_New(posns.size());
-  for (unsigned int i = 0; i < posns.size(); i++) {
-    PyList_SET_ITEM(x, i, PyInt_FromLong(posns[i]));
-  }
+    PyObject * x = PyList_New(posns.size());
+    if (x == NULL) {
+        return NULL;
+    }
+    for (Py_ssize_t i = 0; i < posns.size(); i++) {
+        PyList_SET_ITEM(x, i, PyInt_FromLong(posns[i]));
+    }
 
-  return x;
+    return x;
 }
 
 static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
