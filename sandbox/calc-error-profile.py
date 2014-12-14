@@ -111,7 +111,7 @@ def main():
                     bp2_consumed += len(seq)
 
                 # for saturated data, find low-abund k-mers
-                posns = ht.find_low_abund_kmers(seq, 2)
+                posns = ht.find_spectral_error_positions(seq, 2)
                 lengths.append(len(seq))
 
                 if args.errors_per_read:

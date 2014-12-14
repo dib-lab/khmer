@@ -1420,7 +1420,8 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     return ret;
 }
 
-static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
+static PyObject * count_find_spectral_error_positions(PyObject * self,
+                                                      PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     khmer::CountingHash * counting = me->counting;
@@ -1435,7 +1436,7 @@ static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
     std::vector<unsigned int> posns;
     Py_BEGIN_ALLOW_THREADS
 
-    posns = counting->find_low_abund_kmers(seq, max_count);
+    posns = counting->find_spectral_error_positions(seq, max_count);
 
     Py_END_ALLOW_THREADS;
 
@@ -1804,7 +1805,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
     { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "find_low_abund_kmers", count_find_low_abund_kmers, METH_VARARGS, "Identify positions of low-abundance k-mers" },
+    { "find_spectral_error_positions", count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
     { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
     { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
     { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
