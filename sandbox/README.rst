@@ -24,6 +24,7 @@ To keep, document, and build recipes for:
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
 * calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference.
 * calc-median-distribution.py - plot coverage distribution; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
+* collect-variants.py
 * combine-pe.py - combine partitions based on shared PE reads.
 * compare-partitions.py
 * dn-identify-errors.py - prototype script to identify errors in reads based on diginorm principles
