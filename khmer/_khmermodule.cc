@@ -1428,7 +1428,7 @@ static PyObject * count_find_low_abund_kmers(PyObject * self, PyObject * args)
     char * seq = NULL;
     khmer::BoundedCounterType max_count = 0; // unsigned short int
 
-    if (!PyArg_ParseTuple(args, "sI", &seq, &max_count)) {
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
         return NULL;
     }
 
