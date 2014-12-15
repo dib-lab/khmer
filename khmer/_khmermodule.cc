@@ -4256,6 +4256,11 @@ static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
         return NULL;
     }
 
+    if ((error_rate < 0) || (error_rate > 1.0)) {
+        PyErr_SetString(PyExc_ValueError, "Error rate should be between 0.0 and 1.0");
+        return NULL;
+    }
+
     khmer_KHLLCounterObject * khllcounter_obj = (khmer_KHLLCounterObject *) \
             PyObject_New(khmer_KHLLCounterObject, &khmer_KHLLCounterType);
 
