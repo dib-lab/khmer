@@ -8,8 +8,10 @@
 import sys
 import os
 import argparse
+import khmer
 from khmer import extract_countinghash_info, extract_hashbits_info
 from khmer import __version__
+from khmer.utils import print_error
 import screed
 
 DEFAULT_K = 32
@@ -93,12 +95,9 @@ def add_loadhash_args(parser):
     class LoadAction(argparse.Action):
 
         def __call__(self, parser, namespace, values, option_string=None):
-            env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-            env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-            env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                           DEFAULT_MIN_TABLESIZE)
-
-            from khmer.utils import print_error
+            env_ksize = get_env_ksize()
+            env_n_tables = get_env_n_tables()
+            env_tablesize = get_env_tablesize() 
 
             setattr(namespace, self.dest, values)
 
@@ -190,7 +189,6 @@ _algorithms = {
 
 
 def info(scriptname, algorithm_list=None):
-    import khmer
 
     sys.stderr.write("\n")
     sys.stderr.write("|| This is the script '%s' in khmer.\n"

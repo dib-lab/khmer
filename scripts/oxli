@@ -37,12 +37,12 @@ def get_parser():
     # sub parser for abund-dist-single
     # we have to adapt the build_counting_args from khmer
     parser_abund_dist_single = subparsers.add_parser('abund_dist_single',
-                                                     help="Calculate the abundance distribution of k-mers from a single\
-                    sequence file.", description="Caluculate the abundance"
-                                                     "distribution of k-mers from a single sequence file",
-                                                     epilog=textwrap.dedent(
-                                                         abund_dist_single.parser_epilog),
-                                                     formatter_class=common.ComboFormatter)
+        help="Calculate the abundance distribution of k-mers from a single\
+        sequence file.", description="Caluculate the abundance"
+        "distribution of k-mers from a single sequence file",
+        epilog=textwrap.dedent(
+            abund_dist_single.parser_epilog),
+        formatter_class=common.ComboFormatter)
     # use modified build_counting_args and build_hash_args from oxli.common
     common.add_counting_args(parser_abund_dist_single)
     abund_dist_single.add_args(parser_abund_dist_single)
@@ -75,18 +75,6 @@ def fastq_to_fasta(args):
     fastq_to_fasta subcommand handler function
     """
     fq2fa.do_fastq_to_fasta(args.input_sequence, args.output, args.n_keep)
-
-
-# def abund_dist_single(args)
-    """
-    Produce the k-mer abundance distribution for the given file, without
-    loading a prebuilt k-mer counting table
-    
-    % python scripts/oxli abund_dist_single <data> <histout>
-    
-    use '-h' for parameter help
-    """
-
 
 def main():
     """
