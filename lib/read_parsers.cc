@@ -17,8 +17,7 @@ namespace khmer
 namespace read_parsers
 {
 
-SeqAnParser::SeqAnParser( char const * filename ) : IParser( ),
-    _seqan_spin_lock(false)
+SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
 {
     seqan::open(_stream, filename);
     if (!seqan::isGood(_stream)) {
@@ -30,6 +29,8 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( ),
 	message = message + filename + " does not contain any sequences!";
 	throw InvalidStreamHandle(message.c_str());
     }
+    __asm__ __volatile__ ("" ::: "memory");
+    _seqan_spin_lock = 0;
 }
 
 bool SeqAnParser::is_complete()
@@ -43,7 +44,8 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     while (!__sync_bool_compare_and_swap(& _seqan_spin_lock, 0, 1));
     int ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.accuracy, _stream);
-    __sync_bool_compare_and_swap(& _seqan_spin_lock, 1, 0);
+    __asm__ __volatile__ ("" ::: "memory");
+    _seqan_spin_lock = 0;
     if (ret != 0) {
         throw NoMoreReadsAvailable();
     }
