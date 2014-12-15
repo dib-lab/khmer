@@ -46,13 +46,16 @@ os.environ['OPT'] = " ".join(
 # so it needs to be disabled for now.
 # This function comes from the yt project:
 # https://bitbucket.org/yt_analysis/yt/src/f7c75759e0395861b52d16921d8ce3ad6e36f89f/yt/utilities/lib/setup.py?at=yt
+
+
 def check_for_openmp():
     # Create a temporary directory
     tmpdir = tempfile.mkdtemp()
     curdir = os.getcwd()
     exit_code = 1
 
-    if os.name == 'nt': return False
+    if os.name == 'nt':
+        return False
 
     try:
         os.chdir(tmpdir)
@@ -63,15 +66,16 @@ def check_for_openmp():
         # Attempt to compile a test script.
         # See http://openmp.org/wp/openmp-compilers/
         filename = r'test.c'
-        file = open(filename,'wt', 1)
+        file = open(filename, 'wt', 1)
         file.write(
             "#include <omp.h>\n"
             "#include <stdio.h>\n"
             "int main() {\n"
             "#pragma omp parallel\n"
-            "printf(\"Hello from thread %d, nthreads %d\\n\", omp_get_thread_num(), omp_get_num_threads());\n"
+            "printf(\"Hello from thread %d, nthreads %d\\n\","
+            "omp_get_thread_num(), omp_get_num_threads());\n"
             "}"
-            )
+        )
         with open(os.devnull, 'w') as fnull:
             exit_code = subprocess.call([compiler, '-fopenmp', filename],
                                         stdout=fnull, stderr=fnull)
@@ -99,7 +103,8 @@ BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
 SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
-    "hashbits", "labelhash", "counting", "subset", "read_aligner", "hllcounter"])
+    "hashbits", "labelhash", "counting", "subset", "read_aligner",
+    "hllcounter"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3", "sha1"])
