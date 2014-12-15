@@ -68,3 +68,18 @@ def test_hll_c_1():
         hllcpp.consume_string(record['sequence'])
 
     assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
+
+
+def test_hll_c_2():
+    # test c++ code to count unique kmers using HyperLogLog
+
+    filename = utils.get_test_data('random-20-a.fa')
+
+    K = 20  # size of kmer
+    ERROR_RATE = 0.01
+
+    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+
+    hllcpp.consume_fasta(filename)
+
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
