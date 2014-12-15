@@ -24,7 +24,6 @@
 
 #define arr_len(a) (a + sizeof a / sizeof a[0])
 
-using namespace std;
 using namespace khmer;
 
 std::map<int, std::vector<double> > rawEstimateData;
@@ -52,7 +51,7 @@ double get_alpha(const int p)
 void init_raw_estimate_data() {
     if (rawEstimateData.empty()) {
         for(int i=4; i <= 18; i++) {
-            vector<double> v;
+            std::vector<double> v;
             switch(i) {
               case 4:
                 v.assign(RAW_ESTIMATE_DATA_4, arr_len(RAW_ESTIMATE_DATA_4));
@@ -108,7 +107,7 @@ void init_raw_estimate_data() {
 void init_bias_data() {
     if (biasData.empty()) {
         for(int i=4; i <= 18; i++) {
-            vector<double> v;
+            std::vector<double> v;
             switch(i) {
               case 4:
                 v.assign(RAW_BIAS_DATA_4, arr_len(RAW_BIAS_DATA_4));
@@ -166,13 +165,13 @@ double get_threshold(int p)
     return THRESHOLD_DATA[p - 4];
 }
 
-vector<int> get_nearest_neighbors(double E, vector<double> estimate)
+std::vector<int> get_nearest_neighbors(double E, std::vector<double> estimate)
 {
-    vector< pair<double,int> > distance_map;
-    vector<int> nearest;
+    std::vector< std::pair<double,int> > distance_map;
+    std::vector<int> nearest;
 
     int i = 0;
-    for (vector<double>::iterator it = estimate.begin();
+    for (std::vector<double>::iterator it = estimate.begin();
          it != estimate.end();
          ++it) {
       std::pair<double, int> p(pow(E - *it, 2.0), i);
@@ -191,13 +190,13 @@ vector<int> get_nearest_neighbors(double E, vector<double> estimate)
 
 double estimate_bias(double E, int p)
 {
-    vector<double> bias = biasData[p];
-    vector<double> raw_estimate = rawEstimateData[p];
+    std::vector<double> bias = biasData[p];
+    std::vector<double> raw_estimate = rawEstimateData[p];
 
-    vector<int> nearest = get_nearest_neighbors(E, raw_estimate);
+    std::vector<int> nearest = get_nearest_neighbors(E, raw_estimate);
     double estimate = 0.0;
 
-    for (vector<int>::iterator it = nearest.begin();
+    for (std::vector<int>::iterator it = nearest.begin();
          it != nearest.end();
          ++it) {
       estimate += bias[*it];
@@ -234,7 +233,7 @@ HLLCounter::HLLCounter(int p, WordLength ksize) {
 
 void HLLCounter::init(int p, WordLength ksize) {
     int m = 1 << p;
-    vector<int> M(m, 0.0);
+    std::vector<int> M(m, 0.0);
 
     this->alpha = get_alpha(p);
     this->p = p;
@@ -271,7 +270,7 @@ HashIntoType HLLCounter::estimate_cardinality()
     return this->_Ep();
 }
 
-void HLLCounter::add(const string &value)
+void HLLCounter::add(const std::string &value)
 {
     //HashIntoType x = khmer::_hash(value.c_str(), value.size());
     //HashIntoType x = khmer::_hash_forward(value.c_str(), value.size());
@@ -279,7 +278,7 @@ void HLLCounter::add(const string &value)
 
     HashIntoType x = khmer::_hash_murmur(value);
     HashIntoType j = x & (this->m - 1);
-    this->M[j] = max(this->M[j], get_rho(x >> this->p, 64 - this->p));
+    this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 
 unsigned int HLLCounter::consume_string(const std::string &s) {
