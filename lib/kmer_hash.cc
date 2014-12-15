@@ -13,7 +13,6 @@
 #include "khmer.hh"
 #include "kmer_hash.hh"
 #include "MurmurHash3.h"
-#include "sha1.h"
 
 using namespace std;
 
@@ -154,53 +153,6 @@ HashIntoType _hash_murmur_forward(const std::string kmer)
     HashIntoType r = 0;
 
     khmer::_hash_murmur(kmer, h, r);
-    return h;
-}
-
-HashIntoType _hash_sha1(const std::string kmer)
-{
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-    return khmer::_hash_sha1(kmer, h, r);
-}
-
-HashIntoType _hash_sha1(const std::string kmer,
-                        HashIntoType& h, HashIntoType& r)
-{
-    HashIntoType buf;
-    SHA1_CTX context;
-    uint8_t digest[20];
-    h = 0;
-    r = 0;
-
-    SHA1_Init(&context);
-    SHA1_Update(&context, (uint8_t*)kmer.c_str(), kmer.size());
-    SHA1_Final(&context, digest);
-    for (int i=0; i < 8; i++) {
-      buf = digest[i];
-      h |= buf << ((7 - i) * 8);
-    }
-
-    std::string rev = khmer::_revcomp(kmer);
-
-    SHA1_Init(&context);
-    SHA1_Update(&context, (uint8_t*)rev.c_str(), rev.size());
-    SHA1_Final(&context, digest);
-    for (int i=0; i < 8; i++) {
-      buf = digest[i];
-      r |= buf << ((7 - i) * 8);
-    }
-
-    return h ^ r;
-}
-
-HashIntoType _hash_sha1_forward(const std::string kmer)
-{
-    HashIntoType h = 0;
-    HashIntoType r = 0;
-
-    khmer::_hash_sha1(kmer, h, r);
     return h;
 }
 

@@ -79,12 +79,6 @@ HashIntoType _hash_murmur(const std::string kmer);
 HashIntoType _hash_murmur(const std::string kmer,
                           HashIntoType& h, HashIntoType& r);
 HashIntoType _hash_murmur_forward(const std::string kmer);
-
-// two-way hash functions, SHA-1.
-HashIntoType _hash_sha1(const std::string kmer);
-HashIntoType _hash_sha1(const std::string kmer,
-                        HashIntoType& h, HashIntoType& r);
-HashIntoType _hash_sha1_forward(const std::string kmer);
 };
 
 #endif // KMER_HASH_HH

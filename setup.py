@@ -107,7 +107,7 @@ SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
     "hllcounter"])
 
 SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
-    "MurmurHash3", "sha1"])
+    "MurmurHash3"])
 
 EXTRA_COMPILE_ARGS = ['-O3', ]
 
