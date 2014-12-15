@@ -12,6 +12,9 @@ import os
 import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
+import shutil
+import subprocess
+import tempfile
 
 from setuptools import setup
 from setuptools import Extension
@@ -39,6 +42,48 @@ os.environ['OPT'] = " ".join(
     flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
 )
 
+# Checking for OpenMP support. Currently clang doesn't work with OpenMP,
+# so it needs to be disabled for now.
+# This function comes from the yt project:
+# https://bitbucket.org/yt_analysis/yt/src/f7c75759e0395861b52d16921d8ce3ad6e36f89f/yt/utilities/lib/setup.py?at=yt
+def check_for_openmp():
+    # Create a temporary directory
+    tmpdir = tempfile.mkdtemp()
+    curdir = os.getcwd()
+    exit_code = 1
+
+    if os.name == 'nt': return False
+
+    try:
+        os.chdir(tmpdir)
+
+        # Get compiler invocation
+        compiler = os.getenv('CC', 'cc')
+
+        # Attempt to compile a test script.
+        # See http://openmp.org/wp/openmp-compilers/
+        filename = r'test.c'
+        file = open(filename,'wt', 1)
+        file.write(
+            "#include <omp.h>\n"
+            "#include <stdio.h>\n"
+            "int main() {\n"
+            "#pragma omp parallel\n"
+            "printf(\"Hello from thread %d, nthreads %d\\n\", omp_get_thread_num(), omp_get_num_threads());\n"
+            "}"
+            )
+        with open(os.devnull, 'w') as fnull:
+            exit_code = subprocess.call([compiler, '-fopenmp', filename],
+                                        stdout=fnull, stderr=fnull)
+
+        # Clean up
+        file.close()
+    finally:
+        os.chdir(curdir)
+        shutil.rmtree(tmpdir)
+
+    return exit_code == 0
+
 # We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
@@ -64,7 +109,8 @@ EXTRA_COMPILE_ARGS = ['-O3', ]
 if sys.platform == 'darwin':
     # force 64bit only builds
     EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
-else:
+
+if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
 
 EXTENSION_MOD_DICT = \
@@ -75,9 +121,6 @@ EXTENSION_MOD_DICT = \
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
     }
-
-if sys.platform != 'darwin':
-    EXTENSION_MOD_DICT['extra_link_args'] = ['-lgomp']
 
 EXTENSION_MOD = Extension("khmer._khmermodule",  # pylint: disable=W0142
                           ** EXTENSION_MOD_DICT)
