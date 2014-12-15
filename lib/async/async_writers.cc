@@ -113,4 +113,10 @@ void AsyncHasher::consume() {
     }
 }
 
+/////
+//
+// class AsyncSequenceParser
+//
+/////
+
 

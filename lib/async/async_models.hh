@@ -119,24 +119,47 @@ class Async {
         }
 };
 
-/*
+
+struct NoMoreQueuesAvailable : public khmer_exception {
+};
+
 template <class T> class AsyncRRProducer: public virtual Async {
 
     protected:
         std::vector<queue<T, Cap> * > _out_queues;
         bool _open_slots;
+        uint32_t _acquire_q_spinlock;
     
     public:
         AsyncRRProducer():
             Async() {
             _open_slots = 0;
+            _acquire_q_spinlock = 0;
         }
 
         void start(unsigned int n_threads) {
             _out_queues.clear();
-            for (unsigned int q=0; q<n_threads; 
+            while(!__sync_bool_compare_and_swap( &_acquire_q_spinlock, 0, 1));
+            for (unsigned int q=0; q<n_threads; ++g) {
+                _out_queues.push_back(new std::vector<T, Cap>());
+            }
+            _open_slots = n_threads;
+            __sync_bool_compare_and_swap( &_acquire_q_spinlock, 1, 0);
         }
-*/
+
+        std::vector<T, Cap> * acquire_queue() {
+            while(!__sync_bool_compare_and_swap ( &_acquire_q_spinlock, 0 1));
+            if (_open_slots < 1) {
+                throw NoMoreQueuesAvailable("No more queues to acquire");
+            }
+            _open_slots--;
+            std::vector<T, Cap> * q = _out_queues[_open_slots];
+            __sync_bool_compare_compare_and_swap( &_acquire_q_spinlock, 1, 0);
+            return q;
+        }
+
+        
+
 
 // Consumer model: draws items off an input queue and does stuff
 template <class T> class AsyncConsumer: public virtual Async {
