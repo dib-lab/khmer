@@ -30,12 +30,13 @@ if type gcov >/dev/null 2>&1 && [[ "${NODE_LABELS}" != *osx* ]]
 then
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage"
 	python setup.py build_ext --build-temp $PWD --debug --inplace \
-		--libraries gcov
+		--libraries gcov develop
 	make coverage-gcovr.xml coverage.xml
 	./setup.py install
 else
 	echo "gcov was not found (or we are on OSX), skipping coverage check"
 	./setup.py install
+	./setup.py develop
 	make nosetests.xml
 fi
 

@@ -297,13 +297,13 @@ def test_very_short_read():
     short_filename = utils.get_test_data('test-short.fa')
     kh = khmer.new_hashtable(9, 4)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
-    assert n_reads == 1
-    assert n_kmers == 0
+    assert n_reads == 1, n_reads
+    assert n_kmers == 0, n_kmers
 
     kh = khmer.new_hashtable(8, 4)
     n_reads, n_kmers = kh.consume_fasta(short_filename)
-    assert n_reads == 1
-    assert n_kmers == 1
+    assert n_reads == 1, n_reads
+    assert n_kmers == 1, n_kmers
 
 
 class Test_ConsumeString(object):

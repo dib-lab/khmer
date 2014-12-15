@@ -1,3 +1,34 @@
+2014-12-09  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
+    newly found read dropping issue
+    https://github.com/ged-lab/khmer/issues/249
+    https://github.com/ged-lab/khmer/pull/641
+    Supports reading from non-seekable plain and gziped FAST[AQ] files (a.k.a
+    pipe or streaming support)
+
+    * khmer/{__init__.py,_khmermodule.cc}: removed the Config object, the
+    threads argument to new_counting_hash, and adapted to other changes in API.
+    Dropped the unused _dump_report_fn method. Enhanced error reporting.
+    * lib/{bittest,consume_prof,error,khmer_config,scoringmatrix,thread_id_map}
+    .{cc,hh},tests/test_khmer_config.py: deleted unused files
+    * sandbox/collect-reads.py,scripts/{abundance-dist-single,do-partition,
+    filter-abund-single,load-into-counting}.py: adapted to Python API changes:
+    no threads argument to ReadParser, no more config
+    * tests/test_{counting_hash,counting_single,hashbits,hashbits_obj,
+    test_read_parsers}.py: updated tests to new error pattern (upon object
+    creation, not first access) and the same API change as above. Thanks to
+    Camille for her enhanced multi-thread test.
+    * lib/{counting,hashtable,ht-diff}.cc,khmer.hh: renamed MAX_COUNT define to
+    MAX_KCOUNT; avoids naming conflict with SeqAn
+    * khmer/file.py: check_file_status(): ignored input files named '-'
+    * khmer/khmer_tst_utils.py: added method to pipe input files to a target
+    script
+    * tests/test_scripts.py: enhanced streaming tests now that four of them
+    work.
+    * Makefile: refreshed cppcheck{,-result.xml} targets, added develop
+    setuptools command prior to testing
+
 2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/user/known_issues.txt: Document that multithreading leads to dropped
