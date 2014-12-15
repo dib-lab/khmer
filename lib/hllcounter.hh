@@ -10,7 +10,6 @@
 #include <vector>
 #include <string>
 
-#include "khmer_config.hh"
 #include "read_parsers.hh"
 
 
