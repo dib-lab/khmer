@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <numeric>
 #include <inttypes.h>
+#include <sstream>
 
 #include "khmer.hh"
 #include "kmer_hash.hh"
@@ -33,7 +34,16 @@ std::map<int, std::vector<double> > biasData;
 double get_alpha(const int p)
 {
     if ((p < 4) or (p > 16)) {
-        return 0;    // TODO: treat error
+        double valid_lower_bound = 1.04 / std::sqrt(std::pow(2, 17));
+        double valid_upper_bound = 1.04 / std::sqrt(std::pow(2, 3));
+
+        std::stringstream message;
+        if (p < 4) {
+            message << "Max error is " << valid_upper_bound;
+        } else {
+            message << "Min error is " << valid_lower_bound;
+        }
+        throw khmer_exception(message.str().c_str());
     }
 
     switch (p) {

@@ -4268,7 +4268,12 @@ static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate, ksize);
+    try {
+        khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate, ksize);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     return (PyObject *) khllcounter_obj;
 }
