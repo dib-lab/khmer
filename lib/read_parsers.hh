@@ -124,7 +124,7 @@ public:
 
 private:
     seqan::SequenceStream _stream;
-    pthread_mutex_t _imprint_mutex;
+    uint32_t _seqan_spin_lock;
 
 };
 
