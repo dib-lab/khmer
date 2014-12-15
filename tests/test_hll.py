@@ -16,6 +16,7 @@ import screed
 
 import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
+from nose.tools import raises
 
 
 TT = string.maketrans('ACGT', 'TGCA')
@@ -83,3 +84,13 @@ def test_hll_c_2():
     hllcpp.consume_fasta(filename)
 
     assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
+
+
+@raises(ValueError)
+def test_hll_error_rate():
+    # test c++ code to count unique kmers using HyperLogLog
+
+    K = 20  # size of kmer
+    ERROR_RATE = -0.01
+
+    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
