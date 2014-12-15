@@ -276,8 +276,6 @@ void HLLCounter::add(const string &value)
     //HashIntoType x = khmer::_hash(value.c_str(), value.size());
     //HashIntoType x = khmer::_hash_forward(value.c_str(), value.size());
     //HashIntoType x = khmer::_hash_murmur_forward(value);
-    //HashIntoType x = khmer::_hash_sha1(value);
-    //HashIntoType x = khmer::_hash_sha1_forward(value);
 
     HashIntoType x = khmer::_hash_murmur(value);
     HashIntoType j = x & (this->m - 1);
