@@ -1839,3 +1839,44 @@ def test_oxli_fastq_to_fasta():
     (status, out, err) = utils.runscript(script, args, in_dir_n)
     assert len(out.splitlines()) > 2
     assert "4 lines dropped" in err, err
+
+
+def test_oxli_abundance_dist_single():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('oxli')
+    args = ['abund_dist_single', '-x', '1e7', '-N', '2', '-k', '17', '-z',
+            '-t', infile,
+            outfile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+
+def test_oxli_abundance_dist_single_nobigcount():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('oxli')
+    args = ['abund_dist_single', '-x', '1e7', '-N',
+            '2', '-k', '17', '-z', '-b', infile, outfile]
+    utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '255 2 98 1.0', line

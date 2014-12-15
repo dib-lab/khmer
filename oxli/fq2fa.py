@@ -13,8 +13,10 @@ import sys
 import argparse
 import screed
 
-
 def add_args(parser):
+    """
+    Adds the arguments for the fastq_to_fasta argument for oxli
+    """
     parser.add_argument('input_sequence', help='The name of the input'
                               ' FASTQ sequence file.')
     parser.add_argument('-o', '--output', metavar="filename",
@@ -28,7 +30,9 @@ def add_args(parser):
 
 
 def do_fastq_to_fasta(input_sequence, output, n_keep):
-    #= get_parser().parse_)
+    """
+    Converts fastq files to fasta files
+    """
     print >> sys.stderr, ('fastq from ', input_sequence)
 
     n_count = 0
