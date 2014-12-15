@@ -87,10 +87,30 @@ def test_hll_c_2():
 
 
 @raises(ValueError)
-def test_hll_error_rate():
-    # test c++ code to count unique kmers using HyperLogLog
+def test_hll_invalid_error_rate():
+    # test if error_rate is a valid value
 
     K = 20  # size of kmer
     ERROR_RATE = -0.01
+
+    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+
+
+@raises(ValueError)
+def test_hll_invalid_error_rate_max():
+    # test if error_rate is a valid value
+
+    K = 20  # size of kmer
+    ERROR_RATE = 0.50
+
+    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+
+
+@raises(ValueError)
+def test_hll_invalid_error_rate_min():
+    # test if error_rate is a valid value
+
+    K = 20  # size of kmer
+    ERROR_RATE = 0.000001
 
     hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
