@@ -57,6 +57,18 @@ def test_gzip_decompression():
     assert 100 == reads_count
 
 
+def test_gzip_decompression_truncated():
+
+    reads_count = 0
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
+    try:
+        for read in rparser:
+            reads_count += 1
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
+
+
 @attr('highmem')
 def test_bzip2_decompression():
 
