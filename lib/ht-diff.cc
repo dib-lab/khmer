@@ -46,7 +46,7 @@ int main( int argc, char * argv[ ] )
     int			rc		    = 0;
     int			opt		    = -1;
     char *		conv_residue	    = NULL;
-    uint32_t		max_count	    = MAX_COUNT;
+    uint32_t		max_count	    = MAX_KCOUNT;
     bool		report_all	    = false;
     string		ifile_name_1;
     string		ifile_name_2;

@@ -30,11 +30,6 @@ from khmer._khmer import reverse_hash  # tests/test_functions.py
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
 
-from khmer._khmer import get_config  # tests/test_read_parsers.py
-# tests/test_khmer_config.py
-# scripts/{filter-abund-single,load-graph}.py
-# scripts/{abundance-dist-single,load-into-counting}.py
-
 from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
@@ -63,7 +58,7 @@ def new_hashbits(k, starting_size, n_tables=2):
     return _new_hashbits(k, primes)
 
 
-def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
+def new_counting_hash(k, starting_size, n_tables=2):
     """Return a new countinghash object.
 
     Keyword arguments:
@@ -74,7 +69,7 @@ def new_counting_hash(k, starting_size, n_tables=2, n_threads=1):
     """
     primes = get_n_primes_above_x(n_tables, starting_size)
 
-    return _new_counting_hash(k, primes, n_threads)
+    return _new_counting_hash(k, primes)
 
 
 def load_hashbits(filename):

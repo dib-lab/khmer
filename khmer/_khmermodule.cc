@@ -15,7 +15,6 @@
 #include <iostream>
 
 #include "khmer.hh"
-#include "khmer_config.hh"
 #include "kmer_hash.hh"
 #include "hashtable.hh"
 #include "hashbits.hh"
@@ -175,292 +174,6 @@ void _report_fn(const char * info, void * data, unsigned long long n_reads,
     // ...allow other Python threads to do stuff...
     Py_BEGIN_ALLOW_THREADS;
     Py_END_ALLOW_THREADS;
-}
-
-
-/***********************************************************************/
-
-//
-// Config object -- configuration of khmer internals
-//
-
-/*
-// For bookkeeping purposes.
-static Config *     the_active_config     = NULL;
-*/
-
-typedef struct {
-    PyObject_HEAD
-    Config *    config;
-} khmer_ConfigObject;
-
-static void   khmer_config_dealloc( PyObject * );
-static PyObject * khmer_config_getattr( PyObject * obj, char * name );
-
-static PyTypeObject khmer_ConfigType = {
-    PyObject_HEAD_INIT(NULL)
-    0,
-    "Config", sizeof(khmer_ConfigObject),
-    0,
-    khmer_config_dealloc,   /*tp_dealloc*/
-    0,              /*tp_print*/
-    khmer_config_getattr,   /*tp_getattr*/
-    0,              /*tp_setattr*/
-    0,              /*tp_compare*/
-    0,              /*tp_repr*/
-    0,              /*tp_as_number*/
-    0,              /*tp_as_sequence*/
-    0,              /*tp_as_mapping*/
-    0,              /*tp_hash */
-    0,              /*tp_call*/
-    0,              /*tp_str*/
-    0,              /*tp_getattro*/
-    0,              /*tp_setattro*/
-    0,              /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,     /*tp_flags*/
-    "config object",            /* tp_doc */
-};
-
-/*
-static
-PyObject *
-new_config( PyObject * self, PyObject * args )
-{
-  // TODO: Take a dictionary to initialize config values.
-  //       Need Config constructor which supports this first.
-
-  khmer_ConfigObject * obj =
-    (khmer_ConfigObject *)PyObject_New(khmer_ConfigObject, &khmer_ConfigType);
-
-  obj->config = new Config( );
-
-  return (PyObject *)obj;
-}
-*/
-
-static
-PyObject *
-get_config( PyObject * self, PyObject * args )
-{
-    khmer_ConfigObject *    obj =
-        (khmer_ConfigObject *)PyObject_New(khmer_ConfigObject, &khmer_ConfigType);
-    if (obj == NULL) {
-        return NULL;
-    }
-
-    Config *    config_new      = &(get_active_config( ));
-    obj->config     = config_new;
-//  the_active_config = config_new;
-
-    return (PyObject *)obj;
-}
-
-/*
-static
-PyObject *
-set_config( PyObject * self, PyObject * args )
-{
-  khmer_ConfigObject *    obj     = NULL;
-
-  if (!PyArg_ParseTuple( args, "O!", &khmer_ConfigType, &obj ))
-    return NULL;
-
-  Config *    config = obj->config;
-  // TODO? Add sanity check to ensure that 'config' is valid.
-  set_active_config( *config );
-  the_active_config = config;
-
-  Py_RETURN_NONE;
-}
-*/
-
-static
-void
-khmer_config_dealloc( PyObject* self )
-{
-//  khmer_ConfigObject * obj = (khmer_ConfigObject *) self;
-//  if (the_active_config != obj->config)
-//  {
-//    delete obj->config;
-//    obj->config = NULL;
-//  }
-
-    PyObject_Del( self );
-}
-
-static
-PyObject *
-config_has_extra_sanity_checks( PyObject * self, PyObject * args )
-{
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    if (config->has_extra_sanity_checks( )) {
-        Py_RETURN_TRUE;
-    }
-    Py_RETURN_FALSE;
-}
-
-static
-PyObject *
-config_get_number_of_threads( PyObject * self, PyObject * args )
-{
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    return PyInt_FromSize_t( (size_t)config->get_number_of_threads( ) );
-}
-
-static
-PyObject *
-config_set_number_of_threads( PyObject * self, PyObject * args )
-{
-    int   number_of_threads;
-
-    if (!PyArg_ParseTuple( args, "i", &number_of_threads )) {
-        return NULL;
-    }
-
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    // TODO: Catch exceptions and set errors as appropriate.
-    config->set_number_of_threads( number_of_threads );
-
-    Py_RETURN_NONE;
-}
-
-
-static
-PyObject *
-config_get_reads_input_buffer_size( PyObject * self, PyObject * args )
-{
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    // TODO: More safely match type with uint64_t.
-    return PyLong_FromUnsignedLongLong( config->get_reads_input_buffer_size( ) );
-}
-
-
-static
-PyObject *
-config_set_reads_input_buffer_size( PyObject * self, PyObject * args )
-{
-    unsigned long long reads_input_buffer_size;
-
-    if (!PyArg_ParseTuple( args, "K", &reads_input_buffer_size )) {
-        return NULL;
-    }
-
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    // TODO: Catch exceptions and set errors as appropriate.
-    config->set_reads_input_buffer_size( reads_input_buffer_size );
-
-    Py_RETURN_NONE;
-}
-
-
-static
-PyObject *
-config_get_input_buffer_trace_level( PyObject * self, PyObject * args )
-{
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    return PyInt_FromSize_t( (size_t)config->get_input_buffer_trace_level( ) );
-}
-
-
-static
-PyObject *
-config_set_input_buffer_trace_level( PyObject * self, PyObject * args )
-{
-    unsigned char trace_level;
-
-    if (!PyArg_ParseTuple( args, "B", &trace_level )) {
-        return NULL;
-    }
-
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    // TODO: Catch exceptions and set errors as appropriate.
-    config->set_input_buffer_trace_level( (uint8_t)trace_level );
-
-    Py_RETURN_NONE;
-}
-
-
-static
-PyObject *
-config_get_reads_parser_trace_level( PyObject * self, PyObject * args )
-{
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    return PyInt_FromSize_t( (size_t)config->get_reads_parser_trace_level( ) );
-}
-
-
-static
-PyObject *
-config_set_reads_parser_trace_level( PyObject * self, PyObject * args )
-{
-    unsigned char trace_level;
-
-    if (!PyArg_ParseTuple( args, "B", &trace_level )) {
-        return NULL;
-    }
-
-    khmer_ConfigObject *      me        = (khmer_ConfigObject *) self;
-    Config *      config    = me->config;
-    // TODO: Catch exceptions and set errors as appropriate.
-    config->set_reads_parser_trace_level( (uint8_t)trace_level );
-
-    Py_RETURN_NONE;
-}
-
-
-static PyMethodDef khmer_config_methods[] = {
-    {
-        "has_extra_sanity_checks", config_has_extra_sanity_checks,
-        METH_VARARGS, "Compiled with extra sanity checking?"
-    },
-    {
-        "get_number_of_threads", config_get_number_of_threads,
-        METH_VARARGS, "Get the number of threads to use."
-    },
-    {
-        "set_number_of_threads", config_set_number_of_threads,
-        METH_VARARGS, "Set the number of threads to use."
-    },
-    {
-        "get_reads_input_buffer_size", config_get_reads_input_buffer_size,
-        METH_VARARGS, "Get the buffer size used by the reads file parser."
-    },
-    {
-        "set_reads_input_buffer_size", config_set_reads_input_buffer_size,
-        METH_VARARGS, "Set the buffer size used by the reads file parser."
-    },
-    {
-        "get_input_buffer_trace_level", config_get_input_buffer_trace_level,
-        METH_VARARGS, "Get the trace level of the input buffer manager."
-    },
-    {
-        "set_input_buffer_trace_level", config_set_input_buffer_trace_level,
-        METH_VARARGS, "Set the trace level of the input buffer manager."
-    },
-    {
-        "get_reads_parser_trace_level", config_get_reads_parser_trace_level,
-        METH_VARARGS, "Get the trace level of the reads file parser."
-    },
-    {
-        "set_reads_parser_trace_level", config_set_reads_parser_trace_level,
-        METH_VARARGS, "Set the trace level of the reads file parser."
-    },
-    {NULL, NULL, 0, NULL}           /* sentinel */
-};
-
-static
-PyObject *
-khmer_config_getattr( PyObject * obj, char * name )
-{
-    return Py_FindMethod(khmer_config_methods, obj, name);
 }
 
 /***********************************************************************/
@@ -645,25 +358,10 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     using namespace read_parsers;
 
     const char *      ifile_name_CSTR;
-    Config  &the_config   = get_active_config( );
-    uint32_t    number_of_threads = the_config.get_number_of_threads( );
-    uint64_t    cache_size    = the_config.get_reads_input_buffer_size( );
-    uint8_t     trace_level   = the_config.get_reads_parser_trace_level( );
 
-    if (!PyArg_ParseTuple(
-                args, "s|IKH",
-                &ifile_name_CSTR, &number_of_threads, &cache_size, &trace_level
-            )) {
+    if (!PyArg_ParseTuple(args, "s", &ifile_name_CSTR )) {
         return NULL;
     }
-    if (number_of_threads < 1) {
-        PyErr_SetString(
-            PyExc_ValueError,
-            "Invalid thread number, must be integer greater than zero."
-        );
-        return NULL;
-    }
-    // TODO: Handle keyword arguments.
     std:: string    ifile_name( ifile_name_CSTR );
 
     PyObject * self     = subtype->tp_alloc( subtype, 1 );
@@ -675,11 +373,9 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
     // Wrap the low-level parser object.
     try {
         myself->parser =
-            IParser:: get_parser(
-                ifile_name, number_of_threads, cache_size, trace_level
-            );
+            IParser:: get_parser( ifile_name );
     } catch (InvalidStreamHandle &exc) {
-        PyErr_SetString( PyExc_ValueError, "invalid input file name" );
+        PyErr_SetString( PyExc_ValueError, exc.what() );
         return NULL;
     }
     return self;
@@ -695,7 +391,7 @@ _ReadParser_iternext( PyObject * self )
     ReadParser_Object * myself  = (ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
 
-    bool    stop_iteration;
+    bool    stop_iteration = false;
     char    const * exc = NULL;
     Read *  the_read_PTR    = new Read( );
 
@@ -705,8 +401,8 @@ _ReadParser_iternext( PyObject * self )
         if (!stop_iteration)
             try {
                 parser->imprint_next_read( *the_read_PTR );
-            } catch (InvalidReadFileFormat &e) {
-                exc = e.what( );
+            } catch (NoMoreReadsAvailable &e) {
+                stop_iteration = true;
             }
     } catch (StreamReadError &e) {
         exc = e.what();
@@ -745,7 +441,6 @@ _ReadPairIterator_iternext( PyObject * self )
     uint8_t         pair_mode = myself->pair_mode;
 
     ReadPair    the_read_pair;
-    // cppcheck-suppress unreadVariable
     bool    stop_iteration      = false;
     bool    invalid_file_format     = false;
     char    exc_message[ CHAR_MAX ];
@@ -756,9 +451,6 @@ _ReadPairIterator_iternext( PyObject * self )
     if (!stop_iteration)
         try {
             parser->imprint_next_read_pair( the_read_pair, pair_mode );
-        } catch (InvalidReadFileFormat &exc) {
-            invalid_file_format = true;
-            strncpy( exc_message, exc.what( ), CHAR_MAX );
         } catch (UnknownPairReadingMode &exc) {
             unknown_pair_reading_mode = true;
         } catch (InvalidReadPair &exc) {
@@ -1196,9 +888,6 @@ static PyObject * hash_consume_fasta_with_reads_parser(
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
         exc_raised = true;
-    } catch (read_parsers::InvalidReadFileFormat &e) {
-        exc = e.what();
-        exc_raised = true;
     }
     Py_END_ALLOW_THREADS
     if (exc_raised) {
@@ -1530,38 +1219,6 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self,
 
     Py_RETURN_NONE;
 }
-
-// callback function to pass into dump function
-
-void _dump_report_fn(const char * info, unsigned int count, void * data)
-{
-    // handle signals etc. (like CTRL-C)
-    if (PyErr_CheckSignals() != 0) {
-        throw _khmer_signal("PyErr_CheckSignals received a signal");
-    }
-
-    // if 'data' is set, it is a Python callable
-    if (data) {
-        PyObject * obj = (PyObject *) data;
-        if (obj != Py_None) {
-            PyObject * args = Py_BuildValue("sI", info, count);
-            if (args != NULL) {
-                PyObject * r = PyObject_Call(obj, args, NULL);
-                Py_XDECREF(r);
-            }
-            Py_XDECREF(args);
-        }
-    }
-
-    if (PyErr_Occurred()) {
-        throw _khmer_signal("PyErr_Occurred is set");
-    }
-
-    // ...allow other Python threads to do stuff...
-    Py_BEGIN_ALLOW_THREADS;
-    Py_END_ALLOW_THREADS;
-}
-
 
 static PyObject * hash_load(PyObject * self, PyObject * args)
 {
@@ -1895,10 +1552,8 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
 {
     WordLength k = 0;
     PyListObject * sizes_list_o = NULL;
-    unsigned int n_threads = 1;
 
-    if (!PyArg_ParseTuple(args, "bO!|I", &k, &PyList_Type, &sizes_list_o,
-                          &n_threads)) {
+    if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
         return NULL;
     }
 
@@ -1930,7 +1585,7 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    kcounting_obj->counting = new CountingHash(k, sizes, n_threads);
+    kcounting_obj->counting = new CountingHash(k, sizes);
 
     return (PyObject *) kcounting_obj;
 }
@@ -2006,12 +1661,21 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
 
-    // cppcheck-suppress unreadVariable
     HashIntoType * dist = NULL;
 
+    const char * exception = NULL;
     Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(rparser, hashbits);
+    try {
+        dist = counting->abundance_distribution(rparser, hashbits);
+    } catch (khmer::read_parsers::NoMoreReadsAvailable &exc ) {
+        exception = exc.what();
+    }
     Py_END_ALLOW_THREADS
+    if (exception != NULL) {
+        delete[] dist;
+        PyErr_SetString(PyExc_IOError, exception);
+        return NULL;
+    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {
@@ -2619,8 +2283,6 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
                                 _report_fn, callback_obj);
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
-    } catch (read_parsers::InvalidReadFileFormat &e) {
-        exc = e.what();
     }
 
     Py_END_ALLOW_THREADS
@@ -2722,8 +2384,6 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
         );
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
-    } catch (read_parsers::InvalidReadFileFormat &e) {
-        exc = e.what();
     }
     Py_END_ALLOW_THREADS
     if (exc != NULL) {
@@ -4635,10 +4295,6 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,       "Create a default internals config"
     },
 #endif
-    {
-        "get_config",       get_config,
-        METH_VARARGS,       "Get active khmer configuration object"
-    },
 #if (0)
     {
         "set_config",       set_active_config,
@@ -4689,7 +4345,6 @@ init_khmer(void)
 {
     using namespace python;
 
-    khmer_ConfigType.ob_type          = &PyType_Type;
     khmer_KCountingHashType.ob_type   = &PyType_Type;
 
     // implemented __new__ for Hashbits; keeping factory func around as well
