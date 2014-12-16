@@ -47,7 +47,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     __asm__ __volatile__ ("" ::: "memory");
     _seqan_spin_lock = 0;
     if (ret != 0) {
-	if (seqan::isGood(_stream)) {
+	if (seqan::atEnd(_stream) || seqan::isGood(_stream)) {
 	    throw NoMoreReadsAvailable();
 	} else {
 	    throw StreamReadError();

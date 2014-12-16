@@ -442,7 +442,6 @@ _ReadPairIterator_iternext( PyObject * self )
 
     ReadPair    the_read_pair;
     bool    stop_iteration      = false;
-    char    exc_message[ CHAR_MAX ];
     bool    unknown_pair_reading_mode   = false;
     bool    invalid_read_pair       = false;
     bool    stream_read_error = false;
