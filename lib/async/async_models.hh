@@ -119,7 +119,7 @@ class Async {
         }
 };
 
-
+/*
 struct NoMoreQueuesAvailable : public khmer_exception {
 };
 
@@ -157,7 +157,7 @@ template <class T> class AsyncRRProducer: public virtual Async {
             __sync_bool_compare_compare_and_swap( &_acquire_q_spinlock, 1, 0);
             return q;
         }
-
+*/
         
 
 
