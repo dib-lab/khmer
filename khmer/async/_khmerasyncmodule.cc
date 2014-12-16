@@ -170,7 +170,10 @@ static PyObject * asyncseqproc_processed_iternext(PyObject * self) {
         ((Read_Object *)read_1_OBJECT)->read = read_1_ptr;
         PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
         ((Read_Object *)read_2_OBJECT)->read = read_2_ptr;
-        return PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+        PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+        Py_XDECREF(read_1_OBJECT);
+        Py_XDECREF(read_2_OBJECT);
+        return tup;
     }
 
     read_1_ptr = new Read ( * batch_ptr->first() );

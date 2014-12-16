@@ -197,8 +197,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
             for n, record in enumerate(diginorm):
                 if n % 100000 == 0 and n > 0:
                     print >>sys.stderr, '... kept {kept} of {total} or'\
-                        ' {perc:2}%'.format(kept=n, total=diginorm.n_processed(),
-                                            perc=int(float(n) /
+                        ' {perc:2}%'.format(kept=diginorm.n_kept(), total=diginorm.n_processed(),
+                                            perc=int(float(diginorm.n_kept()) /
                                                      float(diginorm.n_processed()) * 100.))
                     print >>sys.stderr, '... in file', input_filename
                     print >>sys.stderr, 'loads (reader, output):', diginorm.queue_load()
