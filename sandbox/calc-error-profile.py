@@ -6,12 +6,11 @@
 #
 """
 Calculate the mismatch error profile for shotgun data, using a subset of
-reads.
+reads.  The output is placed in <infile>.errhist in the cwd by default.
 
 % scripts/calc-error-profile.py [ -o outfile ] <infile>
 
-Reads FASTQ and FASTA input.  Output histogram is placed in
-<infilename>.errhist OR in the filename passed to -o.
+Reads FASTQ and FASTA input.
 """
 
 import sys
@@ -23,15 +22,16 @@ import os.path
 N_HT = 4
 HASHSIZE = 1e7
 K = 20
-C = 20
+C = 10
 
 MAX_SEQ_LEN = 65535
 MAX_READS = 1e8
+CHECK_EXIT = 25000
 
 
-def exit_condition(n2_consumed, n_consumed):
-    return (n2_consumed >= n_consumed or
-            n2_consumed > 1e5)
+def exit_condition(n_consumed, n_checked):
+    return (n_checked >= n_consumed or
+            n_checked > 2e5)
 
 
 def main():
@@ -41,6 +41,8 @@ def main():
 
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='output_file',
+                        help="output file for histogram; defaults to "
+                             "<first filename>.errhist in cwd.",
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--errors-per-read', dest='errors_per_read',
                         type=argparse.FileType('w'), default=None)
@@ -69,8 +71,8 @@ def main():
     positions = [0] * MAX_SEQ_LEN
     lengths = []                  # keep track of sequence lengths
 
-    n_consumed = n2_consumed = 0
-    bp_consumed = bp2_consumed = 0
+    n_consumed = 0
+    bp_consumed = 0
     total = 0
     n_checked = 0
 
@@ -83,15 +85,15 @@ def main():
         for n, record in enumerate(screed.open(filename)):
             total += 1
 
-            if total % 25000 == 0:
-                print >>sys.stderr, '...', total, n_consumed, n2_consumed
+            if total % CHECK_EXIT == 0:
+                print >>sys.stderr, '...', total, n_consumed, n_checked
 
                 # two exit conditions: first, have we hit our max reads limit?
                 if total >= MAX_READS:
                     break
 
-                # OR, alternatively, have we collected enough reads?
-                if exit_condition(n2_consumed, n_consumed):
+                # OR, alternatively, have we counted enough reads?
+                if exit_condition(n_consumed, n_checked):
                     break
 
             # for each sequence, calculate its coverage:
@@ -104,12 +106,6 @@ def main():
                 n_consumed += 1
                 bp_consumed += len(seq)
             else:
-                # also consume & track up to 2C -- CTB consume only high abnd?
-                if med < 2 * C:   # @@CTB
-                    # keep this, because it reassures us that sufficient
-                    # data has been seen.
-                    bp2_consumed += len(seq)
-
                 # for saturated data, find low-abund k-mers
                 posns = ht.find_spectral_error_positions(seq, 2)
                 lengths.append(len(seq))
@@ -133,6 +129,7 @@ def main():
         length_count[j] = sum([1 for i in lengths if i >= j])
 
     # write!
+    output_file.write('position error_count error_fraction\n')
     for n, i in enumerate(positions[:max_length]):
         print >>output_file, n, i, float(i) / float(length_count[n])
 
@@ -140,15 +137,15 @@ def main():
 
     print >>sys.stderr, ''
     print >>sys.stderr, 'total sequences:', total
-    print >>sys.stderr, 'n consumed:', n_consumed, n2_consumed
-    print >>sys.stderr, 'bp consumed:', bp_consumed, bp_consumed / float(C)
+    print >>sys.stderr, 'n consumed:', n_consumed
     print >>sys.stderr, 'n checked:', n_checked
+    print >>sys.stderr, 'bp consumed:', bp_consumed, bp_consumed / float(C)
     print >>sys.stderr, 'error rate: %.2f%%' % \
         (100.0 * sum(positions) / float(sum(lengths)))
 
     print >>sys.stderr, 'Error histogram is in %s' % output_filename
 
-    if not exit_condition(n2_consumed, n_consumed):
+    if not exit_condition(n_consumed, n_checked):
         print >>sys.stderr, ""
         print >>sys.stderr, "** WARNING: not enough reads to get a good result"
         print >>sys.stderr, "** Is this high diversity sample / small subset?"

@@ -1,4 +1,4 @@
-2014-12-15  Titus Brown  <titus@idyll.org>
+2014-12-16  Titus Brown  <titus@idyll.org>
 
     * sandbox/{calc-error-profile.py,collect-variants.py,correct-errors.py,
     trim-low-abund.py}: Support for k-mer spectral error analysis, sublinear
