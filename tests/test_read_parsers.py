@@ -68,6 +68,18 @@ def test_bzip2_decompression():
     assert 100 == reads_count
 
 
+def test_bzip2_decompression_truncated():
+
+    reads_count = 0
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
+    try:
+        for read in rparser:
+            reads_count += 1
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
+
+
 def test_badbzip2():
     try:
         rparser = ReadParser(utils.get_test_data("test-empty.fa.bz2"))
@@ -110,7 +122,8 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
     for t in threads:
         t.join()
 
-    assert reads_count_1thr == sum(reads_counts_per_thread)
+    assert reads_count_1thr == sum(reads_counts_per_thread), \
+            reads_counts_per_thread
 
 
 @attr('multithread')

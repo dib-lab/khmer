@@ -396,16 +396,15 @@ _ReadParser_iternext( PyObject * self )
     Read *  the_read_PTR    = new Read( );
 
     Py_BEGIN_ALLOW_THREADS
-    try {
-        stop_iteration = parser->is_complete( );
-        if (!stop_iteration)
-            try {
+    stop_iteration = parser->is_complete( );
+    if (!stop_iteration) {
+        try {
                 parser->imprint_next_read( *the_read_PTR );
             } catch (NoMoreReadsAvailable &e) {
                 stop_iteration = true;
-            }
-    } catch (StreamReadError &e) {
-        exc = e.what();
+            } catch (StreamReadError &e) {
+		exc = e.what();
+	    }
     }
     Py_END_ALLOW_THREADS
 

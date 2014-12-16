@@ -41,17 +41,20 @@ bool SeqAnParser::is_complete()
 void SeqAnParser::imprint_next_read(Read &the_read)
 {
     the_read.reset();
+    int ret = -1;
     while (!__sync_bool_compare_and_swap(& _seqan_spin_lock, 0, 1));
-    int ret = seqan::readRecord(the_read.name, the_read.sequence,
+    bool atEnd = seqan::atEnd(_stream);
+    if (!atEnd) {
+	ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.accuracy, _stream);
+    }
     __asm__ __volatile__ ("" ::: "memory");
     _seqan_spin_lock = 0;
+    if (atEnd) {
+	throw NoMoreReadsAvailable();
+    }
     if (ret != 0) {
-	if (seqan::atEnd(_stream) || seqan::isGood(_stream)) {
-	    throw NoMoreReadsAvailable();
-	} else {
-	    throw StreamReadError();
-	}
+	throw StreamReadError();
     }
 }
 
