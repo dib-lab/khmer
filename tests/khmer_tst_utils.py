@@ -13,6 +13,7 @@ import nose
 import sys
 import khmer.file
 import traceback
+import subprocess
 
 
 def get_test_data(filename):
@@ -120,3 +121,48 @@ def runscript(scriptname, args, in_directory=None,
         assert False, (status, out, err)
 
     return status, out, err
+
+
+def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
+                      fail_ok=False, sandbox=False):
+    """
+    Run the given Python script, with the given args, in the given directory,
+    using 'subprocess'.
+    """
+
+    cwd = os.getcwd()
+
+    status = -1
+
+    if sandbox:
+        paths = [os.path.join(os.path.dirname(__file__), "../sandbox")]
+    else:
+        paths = [os.path.join(os.path.dirname(__file__), "../scripts")]
+        paths.extend(os.environ['PATH'].split(':'))
+    for path in paths:
+        scriptfile = os.path.join(path, scriptname)
+        if os.path.isfile(scriptfile):
+            if in_directory:
+                os.chdir(in_directory)
+            sysargs = 'cat ' + stdinfilename + ' | python ' + scriptfile + \
+                " " + args
+            out = open(os.path.join(in_directory, "out"), 'w+b')
+            err = open(os.path.join(in_directory, "err"), 'w+b')
+            print 'running:', scriptname, 'in:', in_directory
+            print 'arguments', sysargs
+            status = subprocess.call(args=sysargs, stdout=out, stderr=err,
+                                     shell=True)
+            os.chdir(cwd)
+            if status != 0 and not fail_ok:
+                out.seek(0)
+                out = out.read()
+                err.seek(0)
+                err = err.read()
+                print out
+                print err
+                assert False, (status, out, err)
+
+            return status, out, err
+
+        if sandbox:
+            raise nose.SkipTest("sandbox tests are only run in a repository.")

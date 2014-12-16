@@ -332,7 +332,7 @@ _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
         myself->parser =
             IParser:: get_parser( ifile_name );
     } catch (InvalidStreamHandle &exc) {
-        PyErr_SetString( PyExc_ValueError, "invalid input file name" );
+        PyErr_SetString( PyExc_ValueError, exc.what() );
         return NULL;
     }
     return self;
@@ -441,7 +441,10 @@ _ReadPairIterator_iternext( PyObject * self )
     ((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
     PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
     ((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
-    return PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+    PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+    Py_XDECREF(read_1_OBJECT);
+    Py_XDECREF(read_2_OBJECT);
+    return tup;
 }
 
 
@@ -1576,12 +1579,21 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
 
     read_parsers:: IParser * rparser = rparser_obj->parser;
     Hashbits * hashbits = tracking_obj->hashbits;
-
     HashIntoType * dist = NULL;
 
+    const char * exception = NULL;
     Py_BEGIN_ALLOW_THREADS
-    dist = counting->abundance_distribution(rparser, hashbits);
+    try {
+        dist = counting->abundance_distribution(rparser, hashbits);
+    } catch (khmer::read_parsers::NoMoreReadsAvailable &exc ) {
+        exception = exc.what();
+    }
     Py_END_ALLOW_THREADS
+    if (exception != NULL) {
+        delete[] dist;
+        PyErr_SetString(PyExc_IOError, exception);
+        return NULL;
+    }
 
     PyObject * x = PyList_New(MAX_BIGCOUNT + 1);
     if (x == NULL) {
@@ -4104,8 +4116,8 @@ static PyObject * forward_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((char)ksize != ksize) {
-        PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
+    if (ksize > KSIZE_MAX) {
+        PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 
@@ -4121,8 +4133,8 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((unsigned char)ksize != ksize) {
-        PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
+    if (ksize > KSIZE_MAX) {
+        PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 
@@ -4144,8 +4156,8 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    if ((char)ksize != ksize) {
-        PyErr_SetString(PyExc_ValueError, "k-mer size must be <= 255");
+    if (ksize > KSIZE_MAX) {
+        PyErr_Format(PyExc_ValueError, "k-mer size must be <= %u", KSIZE_MAX);
         return NULL;
     }
 

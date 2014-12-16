@@ -1,18 +1,15 @@
-2014-11-17  Michael R. Crusoe  <mcrusoe@msu.edu>
+2014-12-09  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a
     newly found read dropping issue
     https://github.com/ged-lab/khmer/issues/249
     https://github.com/ged-lab/khmer/pull/641
+    Supports reading from non-seekable plain and gziped FAST[AQ] files (a.k.a
+    pipe or streaming support)
 
-    * lib/{read_parsers}.{cc,hh},setup.py,third-party/seqan: replaced parsers
-    with Seqan implementation. Removed unused exception classes.
-    * lib/{counting,hashtable,labelhash,read_aligner}.{cc,hh}: removed
-    Hashtable::Hasher (was for tracing only); removed refs to Config;
-    corrected scope, removed unused lines; adopted API changes
     * khmer/{__init__.py,_khmermodule.cc}: removed the Config object, the
     threads argument to new_counting_hash, and adapted to other changes in API.
-    Droped the unused _dump_report_fn method.
+    Dropped the unused _dump_report_fn method. Enhanced error reporting.
     * lib/{bittest,consume_prof,error,khmer_config,scoringmatrix,thread_id_map}
     .{cc,hh},tests/test_khmer_config.py: deleted unused files
     * sandbox/collect-reads.py,scripts/{abundance-dist-single,do-partition,
@@ -24,7 +21,68 @@
     Camille for her enhanced multi-thread test.
     * lib/{counting,hashtable,ht-diff}.cc,khmer.hh: renamed MAX_COUNT define to
     MAX_KCOUNT; avoids naming conflict with SeqAn
-    * Makefile: refreshed cppcheck{,-result.xml} targets
+    * khmer/file.py: check_file_status(): ignored input files named '-'
+    * khmer/khmer_tst_utils.py: added method to pipe input files to a target
+    script
+    * tests/test_scripts.py: enhanced streaming tests now that four of them
+    work.
+    * Makefile: refreshed cppcheck{,-result.xml} targets, added develop
+    setuptools command prior to testing
+
+2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/user/known_issues.txt: Document that multithreading leads to dropped
+    reads.
+
+2014-12-07  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    This is khmer v1.2
+
+    * Makefile: add sandbox scripts to the pylint_report.txt target
+    * doc/dev/coding-guidelines-and-review.txt: Add question about command
+    line API to the checklist
+    * doc/dev/release.txt: refresh release procedure
+    * doc/release-notes/release-1.2.md
+
+2014-12-05  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * CITATIONS,khmer/khmer_args.py: update citations for Qingpeng's paper
+
+2014-12-01  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/roadmap.txt: Explain the roadmap to v2 through v4
+
+2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
+
+    * tests/test_scripts.py: Stop a test from making a temporary output file
+    in the current dir by explictly specifying an output file.
+
+2014-12-01  Kevin Murray  <spam@kdmurray.id.au>
+
+    * load-into-counting.py: Add a CLI parameter to output a machine-readable
+    summary of the run, including number of k-mers, FPR, input files etc in
+    json or TSV format.
+
+2014-12-01  Titus Brown  <t@idyll.org>
+
+    * Update sandbox docs: some scripts now used in recipes
+
+2014-11-23  Phillip Garland  <pgarland@gmail.com>
+
+    * lib/khmer.hh (khmer): define KSIZE_MAX
+    * khmer/_khmermodule.cc (forward_hash, forward_hash_no_rc) (reverse_hash):
+    Use KSIZE_MAX to check whether the user-supplied k is larger than khmer
+    supports.
+
+2014-11-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * CODE_OF_CONDUT.RST,doc/dev/{index,CODE_OF_CONDUCT}.txt: added a code of
+    conduct
+
+2014-11-18  Jonathan Gluck  <jdg@cs.umd.edu>
+
+    * tests/test_counting_hash.py: Fixed copy paste error in comments, True to
+    False.
 
 2014-11-15  Jacob Fenton  <bocajnotnef@gmail.com>
 

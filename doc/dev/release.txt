@@ -21,7 +21,7 @@ release makers, following this checklist by MRC.
 
 #. (Optional) Check for updates to versioneer::
 
-        pip install versioneer
+        pip install --upgrade versioneer
         versioneer-installer
 
         git diff
@@ -77,37 +77,45 @@ release makers, following this checklist by MRC.
         source bin/activate
         git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
         cd khmer
+        make install-dependencies
         make install
-        nosetests khmer --attr '!known_failing'
         make test
-        normalize-by-median.py --version # double-check version number
+        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+                echo 1st manual version check passed
+        cd ..
+        nosetests khmer --attr '!known_failing'
+
 
         # Secondly we test via pip
         
-        cd ../../testenv2
+        cd ../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-${rc}#egg=khmer
         cd src/khmer
+        make install-dependencies
         make dist
         make install
-        nosetests khmer --attr '!known_failing'
         make test
-        normalize-by-median.py --version # double-check version number
+        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+                echo 2nd manual version check passed
         cp dist/khmer*tar.gz ../../../testenv3/
-        
+        cd ../..
+        nosetests khmer --attr '!known_failing'
+
         # Is the distribution in testenv2 complete enough to build another
         # functional distribution?
         
-        cd ../../../testenv3/
+        cd ../testenv3/
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install khmer*tar.gz
-        nosetests khmer --attr '!known_failing'
+        pip install nose
         tar xzf khmer*tar.gz
         cd khmer*
         make dist
         make test
+        pushd .. ; nosetests khmer --attr '!known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
    to change your PyPI credentials as documented here:
@@ -127,9 +135,10 @@ release makers, following this checklist by MRC.
         pip install screed nose
         pip install -i https://testpypi.python.org/pypi --pre --no-clean khmer
         nosetests khmer --attr '!known_failing'
-        normalize-by-median.py --version 2>&1 | awk ' { print $2 } '
+        normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
+                echo 3rd manual version check passed
         cd build/khmer
-        ./setup.py nosetests
+        make test
 
 #. Do any final testing (BaTLab and/or acceptance tests).
 

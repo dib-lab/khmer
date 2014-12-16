@@ -55,7 +55,7 @@ In short:
 ``pip install khmer`` to download, build, and install the latest stable
 version.
 
-For more details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/install.html>`_
+For more details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/user/install.html>`_
 
 The use of a virtualenv is recommended, see
 https://virtualenv.pypa.io/en/latest/virtualenv.html#installation

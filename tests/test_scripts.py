@@ -7,6 +7,7 @@
 
 # pylint: disable=C0111,C0103,E1103,W0612
 
+import json
 import sys
 import os
 import shutil
@@ -64,6 +65,71 @@ def test_load_into_counting_fail():
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert status == 1, status
     assert "ERROR:" in err
+
+
+def test_load_into_counting_tsv():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
+
+    outfile = utils.get_temp_filename('out.kh')
+    tabfile = outfile + '.info.tsv'
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+    assert os.path.exists(tabfile)
+    with open(tabfile) as tabfh:
+        tabfile_lines = tabfh.readlines()
+    assert len(tabfile_lines) == 2
+    outbase = os.path.basename(outfile)
+    expected_tsv_line = '\t'.join([outbase, '0.000', '95', infile]) + '\n'
+    assert tabfile_lines[1] == expected_tsv_line, tabfile_lines
+
+
+def test_load_into_counting_json():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
+
+    outfile = utils.get_temp_filename('out.kh')
+    jsonfile = outfile + '.info.json'
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+    assert os.path.exists(jsonfile)
+
+    with open(jsonfile) as jsonfh:
+        got_json = json.load(jsonfh)
+    outbase = os.path.basename(outfile)
+    expected_json = {
+        "files": [infile],
+        "ht_name": outbase,
+        "num_kmers": 95,
+        "fpr": 9.024965705097741e-11,
+        "mrinfo_version": "0.1.0",
+    }
+
+    assert got_json == expected_json, got_json
+
+
+def test_load_into_counting_bad_summary_fmt():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
+
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status != 0, status
+    assert "invalid choice: 'badfmt'" in err, err
 
 
 def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
@@ -270,11 +336,12 @@ def test_filter_stoptags():
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.kh')
+    outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = scriptpath('normalize-by-median.py')
-    args = ['--loadtable', hashfile, infile]
+    args = ['--loadtable', hashfile, '-o', outfile, infile]
     (status, out, err) = utils.runscript(script, args)
     assert status == 0, (out, err)
-    print(out, err)
+    assert os.path.exists(outfile)
 
 
 def test_normalize_by_median():
@@ -1590,34 +1657,46 @@ def execute_streaming_diginorm(ifilename):
     return in_dir + '/outfile'
 
 
-def execute_abund_dist_single_streaming(ifilename, somedir=None):
+def execute_load_graph_streaming(filename):
     '''Helper function for the matrix of streaming tests using screed via
     filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
 
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    ifile = open(ifilename, 'rb')
-    script = scriptpath('abundance-dist-single.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '6', '-t', fifo, 'outfile']
-    os.mkfifo(fifo)
+    script = scriptpath('load-graph.py')
+    args = '-x 1e7 -N 2 -k 20 -t out -'
 
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
+    infile = utils.get_temp_filename('temp')
+    in_dir = os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data(filename), infile)
+    (status, out, err) = utils.runscriptredirect(script, args, infile, in_dir)
 
-    fifofile = open(fifo, 'wb')
-    chunk = ifile.read(8192)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(8192)
+    if status != 0:
+        for line in out:
+            print out
+        for line in err:
+            print err
+        assert status == 0, status
+    err.seek(0)
+    err = err.read()
+    assert 'Total number of unique k-mers: 3960' in err, err
 
-    fifofile.close()
-    thread.join()
+    ht_file = os.path.join(in_dir, 'out.pt')
+    assert os.path.exists(ht_file), ht_file
 
-    return in_dir + '/outfile'
+    tagset_file = os.path.join(in_dir, 'out.tagset')
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
 
 
 @attr('known_failing')
@@ -1678,51 +1757,33 @@ def test_screed_streaming_gzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
 
 
-@attr('known_failing')
 def test_read_parser_streaming_ufa():
-    # uncompressed fa
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('test-abund-read-2.fa'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+    # uncompressed FASTA
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
+
+
+def test_read_parser_streaming_ufq():
+    # uncompressed FASTQ
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('100-reads.fq.bz2'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+    # bzip compressed FASTQ
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
 
 
-@attr('known_failing')
 def test_read_parser_streaming_gzfq():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('100-reads.fq.gz'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+    # gzip compressed FASTQ
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('test-abund-read-2.fa.bz2'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+    # bzip compressed FASTA
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
 
 
-@attr('known_failing')
 def test_read_parser_streaming_gzfa():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('test-abund-read-2.fa.gz'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+    # gzip compressed FASTA
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
