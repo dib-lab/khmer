@@ -399,12 +399,12 @@ _ReadParser_iternext( PyObject * self )
     stop_iteration = parser->is_complete( );
     if (!stop_iteration) {
         try {
-                parser->imprint_next_read( *the_read_PTR );
-            } catch (NoMoreReadsAvailable &e) {
-                stop_iteration = true;
-            } catch (StreamReadError &e) {
-		exc = e.what();
-	    }
+            parser->imprint_next_read( *the_read_PTR );
+        } catch (NoMoreReadsAvailable &e) {
+            stop_iteration = true;
+        } catch (StreamReadError &e) {
+            exc = e.what();
+        }
     }
     Py_END_ALLOW_THREADS
 
@@ -454,10 +454,10 @@ _ReadPairIterator_iternext( PyObject * self )
         } catch (InvalidReadPair &exc) {
             invalid_read_pair = true;
         } catch (StreamReadError &exc) {
-	    stream_read_error = true;
-	} catch (NoMoreReadsAvailable &exc) {
-	    stop_iteration = true;
-	}
+            stream_read_error = true;
+        } catch (NoMoreReadsAvailable &exc) {
+            stop_iteration = true;
+        }
     Py_END_ALLOW_THREADS
 
     // Note: Can return NULL instead of setting the StopIteration exception.
@@ -477,8 +477,8 @@ _ReadPairIterator_iternext( PyObject * self )
     }
 
     if (stream_read_error) {
-	PyErr_SetString( PyExc_IOError, "Input file error.");
-	return NULL;
+        PyErr_SetString( PyExc_IOError, "Input file error.");
+        return NULL;
     }
 
     // Copy elements of 'ReadPair' object into Python tuple.

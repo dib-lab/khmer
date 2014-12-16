@@ -45,16 +45,16 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     while (!__sync_bool_compare_and_swap(& _seqan_spin_lock, 0, 1));
     bool atEnd = seqan::atEnd(_stream);
     if (!atEnd) {
-	ret = seqan::readRecord(the_read.name, the_read.sequence,
+        ret = seqan::readRecord(the_read.name, the_read.sequence,
                                 the_read.accuracy, _stream);
     }
     __asm__ __volatile__ ("" ::: "memory");
     _seqan_spin_lock = 0;
     if (atEnd) {
-	throw NoMoreReadsAvailable();
+        throw NoMoreReadsAvailable();
     }
     if (ret != 0) {
-	throw StreamReadError();
+        throw StreamReadError();
     }
 }
 
