@@ -164,9 +164,6 @@ def test_old_illumina_pair_mating():
 
     import threading
 
-    # Note: This file, when used in conjunction with a 65600 byte per-thread
-    #       prefetch buffer, tests the paired read mating logic with the
-    #       old Illumina read name format.
     rparser = ReadParser(utils.get_test_data("test-reads.fa"))
 
     def thread_1_runtime(rparser):
@@ -177,7 +174,6 @@ def test_old_illumina_pair_mating():
         for readnum, read in enumerate(rparser):
             if 0 == readnum:
                 pass
-                # assert "850:2:1:1198:16820/1" == read.name, read.name
 
     t1 = threading.Thread(target=thread_1_runtime, args=[rparser])
     t2 = threading.Thread(target=thread_2_runtime, args=[rparser])

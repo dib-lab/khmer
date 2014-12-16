@@ -120,8 +120,7 @@ void
 Hashtable::
 consume_fasta(
     std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed,
-    CallbackFn	      callback,	    void *		callback_data
+    unsigned int	      &total_reads, unsigned long long	&n_consumed
 )
 {
     IParser *	  parser =
@@ -129,8 +128,7 @@ consume_fasta(
 
     consume_fasta(
         parser,
-        total_reads, n_consumed,
-        callback, callback_data
+        total_reads, n_consumed
     );
 
     delete parser;
@@ -140,13 +138,9 @@ void
 Hashtable::
 consume_fasta(
     read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads, unsigned long long  &n_consumed,
-    CallbackFn		    callback,	  void *	      callback_data
+    unsigned int		    &total_reads, unsigned long long  &n_consumed
 )
 {
-#if (0) // Note: Used with callback - currently disabled.
-    unsigned long long int  n_consumed_LOCAL	= 0;
-#endif
     Read			  read;
 
     // Iterate through the reads and consume their k-mers.
@@ -159,28 +153,8 @@ consume_fasta(
             unsigned int this_n_consumed =
                 check_and_process_read(read.sequence, is_valid);
 
-#if (0) // Note: Used with callback - currently disabled.
-            n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#else
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#endif
             __sync_add_and_fetch( &total_reads, 1 );
-
-            // TODO: Figure out alternative to callback into Python VM
-            //       Cannot use in multi-threaded operation.
-#if (0)
-            // run callback, if specified
-            if (callback && (0 == (total_reads_LOCAL % CALLBACK_PERIOD))) {
-                try {
-                    callback(
-                        "consume_fasta", callback_data,
-                        total_reads_LOCAL, n_consumed_LOCAL
-                    );
-                } catch (...) {
-                    throw;
-                }
-            }
-#endif // 0
         } catch (read_parsers::NoMoreReadsAvailable) {
         }
 
@@ -445,8 +419,7 @@ void
 Hashtable::
 consume_fasta_and_tag(
     std:: string const  &filename,
-    unsigned int	      &total_reads, unsigned long long	&n_consumed,
-    CallbackFn	      callback,	    void *		callback_data
+    unsigned int	      &total_reads, unsigned long long	&n_consumed
 )
 {
     IParser *	  parser =
@@ -454,8 +427,7 @@ consume_fasta_and_tag(
 
     consume_fasta_and_tag(
         parser,
-        total_reads, n_consumed,
-        callback, callback_data
+        total_reads, n_consumed
     );
 
     delete parser;
@@ -465,13 +437,9 @@ void
 Hashtable::
 consume_fasta_and_tag(
     read_parsers:: IParser *  parser,
-    unsigned int		    &total_reads,   unsigned long long	&n_consumed,
-    CallbackFn		    callback,	    void *		callback_data
+    unsigned int		    &total_reads,   unsigned long long	&n_consumed
 )
 {
-#if (0) // Note: Used with callback - currently disabled.
-    unsigned long long int  n_consumed_LOCAL	= 0;
-#endif
     Read			  read;
 
     // TODO? Delete the following assignments.
@@ -487,30 +455,9 @@ consume_fasta_and_tag(
             unsigned long long this_n_consumed = 0;
             consume_sequence_and_tag( read.sequence, this_n_consumed );
 
-#if (0) // Note: Used with callback - currently disabled.
-            n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#else
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
-#endif
             __sync_add_and_fetch( &total_reads, 1 );
         }
-
-        // TODO: Figure out alternative to callback into Python VM
-        //       Cannot use in multi-threaded operation.
-#if (0)
-        // run callback, if specified
-        if (total_reads_TL % CALLBACK_PERIOD == 0 && callback) {
-            std::cout << "n tags: " << all_tags.size() << "\n";
-            try {
-                callback("consume_fasta_and_tag", callback_data, total_reads_TL,
-                         n_consumed);
-            } catch (...) {
-                delete parser;
-                throw;
-            }
-        }
-#endif // 0
-
     } // while reads left for parser
 
 }
@@ -523,9 +470,7 @@ consume_fasta_and_tag(
 
 void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
         unsigned int &total_reads,
-        unsigned long long &n_consumed,
-        CallbackFn callback,
-        void * callback_data)
+        unsigned long long &n_consumed)
 {
     total_reads = 0;
     n_consumed = 0;
@@ -614,17 +559,6 @@ void Hashtable::consume_fasta_and_tag_with_stoptags(const std::string &filename,
         // reset the sequence info, increment read number
         total_reads++;
 
-        // run callback, if specified
-        if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            std::cout << "n tags: " << all_tags.size() << "\n";
-            try {
-                callback("consume_fasta_and_tag", callback_data, total_reads,
-                         n_consumed);
-            } catch (...) {
-                delete parser;
-                throw;
-            }
-        }
     }
     delete parser;
 }
@@ -655,9 +589,7 @@ void Hashtable::divide_tags_into_subsets(unsigned int subset_size,
 
 void Hashtable::consume_partitioned_fasta(const std::string &filename,
         unsigned int &total_reads,
-        unsigned long long &n_consumed,
-        CallbackFn callback,
-        void * callback_data)
+        unsigned long long &n_consumed)
 {
     total_reads = 0;
     n_consumed = 0;
@@ -696,17 +628,6 @@ void Hashtable::consume_partitioned_fasta(const std::string &filename,
 
         // reset the sequence info, increment read number
         total_reads++;
-
-        // run callback, if specified
-        if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("consume_partitioned_fasta", callback_data, total_reads,
-                         n_consumed);
-            } catch (...) {
-                delete parser;
-                throw;
-            }
-        }
     }
 
     delete parser;
@@ -926,9 +847,7 @@ const
 }
 
 void Hashtable::filter_if_present(const std::string &infilename,
-                                  const std::string &outputfile,
-                                  CallbackFn callback,
-                                  void * callback_data)
+                                  const std::string &outputfile)
 {
     IParser* parser = IParser::get_parser(infilename);
     ofstream outfile(outputfile.c_str());
@@ -964,18 +883,6 @@ void Hashtable::filter_if_present(const std::string &infilename,
             }
 
             total_reads++;
-
-            // run callback, if specified
-            if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-                try {
-                    callback("filter_if_present", callback_data,total_reads, reads_kept);
-                } catch (...) {
-                    delete parser;
-                    parser = NULL;
-                    outfile.close();
-                    throw;
-                }
-            }
         }
     }
 

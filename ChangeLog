@@ -1,5 +1,11 @@
 2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+   * khmer/{__init__.py,_khmermodule.cc},lib/{hashbits.cc,hashbits.hh,
+   hashtable,tests/test_{c_wrapper,read_parsers}.py: remove unused callback
+   functionality
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
    * setup.py: point to the latest screed release candidate to work around
    versioneer bug.
 
