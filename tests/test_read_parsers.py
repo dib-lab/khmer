@@ -59,11 +59,21 @@ def test_gzip_decompression():
 
 def test_gzip_decompression_truncated():
 
-    reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
     try:
         for read in rparser:
-            reads_count += 1
+            pass
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
+
+
+def test_gzip_decompression_truncated_pairiter():
+
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.gz"))
+    try:
+        for read in rparser.iter_read_pairs():
+            pass
         assert 0, "this should fail"
     except IOError, err:
         print str(err)
@@ -82,11 +92,21 @@ def test_bzip2_decompression():
 
 def test_bzip2_decompression_truncated():
 
-    reads_count = 0
     rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
     try:
         for read in rparser:
-            reads_count += 1
+            pass
+        assert 0, "this should fail"
+    except IOError, err:
+        print str(err)
+
+
+def test_bzip2_decompression_truncated_pairiter():
+
+    rparser = ReadParser(utils.get_test_data("100-reads.fq.truncated.bz2"))
+    try:
+        for read in rparser.iter_read_pairs():
+            pass
         assert 0, "this should fail"
     except IOError, err:
         print str(err)
@@ -135,7 +155,7 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
         t.join()
 
     assert reads_count_1thr == sum(reads_counts_per_thread), \
-            reads_counts_per_thread
+        reads_counts_per_thread
 
 
 @attr('multithread')
