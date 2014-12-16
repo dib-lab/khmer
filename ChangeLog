@@ -1,4 +1,4 @@
-2014-12-13  Titus Brown  <titus@idyll.org>
+2014-12-15  Titus Brown  <titus@idyll.org>
 
     * sandbox/{calc-error-profile.py,collect-variants.py,correct-errors.py,
     trim-low-abund.py}: Support for k-mer spectral error analysis, sublinear
@@ -6,6 +6,8 @@
     collection based on graphalign, streaming error correction, and streaming
     error trimming.
     * tests/test_sandbox_scripts.py: added tests for sandbox/trim-low-abund.py.
+    * tests/test_counting_hash.py: added tests for new
+    CountingHash::find_spectral_error_positions function.
 
 2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 

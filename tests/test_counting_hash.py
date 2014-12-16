@@ -445,6 +445,22 @@ def test_find_spectral_error_positions_6():
     assert posns == [7], posns
 
 
+def test_find_spectral_error_positions_err():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    try:
+        posns = hi.find_spectral_error_positions(DNA[:6], 1)
+        assert 0, "should raise ValueError; too short"
+    except ValueError:
+        pass
+
+    try:
+        posns = hi.find_spectral_error_positions("ACGTACGN", 1)
+        assert 0, "should raise ValueError; contains N"
+    except ValueError:
+        pass
+
+
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
     kh = khmer.new_counting_hash(4, 4 ** 4, 4)

@@ -1434,11 +1434,13 @@ static PyObject * count_find_spectral_error_positions(PyObject * self,
     }
 
     std::vector<unsigned int> posns;
-    Py_BEGIN_ALLOW_THREADS
 
-    posns = counting->find_spectral_error_positions(seq, max_count);
-
-    Py_END_ALLOW_THREADS;
+    try {
+        posns = counting->find_spectral_error_positions(seq, max_count);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     PyObject * x = PyList_New(posns.size());
     if (x == NULL) {

@@ -387,7 +387,7 @@ const
 {
     std::vector<unsigned int> posns;
     if (!check_and_normalize_read(seq)) {
-        return posns;
+        throw khmer_exception("invalid read");
     }
 
     KMerIterator kmers(seq.c_str(), _ksize);
