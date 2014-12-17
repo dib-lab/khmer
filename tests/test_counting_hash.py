@@ -375,6 +375,92 @@ def test_trim_short():
     assert hi.get(DNA[:51][-6:]) == 1
 
 
+def test_find_spectral_error_positions_1():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[:30])
+
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n + 8])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [30], posns
+
+
+def test_find_spectral_error_positions_2():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA)
+
+    posns = hi.find_spectral_error_positions(DNA, 2)
+    assert posns == [], posns
+
+
+def test_find_spectral_error_positions_6():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[1:])
+
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n + 8])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [0], posns
+
+
+def test_find_spectral_error_positions_4():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+
+    posns = hi.find_spectral_error_positions(DNA, 2)
+    assert posns == [], posns
+
+
+def test_find_spectral_error_positions_5():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[:10])
+    hi.consume(DNA[11:])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [10], posns
+
+
+def test_find_spectral_error_positions_6():
+    K = 8
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[K:])
+
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n + 8])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [7], posns
+
+
+def test_find_spectral_error_positions_err():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    try:
+        posns = hi.find_spectral_error_positions(DNA[:6], 1)
+        assert 0, "should raise ValueError; too short"
+    except ValueError:
+        pass
+
+    try:
+        posns = hi.find_spectral_error_positions("ACGTACGN", 1)
+        assert 0, "should raise ValueError; contains N"
+    except ValueError:
+        pass
+
+
 def test_maxcount():
     # hashtable should saturate at some point so as not to overflow counter
     kh = khmer.new_counting_hash(4, 4 ** 4, 4)

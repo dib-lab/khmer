@@ -159,6 +159,16 @@ public:
     {
         return index >= length;
     }
+
+    unsigned int get_start_pos() const
+    {
+        return index - _ksize;
+    }
+
+    unsigned int get_end_pos() const
+    {
+        return index;
+    }
 }; // class KMerIterator
 
 class Hashtable  		// Base class implementation of a Bloom ht.
@@ -175,9 +185,9 @@ protected:
     unsigned int    _nbits_sub_1;
 
     Hashtable( WordLength ksize )
-	    : _max_count( MAX_KCOUNT ),
-	    _max_bigcount( MAX_BIGCOUNT ),
-            _ksize( ksize )
+        : _max_count( MAX_KCOUNT ),
+          _max_bigcount( MAX_BIGCOUNT ),
+          _ksize( ksize )
     {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {

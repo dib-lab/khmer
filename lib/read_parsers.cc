@@ -25,9 +25,9 @@ SeqAnParser::SeqAnParser( char const * filename ) : IParser( )
         message = message + filename + " for reading.";
         throw InvalidStreamHandle(message.c_str());
     } else if (seqan::atEnd(_stream)) {
-	std::string message = "File ";
-	message = message + filename + " does not contain any sequences!";
-	throw InvalidStreamHandle(message.c_str());
+        std::string message = "File ";
+        message = message + filename + " does not contain any sequences!";
+        throw InvalidStreamHandle(message.c_str());
     }
     __asm__ __volatile__ ("" ::: "memory");
     _seqan_spin_lock = 0;

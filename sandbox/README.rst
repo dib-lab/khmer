@@ -22,6 +22,9 @@ To keep, document, and build recipes for:
 * abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
 * assemstats3.py - print out assembly statistics
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
+* calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference.
+* calc-median-distribution.py - plot coverage distribution; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
+* collect-variants.py
 * combine-pe.py - combine partitions based on shared PE reads.
 * compare-partitions.py
 * dn-identify-errors.py - prototype script to identify errors in reads based on diginorm principles
@@ -53,7 +56,7 @@ To keep, document, and build recipes for:
 * sweep-reads2.py - various ways to extract reads based on k-mer overlap
 * sweep-reads3.py - various ways to extract reads based on k-mer overlap
 * to-casava-1.8-fastq.py - convert reads to different Casava format
-* trim-low-abund.py - streaming version of filter-abund.
+* trim-low-abund.py - streaming k-mer abundance trimming; see filter-abund for non-streaming, and look to `khmer-recipes #6 <https://github.com/ged-lab/khmer-recipes/blob/master/006-streaming-sequence-trimming/index.rst>`__ for usage.
 * write-trimmomatic.py
 
 Good ideas to rewrite using newer tools/approaches:

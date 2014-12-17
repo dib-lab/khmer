@@ -1115,6 +1115,41 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     return ret;
 }
 
+static PyObject * count_find_spectral_error_positions(PyObject * self,
+        PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    khmer::CountingHash * counting = me->counting;
+
+    char * seq = NULL;
+    khmer::BoundedCounterType max_count = 0; // unsigned short int
+
+    if (!PyArg_ParseTuple(args, "sH", &seq, &max_count)) {
+        return NULL;
+    }
+
+    std::vector<unsigned int> posns;
+
+    try {
+        posns = counting->find_spectral_error_positions(seq, max_count);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_ssize_t posns_size = posns.size();
+
+    PyObject * x = PyList_New(posns_size);
+    if (x == NULL) {
+        return NULL;
+    }
+    for (Py_ssize_t i = 0; i < posns_size; i++) {
+        PyList_SET_ITEM(x, i, PyInt_FromLong(posns[i]));
+    }
+
+    return x;
+}
+
 static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
         PyObject * args)
 {
@@ -1437,6 +1472,7 @@ static PyMethodDef khmer_counting_methods[] = {
     { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
     { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
     { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
+    { "find_spectral_error_positions", count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
     { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
     { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
     { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
@@ -1893,6 +1929,7 @@ static PyObject * hashbits_load_stop_tags(PyObject * self, PyObject * args)
 
     Py_RETURN_NONE;
 }
+
 
 static PyObject * hashbits_save_stop_tags(PyObject * self, PyObject * args)
 {

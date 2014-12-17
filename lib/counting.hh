@@ -248,6 +248,8 @@ public:
                                     BoundedCounterType min_abund) const;
     unsigned long trim_below_abundance(std::string seq,
                                        BoundedCounterType max_abund) const;
+    std::vector<unsigned int> find_spectral_error_positions(std::string seq,
+            BoundedCounterType min_abund) const;
 
     void collect_high_abundance_kmers(const std::string &infilename,
                                       unsigned int lower_count,

@@ -90,7 +90,7 @@ astyle: $(CPPSOURCES)
 
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
-		setup.py khmer/ scripts/ tests/
+		setup.py khmer/*.py scripts/*.py tests/*.py
 
 # A command to automatically run astyle and autopep8 on appropriate files
 format: astyle autopep8
