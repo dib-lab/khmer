@@ -381,8 +381,8 @@ const
 }
 
 std::vector<unsigned int> CountingHash::find_spectral_error_positions(
-        std::string seq,
-        BoundedCounterType max_abund)
+    std::string seq,
+    BoundedCounterType max_abund)
 const
 {
     std::vector<unsigned int> posns;

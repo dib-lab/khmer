@@ -1116,7 +1116,7 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
 }
 
 static PyObject * count_find_spectral_error_positions(PyObject * self,
-                                                      PyObject * args)
+        PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     khmer::CountingHash * counting = me->counting;

@@ -185,9 +185,9 @@ protected:
     unsigned int    _nbits_sub_1;
 
     Hashtable( WordLength ksize )
-	    : _max_count( MAX_KCOUNT ),
-	    _max_bigcount( MAX_BIGCOUNT ),
-            _ksize( ksize )
+        : _max_count( MAX_KCOUNT ),
+          _max_bigcount( MAX_BIGCOUNT ),
+          _ksize( ksize )
     {
         _tag_density = DEFAULT_TAG_DENSITY;
         if (!(_tag_density % 2 == 0)) {
