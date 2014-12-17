@@ -4,7 +4,7 @@
 #  and documentation
 # make coverage-report to check coverage of the python scripts by the tests
 
-CPPSOURCES=$(wildcard lib/*.cc lib/*.hh khmer/_khmermodule.cc)
+CPPSOURCES=$(wildcard lib/*.cc lib/*.hh lib/async/*.cc lib/async/*.hh khmer/_khmermodule.cc khmer/async/_khmerasyncmodule.cc)
 PYSOURCES=$(wildcard khmer/*.py scripts/*.py)
 SOURCES=$(PYSOURCES) $(CPPSOURCES) setup.py
 DEVPKGS=sphinxcontrib-autoprogram pep8==1.5.7 diff_cover \
@@ -12,10 +12,10 @@ autopep8 pylint coverage gcovr nose screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
-CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
+CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc khmer/async/_khmerasyncmodule.cc | grep -v test | cppcheck -DNDEBUG \
 	 -DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
 	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
-	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib
+	 --quiet -Ilib -Ilib/async -Ithird-party/bzip2 -Ithird-party/zlib
 
 all: khmer/_khmermodule.so
 
@@ -43,8 +43,8 @@ dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
-	rm -f khmer/_khmermodule.so || true
-	rm khmer/*.pyc lib/*.pyc || true
+	rm -f khmer/_khmermodule.so khmer/_khmer_async.so || true
+	rm khmer/*.pyc khmer/async/*.pyc lib/*.pyc || true
 	./setup.py clean --all || true
 	rm coverage-debug || true
 	rm -Rf .coverage || true
@@ -155,8 +155,7 @@ lib:
 	$(MAKE)
 
 test:
-	./setup.py develop
-	./setup.py nosetests
+	./setup.py test -s nose.collector
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \

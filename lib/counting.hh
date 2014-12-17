@@ -60,6 +60,7 @@ public:
         _tablesizes.push_back(single_tablesize);
 
         _allocate_counters();
+        //init_threadstuff();
     }
 
     CountingHash( WordLength ksize, std::vector<HashIntoType>& tablesizes ) :
@@ -68,6 +69,7 @@ public:
     {
 
         _allocate_counters();
+        //init_threadstuff();
     }
 
     virtual ~CountingHash()
@@ -84,6 +86,17 @@ public:
             _counts = NULL;
 
             _n_tables = 0;
+        }
+    }
+
+    virtual void init_threadstuff(unsigned int block_size=TABLE_BLOCK_SIZE) {
+        _threadsafe = true;
+        HashIntoType _max_size = _tablesizes.back();
+        _n_table_blocks = (_max_size < block_size) ? 1 : (_max_size / block_size);
+        std::cout << "Table lock blocks: " << _n_table_blocks << std::endl;
+        _table_spinlocks = new uint32_t[_n_table_blocks];
+        for (unsigned int i=0; i<_n_table_blocks; ++i) {
+            _table_spinlocks[i] = 0;
         }
     }
 
@@ -152,7 +165,6 @@ public:
     {
         bool is_new_kmer = true;
         unsigned int  n_full	  = 0;
-
         for (unsigned int i = 0; i < _n_tables; i++) {
             const HashIntoType bin = khash % _tablesizes[i];
             Byte current_count = _counts[ i ][ bin ];
@@ -165,6 +177,7 @@ public:
             //	 However, do we actually care if there is a little
             //	 bit of slop here? It can always be trimmed off later, if
             //	 that would help with stats.
+
             if ( _max_count > current_count ) {
                 __sync_add_and_fetch( *(_counts + i) + bin, 1 );
             } else {
@@ -185,10 +198,49 @@ public:
         }
 
         if (is_new_kmer) {
+          __sync_add_and_fetch(&_n_unique_kmers, 1);
+        }
+
+    } // count
+
+    virtual void count_ts(HashIntoType khash)
+    {
+        bool is_new_kmer = true;
+        unsigned int  n_full	  = 0;
+        uint32_t lock_index = khash % _n_table_blocks;
+        while(!__sync_bool_compare_and_swap( &_table_spinlocks[lock_index], 0, 1));
+        for (unsigned int i = 0; i < _n_tables; i++) {
+            const HashIntoType bin = khash % _tablesizes[i];
+            Byte current_count = _counts[ i ][ bin ];
+            if (is_new_kmer && current_count != 0) {
+                is_new_kmer = false;
+            }
+            if ( _max_count > current_count ) {
+                __sync_add_and_fetch( *(_counts + i) + bin, 1 );
+            } else {
+                n_full++;
+            }
+        } // for each table
+        __sync_bool_compare_and_swap( &_table_spinlocks[lock_index], 1, 0);
+
+        if (n_full == _n_tables && _use_bigcount) {
+            while (!__sync_bool_compare_and_swap( &_bigcount_spin_lock, 0, 1 ));
+            if (_bigcounts[khash] == 0) {
+                _bigcounts[khash] = _max_count + 1;
+            } else {
+                if (_bigcounts[khash] < _max_bigcount) {
+                    _bigcounts[khash] += 1;
+                }
+            }
+            __sync_bool_compare_and_swap( &_bigcount_spin_lock, 1, 0 );
+        }
+
+        if (is_new_kmer) {
             __sync_add_and_fetch(&_n_unique_kmers, 1);
         }
 
     } // count
+
 
     // get the count for the given k-mer.
     virtual const BoundedCounterType get_count(const char * kmer) const

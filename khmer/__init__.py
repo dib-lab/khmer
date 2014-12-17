@@ -34,13 +34,13 @@ from khmer._khmer import ReadParser  # sandbox/to-casava-1.8-fastq.py
 # tests/test_read_parsers.py,scripts/{filter-abund-single,load-graph}.py
 # scripts/{abundance-dist-single,load-into-counting}.py
 
-
 from struct import pack, unpack
 
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
+import khmer.async as async
 
 def new_hashbits(k, starting_size, n_tables=2):
     """Return a new hashbits object. Deprecated.
@@ -240,7 +240,6 @@ These constructors add the functionality provided by the existing
 factory methods to the constructors defined over in cpython land.
 Additional functionality can be added to these classes as appropriate.
 '''
-
 
 class LabelHash(_LabelHash):
 
