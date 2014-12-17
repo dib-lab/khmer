@@ -109,8 +109,8 @@ def main():
             threads.append(cur_thrd)
             cur_thrd.start()
 
-        for _ in threads:
-            _.join()
+        for thread in threads:
+            thread.join()
 
         if index > 0 and index % 10 == 0:
             check_space_for_hashtable(args.n_tables * args.min_tablesize)

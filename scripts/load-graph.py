@@ -77,14 +77,14 @@ def main():
         rparser = khmer.ReadParser(filename)
         threads = []
         print >>sys.stderr, 'consuming input', filename
-        for _ in xrange(args.threads):
+        for num in xrange(args.threads):
             cur_thread = threading.Thread(
                 target=target_method, args=(rparser,))
             threads.append(cur_thread)
             cur_thread.start()
 
-        for _ in threads:
-            _.join()
+        for thread in threads:
+            thread.join()
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
