@@ -24,7 +24,6 @@ def load_fa_seq_names(filename):
 
 class Test_Filter(object):
 
-    @attr('highmem')
     def test_abund(self):
         ht = khmer.new_hashtable(10, 4 ** 10)
 

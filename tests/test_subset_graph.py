@@ -193,7 +193,6 @@ class Test_RandomData(object):
 
 class Test_SaveLoadPmap(object):
 
-    @attr('highmem')
     def test_save_load_merge(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
         filename = utils.get_test_data('test-graph2.fa')
@@ -226,7 +225,6 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
-    @attr('highmem')
     def test_save_load_merge_2(self):
         ht = khmer.new_hashbits(20, 4 ** 8 + 1)
         filename = utils.get_test_data('random-20-a.fa')
@@ -265,7 +263,6 @@ class Test_SaveLoadPmap(object):
         except IOError, e:
             print str(e)
 
-    @attr('highmem')
     def test_save_merge_from_disk(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
         filename = utils.get_test_data('test-graph2.fa')
@@ -295,7 +292,6 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
-    @attr('highmem')
     def test_save_merge_from_disk_2(self):
         ht = khmer.new_hashbits(20, 4 ** 7 + 1)
         filename = utils.get_test_data('random-20-a.fa')
@@ -323,7 +319,6 @@ class Test_SaveLoadPmap(object):
         n_partitions = ht.output_partitions(filename, outfile)
         assert n_partitions == 1, n_partitions        # combined.
 
-    @attr('highmem')
     def test_save_merge_from_disk_file_not_exist(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
         filename = utils.get_test_data('test-graph2.fa')
@@ -345,7 +340,6 @@ class Test_SaveLoadPmap(object):
         except IOError, e:
             print str(e)
 
-    @attr('highmem')
     def test_merge_from_disk_file_bad_type(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
         infile = utils.get_test_data('goodversion-k12.ht')
@@ -356,7 +350,6 @@ class Test_SaveLoadPmap(object):
         except IOError, e:
             print str(e)
 
-    @attr('highmem')
     def test_merge_from_disk_file_version(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
         infile = utils.get_test_data('badversion-k12.ht')

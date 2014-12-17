@@ -41,7 +41,7 @@ def test_check_space():
 
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
 
     outfile = utils.get_temp_filename('out.kh')
     infile = utils.get_test_data('test-abund-read-2.fa')
@@ -49,7 +49,7 @@ def test_load_into_counting():
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 95' in err, err
+    assert 'Total number of unique k-mers: 89' in err, err
     assert os.path.exists(outfile)
 
 
@@ -668,7 +668,7 @@ def test_load_graph_multithread():
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
 
-    args = ['-N', '4', '-x', '1e9', '-T', '8', outfile, infile]
+    args = ['-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
 
     (status, out, err) = utils.runscript(script, args)
 
