@@ -15,6 +15,7 @@ Use '-h' for parameter help.
 """
 
 import sys
+import threading
 
 import khmer
 from khmer.khmer_args import build_hashbits_args
@@ -73,10 +74,17 @@ def main():
         target_method = htable.consume_fasta_and_tag_with_reads_parser
 
     for _, filename in enumerate(filenames):
-
         rparser = khmer.ReadParser(filename)
+        threads = []
         print >>sys.stderr, 'consuming input', filename
-        target_method(rparser)
+        for num in xrange(args.threads):
+            cur_thread = threading.Thread(
+                target=target_method, args=(rparser,))
+            threads.append(cur_thread)
+            cur_thread.start()
+
+        for thread in threads:
+            thread.join()
 
     if args.report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(

@@ -2390,6 +2390,8 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
         );
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
+    } catch (khmer::read_parsers::NoMoreReadsAvailable &e) {
+        exc = e.what();
     }
     Py_END_ALLOW_THREADS
     if (exc != NULL) {
