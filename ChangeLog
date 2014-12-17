@@ -1,3 +1,8 @@
+2014-12-17  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * scripts/load-graph.py,khmer/_khmermodule.cc: restore threading to
+    load-graph.py
+
 2014-12-16  Titus Brown  <titus@idyll.org>
 
     * sandbox/{calc-error-profile.py,collect-variants.py,correct-errors.py,
