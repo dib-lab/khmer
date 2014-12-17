@@ -9,6 +9,16 @@
     * tests/test_counting_hash.py: added tests for new
     CountingHash::find_spectral_error_positions function.
 
+2014-12-16  Michael R. Crusoe  <mcrusoe@msu.edu>  &  Camille Scott
+<camille.scott.w@gmail.com>
+
+    * khmer/_khmermodule.cc: fixed memory leak in the ReadParser paired
+    iterator (not used by any scripts).
+    * lib/read_parsers.cc,khmer/_khmermodule.cc: Improved exception handling.
+    * tests/test_read_parsers.py,
+    tests/test-data/100-reads.fq.truncated.{bz2,gz}: Added tests for truncated
+    compressed files accessed via ReadParser paired and unpaired iterators.
+
 2014-12-09  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     New FAST[AQ] parser (from the SeqAn project). Fixes known issue and a

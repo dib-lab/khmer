@@ -396,16 +396,15 @@ _ReadParser_iternext( PyObject * self )
     Read *  the_read_PTR    = new Read( );
 
     Py_BEGIN_ALLOW_THREADS
-    try {
-        stop_iteration = parser->is_complete( );
-        if (!stop_iteration)
-            try {
-                parser->imprint_next_read( *the_read_PTR );
-            } catch (NoMoreReadsAvailable &e) {
-                stop_iteration = true;
-            }
-    } catch (StreamReadError &e) {
-        exc = e.what();
+    stop_iteration = parser->is_complete( );
+    if (!stop_iteration) {
+        try {
+            parser->imprint_next_read( *the_read_PTR );
+        } catch (NoMoreReadsAvailable &e) {
+            stop_iteration = true;
+        } catch (StreamReadError &e) {
+            exc = e.what();
+        }
     }
     Py_END_ALLOW_THREADS
 
@@ -442,10 +441,9 @@ _ReadPairIterator_iternext( PyObject * self )
 
     ReadPair    the_read_pair;
     bool    stop_iteration      = false;
-    bool    invalid_file_format     = false;
-    char    exc_message[ CHAR_MAX ];
     bool    unknown_pair_reading_mode   = false;
     bool    invalid_read_pair       = false;
+    bool    stream_read_error = false;
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
     if (!stop_iteration)
@@ -455,6 +453,10 @@ _ReadPairIterator_iternext( PyObject * self )
             unknown_pair_reading_mode = true;
         } catch (InvalidReadPair &exc) {
             invalid_read_pair = true;
+        } catch (StreamReadError &exc) {
+            stream_read_error = true;
+        } catch (NoMoreReadsAvailable &exc) {
+            stop_iteration = true;
         }
     Py_END_ALLOW_THREADS
 
@@ -463,10 +465,6 @@ _ReadPairIterator_iternext( PyObject * self )
         return NULL;
     }
 
-    if (invalid_file_format) {
-        PyErr_SetString( PyExc_IOError, (char const *)exc_message );
-        return NULL;
-    }
     if (unknown_pair_reading_mode) {
         PyErr_SetString(
             PyExc_ValueError, "Unknown pair reading mode supplied."
@@ -478,13 +476,21 @@ _ReadPairIterator_iternext( PyObject * self )
         return NULL;
     }
 
+    if (stream_read_error) {
+        PyErr_SetString( PyExc_IOError, "Input file error.");
+        return NULL;
+    }
+
     // Copy elements of 'ReadPair' object into Python tuple.
     // TODO? Replace dummy reads with 'None' object.
     PyObject * read_1_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
     ((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
     PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
     ((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
-    return PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+    PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
+    Py_XDECREF(read_1_OBJECT);
+    Py_XDECREF(read_2_OBJECT);
+    return tup;
 }
 
 
