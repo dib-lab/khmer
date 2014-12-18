@@ -435,6 +435,92 @@ void Hashtable::consume_sequence_and_tag(const std::string& seq,
     }
 }
 
+void Hashtable::consume_sequence_and_tag_with_positions(const std::string& seq,
+        std::vector<unsigned int> &posns,
+        std::vector<HashIntoType> &tags)
+{
+    bool kmer_tagged;
+    unsigned int position = 0;
+
+    KMerIterator kmers(seq.c_str(), _ksize);
+    HashIntoType kmer;
+
+    unsigned int since = _tag_density / 2 + 1;
+
+    while(!kmers.done()) {
+        kmer = kmers.next();
+        bool is_new_kmer;
+
+        // Set the bits for the kmer in the various hashtables,
+        // and report on whether or not they had already been set.
+        // This is probably better than first testing and then setting the bits,
+        // as a failed test essentially results in doing the same amount of work
+        // twice.
+        is_new_kmer = test_and_set_bits( kmer );
+
+        if (is_new_kmer) {
+            ++since;
+        } else {
+            ACQUIRE_ALL_TAGS_SPIN_LOCK
+            kmer_tagged = set_contains(all_tags, kmer);
+            RELEASE_ALL_TAGS_SPIN_LOCK
+            if (kmer_tagged) {
+                since = 1;
+
+                posns.push_back(position);
+                tags.push_back(kmer);
+            } else {
+                ++since;
+            }
+        }
+
+        if (since >= _tag_density) {
+            ACQUIRE_ALL_TAGS_SPIN_LOCK
+            all_tags.insert(kmer);
+            RELEASE_ALL_TAGS_SPIN_LOCK
+            posns.push_back(position);
+            tags.push_back(kmer);
+            since = 1;
+        }
+
+        position++;
+    } // iteration over kmers
+
+    if (since >= _tag_density/2 - 1) {
+        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        all_tags.insert(kmer);	// insert the last k-mer, too.
+        RELEASE_ALL_TAGS_SPIN_LOCK
+        posns.push_back(position);
+        tags.push_back(kmer);
+    }
+}
+
+void Hashtable::retrieve_tags(const std::string& subseq,
+        std::vector<unsigned int> &posns,
+        std::vector<HashIntoType> &tags)
+{
+    bool kmer_tagged;
+    unsigned int position = 0;
+
+    KMerIterator kmers(subseq.c_str(), _ksize);
+    HashIntoType kmer;
+
+    unsigned int since = _tag_density / 2 + 1;
+
+    while(!kmers.done()) {
+        kmer = kmers.next();
+
+        ACQUIRE_ALL_TAGS_SPIN_LOCK
+        kmer_tagged = set_contains(all_tags, kmer);
+        RELEASE_ALL_TAGS_SPIN_LOCK
+        if (kmer_tagged) {
+            posns.push_back(position);
+            tags.push_back(kmer);
+        }
+        position++;
+    } // iteration over kmers
+}
+
 //
 // consume_fasta_and_tag: consume a FASTA file of reads, tagging reads every
 //     so often.

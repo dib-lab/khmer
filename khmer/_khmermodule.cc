@@ -1325,6 +1325,79 @@ static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
     return Py_BuildValue("K", n_consumed);
 }
 
+static PyObject * hash_consume_and_tag_with_positions(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * seq;
+
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    std::vector<unsigned int> posns;
+    std::vector<HashIntoType> tags;
+
+    // call the C++ function, and trap signals => Python
+    try {
+        // @CTB needs to normalize
+        counting->consume_sequence_and_tag_with_positions(seq, posns, tags);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_ValueError, e.get_message().c_str());
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(tags.size());
+
+    for (Py_ssize_t i = 0; i < tags.size(); i++) {
+      PyObject * to = PyLong_FromUnsignedLongLong(tags[i]);
+      PyObject * po = PyLong_FromUnsignedLong(posns[i]);
+      PyObject * ko = PyTuple_New(2);
+      PyTuple_SET_ITEM(ko, 0, po);
+      PyTuple_SET_ITEM(ko, 1, to);
+
+      PyList_SET_ITEM(x, i, ko);
+    }
+    return x;
+}
+
+static PyObject * hash_retrieve_tags(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * seq;
+
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    std::vector<unsigned int> posns;
+    std::vector<HashIntoType> tags;
+
+    // call the C++ function, and trap signals => Python
+    try {
+         counting->retrieve_tags(seq, posns, tags);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_ValueError, e.get_message().c_str());
+        return NULL;
+    }
+
+    PyObject * x = PyList_New(tags.size());
+
+    for (Py_ssize_t i = 0; i < tags.size(); i++) {
+      PyObject * to = PyLong_FromUnsignedLongLong(tags[i]);
+      PyObject * po = PyLong_FromUnsignedLong(posns[i]);
+      PyObject * ko = PyTuple_New(2);
+      PyTuple_SET_ITEM(ko, 0, po);
+      PyTuple_SET_ITEM(ko, 1, to);
+
+      PyList_SET_ITEM(x, i, ko);
+    }
+    return x;
+}
+
 static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1484,6 +1557,8 @@ static PyMethodDef khmer_counting_methods[] = {
         METH_VARARGS, ""
     },
     { "consume_and_tag", hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
+    { "consume_and_tag_with_positions", hash_consume_and_tag_with_positions, METH_VARARGS, "Consume a sequence and tag it; return tags and positions" },
+    { "retrieve_tags", hash_retrieve_tags, METH_VARARGS, "Retrieve tags" },
     { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
     { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
