@@ -394,7 +394,12 @@ _ReadParser_iternext( PyObject * self )
 
     bool    stop_iteration = false;
     char    const * exc = NULL;
-    Read *  the_read_PTR    = new Read( );
+    Read *  the_read_PTR;
+    try {
+	the_read_PTR = new Read( );
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
 
     Py_BEGIN_ALLOW_THREADS
     stop_iteration = parser->is_complete( );
@@ -485,9 +490,18 @@ _ReadPairIterator_iternext( PyObject * self )
     // Copy elements of 'ReadPair' object into Python tuple.
     // TODO? Replace dummy reads with 'None' object.
     PyObject * read_1_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
-    ((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
+    try {
+	((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
     PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
-    ((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
+    try {
+	((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
+    } catch (std::bad_alloc &e) {
+	delete ((Read_Object *)read_1_OBJECT)->read;
+	return PyErr_NoMemory();
+    }
     PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
     Py_XDECREF(read_1_OBJECT);
     Py_XDECREF(read_2_OBJECT);
@@ -1461,7 +1475,11 @@ static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self,
     HashIntoType kmer, kmer_f, kmer_r;
     kmer = _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
 
-    ppi = new _pre_partition_info(kmer);
+    try {
+	ppi = new _pre_partition_info(kmer);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
     counting->partition->find_all_tags_truncate_on_abundance(kmer_f, kmer_r,
             ppi->tagged_kmers,
             counting->all_tags,
@@ -1516,6 +1534,8 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self,
         Py_END_ALLOW_THREADS
     } catch (_khmer_signal &e) {
         return NULL;
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
     }
 
     khmer_KSubsetPartitionObject * subset_obj = (khmer_KSubsetPartitionObject *)\
@@ -1629,7 +1649,11 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    kcounting_obj->counting = new CountingHash(k, size);
+    try {
+	kcounting_obj->counting = new CountingHash(k, size);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
 
     return (PyObject *) kcounting_obj;
 }
@@ -1675,7 +1699,11 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    kcounting_obj->counting = new CountingHash(k, sizes);
+    try {
+	kcounting_obj->counting = new CountingHash(k, sizes);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
 
     return (PyObject *) kcounting_obj;
 }
@@ -2250,6 +2278,8 @@ static PyObject * hashbits_do_subset_partition(PyObject * self,
         Py_END_ALLOW_THREADS
     } catch (_khmer_signal &e) {
         return NULL;
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
     }
 
     return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
@@ -2575,7 +2605,11 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
     HashIntoType kmer, kmer_f, kmer_r;
     kmer = _hash(kmer_s, hashbits->ksize(), kmer_f, kmer_r);
 
-    ppi = new _pre_partition_info(kmer);
+    try {
+	ppi = new _pre_partition_info(kmer);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
     hashbits->partition->find_all_tags(kmer_f, kmer_r, ppi->tagged_kmers,
                                        hashbits->all_tags);
     hashbits->add_kmer_to_tags(kmer);
@@ -3025,7 +3059,11 @@ static PyObject * hashbits_load_subset_partitionmap(PyObject * self,
     }
 
     SubsetPartition * subset_p;
-    subset_p = new SubsetPartition(hashbits);
+    try {
+	subset_p = new SubsetPartition(hashbits);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
 
     bool fail = false;
     std::string err;
@@ -3422,7 +3460,11 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
             }
         }
 
-        self->hashbits = new Hashbits(k, sizes);
+        try {
+	    self->hashbits = new Hashbits(k, sizes);
+	} catch (std::bad_alloc &e) {
+	    return PyErr_NoMemory();
+	}
     }
     return (PyObject *) self;
 }
@@ -3702,7 +3744,12 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
 
         // We want the hashbits pointer in the base class to point to our labelhash,
         // so that the KHashbits methods are called on the correct object (a LabelHash)
-        self->labelhash = new LabelHash(k, sizes);
+        try {
+	    self->labelhash = new LabelHash(k, sizes);
+	} catch (std::bad_alloc &e) {
+	    Py_DECREF(self);
+	    return PyErr_NoMemory();
+	}
         self->khashbits.hashbits = (Hashbits *)self->labelhash;
     }
 
@@ -4213,7 +4260,11 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    khashbits_obj->hashbits = new Hashbits(k, sizes);
+    try {
+	khashbits_obj->hashbits = new Hashbits(k, sizes);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
 
     return (PyObject *) khashbits_obj;
 }
@@ -4246,7 +4297,11 @@ static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
     }
 
     // ...and set the collected kmers as the stoptags.
-    khashbits_obj->hashbits = new Hashbits(counting->ksize(), sizes);
+    try {
+	khashbits_obj->hashbits = new Hashbits(counting->ksize(), sizes);
+    } catch (std::bad_alloc &e) {
+	return PyErr_NoMemory();
+    }
     khashbits_obj->hashbits->stop_tags.swap(found_kmers);
 
     return (PyObject *) khashbits_obj;
