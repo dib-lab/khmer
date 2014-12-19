@@ -37,7 +37,7 @@ def check_file_status(file_path, force):
             print >>sys.stderr, "ERROR: Input file %s is empty; exiting." % \
                                 file_path
             if not force:
-	        sys.exit(1)
+                sys.exit(1)
 
 
 def check_space(in_files, force, _testhook_free_space=None):

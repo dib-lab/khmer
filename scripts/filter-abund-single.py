@@ -65,9 +65,10 @@ def main():
     info('filter-abund-single.py', ['counting'])
     args = get_parser().parse_args()
     check_file_status(args.datafile, args.force)
-    check_space([args.datafile],args.force)
+    check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
     report_on_config(args)
 
     print >>sys.stderr, 'making k-mer counting table'

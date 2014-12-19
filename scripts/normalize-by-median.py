@@ -225,7 +225,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     check_valid_file_exists(args.input_filenames)
     check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
 
     # list to save error files along with throwing exceptions
     if args.force:

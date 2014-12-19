@@ -49,6 +49,7 @@ def get_parser():
                         help='Overwrite output file if it exists')
     return parser
 
+
 def main():
     info('filter-stoptags.py', ['graph'])
     args = get_parser().parse_args()
