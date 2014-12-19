@@ -45,7 +45,7 @@ else:
 
 
 def worker(queue, basename, stop_big_traversals):
-    while 1:
+    while True:
         try:
             (htable, index, start, stop) = queue.get(False)
         except Queue.Empty:
@@ -97,6 +97,8 @@ def get_parser():
     parser.add_argument('graphbase', help="base name for output files")
     parser.add_argument('input_filenames', metavar='input_sequence_filename',
                         nargs='+', help='input FAST[AQ] sequence filenames')
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -108,9 +110,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     report_on_config(args, hashtype='hashbits')
 
     for infile in args.input_filenames:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    check_space(args.input_filenames)
+    check_space(args.input_filenames, args.force)
 
     print >>sys.stderr, 'Saving k-mer presence table to %s' % args.graphbase
     print >>sys.stderr, 'Loading kmers from sequences in %s' % \
@@ -137,7 +139,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
                               " this data set.  Increase k-mer presence table "
                               "size/num of tables.")
         print >> sys.stderr, "**"
-        sys.exit(1)
+        if not args.force:
+            sys.exit(1)
 
     # partition-graph
 

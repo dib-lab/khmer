@@ -60,6 +60,8 @@ def get_parser():
                         "filename.")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -68,8 +70,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     args = get_parser().parse_args()
     report_on_config(args)
 
-    check_file_status(args.input_sequence_filename)
-    check_space([args.input_sequence_filename])
+    check_file_status(args.input_sequence_filename, args.force)
+    check_space([args.input_sequence_filename], args.force)
     if args.savetable:
         check_space_for_hashtable(args.n_tables * args.min_tablesize)
 

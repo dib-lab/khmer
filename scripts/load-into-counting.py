@@ -62,6 +62,8 @@ def get_parser():
                         "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -76,10 +78,10 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name)
+        check_file_status(name, args.force)
 
-    check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize)
+    check_space(args.input_sequence_filename, args.force)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
 
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)

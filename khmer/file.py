@@ -14,7 +14,7 @@ import sys
 from stat import S_ISBLK, S_ISFIFO
 
 
-def check_file_status(file_path):
+def check_file_status(file_path, force):
     """Check the status of the file; if the file is empty or doesn't exist
     AND if the file is NOT a fifo/block/named pipe then a warning is printed
     and sys.exit(1) is called
@@ -30,15 +30,17 @@ def check_file_status(file_path):
     if not os.path.exists(file_path):
         print >>sys.stderr, "ERROR: Input file %s does not exist; exiting" % \
                             file_path
-        sys.exit(1)
+        if not force:
+            sys.exit(1)
     else:
         if os.stat(file_path).st_size == 0:
             print >>sys.stderr, "ERROR: Input file %s is empty; exiting." % \
                                 file_path
-            sys.exit(1)
+            if not force:
+                sys.exit(1)
 
 
-def check_space(in_files, _testhook_free_space=None):
+def check_space(in_files, force, _testhook_free_space=None):
     """
     Estimate size of input files passed, then calculate
     disk space available. Exit if insufficient disk space,
@@ -74,10 +76,11 @@ def check_space(in_files, _testhook_free_space=None):
                             % (float(total_size) / 1e9,)
         print >>sys.stderr, "       Free space: %.1f GB" \
                             % (float(free_space) / 1e9,)
-        sys.exit(1)
+        if not force:
+            sys.exit(1)
 
 
-def check_space_for_hashtable(hash_size, _testhook_free_space=None):
+def check_space_for_hashtable(hash_size, force, _testhook_free_space=None):
     """
     Check we have enough size to write a hash table
     """
@@ -99,7 +102,8 @@ def check_space_for_hashtable(hash_size, _testhook_free_space=None):
                             % (float(hash_size) / 1e9,)
         print >>sys.stderr, "       Free space: %.1f GB" \
                             % (float(free_space) / 1e9,)
-        sys.exit(1)
+        if not force:
+            sys.exit(1)
 
 
 def check_valid_file_exists(in_files):

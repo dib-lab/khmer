@@ -12,6 +12,7 @@ import khmer
 from khmer import ReadParser
 import khmer_tst_utils as utils
 from nose.plugins.attrib import attr
+from functools import reduce
 
 
 @attr('highmem')
@@ -118,7 +119,7 @@ def test_badbzip2():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
     except ValueError, err:
         print str(err)
@@ -306,12 +307,12 @@ def test_constructor():
         rparser = ReadParser(utils.get_test_data("single-read.fq"), "a")
         assert 0, ("ReadParser's constructor shouldn't accept a character for "
                    "the number of threads")
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         rparser = ReadParser("non-existent-file-name")
         assert 0, "ReadParser shouldn't accept a non-existant file name"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -322,7 +323,7 @@ def test_iternext():
         for read_1, read_2 in rparser.iter_read_pairs():
             read_pairs.append(read_1, read_2)
         assert 0, "Shouldn't be able to iterate over non FASTA file"
-    except IOError, err:
+    except IOError as err:
         print str(err)
     except ValueError, err:
         print str(err)

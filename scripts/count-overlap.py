@@ -44,7 +44,8 @@ def get_parser():
                         help="input sequence filename")
     parser.add_argument('report_filename', metavar='output_report_filename',
                         help='output report filename')
-
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -54,9 +55,9 @@ def main():
     report_on_config(args, hashtype='hashbits')
 
     for infile in [args.ptfile, args.fafile]:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    check_space([args.ptfile, args.fafile])
+    check_space([args.ptfile, args.fafile], args.force)
 
     print >>sys.stderr, 'loading k-mer presence table from', args.ptfile
     ht1 = khmer.load_hashbits(args.ptfile)

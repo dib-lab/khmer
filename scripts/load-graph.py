@@ -40,6 +40,8 @@ def get_parser():
                         help="Prints the total number of k-mers to stderr")
     parser.add_argument('--write-fp-rate', '-w', action='store_true',
                         help="Write false positive rate into .info file")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -52,10 +54,11 @@ def main():
     filenames = args.input_filenames
 
     for _ in args.input_filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.input_filenames)
-    check_space_for_hashtable(float(args.n_tables * args.min_tablesize) / 8.)
+    check_space(args.input_filenames, args.force)
+    check_space_for_hashtable(
+        (float(args.n_tables * args.min_tablesize) / 8.), args.force)
 
     print >>sys.stderr, 'Saving k-mer presence table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
@@ -111,7 +114,8 @@ def main():
         print >> sys.stderr, ("** ERROR: the graph structure is too small for "
                               "this data set. Increase table size/# tables.")
         print >> sys.stderr, "**"
-        sys.exit(1)
+        if not args.force:
+            sys.exit(1)
 
     print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
     if not args.no_build_tagset:

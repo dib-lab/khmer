@@ -208,6 +208,8 @@ def get_parser():
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers"
                         " post-normalization to stderr")
+    parser.add_argument('--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     add_loadhash_args(parser)
     return parser
 
@@ -221,9 +223,10 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     report_fp = args.report
 
     check_valid_file_exists(args.input_filenames)
-    check_space(args.input_filenames)
+    check_space(args.input_filenames, args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
 
     # list to save error files along with throwing exceptions
     if args.force:
@@ -313,7 +316,8 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
                               "tables.")
         print >> sys.stderr, "**"
         print >> sys.stderr, "** Do not use these results!!"
-        sys.exit(1)
+        if not args.force:
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()

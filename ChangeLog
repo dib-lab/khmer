@@ -1,3 +1,14 @@
+2014-12-17  Jessica Mizzi  <mizzijes@msu.edu>
+
+    * khmer/file.py,sandbox/sweep-reads.py,scripts/{abundance-dist-single,
+    abundance-dist,annotate-partitions,count-median,count-overlap,do-partition,
+    extract-paired-reads,extract-partitions,filter-abund-single,filter-abund,
+    filter-stoptags,interleave-reads,load-graph,load-into-counting,
+    make-initial-stoptags,merge-partitions,normalize-by-median,partition-graph,
+    sample-reads-randomly,split-paired-reads}.py,setup.cfg,
+    tests/{test_script_arguments,test_scripts}.py: Added force option to all 
+    scripts to script IO sanity checks and updated tests to match. 
+
 2014-12-17  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * scripts/load-graph.py,khmer/_khmermodule.cc: restore threading to

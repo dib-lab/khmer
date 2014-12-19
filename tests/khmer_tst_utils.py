@@ -56,7 +56,7 @@ def _runscript(scriptname, sandbox=False):
         pkg_resources.get_distribution("khmer").run_script(
             scriptname, ns)
         return 0
-    except pkg_resources.ResolutionError, err:
+    except pkg_resources.ResolutionError as err:
         if sandbox:
             paths = [os.path.join(os.path.dirname(__file__), "../sandbox")]
         else:
@@ -66,7 +66,7 @@ def _runscript(scriptname, sandbox=False):
         for path in paths:
             scriptfile = os.path.join(path, scriptname)
             if os.path.isfile(scriptfile):
-                execfile(scriptfile, ns)
+                exec(compile(open(scriptfile).read(), scriptfile, 'exec'), ns)
                 return 0
         if sandbox:
             raise nose.SkipTest("sandbox tests are only run in a repository.")
@@ -103,7 +103,7 @@ def runscript(scriptname, args, in_directory=None,
             status = _runscript(scriptname, sandbox=sandbox)
         except nose.SkipTest:
             raise
-        except SystemExit, e:
+        except SystemExit as e:
             status = e.code
         except:
             traceback.print_exc(file=sys.stderr)
