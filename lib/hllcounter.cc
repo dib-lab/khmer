@@ -34,8 +34,8 @@ std::map<int, std::vector<double> > biasData;
 double get_alpha(const int p)
 {
     if ((p < 4) or (p > 16)) {
-        double valid_lower_bound = 1.04 / std::sqrt(std::pow(2, 17));
-        double valid_upper_bound = 1.04 / std::sqrt(std::pow(2, 3));
+        double valid_lower_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2), 17));
+        double valid_upper_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2), 3));
 
         std::stringstream message;
         if (p < 4) {
