@@ -68,13 +68,15 @@ def check_for_openmp():
         filename = r'test.c'
         file = open(filename, 'wt', 1)
         file.write(
-            "#include <omp.h>\n"
-            "#include <stdio.h>\n"
-            "int main() {\n"
-            "#pragma omp parallel\n"
-            "printf(\"Hello from thread %d, nthreads %d\\n\","
-            "omp_get_thread_num(), omp_get_num_threads());\n"
-            "}"
+            """
+            #include <omp.h>
+            #include <stdio.h>
+            int main() {
+            #pragma omp parallel
+            printf("Hello from thread %d, nthreads %d",
+                    omp_get_thread_num(), omp_get_num_threads());
+            }
+            """
         )
         with open(os.devnull, 'w') as fnull:
             exit_code = subprocess.call([compiler, '-fopenmp', filename],
@@ -110,6 +112,7 @@ SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
     "MurmurHash3"])
 
 EXTRA_COMPILE_ARGS = ['-O3', ]
+EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
     # force 64bit only builds
@@ -117,11 +120,13 @@ if sys.platform == 'darwin':
 
 if check_for_openmp():
     EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
+    EXTRA_LINK_ARGS.extend(['-fopenmp'])
 
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
+        "extra_link_args": EXTRA_LINK_ARGS,
         "depends": BUILD_DEPENDS,
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
