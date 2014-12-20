@@ -1,3 +1,10 @@
+2014-12-20  Titus Brown  <titus@idyll.org>
+
+    * sandbox/slice-reads-by-coverage.py: fixed 'N' behavior to match other
+    scripts ('N's are now replaced by 'A', not 'G').
+    * sandbox/trim-low-abund.py: corrected reporting bug (bp written);
+    simplified second-pass logic a bit; expanded reporting.
+
 2014-12-17  Jessica Mizzi  <mizzijes@msu.edu>
 
     * khmer/file.py,sandbox/sweep-reads.py,scripts/{abundance-dist-single,
