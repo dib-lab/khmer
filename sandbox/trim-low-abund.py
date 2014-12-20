@@ -114,7 +114,7 @@ def main():
 
     ###
 
-    save_pass2 = 0
+    save_pass2_total = 0
 
     read_bp = 0
     read_reads = 0
@@ -133,6 +133,7 @@ def main():
         pass2fp = open(pass2filename, 'w')
         trimfp = open(trimfilename, 'w')
 
+        save_pass2 = 0
         for n, read in enumerate(screed.open(filename)):
             if n % 10000 == 0:
                 print '...', n, filename, save_pass2, read_reads, read_bp, \
@@ -164,6 +165,7 @@ def main():
 
         print '%s: kept aside %d of %d from first pass, in %s' % \
               (filename, save_pass2, n, filename)
+        save_pass2_total += save_pass2
 
     skipped_n = 0
     skipped_bp = 0
@@ -180,7 +182,16 @@ def main():
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
-            if med >= NORMALIZE_LIMIT or not args.variable_coverage:
+            # do we retain low-abundance components unchanged?
+            if med < NORMALIZE_LIMIT and args.variable_coverage:
+                trimfp.write(output_single(read))
+                wrote_reads += 1
+                wrote_bp += len(read.sequence)
+                skipped_n += 1
+                skipped_bp += len(read.sequence)
+
+            # otherwise, examine/trim/truncate.
+            else: # med >= NORMALIZE LIMIT or not args.variable_coverage
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
                     trimfp.write(output_single(read, trim_at))
@@ -188,12 +199,6 @@ def main():
                     wrote_bp += trim_at
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
-            else:
-                trimfp.write(output_single(read))
-                wrote_reads += 1
-                wrote_bp += len(read)
-                skipped_n += 1
-                skipped_bp += len(read)
 
         print 'removing %s' % pass2filename
         os.unlink(pass2filename)
@@ -205,6 +210,7 @@ def main():
     print 'wrote %d reads, %d bp' % (wrote_reads, wrote_bp,)
     print 'removed %d reads and trimmed %d reads' % (read_reads - wrote_reads,
                                                      trimmed_reads,)
+    print 'looked at %d reads twice' % (save_pass2_total,)
     print 'trimmed or removed %.2f%% of bases (%d total)' % \
         ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
     if args.variable_coverage:
