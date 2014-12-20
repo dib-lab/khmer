@@ -191,7 +191,7 @@ def main():
                 skipped_bp += len(read.sequence)
 
             # otherwise, examine/trim/truncate.
-            else: # med >= NORMALIZE LIMIT or not args.variable_coverage
+            else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
                     trimfp.write(output_single(read, trim_at))
