@@ -23,6 +23,7 @@ N_HT = 4
 HASHSIZE = 1e7
 K = 20
 C = 10
+CUTOFF = 3
 
 MAX_SEQ_LEN = 65535
 MAX_READS = 1e8
@@ -107,7 +108,7 @@ def main():
                 bp_consumed += len(seq)
             else:
                 # for saturated data, find low-abund k-mers
-                posns = ht.find_spectral_error_positions(seq, 2)
+                posns = ht.find_spectral_error_positions(seq, CUTOFF)
                 lengths.append(len(seq))
 
                 if args.errors_per_read:
