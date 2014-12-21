@@ -18,6 +18,12 @@
 
 2014-12-17  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+    * setup.cfg,tests/test_{counting_hash,counting_single,filter,graph,
+    hashbits,hashbits_obj,labelhash,lump,read_parsers,scripts,subset_graph}.py:
+    reduce memory usage of tests to about 100 megabytes max.
+
+2014-12-17  Michael R. Crusoe  <mcrusoe@msu.edu>
+
     * scripts/load-graph.py,khmer/_khmermodule.cc: restore threading to
     load-graph.py
 

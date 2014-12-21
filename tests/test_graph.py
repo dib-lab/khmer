@@ -21,7 +21,6 @@ class Test_ExactGraphFu(object):
     def setup(self):
         self.ht = khmer.new_hashbits(12, 1e4)
 
-    @attr('highmem')
     def test_counts(self):
         ht = self.ht
         ht.consume_fasta(utils.get_test_data('test-graph.fa'))
@@ -193,7 +192,6 @@ class Test_InexactGraphFu(object):
 
 class Test_Partitioning(object):
 
-    @attr('highmem')
     def test_output_unassigned(self):
         import screed
 
@@ -211,7 +209,6 @@ class Test_Partitioning(object):
         assert len1 > 0
         assert len1 == len2, (len1, len2)
 
-    @attr('highmem')
     def test_not_output_unassigned(self):
         import screed
 
@@ -245,7 +242,6 @@ class Test_Partitioning(object):
         x = set([r.accuracy for r in screed.open(output_file)])
         assert x, x
 
-    @attr('highmem')
     def test_disconnected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -256,7 +252,6 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (99, 0), x             # disconnected @ 21
 
-    @attr('highmem')
     def test_connected_20_a(self):
         filename = utils.get_test_data('random-20-a.fa')
 
@@ -267,7 +262,6 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ 20
 
-    @attr('highmem')
     def test_disconnected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
@@ -278,7 +272,6 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (99, 0), x             # disconnected @ 21
 
-    @attr('highmem')
     def test_connected_20_b(self):
         filename = utils.get_test_data('random-20-b.fa')
 
@@ -289,7 +282,6 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (1, 0)             # connected @ 20
 
-    @attr('highmem')
     def test_disconnected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
@@ -300,7 +292,6 @@ class Test_Partitioning(object):
         x = ht.subset_count_partitions(subset)
         assert x == (999, 0), x            # disconnected @ K = 32
 
-    @attr('highmem')
     def test_connected_31_c(self):
         filename = utils.get_test_data('random-31-c.fa')
 
