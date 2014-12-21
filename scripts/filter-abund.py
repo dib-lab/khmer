@@ -67,6 +67,8 @@ def get_parser():
                         'file for each input file.')
     parser.add_argument('--version', action='version',
                         version='khmer {v}'.format(v=__version__))
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -78,9 +80,9 @@ def main():
     infiles = args.input_filename
 
     for _ in infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     print >>sys.stderr, 'loading hashtable'
     htable = khmer.load_counting_hash(counting_ht)

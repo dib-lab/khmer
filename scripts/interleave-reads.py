@@ -63,6 +63,8 @@ def get_parser():
                         default=sys.stdout)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -71,9 +73,9 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.infiles)
+    check_space(args.infiles, args.force)
 
     s1_file = args.infiles[0]
     if len(args.infiles) == 2:
@@ -92,7 +94,7 @@ def main():
         print >> sys.stderr, "Error! R2 file %s does not exist" % s2_file
         fail = True
 
-    if fail:
+    if fail and not args.force:
         sys.exit(1)
 
     print >> sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)

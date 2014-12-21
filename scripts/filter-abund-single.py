@@ -56,28 +56,27 @@ def get_parser():
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
 def main():
     info('filter-abund-single.py', ['counting'])
     args = get_parser().parse_args()
-    check_file_status(args.datafile)
-    check_space([args.datafile])
+    check_file_status(args.datafile, args.force)
+    check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
     report_on_config(args)
-
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables,
-                                     args.threads)
+                                     args.n_tables)
 
     # first, load reads into hash table
-    rparser = khmer.ReadParser(args.datafile, args.threads)
+    rparser = khmer.ReadParser(args.datafile)
     threads = []
     print >>sys.stderr, 'consuming input, round 1 --', args.datafile
     for _ in xrange(args.threads):

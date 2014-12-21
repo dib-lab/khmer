@@ -60,7 +60,7 @@ BoundedCounterType CountingHash::get_min_count(const std::string &s)
 {
     KMerIterator kmers(s.c_str(), _ksize);
 
-    BoundedCounterType min_count = MAX_COUNT;
+    BoundedCounterType min_count = MAX_KCOUNT;
 
     while(!kmers.done()) {
         HashIntoType kmer = kmers.next();
@@ -378,6 +378,62 @@ const
     }
 
     return seq.length();
+}
+
+std::vector<unsigned int> CountingHash::find_spectral_error_positions(
+    std::string seq,
+    BoundedCounterType max_abund)
+const
+{
+    std::vector<unsigned int> posns;
+    if (!check_and_normalize_read(seq)) {
+        throw khmer_exception("invalid read");
+    }
+
+    KMerIterator kmers(seq.c_str(), _ksize);
+
+    HashIntoType kmer = kmers.next();
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // find the first trusted k-mer
+    while (!kmers.done()) {
+        if (get_count(kmer) > max_abund) {
+            break;
+        }
+        kmer = kmers.next();
+    }
+
+    if (kmers.done()) {
+        return posns;
+    }
+
+    // did we bypass some erroneous k-mers? call the last one.
+    if (kmers.get_start_pos() > 0) {
+        // if we are well past the first k, forget the whole thing (!? @CTB)
+        if (kmers.get_start_pos() >= _ksize && 0) {
+            return posns;
+        }
+        posns.push_back(kmers.get_start_pos() - 1);
+    }
+
+    while (!kmers.done()) {
+        kmer = kmers.next();
+        if (get_count(kmer) <= max_abund) { // error!
+            posns.push_back(kmers.get_end_pos() - 1);
+
+            // find next good
+            while (!kmers.done()) {
+                kmer = kmers.next();
+                if (get_count(kmer) > max_abund) { // a good stretch again.
+                    break;
+                }
+            }
+        }
+    }
+
+    return posns;
 }
 
 

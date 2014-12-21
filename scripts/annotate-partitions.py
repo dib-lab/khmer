@@ -55,6 +55,8 @@ def get_parser():
                         'annotate.')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -68,11 +70,11 @@ def main():
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    check_file_status(partitionmap_file)
+    check_file_status(partitionmap_file, args.force)
     for _ in filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(filenames)
+    check_space(filenames, args.force)
 
     print >>sys.stderr, 'loading partition map from:', partitionmap_file
     htable.load_partitionmap(partitionmap_file)

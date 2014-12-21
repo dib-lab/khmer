@@ -44,6 +44,8 @@ def get_parser():
                         'files')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -61,9 +63,9 @@ def main():
     htable = khmer.new_hashbits(ksize, 1, 1)
 
     for _ in pmap_files:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(pmap_files)
+    check_space(pmap_files, args.force)
 
     for pmap_file in pmap_files:
         print >>sys.stderr, 'merging', pmap_file

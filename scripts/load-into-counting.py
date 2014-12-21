@@ -62,6 +62,8 @@ def get_parser():
                         "summary be in? (json or tsv, disabled by default)")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -76,10 +78,10 @@ def main():
     filenames = args.input_sequence_filename
 
     for name in args.input_sequence_filename:
-        check_file_status(name)
+        check_file_status(name, args.force)
 
-    check_space(args.input_sequence_filename)
-    check_space_for_hashtable(args.n_tables * args.min_tablesize)
+    check_space(args.input_sequence_filename, args.force)
+    check_space_for_hashtable(args.n_tables * args.min_tablesize, args.force)
 
     print >>sys.stderr, 'Saving k-mer counting table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
@@ -90,17 +92,14 @@ def main():
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables, args.threads)
+                                     args.n_tables)
     htable.set_use_bigcount(args.bigcount)
-
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     filename = None
 
     for index, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, args.threads)
+        rparser = khmer.ReadParser(filename)
         threads = []
         print >>sys.stderr, 'consuming input', filename
         for _ in xrange(args.threads):
@@ -112,8 +111,8 @@ def main():
             threads.append(cur_thrd)
             cur_thrd.start()
 
-        for _ in threads:
-            _.join()
+        for thread in threads:
+            thread.join()
 
         if index > 0 and index % 10 == 0:
             check_space_for_hashtable(args.n_tables * args.min_tablesize)

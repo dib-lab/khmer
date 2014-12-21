@@ -62,6 +62,8 @@ def get_parser():
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('graphbase', help='basename for input and output '
                         'filenames')
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -77,9 +79,9 @@ def main():
     if args.stoptags:
         infiles.append(args.stoptags)
     for _ in infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     print >>sys.stderr, 'loading htable %s.pt' % graphbase
     htable = khmer.load_hashbits(graphbase + '.pt')
