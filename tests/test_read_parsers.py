@@ -15,7 +15,6 @@ from nose.plugins.attrib import attr
 from functools import reduce
 
 
-@attr('highmem')
 def test_read_properties():
 
     # Note: Using a data file with only one read.
@@ -29,7 +28,6 @@ def test_read_properties():
         assert read.accuracy == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 
-@attr('highmem')
 def test_with_default_arguments():
 
     read_names = []
@@ -47,7 +45,6 @@ def test_with_default_arguments():
         assert m == n
 
 
-@attr('highmem')
 def test_gzip_decompression():
 
     reads_count = 0
@@ -80,7 +77,6 @@ def test_gzip_decompression_truncated_pairiter():
         print str(err)
 
 
-@attr('highmem')
 def test_bzip2_decompression():
 
     reads_count = 0
@@ -126,7 +122,6 @@ def test_badbzip2():
 
 
 @attr('multithread')
-@attr('highmem')
 def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
     import operator
@@ -160,7 +155,6 @@ def test_with_multiple_threads(testfile="test-reads.fq.bz2"):
 
 
 @attr('multithread')
-@attr('highmem')
 def test_with_multiple_threads_big():
     test_with_multiple_threads(testfile="test-large.fa")
 
@@ -269,7 +263,6 @@ def test_read_pair_iterator_in_error_mode():
     assert all(matches)  # Assert ALL the matches. :-]
 
 
-@attr('highmem')
 def test_read_pair_iterator_in_error_mode_xfail():
 
     rparser = \
