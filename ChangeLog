@@ -24,6 +24,12 @@
     sandbox/uniqify-sequences.py, sandbox/write-interleave.py}: cleaned up
     to make 'import'-able and 'execfile'-able.
 
+2014-12-26  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * tests/test_functions.py: Generate a temporary filename instead of
+    writing to the current directory
+    * Makefile: always run the `test` target if specified
+
 2014-12-20  Titus Brown  <titus@idyll.org>
 
     * sandbox/slice-reads-by-coverage.py: fixed 'N' behavior to match other
