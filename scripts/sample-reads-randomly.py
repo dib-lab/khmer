@@ -55,9 +55,9 @@ def get_parser():
         epilog=textwrap.dedent(epilog))
 
     parser.add_argument('filenames', nargs='+')
-    parser.add_argument('-N', '--num_reads', type=int, dest='num_reads',
+    parser.add_argument('-N', '--num_reads', type=float, dest='num_reads',
                         default=DEFAULT_NUM_READS)
-    parser.add_argument('-M', '--max_reads', type=int, dest='max_reads',
+    parser.add_argument('-M', '--max_reads', type=float, dest='max_reads',
                         default=DEFAULT_MAX_READS)
     parser.add_argument('-S', '--samples', type=int, dest='num_samples',
                         default=1)
