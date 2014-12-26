@@ -8,17 +8,23 @@
 import sys
 import khmer
 
-files = sys.argv[2:]
 
-total_reads = len(files) * [0]
-n_consumed = len(files) * [0]
-n_seq_kept = len(files) * [0]
+def main():
+    files = sys.argv[2:]
 
-print 'loading ht'
-ht = khmer.new_counting_hash(1, 1, 1)
+    total_reads = len(files) * [0]
+    n_consumed = len(files) * [0]
+    n_seq_kept = len(files) * [0]
 
-ht.load(sys.argv[1])
+    print 'loading ht'
+    ht = khmer.new_counting_hash(1, 1, 1)
 
-for i, infile in enumerate(files):
-    print 'outputting', infile + '.freq'
-    ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")
+    ht.load(sys.argv[1])
+
+    for i, infile in enumerate(files):
+        print 'outputting', infile + '.freq'
+        ht.output_fasta_kmer_pos_freq(infile, infile + ".freq")
+
+
+if __name__ == '__main__':
+    main()

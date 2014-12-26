@@ -8,11 +8,13 @@
 # pylint: disable=C0111,C0103,E1103,W0612
 
 import sys
-import os
+import os, os.path
 import shutil
 from cStringIO import StringIO
 import traceback
 import nose
+import glob
+import imp
 
 import khmer_tst_utils as utils
 import khmer
@@ -27,6 +29,29 @@ def scriptpath(script):
 def teardown():
     utils.cleanup()
 
+
+def test_import_all():
+    path = os.path.join(os.path.dirname(__file__), "../sandbox/*.py")
+    scripts = glob.glob(path)
+    for s in scripts:
+        s = os.path.normpath(s)
+        yield _checkImportSucceeds('sandbox', s)
+    
+
+class _checkImportSucceeds(object):
+    def __init__(self, tag, filename):
+        self.tag = tag
+        self.filename = filename
+        self.description = '%s: test import %s' % (self.tag,
+                                                   os.path.split(filename)[-1])
+
+    def __call__(self):
+        try:
+            mod = imp.load_source('__zzz', self.filename)
+        except:
+            print traceback.format_exc()
+            raise AssertionError("%s cannot be imported" % (self.filename,))
+    
 
 def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')

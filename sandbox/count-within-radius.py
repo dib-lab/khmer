@@ -19,36 +19,42 @@ RADIUS = 100
 
 MAX_DENSITY = 2000
 
-infile = sys.argv[1]
-outfile = sys.argv[2]
-if len(sys.argv) > 3:
-    RADIUS = int(sys.argv[3])
 
-print 'saving to:', outfile
+def main():
+    infile = sys.argv[1]
+    outfile = sys.argv[2]
+    if len(sys.argv) > 3:
+        RADIUS = int(sys.argv[3])
 
-print 'making hashtable'
-ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
+    print 'saving to:', outfile
 
-print 'eating', infile
-ht.consume_fasta(infile)
+    print 'making hashtable'
+    ht = khmer.new_hashbits(K, HASHTABLE_SIZE, N_HT)
 
-print 'loading'
-ht.save(outfile + '.ht')
+    print 'eating', infile
+    ht.consume_fasta(infile)
 
-outfp = open(outfile, 'w')
-for n, record in enumerate(screed.open(infile)):
-    if n % 10000 == 0:
-        print '... saving', n
-    seq = record['sequence']
+    print 'loading'
+    ht.save(outfile + '.ht')
 
-    for pos in range(0, len(seq), 200):
-        subseq = seq[pos:pos + 200]
+    outfp = open(outfile, 'w')
+    for n, record in enumerate(screed.open(infile)):
+        if n % 10000 == 0:
+            print '... saving', n
+        seq = record['sequence']
 
-        middle = (len(subseq) - K + 1) / 2
+        for pos in range(0, len(seq), 200):
+            subseq = seq[pos:pos + 200]
 
-        density = ht.count_kmers_within_radius(
-            subseq[middle:middle + K], RADIUS,
-            MAX_DENSITY)
-        density /= float(RADIUS)
+            middle = (len(subseq) - K + 1) / 2
 
-        print >>outfp, '>%s d=%.3f\n%s' % (record['name'], density, subseq)
+            density = ht.count_kmers_within_radius(
+                subseq[middle:middle + K], RADIUS,
+                MAX_DENSITY)
+            density /= float(RADIUS)
+
+            print >>outfp, '>%s d=%.3f\n%s' % (record['name'], density, subseq)
+
+
+if __name__ == '__main__':
+    main()
