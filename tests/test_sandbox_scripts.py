@@ -8,7 +8,8 @@
 # pylint: disable=C0111,C0103,E1103,W0612
 
 import sys
-import os, os.path
+import os
+import os.path
 import shutil
 from cStringIO import StringIO
 import traceback
@@ -40,7 +41,7 @@ def test_import_all():
     for s in scripts:
         s = os.path.normpath(s)
         yield _checkImportSucceeds('test_sandbox_scripts.py', s)
-    
+
 
 class _checkImportSucceeds(object):
     def __init__(self, tag, filename):
@@ -67,7 +68,7 @@ class _checkImportSucceeds(object):
 
         try:
             try:
-                global_dict = { '__name__': '__main__' }
+                global_dict = {'__name__': '__main__'}
                 execfile(self.filename, global_dict)
             except (ImportError, SyntaxError):
                 print traceback.format_exc()
