@@ -19,7 +19,7 @@ import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
-from khmer.counting_args import build_counting_multifile_args
+from khmer.khmer_args import build_counting_args
 
 ###
 

@@ -19,7 +19,7 @@ import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
-from khmer.counting_args import build_counting_multifile_args
+from khmer.khmer_args import build_counting_args
 
 import random
 
@@ -29,7 +29,7 @@ DEFAULT_COVERAGE = 20
 
 
 def main():
-    parser = build_counting_multifile_args()
+    parser = build_counting_args()
     parser.add_argument('--coverage', '-C', dest='coverage',
                         default=DEFAULT_COVERAGE, type=int)
     args = parser.parse_args()
