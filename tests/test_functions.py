@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 import os
 import khmer_tst_utils as utils
 
+
 def test_forward_hash():
     assert khmer.forward_hash('AAAA', 4) == 0
     assert khmer.forward_hash('TTTT', 4) == 0
