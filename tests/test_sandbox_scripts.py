@@ -31,11 +31,15 @@ def teardown():
 
 
 def test_import_all():
-    path = os.path.join(os.path.dirname(__file__), "../sandbox/*.py")
+    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    if not os.path.exists(sandbox_path):
+        raise nose.SkipTest("sandbox scripts are only tested in a repository")
+
+    path = os.path.join(sandbox_path, "*.py")
     scripts = glob.glob(path)
     for s in scripts:
         s = os.path.normpath(s)
-        yield _checkImportSucceeds('sandbox', s)
+        yield _checkImportSucceeds('test_sandbox_scripts.py', s)
     
 
 class _checkImportSucceeds(object):
