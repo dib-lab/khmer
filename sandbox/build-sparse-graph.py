@@ -8,11 +8,13 @@
 import khmer
 import sys
 import screed
+try:
+    import graph_tool.all as gt
+except ImportError:
+    pass
 
 
 def main():
-    import graph_tool.all as gt
-    
     input_fasta = sys.argv[3]
     K = int(sys.argv[1])
     x = float(sys.argv[2])

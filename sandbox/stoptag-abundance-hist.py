@@ -8,10 +8,12 @@
 import sys
 import khmer
 import os
-
+try:
+    from pylab import *
+except ImportError:
+    pass
 
 def main():
-    from pylab import *
 
     hashfile = sys.argv[1]
     filename = sys.argv[2]

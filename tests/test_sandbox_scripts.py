@@ -51,7 +51,30 @@ class _checkImportSucceeds(object):
         except:
             print traceback.format_exc()
             raise AssertionError("%s cannot be imported" % (self.filename,))
-    
+
+        ###
+
+        oldargs = sys.argv
+        sys.argv = [self.filename]
+
+        oldout, olderr = sys.stdout, sys.stderr
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
+
+        try:
+            try:
+                global_dict = { '__name__': '__main__' }
+                execfile(self.filename, global_dict)
+            except (ImportError, SyntaxError):
+                print traceback.format_exc()
+                raise AssertionError("%s cannot be exec'd" % (self.filename,))
+            except:
+                pass                        # other failures are expected :)
+        finally:
+            sys.argv = oldargs
+            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
+            sys.stdout, sys.stderr = oldout, olderr
+
 
 def test_sweep_reads():
     readfile = utils.get_temp_filename('reads.fa')

@@ -8,12 +8,17 @@
 import sys
 import screed
 import os.path
+import argparse
 
 ROTARY_SIZE = 100
 
 
 def main():
-    prefix = os.path.basename(sys.argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument(filenames, nargs='+')
+    args = parser.parse_args()
+
+    prefix = os.path.basename(args.filenames[0])
 
     fp_d = {}
     for n in range(0, ROTARY_SIZE):
@@ -21,7 +26,7 @@ def main():
         fp_d[n] = open(prefix + '.%03d' % num, 'w')
 
     total = 0
-    for filename in sys.argv[1:]:
+    for filename in args.filenames:
         for record in screed.open(filename):
             total += 1
             if total % 10000 == 0:
