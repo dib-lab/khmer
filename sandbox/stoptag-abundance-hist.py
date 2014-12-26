@@ -8,35 +8,44 @@
 import sys
 import khmer
 import os
-from pylab import *
+try:
+    from pylab import *
+except ImportError:
+    pass
 
-hashfile = sys.argv[1]
-filename = sys.argv[2]
-figure = sys.argv[3]
+def main():
 
-ht = khmer.load_counting_hash(hashfile)
+    hashfile = sys.argv[1]
+    filename = sys.argv[2]
+    figure = sys.argv[3]
 
-outabund = open(os.path.basename(filename) + '.counts', 'w')
+    ht = khmer.load_counting_hash(hashfile)
 
-counts = []
-d = {}
-for sequence in open(sys.argv[2]):
-    sequence = sequence.strip()
+    outabund = open(os.path.basename(filename) + '.counts', 'w')
 
-    count = ht.get(sequence)
-    counts.append(count)
-    d[count] = d.get(count, 0) + 1
+    counts = []
+    d = {}
+    for sequence in open(sys.argv[2]):
+        sequence = sequence.strip()
 
-    if count > 1000:
-        print >>outabund, sequence, count
+        count = ht.get(sequence)
+        counts.append(count)
+        d[count] = d.get(count, 0) + 1
 
-outfp = open(figure + '.countshist', 'w')
-sofar = 0
-sofar_cumu = 0
-for k in sorted(d.keys()):
-    sofar += d[k]
-    sofar_cumu += k * d[k]
-    print >>outfp, k, d[k], sofar, sofar_cumu
+        if count > 1000:
+            print >>outabund, sequence, count
 
-hist(counts, normed=True, cumulative=True, bins=100, range=(1, 1000))
-savefig(figure)
+    outfp = open(figure + '.countshist', 'w')
+    sofar = 0
+    sofar_cumu = 0
+    for k in sorted(d.keys()):
+        sofar += d[k]
+        sofar_cumu += k * d[k]
+        print >>outfp, k, d[k], sofar, sofar_cumu
+
+    hist(counts, normed=True, cumulative=True, bins=100, range=(1, 1000))
+    savefig(figure)
+
+
+if __name__ == '__main__':
+    main()

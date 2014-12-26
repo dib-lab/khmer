@@ -19,7 +19,7 @@ import sys
 import khmer
 import os.path
 import screed
-from khmer.hashbits_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import (build_hashbits_args, DEFAULT_MIN_TABLESIZE)
 
 
 def main():

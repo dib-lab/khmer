@@ -12,7 +12,7 @@
 import sys
 import screed
 import khmer
-from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_counting_args, DEFAULT_MIN_TABLESIZE
 
 DEFAULT_LOWER_CUTOFF = 2000
 DEFAULT_UPPER_CUTOFF = 65535
