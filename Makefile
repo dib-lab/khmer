@@ -154,7 +154,7 @@ lib:
 	cd lib && \
 	$(MAKE)
 
-test:
+test: FORCE
 	./setup.py develop
 	./setup.py nosetests
 

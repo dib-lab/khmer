@@ -9,10 +9,13 @@
 
 import sys
 import os
+import os.path
 import shutil
 from cStringIO import StringIO
 import traceback
 import nose
+import glob
+import imp
 
 import khmer_tst_utils as utils
 import khmer
@@ -26,6 +29,56 @@ def scriptpath(script):
 
 def teardown():
     utils.cleanup()
+
+
+def test_import_all():
+    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    if not os.path.exists(sandbox_path):
+        raise nose.SkipTest("sandbox scripts are only tested in a repository")
+
+    path = os.path.join(sandbox_path, "*.py")
+    scripts = glob.glob(path)
+    for s in scripts:
+        s = os.path.normpath(s)
+        yield _checkImportSucceeds('test_sandbox_scripts.py', s)
+
+
+class _checkImportSucceeds(object):
+    def __init__(self, tag, filename):
+        self.tag = tag
+        self.filename = filename
+        self.description = '%s: test import %s' % (self.tag,
+                                                   os.path.split(filename)[-1])
+
+    def __call__(self):
+        try:
+            mod = imp.load_source('__zzz', self.filename)
+        except:
+            print traceback.format_exc()
+            raise AssertionError("%s cannot be imported" % (self.filename,))
+
+        ###
+
+        oldargs = sys.argv
+        sys.argv = [self.filename]
+
+        oldout, olderr = sys.stdout, sys.stderr
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
+
+        try:
+            try:
+                global_dict = {'__name__': '__main__'}
+                execfile(self.filename, global_dict)
+            except (ImportError, SyntaxError):
+                print traceback.format_exc()
+                raise AssertionError("%s cannot be exec'd" % (self.filename,))
+            except:
+                pass                        # other failures are expected :)
+        finally:
+            sys.argv = oldargs
+            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
+            sys.stdout, sys.stderr = oldout, olderr
 
 
 def test_sweep_reads():

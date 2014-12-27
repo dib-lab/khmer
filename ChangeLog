@@ -1,3 +1,35 @@
+2014-12-26  Titus Brown  <titus@idyll.org>
+
+    * tests/tests_sandbox_scripts.py: added import and execfile test for all
+    sandbox/ scripts.
+    * sandbox/{abundance-hist-by-position.py,
+    sandbox/assembly-diff-2.py, sandbox/assembly-diff.py,
+    sandbox/bloom_count.py, sandbox/bloom_count_intersection.py,
+    sandbox/build-sparse-graph.py, sandbox/combine-pe.py,
+    sandbox/compare-partitions.py, sandbox/count-within-radius.py,
+    sandbox/degree-by-position.py, sandbox/ec.py,
+    sandbox/error-correct-pass2.py, sandbox/extract-single-partition.py,
+    sandbox/fasta-to-abundance-hist.py, sandbox/filter-median-and-pct.py,
+    sandbox/filter-median.py, sandbox/find-high-abund-kmers.py,
+    sandbox/find-unpart.py, sandbox/graph-size.py,
+    sandbox/hi-lo-abundance-by-position.py, sandbox/multi-rename.py,
+    sandbox/normalize-by-median-pct.py, sandbox/print-stoptags.py,
+    sandbox/print-tagset.py, sandbox/readstats.py,
+    sandbox/renumber-partitions.py, sandbox/shuffle-fasta.py,
+    sandbox/shuffle-reverse-rotary.py, sandbox/split-fasta.py,
+    sandbox/split-sequences-by-length.py, sandbox/stoptag-abundance-hist.py,
+    sandbox/stoptags-by-position.py, sandbox/strip-partition.py,
+    sandbox/subset-report.py, sandbox/sweep-out-reads-with-contigs.py,
+    sandbox/sweep-reads2.py, sandbox/sweep-reads3.py,
+    sandbox/uniqify-sequences.py, sandbox/write-interleave.py}: cleaned up
+    to make 'import'-able and 'execfile'-able.
+
+2014-12-26  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * tests/test_functions.py: Generate a temporary filename instead of
+    writing to the current directory
+    * Makefile: always run the `test` target if specified
+
 2014-12-20  Titus Brown  <titus@idyll.org>
 
     * sandbox/slice-reads-by-coverage.py: fixed 'N' behavior to match other
