@@ -66,14 +66,15 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
-    info('abundance-dist-single.py', ['counting'])
+    info('abundance-dist-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
     report_on_config(args)
 
     check_file_status(args.input_sequence_filename, args.force)
     check_space([args.input_sequence_filename], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(args.n_tables * args.min_tablesize,
+                                  args.force)
 
     if (not args.squash_output and
             os.path.exists(args.output_histogram_filename)):

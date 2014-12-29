@@ -1,7 +1,7 @@
 .. vim: set filetype=rst
 
 .. If you update this file then you may need to update the citations in
-   scripts/galaxy/macro.xml as well
+   scripts/galaxy/macro.xml and khmer/khmer_args.py as well
 
 Citations
 ---------
@@ -12,7 +12,7 @@ Software Citation
 If you use the khmer software, you must cite:
 
    Crusoe et al., The khmer software package: enabling efficient sequence
-   analysis. 2014. doi: 10.6084/m9.figshare.979190
+   analysis. 2014. http://dx.doi.org/10.6084/m9.figshare.979190
 
 .. code-block:: tex
 
@@ -30,7 +30,12 @@ If you use the khmer software, you must cite:
   }
 
 If you use any of our published scientific methods, you should *also*
-cite the relevant paper(s), as directed below.
+cite the relevant paper(s), as directed below. Additionally some scripts use
+the `SeqAn library <http://www.seqan.de>`_ for read parsing: the full citation
+for that library is also included below.
+
+To see a quick summary of papers for a given script just run it without using
+any command line arguments.
 
 Graph partitioning and/or compressible graph representation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -42,7 +47,7 @@ representation and partitioning algorithms described in:
    Pell J, Hintze A, Canino-Koning R, Howe A, Tiedje JM, Brown CT.
    Scaling metagenome sequence assembly with probabilistic de Bruijn graphs
    Proc Natl Acad Sci U S A. 2012 Aug 14;109(33):13272-7.
-   doi: 10.1073/pnas.1121464109.
+   http://dx.doi.org/10.1073/pnas.1121464109.
    PMID: 22847406
 
 .. code-block:: tex
@@ -111,7 +116,7 @@ implement the probabilistic k-mer counting described in:
    These Are Not the K-mers You Are Looking For: Efficient Online K-mer
    Counting Using a Probabilistic Data Structure
    Zhang Q, Pell J, Canino-Koning R, Howe AC, Brown CT.
-   doi: 10.1371/journal.pone.0101271
+   http://dx.doi.org/10.1371/journal.pone.0101271
 
 .. code-block:: tex
 
@@ -152,3 +157,55 @@ implement the probabilistic k-mer counting described in:
       number = "7",
       doi = "10.1371/journal.pone.0101271"
   }
+
+FASTA and FASTQ reading
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The abundance-dist-single.py, filter-abund-single.py, load-graph.py, and
+load-into-counting.py scripts use the SeqAn library for FASTQ and FASTA
+reading as described in:
+
+   SeqAn An efficient, generic C++ library for sequence analysis
+   Döring A, Weese D, Rausch T, Reinert K.
+   http://dx.doi.org/10.1186/1471-2105-9-11 
+
+.. code-block:: tex
+
+  @Article{SeqAn,
+    AUTHOR = {Doring, Andreas and Weese, David and Rausch, Tobias and Reinert,
+      Knut},
+    TITLE = {SeqAn An efficient, generic C++ library for sequence analysis},
+    JOURNAL = {BMC Bioinformatics},
+    VOLUME = {9},
+    YEAR = {2008},
+    NUMBER = {1},
+    PAGES = {11},
+    URL = {http://www.biomedcentral.com/1471-2105/9/11},
+    DOI = {10.1186/1471-2105-9-11},
+    PubMedID = {18184432},
+    ISSN = {1471-2105},
+    ABSTRACT = {BACKGROUND: The use of novel algorithmic techniques is pivotal
+    to many important problems in life science. For example the sequencing of
+    the human genome [1] would not have been possible without advanced assembly
+    algorithms. However, owing to the high speed of technological progress and
+    the urgent need for bioinformatics tools, there is a widening gap between
+    state-of-the-art algorithmic techniques and the actual algorithmic
+    components of tools that are in widespread use. RESULTS: To remedy this
+    trend we propose the use of SeqAn, a library of efficient data types and
+    algorithms for sequence analysis in computational biology. SeqAn comprises
+    implementations of existing, practical state-of-the-art algorithmic
+    components to provide a sound basis for algorithm testing and development.
+    In this paper we describe the design and content of SeqAn and demonstrate
+    its use by giving two examples. In the first example we show an application
+    of SeqAn as an experimental platform by comparing different exact string
+    matching algorithms. The second example is a simple version of the well-
+    known MUMmer tool rewritten in SeqAn. Results indicate that our
+    implementation is very efficient and versatile to use. CONCLUSION: We
+    anticipate that SeqAn greatly simplifies the rapid development of new
+    bioinformatics tools by providing a collection of readily usable, well-
+    designed algorithmic components which are fundamental for the field of
+    sequence analysis. This leverages not only the implementation of new
+    algorithms, but also enables a sound analysis and comparison of existing
+    algorithms.},
+  }
+

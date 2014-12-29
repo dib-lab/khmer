@@ -1,3 +1,9 @@
+2015-12-29  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * CITATION,khmer/khmer_args.py,scripts/{abundance-dist-single,
+    filter-abund-single,load-graph,load-into-counting}.py: Give credit to the
+    SeqAn project for their FASTQ/FASTA reader that we use.
+
 2014-12-26  Titus Brown  <titus@idyll.org>
 
     * tests/tests_sandbox_scripts.py: added import and execfile test for all

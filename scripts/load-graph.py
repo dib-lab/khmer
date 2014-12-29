@@ -46,7 +46,7 @@ def get_parser():
 
 
 def main():
-    info('load-graph.py', ['graph'])
+    info('load-graph.py', ['graph', 'SeqAn'])
     args = get_parser().parse_args()
     report_on_config(args, hashtype='hashbits')
 
