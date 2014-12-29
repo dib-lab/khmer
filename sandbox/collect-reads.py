@@ -39,7 +39,7 @@ def get_parser():
 
     Example::
 
-        collect-reads.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+        collect-reads.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Collect reads until a given avg coverage.",

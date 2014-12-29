@@ -9,7 +9,7 @@
 Accept or discard sequences XXX, based on the given counting
 hash table.  Output sequences will be placed in 'infile.medfilt'.
 
-% python sandbox/filter-median.py <counting.kh> <data1> [ <data2> <...> ]
+% python sandbox/filter-median.py <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
