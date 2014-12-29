@@ -25,6 +25,14 @@ def teardown():
     utils.cleanup()
 
 
+def test_toobig():
+    try:
+        pt = khmer.Hashbits(32, 1e13, 1)
+        assert 0, "This should fail"
+    except MemoryError as err:
+        print str(err)
+
+
 def test__get_set_tag_density():
     ht = khmer.Hashbits(32, 1, 1)
 

@@ -101,6 +101,14 @@ class Test_CountingHash(object):
         assert hi.get(GG) == 2
 
 
+def test_toobig():
+    try:
+        ct = khmer.new_counting_hash(30, 1e13, 1)
+        assert 0, "this should fail"
+    except MemoryError as err:
+        print str(err)
+
+
 def test_3_tables():
     x = list(PRIMES_1m)
     x.append(1000005)

@@ -24,6 +24,14 @@ def test_no_collision():
     assert kh.get('TTTT') == 2
 
 
+def test_toobig():
+    try:
+        ct = khmer.new_hashtable(4, 1000000000000)
+        assert 0, "this should fail"
+    except MemoryError as err:
+        print str(err)
+
+
 def test_collision():
     kh = khmer.new_hashtable(4, 4)
 

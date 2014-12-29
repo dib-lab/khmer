@@ -22,6 +22,14 @@ def teardown():
 #  * thread-safety
 
 
+def test_toobig():
+    try:
+        lh = LabelHash(20, 1e13, 1)
+        assert 0, "This should fail."
+    except MemoryError as err:
+        print str(err)
+
+
 def test_n_labels():
     lh = LabelHash(20, 1e7, 4)
     filename = utils.get_test_data('test-labels.fa')

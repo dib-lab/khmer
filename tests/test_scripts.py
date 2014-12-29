@@ -54,6 +54,20 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+def test_load_into_counting_toobig():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']
+
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status == -1, status
+    assert "MemoryError" in err, err
+
+
 def test_load_into_counting_fail():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
