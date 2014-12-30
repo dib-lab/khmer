@@ -242,10 +242,9 @@ HLLCounter::HLLCounter(int p, WordLength ksize) {
 }
 
 void HLLCounter::init(int p, WordLength ksize) {
+    this->alpha = get_alpha(p);
     int m = 1 << p;
     std::vector<int> M(m, 0.0);
-
-    this->alpha = get_alpha(p);
     this->p = p;
     this->m = 1 << p;
     this->M = M;
