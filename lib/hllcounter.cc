@@ -39,9 +39,9 @@ double get_alpha(const int p)
 
         std::stringstream message;
         if (p < 4) {
-            message << "Max error is " << valid_upper_bound;
+            message << "Max error should be smaller than " << valid_upper_bound;
         } else {
-            message << "Min error is " << valid_lower_bound;
+            message << "Min error should be greater than " << valid_lower_bound;
         }
         throw khmer_exception(message.str().c_str());
     }
@@ -267,7 +267,7 @@ double HLLCounter::_Ep()
 
 HashIntoType HLLCounter::estimate_cardinality()
 {
-    int V = count(this->M.begin(), this->M.end(), 0);
+    long V = count(this->M.begin(), this->M.end(), 0);
 
     if (V > 0) {
         double H = this->m * log((double)this->m / V);

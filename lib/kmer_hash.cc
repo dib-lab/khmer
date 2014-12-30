@@ -97,7 +97,7 @@ std::string _revhash(HashIntoType hash, WordLength k)
 std::string _revcomp(const std::string& kmer)
 {
     std::string out = kmer;
-    int ksize = out.size();
+    size_t ksize = out.size();
 
     for (int i=0; i < ksize; ++i) {
       char complement;
