@@ -81,29 +81,30 @@ release makers, following this checklist by MRC.
         git clone --depth 1 --branch v${new_version}-${rc} https://github.com/ged-lab/khmer.git
         cd khmer
         make install-dependencies
-        make install
         make test
+        pip uninstall --yes khmer
+        make install
         normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
                 echo 1st manual version check passed
-        cd ..
+        cd lib # make sure we are in a place without a 'khmer' subdirectory
         nosetests khmer --attr '!known_failing'
-
 
         # Secondly we test via pip
         
-        cd ../testenv2
+        cd ../../../testenv2
         source bin/activate
         pip install -U setuptools==3.4.1
         pip install -e git+https://github.com/ged-lab/khmer.git@v${new_version}-${rc}#egg=khmer
         cd src/khmer
         make install-dependencies
         make dist
-        make install
         make test
+        pip uninstall --yes khmer
+        make install
         normalize-by-median.py --version 2>&1 | grep ${new_version}-${rc} && \
                 echo 2nd manual version check passed
         cp dist/khmer*tar.gz ../../../testenv3/
-        cd ../..
+        cd ../.. # make sure we are in a place without a 'khmer' directory
         nosetests khmer --attr '!known_failing'
 
         # Is the distribution in testenv2 complete enough to build another
@@ -118,6 +119,7 @@ release makers, following this checklist by MRC.
         cd khmer*
         make dist
         make test
+        pip uninstall --yes khmer
         pushd .. ; nosetests khmer --attr '!known_failing' ; popd
 
 #. Publish the new release on the testing PyPI server.  You will need
