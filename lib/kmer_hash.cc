@@ -116,7 +116,7 @@ std::string _revcomp(const std::string& kmer)
           complement = 'A';
           break;
         default:
-          complement = kmer[i];
+          throw khmer::khmer_exception("Invalid base in read");
           break;
       }
       out[ksize - i - 1] = complement;

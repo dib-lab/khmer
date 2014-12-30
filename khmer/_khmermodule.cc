@@ -4304,8 +4304,12 @@ hllcounter_add( PyObject * self, PyObject * args )
         return NULL;
     }
 
-    /* TODO: handle errors */
-    hllcounter->add(kmer_str);
+    try {
+        hllcounter->add(kmer_str);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
 
     Py_RETURN_NONE;
 }
@@ -4332,13 +4336,20 @@ hllcounter_consume_string( PyObject * self, PyObject * args )
     khmer::HLLCounter * hllcounter = me->hllcounter;
 
     const char * kmer_str;
+    unsigned long long n_consumed;
 
     if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
         return NULL;
     }
 
-    /* TODO: handle errors */
-    return PyLong_FromLong(hllcounter->consume_string(kmer_str));
+    try {
+        n_consumed = hllcounter->consume_string(kmer_str);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    return PyLong_FromLong(n_consumed);
 }
 
 static PyObject * hllcounter_consume_fasta(PyObject * self, PyObject * args)
