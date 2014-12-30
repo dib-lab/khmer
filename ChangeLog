@@ -1,4 +1,4 @@
-2014-12-05  Brian Wyss  <wyssbria@msu.edu>
+2014-12-30  Brian Wyss  <wyssbria@msu.edu>
 
     * tests/test_scripts.py: added four new tests:
     load_into_counting_multifile(), test_abundance_dist_single_nosquash(),
