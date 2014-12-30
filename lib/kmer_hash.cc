@@ -94,7 +94,7 @@ std::string _revhash(HashIntoType hash, WordLength k)
     return s;
 }
 
-std::string _revcomp(const std::string kmer)
+std::string _revcomp(const std::string& kmer)
 {
     std::string out = kmer;
     int ksize = out.size();
@@ -124,7 +124,7 @@ std::string _revcomp(const std::string kmer)
     return out;
 }
 
-HashIntoType _hash_murmur(const std::string kmer)
+HashIntoType _hash_murmur(const std::string& kmer)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;
@@ -132,7 +132,7 @@ HashIntoType _hash_murmur(const std::string kmer)
     return khmer::_hash_murmur(kmer, h, r);
 }
 
-HashIntoType _hash_murmur(const std::string kmer,
+HashIntoType _hash_murmur(const std::string& kmer,
                           HashIntoType& h, HashIntoType& r)
 {
     HashIntoType out[2];
@@ -147,7 +147,7 @@ HashIntoType _hash_murmur(const std::string kmer,
     return h ^ r;
 }
 
-HashIntoType _hash_murmur_forward(const std::string kmer)
+HashIntoType _hash_murmur_forward(const std::string& kmer)
 {
     HashIntoType h = 0;
     HashIntoType r = 0;

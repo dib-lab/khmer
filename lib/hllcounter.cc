@@ -268,11 +268,10 @@ double HLLCounter::_Ep()
 
 HashIntoType HLLCounter::estimate_cardinality()
 {
-    double H;
     int V = count(this->M.begin(), this->M.end(), 0);
 
     if (V > 0) {
-        H = this->m * log((double)this->m / V);
+        double H = this->m * log((double)this->m / V);
         if (H <= get_threshold(this->p)) {
             return H;
         }
