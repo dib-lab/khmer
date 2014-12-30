@@ -166,22 +166,43 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
 
 
 def test_filter_abund_1():
+    script = scriptpath('filter-abund.py')
+
     infile = utils.get_temp_filename('test.fa')
+    n_infile = utils.get_temp_filename('test-fastq-n-reads.fq')
+
     in_dir = os.path.dirname(infile)
+    n_in_dir = os.path.dirname(n_infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
 
-    script = scriptpath('filter-abund.py')
+    counting_ht = _make_counting(infile, K=17)
+    n_counting_ht = _make_counting(n_infile, K=17)
+
     args = [counting_ht, infile]
     utils.runscript(script, args, in_dir)
 
     outfile = infile + '.abundfilt'
+    n_outfile = n_infile + '.abundfilt'
+    n_outfile2 = n_infile + '2.abundfilt'
+
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.sequence for r in screed.open(outfile)])
+
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+    args = [n_counting_ht, n_infile]
+    utils.runscript(script, args, n_in_dir)
+
+    seqs = set([r.sequence for r in screed.open(n_infile)])
+    assert os.path.exists(n_outfile), n_outfile
+
+    args = [n_counting_ht, n_infile, '-o', n_outfile2]
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(n_outfile2), n_outfile2
 
 
 def test_filter_abund_2():
