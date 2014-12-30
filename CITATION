@@ -161,13 +161,12 @@ implement the probabilistic k-mer counting described in:
 FASTA and FASTQ reading
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The abundance-dist-single.py, filter-abund-single.py, load-graph.py, and
-load-into-counting.py scripts use the SeqAn library for FASTQ and FASTA
-reading as described in:
+Several scripts use the SeqAn library for FASTQ and FASTA reading as described
+in:
 
    SeqAn An efficient, generic C++ library for sequence analysis
    Döring A, Weese D, Rausch T, Reinert K.
-   http://dx.doi.org/10.1186/1471-2105-9-11 
+   http://dx.doi.org/10.1186/1471-2105-9-11
 
 .. code-block:: tex
 
