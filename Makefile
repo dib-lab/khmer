@@ -169,6 +169,7 @@ coverity-build:
 	if [[ -x ${cov_analysis_dir}/bin/cov-build ]]; \
 	then \
 		export PATH=${PATH}:${cov_analysis_dir}/bin; \
+		./setup.py develop; \
 		cov-build --dir cov-int --c-coverage gcov --disable-gcov-arg-injection make coverage-debug; \
 		cov-capture --dir cov-int --c-coverage gcov python -m nose --attr '!known_failing' ; \
 		cov-import-scm --dir cov-int --scm git 2>/dev/null; \
