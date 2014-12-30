@@ -1,3 +1,9 @@
+2014-12-30  Brian Wyss  <wyssbria@msu.edu>
+
+    * tests/test_scripts.py: added four new tests:
+    load_into_counting_multifile(), test_abundance_dist_single_nosquash(),
+    test_abundance_dist_single_savehash, test_filter_abund_2_singlefile
+
 2015-12-29  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * CITATION,khmer/khmer_args.py,scripts/{abundance-dist-single,
