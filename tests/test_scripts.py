@@ -185,6 +185,7 @@ def test_filter_abund_1():
 
     outfile = infile + '.abundfilt'
     n_outfile = n_infile + '.abundfilt'
+    n_outfile2 = n_infile + '2.abundfilt'
 
     assert os.path.exists(outfile), outfile
 
@@ -199,9 +200,9 @@ def test_filter_abund_1():
     seqs = set([r.sequence for r in screed.open(n_infile)])
     assert os.path.exists(n_outfile), n_outfile
 
-    args = [n_counting_ht, n_infile, '-o' 'outfile']
+    args = [n_counting_ht, n_infile, '-o', n_outfile2]
     utils.runscript(script, args, in_dir)
-    assert os.path.exists(outfile), outfile
+    assert os.path.exists(n_outfile2), n_outfile2
 
 
 def test_filter_abund_2():
