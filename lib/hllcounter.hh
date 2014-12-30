@@ -26,14 +26,10 @@ public:
     unsigned int consume_string(const std::string &);
     void consume_fasta(std::string const &,
                        unsigned int &,
-                       unsigned long long &,
-                       CallbackFn callback = NULL,
-                       void * callback_data = NULL);
+                       unsigned long long &);
     void consume_fasta(read_parsers::IParser *,
                        unsigned int &,
-                       unsigned long long &,
-                       CallbackFn callback = NULL,
-                       void *callback_data = NULL);
+                       unsigned long long &);
     unsigned int check_and_process_read(std::string &,
                                         bool &);
     bool check_and_normalize_read(std::string &) const;

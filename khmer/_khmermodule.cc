@@ -4358,11 +4358,8 @@ static PyObject * hllcounter_consume_fasta(PyObject * self, PyObject * args)
     khmer::HLLCounter * hllcounter = me->hllcounter;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(
-                args, "s|O", &filename, &callback_obj
-            )) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -4370,8 +4367,7 @@ static PyObject * hllcounter_consume_fasta(PyObject * self, PyObject * args)
     unsigned long long  n_consumed    = 0;
     unsigned int          total_reads   = 0;
     try {
-        hllcounter->consume_fasta(filename, total_reads, n_consumed,
-                                _report_fn, callback_obj);
+        hllcounter->consume_fasta(filename, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;

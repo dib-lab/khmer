@@ -306,15 +306,10 @@ unsigned int HLLCounter::consume_string(const std::string &s) {
 void HLLCounter::consume_fasta(
         std::string const &filename,
         unsigned int &total_reads,
-        unsigned long long &n_consumed,
-        CallbackFn callback,
-        void * callback_data) {
+        unsigned long long &n_consumed) {
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
-    consume_fasta(
-        parser,
-        total_reads, n_consumed,
-        callback, callback_data);
+    consume_fasta(parser, total_reads, n_consumed);
 
     delete parser;
 }
@@ -322,9 +317,7 @@ void HLLCounter::consume_fasta(
 void HLLCounter::consume_fasta(
         read_parsers::IParser *parser,
         unsigned int &      total_reads,
-        unsigned long long &    n_consumed,
-        CallbackFn      callback,
-        void *      callback_data) {
+        unsigned long long &    n_consumed) {
 
     read_parsers::Read read;
     HLLCounter** counters;
