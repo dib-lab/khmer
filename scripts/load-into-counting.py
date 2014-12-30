@@ -69,7 +69,7 @@ def get_parser():
 
 def main():
 
-    info('load-into-counting.py', ['counting'])
+    info('load-into-counting.py', ['counting', 'SeqAn'])
 
     args = get_parser().parse_args()
     report_on_config(args)

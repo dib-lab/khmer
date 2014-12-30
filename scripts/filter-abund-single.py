@@ -62,7 +62,7 @@ def get_parser():
 
 
 def main():
-    info('filter-abund-single.py', ['counting'])
+    info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
     check_file_status(args.datafile, args.force)
     check_space([args.datafile], args.force)
