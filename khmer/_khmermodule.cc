@@ -4215,6 +4215,10 @@ typedef struct {
 } khmer_KHLLCounterObject;
 
 static void khmer_hllcounter_dealloc(PyObject *);
+static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds);
+static int khmer_hllcounter_init(khmer_KHLLCounterObject * self,
+                                 PyObject * args, PyObject * kwds);
 static PyObject * khmer_hllcounter_getattr(PyObject * obj, char * name);
 
 static PyTypeObject khmer_KHLLCounterType = {
@@ -4222,7 +4226,7 @@ static PyTypeObject khmer_KHLLCounterType = {
     0,
     "KHLLCounter", sizeof(khmer_KHLLCounterObject),
     0,
-    khmer_hllcounter_dealloc,	/*tp_dealloc*/
+    (destructor)khmer_hllcounter_dealloc,	/*tp_dealloc*/
     0,				/*tp_print*/
     khmer_hllcounter_getattr,	/*tp_getattr*/
     0,				/*tp_setattr*/
@@ -4237,11 +4241,66 @@ static PyTypeObject khmer_KHLLCounterType = {
     0,				/*tp_getattro*/
     0,				/*tp_setattro*/
     0,				/*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,		/*tp_flags*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,		/*tp_flags*/
     "HyperLogLog counter object",           /* tp_doc */
+    0,                       /* tp_traverse */
+    0,                       /* tp_clear */
+    0,                       /* tp_richcompare */
+    0,                       /* tp_weaklistoffset */
+    0,                       /* tp_iter */
+    0,                       /* tp_iternext */
+    0,  /* tp_methods */
+    0,                       /* tp_members */
+    0,                       /* tp_getset */
+    0,                       /* tp_base */
+    0,                       /* tp_dict */
+    0,                       /* tp_descr_get */
+    0,                       /* tp_descr_set */
+    0,                       /* tp_dictoffset */
+    (initproc)khmer_hllcounter_init,   /* tp_init */
+    0,                       /* tp_alloc */
 };
 
 #define is_hllcounter_obj(v)  ((v)->ob_type == &khmer_KHLLCounterType)
+
+static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds)
+{
+    khmer_KHLLCounterObject * self;
+    self = (khmer_KHLLCounterObject *)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        double error_rate = 0;
+        WordLength ksize = 0;
+
+        if (!PyArg_ParseTuple(args, "db", &error_rate, &ksize)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if ((error_rate < 0) || (error_rate > 1.0)) {
+            Py_DECREF(self);
+            PyErr_SetString(PyExc_ValueError,
+                            "Error rate should be between 0.0 and 1.0");
+            return NULL;
+        }
+
+        try {
+            self->hllcounter = new HLLCounter(error_rate, ksize);
+        } catch (khmer_exception &e) {
+            PyErr_SetString(PyExc_ValueError, e.what());
+            return NULL;
+        }
+    }
+
+    return (PyObject *) self;
+}
+
+static int khmer_hllcounter_init(khmer_KHLLCounterObject * self,
+                                 PyObject * args, PyObject * kwds)
+{
+    return 0;
+}
 
 //
 // new_hll_counter
@@ -4282,13 +4341,13 @@ static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
 // khmer_hllcounter_dealloc -- clean up a hllcounter object.
 //
 
-static void khmer_hllcounter_dealloc(PyObject* self)
+static void khmer_hllcounter_dealloc(PyObject* obj)
 {
-    khmer_KHLLCounterObject * obj = (khmer_KHLLCounterObject *) self;
-    delete obj->hllcounter;
-    obj->hllcounter = NULL;
+    khmer_KHLLCounterObject * self = (khmer_KHLLCounterObject *) obj;
+    delete self->hllcounter;
+    self->hllcounter = NULL;
 
-    PyObject_Del((PyObject *) obj);
+    self->ob_type->tp_free((PyObject*)obj);
 }
 
 static
@@ -4566,6 +4625,12 @@ init_khmer(void)
         return;
     }
 
+    khmer_KHLLCounterType.tp_new = khmer_hllcounter_new;
+    khmer_KHLLCounterType.tp_methods = khmer_hllcounter_methods;
+    if (PyType_Ready(&khmer_KHLLCounterType) < 0) {
+        return;
+    }
+
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
                         "interface for the khmer module low-level extensions" );
@@ -4592,6 +4657,9 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+
+    Py_INCREF(&khmer_KHLLCounterType);
+    PyModule_AddObject(m, "_HLLCounter", (PyObject *)&khmer_KHLLCounterType);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:

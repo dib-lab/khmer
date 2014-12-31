@@ -14,6 +14,7 @@ from khmer._khmer import _new_hll_counter
 from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
+from khmer._khmer import _HLLCounter
 from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
 
 from khmer._khmer import forward_hash  # figuregen/*.py
@@ -263,3 +264,7 @@ class Hashbits(_Hashbits):
         c = _Hashbits.__new__(cls, k, primes)
         c.primes = primes
         return c
+
+
+class HLLCounter(_HLLCounter):
+    pass
