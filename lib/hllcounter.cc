@@ -17,10 +17,10 @@
 #include "read_parsers.hh"
 
 #ifdef _OPENMP
-   #include <omp.h>
+#include <omp.h>
 #else
-   #define omp_get_thread_num() 0
-   #define omp_get_num_threads() 1
+#define omp_get_thread_num() 0
+#define omp_get_num_threads() 1
 #endif
 
 #define arr_len(a) (a + sizeof a / sizeof a[0])
@@ -34,7 +34,8 @@ std::map<int, std::vector<double> > biasData;
 double get_alpha(const int p)
 {
     if ((p < 4) or (p > 16)) {
-        double valid_lower_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2), 17));
+        double valid_lower_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2),
+                                   17));
         double valid_upper_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2), 3));
 
         std::stringstream message;
@@ -58,54 +59,55 @@ double get_alpha(const int p)
     }
 }
 
-void init_raw_estimate_data() {
+void init_raw_estimate_data()
+{
     if (rawEstimateData.empty()) {
         for(int i=4; i <= 18; i++) {
             std::vector<double> v;
             switch(i) {
-              case 4:
+            case 4:
                 v.assign(RAW_ESTIMATE_DATA_4, arr_len(RAW_ESTIMATE_DATA_4));
                 break;
-              case 5:
+            case 5:
                 v.assign(RAW_ESTIMATE_DATA_5, arr_len(RAW_ESTIMATE_DATA_5));
                 break;
-              case 6:
+            case 6:
                 v.assign(RAW_ESTIMATE_DATA_6, arr_len(RAW_ESTIMATE_DATA_6));
                 break;
-              case 7:
+            case 7:
                 v.assign(RAW_ESTIMATE_DATA_7, arr_len(RAW_ESTIMATE_DATA_7));
                 break;
-              case 8:
+            case 8:
                 v.assign(RAW_ESTIMATE_DATA_8, arr_len(RAW_ESTIMATE_DATA_8));
                 break;
-              case 9:
+            case 9:
                 v.assign(RAW_ESTIMATE_DATA_9, arr_len(RAW_ESTIMATE_DATA_9));
                 break;
-              case 10:
+            case 10:
                 v.assign(RAW_ESTIMATE_DATA_10, arr_len(RAW_ESTIMATE_DATA_10));
                 break;
-              case 11:
+            case 11:
                 v.assign(RAW_ESTIMATE_DATA_11, arr_len(RAW_ESTIMATE_DATA_11));
                 break;
-              case 12:
+            case 12:
                 v.assign(RAW_ESTIMATE_DATA_12, arr_len(RAW_ESTIMATE_DATA_12));
                 break;
-              case 13:
+            case 13:
                 v.assign(RAW_ESTIMATE_DATA_13, arr_len(RAW_ESTIMATE_DATA_13));
                 break;
-              case 14:
+            case 14:
                 v.assign(RAW_ESTIMATE_DATA_14, arr_len(RAW_ESTIMATE_DATA_14));
                 break;
-              case 15:
+            case 15:
                 v.assign(RAW_ESTIMATE_DATA_15, arr_len(RAW_ESTIMATE_DATA_15));
                 break;
-              case 16:
+            case 16:
                 v.assign(RAW_ESTIMATE_DATA_16, arr_len(RAW_ESTIMATE_DATA_16));
                 break;
-              case 17:
+            case 17:
                 v.assign(RAW_ESTIMATE_DATA_17, arr_len(RAW_ESTIMATE_DATA_17));
                 break;
-              case 18:
+            case 18:
                 v.assign(RAW_ESTIMATE_DATA_18, arr_len(RAW_ESTIMATE_DATA_18));
                 break;
             }
@@ -114,54 +116,55 @@ void init_raw_estimate_data() {
     }
 }
 
-void init_bias_data() {
+void init_bias_data()
+{
     if (biasData.empty()) {
         for(int i=4; i <= 18; i++) {
             std::vector<double> v;
             switch(i) {
-              case 4:
+            case 4:
                 v.assign(RAW_BIAS_DATA_4, arr_len(RAW_BIAS_DATA_4));
                 break;
-              case 5:
+            case 5:
                 v.assign(RAW_BIAS_DATA_5, arr_len(RAW_BIAS_DATA_5));
                 break;
-              case 6:
+            case 6:
                 v.assign(RAW_BIAS_DATA_6, arr_len(RAW_BIAS_DATA_6));
                 break;
-              case 7:
+            case 7:
                 v.assign(RAW_BIAS_DATA_7, arr_len(RAW_BIAS_DATA_7));
                 break;
-              case 8:
+            case 8:
                 v.assign(RAW_BIAS_DATA_8, arr_len(RAW_BIAS_DATA_8));
                 break;
-              case 9:
+            case 9:
                 v.assign(RAW_BIAS_DATA_9, arr_len(RAW_BIAS_DATA_9));
                 break;
-              case 10:
+            case 10:
                 v.assign(RAW_BIAS_DATA_10, arr_len(RAW_BIAS_DATA_10));
                 break;
-              case 11:
+            case 11:
                 v.assign(RAW_BIAS_DATA_11, arr_len(RAW_BIAS_DATA_11));
                 break;
-              case 12:
+            case 12:
                 v.assign(RAW_BIAS_DATA_12, arr_len(RAW_BIAS_DATA_12));
                 break;
-              case 13:
+            case 13:
                 v.assign(RAW_BIAS_DATA_13, arr_len(RAW_BIAS_DATA_13));
                 break;
-              case 14:
+            case 14:
                 v.assign(RAW_BIAS_DATA_14, arr_len(RAW_BIAS_DATA_14));
                 break;
-              case 15:
+            case 15:
                 v.assign(RAW_BIAS_DATA_15, arr_len(RAW_BIAS_DATA_15));
                 break;
-              case 16:
+            case 16:
                 v.assign(RAW_BIAS_DATA_16, arr_len(RAW_BIAS_DATA_16));
                 break;
-              case 17:
+            case 17:
                 v.assign(RAW_BIAS_DATA_17, arr_len(RAW_BIAS_DATA_17));
                 break;
-              case 18:
+            case 18:
                 v.assign(RAW_BIAS_DATA_18, arr_len(RAW_BIAS_DATA_18));
                 break;
             }
@@ -182,11 +185,11 @@ std::vector<int> get_nearest_neighbors(double E, std::vector<double> estimate)
 
     int i = 0;
     for (std::vector<double>::iterator it = estimate.begin();
-         it != estimate.end();
-         ++it) {
-      std::pair<double, int> p(pow(E - *it, 2.0), i);
-      distance_map.push_back(p);
-      i++;
+            it != estimate.end();
+            ++it) {
+        std::pair<double, int> p(pow(E - *it, 2.0), i);
+        distance_map.push_back(p);
+        i++;
     }
 
     sort(distance_map.begin(), distance_map.end());
@@ -207,9 +210,9 @@ double estimate_bias(double E, int p)
     double estimate = 0.0;
 
     for (std::vector<int>::iterator it = nearest.begin();
-         it != nearest.end();
-         ++it) {
-      estimate += bias[*it];
+            it != nearest.end();
+            ++it) {
+        estimate += bias[*it];
     }
     return estimate / nearest.size();
 }
@@ -237,11 +240,13 @@ HLLCounter::HLLCounter(double error_rate, WordLength ksize)
     this->init(p, ksize);
 }
 
-HLLCounter::HLLCounter(int p, WordLength ksize) {
+HLLCounter::HLLCounter(int p, WordLength ksize)
+{
     this->init(p, ksize);
 }
 
-void HLLCounter::init(int p, WordLength ksize) {
+void HLLCounter::init(int p, WordLength ksize)
+{
     this->alpha = get_alpha(p);
     int m = 1 << p;
     std::vector<int> M(m, 0.0);
@@ -259,8 +264,9 @@ double HLLCounter::_Ep()
     double sum = accumulate(this->M.begin(), this->M.end(), 0.0, ep_sum);
     double E = this->alpha * pow(this->m, 2.0) / sum;
 
-    if (E <= (5 * (double)this->m))
-      return E - estimate_bias(E, this->p);
+    if (E <= (5 * (double)this->m)) {
+        return E - estimate_bias(E, this->p);
+    }
 
     return E;
 }
@@ -285,7 +291,8 @@ void HLLCounter::add(const std::string &value)
     this->M[j] = std::max(this->M[j], get_rho(x >> this->p, 64 - this->p));
 }
 
-unsigned int HLLCounter::consume_string(const std::string &s) {
+unsigned int HLLCounter::consume_string(const std::string &s)
+{
     unsigned int n_consumed = 0;
     std::string kmer = "";
 
@@ -303,9 +310,10 @@ unsigned int HLLCounter::consume_string(const std::string &s) {
 }
 
 void HLLCounter::consume_fasta(
-        std::string const &filename,
-        unsigned int &total_reads,
-        unsigned long long &n_consumed) {
+    std::string const &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed)
+{
     read_parsers::IParser * parser = read_parsers::IParser::get_parser(filename);
 
     consume_fasta(parser, total_reads, n_consumed);
@@ -314,9 +322,10 @@ void HLLCounter::consume_fasta(
 }
 
 void HLLCounter::consume_fasta(
-        read_parsers::IParser *parser,
-        unsigned int &      total_reads,
-        unsigned long long &    n_consumed) {
+    read_parsers::IParser *parser,
+    unsigned int &      total_reads,
+    unsigned long long &    n_consumed)
+{
 
     read_parsers::Read read;
     HLLCounter** counters;
@@ -330,32 +339,35 @@ void HLLCounter::consume_fasta(
         #pragma omp single
         {
             counters = (HLLCounter**)calloc(omp_get_num_threads(),
-                                            sizeof(HLLCounter*));
+            sizeof(HLLCounter*));
             n_consumed_partial = (unsigned int*)calloc(omp_get_num_threads(),
-                                            sizeof(unsigned int));
+            sizeof(unsigned int));
             total_reads_partial = (unsigned int*)calloc(omp_get_num_threads(),
-                                            sizeof(unsigned int));
+            sizeof(unsigned int));
 
-            for (int i=0; i < omp_get_num_threads(); i++) {
+            for (int i=0; i < omp_get_num_threads(); i++)
+            {
                 HLLCounter *newc = new HLLCounter(this->p, this->_ksize);
                 counters[i] = newc;
             }
 
-            while (!parser->is_complete()) {
+            while (!parser->is_complete())
+            {
                 // Iterate through the reads and consume their k-mers.
                 try {
                     read = parser->get_next_read();
 
                     #pragma omp task default(none) firstprivate(read) \
-                     shared(counters, n_consumed_partial, total_reads_partial)
+                    shared(counters, n_consumed_partial, total_reads_partial)
                     {
                         bool is_valid;
                         int n, t = omp_get_thread_num();
                         n = counters[t]->check_and_process_read(read.sequence,
-                                                                is_valid);
+                        is_valid);
                         n_consumed_partial[t] += n;
-                        if (is_valid)
+                        if (is_valid) {
                             total_reads_partial[t] += 1;
+                        }
                     }
                 } catch (read_parsers::NoMoreReadsAvailable) {
                 }
@@ -366,7 +378,8 @@ void HLLCounter::consume_fasta(
 
         #pragma omp single
         {
-            for (int i=0; i < omp_get_num_threads(); ++i) {
+            for (int i=0; i < omp_get_num_threads(); ++i)
+            {
                 this->merge(*counters[i]);
                 delete counters[i];
                 n_consumed += n_consumed_partial[i];
@@ -380,7 +393,8 @@ void HLLCounter::consume_fasta(
 }
 
 unsigned int HLLCounter::check_and_process_read(std::string &read,
-                                                bool &is_valid) {
+        bool &is_valid)
+{
     is_valid = check_and_normalize_read(read);
 
     if (!is_valid) {
@@ -390,7 +404,8 @@ unsigned int HLLCounter::check_and_process_read(std::string &read,
     return consume_string(read);
 }
 
-bool HLLCounter::check_and_normalize_read(std::string &read) const {
+bool HLLCounter::check_and_normalize_read(std::string &read) const
+{
     bool is_valid = true;
 
     if (read.length() < this->_ksize) {
@@ -408,7 +423,8 @@ bool HLLCounter::check_and_normalize_read(std::string &read) const {
     return is_valid;
 }
 
-void HLLCounter::merge(HLLCounter &other) {
+void HLLCounter::merge(HLLCounter &other)
+{
     std::transform(this->M.begin(), this->M.end(),
                    other.M.begin(),
                    this->M.begin(),

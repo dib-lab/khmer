@@ -100,26 +100,26 @@ std::string _revcomp(const std::string& kmer)
     size_t ksize = out.size();
 
     for (int i=0; i < ksize; ++i) {
-      char complement;
+        char complement;
 
-      switch(kmer[i]) {
+        switch(kmer[i]) {
         case 'A':
-          complement = 'T';
-          break;
+            complement = 'T';
+            break;
         case 'C':
-          complement = 'G';
-          break;
+            complement = 'G';
+            break;
         case 'G':
-          complement = 'C';
-          break;
+            complement = 'C';
+            break;
         case 'T':
-          complement = 'A';
-          break;
+            complement = 'A';
+            break;
         default:
-          throw khmer::khmer_exception("Invalid base in read");
-          break;
-      }
-      out[ksize - i - 1] = complement;
+            throw khmer::khmer_exception("Invalid base in read");
+            break;
+        }
+        out[ksize - i - 1] = complement;
     }
     return out;
 }
