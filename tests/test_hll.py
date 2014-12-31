@@ -26,8 +26,11 @@ def teardown():
     utils.cleanup()
 
 
-def test_hll_python_1():
-    # test python code to count unique kmers using HyperLogLog
+def test_hll_add_python():
+    # test python code to count unique kmers using HyperLogLog.
+    # use the lower level add() method, which accepts anything,
+    # and compare to an exact count using collections.Counter
+
     filename = utils.get_test_data('random-20-a.fa')
 
     K = 20  # size of kmer
@@ -55,8 +58,9 @@ def test_hll_python_1():
     assert abs(1 - float(hllcpp.estimate_cardinality()) / n_unique) < 0.01
 
 
-def test_hll_c_1():
-    # test c++ code to count unique kmers using HyperLogLog
+def test_hll_consume_string():
+    # test c++ code to count unique kmers using HyperLogLog,
+    # using screed to feed each read to the counter.
 
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -71,7 +75,7 @@ def test_hll_c_1():
     assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
 
 
-def test_hll_c_2():
+def test_hll_consume_fasta():
     # test c++ code to count unique kmers using HyperLogLog
 
     filename = utils.get_test_data('random-20-a.fa')
@@ -84,6 +88,19 @@ def test_hll_c_2():
     hllcpp.consume_fasta(filename)
 
     assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
+
+
+@raises(ValueError)
+def test_hll_invalid_base():
+    # this test should raise a ValueError,
+    # since there are invalid bases in read.
+
+    K = 5  # size of kmer
+    ERROR_RATE = 0.01
+
+    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+
+    hllcpp.consume_string("ACGTTTCGNAATNNNNN")
 
 
 @raises(ValueError)
@@ -113,4 +130,4 @@ def test_hll_invalid_error_rate_min():
     K = 20  # size of kmer
     ERROR_RATE = 0.000001
 
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+    hllcpp = khmer.HLLCounter(ERROR_RATE, K)
