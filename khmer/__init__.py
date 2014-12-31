@@ -10,11 +10,10 @@ This is khmer; please see http://khmer.readthedocs.org/.
 
 from khmer._khmer import _new_counting_hash
 from khmer._khmer import _new_hashbits
-from khmer._khmer import _new_hll_counter
 from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
-from khmer._khmer import _HLLCounter
+from khmer._khmer import _HLLCounter as HLLCounter
 from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
 
 from khmer._khmer import forward_hash  # figuregen/*.py
@@ -75,7 +74,7 @@ def new_counting_hash(k, starting_size, n_tables=2):
 
 
 def new_hll_counter(error_rate, ksize):
-    return _new_hll_counter(error_rate, ksize)
+    return HLLCounter(error_rate, ksize)
 
 
 def load_hashbits(filename):
@@ -264,7 +263,3 @@ class Hashbits(_Hashbits):
         c = _Hashbits.__new__(cls, k, primes)
         c.primes = primes
         return c
-
-
-class HLLCounter(_HLLCounter):
-    pass

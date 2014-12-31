@@ -4303,41 +4303,6 @@ static int khmer_hllcounter_init(khmer_KHLLCounterObject * self,
 }
 
 //
-// new_hll_counter
-//
-
-static PyObject* _new_hll_counter(PyObject * self, PyObject * args)
-{
-    double error_rate = 0;
-    WordLength ksize = 0;
-
-    if (!PyArg_ParseTuple(args, "db", &error_rate, &ksize)) {
-        return NULL;
-    }
-
-    if ((error_rate < 0) || (error_rate > 1.0)) {
-        PyErr_SetString(PyExc_ValueError, "Error rate should be between 0.0 and 1.0");
-        return NULL;
-    }
-
-    khmer_KHLLCounterObject * khllcounter_obj = (khmer_KHLLCounterObject *) \
-            PyObject_New(khmer_KHLLCounterObject, &khmer_KHLLCounterType);
-
-    if (khllcounter_obj == NULL) {
-        return NULL;
-    }
-
-    try {
-        khllcounter_obj->hllcounter = new khmer::HLLCounter(error_rate, ksize);
-    } catch (khmer_exception &e) {
-        PyErr_SetString(PyExc_ValueError, e.what());
-        return NULL;
-    }
-
-    return (PyObject *) khllcounter_obj;
-}
-
-//
 // khmer_hllcounter_dealloc -- clean up a hllcounter object.
 //
 
@@ -4595,10 +4560,6 @@ static PyMethodDef KhmerMethods[] = {
     {
         "get_version_cpp", get_version_cpp,
         METH_VARARGS, "return the VERSION c++ compiler option"
-    },
-    {
-        "_new_hll_counter", _new_hll_counter,
-        METH_VARARGS,		"Create an empty HyperLogLog counter"
     },
     { NULL, NULL, 0, NULL } // sentinel
 };
