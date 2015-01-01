@@ -165,6 +165,11 @@ sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 sloccount: 
 	sloccount lib khmer scripts tests setup.py Makefile
 
+coverity-install:
+	wget https://scan.coverity.com/download/linux-64 --post-data "token=${COVERITY_TOKEN}&project=ged-lab/khmer" -O coverity_tool.tgz
+	tar xf coverity_tool.tgz
+	export cov_analysis_dir=cov-analysis-linux64-7.5.0
+
 coverity-build:
 	if [[ -x ${cov_analysis_dir}/bin/cov-build ]]; \
 	then \
