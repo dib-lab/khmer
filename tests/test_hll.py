@@ -20,6 +20,9 @@ from nose.tools import raises
 
 
 TT = string.maketrans('ACGT', 'TGCA')
+K = 20  # size of kmer
+ERR_RATE = 0.01
+N_UNIQUE = 3960
 
 
 def teardown():
@@ -32,11 +35,7 @@ def test_hll_add_python():
     # and compare to an exact count using collections.Counter
 
     filename = utils.get_test_data('random-20-a.fa')
-
-    K = 20  # size of kmer
-    ERROR_RATE = 0.01  # bounded error
-
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
     counter = set()
 
     for n, record in enumerate(fasta_iter(open(filename))):
@@ -54,8 +53,8 @@ def test_hll_add_python():
 
     n_unique = len(counter)
 
-    assert n_unique == 3960
-    assert abs(1 - float(hllcpp.estimate_cardinality()) / n_unique) < 0.01
+    assert n_unique == N_UNIQUE
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
 def test_hll_consume_string():
@@ -63,31 +62,29 @@ def test_hll_consume_string():
     # using screed to feed each read to the counter.
 
     filename = utils.get_test_data('random-20-a.fa')
-
-    K = 20  # size of kmer
-    ERROR_RATE = 0.01
-
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
-
+    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
     for n, record in enumerate(fasta_iter(open(filename))):
         hllcpp.consume_string(record['sequence'])
 
-    assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
 def test_hll_consume_fasta():
     # test c++ code to count unique kmers using HyperLogLog
 
     filename = utils.get_test_data('random-20-a.fa')
-
-    K = 20  # size of kmer
-    ERROR_RATE = 0.01
-
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
-
+    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
     hllcpp.consume_fasta(filename)
 
-    assert abs(1 - float(hllcpp.estimate_cardinality()) / 3960) < 0.01
+    assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
+
+
+def test_hll_len():
+    filename = utils.get_test_data('random-20-a.fa')
+    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
+    hllcpp.consume_fasta(filename)
+
+    assert hllcpp.estimate_cardinality() == len(hllcpp)
 
 
 @raises(ValueError)
@@ -95,11 +92,7 @@ def test_hll_invalid_base():
     # this test should raise a ValueError,
     # since there are invalid bases in read.
 
-    K = 5  # size of kmer
-    ERROR_RATE = 0.01
-
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
-
+    hllcpp = khmer.new_hll_counter(ERR_RATE, 5)
     hllcpp.consume_string("ACGTTTCGNAATNNNNN")
 
 
@@ -107,27 +100,18 @@ def test_hll_invalid_base():
 def test_hll_invalid_error_rate():
     # test if error_rate is a valid value
 
-    K = 20  # size of kmer
-    ERROR_RATE = -0.01
-
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+    hllcpp = khmer.new_hll_counter(-0.01, K)
 
 
 @raises(ValueError)
 def test_hll_invalid_error_rate_max():
     # test if error_rate is a valid value
 
-    K = 20  # size of kmer
-    ERROR_RATE = 0.50
-
-    hllcpp = khmer.new_hll_counter(ERROR_RATE, K)
+    hllcpp = khmer.new_hll_counter(0.5, K)
 
 
 @raises(ValueError)
 def test_hll_invalid_error_rate_min():
     # test if error_rate is a valid value
 
-    K = 20  # size of kmer
-    ERROR_RATE = 0.000001
-
-    hllcpp = khmer.HLLCounter(ERROR_RATE, K)
+    hllcpp = khmer.HLLCounter(0.000001, K)

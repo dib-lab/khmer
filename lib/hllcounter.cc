@@ -235,7 +235,6 @@ int get_rho(HashIntoType w, int max_width)
 
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
-    // TODO: check if 0 < error_rate < 1
     int p = ceil(log2(pow(1.04 / error_rate, 2)));
     this->init(p, ksize);
 }
