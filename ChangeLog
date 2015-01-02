@@ -112,6 +112,20 @@
     modifications to Hashtable that might exposure potential memory corruption 
     with default copy constructor
 
+2015-01-01  Luiz Irber <irberlui@msu.edu>
+
+    * lib/hllcounter.{cc,hh}: Implemented a HyperLogLog counter.
+    * khmer/{_khmermodule.cc, __init__.py}: added HLLCounter class
+    initialization and wrapper.
+    * tests/test_hll.py: added test functions for the new
+    HyperLogLog counter.
+    * sandbox/unique-kmers.py: implemented a CLI script for
+    approximate cardinality estimation using a HyperLogLog counter.
+    * setup.cfg, Makefile, third-party/smhasher/MurmurHash3.{cc,h},
+    lib/kmer_hash.{cc,hh}, setup.py: added MurmurHash3 hash function
+    and configuration.
+    * setup.py: added a function to check if compiler supports OpenMP.
+
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
     * tests/test_scripts.py: Attained complete testing coverage for 
