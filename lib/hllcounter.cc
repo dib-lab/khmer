@@ -47,6 +47,13 @@ double get_alpha(const int p)
         throw khmer_exception(message.str().c_str());
     }
 
+    /*
+       For a description of following constants see
+       HyperLogLog in Practice: Algorithmic Engineering of a State of The Art
+          Cardinality Estimation Algorithm
+       Stefan Heule, Marc Nunkesser and Alex Hall
+       dx.doi.org/10.1145/2452376.2452456
+    */
     switch (p) {
     case 4:
         return 0.673;
@@ -224,13 +231,7 @@ double ep_sum(double acc, int b)
 
 int get_rho(HashIntoType w, int max_width)
 {
-    int rho = max_width - floor(log2(w)); /* TODO find last bit set */
-
-    if (rho <= 0) {
-        return -1;    // TODO: treat error, w overflow
-    }
-
-    return rho;
+    return max_width - floor(log2(w));
 }
 
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)

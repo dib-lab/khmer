@@ -52,6 +52,13 @@ private:
 #ifdef __cplusplus
 extern "C" {
 #endif
+/*
+   For a description of following constants see
+   HyperLogLog in Practice: Algorithmic Engineering of a State of The Art
+      Cardinality Estimation Algorithm
+   jtefan Heule, Marc Nunkesser and Alex Hall
+   dx.doi.org/10.1145/2452376.2452456
+*/
 const int THRESHOLD_DATA[] = {
     10, 20, 40, 80, 220, 400, 900, 1800, 3100,
     6500, 11500, 20000, 50000, 120000, 350000
