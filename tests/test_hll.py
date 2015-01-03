@@ -87,6 +87,26 @@ def test_hll_len():
     assert hllcpp.estimate_cardinality() == len(hllcpp)
 
 
+def test_hll_merge():
+    hll_total = khmer.HLLCounter(ERR_RATE, K)
+    hll_merged = khmer.HLLCounter(ERR_RATE, K)
+
+    filename = utils.get_test_data("test-abund-read-2.fa")
+    hll_partial_1 = khmer.HLLCounter(ERR_RATE, K)
+    hll_partial_1.consume_fasta(filename)
+    hll_total.consume_fasta(filename)
+
+    filename = utils.get_test_data("test-abund-read-3.fa")
+    hll_partial_2 = khmer.HLLCounter(ERR_RATE, K)
+    hll_partial_2.consume_fasta(filename)
+    hll_total.consume_fasta(filename)
+
+    hll_merged.merge(hll_partial_1)
+    hll_merged.merge(hll_partial_2)
+
+    assert len(hll_total) == len(hll_merged)
+
+
 @raises(ValueError)
 def test_hll_invalid_base():
     # this test should raise a ValueError,

@@ -4365,6 +4365,10 @@ hllcounter_add(khmer_KHLLCounter_Object * me, PyObject * args)
 
 static
 PyObject *
+hllcounter_merge(khmer_KHLLCounter_Object * me, PyObject * args);
+
+static
+PyObject *
 hllcounter_estimate_cardinality(khmer_KHLLCounter_Object * me, PyObject * args)
 {
     if (!PyArg_ParseTuple( args, "" )) {
@@ -4442,6 +4446,11 @@ static PyMethodDef khmer_hllcounter_methods[] = {
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter."
     },
+    {
+        "merge", (PyCFunction)hllcounter_merge,
+        METH_VARARGS,
+        "Merge this counter with another one."
+    },
     {NULL} /* Sentinel */
 };
 
@@ -4488,6 +4497,22 @@ static PyTypeObject khmer_KHLLCounter_Type = {
 };
 
 #define is_hllcounter_obj(v)  ((v)->ob_type == &khmer_KHLLCounter_Type)
+
+static
+PyObject *
+hllcounter_merge(khmer_KHLLCounter_Object * me, PyObject * args)
+{
+    khmer_KHLLCounter_Object * other;
+
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KHLLCounter_Type, &other)) {
+        return NULL;
+    }
+
+    me->hllcounter->merge(*other->hllcounter);
+
+    Py_RETURN_NONE;
+}
+
 
 
 //////////////////////////////
