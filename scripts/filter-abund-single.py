@@ -24,7 +24,7 @@ from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info)
 from khmer.kfile import (check_file_status, check_space,
-                        check_space_for_hashtable)
+                         check_space_for_hashtable)
 #
 DEFAULT_CUTOFF = 2
 

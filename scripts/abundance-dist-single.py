@@ -22,7 +22,7 @@ import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
 from khmer.kfile import (check_file_status, check_space,
-                        check_space_for_hashtable)
+                         check_space_for_hashtable)
 
 
 def get_parser():

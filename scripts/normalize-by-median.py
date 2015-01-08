@@ -25,7 +25,7 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
-                        check_valid_file_exists)
+                         check_valid_file_exists)
 DEFAULT_DESIRED_COVERAGE = 10
 
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
