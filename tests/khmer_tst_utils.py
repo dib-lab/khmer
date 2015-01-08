@@ -11,7 +11,7 @@ from pkg_resources import Requirement, resource_filename, ResolutionError
 from cStringIO import StringIO
 import nose
 import sys
-import khmer.file
+import khmer.kfile
 import traceback
 import subprocess
 
