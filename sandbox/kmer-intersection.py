@@ -11,6 +11,7 @@
 
 
 import argparse
+import math
 import os
 import sys
 import textwrap
@@ -18,6 +19,7 @@ import textwrap
 import khmer
 from khmer.khmer_args import DEFAULT_K, info, ComboFormatter
 from khmer import __version__
+from screed.fasta import fasta_iter
 
 
 def get_parser():
@@ -57,17 +59,31 @@ def main():
     input_filename = None
 
     total_hll = khmer.HLLCounter(args.error_rate, args.ksize)
-    hlls = []
-    for index, input_filename in enumerate(args.input_filenames):
-        hll = khmer.HLLCounter(args.error_rate, args.ksize)
-        hll.consume_fasta(input_filename)
-        total_hll.merge(hll)
-        hlls.append(hll)
+    curve = []
 
-    overlap = len(hlls[0]) + len(hlls[1]) - len(total_hll)
-    print '# of unique k-mers in dataset 1:', len(hlls[0])
-    print '# of unique k-mers in dataset 2:', len(hlls[1])
+    first = khmer.HLLCounter(args.error_rate, args.ksize)
+    first.consume_fasta(args.input_filenames[0])
+    total_hll.merge(first)
+
+    second = khmer.HLLCounter(args.error_rate, args.ksize)
+    for n, record in enumerate(fasta_iter(open(args.input_filenames[1]))):
+        second.consume_string(record['sequence'])
+        interval = int(math.log(n + 1, 1.1))
+        if n < 100 or n % interval == 0:
+            total_hll.merge(second)
+            curve.append((n, len(first) + len(second) - len(total_hll)))
+
+    overlap = len(first) + len(second) - len(total_hll)
+    print '# of unique k-mers in dataset 1:', len(first)
+    print '# of unique k-mers in dataset 2:', len(second)
     print '# of overlap unique k-mers:', overlap
+
+    total_reads = curve[-1][0]
+    interval = total_reads / 100
+    with open('curve', 'w') as f:
+        for c in curve:
+            if c[0] % interval == 0:  # TODO: this is WRONG!
+                f.write("%d %d\n" % (c[0], c[1]))
 
 
 if __name__ == "__main__":
