@@ -19,7 +19,7 @@ import sys
 import khmer
 import argparse
 import os
-from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_file_status
 from khmer.khmer_args import info
 
 

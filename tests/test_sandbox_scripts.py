@@ -19,7 +19,6 @@ import imp
 
 import khmer_tst_utils as utils
 import khmer
-import khmer.kfile
 import screed
 
 

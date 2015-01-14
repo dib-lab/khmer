@@ -36,8 +36,6 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-from khmer.kfile import (check_file_status, check_valid_file_exists,
-                         check_space)
 
 DEFAULT_OUT_PREF = 'reads'
 DEFAULT_RANGE = -1
