@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,7 +24,7 @@ import screed
 import argparse
 import textwrap
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 DEFAULT_MAX_SIZE = int(1e6)

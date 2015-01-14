@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
@@ -21,8 +21,8 @@ import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
+from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_space_for_hashtable
 
 
 def get_parser():
@@ -35,14 +35,14 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer counting table from the given"

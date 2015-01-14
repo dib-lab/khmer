@@ -34,6 +34,11 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
 #endif
 
+#define NONCOPYABLE(className)\
+private:\
+    className(const className&);\
+    const className& operator=(const className&)
+
 #include <set>
 #include <map>
 #include <queue>

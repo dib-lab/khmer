@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,7 +21,7 @@ import io
 
 import khmer_tst_utils as utils
 import khmer
-import khmer.file
+import khmer.kfile
 import screed
 
 
@@ -36,7 +36,7 @@ def teardown():
 def test_check_space():
     # @CTB this probably belongs in a new test file, along with other
     # tests of the file.py module.
-    khmer.file.check_space(
+    khmer.kfile.check_space(
         ['', utils.get_test_data('test-abund-read-2.fa')], False)
 
 
@@ -44,7 +44,7 @@ def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
@@ -58,7 +58,7 @@ def test_load_into_counting_fail():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
@@ -87,7 +87,7 @@ def test_load_into_counting_tsv():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     tabfile = outfile + '.info.tsv'
     infile = utils.get_test_data('test-abund-read-2.fa')
 
@@ -109,7 +109,7 @@ def test_load_into_counting_json():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     jsonfile = outfile + '.info.json'
     infile = utils.get_test_data('test-abund-read-2.fa')
 
@@ -138,7 +138,7 @@ def test_load_into_counting_bad_summary_fmt():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
@@ -155,7 +155,7 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     if not BIGCOUNT:
         args.append('-b')
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
 
     args.extend([outfile, infilename])
 
@@ -393,7 +393,7 @@ def test_filter_stoptags():
 
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
-    hashfile = utils.get_test_data('normC20k20.kh')
+    hashfile = utils.get_test_data('normC20k20.ct')
     outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = scriptpath('normalize-by-median.py')
     args = ['--loadtable', hashfile, '-o', outfile, infile]
@@ -527,7 +527,7 @@ def test_normalize_by_median_force():
 
 def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
-    hashfile = utils.get_temp_filename('test-out.kh')
+    hashfile = utils.get_temp_filename('test-out.ct')
     outfile = infile + '.keep'
     in_dir = os.path.dirname(infile)
 

@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -10,7 +10,7 @@
 Trim sequences at k-mers of the given abundance, based on the given counting
 hash table.  Output sequences will be placed in 'infile.abundfilt'.
 
-% python scripts/filter-abund.py <counting.kh> <data1> [ <data2> <...> ]
+% python scripts/filter-abund.py <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -21,7 +21,7 @@ import argparse
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (ComboFormatter, add_threading_args, info)
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer import __version__
 #
 
@@ -37,8 +37,8 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 table.kh data/100k-filtered.fa
-        filter-abund.py -C 2 table.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 table.ct data/100k-filtered.fa
+        filter-abund.py -C 2 table.ct data/100k-filtered.fa
     """
     parser = argparse.ArgumentParser(
         description='Trim sequences at a minimum k-mer abundance.',

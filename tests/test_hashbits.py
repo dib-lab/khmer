@@ -543,7 +543,7 @@ def test_load_notexist_should_fail():
 
 def test_load_truncated_should_fail():
     inpath = utils.get_test_data('random-20-a.fa')
-    savepath = utils.get_temp_filename('temphashbitssave0.kh')
+    savepath = utils.get_temp_filename('temphashbitssave0.ct')
 
     hi = khmer.new_counting_hash(12, 1000)
     hi.consume_fasta(inpath)
@@ -660,7 +660,7 @@ def test_hashbits_file_version_check():
 
 def test_hashbits_file_type_check():
     kh = khmer.new_counting_hash(12, 1, 1)
-    savepath = utils.get_temp_filename('tempcountingsave0.kh')
+    savepath = utils.get_temp_filename('tempcountingsave0.ct')
     kh.save(savepath)
 
     ht = khmer.new_hashbits(12, 1, 1)
