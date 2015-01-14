@@ -1,3 +1,8 @@
+2015-01-14  Reed Cartwright  <cartwright@asu.edu>
+
+    * doc/dev/getting-started.txt: Added install information for
+    Arch Linux
+
 2014-01-14  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/user/{blog-posts,guide}.txt,examples/stamps/do.sh,sandbox/{
@@ -38,11 +43,6 @@
     * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future 
     modifications to Hashtable that might exposure potential memory corruption 
     with default copy constructor
-
-2015-01-08  Reed Cartwright  <cartwright@asu.edu>
-
-    * doc/dev/getting-started.txt: Added install information for
-    Arch Linux
 
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
