@@ -1,3 +1,8 @@
+2015-01-08  Reed Cartwright <cartwright@asu.edu>
+
+   * doc/dev/getting-started.txt: Added install information for
+   Arch Linux
+
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
     * tests/test_scripts.py: Attained complete testing coverage for 
