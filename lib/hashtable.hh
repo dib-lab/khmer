@@ -239,6 +239,9 @@ protected:
     }
 
     uint32_t _all_tags_spin_lock;
+
+    NONCOPYABLE(Hashtable);
+
 public:
     SubsetPartition * partition;
     SeenSet all_tags;
