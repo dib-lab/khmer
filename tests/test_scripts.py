@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,7 +21,7 @@ import io
 
 import khmer_tst_utils as utils
 import khmer
-import khmer.file
+import khmer.kfile
 import screed
 
 
@@ -36,7 +36,7 @@ def teardown():
 def test_check_space():
     # @CTB this probably belongs in a new test file, along with other
     # tests of the file.py module.
-    khmer.file.check_space(
+    khmer.kfile.check_space(
         ['', utils.get_test_data('test-abund-read-2.fa')], False)
 
 

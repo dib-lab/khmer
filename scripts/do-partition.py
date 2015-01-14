@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -25,7 +25,7 @@ import textwrap
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info,
                               add_threading_args)
 import glob
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 
 DEFAULT_SUBSET_SIZE = int(1e5)
 DEFAULT_N_THREADS = 4

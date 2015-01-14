@@ -1,3 +1,27 @@
+2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
+
+    * tests/khmer_tst_utils.py, tests/test_sandbox_scripts.py: removed
+    unused module imports
+    * .gitignore: added pylint_report.txt so that it is not accidentally
+    committed after running make diff_pylint_report
+    * khmer/file.py -> khmer/kfile.py: renamed internal file handling
+    class to avoid collisions with builtin Python file module
+    * sandbox/collect-reads.py, sanbox/saturate-by-median.py,
+    sandbox/sweep-files.py, sandbox/sweep-reads.py,
+    scripts/abundance-dist-single.py, scripts/abundance-dist.py,
+    scripts/annotate-partitions.py, scripts/count-median.py,
+    scripts/count-overlap.py, scripts/do-partition.py,
+    scripts/extract-long-sequences.py, scripts/extract-paired-reads.py,
+    scripts/extract-partitions.py, scripts/filter-abund-single.py,
+    scripts/filter-abund.py, scripts/filter-stoptags.py,
+    scripts/find-knots.py, scripts/interleave-reads.py,
+    scripts/load-graph.py, scripts/load-into-counting.py,
+    scripts/make-initial-stoptags.py, scripts/merge-partitions.py,
+    scripts/normalize-by-median.py, scripts/partition-graph.py,
+    scripts/sample-reads-randomly.py, scripts/split-paired-reads.py,
+    tests/test_script_arguments.py, tests/test_scripts.py: changed all
+    occurrences of `file` to `kfile`
+
 2015-01-09  Rhys Kidd  <rhyskidd@gmail.com>
 
     * lib/khmer.hh: implement generic NONCOPYABLE() macro guard
