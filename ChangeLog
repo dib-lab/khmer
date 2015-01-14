@@ -1,19 +1,9 @@
-2015-01-13  Daniel Standage <daniel.standage@gmail.com>
+2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
 
     * tests/khmer_tst_utils.py, tests/test_sandbox_scripts.py: removed
     unused module imports
     * .gitignore: added pylint_report.txt so that it is not accidentally
     committed after running make diff_pylint_report
-
-2015-01-09  Rhys Kidd  <rhyskidd@gmail.com>
-
-    * lib/khmer.hh: implement generic NONCOPYABLE() macro guard
-    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future 
-    modifications to Hashtable that might exposure potential memory corruption 
-    with default copy constructor
-
-2015-01-08  Daniel Standage <daniel.standage@gmail.com>
-
     * khmer/file.py -> khmer/kfile.py: renamed internal file handling
     class to avoid collisions with builtin Python file module
     * sandbox/collect-reads.py, sanbox/saturate-by-median.py,
@@ -31,6 +21,13 @@
     scripts/sample-reads-randomly.py, scripts/split-paired-reads.py,
     tests/test_script_arguments.py, tests/test_scripts.py: changed all
     occurrences of `file` to `kfile`
+
+2015-01-09  Rhys Kidd  <rhyskidd@gmail.com>
+
+    * lib/khmer.hh: implement generic NONCOPYABLE() macro guard
+    * lib/hashtable.hh: apply NONCOPYABLE macro guard in case of future 
+    modifications to Hashtable that might exposure potential memory corruption 
+    with default copy constructor
 
 2014-12-30  Michael Wright  <wrig517@msu.edu>
 
