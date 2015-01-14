@@ -693,7 +693,7 @@ def test_load_gz_truncated_should_fail():
 def test_counting_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
-    inpath = utils.get_test_data('badversion-k12.kh')
+    inpath = utils.get_test_data('badversion-k12.ct')
 
     try:
         ht.load(inpath)
@@ -705,7 +705,7 @@ def test_counting_file_version_check():
 def test_counting_gz_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
-    inpath = utils.get_test_data('badversion-k12.kh.gz')
+    inpath = utils.get_test_data('badversion-k12.ct.gz')
 
     try:
         ht.load(inpath)

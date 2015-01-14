@@ -1,3 +1,13 @@
+2014-01-14  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * doc/user/{blog-posts,guide}.txt,examples/stamps/do.sh,sandbox/{
+    collect-reads,error-correct-pass2,filter-median-and-pct,filter-median,
+    read_aligner,split-sequences-by-length}.py,scripts/{filter-abund,
+    load-into-counting}.py,tests/test_{counting_hash,hashbits,scripts}.py:
+    remove references to ".kh" files replaces with ".pt" or ".ct" as
+    appropriate
+    * tests/test-data/{bad-vesionk12,normC20k20}.kh: renamed to "*.ct"
+
 2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
 
     * tests/khmer_tst_utils.py, tests/test_sandbox_scripts.py: removed
