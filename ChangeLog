@@ -39,7 +39,7 @@
     modifications to Hashtable that might exposure potential memory corruption 
     with default copy constructor
 
-2015-01-08  Reed Cartwright <cartwright@asu.edu>
+2015-01-08  Reed Cartwright  <cartwright@asu.edu>
 
     * doc/dev/getting-started.txt: Added install information for
     Arch Linux
