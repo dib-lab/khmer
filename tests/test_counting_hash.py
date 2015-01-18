@@ -267,7 +267,6 @@ def test_2_kadian():
     assert x == 1, x
 
 
-@attr('highmem')
 def test_save_load():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
@@ -292,7 +291,6 @@ def test_save_load():
     assert x == y, (x, y)
 
 
-@attr('highmem')
 def test_load_gz():
     inpath = utils.get_test_data('random-20-a.fa')
 
@@ -328,7 +326,6 @@ def test_load_gz():
     assert x == y, (x, y)
 
 
-@attr('highmem')
 def test_save_load_gz():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
@@ -560,10 +557,9 @@ def test_nobigcount_save():
     assert kh.get('AAAA') == MAX_COUNT
 
 
-@attr('highmem')
 def test_bigcount_abund_dist():
-    kh = khmer.new_counting_hash(18, 1e7, 4)
-    tracking = khmer.new_hashbits(18, 1e7, 4)
+    kh = khmer.new_counting_hash(18, 1e2, 4)
+    tracking = khmer.new_hashbits(18, 1e2, 4)
     kh.set_use_bigcount(True)
 
     seqpath = utils.get_test_data('test-abund-read-2.fa')
@@ -577,7 +573,6 @@ def test_bigcount_abund_dist():
     assert dist[1001] == 1, pdist
 
 
-@attr('highmem')
 def test_bigcount_abund_dist_2():
     kh = khmer.new_counting_hash(18, 1e7, 4)
     tracking = khmer.new_hashbits(18, 1e7, 4)
@@ -698,7 +693,7 @@ def test_load_gz_truncated_should_fail():
 def test_counting_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
-    inpath = utils.get_test_data('badversion-k12.kh')
+    inpath = utils.get_test_data('badversion-k12.ct')
 
     try:
         ht.load(inpath)
@@ -710,7 +705,7 @@ def test_counting_file_version_check():
 def test_counting_gz_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
-    inpath = utils.get_test_data('badversion-k12.kh.gz')
+    inpath = utils.get_test_data('badversion-k12.ct.gz')
 
     try:
         ht.load(inpath)

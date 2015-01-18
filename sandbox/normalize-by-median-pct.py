@@ -19,7 +19,7 @@ import screed
 import os
 import khmer
 from itertools import izip
-from khmer.counting_args import build_construct_args, DEFAULT_MIN_HASHSIZE
+from khmer.khmer_args import build_counting_args, DEFAULT_MIN_TABLESIZE
 import argparse
 
 DEFAULT_DESIRED_COVERAGE = 5
@@ -42,7 +42,7 @@ def validpair(r0, r1):
 
 
 def main():
-    parser = build_construct_args()
+    parser = build_counting_args()
     parser.add_argument('-C', '--cutoff', type=int, dest='cutoff',
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')

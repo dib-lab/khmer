@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 # pylint: disable=missing-docstring,invalid-name
@@ -21,8 +21,8 @@ import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
     add_threading_args
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
+from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_space_for_hashtable
 
 
 def get_parser():
@@ -35,14 +35,14 @@ def get_parser():
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 out.ct data/100k-filtered.fa
 
     Multiple threads can be used to accelerate the process, if you have extra
     cores to spare.
 
     Example::
 
-        load-into-counting.py -k 20 -x 5e7 -T 4 out.kh data/100k-filtered.fa
+        load-into-counting.py -k 20 -x 5e7 -T 4 out.ct data/100k-filtered.fa
     """
 
     parser = build_counting_args("Build a k-mer counting table from the given"
@@ -69,7 +69,7 @@ def get_parser():
 
 def main():
 
-    info('load-into-counting.py', ['counting'])
+    info('load-into-counting.py', ['counting', 'SeqAn'])
 
     args = get_parser().parse_args()
     report_on_config(args)
@@ -115,7 +115,8 @@ def main():
             thread.join()
 
         if index > 0 and index % 10 == 0:
-            check_space_for_hashtable(args.n_tables * args.min_tablesize)
+            check_space_for_hashtable(args.n_tables * args.min_tablesize,
+                                      args.force)
             print >>sys.stderr, 'mid-save', base
             htable.save(base)
         with open(base + '.info', 'a') as info_fh:
