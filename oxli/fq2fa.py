@@ -4,7 +4,6 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
-# pylint: disable=invalid-name,missing-docstring
 
 """
 Convert FASTQ files to FASTA format.

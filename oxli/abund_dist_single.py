@@ -70,7 +70,7 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
         ksize=common.get_env_ksize,
         n_tables=common.get_env_n_tables, 
         min_tablesize=common.get_env_tablesize,
-        threads=int(1)):
+        threads=common.DEFAULT_N_THREADS):
     """
     Calculates the abundance distribution of k-mers from a single sequence file
     """

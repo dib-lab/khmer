@@ -1880,3 +1880,199 @@ def test_oxli_abundance_dist_single_nobigcount():
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '255 2 98 1.0', line
+
+def test_oxli_build_graph():
+    script = scriptpath('oxli')
+    args = ['build_graph', '-x', '1e7', '-N', '2', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    assert 'Total number of unique k-mers: 3960' in err, err
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
+
+@attr('known_failing')
+def test_oxli_build_graph_no_tags():
+    script = scriptpath('load-graph.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-n']
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert not os.path.exists(tagset_file), tagset_file
+
+    assert khmer.load_hashbits(ht_file)
+
+    # can't think of a good way to make sure this worked, beyond just
+    # loading the ht file...
+
+@attr('known_failing')
+def test_oxli_build_graph_fail():
+    script = scriptpath('load-graph.py')
+    args = ['-x', '1e3', '-N', '2', '-k', '20']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args, fail_ok=True)
+    assert status == 1, status
+    assert "ERROR:" in err
+
+@attr('known_failing')
+def test_oxli_build_graph_write_fp():
+    script = scriptpath('load-graph.py')
+    args = ['-x', '1e5', '-N', '2', '-k', '20', '-w']  # use small HT
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data('random-20-a.fa')
+
+    args.extend([outfile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    info_file = outfile + '.info'
+    assert os.path.exists(info_file), info_file
+    data = [x.strip() for x in open(info_file)]
+    data = set(data)
+    assert '3959 unique k-mers' in data
+    assert 'false positive rate estimated to be 0.002' in data
+
+@attr('known_failing')
+def test_oxli_build_graph_multithread():
+    script = scriptpath('load-graph.py')
+
+    outfile = utils.get_temp_filename('test')
+    infile = utils.get_test_data('test-reads.fa')
+
+    args = ['-N', '4', '-x', '1e9', '-T', '8', outfile, infile]
+
+    (status, out, err) = utils.runscript(script, args)
+
+@attr('known_failing')
+def _oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
+                do_partition=False,
+                annotate_partitions=False,
+                stop_big_traverse=False):
+    script = scriptpath('load-graph.py')
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
+
+    outfile = utils.get_temp_filename('out')
+    infile = infilename
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.pt'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    if do_partition:
+        script = scriptpath('partition-graph.py')
+        args = [outfile]
+        if stop_big_traverse:
+            args.insert(0, '--no-big-traverse')
+        utils.runscript(script, args)
+
+        script = scriptpath('merge-partitions.py')
+        args = [outfile, '-k', str(ksize)]
+        utils.runscript(script, args)
+
+        final_pmap_file = outfile + '.pmap.merged'
+        assert os.path.exists(final_pmap_file)
+
+        if annotate_partitions:
+            script = scriptpath('annotate-partitions.py')
+            args = ["-k", str(ksize), outfile, infilename]
+
+            in_dir = os.path.dirname(outfile)
+            utils.runscript(script, args, in_dir)
+
+            baseinfile = os.path.basename(infilename)
+            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
+
+    return outfile
+
+@attr('known_failing')
+def _DEBUG_oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
+                      do_partition=False,
+                      annotate_partitions=False,
+                      stop_big_traverse=False):
+    script = scriptpath('load-graph.py')
+    args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
+
+    outfile = utils.get_temp_filename('out')
+    infile = utils.get_test_data(infilename)
+
+    args.extend([outfile, infile])
+
+    utils.runscript(script, args)
+
+    ht_file = outfile + '.ct'
+    assert os.path.exists(ht_file), ht_file
+
+    tagset_file = outfile + '.tagset'
+    assert os.path.exists(tagset_file), tagset_file
+
+    if do_partition:
+        print ">>>> DEBUG: Partitioning <<<"
+        script = scriptpath('partition-graph.py')
+        args = [outfile]
+        if stop_big_traverse:
+            args.insert(0, '--no-big-traverse')
+        utils.runscript(script, args)
+
+        print ">>>> DEBUG: Merging Partitions <<<"
+        script = scriptpath('merge-partitions.py')
+        args = [outfile, '-k', str(ksize)]
+        utils.runscript(script, args)
+
+        final_pmap_file = outfile + '.pmap.merged'
+        assert os.path.exists(final_pmap_file)
+
+        if annotate_partitions:
+            print ">>>> DEBUG: Annotating Partitions <<<"
+            script = scriptpath('annotate-partitions.py')
+            args = ["-k", str(ksize), outfile, infilename]
+
+            in_dir = os.path.dirname(outfile)
+            utils.runscript(script, args, in_dir)
+
+            baseinfile = os.path.basename(infilename)
+            assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
+
+    return outfile

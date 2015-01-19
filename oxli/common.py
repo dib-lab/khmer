@@ -48,10 +48,9 @@ def add_hash_args(parser):
     Take an existing parser and add the Khmer* hash args to it
     """
 
-    env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                   DEFAULT_MIN_TABLESIZE)
+    env_ksize = get_env_ksize()
+    env_n_tables = get_env_n_tables()
+    env_tablesize = get_env_tablesize()
 
     parser.add_argument('--version', action='version',
                         version='khmer {v}'.format(v=__version__))
@@ -77,15 +76,13 @@ def add_counting_args(parser):
     parser.hashtype = 'counting'
 
 
-def build_hashbits_args(descr=None, epilog=None):
+def add_hashbits_args(parser):
     """Build an argparse.ArgumentParser with arguments for hashbits based
     scripts and return it.
     """
 
-    parser = build_hash_args(descr=descr, epilog=epilog)
+    add_hash_args(parser)
     parser.hashtype = 'hashbits'
-
-    return parser
 
 # add an argument for loadhash with warning about parameters
 
