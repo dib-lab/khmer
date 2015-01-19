@@ -16,7 +16,7 @@ Use '-h' for parameter help.
 """
 import sys
 import argparse
-import screed
+from oxli import fq2fa
 
 
 def get_parser():
@@ -24,48 +24,13 @@ def get_parser():
         description='Converts FASTQ format (.fq) files to FASTA format (.fa).',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('input_sequence', help='The name of the input'
-                        ' FASTQ sequence file.')
-    parser.add_argument('-o', '--output', metavar="filename",
-                        help='The name of the output'
-                        ' FASTA sequence file.',
-                        type=argparse.FileType('w'),
-                        default=sys.stdout)
-    parser.add_argument('-n', '--n_keep', default=False, action='store_true',
-                        help='Option to drop reads containing \'N\'s in ' +
-                        'input_sequence file.')
+    fq2fa.add_args(parser)
     return parser
 
 
 def main():
     args = get_parser().parse_args()
-    print >> sys.stderr, ('fastq from ', args.input_sequence)
-
-    n_count = 0
-    for n, record in enumerate(screed.open(args.input_sequence)):
-        if n % 10000 == 0:
-            print>>sys.stderr, '...', n
-
-        sequence = record['sequence']
-        name = record['name']
-
-        if 'N' in sequence:
-            if not args.n_keep:
-                n_count += 1
-                continue
-
-        args.output.write('>' + name + '\n')
-        args.output.write(sequence + '\n')
-
-    print >> sys.stderr, '\n' + 'lines from ' + args.input_sequence
-
-    if not args.n_keep:
-        print >> sys.stderr, str(n_count) + ' lines dropped.'
-
-    else:
-        print >> sys.stderr, 'No lines dropped from file.'
-
-    print >> sys.stderr, 'Wrote output to', args.output
+    fq2fa.do_fastq_to_fasta(args.input_sequence, args.output, args.n_keep)
 
 if __name__ == '__main__':
     main()

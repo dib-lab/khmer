@@ -1,3 +1,12 @@
+2014-12-14  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * oxli/{__init__, fq2fa, common, abund-dist-single}.py, 
+    scripts/{fasq-to-fasta, pseudoxli, abundance-dist-single}.py: 
+    Implemented oxli single entry point for fastq-to-fasta and 
+    abundance-dist-single scripts
+    * test/test_scripts.py: added test for oxli-fastq-to-fasta_and_tag,
+    oxli-abundance-dist-single and oxli-abundnace-dist-single-nobigccount
+
 2014-12-08  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * doc/user/known_issues.txt: Document that multithreading leads to dropped
