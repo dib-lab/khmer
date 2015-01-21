@@ -73,10 +73,6 @@ def new_counting_hash(k, starting_size, n_tables=2):
     return _new_counting_hash(k, primes)
 
 
-def new_hll_counter(error_rate, ksize):
-    return HLLCounter(error_rate, ksize)
-
-
 def load_hashbits(filename):
     """Load a hashbits object from the given filename and return it.
 
