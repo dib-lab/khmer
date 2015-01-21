@@ -74,10 +74,10 @@ def get_parser():
 
 
 def main():
-    info('unique-kmers.py')
+    info('unique-kmers.py', ['SeqAn'])
     args = get_parser().parse_args()
 
-    hllcpp = khmer.new_hll_counter(args.error_rate, args.ksize)
+    hllcpp = khmer.HLLCounter(args.error_rate, args.ksize)
 
     report_fp = args.report
     input_filename = None

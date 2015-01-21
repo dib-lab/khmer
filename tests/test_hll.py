@@ -35,7 +35,7 @@ def test_hll_add_python():
     # and compare to an exact count using collections.Counter
 
     filename = utils.get_test_data('random-20-a.fa')
-    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
     counter = set()
 
     for n, record in enumerate(fasta_iter(open(filename))):
@@ -62,7 +62,7 @@ def test_hll_consume_string():
     # using screed to feed each read to the counter.
 
     filename = utils.get_test_data('random-20-a.fa')
-    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
     for n, record in enumerate(fasta_iter(open(filename))):
         hllcpp.consume_string(record['sequence'])
 
@@ -73,7 +73,7 @@ def test_hll_consume_fasta():
     # test c++ code to count unique kmers using HyperLogLog
 
     filename = utils.get_test_data('random-20-a.fa')
-    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
     hllcpp.consume_fasta(filename)
 
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
@@ -81,7 +81,7 @@ def test_hll_consume_fasta():
 
 def test_hll_len():
     filename = utils.get_test_data('random-20-a.fa')
-    hllcpp = khmer.new_hll_counter(ERR_RATE, K)
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
     hllcpp.consume_fasta(filename)
 
     assert hllcpp.estimate_cardinality() == len(hllcpp)
@@ -92,7 +92,7 @@ def test_hll_invalid_base():
     # this test should raise a ValueError,
     # since there are invalid bases in read.
 
-    hllcpp = khmer.new_hll_counter(ERR_RATE, 5)
+    hllcpp = khmer.HLLCounter(ERR_RATE, 5)
     hllcpp.consume_string("ACGTTTCGNAATNNNNN")
 
 
@@ -100,14 +100,14 @@ def test_hll_invalid_base():
 def test_hll_invalid_error_rate():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.new_hll_counter(-0.01, K)
+    hllcpp = khmer.HLLCounter(-0.01, K)
 
 
 @raises(ValueError)
 def test_hll_invalid_error_rate_max():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.new_hll_counter(0.5, K)
+    hllcpp = khmer.HLLCounter(0.5, K)
 
 
 @raises(ValueError)
