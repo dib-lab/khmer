@@ -14,8 +14,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp',
-                        help="output file for histogram; defaults to "
-                             "<first filename>.errhist in cwd.",
+                        help="output file for statistics; defaults to stdout.",
                         type=argparse.FileType('w'), default=None)
     args = parser.parse_args()
 
@@ -48,7 +47,7 @@ def main():
 
     if total_seqs == 0:
         print >>args.outfp, \
-            'No sequences found in %d files' % len(sys.argv[1:])
+            'No sequences found in %d files' % len(args.filenames)
     else:
         print >>args.outfp, '---------------'
         print >>args.outfp, "\n".join(output)
