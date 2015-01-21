@@ -7,14 +7,23 @@
 #
 import sys
 import screed
+import argparse
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filenames', nargs='+')
+    parser.add_argument('-o', '--output', dest='outfp',
+                        help="output file for histogram; defaults to "
+                             "<first filename>.errhist in cwd.",
+                        type=argparse.FileType('w'), default=None)
+    args = parser.parse_args()
+
     total_bp = 0
     total_seqs = 0
 
     output = []
-    for filename in sys.argv[1:]:
+    for filename in args.filenames:
         bp = 0
         seqs = 0
         for record in screed.open(filename):
@@ -38,13 +47,14 @@ def main():
             total_seqs += seqs
 
     if total_seqs == 0:
-        print 'No sequences found in %d files' % len(sys.argv[1:])
+        print >>args.outfp, \
+            'No sequences found in %d files' % len(sys.argv[1:])
     else:
-        print '---------------'
-        print "\n".join(output)
-        print '---------------'
-        print '%d bp / %d seqs; %.1f average length -- total'.format(
-            total_bp, total_seqs, total_bp / float(total_seqs))
+        print >>args.outfp, '---------------'
+        print >>args.outfp, "\n".join(output)
+        print >>args.outfp, '---------------'
+        print >>args.outfp, '%d bp / %d seqs; %.1f average length -- total' % \
+            (total_bp, total_seqs, total_bp / float(total_seqs))
 
 
 if __name__ == '__main__':

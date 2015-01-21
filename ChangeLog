@@ -1,3 +1,9 @@
+2015-01-21  Titus Brown  <titus@idyll.org>
+
+    * sandbox/readstats.py: fixed non-functional string interpolation at end;
+    added -o to send output to a file.
+    * tests/test_sandbox_scripts.py: added tests for readstats.py
+
 2015-01-14  Reed Cartwright  <cartwright@asu.edu>
 
     * doc/dev/getting-started.txt: Added install information for
