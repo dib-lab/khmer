@@ -5,13 +5,25 @@
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
+"""
+Display summary statistics for one or more FASTA/FASTQ files.
+
+% scripts/readstats.py [ -o output.txt ] <file1> <file2>
+
+Use '-h' for parameter help.
+"""
+
 import sys
 import screed
 import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    descr = "Display summary statistics for one or more FASTA/FASTQ files."
+    epilog = """ """
+    
+    parser = argparse.ArgumentParser(description=descr,
+                                     epilog=textwrap.dedent(epilog))
     parser.add_argument('filenames', nargs='+')
     parser.add_argument('-o', '--output', dest='outfp',
                         help="output file for statistics; defaults to stdout.",
