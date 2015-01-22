@@ -74,8 +74,9 @@ def execute_build_graph(args):
     for element in args.input_filenames:
         ifiles.append(element)
 
-    build_graph.do_build_graph(args.no_build_tagset, args.output_filename,
-                               ifiles, args.report_total_kmers, 
+    build_graph.do_build_graph(args.output_filename, ifiles, 
+                               args.force,
+                               args.no_build_tagset, args.report_total_kmers, 
                                args.write_fp_rate, args.quiet,
                                args.ksize, args.n_tables, 
                                args.min_tablesize, args.threads)

@@ -7,6 +7,7 @@
 import khmer
 from nose.plugins.attrib import attr
 import os
+import khmer_tst_utils as utils
 
 
 def test_forward_hash():
@@ -51,7 +52,7 @@ def test_get_primes():
 
 
 def test_extract_countinghash_info():
-    fn = 'test_extract_counting.ht'
+    fn = utils.get_temp_filename('test_extract_counting.ct')
     for size in [1e6, 2e6, 5e6, 1e7]:
         ht = khmer.new_counting_hash(25, size, 4)
         ht.save(fn)
@@ -71,7 +72,7 @@ def test_extract_countinghash_info():
 
 
 def test_extract_hashbits_info():
-    fn = 'test_extract_hashbits.ht'
+    fn = utils.get_temp_filename('test_extract_hashbits.pt')
     for size in [1e6, 2e6, 5e6, 1e7]:
         ht = khmer.Hashbits(25, size, 4)
         ht.save(fn)

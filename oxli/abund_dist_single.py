@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -20,7 +20,7 @@ import threading
 import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
-from khmer.file import (check_file_status, check_space,
+from khmer.kfile import (check_file_status, check_space,
                         check_space_for_hashtable)
 from oxli import common
 
@@ -61,6 +61,8 @@ def add_args(parser):
                         "filename.")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists.')
 
 
 def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
@@ -70,7 +72,7 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
         ksize=common.get_env_ksize,
         n_tables=common.get_env_n_tables, 
         min_tablesize=common.get_env_tablesize,
-        threads=common.DEFAULT_N_THREADS):
+        threads=common.DEFAULT_N_THREADS, force=False):
     """
     Calculates the abundance distribution of k-mers from a single sequence file
     """
@@ -80,10 +82,10 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
     # not sure what to do with this
     # report_on_config()
 
-    check_file_status(input_sequence_filename)
-    check_space([input_sequence_filename])
+    check_file_status(input_sequence_filename, force)
+    check_space([input_sequence_filename], force)
     if savetable:
-        check_space_for_hashtable(n_tables * min_tablesize)
+        check_space_for_hashtable(n_tables * min_tablesize, force)
 
     if (not squash_output and
             os.path.exists(output_histogram_filename)):
@@ -95,8 +97,7 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
 
     print >>sys.stderr, 'making k-mer counting table'
     counting_hash = khmer.new_counting_hash(ksize, min_tablesize,
-                                            n_tables,
-                                            threads)
+                                            n_tables)
     counting_hash.set_use_bigcount(bigcount)
 
     print >> sys.stderr, 'building k-mer tracking table'
@@ -108,10 +109,10 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
         counting_hash.hashsizes()
     print >>sys.stderr, 'outputting to', output_histogram_filename
 
-    khmer.get_config().set_reads_input_buffer_size(threads * 64 * 1024)
+    #khmer.get_config().set_reads_input_buffer_size(threads * 64 * 1024)
 
     # start loading
-    rparser = khmer.ReadParser(input_sequence_filename, threads)
+    rparser = khmer.ReadParser(input_sequence_filename)
     threadlist = []
     print >>sys.stderr, 'consuming input, round 1 --', \
         input_sequence_filename
@@ -142,7 +143,7 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
 
     print >>sys.stderr, 'preparing hist from %s...' % \
         input_sequence_filename
-    rparser = khmer.ReadParser(input_sequence_filename, threads)
+    rparser = khmer.ReadParser(input_sequence_filename)
     threadlist = []
     print >>sys.stderr, 'consuming input, round 2 --', \
         input_sequence_filename

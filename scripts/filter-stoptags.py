@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,7 +21,7 @@ import argparse
 import textwrap
 import sys
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 # @CTB K should be loaded from file...
@@ -45,6 +45,8 @@ def get_parser():
                         nargs='+')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -55,9 +57,9 @@ def main():
     infiles = args.input_filenames
 
     for _ in infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     print >>sys.stderr, 'loading stop tags, with K', args.ksize
     htable = khmer.new_hashbits(args.ksize, 1, 1)

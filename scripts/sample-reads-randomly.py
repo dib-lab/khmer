@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,7 +24,7 @@ import textwrap
 import sys
 
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 DEFAULT_NUM_READS = int(1e5)
@@ -67,6 +67,8 @@ def get_parser():
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exits')
     return parser
 
 
@@ -82,9 +84,9 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.filenames)
+    check_space(args.filenames, args.force)
 
     # seed the random number generator?
     if args.random_seed:
@@ -102,7 +104,8 @@ def main():
         if num_samples > 1:
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
-            sys.exit(-1)
+            if not args.force:
+                sys.exit(1)
         output_filename = output_file.name
     else:
         filename = args.filenames[0]

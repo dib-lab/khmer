@@ -44,8 +44,7 @@ def main():
             print >>sys.stderr, '...', n, n_kept
 
         seq = record.sequence.upper()
-        if 'N' in seq:
-            seq = seq.replace('N', 'G')
+        seq = seq.replace('N', 'A')
 
         try:
             med, _, _ = htable.get_median_count(seq)

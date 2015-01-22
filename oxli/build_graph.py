@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -19,8 +19,8 @@ import sys
 import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
+from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_space_for_hashtable
 from oxli import common
         
 def add_args(parser):
@@ -37,60 +37,64 @@ def add_args(parser):
                         help="Prints the total number of k-mers to stderr")
     parser.add_argument('--write-fp-rate', '-w', action='store_true',
                         help="Write false positive rate into .info file")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
 
 
-def do_build_graph(output_filename, input_filenames,no_build_tagset=False, 
+def do_build_graph(output_filename, input_filenames,force=False,
+        no_build_tagset=False, 
         report_total_kmers=False, write_fp_rate=False, quiet=False,
         ksize=common.get_env_ksize(),
         n_tables=common.get_env_n_tables(),
         min_tablesize=common.get_env_tablesize(),
         threads=common.DEFAULT_N_THREADS):
+    
     info('load-graph.py', ['graph'])
-    args = get_parser().parse_args()
-    report_on_config(args, hashtype='hashbits')
+    #report_on_config( hashtype='hashbits')
 
-    base = args.output_filename
-    filenames = args.input_filenames
+    base = output_filename
+    filenames = input_filenames
 
-    for _ in args.input_filenames:
-        check_file_status(_)
+    for _ in input_filenames:
+        check_file_status(_, force)
 
-    check_space(args.input_filenames)
-    check_space_for_hashtable(float(args.n_tables * args.min_tablesize) / 8.)
+    check_space(input_filenames, force)
+    check_space_for_hashtable(float(n_tables * min_tablesize) / 8., force)
 
     print >>sys.stderr, 'Saving k-mer presence table to %s' % base
     print >>sys.stderr, 'Loading kmers from sequences in %s' % repr(filenames)
-    if args.no_build_tagset:
+    if no_build_tagset:
         print >>sys.stderr, 'We WILL NOT build the tagset.'
     else:
         print >>sys.stderr, 'We WILL build the tagset', \
                             ' (for partitioning/traversal).'
 
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
+    # I don't know why these stopped working
+    #config = khmer.get_config()
+    #config.set_reads_input_buffer_size(threads * 64 * 1024)
 
     print >>sys.stderr, 'making k-mer presence table'
-    htable = khmer.new_hashbits(args.ksize, args.min_tablesize, args.n_tables)
+    htable = khmer.new_hashbits(ksize, min_tablesize, n_tables)
 
-    if args.no_build_tagset:
+    if no_build_tagset:
         target_method = htable.consume_fasta_with_reads_parser
     else:
         target_method = htable.consume_fasta_and_tag_with_reads_parser
 
     for _, filename in enumerate(filenames):
 
-        rparser = khmer.ReadParser(filename, 1)
+        rparser = khmer.ReadParser(filename)
         print >>sys.stderr, 'consuming input', filename
         target_method(rparser)
 
-    if args.report_total_kmers:
+    if report_total_kmers:
         print >> sys.stderr, 'Total number of unique k-mers: {0}'.format(
             htable.n_unique_kmers())
 
     print >>sys.stderr, 'saving k-mer presence table in', base + '.pt'
     htable.save(base + '.pt')
 
-    if not args.no_build_tagset:
+    if not no_build_tagset:
         print >>sys.stderr, 'saving tagset in', base + '.tagset'
         htable.save_tagset(base + '.tagset')
 
@@ -99,7 +103,7 @@ def do_build_graph(output_filename, input_filenames,no_build_tagset=False,
 
     fp_rate = khmer.calc_expected_collisions(htable)
     print >>sys.stderr, 'fp rate estimated to be %1.3f' % fp_rate
-    if args.write_fp_rate:
+    if write_fp_rate:
         print >> info_fp, \
             '\nfalse positive rate estimated to be %1.3f' % fp_rate
 
@@ -111,7 +115,7 @@ def do_build_graph(output_filename, input_filenames,no_build_tagset=False,
         sys.exit(1)
 
     print >> sys.stderr, 'wrote to', base + '.info and', base + '.pt'
-    if not args.no_build_tagset:
+    if not no_build_tagset:
         print >> sys.stderr, 'and ' + base + '.tagset'
 
 if __name__ == '__main__':

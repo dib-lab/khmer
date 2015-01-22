@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,8 +21,6 @@ import threading
 import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
-from khmer.file import (check_file_status, check_space,
-                        check_space_for_hashtable)
 from oxli import common, abund_dist_single
 import argparse
 
@@ -42,7 +40,7 @@ def get_parser():
 
 
 def main():  # pylint: disable=too-many-locals,too-many-branches
-    info('abundance-dist-single.py', ['counting'])
+    info('abundance-dist-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
     report_on_config(args)
 
@@ -54,7 +52,8 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                                            args.quiet, args.ksize,
                                            args.n_tables,
                                            args.min_tablesize,
-                                           args.threads)
+                                           args.threads, args.force)
+
 
 
 if __name__ == '__main__':
