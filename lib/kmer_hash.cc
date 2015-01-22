@@ -99,7 +99,7 @@ std::string _revcomp(const std::string& kmer)
     std::string out = kmer;
     size_t ksize = out.size();
 
-    for (int i=0; i < ksize; ++i) {
+    for (size_t i=0; i < ksize; ++i) {
         char complement;
 
         switch(kmer[i]) {
@@ -137,11 +137,11 @@ HashIntoType _hash_murmur(const std::string& kmer,
 {
     HashIntoType out[2];
     uint32_t seed = 0;
-    MurmurHash3_x64_128((void *)kmer.c_str(), kmer.size(), seed, &out);
+    MurmurHash3_x64_128((void *)kmer.c_str(), (int)kmer.size(), seed, &out);
     h = out[0];
 
     std::string rev = khmer::_revcomp(kmer);
-    MurmurHash3_x64_128((void *)rev.c_str(), rev.size(), seed, &out);
+    MurmurHash3_x64_128((void *)rev.c_str(), (int)rev.size(), seed, &out);
     r = out[0];
 
     return h ^ r;
