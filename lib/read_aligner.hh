@@ -36,53 +36,21 @@ enum Transition { MM, MIr, MIg, MMu, MIru, MIgu,
                   disallowed
                 };
 
-/*
-Ig_t-Ig_t       0.2294619
-Ig_t-Ig_u       0.0021453
-Ig_t-M_t        0.7611255
-Ig_t-M_u        0.0072673
-Ig_u-Ig_t       0.0431328
-Ig_u-Ig_u       0.1821200
-Ig_u-M_t        0.1384551
-Ig_u-M_u        0.6362921
-Ir_t-Ir_t       0.4647955
-Ir_t-Ir_u       0.0096792
-Ir_t-M_t        0.5196194
-Ir_t-M_u        0.0059060
-Ir_u-Ir_t       0.0036995
-Ir_u-Ir_u       0.5885548
-Ir_u-M_t        0.1434529
-Ir_u-M_u        0.2642928
-M_t-Ig_t        0.0000334
-M_t-Ig_u        0.0000003
-M_t-Ir_t        0.0000735
-M_t-Ir_u        0.0000017
-M_t-M_t 0.9848843
-M_t-M_u 0.0150068
-M_u-Ig_t        0.0001836
-M_u-Ig_u        0.0004173
-M_u-Ir_t        0.0000262
-M_u-Ir_u        0.0033370
-M_u-M_t 0.0799009
-M_u-M_u 0.9161349
-
-*/
 // log probabilities for state transitions
-static double trans_default[] = { log2(0.9848843), log2(0.0000735), log2(0.0000334), log2(0.0150068), log2(0.0000017), log2(0.0000003),  // M_t
+/*static double trans_default[] = { log2(0.9848843), log2(0.0000735), log2(0.0000334), log2(0.0150068), log2(0.0000017), log2(0.0000003),  // M_t
                                   log2(0.5196194), log2(0.4647955), log2(0.0059060), log2(0.0096792),                        // Ir_t
                                   log2(0.7611255), log2(0.2294619), log2(0.0072673), log2(0.0021453),                        // Ig_t
                                   log2(0.0799009), log2(0.0000262), log2(0.0001836), log2(0.9161349), log2(0.0033370), log2(0.0004173),  // M_u
                                   log2(0.1434529), log2(0.0036995), log2(0.2642928), log2(0.5885548),                        // Ir_u
                                   log2(0.1384551), log2(0.0431328), log2(0.6362921), log2(0.1821200),                        // Ig_u
-                                };
-/*{ log2(.80), log2(.045), log2(.045), log2(.06), log2(.025), log2(.025),
-                                  log2(.875), log2(.045), log2(.055), log2(.025),
-                                  log2(.875), log2(.045), log2(.055), log2(.025),
-			    log2(.80), log2(.045), log2(.045), log2(.06), log2(.025), log2(.025),
-                                  log2(.875), log2(.045), log2(.055), log2(.025),
-                                  log2(.875), log2(.045), log2(.055), log2(.025),
-};*/
-
+                                }; */
+static double trans_default[] = { log2(0.9689743), log2(0.0001698), log2(0.0000456), log2(0.0126538), log2(0.0000308), log2(0.0000029),
+				log2(0.3889048), log2(0.4079255), log2(0.0426958), log2(0.0975983),
+				log2(0.7371994), log2(0.2072666), log2(0.0169641), log2(0.0028187),
+				log2(0.0957960), log2(0.0000338), log2(0.0002135), log2(0.8789753), log2(0.0032465), log2(0.0004094),
+				log2(0.1640802), log2(0.0041675), log2(0.2498542), log2(0.5809211),
+				log2(0.1735752), log2(0.0467725), log2(0.5993784), log2(0.1744346),
+}; // from a k=21 training run
 enum Nucl {A, C, G, T};
 static const char nucl_lookup[4] = {'A', 'C', 'G', 'T'};
 static const double background_prob = 0;//log2(.99);
