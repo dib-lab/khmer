@@ -4467,6 +4467,28 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
     return PyString_FromString(_revhash(val, ksize).c_str());
 }
 
+static PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
+{
+    const char * kmer;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
+
+    return PyLong_FromUnsignedLongLong(_hash_murmur(kmer));
+}
+
+static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
+{
+    const char * kmer;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
+
+    return PyLong_FromUnsignedLongLong(_hash_murmur_forward(kmer));
+}
+
 static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
 {
     PyObject * o;
@@ -4542,6 +4564,20 @@ static PyMethodDef KhmerMethods[] = {
     {
         "reverse_hash",     reverse_hash,
         METH_VARARGS,       "",
+    },
+    {
+        "hash_murmur3",
+        murmur3_forward_hash,
+        METH_VARARGS,
+        "Calculate the hash value of a k-mer using MurmurHash3 "
+        "(with reverse complement)",
+    },
+    {
+        "hash_no_rc_murmur3",
+        murmur3_forward_hash_no_rc,
+        METH_VARARGS,
+        "Calculate the hash value of a k-mer using MurmurHash3 "
+        "(no reverse complement)",
     },
     {
         "set_reporting_callback",   set_reporting_callback,

@@ -28,6 +28,9 @@ from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 from khmer._khmer import reverse_hash  # tests/test_functions.py
 # tests/counting_single.py
 
+from khmer._khmer import hash_murmur3        # tests/test_functions.py
+from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
+
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
 
