@@ -55,7 +55,6 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
                                            args.threads, args.force)
 
 
-
 if __name__ == '__main__':
     main()
 

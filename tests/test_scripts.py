@@ -1971,6 +1971,7 @@ def test_oxli_abundance_dist_single_nobigcount():
     line = fp.next().strip()
     assert line == '255 2 98 1.0', line
 
+
 def test_oxli_build_graph():
     script = scriptpath('oxli')
     args = ['build_graph', '-x', '1e7', '-t', '-N', '2', '-k', '20']
@@ -2000,6 +2001,7 @@ def test_oxli_build_graph():
     x = ht.subset_count_partitions(subset)
     assert x == (1, 0), x
 
+
 @attr('known_failing')
 def test_oxli_build_graph_no_tags():
     script = scriptpath('load-graph.py')
@@ -2023,6 +2025,7 @@ def test_oxli_build_graph_no_tags():
     # can't think of a good way to make sure this worked, beyond just
     # loading the ht file...
 
+
 @attr('known_failing')
 def test_oxli_build_graph_fail():
     script = scriptpath('load-graph.py')
@@ -2036,6 +2039,7 @@ def test_oxli_build_graph_fail():
     (status, out, err) = utils.runscript(script, args, fail_ok=True)
     assert status == 1, status
     assert "ERROR:" in err
+
 
 @attr('known_failing')
 def test_oxli_build_graph_write_fp():
@@ -2059,6 +2063,7 @@ def test_oxli_build_graph_write_fp():
     assert '3959 unique k-mers' in data
     assert 'false positive rate estimated to be 0.002' in data
 
+
 @attr('known_failing')
 def test_oxli_build_graph_multithread():
     script = scriptpath('load-graph.py')
@@ -2070,11 +2075,12 @@ def test_oxli_build_graph_multithread():
 
     (status, out, err) = utils.runscript(script, args)
 
+
 @attr('known_failing')
 def _oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
-                do_partition=False,
-                annotate_partitions=False,
-                stop_big_traverse=False):
+                     do_partition=False,
+                     annotate_partitions=False,
+                     stop_big_traverse=False):
     script = scriptpath('load-graph.py')
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
@@ -2117,11 +2123,12 @@ def _oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     return outfile
 
+
 @attr('known_failing')
 def _DEBUG_oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
-                      do_partition=False,
-                      annotate_partitions=False,
-                      stop_big_traverse=False):
+                           do_partition=False,
+                           annotate_partitions=False,
+                           stop_big_traverse=False):
     script = scriptpath('load-graph.py')
     args = ['-x', str(min_hashsize), '-N', str(n_hashes), '-k', str(ksize)]
 
@@ -2166,4 +2173,3 @@ def _DEBUG_oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
             assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
 
     return outfile
-    
