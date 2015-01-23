@@ -27,36 +27,42 @@ def read_partition_file(fp):
 
             yield name, partition_id, surrendered, sequence
 
-(filename1, filename2) = sys.argv[1:]
 
-p1 = {}
-s1 = {}
-for name, pid, _, _ in read_partition_file(open(filename1)):
-    name = name.split('\t')[0]
-    x = p1.get(pid, set())
-    x.add(name)
-    p1[pid] = x
+def main():
+    (filename1, filename2) = sys.argv[1:]
 
-    s1[name] = pid
+    p1 = {}
+    s1 = {}
+    for name, pid, _, _ in read_partition_file(open(filename1)):
+        name = name.split('\t')[0]
+        x = p1.get(pid, set())
+        x.add(name)
+        p1[pid] = x
 
-p2 = {}
-s2 = {}
-for name, pid, _, _ in read_partition_file(open(filename2)):
-    name = name.split('\t')[0]
-    x = p2.get(pid, set())
-    x.add(name)
-    p2[pid] = x
+        s1[name] = pid
 
-    s2[name] = pid
+    p2 = {}
+    s2 = {}
+    for name, pid, _, _ in read_partition_file(open(filename2)):
+        name = name.split('\t')[0]
+        x = p2.get(pid, set())
+        x.add(name)
+        p2[pid] = x
 
-found = set()
-for name in s1:
-    pid = s1[name]
-    pid2 = s2[name]
+        s2[name] = pid
 
-    x1 = p1[pid]
-    x2 = p2[pid2]
+    found = set()
+    for name in s1:
+        pid = s1[name]
+        pid2 = s2[name]
 
-    if x1 != x2 and pid not in found:
-        print pid, pid2, len(x1), len(x2)
-        found.add(pid)
+        x1 = p1[pid]
+        x2 = p2[pid2]
+
+        if x1 != x2 and pid not in found:
+            print pid, pid2, len(x1), len(x2)
+            found.add(pid)
+
+
+if __name__ == '__main__':
+    main()

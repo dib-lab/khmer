@@ -9,77 +9,85 @@
 Error correct reads based on a counting hash from a diginorm step.
 Output sequences will be put in @@@.
 
-% python scripts/error-correct-pass2 <counting.kh> <data1> [ <data2> <...> ]
+% python scripts/error-correct-pass2 <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
 import sys
-import screed.fasta
+import screed
 import os
 import khmer
-from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
+import argparse
 
-from khmer.counting_args import build_counting_multifile_args
 
 ###
 
-DEFAULT_COVERAGE = 20
-DEFAULT_MAX_ERROR_REGION = 40
+DEFAULT_CUTOFF = 2
+
+def output_single(read, new_sequence):
+    name = read.name
+    sequence = new_sequence
+
+    accuracy = None
+    if hasattr(read, 'accuracy'):
+        accuracy = read.accuracy[:len(sequence)]
+        sequence = sequence[:len(accuracy)] # in cases where sequence _lengthened_
+
+    if accuracy:
+        assert len(sequence) == len(accuracy), (sequence, accuracy)
+        return "@%s\n%s\n+\n%s\n" % (name, sequence, accuracy)
+    else:
+        return ">%s\n%s\n" % (name, sequence)
 
 
 def main():
-    parser = build_counting_multifile_args()
-    parser.add_argument('--cutoff', '-C', dest='coverage',
-                        default=DEFAULT_COVERAGE, type=int,
-                        help="Diginorm coverage.")
-    parser.add_argument('--max-error-region', '-M', dest='max_error_region',
-                        default=DEFAULT_MAX_ERROR_REGION, type=int,
-                        help="Max length of error region allowed")
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--trusted-cov", dest="trusted_cov", type=int,
+                        default=DEFAULT_CUTOFF)
+    parser.add_argument("--theta", dest="bits_theta", type=float, default=1.0)
+    parser.add_argument('-o', '--output', dest='output_file',
+                        help="output file for histogram; defaults to "
+                             "<first filename>.errhist in cwd.",
+                        type=argparse.FileType('w'), default=None)
+
+    parser.add_argument('counts_table')
+    parser.add_argument('readfile')
+    
     args = parser.parse_args()
 
-    counting_ht = args.input_table
-    infiles = args.input_filenames
+    print 'loading counts'
+    ht = khmer.load_counting_hash(args.counts_table)
 
-    print 'file with ht: %s' % counting_ht
+    aligner = khmer.new_readaligner(ht,
+                                    args.trusted_cov,
+                                    args.bits_theta)
 
-    print 'loading hashtable'
-    ht = khmer.load_counting_hash(counting_ht)
-    K = ht.ksize()
-    C = args.coverage
-    max_error_region = args.max_error_region
+    print "trusted:", args.trusted_cov
 
-    print "K:", K
-    print "C:", C
-    print "max error region:", max_error_region
+    corrfp = args.output_file
+    if not corrfp:
+        outfile = os.path.basename(args.readfile) + '.corr'
+        corrfp = open(outfile, 'w')
 
-    # the filtering function.
-    def process_fn(record):
-        # read_aligner is probably not threadsafe?
-        aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
+    n_corrected = 0
+    for n, read in enumerate(screed.open(args.readfile)):
+        if n % 10000 == 0:
+            print >>sys.stderr, '...', n, n_corrected
+        seq = read.sequence.replace('N', 'A')
 
-        name = record['name']
-        seq = record['sequence']
+        # build the alignment...
+        score, graph_alignment, read_alignment, truncated = \
+               aligner.align(seq)
+        
+        if not truncated:
+            graph_seq = graph_alignment.replace("-", "")
+            if graph_seq != seq:
+                n_corrected += 1
 
-        seq = seq.replace('N', 'A')
-
-        grXreAlign, reXgrAlign = aligner.align(seq)
-
-        if len(reXgrAlign) > 0:
-            graph_seq = grXreAlign.replace('-', '')
             seq = graph_seq
 
-        return name, seq
-
-    # the filtering loop
-    for infile in infiles:
-        print 'filtering', infile
-        outfile = os.path.basename(infile) + '.corr'
-        outfp = open(outfile, 'w')
-
-        tsp = ThreadedSequenceProcessor(process_fn)
-        tsp.start(verbose_loader(infile), outfp)
-
-        print 'output in', outfile
+        corrfp.write(output_single(read, seq))
 
 if __name__ == '__main__':
     main()

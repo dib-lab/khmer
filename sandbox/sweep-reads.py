@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
@@ -34,8 +34,8 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-from khmer.file import (check_file_status, check_valid_file_exists,
-                        check_space)
+from khmer.kfile import (check_file_status, check_valid_file_exists,
+                         check_space)
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
@@ -191,7 +191,8 @@ def get_parser():
     parser.add_argument(dest='input_fastp', help='Reference fasta or fastp')
     parser.add_argument('input_files', nargs='+',
                         help='Reads to be swept and sorted')
-
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -224,13 +225,13 @@ def main():
     buf_size = args.buffer_size
     max_reads = args.max_reads
 
-    check_file_status(args.input_fastp)
+    check_file_status(args.input_fastp, args.force)
     check_valid_file_exists(args.input_files)
     all_input_files = [input_fastp]
     all_input_files.extend(args.input_files)
 
     # Check disk space availability
-    check_space(all_input_files)
+    check_space(all_input_files, args.force)
 
     # figure out input file type (FA/FQ) -- based on first file
     ix = iter(screed.open(args.input_files[0]))

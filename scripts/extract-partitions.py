@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,7 +24,7 @@ import screed
 import argparse
 import textwrap
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 DEFAULT_MAX_SIZE = int(1e6)
@@ -81,6 +81,8 @@ def get_parser():
                         help='Output unassigned sequences, too')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -94,9 +96,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     n_unassigned = 0
 
     for infile in args.part_filenames:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    check_space(args.part_filenames)
+    check_space(args.part_filenames, args.force)
 
     print >>sys.stderr, '---'
     print >>sys.stderr, 'reading partitioned files:', repr(args.part_filenames)

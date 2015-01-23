@@ -24,7 +24,6 @@ def load_fa_seq_names(filename):
 
 class Test_Filter(object):
 
-    @attr('highmem')
     def test_abund(self):
         ht = khmer.new_hashtable(10, 4 ** 10)
 
@@ -35,18 +34,18 @@ class Test_Filter(object):
         try:
             ht.consume_fasta()
             assert 0, "should fail"
-        except TypeError, err:
+        except TypeError as err:
             print str(err)
         try:
             ht.consume_fasta("nonexistent")
             assert 0, "should fail"
-        except IOError, err:
+        except IOError as err:
             print str(err)
         ht.output_fasta_kmer_pos_freq(filename, outname)
         try:
             ht.output_fasta_kmer_pos_freq()
             assert 0, "should fail"
-        except TypeError, err:
+        except TypeError as err:
             print str(err)
 
         fd = open(outname, "r")
