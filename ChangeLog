@@ -1,3 +1,10 @@
+2015-01-23  Jessica Mizzi  <mizzijes@msu.edu>
+
+    * khmer/utils.py: Added single write_record fuction to write FASTA/Q
+    * scripts/{abundance-dist,extract-long-sequences,extract-partitions,
+    interleave-reads,normalize-by-median,sample-reads-randomly}.py: 
+    Replaced FASTA/Q writing method with write_record
+
 2015-01-21  Luiz Irber  <irberlui@msu.edu>
 
     * lib/hllcounter.{cc,hh}: Implemented a HyperLogLog counter.
