@@ -34,18 +34,12 @@ std::map<int, std::vector<double> > biasData;
 
 double calc_alpha(const int p)
 {
-    if ((p < 4) or (p > 16)) {
-        double valid_lower_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2),
-                                   17));
-        double valid_upper_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2), 3));
-
-        std::stringstream message;
-        if (p < 4) {
-            message << "Max error should be smaller than " << valid_upper_bound;
-        } else {
-            message << "Min error should be greater than " << valid_lower_bound;
-        }
-        throw khmer_exception(message.str().c_str());
+    if (p < 4) {
+        // ceil(log2((1.04 / x) ^ 2)) = 4, solve for x
+        throw khmer_exception("Error rate must be smaller than 0.367696");
+    } else if (p > 16) {
+        // ceil(log2((1.04 / x) ^ 2)) = 16, solve for x
+        throw khmer_exception("Error rate must be greater than 0.0040624");
     }
 
     /*
@@ -237,6 +231,9 @@ int get_rho(HashIntoType w, int max_width)
 
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
+    if (error_rate < 0) {
+        throw khmer_exception("Error rate should be a positive number");
+    }
     int p = ceil(log2(pow(1.04 / error_rate, 2)));
     this->init(p, ksize);
 }

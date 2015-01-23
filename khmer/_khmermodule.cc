@@ -4347,13 +4347,6 @@ static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
             return NULL;
         }
 
-        if ((error_rate < 0) || (error_rate > 1.0)) {
-            Py_DECREF(self);
-            PyErr_SetString(PyExc_ValueError,
-                            "Error rate should be between 0.0 and 1.0");
-            return NULL;
-        }
-
         try {
             self->hllcounter = new HLLCounter(error_rate, ksize);
         } catch (khmer_exception &e) {
