@@ -17,6 +17,7 @@ def print_error(msg):
 
     print >>sys.stderr, msg
 
+
 def write_record(record, fp):
     """
         Writes output sequence and returns str.
@@ -25,10 +26,10 @@ def write_record(record, fp):
         fp.write(
             '@{name}\n{seq}\n'
             '+\n{acc}\n'.format(name=record.name,
-                               seq=record.sequence,
-                               acc=record.accuracy))
+                                seq=record.sequence,
+                                acc=record.accuracy))
     else:
-       fp.write(
+        fp.write(
             '>{name}\n{seq}\n'.format(name=record.name,
                                       seq=record.sequence))
 

@@ -21,6 +21,7 @@ import screed
 import sys
 from khmer.utils import write_record
 
+
 def get_parser():
     parser = argparse.ArgumentParser(
         description='Extract FASTQ or FASTA sequences longer than'
