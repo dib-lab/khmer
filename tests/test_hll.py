@@ -9,13 +9,10 @@
 import string
 
 import khmer
-from khmer import ReadParser
 
 from screed.fasta import fasta_iter
-import screed
 
 import khmer_tst_utils as utils
-from nose.plugins.attrib import attr
 from nose.tools import raises
 
 
@@ -69,6 +66,13 @@ def test_hll_consume_string():
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
+@raises(IOError)
+def test_hll_empty_fasta():
+    filename = utils.get_test_data('test-empty.fa')
+    hll = khmer.HLLCounter(ERR_RATE, K)
+    hll.consume_fasta(filename)
+
+
 def test_hll_consume_fasta():
     # test c++ code to count unique kmers using HyperLogLog
 
@@ -85,6 +89,12 @@ def test_hll_len():
     hllcpp.consume_fasta(filename)
 
     assert hllcpp.estimate_cardinality() == len(hllcpp)
+
+
+def test_hll_empty():
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
+
+    assert len(hllcpp) == 0
 
 
 @raises(ValueError)
