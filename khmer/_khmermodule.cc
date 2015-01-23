@@ -4455,6 +4455,27 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
+static
+PyObject *
+hllcounter_getp(khmer_KHLLCounter_Object * me)
+{
+    return PyLong_FromLong(me->hllcounter->get_p());
+}
+
+static
+PyObject *
+hllcounter_getm(khmer_KHLLCounter_Object * me)
+{
+    return PyLong_FromLong(me->hllcounter->get_m());
+}
+
+static
+PyObject *
+hllcounter_getalpha(khmer_KHLLCounter_Object * me)
+{
+    return PyFloat_FromDouble(me->hllcounter->get_alpha());
+}
+
 static PyMethodDef khmer_hllcounter_methods[] = {
     {
         "add", (PyCFunction)hllcounter_add,
@@ -4476,6 +4497,28 @@ static PyMethodDef khmer_hllcounter_methods[] = {
         METH_VARARGS,
         "Read sequences from file, break into k-mers, "
         "and add each k-mer to the counter."
+    },
+    {NULL} /* Sentinel */
+};
+
+static PyGetSetDef khmer_hllcounter_getseters[] = {
+    {
+        "alpha",
+        (getter)hllcounter_getalpha, NULL,
+        "alpha constant for the current counter.",
+        NULL
+    },
+    {
+        "p",
+        (getter)hllcounter_getp, NULL,
+        "p for the current counter. The number of registers m is 2 ** p",
+        NULL
+    },
+    {
+        "m",
+        (getter)hllcounter_getm, NULL,
+        "Get the number of registers for the current counter.",
+        NULL
     },
     {NULL} /* Sentinel */
 };
@@ -4510,7 +4553,7 @@ static PyTypeObject khmer_KHLLCounter_Type = {
     0,                                         /* tp_iternext */
     khmer_hllcounter_methods,                  /* tp_methods */
     0,                                         /* tp_members */
-    0,                                         /* tp_getset */
+    khmer_hllcounter_getseters,                /* tp_getset */
     0,                                         /* tp_base */
     0,                                         /* tp_dict */
     0,                                         /* tp_descr_get */

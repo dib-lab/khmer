@@ -37,6 +37,19 @@ public:
     HashIntoType estimate_cardinality();
     void merge(HLLCounter &);
     virtual ~HLLCounter() {}
+
+    double get_alpha()
+    {
+        return alpha;
+    }
+    int get_p()
+    {
+        return p;
+    }
+    int get_m()
+    {
+        return m;
+    }
 private:
     double _Ep();
     double alpha;

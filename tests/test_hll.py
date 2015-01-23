@@ -97,6 +97,41 @@ def test_hll_empty():
     assert len(hllcpp) == 0
 
 
+@raises(AttributeError)
+def test_hll_readonly_alpha():
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
+    hllcpp.alpha = 5
+
+
+@raises(AttributeError)
+def test_hll_readonly_p():
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
+    hllcpp.p = 5
+
+
+@raises(AttributeError)
+def test_hll_readonly_m():
+    hllcpp = khmer.HLLCounter(ERR_RATE, K)
+    hllcpp.m = 5
+
+
+def test_hll_cover_calc_alpha():
+    hllcpp = khmer.HLLCounter(0.36, K)
+    assert hllcpp.alpha == 0.673
+    assert hllcpp.p == 4
+    assert hllcpp.m == 16
+
+    hllcpp = khmer.HLLCounter(0.21, K)
+    assert hllcpp.alpha == 0.697
+    assert hllcpp.p == 5
+    assert hllcpp.m == 32
+
+    hllcpp = khmer.HLLCounter(0.16, K)
+    assert hllcpp.alpha == 0.709
+    assert hllcpp.p == 6
+    assert hllcpp.m == 64
+
+
 @raises(ValueError)
 def test_hll_invalid_base():
     # this test should raise a ValueError,
@@ -117,11 +152,25 @@ def test_hll_invalid_error_rate():
 def test_hll_invalid_error_rate_max():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.HLLCounter(0.5, K)
+    hllcpp = khmer.HLLCounter(0.367696, K)
+
+
+def test_hll_error_rate_max():
+    # test if error_rate is a valid value
+
+    hllcpp = khmer.HLLCounter(0.367695, K)
+    assert hllcpp.p == 4
 
 
 @raises(ValueError)
 def test_hll_invalid_error_rate_min():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.HLLCounter(0.000001, K)
+    hllcpp = khmer.HLLCounter(0.0040624, K)
+
+
+def test_hll_error_rate_min():
+    # test if error_rate is a valid value
+
+    hllcpp = khmer.HLLCounter(0.0040625, K)
+    assert hllcpp.p == 16

@@ -32,7 +32,7 @@ std::map<int, std::vector<double> > rawEstimateData;
 std::map<int, std::vector<double> > biasData;
 
 
-double get_alpha(const int p)
+double calc_alpha(const int p)
 {
     if ((p < 4) or (p > 16)) {
         double valid_lower_bound = 1.04 / std::sqrt(std::pow(static_cast<float>(2),
@@ -248,7 +248,7 @@ HLLCounter::HLLCounter(int p, WordLength ksize)
 
 void HLLCounter::init(int p, WordLength ksize)
 {
-    this->alpha = get_alpha(p);
+    this->alpha = calc_alpha(p);
     this->p = p;
     this->_ksize = ksize;
     this->m = 1 << p;
