@@ -45,6 +45,27 @@ def test_reverse_hash():
     assert s == "GGGG"
 
 
+def test_hash_murmur3():
+    assert khmer.hash_murmur3('AAAA') == 526240128537019279
+    assert khmer.hash_murmur3('TTTT') == 526240128537019279
+    assert khmer.hash_murmur3('CCCC') == 14391997331386449225
+    assert khmer.hash_murmur3('GGGG') == 14391997331386449225
+
+
+def test_hash_no_rc_murmur3():
+    h = khmer.hash_no_rc_murmur3('AAAA')
+    assert h == 5231866503566620412, h
+
+    h = khmer.hash_no_rc_murmur3('TTTT')
+    assert h == 5753003579327329651, h
+
+    h = khmer.hash_no_rc_murmur3('CCCC')
+    assert h == 3789793362494378039, h
+
+    h = khmer.hash_no_rc_murmur3('GGGG')
+    assert h == 17519752047064575358, h
+
+
 def test_get_primes():
     primes = khmer.get_n_primes_near_x(7, 20)
 

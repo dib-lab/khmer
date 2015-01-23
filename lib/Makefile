@@ -168,7 +168,7 @@ AUX_PROGS=#ht-diff
 CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o kmer_hash.o
 PARSERS_OBJS= read_parsers.o
 
-all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o test aligner.o scoringmatrix.o node.o kmer.o
+all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o hllcounter.o test aligner.o scoringmatrix.o node.o kmer.o
 
 clean:
 	-(cd $(ZLIB_DIR) && make distclean)
@@ -257,6 +257,8 @@ hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh kmer_hash.hh khmer.hh
 subset.o: subset.cc subset.hh hashbits.hh kmer_hash.hh khmer.hh
 
 counting.o: counting.cc counting.hh hashtable.hh kmer_hash.hh khmer.hh
+
+hllcounter.o: hllcounter.cc hllcounter.hh khmer.hh
 
 test-StreamReader.o: test-StreamReader.cc read_parsers.hh
 
