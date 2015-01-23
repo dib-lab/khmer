@@ -1,5 +1,9 @@
 2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
 
+    * Makefile: remove the user installs for the `install-dependencies` target
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
     * README.rst,doc/user/install.txt: clarify that we support Python 2.7.x
     and not Python 3.
 
