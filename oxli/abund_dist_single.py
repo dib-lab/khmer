@@ -21,7 +21,7 @@ import textwrap
 from khmer.khmer_args import (build_counting_args, add_threading_args,
                               report_on_config, info)
 from khmer.kfile import (check_file_status, check_space,
-                        check_space_for_hashtable)
+                         check_space_for_hashtable)
 from oxli import common
 
 parser_epilog = '''
@@ -33,6 +33,7 @@ parser_epilog = '''
     To count k-mers in multiple files use :program:`load_into_counting.py` and
     :program:`abundance_dist.py`.
     '''
+
 
 def add_args(parser):
     """
@@ -66,13 +67,13 @@ def add_args(parser):
 
 
 def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
-        output_zero=True, bigcount=True, squash_output=False, 
-        savetable='', report_total_kmers=False,
-        quiet=False,
-        ksize=common.get_env_ksize,
-        n_tables=common.get_env_n_tables, 
-        min_tablesize=common.get_env_tablesize,
-        threads=common.DEFAULT_N_THREADS, force=False):
+                         output_zero=True, bigcount=True, squash_output=False,
+                         savetable='', report_total_kmers=False,
+                         quiet=False,
+                         ksize=common.get_env_ksize,
+                         n_tables=common.get_env_n_tables,
+                         min_tablesize=common.get_env_tablesize,
+                         threads=common.DEFAULT_N_THREADS, force=False):
     """
     Calculates the abundance distribution of k-mers from a single sequence file
     """
@@ -109,7 +110,7 @@ def do_abund_dist_single(input_sequence_filename, output_histogram_filename,
         counting_hash.hashsizes()
     print >>sys.stderr, 'outputting to', output_histogram_filename
 
-    #khmer.get_config().set_reads_input_buffer_size(threads * 64 * 1024)
+    # khmer.get_config().set_reads_input_buffer_size(threads * 64 * 1024)
 
     # start loading
     rparser = khmer.ReadParser(input_sequence_filename)

@@ -43,6 +43,7 @@ def test_import_all():
 
 
 class _checkImportSucceeds(object):
+
     def __init__(self, tag, filename):
         self.tag = tag
         self.filename = filename
@@ -56,7 +57,7 @@ class _checkImportSucceeds(object):
             print traceback.format_exc()
             raise AssertionError("%s cannot be imported" % (self.filename,))
 
-        ###
+        #
 
         oldargs = sys.argv
         sys.argv = [self.filename]
@@ -68,7 +69,9 @@ class _checkImportSucceeds(object):
         try:
             try:
                 global_dict = {'__name__': '__main__'}
-                execfile(self.filename, global_dict)
+                exec(
+                    compile(open(self.filename).read(), self.filename, 'exec'),
+                    global_dict)
             except (ImportError, SyntaxError):
                 print traceback.format_exc()
                 raise AssertionError("%s cannot be exec'd" % (self.filename,))

@@ -22,7 +22,8 @@ from khmer.khmer_args import (report_on_config, info, add_threading_args)
 from khmer.kfile import check_file_status, check_space
 from khmer.kfile import check_space_for_hashtable
 from oxli import common
-        
+
+
 def add_args(parser):
     add_threading_args(parser)
     parser.add_argument('--no-build-tagset', '-n', default=False,
@@ -41,16 +42,16 @@ def add_args(parser):
                         help='Overwrite output file if it exists')
 
 
-def do_build_graph(output_filename, input_filenames,force=False,
-        no_build_tagset=False, 
-        report_total_kmers=False, write_fp_rate=False, quiet=False,
-        ksize=common.get_env_ksize(),
-        n_tables=common.get_env_n_tables(),
-        min_tablesize=common.get_env_tablesize(),
-        threads=common.DEFAULT_N_THREADS):
-    
+def do_build_graph(output_filename, input_filenames, force=False,
+                   no_build_tagset=False,
+                   report_total_kmers=False, write_fp_rate=False, quiet=False,
+                   ksize=common.get_env_ksize(),
+                   n_tables=common.get_env_n_tables(),
+                   min_tablesize=common.get_env_tablesize(),
+                   threads=common.DEFAULT_N_THREADS):
+
     info('load-graph.py', ['graph'])
-    #report_on_config( hashtype='hashbits')
+    # report_on_config( hashtype='hashbits')
 
     base = output_filename
     filenames = input_filenames
@@ -70,8 +71,8 @@ def do_build_graph(output_filename, input_filenames,force=False,
                             ' (for partitioning/traversal).'
 
     # I don't know why these stopped working
-    #config = khmer.get_config()
-    #config.set_reads_input_buffer_size(threads * 64 * 1024)
+    # config = khmer.get_config()
+    # config.set_reads_input_buffer_size(threads * 64 * 1024)
 
     print >>sys.stderr, 'making k-mer presence table'
     htable = khmer.new_hashbits(ksize, min_tablesize, n_tables)

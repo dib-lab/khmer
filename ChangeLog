@@ -1,3 +1,12 @@
+2015-1-23  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * oxli/{__init__, fq2fa, common, abund_dist_single, build_graph}.py, 
+    scripts/{fasq-to-fasta, pseudoxli, abundance-dist-single, 
+    load-graph}.py,: Implemented oxli single entry point for fastq-to-fasta and 
+    abundance-dist-single scripts
+    * test/test_scripts.py: added test for oxli-fastq-to-fasta_and_tag,
+    oxli-abundance-dist-single and oxli-abundnace-dist-single-nobigccount
+
 2015-01-14  Reed Cartwright  <cartwright@asu.edu>
 
     * doc/dev/getting-started.txt: Added install information for
@@ -142,15 +151,6 @@
     * tests/test_read_parsers.py,
     tests/test-data/100-reads.fq.truncated.{bz2,gz}: Added tests for truncated
     compressed files accessed via ReadParser paired and unpaired iterators.
-
-2014-12-14  Jacob Fenton  <bocajnotnef@gmail.com>
-
-    * oxli/{__init__, fq2fa, common, abund-dist-single}.py, 
-    scripts/{fasq-to-fasta, pseudoxli, abundance-dist-single}.py: 
-    Implemented oxli single entry point for fastq-to-fasta and 
-    abundance-dist-single scripts
-    * test/test_scripts.py: added test for oxli-fastq-to-fasta_and_tag,
-    oxli-abundance-dist-single and oxli-abundnace-dist-single-nobigccount
 
 2014-12-09  Michael R. Crusoe  <mcrusoe@msu.edu>
 

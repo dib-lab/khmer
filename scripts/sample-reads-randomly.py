@@ -34,13 +34,13 @@ DEBUG = True
 
 def get_parser():
     epilog = ("""
-    
+
     Take a list of files containing sequences, and subsample 100,000
     sequences (:option:`-N`/:option:`--num_reads`) uniformly, using
     reservoir sampling.  Stop after first 100m sequences
     (:option:`-M`/:option:`--max_reads`). By default take one subsample,
     but take :option:`-S`/:option:`--samples` samples if specified.
-    
+
     The output is placed in :option:`-o`/:option:`--output` <file>
     (for a single sample) or in <file>.subset.0 to <file>.subset.S-1
     (for more than one sample).
@@ -112,7 +112,7 @@ def main():
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
-        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' % \
+        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' %\
             args.num_reads
         print >>sys.stderr, 'Subsampled reads will be placed in %s' % \
             output_filename

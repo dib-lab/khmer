@@ -22,7 +22,7 @@ def get_parser():
     """
     returns the parser object for the oxli subcommand handler
     """
-    
+
     parser = argparse.ArgumentParser(
         description='Single entry point script for khmer',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -39,15 +39,15 @@ def get_parser():
     # sub parser for abund-dist-single
     # we have to adapt the build_counting_args from khmer
     parser_abund_dist_single = subparsers.add_parser('abund_dist_single',
-                                help="Calculate the abundance distribution "
-                                "of k-mers from a single sequence file.", 
-                                description="Caluculate the abundance"
-                                "distribution of k-mers from a single sequence"
-                                " file",
-                                epilog=textwrap.dedent(
-                                abund_dist_single.parser_epilog),
-                                formatter_class=common.ComboFormatter)
-    
+                                                     help="Calculate the abundance distribution "
+                                                     "of k-mers from a single sequence file.",
+                                                     description="Caluculate the abundance"
+                                                     "distribution of k-mers from a single sequence"
+                                                     " file",
+                                                     epilog=textwrap.dedent(
+                                                         abund_dist_single.parser_epilog),
+                                                     formatter_class=common.ComboFormatter)
+
     # use modified build_counting_args and build_hash_args from oxli.common
     common.add_counting_args(parser_abund_dist_single)
     abund_dist_single.add_args(parser_abund_dist_single)
@@ -55,11 +55,11 @@ def get_parser():
 
     # build-graph (formerly load-graph) parsers here
     parser_build_graph = subparsers.add_parser('build_graph',
-                        help="Load sequences into the compressible graph "
-                        "format plus optional tagset", 
-                        description="Load sequences into the compressible "
-                        "graphi format plus optional tagset")
-    
+                                               help="Load sequences into the compressible graph "
+                                               "format plus optional tagset",
+                                               description="Load sequences into the compressible "
+                                               "graphi format plus optional tagset")
+
     common.add_hashbits_args(parser_build_graph)
     build_graph.add_args(parser_build_graph)
     parser_build_graph.set_defaults(func=execute_build_graph)
@@ -75,11 +75,11 @@ def execute_build_graph(args):
     for element in args.input_filenames:
         ifiles.append(element)
 
-    build_graph.do_build_graph(args.output_filename, ifiles, 
+    build_graph.do_build_graph(args.output_filename, ifiles,
                                args.force,
-                               args.no_build_tagset, args.report_total_kmers, 
+                               args.no_build_tagset, args.report_total_kmers,
                                args.write_fp_rate, args.quiet,
-                               args.ksize, args.n_tables, 
+                               args.ksize, args.n_tables,
                                args.min_tablesize, args.threads)
 
 

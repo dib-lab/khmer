@@ -31,17 +31,20 @@ def get_env_ksize():
     """
     return os.environ.get('KHMER_KSIZE', DEFAULT_K)
 
+
 def get_env_n_tables():
     """
     oxli utility function to return environment n_tables
-    """    
+    """
     return os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
+
 
 def get_env_tablesize():
     """
     oxli utility function to return environment tablesize
     """
     return os.environ.get('KHMER_MIN_TABLESIZE', DEFAULT_MIN_TABLESIZE)
+
 
 def add_hash_args(parser):
     """
@@ -94,7 +97,7 @@ def add_loadhash_args(parser):
         def __call__(self, parser, namespace, values, option_string=None):
             env_ksize = get_env_ksize()
             env_n_tables = get_env_n_tables()
-            env_tablesize = get_env_tablesize() 
+            env_tablesize = get_env_tablesize()
 
             setattr(namespace, self.dest, values)
 
