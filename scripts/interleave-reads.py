@@ -27,16 +27,7 @@ import argparse
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-
-
-def output_pair(read1, read2):
-    if hasattr(read1, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
-            (read1.name, read1.sequence, read1.accuracy,
-             read2.name, read2.sequence, read2.accuracy)
-    else:
-        return ">%s\n%s\n>%s\n%s\n" % (read1.name, read1.sequence, read2.name,
-                                       read2.sequence)
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -118,7 +109,8 @@ def main():
 
         read1.name = name1
         read2.name = name2
-        args.output.write(output_pair(read1, read2))
+        write_record(read1, args.output)
+        write_record(read2, args.output)
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
 

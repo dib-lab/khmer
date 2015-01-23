@@ -17,5 +17,19 @@ def print_error(msg):
 
     print >>sys.stderr, msg
 
+def write_record(record, fp):
+    """
+        Writes output sequence and returns str.
+    """
+    if hasattr(record, 'accuracy'):
+        fp.write(
+            '@{name}\n{seq}\n'
+            '+\n{acc}\n'.format(name=record.name,
+                               seq=record.sequence,
+                               acc=record.accuracy))
+    else:
+       fp.write(
+            '>{name}\n{seq}\n'.format(name=record.name,
+                                      seq=record.sequence))
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
