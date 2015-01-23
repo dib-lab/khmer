@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -13,6 +13,7 @@ from khmer._khmer import _new_hashbits
 from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
+from khmer._khmer import _HLLCounter
 from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
 
 from khmer._khmer import forward_hash  # figuregen/*.py
@@ -26,6 +27,9 @@ from khmer._khmer import forward_hash_no_rc  # tests/test_functions.py
 
 from khmer._khmer import reverse_hash  # tests/test_functions.py
 # tests/counting_single.py
+
+from khmer._khmer import hash_murmur3        # tests/test_functions.py
+from khmer._khmer import hash_no_rc_murmur3  # tests/test_functions.py
 
 from khmer._khmer import get_version_cpp as __version_cpp__
 # tests/test_version.py
@@ -258,3 +262,9 @@ class Hashbits(_Hashbits):
         c = _Hashbits.__new__(cls, k, primes)
         c.primes = primes
         return c
+
+
+class HLLCounter(_HLLCounter):
+
+    def __len__(self):
+        return self.estimate_cardinality()
