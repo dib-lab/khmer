@@ -24,7 +24,7 @@ def main():
     epilog = ("""
     Report number of bases, number of sequences, and average sequence length
     for one or more FASTA/FASTQ files; and report aggregate statistics at end.
-    
+
     With :option:`-o`/:options:`--output`, the output will be saved to the
     specified file.
 
@@ -48,15 +48,21 @@ def main():
     for filename in args.filenames:
         bp = 0
         seqs = 0
-        for record in screed.open(filename):
+
+        try:
+            input_iter = screed.open(filename)
+        except (IOError, OSError, EOFError), e:
+            print >>sys.stderr, 'ERROR in opening %s:' % filename
+            print >>sys.stderr, '     ', str(e)
+            continue
+
+        for record in input_iter:
             if seqs % 100000 == 0:
                 print >>sys.stderr, '...', filename, seqs
             bp += len(record.sequence)
             seqs += 1
 
-        if seqs == 0:
-            print >>sys.stderr, 'No sequences found in %s' % filename
-        else:
+        if seqs:
             avg_len = bp / float(seqs)
             s = '%d bp / %d seqs; %.1f average length -- %s' % (bp,
                                                                 seqs,
@@ -67,16 +73,18 @@ def main():
 
             total_bp += bp
             total_seqs += seqs
+        else:
+            print >>sys.stderr, 'No sequences found in %s' % filename
 
-    if total_seqs == 0:
-        print >>args.outfp, \
-            'No sequences found in %d files' % len(args.filenames)
-    else:
+    if total_seqs:
         print >>args.outfp, '---------------'
         print >>args.outfp, "\n".join(output)
         print >>args.outfp, '---------------'
         print >>args.outfp, '%d bp / %d seqs; %.1f average length -- total' % \
             (total_bp, total_seqs, total_bp / float(total_seqs))
+    else:
+        print >>args.outfp, \
+            'No sequences found in %d files' % len(args.filenames)
 
 
 if __name__ == '__main__':

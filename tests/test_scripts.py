@@ -1891,7 +1891,7 @@ def test_readstats():
 
     args = [utils.get_test_data("test-sweep-reads.fq"),
             utils.get_test_data("paired-mixed.fq")]
-    status, out, err = utils.runscript('readstats.py', args, sandbox=True)
+    status, out, err = utils.runscript('readstats.py', args)
     assert status == 0
 
     for k in readstats_output:
@@ -1907,10 +1907,22 @@ def test_readstats_output():
             utils.get_test_data("test-sweep-reads.fq"),
             utils.get_test_data("paired-mixed.fq")]
 
-    status, _, _ = utils.runscript('readstats.py', args, sandbox=True)
+    status, _, _ = utils.runscript('readstats.py', args)
     assert status == 0
 
     out = open(outfile).read()
 
     for k in readstats_output:
         assert k in out, (k, out)
+
+
+def test_readstats_empty():
+    expected_output = "No sequences found in 2 files"
+
+    args = [utils.get_test_data("test-empty.fa"),
+            utils.get_test_data("test-empty.fa.bz2")]
+
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    assert expected_output in out
