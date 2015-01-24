@@ -20,6 +20,8 @@ import textwrap
 
 
 def main():
+    "Main function - run when executed as a script."
+    
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
     epilog = ("""
     Report number of bases, number of sequences, and average sequence length
@@ -51,9 +53,9 @@ def main():
 
         try:
             input_iter = screed.open(filename)
-        except (IOError, OSError, EOFError), e:
+        except (IOError, OSError, EOFError), exc:
             print >>sys.stderr, 'ERROR in opening %s:' % filename
-            print >>sys.stderr, '     ', str(e)
+            print >>sys.stderr, '     ', str(exc)
             continue
 
         for record in input_iter:
