@@ -32,7 +32,7 @@ def main():
 
         readstats.py tests/test-data/test-abund-read-2.fa
     """)
-    
+
     parser = argparse.ArgumentParser(description=descr,
                                      epilog=textwrap.dedent(epilog))
     parser.add_argument('filenames', nargs='+')
