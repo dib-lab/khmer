@@ -4,9 +4,9 @@
 Installing and running khmer
 ============================
 
-You'll need a 64-bit operating system, Python 2.7+ and internet access.
+You'll need a 64-bit operating system, Python 2.7.x and internet access.
 
-The khmer project currently works with Python 2.6 but we target Python 2.7+. 
+The khmer project currently works with Python 2.6 but we target Python 2.7.x.
 
 Build requirements
 ------------------

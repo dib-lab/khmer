@@ -4,6 +4,29 @@
    scores length always matches the sequence length; fixed argparse
    setup to make use of default parameter.
 
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: remove the user installs for the `install-dependencies` target
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst,doc/user/install.txt: clarify that we support Python 2.7.x
+    and not Python 3.
+
+2015-01-21  Luiz Irber  <irberlui@msu.edu>
+
+    * lib/hllcounter.{cc,hh}: Implemented a HyperLogLog counter.
+    * khmer/{_khmermodule.cc, __init__.py}: added HLLCounter class
+    initialization and wrapper.
+    * tests/test_hll.py: added test functions for the new
+    HyperLogLog counter.
+    * sandbox/unique-kmers.py: implemented a CLI script for
+    approximate cardinality estimation using a HyperLogLog counter.
+    * setup.cfg, Makefile, third-party/smhasher/MurmurHash3.{cc,h},
+    lib/kmer_hash.{cc,hh}, setup.py: added MurmurHash3 hash function
+    and configuration.
+    * setup.py: added a function to check if compiler supports OpenMP.
+
 2015-01-14  Reed Cartwright  <cartwright@asu.edu>
 
     * doc/dev/getting-started.txt: Added install information for
