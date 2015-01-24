@@ -1883,3 +1883,36 @@ def test_read_parser_streaming_bzfa():
 def test_read_parser_streaming_gzfa():
     # gzip compressed FASTA
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
+
+
+
+
+def test_readstats():
+    readstats_output = ("358 bp / 5 seqs; 71.6 average length",
+                        "916 bp / 11 seqs; 83.3 average length")
+
+    args = [utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq")]
+    status, out, err = utils.runscript('readstats.py', args, sandbox=True)
+    assert status == 0
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
+
+def test_readstats_output():
+    readstats_output = ("358 bp / 5 seqs; 71.6 average length",
+                        "916 bp / 11 seqs; 83.3 average length")
+
+    outfile = utils.get_temp_filename('output.txt')
+    args = ["-o", outfile,
+            utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq")]
+
+    status, _, _ = utils.runscript('readstats.py', args, sandbox=True)
+    assert status == 0
+
+    out = open(outfile).read()
+
+    for k in readstats_output:
+        assert k in out, (k, out)

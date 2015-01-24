@@ -16,11 +16,22 @@ Use '-h' for parameter help.
 import sys
 import screed
 import argparse
+import textwrap
 
 
 def main():
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
-    epilog = """ """
+    epilog = ("""
+    Report number of bases, number of sequences, and average sequence length
+    for one or more FASTA/FASTQ files; and report aggregate statistics at end.
+    
+    With :option:`-o`/:options:`--output`, the output will be saved to the
+    specified file.
+
+    Example::
+
+        readstats.py tests/test-data/test-abund-read-2.fa
+    """)
     
     parser = argparse.ArgumentParser(description=descr,
                                      epilog=textwrap.dedent(epilog))

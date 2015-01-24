@@ -1,8 +1,9 @@
 2015-01-21  Titus Brown  <titus@idyll.org>
 
     * sandbox/readstats.py: fixed non-functional string interpolation at end;
-    added -o to send output to a file.
-    * tests/test_sandbox_scripts.py: added tests for readstats.py
+    added -o to send output to a file; moved to scripts/.
+    * doc/user/scripts.txt: added readstats description.
+    * tests/test_scripts.py: added tests for readstats.py
 
 2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
 
