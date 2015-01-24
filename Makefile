@@ -21,9 +21,7 @@ CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 all: khmer/_khmermodule.so
 
 install-dependencies:
-	pip2 install --user --upgrade $(DEVPKGS) || pip2 install --upgrade \
-		$(DEVPKGS) || pip install --user --upgrade $(DEVPKGS) || pip \
-		install --upgrade $(DEVPKGS)
+	pip2 install --upgrade $(DEVPKGS) || pip install --upgrade $(DEVPKGS)
 
 khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
