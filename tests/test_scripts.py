@@ -1885,8 +1885,6 @@ def test_read_parser_streaming_gzfa():
     execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
 
 
-
-
 def test_readstats():
     readstats_output = ("358 bp / 5 seqs; 71.6 average length",
                         "916 bp / 11 seqs; 83.3 average length")
