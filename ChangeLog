@@ -4,6 +4,15 @@
    scores length always matches the sequence length; fixed argparse
    setup to make use of default parameter.
 
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: remove the user installs for the `install-dependencies` target
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst,doc/user/install.txt: clarify that we support Python 2.7.x
+    and not Python 3.
+
 2015-01-21  Luiz Irber  <irberlui@msu.edu>
 
     * lib/hllcounter.{cc,hh}: Implemented a HyperLogLog counter.
