@@ -1,4 +1,4 @@
-2015-01-24  Titus Brown  <titus@idyll.org>
+2015-01-25  Titus Brown  <titus@idyll.org>
 
     * sandbox/readstats.py: fixed non-functional string interpolation at end;
     added -o to send output to a file; moved to scripts/.

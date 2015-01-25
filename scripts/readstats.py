@@ -19,9 +19,7 @@ import argparse
 import textwrap
 
 
-def main():
-    "Main function - run when executed as a script."
-    
+def get_parser():
     descr = "Display summary statistics for one or more FASTA/FASTQ files."
     epilog = ("""
     Report number of bases, number of sequences, and average sequence length
@@ -41,6 +39,14 @@ def main():
     parser.add_argument('-o', '--output', dest='outfp',
                         help="output file for statistics; defaults to stdout.",
                         type=argparse.FileType('w'), default=None)
+
+    return parser
+
+
+def main():
+    "Main function - run when executed as a script."
+
+    parser = get_parser()
     args = parser.parse_args()
 
     total_bp = 0
