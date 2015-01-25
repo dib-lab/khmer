@@ -4469,6 +4469,20 @@ hllcounter_getalpha(khmer_KHLLCounter_Object * me)
     return PyFloat_FromDouble(me->hllcounter->get_alpha());
 }
 
+static
+PyObject *
+hllcounter_getcounters(khmer_KHLLCounter_Object * me)
+{
+    std::vector<int> counters = me->hllcounter->get_M();
+
+    PyObject * x = PyList_New(counters.size());
+    for (size_t i = 0; i < counters.size(); i++) {
+        PyList_SET_ITEM(x, i, PyLong_FromLong(counters[i]));
+    }
+
+    return x;
+}
+
 static PyMethodDef khmer_hllcounter_methods[] = {
     {
         "add", (PyCFunction)hllcounter_add,
@@ -4510,7 +4524,13 @@ static PyGetSetDef khmer_hllcounter_getseters[] = {
     {
         "m",
         (getter)hllcounter_getm, NULL,
-        "Get the number of registers for the current counter.",
+        "Number of registers for the current counter.",
+        NULL
+    },
+    {
+        "counters",
+        (getter)hllcounter_getcounters, NULL,
+        "Counters. len(counters) == m == 2 ** p",
         NULL
     },
     {NULL} /* Sentinel */

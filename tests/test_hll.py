@@ -83,6 +83,32 @@ def test_hll_consume_fasta():
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
+def test_hll_consume_fasta_ep():
+    # During estimation trigger the _Ep() method,
+    # we need all internal counters values to be different than zero for this.
+
+    filename = utils.get_test_data('paired-mixed.fa')
+    hll = khmer.HLLCounter(0.36, 32)
+    hll.consume_fasta(filename)
+
+    assert all(c != 0 for c in hll.counters)
+    assert len(hll) == 236
+
+
+def test_hll_consume_fasta_estimate_bias():
+    # During estimation trigger the estimate_bias method,
+    # we need all internal counters values to be different than zero for this,
+    # and also the cardinality should be small (if it is large we fall on the
+    # default case).
+
+    filename = utils.get_test_data("test-abund-read-3.fa")
+    hll = khmer.HLLCounter(0.36, K)
+    hll.consume_fasta(filename)
+
+    assert all(c != 0 for c in hll.counters)
+    assert len(hll) == 79
+
+
 def test_hll_len():
     filename = utils.get_test_data('random-20-a.fa')
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
@@ -174,3 +200,10 @@ def test_hll_error_rate_min():
 
     hllcpp = khmer.HLLCounter(0.0040625, K)
     assert hllcpp.p == 16
+
+
+def test_hll_get_counters():
+    hll = khmer.HLLCounter(0.36, K)
+    counters = hll.counters
+    assert len(counters) == hll.m
+    assert all(c == 0 for c in counters)

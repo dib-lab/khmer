@@ -50,6 +50,10 @@ public:
     {
         return m;
     }
+    std::vector<int> get_M()
+    {
+        return M;
+    }
 private:
     double _Ep();
     double alpha;
