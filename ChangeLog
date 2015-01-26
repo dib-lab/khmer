@@ -47,7 +47,7 @@
     load-into-counting}.py,tests/test_{counting_hash,hashbits,scripts}.py:
     remove references to ".kh" files replaces with ".pt" or ".ct" as
     appropriate
-    * tests/test-data/{bad-vesionk12,normC20k20}.kh: renamed to "*.ct"
+    * tests/test-data/{bad-versionk12,normC20k20}.kh: renamed to "*.ct"
 
 2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
 
