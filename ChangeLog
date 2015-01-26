@@ -1,5 +1,11 @@
 2015-01-25  Titus Brown  <titus@idyll.org>
 
+   * sandbox/correct-errors.py: fixed sequence output so that quality
+   scores length always matches the sequence length; fixed argparse
+   setup to make use of default parameter.
+
+2015-01-25  Titus Brown  <titus@idyll.org>
+
     * sandbox/readstats.py: fixed non-functional string interpolation at end;
     added -o to send output to a file; moved to scripts/.
     * doc/user/scripts.txt: added readstats description.
@@ -41,7 +47,7 @@
     load-into-counting}.py,tests/test_{counting_hash,hashbits,scripts}.py:
     remove references to ".kh" files replaces with ".pt" or ".ct" as
     appropriate
-    * tests/test-data/{bad-vesionk12,normC20k20}.kh: renamed to "*.ct"
+    * tests/test-data/{bad-versionk12,normC20k20}.kh: renamed to "*.ct"
 
 2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
 
