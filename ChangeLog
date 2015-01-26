@@ -28,7 +28,6 @@
 
     * README.rst,doc/user/install.txt: clarify that we support Python 2.7.x
     and not Python 3.
->>>>>>> d4621d3831fa724f975c1acb323d6aece08dfbc4
 
 2015-01-21  Luiz Irber  <irberlui@msu.edu>
 
