@@ -2174,6 +2174,7 @@ def _DEBUG_oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
 
     return outfile
 
+
 def test_readstats():
     readstats_output = ("358 bp / 5 seqs; 71.6 average length",
                         "916 bp / 11 seqs; 83.3 average length")
