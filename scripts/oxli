@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+#
+# This file is a part of khmer, http://github.com/ged-lab/khmer/, and is
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under the
+# three-clause BSD license; see doc/LICENSE.txt.
+# Contact: khmer-project@idyll.org
+#
+
+"""
+Single entry point script for khmer
+"""
+
+import argparse
+import textwrap
+from oxli import common
+from oxli import fq2fa
+from oxli import abund_dist_single
+from oxli import build_graph
+
+
+def get_parser():
+    """
+    returns the parser object for the oxli subcommand handler
+    """
+
+    parser = argparse.ArgumentParser(
+        description='Single entry point script for khmer',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    subparsers = parser.add_subparsers()
+
+    # sub parser for fastq-to-fasta
+    parser_fq2fa = subparsers.add_parser('fastq_to_fasta', help="Converts \
+            FASTQ format (.fq) files to FASTA format (.fa)")
+
+    fq2fa.add_args(parser_fq2fa)
+    parser_fq2fa.set_defaults(func=execute_fastq_to_fasta)
+
+    # sub parser for abund-dist-single
+    # we have to adapt the build_counting_args from khmer
+    parser_abund_dist_single = subparsers.add_parser('abund_dist_single',
+                                                     help="Calculate the abundance distribution "
+                                                     "of k-mers from a single sequence file.",
+                                                     description="Caluculate the abundance"
+                                                     "distribution of k-mers from a single sequence"
+                                                     " file",
+                                                     epilog=textwrap.dedent(
+                                                         abund_dist_single.parser_epilog),
+                                                     formatter_class=common.ComboFormatter)
+
+    # use modified build_counting_args and build_hash_args from oxli.common
+    common.add_counting_args(parser_abund_dist_single)
+    abund_dist_single.add_args(parser_abund_dist_single)
+    parser_abund_dist_single.set_defaults(func=execute_abundance_dist_single)
+
+    # build-graph (formerly load-graph) parsers here
+    parser_build_graph = subparsers.add_parser('build_graph',
+                                               help="Load sequences into the compressible graph "
+                                               "format plus optional tagset",
+                                               description="Load sequences into the compressible "
+                                               "graphi format plus optional tagset")
+
+    common.add_hashbits_args(parser_build_graph)
+    build_graph.add_args(parser_build_graph)
+    parser_build_graph.set_defaults(func=execute_build_graph)
+
+    return parser
+
+
+def execute_build_graph(args):
+    """
+    oxli build_graph arg handling function
+    """
+    ifiles = []
+    for element in args.input_filenames:
+        ifiles.append(element)
+
+    build_graph.do_build_graph(args.output_filename, ifiles,
+                               args.force,
+                               args.no_build_tagset, args.report_total_kmers,
+                               args.write_fp_rate, args.quiet,
+                               args.ksize, args.n_tables,
+                               args.min_tablesize, args.threads)
+
+
+def execute_abundance_dist_single(args):
+    """
+    Produce the k-mer abundance distribution for the given file, without
+    loading a prebuilt k-mer counting table
+
+    % python scripts/oxli abund_dist_single <data> <histout>
+
+    use '-h' for parameter help
+    """
+    abund_dist_single.do_abund_dist_single(args.input_sequence_filename,
+                                           args.output_histogram_filename,
+                                           args.output_zero, args.bigcount,
+                                           args.squash_output, args.savetable,
+                                           args.report_total_kmers,
+                                           args.quiet, args.ksize,
+                                           args.n_tables, args.min_tablesize,
+                                           args.threads,
+                                           )
+
+
+def execute_fastq_to_fasta(args):
+    """
+    fastq_to_fasta subcommand handler function
+    """
+    fq2fa.do_fastq_to_fasta(args.input_sequence, args.output, args.n_keep)
+
+
+def main():
+    """
+    main function; does the parsing and kicks off the subcommand
+    """
+    args = get_parser().parse_args()
+    args.func(args)
+
+if __name__ == '__main__':
+    main()

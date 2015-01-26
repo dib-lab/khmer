@@ -761,5 +761,5 @@ def test_consume_absentfasta_with_reads_parser():
         assert 0, "this should fail"
     except IOError as err:
         print str(err)
-    except ValueError, err:
+    except ValueError as err:
         print str(err)

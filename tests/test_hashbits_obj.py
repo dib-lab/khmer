@@ -550,5 +550,5 @@ def test_consume_fasta_and_tag_with_badreads_parser():
         assert 0, "this should fail"
     except IOError as e:
         print str(e)
-    except ValueError, e:
+    except ValueError as e:
         print str(e)
