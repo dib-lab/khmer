@@ -103,9 +103,15 @@ class Async {
         // Define a lock for writing to standard out
         void lock_stdout() {
             while(!__sync_bool_compare_and_swap( &_stdout_spin_lock, 0, 1 ));
+            #if(VERBOSITY)
+            std::cout << "** stdout lock acquire **" << std::endl;
+            #endif
         }
 
         void unlock_stdout() {
+            #if(VERBOSITY)
+            std::cout << "** stdout lock release **" << std::endl;
+            #endif
             __sync_bool_compare_and_swap( &_stdout_spin_lock, 1, 0 );
         }
 

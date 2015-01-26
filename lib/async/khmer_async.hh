@@ -12,9 +12,9 @@
 #include <time.h>
 #include <boost/lockfree/queue.hpp>
 
-#define VERBOSITY 0
+#define VERBOSITY 1
 
-using namespace boost::lockfree;
+using namespace pkgboost::lockfree;
 
 namespace khmer {
 
