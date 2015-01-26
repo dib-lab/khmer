@@ -4512,25 +4512,25 @@ static PyGetSetDef khmer_hllcounter_getseters[] = {
     {
         "alpha",
         (getter)hllcounter_getalpha, NULL,
-        "alpha constant for the current counter.",
+        "alpha constant for this HLL counter.",
         NULL
     },
     {
         "p",
         (getter)hllcounter_getp, NULL,
-        "p for the current counter. The number of registers m is 2 ** p",
+        "p for this HLL counter. The number of internal counters m is 2 ** p",
         NULL
     },
     {
         "m",
         (getter)hllcounter_getm, NULL,
-        "Number of registers for the current counter.",
+        "Number of internal counters for this HLL counter.",
         NULL
     },
     {
         "counters",
         (getter)hllcounter_getcounters, NULL,
-        "Counters. len(counters) == m == 2 ** p",
+        "Read-only internal counters. len(counters) == m == 2 ** p",
         NULL
     },
     {NULL} /* Sentinel */
