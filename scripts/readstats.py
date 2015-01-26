@@ -36,7 +36,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description=descr,
                                      epilog=textwrap.dedent(epilog))
     parser.add_argument('filenames', nargs='+')
-    parser.add_argument('-o', '--output', dest='outfp', metavar='output',
+    parser.add_argument('-o', '--output', dest='outfp', metavar="filename",
                         help="output file for statistics; defaults to stdout.",
                         type=argparse.FileType('w'), default=None)
 
