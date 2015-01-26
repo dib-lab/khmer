@@ -10,7 +10,7 @@
 
 def print_error(msg):
     """
-        Prints the given message to 'stderr'.
+    Prints the given message to 'stderr'.
     """
 
     import sys
@@ -20,7 +20,7 @@ def print_error(msg):
 
 def write_record(record, fp):
     """
-        Writes output sequence and returns str.
+    Writes output sequence and returns str.
     """
     if hasattr(record, 'accuracy'):
         fp.write(
