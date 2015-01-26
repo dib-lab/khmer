@@ -1,3 +1,16 @@
+2015-01-25  Titus Brown  <titus@idyll.org>
+
+   * sandbox/correct-errors.py: fixed sequence output so that quality
+   scores length always matches the sequence length; fixed argparse
+   setup to make use of default parameter.
+
+2015-01-25  Titus Brown  <titus@idyll.org>
+
+    * sandbox/readstats.py: fixed non-functional string interpolation at end;
+    added -o to send output to a file; moved to scripts/.
+    * doc/user/scripts.txt: added readstats description.
+    * tests/test_scripts.py: added tests for readstats.py
+
 2015-1-23  Jacob Fenton  <bocajnotnef@gmail.com>
 
     * oxli/{__init__, fq2fa, common, abund_dist_single, build_graph}.py, 
@@ -6,6 +19,16 @@
     abundance-dist-single scripts
     * test/test_scripts.py: added test for oxli-fastq-to-fasta_and_tag,
     oxli-abundance-dist-single and oxli-abundnace-dist-single-nobigccount
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: remove the user installs for the `install-dependencies` target
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst,doc/user/install.txt: clarify that we support Python 2.7.x
+    and not Python 3.
+>>>>>>> d4621d3831fa724f975c1acb323d6aece08dfbc4
 
 2015-01-21  Luiz Irber  <irberlui@msu.edu>
 
@@ -34,7 +57,7 @@
     load-into-counting}.py,tests/test_{counting_hash,hashbits,scripts}.py:
     remove references to ".kh" files replaces with ".pt" or ".ct" as
     appropriate
-    * tests/test-data/{bad-vesionk12,normC20k20}.kh: renamed to "*.ct"
+    * tests/test-data/{bad-versionk12,normC20k20}.kh: renamed to "*.ct"
 
 2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
 

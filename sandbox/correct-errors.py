@@ -42,7 +42,12 @@ def output_single(read, new_sequence):
     if hasattr(read, 'accuracy'):
         accuracy = read.accuracy[:len(sequence)]
 
+        # in cases where sequence _lengthened_, need to truncate it to
+        # match the quality score length.
+        sequence = sequence[:len(accuracy)]
+
     if accuracy:
+        assert len(sequence) == len(accuracy), (sequence, accuracy)
         return "@%s\n%s\n+\n%s\n" % (name, sequence, accuracy)
     else:
         return ">%s\n%s\n" % (name, sequence)
@@ -66,7 +71,7 @@ def main():
                         help='lower bound on hashsize to use')
 
     parser.add_argument("--trusted-cov", dest="trusted_cov", type=int,
-                        default=2)
+                        default=DEFAULT_CUTOFF)
     parser.add_argument("--theta", dest="bits_theta", type=float, default=1.0)
 
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',

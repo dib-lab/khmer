@@ -2173,3 +2173,45 @@ def _DEBUG_oxli_make_graph(infilename, min_hashsize=1e7, n_hashes=2, ksize=20,
             assert os.path.exists(os.path.join(in_dir, baseinfile + '.part'))
 
     return outfile
+
+def test_readstats():
+    readstats_output = ("358 bp / 5 seqs; 71.6 average length",
+                        "916 bp / 11 seqs; 83.3 average length")
+
+    args = [utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq")]
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
+
+def test_readstats_output():
+    readstats_output = ("358 bp / 5 seqs; 71.6 average length",
+                        "916 bp / 11 seqs; 83.3 average length")
+
+    outfile = utils.get_temp_filename('output.txt')
+    args = ["-o", outfile,
+            utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq")]
+
+    status, _, _ = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    out = open(outfile).read()
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
+
+def test_readstats_empty():
+    expected_output = "No sequences found in 2 files"
+
+    args = [utils.get_test_data("test-empty.fa"),
+            utils.get_test_data("test-empty.fa.bz2")]
+
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    assert expected_output in out
