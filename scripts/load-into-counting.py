@@ -20,7 +20,7 @@ import threading
 import textwrap
 import khmer
 from khmer.khmer_args import build_counting_args, report_on_config, info,\
-    add_threading_args
+    add_threading_args, update_memory_parameters
 from khmer.kfile import check_file_status, check_space
 from khmer.kfile import check_space_for_hashtable
 
@@ -72,6 +72,7 @@ def main():
     info('load-into-counting.py', ['counting', 'SeqAn'])
 
     args = get_parser().parse_args()
+    update_memory_parameters(args)
     report_on_config(args)
 
     base = args.output_countingtable_filename

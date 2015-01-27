@@ -52,7 +52,34 @@ def build_hash_args(descr=None, epilog=None):
                         default=env_tablesize,
                         help='lower bound on tablesize to use')
 
+    parser.add_argument('--max-memory', metavar='max_memory',
+                        type=float, deafult=None, help='maximum memory to use')
+
     return parser
+
+
+def update_memory_parameters(parser, args):
+    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
+    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
+                                   DEFAULT_MIN_TABLESIZE)
+
+    if args.max_memory is None:
+        return
+    elif (args.n_tables != env_n_tables or \
+          args.min_tablesize != env_tablesize):
+        raise Exception("ERROR: max_memory specified along with other "
+                        "memory parameters (-x or -N)")
+
+    n_tables = DEFAULT_N_TABLES
+    max_memory = args.max_memory
+
+    if parser.hashtype == 'counting':
+        tablesize = int(max_memory / float(n_tables))
+    elif parser.hashtype == 'hashbits':
+        tablesize = int(8 * max_memory / float(n_tables))
+
+    args.min_tablesize = tablesize
+    args.n_tables = n_tables
 
 
 def build_counting_args(descr=None, epilog=None):
