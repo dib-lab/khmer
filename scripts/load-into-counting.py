@@ -71,8 +71,9 @@ def main():
 
     info('load-into-counting.py', ['counting', 'SeqAn'])
 
-    args = get_parser().parse_args()
-    update_memory_parameters(args)
+    parser = get_parser()
+    args = parser.parse_args()
+    update_memory_parameters(parser, args)
     report_on_config(args)
 
     base = args.output_countingtable_filename

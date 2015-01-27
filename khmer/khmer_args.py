@@ -53,7 +53,7 @@ def build_hash_args(descr=None, epilog=None):
                         help='lower bound on tablesize to use')
 
     parser.add_argument('--max-memory', metavar='max_memory',
-                        type=float, deafult=None, help='maximum memory to use')
+                        type=float, default=None, help='maximum memory to use')
 
     return parser
 
