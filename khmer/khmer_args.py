@@ -34,9 +34,6 @@ def build_hash_args(descr=None, epilog=None):
         formatter_class=ComboFormatter)
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                   DEFAULT_MIN_TABLESIZE)
 
     parser.add_argument('--version', action='version',
                         version='khmer {v}'.format(v=__version__))
@@ -46,10 +43,10 @@ def build_hash_args(descr=None, epilog=None):
     parser.add_argument('--ksize', '-k', type=int, default=env_ksize,
                         help='k-mer size to use')
     parser.add_argument('--n_tables', '-N', type=int,
-                        default=env_n_tables,
+                        default=None,
                         help='number of k-mer counting tables to use')
     parser.add_argument('--min-tablesize', '-x', type=float,
-                        default=env_tablesize,
+                        default=None,
                         help='lower bound on tablesize to use')
 
     parser.add_argument('--max-memory', metavar='max_memory',
@@ -63,23 +60,29 @@ def update_memory_parameters(parser, args):
     env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
                                    DEFAULT_MIN_TABLESIZE)
 
-    if args.max_memory is None:
-        return
-    elif (args.n_tables != env_n_tables or \
-          args.min_tablesize != env_tablesize):
-        raise Exception("ERROR: max_memory specified along with other "
-                        "memory parameters (-x or -N)")
+    if args.n_tables is None and (args.max_memory and args.min_tablesize):
+        if parser.hashtype == 'counting':
+            tablesize = int(args.max_memory / float(args.min_tablesize))
+        elif parser.hashtype == 'hashbits':
+            tablesize = int(8 * args.max_memory / float(args.min_tablesize))
 
-    n_tables = DEFAULT_N_TABLES
-    max_memory = args.max_memory
-
-    if parser.hashtype == 'counting':
-        tablesize = int(max_memory / float(n_tables))
-    elif parser.hashtype == 'hashbits':
-        tablesize = int(8 * max_memory / float(n_tables))
-
-    args.min_tablesize = tablesize
-    args.n_tables = n_tables
+    elif args.max_memory is None and (args.n_tables and args.min_tablesize):
+        pass
+    elif args.min_tablesize is None and (args.n_tables and args.max_memory):
+        if parser.hashtype == 'hashbits':
+            args.min_tablesize = int(8 * args.max_memory /
+                                     float(args.n_tables))
+        else:
+            args.min_tablesize = int(args.max_memory / float(args.n_tables))
+    elif args.max_memory and not (args.n_tables or args.min_tablesize):
+        args.n_tables = env_n_tables
+        if parser.hashtype == 'hashbits':
+            args.min_tablesize = int(8 * args.max_memory /
+                                     float(args.n_tables))
+        else:
+            args.min_tablesize = int(args.max_memory / float(args.n_tables))
+    else:
+        raise Exception("missed an if statement @ctb")
 
 
 def build_counting_args(descr=None, epilog=None):
