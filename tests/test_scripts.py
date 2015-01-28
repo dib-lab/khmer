@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -21,7 +21,7 @@ import io
 
 import khmer_tst_utils as utils
 import khmer
-import khmer.file
+import khmer.kfile
 import screed
 
 
@@ -36,20 +36,21 @@ def teardown():
 def test_check_space():
     # @CTB this probably belongs in a new test file, along with other
     # tests of the file.py module.
-    khmer.file.check_space(['', utils.get_test_data('test-abund-read-2.fa')])
+    khmer.kfile.check_space(
+        ['', utils.get_test_data('test-abund-read-2.fa')], False)
 
 
 def test_load_into_counting():
     script = scriptpath('load-into-counting.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+    args = ['-x', '1e3', '-N', '2', '-k', '20', '-t']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
 
     (status, out, err) = utils.runscript(script, args)
-    assert 'Total number of unique k-mers: 95' in err, err
+    assert 'Total number of unique k-mers: 89' in err, err
     assert os.path.exists(outfile)
 
 
@@ -57,7 +58,7 @@ def test_load_into_counting_fail():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e2', '-N', '2', '-k', '20']  # use small HT
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
@@ -67,11 +68,26 @@ def test_load_into_counting_fail():
     assert "ERROR:" in err
 
 
+def test_load_into_counting_multifile():
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '20', '-t']
+
+    outfile = utils.get_temp_filename('out.kh')
+    infile = utils.get_test_data('test-abund-read-2.fa')
+
+    args.extend([outfile, infile, infile, infile, infile, infile,
+                 infile, infile, infile, infile, infile, infile])
+
+    (status, out, err) = utils.runscript(script, args)
+    assert 'Total number of unique k-mers: 95' in err, err
+    assert os.path.exists(outfile)
+
+
 def test_load_into_counting_tsv():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'tsv']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     tabfile = outfile + '.info.tsv'
     infile = utils.get_test_data('test-abund-read-2.fa')
 
@@ -93,7 +109,7 @@ def test_load_into_counting_json():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-t', '-s', 'json']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     jsonfile = outfile + '.info.json'
     infile = utils.get_test_data('test-abund-read-2.fa')
 
@@ -122,7 +138,7 @@ def test_load_into_counting_bad_summary_fmt():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e7', '-N', '2', '-k', '20', '-s', 'badfmt']
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
     infile = utils.get_test_data('test-abund-read-2.fa')
 
     args.extend([outfile, infile])
@@ -139,7 +155,7 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     if not BIGCOUNT:
         args.append('-b')
 
-    outfile = utils.get_temp_filename('out.kh')
+    outfile = utils.get_temp_filename('out.ct')
 
     args.extend([outfile, infilename])
 
@@ -150,22 +166,43 @@ def _make_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
 
 
 def test_filter_abund_1():
+    script = scriptpath('filter-abund.py')
+
     infile = utils.get_temp_filename('test.fa')
+    n_infile = utils.get_temp_filename('test-fastq-n-reads.fq')
+
     in_dir = os.path.dirname(infile)
+    n_in_dir = os.path.dirname(n_infile)
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, K=17)
+    shutil.copyfile(utils.get_test_data('test-fastq-n-reads.fq'), n_infile)
 
-    script = scriptpath('filter-abund.py')
+    counting_ht = _make_counting(infile, K=17)
+    n_counting_ht = _make_counting(n_infile, K=17)
+
     args = [counting_ht, infile]
     utils.runscript(script, args, in_dir)
 
     outfile = infile + '.abundfilt'
+    n_outfile = n_infile + '.abundfilt'
+    n_outfile2 = n_infile + '2.abundfilt'
+
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.sequence for r in screed.open(outfile)])
+
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+    args = [n_counting_ht, n_infile]
+    utils.runscript(script, args, n_in_dir)
+
+    seqs = set([r.sequence for r in screed.open(n_infile)])
+    assert os.path.exists(n_outfile), n_outfile
+
+    args = [n_counting_ht, n_infile, '-o', n_outfile2]
+    utils.runscript(script, args, in_dir)
+    assert os.path.exists(n_outfile2), n_outfile2
 
 
 def test_filter_abund_2():
@@ -232,10 +269,31 @@ def test_filter_abund_1_singlefile():
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
-# test that the -V option does not trim sequences that are low abundance
+
+def test_filter_abund_2_singlefile():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    tabfile = utils.get_temp_filename('test-savetable.ct')
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-t', '--savetable',
+            tabfile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    assert 'Total number of unique k-mers: 98' in err, err
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
 
 
 def test_filter_abund_4_retain_low_abund():
+    # test that the -V option does not trim sequences that are low abundance
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
@@ -335,7 +393,7 @@ def test_filter_stoptags():
 
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
-    hashfile = utils.get_test_data('normC20k20.kh')
+    hashfile = utils.get_test_data('normC20k20.ct')
     outfile = utils.get_temp_filename('paired-mixed.fa.pe.keep')
     script = scriptpath('normalize-by-median.py')
     args = ['--loadtable', hashfile, '-o', outfile, infile]
@@ -469,7 +527,7 @@ def test_normalize_by_median_force():
 
 def test_normalize_by_median_no_bigcount():
     infile = utils.get_temp_filename('test.fa')
-    hashfile = utils.get_temp_filename('test-out.kh')
+    hashfile = utils.get_temp_filename('test-out.ct')
     outfile = infile + '.keep'
     in_dir = os.path.dirname(infile)
 
@@ -668,7 +726,7 @@ def test_load_graph_multithread():
     outfile = utils.get_temp_filename('test')
     infile = utils.get_test_data('test-reads.fa')
 
-    args = ['-N', '4', '-x', '1e9', '-T', '8', outfile, infile]
+    args = ['-N', '4', '-x', '1e7', '-T', '8', outfile, infile]
 
     (status, out, err) = utils.runscript(script, args)
 
@@ -1183,6 +1241,44 @@ def test_abundance_dist_single_nobigcount():
     assert line == '255 2 98 1.0', line
 
 
+def test_abundance_dist_single_nosquash():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test-abund-read-2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', infile, outfile]
+    utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+
+def test_abundance_dist_single_savetable():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = utils.get_temp_filename('test.dist')
+    tabfile = utils.get_temp_filename('test-savetable.ct')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    script = scriptpath('abundance-dist-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', '-z', '-t', '--savetable',
+            tabfile, infile, outfile]
+    utils.runscript(script, args, in_dir)
+
+    fp = iter(open(outfile))
+    line = fp.next().strip()
+    assert line == '1 96 96 0.98', line
+    line = fp.next().strip()
+    assert line == '1001 2 98 1.0', line
+
+
 def test_do_partition():
     seqfile = utils.get_test_data('random-20-a.fa')
     graphbase = utils.get_temp_filename('out')
@@ -1555,7 +1651,7 @@ def test_sample_reads_randomly_S():
     badargs = list(args)
     badargs.extend(['-o', 'test', 'test.fq', 'test.fq'])
     (status, out, err) = utils.runscript(script, badargs, in_dir, fail_ok=True)
-    assert status == -1, (status, out, err)
+    assert status == 1, (status, out, err)
 
     args.append('test.fq')
 
@@ -1657,34 +1753,46 @@ def execute_streaming_diginorm(ifilename):
     return in_dir + '/outfile'
 
 
-def execute_abund_dist_single_streaming(ifilename, somedir=None):
+def execute_load_graph_streaming(filename):
     '''Helper function for the matrix of streaming tests using screed via
     filter-abund-single, i.e. uncompressed fasta, gzip fasta, bz2 fasta,
     uncompressed fastq, etc.
     This is not directly executed but is run by the tests themselves
     '''
 
-    fifo = utils.get_temp_filename('fifo')
-    in_dir = os.path.dirname(fifo)
-    ifile = open(ifilename, 'rb')
-    script = scriptpath('abundance-dist-single.py')
-    args = ['-x', '1e7', '-N', '2', '-k', '6', '-t', fifo, 'outfile']
-    os.mkfifo(fifo)
+    script = scriptpath('load-graph.py')
+    args = '-x 1e7 -N 2 -k 20 -t out -'
 
-    thread = threading.Thread(target=utils.runscript,
-                              args=(script, args, in_dir))
-    thread.start()
+    infile = utils.get_temp_filename('temp')
+    in_dir = os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data(filename), infile)
+    (status, out, err) = utils.runscriptredirect(script, args, infile, in_dir)
 
-    fifofile = open(fifo, 'wb')
-    chunk = ifile.read(8192)
-    while len(chunk) > 0:
-        fifofile.write(chunk)
-        chunk = ifile.read(8192)
+    if status != 0:
+        for line in out:
+            print out
+        for line in err:
+            print err
+        assert status == 0, status
+    err.seek(0)
+    err = err.read()
+    assert 'Total number of unique k-mers: 3960' in err, err
 
-    fifofile.close()
-    thread.join()
+    ht_file = os.path.join(in_dir, 'out.pt')
+    assert os.path.exists(ht_file), ht_file
 
-    return in_dir + '/outfile'
+    tagset_file = os.path.join(in_dir, 'out.tagset')
+    assert os.path.exists(tagset_file), tagset_file
+
+    ht = khmer.load_hashbits(ht_file)
+    ht.load_tagset(tagset_file)
+
+    # check to make sure we get the expected result for this data set
+    # upon partitioning (all in one partition).  This is kind of a
+    # roundabout way of checking that load-graph worked :)
+    subset = ht.do_subset_partition(0, 0)
+    x = ht.subset_count_partitions(subset)
+    assert x == (1, 0), x
 
 
 @attr('known_failing')
@@ -1745,51 +1853,76 @@ def test_screed_streaming_gzipfa():
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
 
 
-@attr('known_failing')
 def test_read_parser_streaming_ufa():
-    # uncompressed fa
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('test-abund-read-2.fa'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+    # uncompressed FASTA
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa'))
+
+
+def test_read_parser_streaming_ufq():
+    # uncompressed FASTQ
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfq():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('100-reads.fq.bz2'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+    # bzip compressed FASTQ
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.bz2'))
 
 
-@attr('known_failing')
 def test_read_parser_streaming_gzfq():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('100-reads.fq.gz'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('CAGGCGCCCACCACCGTGCCCTCCAACCTG')
+    # gzip compressed FASTQ
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fq.gz'))
 
 
 @attr('known_failing')
 def test_read_parser_streaming_bzfa():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('test-abund-read-2.fa.bz2'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+    # bzip compressed FASTA
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.bz2'))
 
 
-@attr('known_failing')
 def test_read_parser_streaming_gzfa():
-    # bzip compressed
-    o = execute_abund_dist_single_streaming(
-        utils.get_test_data('test-abund-read-2.fa.gz'))
-    assert os.path.exists(o)
-    seqs = [r.sequence for r in screed.open(o)]
-    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGG')
+    # gzip compressed FASTA
+    execute_load_graph_streaming(utils.get_test_data('random-20-a.fa.gz'))
+
+
+def test_readstats():
+    readstats_output = ("358 bp / 5 seqs; 71.6 average length",
+                        "916 bp / 11 seqs; 83.3 average length")
+
+    args = [utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq")]
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
+
+def test_readstats_output():
+    readstats_output = ("358 bp / 5 seqs; 71.6 average length",
+                        "916 bp / 11 seqs; 83.3 average length")
+
+    outfile = utils.get_temp_filename('output.txt')
+    args = ["-o", outfile,
+            utils.get_test_data("test-sweep-reads.fq"),
+            utils.get_test_data("paired-mixed.fq")]
+
+    status, _, _ = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    out = open(outfile).read()
+
+    for k in readstats_output:
+        assert k in out, (k, out)
+
+
+def test_readstats_empty():
+    expected_output = "No sequences found in 2 files"
+
+    args = [utils.get_test_data("test-empty.fa"),
+            utils.get_test_data("test-empty.fa.bz2")]
+
+    status, out, err = utils.runscript('readstats.py', args)
+    assert status == 0
+
+    assert expected_output in out

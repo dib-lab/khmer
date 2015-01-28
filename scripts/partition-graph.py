@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,7 +24,7 @@ import argparse
 import khmer
 import sys
 from khmer.khmer_args import (add_threading_args, info)
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 
 # Debugging Support
 import re
@@ -90,6 +90,8 @@ def get_parser():
                         'traversals')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     add_threading_args(parser)
     return parser
 
@@ -101,9 +103,9 @@ def main():
 
     filenames = [basename + '.pt', basename + '.tagset']
     for _ in filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(filenames)
+    check_space(filenames, args.force)
 
     print >>sys.stderr, '--'
     print >>sys.stderr, 'SUBSET SIZE', args.subset_size

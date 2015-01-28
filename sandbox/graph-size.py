@@ -12,7 +12,7 @@ import os.path
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_fasta_iter
 
 K = 32
-HASHTABLE_SIZE = int(4e9)
+HASHTABLE_SIZE = int(4e6)
 THRESHOLD = 500
 N_HT = 4
 WORKER_THREADS = 5

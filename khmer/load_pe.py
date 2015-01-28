@@ -23,7 +23,7 @@ def load_pe(screed_handle):
 
     screed_iter = iter(screed_handle)
 
-    while 1:
+    while True:
         try:
             this_record = screed_iter.next()
         except StopIteration:

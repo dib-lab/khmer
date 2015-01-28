@@ -12,13 +12,16 @@ autopep8 pylint coverage gcovr nose screed
 
 GCOVRURL=git+https://github.com/nschum/gcovr.git@never-executed-branches
 VERSION=$(shell git describe --tags --dirty | sed s/v//)
+CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
+	 -DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
+	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
+	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
+	 -Ithird-party/smhasher
 
 all: khmer/_khmermodule.so
 
 install-dependencies:
-	pip2 install --user --upgrade $(DEVPKGS) || pip2 install --upgrade \
-		$(DEVPKGS) || pip install --user --upgrade $(DEVPKGS) || pip \
-		install --upgrade $(DEVPKGS)
+	pip2 install --upgrade $(DEVPKGS) || pip install --upgrade $(DEVPKGS)
 
 khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
@@ -66,15 +69,10 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
 	@echo '--> pdf in build/sphinx/latex/khmer.pdf'
 
 cppcheck-result.xml: $(CPPSOURCES)
-	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=posix --xml \
-		--inline-suppr --xml-version=2 2> cppcheck-result.xml
+	${CPPCHECK} --xml-version=2 2> cppcheck-result.xml
 
 cppcheck: $(CPPSOURCES)
-	ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
-		-DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
-		--file-list=- -j8 --platform=unix64 --std=posix --inline-suppr --quiet
+	${CPPCHECK}
 
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
@@ -91,7 +89,7 @@ astyle: $(CPPSOURCES)
 
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
-		setup.py khmer/ scripts/ tests/
+		setup.py khmer/*.py scripts/*.py tests/*.py
 
 # A command to automatically run astyle and autopep8 on appropriate files
 format: astyle autopep8
@@ -130,8 +128,8 @@ coverage-report: .coverage
 	coverage report
 
 coverage-gcovr.xml: coverage-debug .coverage
-	gcovr --root=. --branches --gcov-exclude='.*zlib.*|.*bzip2.*' --xml \
-		--output=coverage-gcovr.xml
+	gcovr --root=. --branches --output=coverage-gcovr.xml --xml \
+          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*'
 
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml
@@ -155,7 +153,8 @@ lib:
 	cd lib && \
 	$(MAKE)
 
-test:
+test: FORCE
+	./setup.py develop
 	./setup.py nosetests
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile

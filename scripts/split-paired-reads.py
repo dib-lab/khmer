@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -20,7 +20,7 @@ import os.path
 import textwrap
 import argparse
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 
@@ -42,6 +42,8 @@ def get_parser():
     parser.add_argument('infile')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -51,9 +53,9 @@ def main():
 
     infile = args.infile
 
-    check_file_status(infile)
+    check_file_status(infile, args.force)
     filenames = [infile]
-    check_space(filenames)
+    check_space(filenames, args.force)
 
     out1 = os.path.basename(infile) + '.1'
     out2 = os.path.basename(infile) + '.2'

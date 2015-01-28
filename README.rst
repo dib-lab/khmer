@@ -52,7 +52,7 @@ citation information.
 INSTALL INSTRUCTIONS:
 ---------------------
 
-khmer requires a 64-bit operating system and Python 2.7+. Linux users will need 
+khmer requires a 64-bit operating system and Python 2.7.x. Linux users will need
 the Python development libraries and gcc. OS X users may need XCode installed.
 
 In short:

@@ -11,44 +11,50 @@ import sys
 
 import math
 
-hash_filename = sys.argv[1]
-input_filename = sys.argv[2]
-output_filename = sys.argv[3]
-max_error_region = int(sys.argv[4])
 
-C = 20  # 20
+def main():
+    hash_filename = sys.argv[1]
+    input_filename = sys.argv[2]
+    output_filename = sys.argv[3]
+    max_error_region = int(sys.argv[4])
 
-corrected = 0
-uncorrected = 0
+    C = 20  # 20
 
-outfp = open(output_filename, 'w')
+    corrected = 0
+    uncorrected = 0
 
-ht = khmer.load_counting_hash(hash_filename)
-aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
+    outfp = open(output_filename, 'w')
 
-K = ht.ksize()
+    ht = khmer.load_counting_hash(hash_filename)
+    aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
 
-for n, record in enumerate(screed.open(input_filename)):
-    if n % 1000 == 0:
-        print n
+    K = ht.ksize()
 
-    seq = record.sequence
-    seq_name = record.name
+    for n, record in enumerate(screed.open(input_filename)):
+        if n % 1000 == 0:
+            print n
 
-    seq = seq.replace('N', 'A')
+        seq = record.sequence
+        seq_name = record.name
 
-    grXreAlign, reXgrAlign = aligner.align(seq)
+        seq = seq.replace('N', 'A')
 
-    if len(reXgrAlign) > 0:
-        graph_seq = grXreAlign.replace('-', '')
-        corrected += 1
-        outfp.write('>%s\n%s\n' % (seq_name, graph_seq))
-    else:
-        uncorrected += 1
-        outfp.write('>%s\n%s\n' % (seq_name, seq))
+        grXreAlign, reXgrAlign = aligner.align(seq)
+
+        if len(reXgrAlign) > 0:
+            graph_seq = grXreAlign.replace('-', '')
+            corrected += 1
+            outfp.write('>%s\n%s\n' % (seq_name, graph_seq))
+        else:
+            uncorrected += 1
+            outfp.write('>%s\n%s\n' % (seq_name, seq))
 
 
-print 'corrected', corrected
-print 'uncorrected', uncorrected
+    print 'corrected', corrected
+    print 'uncorrected', uncorrected
 
-outfp.close()
+    outfp.close()
+
+
+if __name__ == '__main__':
+    main()

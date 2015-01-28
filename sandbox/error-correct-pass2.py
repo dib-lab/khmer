@@ -9,7 +9,7 @@
 Error correct reads based on a counting hash from a diginorm step.
 Output sequences will be put in @@@.
 
-% python scripts/error-correct-pass2 <counting.kh> <data1> [ <data2> <...> ]
+% python scripts/error-correct-pass2 <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -19,7 +19,7 @@ import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
-from khmer.counting_args import build_counting_multifile_args
+from khmer.khmer_args import build_counting_args
 
 ###
 

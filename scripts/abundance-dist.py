@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2010-2014. It is licensed under
+# Copyright (C) Michigan State University, 2010-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -19,7 +19,7 @@ import sys
 import khmer
 import argparse
 import os
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status
 from khmer.khmer_args import info
 
 
@@ -44,6 +44,8 @@ def get_parser():
                         help='Overwrite output file if it exists')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -53,7 +55,7 @@ def main():
     infiles = [args.input_counting_table_filename,
                args.input_sequence_filename]
     for infile in infiles:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
     print ('hashtable from', args.input_counting_table_filename,
            file=sys.stderr)
