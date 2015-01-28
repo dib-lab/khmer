@@ -60,6 +60,9 @@ def update_memory_parameters(parser, args):
     env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
                                    DEFAULT_MIN_TABLESIZE)
 
+    # spec all three
+    # spec none
+
     if args.n_tables is None and (args.max_memory and args.min_tablesize):
         if parser.hashtype == 'counting':
             tablesize = int(args.max_memory / float(args.min_tablesize))
