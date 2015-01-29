@@ -34,13 +34,18 @@ __attribute__((cpychecker_type_object_for_typedef(typename)))
 #define CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF(typename)
 #endif
 
+#define NONCOPYABLE(className)\
+private:\
+    className(const className&);\
+    const className& operator=(const className&)
+
 #include <set>
 #include <map>
 #include <queue>
 
 #include "khmer_exception.hh"
 
-#   define MAX_COUNT 255
+#   define MAX_KCOUNT 255
 #   define MAX_BIGCOUNT 65535
 #   define DEFAULT_TAG_DENSITY 40   // must be even
 
@@ -67,6 +72,7 @@ typedef unsigned long long int ExactCounterType;
 
 // largest number we're going to hash into. (8 bytes/64 bits/32 nt)
 typedef unsigned long long int HashIntoType;
+const unsigned char KSIZE_MAX = sizeof(HashIntoType)*4;
 
 // largest size 'k' value for k-mer calculations.  (1 byte/255)
 typedef unsigned char WordLength;
@@ -92,7 +98,8 @@ typedef std::queue<HashIntoType> NodeQueue;
 typedef std::map<PartitionID, PartitionID*> PartitionToPartitionPMap;
 typedef std::map<HashIntoType, unsigned int> TagCountMap;
 typedef std::map<PartitionID, unsigned int> PartitionCountMap;
-typedef std::map<unsigned long long, unsigned long long> PartitionCountDistribution;
+typedef std::map<unsigned long long, unsigned long long>
+PartitionCountDistribution;
 
 // types used in @camillescott's sparse labeling extension
 typedef unsigned long long int Label;

@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -20,7 +20,7 @@ import os.path
 import textwrap
 import argparse
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 
@@ -74,6 +74,8 @@ def get_parser():
     parser.add_argument('infile')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -81,9 +83,9 @@ def main():
     info('extract-paired-reads.py')
     args = get_parser().parse_args()
 
-    check_file_status(args.infile)
+    check_file_status(args.infile, args.force)
     infiles = [args.infile]
-    check_space(infiles)
+    check_space(infiles, args.force)
 
     outfile = os.path.basename(args.infile)
     if len(sys.argv) > 2:
@@ -92,9 +94,9 @@ def main():
     single_fp = open(outfile + '.se', 'w')
     paired_fp = open(outfile + '.pe', 'w')
 
-    print 'reading file "%s"' % args.infile
-    print 'outputting interleaved pairs to "%s.pe"' % outfile
-    print 'outputting orphans to "%s.se"' % outfile
+    print >>sys.stderr, 'reading file "%s"' % args.infile
+    print >>sys.stderr, 'outputting interleaved pairs to "%s.pe"' % outfile
+    print >>sys.stderr, 'outputting orphans to "%s.se"' % outfile
 
     last_record = None
     last_name = None
@@ -141,8 +143,9 @@ def main():
     if n_pe == 0:
         raise Exception("no paired reads!? check file formats...")
 
-    print 'DONE; read %d sequences, %d pairs and %d singletons' % \
-          (index + 1, n_pe, n_se)
+    print >>sys.stderr, 'DONE; read %d sequences,' \
+        ' %d pairs and %d singletons' % \
+        (index + 1, n_pe, n_se)
 
     print >> sys.stderr, 'wrote to: ' + outfile \
         + '.se' + ' and ' + outfile + '.pe'

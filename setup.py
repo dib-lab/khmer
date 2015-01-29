@@ -1,6 +1,6 @@
 #! /usr/bin/env python2
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 """ Setup for khmer project. """
@@ -12,6 +12,9 @@ import os
 import sys
 from os import listdir as os_listdir
 from os.path import join as path_join
+import shutil
+import subprocess
+import tempfile
 
 from setuptools import setup
 from setuptools import Extension
@@ -39,6 +42,54 @@ os.environ['OPT'] = " ".join(
     flag for flag in OPT.split() if flag != '-Wstrict-prototypes'
 )
 
+# Checking for OpenMP support. Currently clang doesn't work with OpenMP,
+# so it needs to be disabled for now.
+# This function comes from the yt project:
+# https://bitbucket.org/yt_analysis/yt/src/f7c75759e0395861b52d16921d8ce3ad6e36f89f/yt/utilities/lib/setup.py?at=yt
+
+
+def check_for_openmp():
+    # Create a temporary directory
+    tmpdir = tempfile.mkdtemp()
+    curdir = os.getcwd()
+    exit_code = 1
+
+    if os.name == 'nt':
+        return False
+
+    try:
+        os.chdir(tmpdir)
+
+        # Get compiler invocation
+        compiler = os.getenv('CC', 'cc')
+
+        # Attempt to compile a test script.
+        # See http://openmp.org/wp/openmp-compilers/
+        filename = r'test.c'
+        file = open(filename, 'wt', 1)
+        file.write(
+            """
+            #include <omp.h>
+            #include <stdio.h>
+            int main() {
+            #pragma omp parallel
+            printf("Hello from thread %d, nthreads %d",
+                    omp_get_thread_num(), omp_get_num_threads());
+            }
+            """
+        )
+        with open(os.devnull, 'w') as fnull:
+            exit_code = subprocess.call([compiler, '-fopenmp', filename],
+                                        stdout=fnull, stderr=fnull)
+
+        # Clean up
+        file.close()
+    finally:
+        os.chdir(curdir)
+        shutil.rmtree(tmpdir)
+
+    return exit_code == 0
+
 # We bundle tested versions of zlib & bzip2. To use the system zlib and bzip2
 # change setup.cfg or use the `--libraries z,bz2` parameter which will make our
 # custom build_ext command strip out the bundled versions.
@@ -48,24 +99,34 @@ BZIP2DIR = 'third-party/bzip2'
 
 BUILD_DEPENDS = []
 BUILD_DEPENDS.extend(path_join("lib", bn + ".hh") for bn in [
-    "khmer", "khmer_config", "kmer_hash", "hashtable", "counting",
-    "hashbits", "labelhash"])
+    "khmer", "kmer_hash", "hashtable", "counting", "hashbits", "labelhash",
+    "hllcounter"])
 
 SOURCES = ["khmer/_khmermodule.cc"]
 SOURCES.extend(path_join("lib", bn + ".cc") for bn in [
-    "khmer_config", "thread_id_map", "trace_logger", "perf_metrics",
-    "read_parsers", "kmer_hash", "hashtable", "hashbits", "labelhash",
-    "counting", "subset", "read_aligner"])
+    "trace_logger", "perf_metrics", "read_parsers", "kmer_hash", "hashtable",
+    "hashbits", "labelhash", "counting", "subset", "read_aligner",
+    "hllcounter"])
 
-EXTRA_COMPILE_ARGS = ['-O3']
+SOURCES.extend(path_join("third-party", "smhasher", bn + ".cc") for bn in [
+    "MurmurHash3"])
+
+EXTRA_COMPILE_ARGS = ['-O3', ]
+EXTRA_LINK_ARGS = []
 
 if sys.platform == 'darwin':
-    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])  # force 64bit only builds
+    # force 64bit only builds
+    EXTRA_COMPILE_ARGS.extend(['-arch', 'x86_64'])
+
+if check_for_openmp():
+    EXTRA_COMPILE_ARGS.extend(['-fopenmp'])
+    EXTRA_LINK_ARGS.extend(['-fopenmp'])
 
 EXTENSION_MOD_DICT = \
     {
         "sources": SOURCES,
         "extra_compile_args": EXTRA_COMPILE_ARGS,
+        "extra_link_args": EXTRA_LINK_ARGS,
         "depends": BUILD_DEPENDS,
         "language": "c++",
         "define_macros": [("VERSION", versioneer.get_version()), ],
@@ -128,6 +189,7 @@ SETUP_METADATA = \
 
 
 class KhmerBuildExt(_build_ext):  # pylint: disable=R0904
+
     """Specialized Python extension builder for khmer project.
 
     Only run the library setup when needed, not on every invocation.

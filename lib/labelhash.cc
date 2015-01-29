@@ -26,15 +26,8 @@ LabelHash::consume_fasta_and_tag_with_labels(
     CallbackFn	      callback,	    void *		callback_data
 )
 {
-    khmer:: Config    &the_config	  = khmer:: get_active_config( );
-
-    // Note: Always assume only 1 thread if invoked this way.
     IParser *	  parser =
-        IParser::get_parser(
-            filename, 1, the_config.get_reads_input_buffer_size( ),
-            the_config.get_reads_parser_trace_level( )
-        );
-
+        IParser::get_parser( filename );
 
     consume_fasta_and_tag_with_labels(
         parser,
@@ -52,9 +45,6 @@ LabelHash::consume_fasta_and_tag_with_labels(
     CallbackFn		    callback,	    void *		callback_data
 )
 {
-    Hasher		  &hasher		=
-        _get_hasher( parser->uuid( ) );
-    unsigned int		  total_reads_LOCAL	= 0;
 #if (0) // Note: Used with callback - currently disabled.
     unsigned long long int  n_consumed_LOCAL	= 0;
 #endif
@@ -63,11 +53,6 @@ LabelHash::consume_fasta_and_tag_with_labels(
     // TODO? Delete the following assignments.
     total_reads = 0;
     n_consumed = 0;
-
-    hasher.trace_logger(
-        TraceLogger:: TLVL_DEBUG2,
-        "Starting trace of 'consume_fasta_and_tag_with_labels'....\n"
-    );
 
     Label _tag_label = 0;
 
@@ -85,29 +70,13 @@ LabelHash::consume_fasta_and_tag_with_labels(
                                                   *the_label );
             _tag_label++;
 
-#ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.start_timers( );
-#endif
 #if (0) // Note: Used with callback - currently disabled.
             n_consumed_LOCAL  = __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #else
             __sync_add_and_fetch( &n_consumed, this_n_consumed );
 #endif
-            total_reads_LOCAL = __sync_add_and_fetch( &total_reads, 1 );
-#ifdef WITH_INTERNAL_METRICS
-            hasher.pmetrics.stop_timers( );
-            hasher.pmetrics.accumulate_timer_deltas(
-                (uint32_t)HashTablePerformanceMetrics:: MKEY_TIME_UPDATE_TALLIES
-            );
-#endif
+            __sync_add_and_fetch( &total_reads, 1 );
         }
-
-        if (0 == (total_reads_LOCAL % 10000))
-            hasher.trace_logger(
-                TraceLogger:: TLVL_DEBUG3,
-                "Total number of reads processed: %llu\n",
-                (unsigned long long int)total_reads_LOCAL
-            );
 
         // TODO: Figure out alternative to callback into Python VM
         //       Cannot use in multi-threaded operation.
@@ -129,11 +98,12 @@ LabelHash::consume_fasta_and_tag_with_labels(
 
 }
 
-void LabelHash::consume_partitioned_fasta_and_tag_with_labels(const std::string &filename,
-        unsigned int &total_reads,
-        unsigned long long &n_consumed,
-        CallbackFn callback,
-        void * callback_data)
+void LabelHash::consume_partitioned_fasta_and_tag_with_labels(
+    const std::string &filename,
+    unsigned int &total_reads,
+    unsigned long long &n_consumed,
+    CallbackFn callback,
+    void * callback_data)
 {
     total_reads = 0;
     n_consumed = 0;
@@ -243,7 +213,7 @@ void LabelHash::consume_sequence_and_tag_with_labels(const std::string& seq,
                     // TODO: MAKE THREADSAFE!
 
                     if (!_cmap_contains_label(tag_labels, kmer, current_label)) {
-printdbg(tag was not labeled: adding to labels...)
+                        printdbg(tag was not labeled: adding to labels...)
                         //ACQUIRE_TAG_COLORS_SPIN_LOCK
                         link_tag_and_label(kmer, current_label);
                         //RELEASE_TAG_COLORS_SPIN_LOCK
@@ -269,7 +239,7 @@ printdbg(tag was not labeled: adding to labels...)
 #endif
             //
             if (since >= _tag_density) {
-printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
+                printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
                 //ACQUIRE_ALL_TAGS_SPIN_LOCK
                 printdbg(in tag spin lock)
                 all_tags.insert(kmer);
@@ -289,7 +259,7 @@ printdbg(exceeded tag density: drop a tag and label -- getting tag lock)
             }
             printdbg(moving to next iter)
         } // iteration over kmers
-printdbg(finished iteration: dropping last tag)
+    printdbg(finished iteration: dropping last tag)
     if (since >= _tag_density/2 - 1) {
         //ACQUIRE_ALL_TAGS_SPIN_LOCK
         all_tags.insert(kmer);	// insert the last k-mer, too.
@@ -359,9 +329,10 @@ void LabelHash::traverse_labels_and_resolve(const SeenSet& tagged_kmers,
     }
 }
 
-LabelHash::~LabelHash() {
-	for (LabelPtrMap::iterator itr=label_ptrs.begin();
-			itr!=label_ptrs.end(); itr++) {
-		delete itr->second;
-	}
+LabelHash::~LabelHash()
+{
+    for (LabelPtrMap::iterator itr=label_ptrs.begin();
+            itr!=label_ptrs.end(); ++itr) {
+        delete itr->second;
+    }
 }

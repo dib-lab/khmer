@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -16,7 +16,7 @@ import sys
 import textwrap
 import khmer
 from khmer.khmer_args import (build_counting_args, info)
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 
 DEFAULT_SUBSET_SIZE = int(1e4)
 DEFAULT_COUNTING_HT_SIZE = 3e6                # number of bytes
@@ -62,6 +62,8 @@ def get_parser():
                         help="Use stoptags in this file during partitioning")
     parser.add_argument('graphbase', help='basename for input and output '
                         'filenames')
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -77,19 +79,19 @@ def main():
     if args.stoptags:
         infiles.append(args.stoptags)
     for _ in infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(infiles)
+    check_space(infiles, args.force)
 
-    print 'loading htable %s.pt' % graphbase
+    print >>sys.stderr, 'loading htable %s.pt' % graphbase
     htable = khmer.load_hashbits(graphbase + '.pt')
 
     # do we want to load stop tags, and do they exist?
     if args.stoptags:
-        print 'loading stoptags from', args.stoptags
+        print >>sys.stderr, 'loading stoptags from', args.stoptags
         htable.load_stop_tags(args.stoptags)
 
-    print 'loading tagset %s.tagset...' % graphbase
+    print >>sys.stderr, 'loading tagset %s.tagset...' % graphbase
     htable.load_tagset(graphbase + '.tagset')
 
     ksize = htable.ksize()
@@ -106,17 +108,17 @@ def main():
         start, end = divvy[:2]
 
     # partition!
-    print 'doing pre-partitioning from', start, 'to', end
+    print >>sys.stderr, 'doing pre-partitioning from', start, 'to', end
     subset = htable.do_subset_partition(start, end)
 
     # now, repartition...
-    print 'repartitioning to find HCKs.'
+    print >>sys.stderr, 'repartitioning to find HCKs.'
     htable.repartition_largest_partition(subset, counting,
                                          EXCURSION_DISTANCE,
                                          EXCURSION_KMER_THRESHOLD,
                                          EXCURSION_KMER_COUNT_THRESHOLD)
 
-    print 'saving stop tags'
+    print >>sys.stderr, 'saving stop tags'
     htable.save_stop_tags(graphbase + '.stoptags')
     print >> sys.stderr, 'wrote to:', graphbase + '.stoptags'
 

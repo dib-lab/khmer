@@ -10,7 +10,8 @@ namespace khmer
 {
 
 struct del_alignment_node_t {
-    del_alignment_node_t& operator()(AlignmentNode* p) {
+    del_alignment_node_t& operator()(AlignmentNode* p)
+    {
         delete p;
         return *this;
     }
@@ -340,6 +341,7 @@ Alignment* ReadAligner::ExtractAlignment(AlignmentNode* node,
     }
 
     if (!(node->seq_idx < read.length())) {
+        delete ret;
         throw khmer_exception();
     }
     std::string read_alignment = "";

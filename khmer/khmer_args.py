@@ -1,4 +1,5 @@
 #
+# vim: set encoding=utf-8
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
@@ -169,11 +170,14 @@ def add_threading_args(parser):
                         help='Number of simultaneous threads to execute')
 
 _algorithms = {
-    'software': 'MR Crusoe et al., 2014. doi: 10.6084/m9.figshare.979190',
-    'diginorm': "CT Brown et al., arXiv:1203.4802 [q-bio.GN]",
-    'graph': "J Pell et al., PNAS, 2014 (PMID 22847406)",
-    'counting': "Q Zhang et al., arXiv:1309.2975 [q-bio.GN]",
-    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished'
+    'software': 'MR Crusoe et al., '
+    '2014. http://dx.doi.org/10.6084/m9.figshare.979190',
+    'diginorm': 'CT Brown et al., arXiv:1203.4802 [q-bio.GN]',
+    'graph': 'J Pell et al., http://dx.doi.org/10.1073/pnas.1121464109',
+    'counting': 'Q Zhang et al., '
+    'http://dx.doi.org/10.1371/journal.pone.0101271',
+    'sweep': 'C Scott, MR Crusoe, and CT Brown, unpublished',
+    'SeqAn': 'A. Döring et al. http://dx.doi.org:80/10.1186/1471-2105-9-11'
 }
 
 

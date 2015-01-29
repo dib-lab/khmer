@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,7 +24,7 @@ import textwrap
 import sys
 
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 DEFAULT_NUM_READS = int(1e5)
@@ -67,6 +67,8 @@ def get_parser():
                         type=argparse.FileType('w'), default=None)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exits')
     return parser
 
 
@@ -82,9 +84,9 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.filenames)
+    check_space(args.filenames, args.force)
 
     # seed the random number generator?
     if args.random_seed:
@@ -102,21 +104,25 @@ def main():
         if num_samples > 1:
             sys.stderr.write(
                 "Error: cannot specify -o with more than one sample.")
-            sys.exit(-1)
+            if not args.force:
+                sys.exit(1)
         output_filename = output_file.name
     else:
         filename = args.filenames[0]
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
-        print 'Subsampling %d reads using reservoir sampling.' % args.num_reads
-        print 'Subsampled reads will be placed in %s' % output_filename
-        print ''
+        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' % \
+            args.num_reads
+        print >>sys.stderr, 'Subsampled reads will be placed in %s' % \
+            output_filename
+        print >>sys.stderr, ''
     else:  # > 1
-        print 'Subsampling %d reads, %d times, using reservoir sampling.' % \
-            (args.num_reads, num_samples)
-        print 'Subsampled reads will be placed in %s.N' % output_filename
-        print ''
+        print >>sys.stderr, 'Subsampling %d reads, %d times,' \
+            % (args.num_reads, num_samples), ' using reservoir sampling.'
+        print >>sys.stderr, 'Subsampled reads will be placed in %s.N' \
+            % output_filename
+        print >>sys.stderr, ''
 
     reads = []
     for n in range(num_samples):
@@ -126,14 +132,15 @@ def main():
 
     # read through all the sequences and load/resample the reservoir
     for filename in args.filenames:
-        print 'opening', filename, 'for reading'
+        print >>sys.stderr, 'opening', filename, 'for reading'
         for record in screed.open(filename):
             total += 1
 
             if total % 10000 == 0:
-                print '...', total, 'reads scanned'
+                print >>sys.stderr, '...', total, 'reads scanned'
                 if total >= args.max_reads:
-                    print 'reached upper limit of %d reads (see -M); exiting' \
+                    print >>sys.stderr, 'reached upper limit of %d reads',\
+                        ' (see -M); exiting' \
                         % args.max_reads
                     break
 
@@ -152,7 +159,8 @@ def main():
 
     # output all the subsampled reads:
     if len(reads) == 1:
-        print 'Writing %d sequences to %s' % (len(reads[0]), output_filename)
+        print >>sys.stderr, 'Writing %d sequences to %s' % \
+            (len(reads[0]), output_filename)
         if not output_file:
             output_file = open(output_filename, 'w')
 
@@ -161,7 +169,8 @@ def main():
     else:
         for n in range(num_samples):
             n_filename = output_filename + '.%d' % n
-            print 'Writing %d sequences to %s' % (len(reads[n]), n_filename)
+            print >>sys.stderr, 'Writing %d sequences to %s' % \
+                (len(reads[n]), n_filename)
             output_file = open(n_filename, 'w')
             for record in reads[n]:
                 output_file.write(output_single(record))

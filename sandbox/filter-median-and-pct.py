@@ -9,7 +9,7 @@
 Accept or discard sequences XXX, based on the given counting
 hash table.  Output sequences will be placed in 'infile.medpctfilt'.
 
-% python sandbox/filter-median-and-pct.py <counting.kh> <data1> [ <data2> <...> ]
+% python sandbox/filter-median-and-pct.py <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """
@@ -19,7 +19,7 @@ import os
 import khmer
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 
-from khmer.counting_args import build_counting_multifile_args
+from khmer.khmer_args import build_counting_args
 
 import random
 

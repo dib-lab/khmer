@@ -47,7 +47,7 @@ citation information.
 INSTALL INSTRUCTIONS:
 ---------------------
 
-khmer requires a 64-bit operating system and Python 2.7+. Linux users will need 
+khmer requires a 64-bit operating system and Python 2.7.x. Linux users will need
 the Python development libraries and gcc. OS X users may need XCode installed.
 
 In short:
@@ -55,7 +55,7 @@ In short:
 ``pip install khmer`` to download, build, and install the latest stable
 version.
 
-For more details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/install.html>`_
+For more details see `doc/install.txt <https://khmer.readthedocs.org/en/latest/user/install.html>`_
 
 The use of a virtualenv is recommended, see
 https://virtualenv.pypa.io/en/latest/virtualenv.html#installation

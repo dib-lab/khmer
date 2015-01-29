@@ -14,7 +14,7 @@
 namespace khmer
 {
 
-/// 
+///
 // A base class for all exceptions.
 //
 // All exceptions should be derived from this base class.
@@ -27,7 +27,10 @@ public:
         : _msg(msg.c_str()) { }
 
     virtual ~khmer_exception() throw() { }
-    virtual const char* what() const throw () { return _msg; }
+    virtual const char* what() const throw ()
+    {
+        return _msg;
+    }
 
 protected:
     const char * _msg;

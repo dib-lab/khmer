@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -20,7 +20,8 @@ import os
 import argparse
 import textwrap
 import khmer
-from khmer.file import check_file_status, check_space
+import sys
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 DEFAULT_K = 32
@@ -54,6 +55,8 @@ def get_parser():
                         'annotate.')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -67,21 +70,22 @@ def main():
 
     partitionmap_file = args.graphbase + '.pmap.merged'
 
-    check_file_status(partitionmap_file)
+    check_file_status(partitionmap_file, args.force)
     for _ in filenames:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(filenames)
+    check_space(filenames, args.force)
 
-    print 'loading partition map from:', partitionmap_file
+    print >>sys.stderr, 'loading partition map from:', partitionmap_file
     htable.load_partitionmap(partitionmap_file)
 
     for infile in filenames:
-        print 'outputting partitions for', infile
+        print >>sys.stderr, 'outputting partitions for', infile
         outfile = os.path.basename(infile) + '.part'
         part_count = htable.output_partitions(infile, outfile)
-        print 'output %d partitions for %s' % (part_count, infile)
-        print 'partitions are in', outfile
+        print >>sys.stderr, 'output %d partitions for %s' % (
+            part_count, infile)
+        print >>sys.stderr, 'partitions are in', outfile
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,7 +24,7 @@ import screed
 import argparse
 import textwrap
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
 
 DEFAULT_MAX_SIZE = int(1e6)
@@ -81,6 +81,8 @@ def get_parser():
                         help='Output unassigned sequences, too')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -94,24 +96,28 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     n_unassigned = 0
 
     for infile in args.part_filenames:
-        check_file_status(infile)
+        check_file_status(infile, args.force)
 
-    check_space(args.part_filenames)
+    check_space(args.part_filenames, args.force)
 
-    print '---'
-    print 'reading partitioned files:', repr(args.part_filenames)
+    print >>sys.stderr, '---'
+    print >>sys.stderr, 'reading partitioned files:', repr(args.part_filenames)
     if args.output_groups:
-        print 'outputting to files named "%s.groupN.fa"' % args.prefix
-        print 'min reads to keep a partition:', args.min_part_size
-        print 'max size of a group file:', args.max_size
+        print >>sys.stderr, 'outputting to files named "%s.groupN.fa"' % \
+            args.prefix
+        print >>sys.stderr, 'min reads to keep a partition:', \
+            args.min_part_size
+        print >>sys.stderr, 'max size of a group file:', args.max_size
     else:
-        print 'NOT outputting groups! Beware!'
+        print >>sys.stderr, 'NOT outputting groups! Beware!'
 
     if args.output_unassigned:
-        print 'outputting unassigned reads to "%s.unassigned.fa"' % args.prefix
-
-    print 'partition size distribution will go to %s' % distfilename
-    print '---'
+        print >>sys.stderr, \
+            'outputting unassigned reads to "%s.unassigned.fa"' % \
+            args.prefix
+    print >>sys.stderr, 'partition size distribution will go to %s' \
+        % distfilename
+    print >>sys.stderr, '---'
 
     #
 
@@ -142,7 +148,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for filename in args.part_filenames:
         for index, read, pid in read_partition_file(filename):
             if index % 100000 == 0:
-                print '...', index
+                print >>sys.stderr, '...', index
 
             count[pid] = count.get(pid, 0) + 1
 
@@ -205,9 +211,9 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             # print 'group_d', partition_id, group_n
         group_n += 1
 
-    print '%d groups' % group_n
+    print >>sys.stderr, '%d groups' % group_n
     if group_n == 0:
-        print 'nothing to output; exiting!'
+        print >>sys.stderr, 'nothing to output; exiting!'
         return
 
     # open a bunch of output files for the different groups
@@ -225,7 +231,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
         for index, read, partition_id in read_partition_file(filename):
             total_seqs += 1
             if index % 100000 == 0:
-                print '...x2', index
+                print >>sys.stderr, '...x2', index
 
             if partition_id == 0:
                 continue
@@ -242,16 +248,20 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             outfp.write(output_single(read))
             part_seqs += 1
 
-    print '---'
-    print 'Of %d total seqs,' % total_seqs
-    print 'extracted %d partitioned seqs into group files,' % part_seqs
-    print 'discarded %d sequences from small partitions (see -m),' % \
+    print >>sys.stderr, '---'
+    print >>sys.stderr, 'Of %d total seqs,' % total_seqs
+    print >>sys.stderr, 'extracted %d partitioned seqs into group files,' % \
+        part_seqs
+    print >>sys.stderr, \
+        'discarded %d sequences from small partitions (see -m),' % \
         toosmall_parts
-    print 'and found %d unpartitioned sequences (see -U).' % n_unassigned
-    print ''
-    print 'Created %d group files named %s.groupXXXX.%s' % (len(group_fps),
-                                                            args.prefix,
-                                                            suffix)
+    print >>sys.stderr, 'and found %d unpartitioned sequences (see -U).' % \
+        n_unassigned
+    print >>sys.stderr, ''
+    print >>sys.stderr, 'Created %d group files named %s.groupXXXX.%s' % \
+        (len(group_fps),
+         args.prefix,
+         suffix)
 
 if __name__ == '__main__':
     main()

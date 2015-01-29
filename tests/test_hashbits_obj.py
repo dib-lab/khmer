@@ -143,7 +143,6 @@ def test_bloom_c_2():  # simple one
     assert ht2.n_unique_kmers() == 3
 
 
-@attr('highmem')
 def test_filter_if_present():
     ht = khmer.Hashbits(32, 1e6, 2)
 
@@ -159,7 +158,6 @@ def test_filter_if_present():
     assert records[0]['name'] == '3'
 
 
-@attr('highmem')
 def test_combine_pe():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.Hashbits(32, 1, 1)
@@ -185,7 +183,6 @@ def test_combine_pe():
     assert ht.count_partitions() == (1, 0)
 
 
-@attr('highmem')
 def test_load_partitioned():
     inpfile = utils.get_test_data('combine_parts_1.fa')
     ht = khmer.Hashbits(32, 1, 1)
@@ -203,7 +200,6 @@ def test_load_partitioned():
     assert ht.get(s3)
 
 
-@attr('highmem')
 def test_count_within_radius_simple():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.Hashbits(4, 1e6, 2)
@@ -216,7 +212,6 @@ def test_count_within_radius_simple():
     assert n == 1
 
 
-@attr('highmem')
 def test_count_within_radius_big():
     inpfile = utils.get_test_data('random-20-a.fa')
     ht = khmer.Hashbits(20, 1e6, 4)
@@ -231,7 +226,6 @@ def test_count_within_radius_big():
     assert n == 39
 
 
-@attr('highmem')
 def test_count_kmer_degree():
     inpfile = utils.get_test_data('all-A.fa')
     ht = khmer.Hashbits(4, 1e6, 2)
@@ -241,36 +235,6 @@ def test_count_kmer_degree():
     assert ht.kmer_degree('AAAT') == 1
     assert ht.kmer_degree('AATA') == 0
     assert ht.kmer_degree('TAAA') == 1
-
-
-@attr('highmem')
-def test_find_radius_for_volume():
-    inpfile = utils.get_test_data('all-A.fa')
-    ht = khmer.Hashbits(4, 1e6, 2)
-    ht.consume_fasta(inpfile)
-
-    assert ht.find_radius_for_volume('AAAA', 0, 100) == 0
-    assert ht.find_radius_for_volume('AAAA', 1, 100) == 0
-    assert ht.find_radius_for_volume('AAAA', 2, 100) == 100
-
-
-def test_circumference():
-    ht = khmer.Hashbits(4, 1e6, 2)
-
-    ht.count('ATGC')
-    ht.count('GATG')
-    ht.count('ATGG')
-
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 2
-
-    ht.count('ATGA')
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 3, x
-
-    ht.count('TGAT')
-    x = ht.count_kmers_on_radius('GATG', 1, 200)
-    assert x == 4, x
 
 
 def test_save_load_tagset():
@@ -317,7 +281,6 @@ def test_save_load_tagset_noclear():
     assert len(data) == 34, len(data)
 
 
-@attr('highmem')
 def test_stop_traverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -339,7 +302,6 @@ def test_stop_traverse():
     assert n == 2, n
 
 
-@attr('highmem')
 def test_tag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -368,7 +330,6 @@ def test_tag_across_stoptraverse():
     assert n == 1, n
 
 
-@attr('highmem')
 def test_notag_across_stoptraverse():
     filename = utils.get_test_data('random-20-a.fa')
 
@@ -471,7 +432,6 @@ def test_extract_unique_paths_4():
     assert x == ['TGGAGAGACACAGATAGACAGG', 'TAGACAGGAGTGGCGAT']
 
 
-@attr('highmem')
 def test_find_unpart():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -494,7 +454,6 @@ def test_find_unpart():
     assert n == 1, n                     # all sequences connect
 
 
-@attr('highmem')
 def test_find_unpart_notraverse():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.even.fa')
@@ -517,7 +476,6 @@ def test_find_unpart_notraverse():
     assert n == 99, n                    # all sequences disconnected
 
 
-@attr('highmem')
 def test_find_unpart_fail():
     filename = utils.get_test_data('random-20-a.odd.fa')
     filename2 = utils.get_test_data('random-20-a.odd.fa')  # <- switch to odd
@@ -571,7 +529,7 @@ def test_badget():
     try:
         hbts.get("AGCTT")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -580,15 +538,17 @@ def test_bad_primes():
         countingtable = khmer._Hashbits.__new__(
             khmer._Hashbits, 6, ["a", "b", "c"])
         assert 0, "this should fail"
-    except TypeError, e:
+    except TypeError as e:
         print str(e)
 
 
 def test_consume_fasta_and_tag_with_badreads_parser():
     presencetable = khmer.Hashbits(6, 1e6, 2)
-    readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
     try:
+        readsparser = khmer.ReadParser(utils.get_test_data("test-empty.fa"))
         presencetable.consume_fasta_and_tag_with_reads_parser(readsparser)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
+        print str(e)
+    except ValueError, e:
         print str(e)

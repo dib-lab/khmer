@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2014. It is licensed under
+# Copyright (C) Michigan State University, 2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -9,14 +9,16 @@
 
 import sys
 import os
+import os.path
 import shutil
 from cStringIO import StringIO
 import traceback
 import nose
+import glob
+import imp
 
 import khmer_tst_utils as utils
 import khmer
-import khmer.file
 import screed
 
 
@@ -26,6 +28,56 @@ def scriptpath(script):
 
 def teardown():
     utils.cleanup()
+
+
+def test_import_all():
+    sandbox_path = os.path.join(os.path.dirname(__file__), "../sandbox")
+    if not os.path.exists(sandbox_path):
+        raise nose.SkipTest("sandbox scripts are only tested in a repository")
+
+    path = os.path.join(sandbox_path, "*.py")
+    scripts = glob.glob(path)
+    for s in scripts:
+        s = os.path.normpath(s)
+        yield _checkImportSucceeds('test_sandbox_scripts.py', s)
+
+
+class _checkImportSucceeds(object):
+    def __init__(self, tag, filename):
+        self.tag = tag
+        self.filename = filename
+        self.description = '%s: test import %s' % (self.tag,
+                                                   os.path.split(filename)[-1])
+
+    def __call__(self):
+        try:
+            mod = imp.load_source('__zzz', self.filename)
+        except:
+            print traceback.format_exc()
+            raise AssertionError("%s cannot be imported" % (self.filename,))
+
+        ###
+
+        oldargs = sys.argv
+        sys.argv = [self.filename]
+
+        oldout, olderr = sys.stdout, sys.stderr
+        sys.stdout = StringIO()
+        sys.stderr = StringIO()
+
+        try:
+            try:
+                global_dict = {'__name__': '__main__'}
+                execfile(self.filename, global_dict)
+            except (ImportError, SyntaxError):
+                print traceback.format_exc()
+                raise AssertionError("%s cannot be exec'd" % (self.filename,))
+            except:
+                pass                        # other failures are expected :)
+        finally:
+            sys.argv = oldargs
+            out, err = sys.stdout.getvalue(), sys.stderr.getvalue()
+            sys.stdout, sys.stderr = oldout, olderr
 
 
 def test_sweep_reads():
@@ -166,3 +218,144 @@ def test_sweep_reads_3():
     assert os.path.exists(counts_fn)
     assert os.path.exists(os.path.join(wdir, 'test.dist.txt'))
     assert not os.path.exists(os.path.join(wdir, 'test_multi.fa'))
+
+
+def test_trim_low_abund_1():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_trim_low_abund_1_duplicate_filename_err():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile]
+    try:
+        utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+        raise Exception("should not reach this")
+    except AssertionError:
+        # an error should be raised by passing 'infile' twice.
+        pass
+
+
+def test_trim_low_abund_2():
+    infile = utils.get_temp_filename('test.fa')
+    infile2 = utils.get_temp_filename('test2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+# make sure that FASTQ records are retained.
+
+
+def test_trim_low_abund_3_fq_retained():
+    infile = utils.get_temp_filename('test.fq')
+    infile2 = utils.get_temp_filename('test2.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile2)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+    # check for 'accuracy' string.
+    seqs = set([r.accuracy for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert '##################' in seqs
+
+
+# test that the -V option does not trim sequences that are low abundance
+
+
+def test_trim_low_abund_4_retain_low_abund():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', infile]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+# test that the -V option *does* trim sequences that are low abundance
+
+
+def test_trim_low_abund_5_trim_high_abund():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', infile]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+
+    # trimmed sequence @ error
+    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGC' in seqs
+
+# test that -V/-Z setting - should not trip if -Z is set high enough.
+
+
+def test_trim_low_abund_6_trim_high_abund_Z():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', '-Z', '25', infile]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+
+    # untrimmed seq.
+    badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
+             'GATTTCCGGGCGG'
+    assert badseq in seqs       # should be there, untrimmed

@@ -10,12 +10,21 @@ We are still in the middle of triaging and documenting the various scripts.
 
 ----
 
+Scripts with recipes:
+
+* calc-median-distribution.py - plot coverage distribution; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
+* collect-reads.py - subsample reads until a particular average coverage; see `khmer-recipes #2 <https://github.com/ged-lab/khmer-recipes/tree/master/002-collect-subset-of-high-coverage>`__
+* saturate-by-median.py - calculate collector's curve on shotgun sequencing; see `khmer-recipes #4 <https://github.com/ged-lab/khmer-recipes/tree/master/004-estimate-sequencing-saturation>`__
+* slice-reads-by-coverage.py - extract reads based on coverage; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
+
 To keep, document, and build recipes for:
 
 * abundance-hist-by-position.py - look at abundance of k-mers by position within read; use with fasta-to-abundance-hist.py
 * assemstats3.py - print out assembly statistics
 * calc-best-assembly.py - calculate the "best assembly" - used in metagenome protocol
+* calc-error-profile.py - calculate a per-base "error profile" for shotgun sequencing data, w/o a reference.
 * calc-median-distribution.py - plot coverage distribution; see `khmer-recipes #1 <https://github.com/ged-lab/khmer-recipes/tree/master/001-extract-reads-by-coverage>`__
+* collect-variants.py
 * combine-pe.py - combine partitions based on shared PE reads.
 * compare-partitions.py
 * dn-identify-errors.py - prototype script to identify errors in reads based on diginorm principles
@@ -34,7 +43,6 @@ To keep, document, and build recipes for:
 * print-tagset.py - print out the tagset k-mers
 * readstats.py - print out read statistics
 * renumber-partitions.py - systematically renumber partitions
-* saturate-by-median.py - calculate collector's curve on shotgun sequencing; see `khmer-recipes #4 <https://github.com/ged-lab/khmer-recipes/tree/master/004-estimate-sequencing-saturation>`__
 * shuffle-fasta.py - FASTA file shuffler for small FASTA files
 * shuffle-reverse-rotary.py - FASTA file shuffler for larger FASTA files
 * split-fasta.py - break a FASTA file up into smaller chunks
@@ -48,7 +56,7 @@ To keep, document, and build recipes for:
 * sweep-reads2.py - various ways to extract reads based on k-mer overlap
 * sweep-reads3.py - various ways to extract reads based on k-mer overlap
 * to-casava-1.8-fastq.py - convert reads to different Casava format
-* trim-low-abund.py - streaming version of filter-abund.
+* trim-low-abund.py - streaming k-mer abundance trimming; see filter-abund for non-streaming, and look to `khmer-recipes #6 <https://github.com/ged-lab/khmer-recipes/blob/master/006-streaming-sequence-trimming/index.rst>`__ for usage.
 * write-trimmomatic.py
 
 Good ideas to rewrite using newer tools/approaches:
