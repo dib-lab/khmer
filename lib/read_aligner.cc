@@ -425,6 +425,7 @@ Alignment* ReadAligner::Align(const std::string& read)
     start.k_cov = 0;
     start.kmer_idx = 0;
 
+#if 0
     for (size_t i = 0; i < num_kmers; i++) {
         std::string kmer = read.substr(i, k);
 
@@ -435,6 +436,10 @@ Alignment* ReadAligner::Align(const std::string& read)
             start.kmer = kmer;
         }
     }
+#endif 0
+    start.kmer = read.substr(0, k);
+    start.kmer_idx = 0;
+    start.k_cov = m_ch->get_count(start.kmer.c_str());
 
     if(start.k_cov > 0) {
         HashIntoType fhash = 0, rhash = 0;
@@ -480,6 +485,7 @@ Alignment* ReadAligner::Align(const std::string& read)
             startingNode.score = k * m_sm.untrusted_match + k * m_sm.tsc[MM];
         }
 
+#if 0
         forward = Subalign(&startingNode, read.length(), true, read);
         final_length = forward->read_alignment.length() + k;
 
@@ -512,6 +518,33 @@ Alignment* ReadAligner::Align(const std::string& read)
         delete forward;
         delete reverse;
         return ret;
+#else
+        forward = Subalign(&startingNode, read.length(), true, read);
+        final_length = forward->read_alignment.length() + k;
+
+        Alignment* ret = new Alignment;
+        //We've actually counted the starting node score
+        //twice, so we need to adjust for that
+        ret->score = forward->score;
+        ret->read_alignment = start.kmer + forward->read_alignment;
+        ret->graph_alignment = start.kmer + forward->graph_alignment;
+        ret->score = ret->score -  GetNull(final_length);
+        ret->truncated = forward->truncated;
+
+#if READ_ALIGNER_DEBUG
+        fprintf(stderr,
+                "FORWARD\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
+                forward->read_alignment.c_str(), forward->graph_alignment.c_str(),
+                forward->score, forward->truncated);
+        fprintf(stderr,
+                "REVERSE\n\tread_aln:%s\n\tgraph_aln:%s\n\tscore:%f\n\ttrunc:%d\n",
+                reverse->read_alignment.c_str(), reverse->graph_alignment.c_str(),
+                reverse->score, reverse->truncated);
+#endif
+
+        delete forward;
+        return ret;
+#endif
     } else {
 
         Alignment* ret = new Alignment;
