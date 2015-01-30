@@ -19,6 +19,7 @@ Use '-h' for parameter help.
 import argparse
 import screed
 import sys
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -43,20 +44,7 @@ def main():
     for filename in args.input_filenames:
         for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
-                # FASTQ
-                if hasattr(record, 'accuracy'):
-                    outfp.write(
-                        '@{name}\n{seq}\n'
-                        '+\n{acc}\n'.format(name=record.name,
-                                            seq=record.sequence,
-                                            acc=record.accuracy))
-
-                # FASTA
-                else:
-                    outfp.write(
-                        '>{name}\n{seq}\n'.format(name=record.name,
-                                                  seq=record.sequence))
-
+                write_record(record, outfp)
     print >> sys.stderr, 'wrote to: ' + args.output
 
 if __name__ == '__main__':
