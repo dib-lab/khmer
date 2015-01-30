@@ -21,6 +21,7 @@ import argparse
 import os
 from khmer.kfile import check_file_status
 from khmer.khmer_args import info
+from khmer.utils import write_record
 
 
 def get_parser():

@@ -26,6 +26,7 @@ import textwrap
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
+from khmer.utils import write_record
 
 DEFAULT_MAX_SIZE = int(1e6)
 DEFAULT_THRESHOLD = 5
@@ -36,13 +37,6 @@ def read_partition_file(filename):
                                           (filename, parse_description=False)):
         _, partition_id = record.name.rsplit('\t', 1)
         yield record_index, record, int(partition_id)
-
-
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
 
 
 def get_parser():
@@ -155,7 +149,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
             if pid == 0:
                 n_unassigned += 1
                 if args.output_unassigned:
-                    print >>unassigned_fp, output_single(read)
+                    write_record(read, unassigned_fp)
 
     if args.output_unassigned:
         unassigned_fp.close()
@@ -245,7 +239,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
 
             outfp = group_fps[group_n]
 
-            outfp.write(output_single(read))
+            write_record(read, outfp)
             part_seqs += 1
 
     print >>sys.stderr, '---'
