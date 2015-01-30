@@ -26,6 +26,7 @@ from khmer.khmer_args import (build_counting_args, add_loadhash_args,
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
+from khmer.utils import write_record
 DEFAULT_DESIRED_COVERAGE = 10
 
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
@@ -79,6 +80,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         total += batch_size
 
         # If in paired mode, check that the reads are properly interleaved
+
         if args.paired:
             if not validpair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs \
@@ -103,16 +105,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         # Emit records if any passed
         if passed_length and passed_filter:
             for record in batch:
-                if hasattr(record, 'accuracy'):
-                    outfp.write(
-                        '@{name}\n{seq}\n'
-                        '+\n{acc}\n'.format(name=record.name,
-                                            seq=record.sequence,
-                                            acc=record.accuracy))
-                else:
-                    outfp.write(
-                        '>{name}\n{seq}\n'.format(name=record.name,
-                                                  seq=record.sequence))
+                write_record(record, outfp)
         else:
             discarded += batch_size
 
