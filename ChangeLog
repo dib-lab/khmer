@@ -1,9 +1,31 @@
+2015-01-25  Titus Brown  <titus@idyll.org>
+
+   * sandbox/correct-errors.py: fixed sequence output so that quality
+   scores length always matches the sequence length; fixed argparse
+   setup to make use of default parameter.
+
+2015-01-25  Titus Brown  <titus@idyll.org>
+
+    * sandbox/readstats.py: fixed non-functional string interpolation at end;
+    added -o to send output to a file; moved to scripts/.
+    * doc/user/scripts.txt: added readstats description.
+    * tests/test_scripts.py: added tests for readstats.py
+
 2015-01-23  Jessica Mizzi  <mizzijes@msu.edu>
 
     * khmer/utils.py: Added single write_record fuction to write FASTA/Q
     * scripts/{abundance-dist,extract-long-sequences,extract-partitions,
     interleave-reads,normalize-by-median,sample-reads-randomly}.py: 
     Replaced FASTA/Q writing method with write_record
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * Makefile: remove the user installs for the `install-dependencies` target
+
+2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * README.rst,doc/user/install.txt: clarify that we support Python 2.7.x
+    and not Python 3.
 
 2015-01-21  Luiz Irber  <irberlui@msu.edu>
 
@@ -32,7 +54,7 @@
     load-into-counting}.py,tests/test_{counting_hash,hashbits,scripts}.py:
     remove references to ".kh" files replaces with ".pt" or ".ct" as
     appropriate
-    * tests/test-data/{bad-vesionk12,normC20k20}.kh: renamed to "*.ct"
+    * tests/test-data/{bad-versionk12,normC20k20}.kh: renamed to "*.ct"
 
 2015-01-13  Daniel Standage  <daniel.standage@gmail.com>
 
