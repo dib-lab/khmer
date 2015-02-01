@@ -1326,6 +1326,47 @@ static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
     return Py_BuildValue("K", n_consumed);
 }
 
+static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * seq;
+
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+
+    std::vector<unsigned int> posns;
+    std::vector<HashIntoType> tags;
+    try {
+        unsigned int pos = 1;
+        KMerIterator kmers(seq, counting->ksize());
+
+        while (!kmers.done()) {
+            HashIntoType kmer = kmers.next();
+            if (set_contains(counting->all_tags, kmer)) {
+                 posns.push_back(pos);
+                 tags.push_back(kmer);
+            }
+            pos++;
+        }
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_ValueError, e.get_message().c_str());
+        return NULL;
+    }
+
+    PyObject * posns_list = PyList_New(posns.size());
+    for (size_t i = 0; i < posns.size(); i++) {
+        PyObject * tup = Py_BuildValue("IK", posns[i], tags[i]);
+        PyList_SET_ITEM(posns_list, i, tup);
+    }
+
+    return posns_list;
+}
+
 static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1485,6 +1526,7 @@ static PyMethodDef khmer_counting_methods[] = {
         METH_VARARGS, ""
     },
     { "consume_and_tag", hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
+    { "get_tags_and_positions", hash_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
     { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
     { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
