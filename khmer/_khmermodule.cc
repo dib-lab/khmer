@@ -4096,8 +4096,38 @@ static PyObject * readaligner_align(PyObject * self, PyObject * args)
     return ret;
 }
 
+static PyObject * readaligner_align_forward(PyObject * self, PyObject * args)
+{
+    khmer_ReadAlignerObject * me = (khmer_ReadAlignerObject *) self;
+    ReadAligner * aligner = me->aligner;
+
+    const char * read;
+
+    if (!PyArg_ParseTuple(args, "s", &read)) {
+        return NULL;
+    }
+
+    /*if (strlen(read) < (unsigned int)aligner->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashtable k-mer size");
+        return NULL;
+    }*/
+
+    Alignment * aln;
+    aln = aligner->AlignForward(read);
+
+    const char* alignment = aln->graph_alignment.c_str();
+    const char* readAlignment = aln->read_alignment.c_str();
+    PyObject * ret = Py_BuildValue("dssO", aln->score, alignment,
+                                   readAlignment, (aln->truncated)? Py_True : Py_False);
+    delete aln;
+
+    return ret;
+}
+
 static PyMethodDef khmer_ReadAligner_methods[] = {
     {"align", readaligner_align, METH_VARARGS, ""},
+    {"align_forward", readaligner_align_forward, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 

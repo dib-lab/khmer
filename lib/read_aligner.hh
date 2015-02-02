@@ -206,6 +206,7 @@ private:
 
 public:
     Alignment* Align(const std::string&);
+    Alignment* AlignForward(const std::string&);
 
     ReadAligner(khmer::CountingHash* ch,
                 BoundedCounterType trusted_cutoff, double bits_theta)
