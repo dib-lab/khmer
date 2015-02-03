@@ -1540,6 +1540,43 @@ def test_split_paired_reads_2_fq():
     assert n > 0
 
 
+def test_split_paired_reads_3_output_dir():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fq.1')
+    in_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fq.2', in_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = [infile, '--output-dir', in_dir]
+
+    utils.runscript(script, args, in_dir)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
 def test_sample_reads_randomly():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)

@@ -16,7 +16,7 @@ Reads FASTQ and FASTA input, retains format for output.
 """
 import screed
 import sys
-import os.path
+import os
 import textwrap
 import argparse
 import khmer
@@ -40,6 +40,10 @@ def get_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infile')
+    parser.add_argument('-o', '--output-dir', metavar="output_directory",
+                        dest='output_directory', default='', help='Output '
+                        'split reads to specified directory. Creates '
+                        'directory if necessary')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -57,8 +61,15 @@ def main():
     filenames = [infile]
     check_space(filenames, args.force)
 
-    out1 = os.path.basename(infile) + '.1'
-    out2 = os.path.basename(infile) + '.2'
+    if args.output_directory:
+        if not os.path.exists(args.output_directory):
+            os.makedirs(args.output_directory)
+        out1 = args.output_directory + '/' + os.path.basename(infile) + '.1'
+        out2 = args.output_directory + '/' + os.path.basename(infile) + '.2'
+    else:
+        out1 = os.path.basename(infile) + '.1'
+        out2 = os.path.basename(infile) + '.2'
+
     fp_out1 = open(out1, 'w')
     fp_out2 = open(out2, 'w')
 
