@@ -186,7 +186,7 @@ def test_align_fwd_middle_trunc_2():
 
 
 def test_simple_readalign():
-    return # DISABLED @CTB
+    return  # DISABLED @CTB
     ch = khmer.new_counting_hash(10, 1048576, 1)
     aligner = khmer.new_readaligner(ch, 2, 0)
     for i in range(20):
@@ -206,7 +206,7 @@ def test_simple_readalign():
 
 
 def test_readalign():
-    return # DISABLED!
+    return  # DISABLED!
     ch = khmer.new_counting_hash(10, 1048576, 1)
     aligner = khmer.new_readaligner(ch, 1, 0)
     for i in range(20):
@@ -368,7 +368,7 @@ queries = [
 
 
 def test_readalign_new():
-    return # DISABLED
+    return  # DISABLED
     ch = khmer.new_counting_hash(32, 1048576, 1)
     aligner = khmer.new_readaligner(ch, 1, 0)
     for seq in ht_seqs:
