@@ -204,6 +204,15 @@ private:
         return ret;
     }
 
+    Alignment * _empty_alignment() {
+        Alignment* ret = new Alignment;
+        ret->score = -std::numeric_limits<double>::infinity();
+        ret->read_alignment = "";
+        ret->graph_alignment = "";
+        ret->truncated = true;
+        return ret;
+    }
+
 public:
     Alignment* Align(const std::string&);
     Alignment* AlignForward(const std::string&);

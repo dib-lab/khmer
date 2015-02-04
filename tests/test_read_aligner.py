@@ -41,6 +41,22 @@ def neq_(v1, v2):
     assert v1 != v2, (v1, v2)
 
 
+def test_align_nothing():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "ACCAAGGCTCGAGATTTACC"
+
+    aligner = khmer.new_readaligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    score, graphAlign, readAlign, trunc = aligner.align(read)
+
+    print score, graphAlign, readAlign
+
+    assert trunc
+    assert len(graphAlign) == 0
+    assert len(readAlign) == 0
+
+
 def test_alignnocov():
     ch = khmer.new_counting_hash(10, 1048576, 1)
     read = "ACCTAGGTTCGACATGTACC"
@@ -113,6 +129,22 @@ def test_align_middle_trunc_2():
 
     # ...but truncated
     assert trunc
+
+
+def test_align_fwd_nothing():
+    ch = khmer.new_counting_hash(10, 1048576, 1)
+    read = "ACCAAGGCTCGAGATTTACC"
+
+    aligner = khmer.new_readaligner(ch, 0, 0)
+    for i in range(20):
+        ch.consume("AGAGGGAAAGCTAGGTTCGACAAGTCCTTGACAGAT")
+    score, graphAlign, readAlign, trunc = aligner.align_forward(read)
+
+    print score, graphAlign, readAlign
+
+    assert trunc
+    assert len(graphAlign) == 0
+    assert len(readAlign) == 0
 
 
 def test_align_fwd_nocov():
