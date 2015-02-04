@@ -9,6 +9,29 @@
 namespace khmer
 {
 
+static Nucl _ch_to_nucl(char base)
+{
+    base = toupper(base);
+
+    Nucl e = A;
+    switch(base) {
+    case 'A':
+        e = A;
+        break;
+    case 'C':
+        e = C;
+        break;
+    case 'G':
+        e = G;
+        break;
+    case 'T':
+    case 'U':
+        e = T;
+        break;
+    }
+    return e;
+}
+
 struct del_alignment_node_t {
     del_alignment_node_t& operator()(AlignmentNode* p)
     {
@@ -452,24 +475,7 @@ Alignment* ReadAligner::Align(const std::string& read)
                   << " emission: " << start.kmer[k - 1] << std::endl;
 #endif
 
-    char base = toupper(start.kmer[k - 1]);
-    Nucl e = A;
-    switch(base) {
-    case 'A':
-       e = A;
-       break;
-    case 'C':
-       e = C;
-       break;
-    case 'G':
-       e = G;
-       break;
-    case 'T':
-    case 'U':
-       e = T;
-       break;
-    }
-
+    Nucl e = _ch_to_nucl(start.kmer[k - 1]);
     AlignmentNode startingNode = AlignmentNode(NULL,
                                                e, start.kmer_idx + k - 1,
                                                MATCH, MM, fhash, rhash, k);
@@ -548,24 +554,7 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
                   << " emission: " << start.kmer[k - 1] << std::endl;
 #endif
 
-    char base = toupper(start.kmer[k - 1]);
-    Nucl e = A;
-    switch(base) {
-    case 'A':
-        e = A;
-        break;
-    case 'C':
-        e = C;
-        break;
-    case 'G':
-        e = G;
-        break;
-    case 'T':
-    case 'U':
-        e = T;
-        break;
-    }
-
+    Nucl e = _ch_to_nucl(start.kmer[k - 1]);
     AlignmentNode startingNode = AlignmentNode(NULL,
                                                e, start.kmer_idx + k - 1,
                                                MATCH, MM, fhash, rhash, k);
@@ -606,5 +595,4 @@ Alignment* ReadAligner::AlignForward(const std::string& read)
     delete forward;
     return ret;
 }
-
 }
