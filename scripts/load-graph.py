@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -20,8 +20,8 @@ import threading
 import khmer
 from khmer.khmer_args import build_hashbits_args
 from khmer.khmer_args import (report_on_config, info, add_threading_args)
-from khmer.file import check_file_status, check_space
-from khmer.file import check_space_for_hashtable
+from khmer.kfile import check_file_status, check_space
+from khmer.kfile import check_space_for_hashtable
 
 
 def get_parser():
@@ -46,7 +46,7 @@ def get_parser():
 
 
 def main():
-    info('load-graph.py', ['graph'])
+    info('load-graph.py', ['graph', 'SeqAn'])
     args = get_parser().parse_args()
     report_on_config(args, hashtype='hashbits')
 

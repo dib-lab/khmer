@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,8 +24,9 @@ import textwrap
 import sys
 
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
+from khmer.utils import write_record
 
 DEFAULT_NUM_READS = int(1e5)
 DEFAULT_MAX_READS = int(1e8)
@@ -165,7 +166,7 @@ def main():
             output_file = open(output_filename, 'w')
 
         for record in reads[0]:
-            output_file.write(output_single(record))
+            write_record(record, output_file)
     else:
         for n in range(num_samples):
             n_filename = output_filename + '.%d' % n
@@ -173,7 +174,7 @@ def main():
                 (len(reads[n]), n_filename)
             output_file = open(n_filename, 'w')
             for record in reads[n]:
-                output_file.write(output_single(record))
+                write_record(record, output_file)
 
 if __name__ == '__main__':
     main()

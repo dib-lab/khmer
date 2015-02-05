@@ -1,6 +1,6 @@
 //
 // This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-// Copyright (C) Michigan State University, 2009-2013. It is licensed under
+// Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
 //
@@ -22,6 +22,7 @@
 #include "read_aligner.hh"
 #include "labelhash.hh"
 #include "khmer_exception.hh"
+#include "hllcounter.hh"
 
 using namespace khmer;
 
@@ -4201,6 +4202,211 @@ static void khmer_subset_dealloc(PyObject* self)
     PyObject_Del((PyObject *) obj);
 }
 
+
+/***********************************************************************/
+
+//
+// KHLLCounter object
+//
+
+typedef struct {
+    PyObject_HEAD
+    khmer::HLLCounter * hllcounter;
+} khmer_KHLLCounter_Object;
+
+static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
+                                      PyObject * kwds)
+{
+    khmer_KHLLCounter_Object * self;
+    self = (khmer_KHLLCounter_Object *)type->tp_alloc(type, 0);
+
+    if (self != NULL) {
+        double error_rate = 0;
+        WordLength ksize = 0;
+
+        if (!PyArg_ParseTuple(args, "db", &error_rate, &ksize)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        if ((error_rate < 0) || (error_rate > 1.0)) {
+            Py_DECREF(self);
+            PyErr_SetString(PyExc_ValueError,
+                            "Error rate should be between 0.0 and 1.0");
+            return NULL;
+        }
+
+        try {
+            self->hllcounter = new HLLCounter(error_rate, ksize);
+        } catch (khmer_exception &e) {
+            Py_DECREF(self);
+            PyErr_SetString(PyExc_ValueError, e.what());
+            return NULL;
+        }
+    }
+
+    return (PyObject *) self;
+}
+
+//
+// khmer_hllcounter_dealloc -- clean up a hllcounter object.
+//
+
+static void khmer_hllcounter_dealloc(khmer_KHLLCounter_Object * obj)
+{
+    delete obj->hllcounter;
+    obj->hllcounter = NULL;
+
+    obj->ob_type->tp_free((PyObject*)obj);
+}
+
+static
+PyObject *
+hllcounter_add(khmer_KHLLCounter_Object * me, PyObject * args)
+{
+    const char * kmer_str;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
+        return NULL;
+    }
+
+    try {
+        me->hllcounter->add(kmer_str);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static
+PyObject *
+hllcounter_estimate_cardinality(khmer_KHLLCounter_Object * me, PyObject * args)
+{
+    if (!PyArg_ParseTuple( args, "" )) {
+        return NULL;
+    }
+
+    return PyLong_FromLong(me->hllcounter->estimate_cardinality());
+}
+
+static
+PyObject *
+hllcounter_consume_string(khmer_KHLLCounter_Object * me, PyObject * args)
+{
+    const char * kmer_str;
+    unsigned long long n_consumed;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer_str)) {
+        return NULL;
+    }
+
+    try {
+        n_consumed = me->hllcounter->consume_string(kmer_str);
+    } catch (khmer_exception &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return NULL;
+    }
+
+    return PyLong_FromLong(n_consumed);
+}
+
+static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
+        PyObject * args)
+{
+    const char * filename;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+    unsigned long long  n_consumed    = 0;
+    unsigned int        total_reads   = 0;
+    try {
+        me->hllcounter->consume_fasta(filename, total_reads, n_consumed);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
+
+    return Py_BuildValue("IK", total_reads, n_consumed);
+}
+
+static PyMethodDef khmer_hllcounter_methods[] = {
+    {
+        "add", (PyCFunction)hllcounter_add,
+        METH_VARARGS,
+        "Add a k-mer to the counter."
+    },
+    {
+        "estimate_cardinality", (PyCFunction)hllcounter_estimate_cardinality,
+        METH_VARARGS,
+        "Return the current estimation."
+    },
+    {
+        "consume_string", (PyCFunction)hllcounter_consume_string,
+        METH_VARARGS,
+        "Break a sequence into k-mers and add each k-mer to the counter."
+    },
+    {
+        "consume_fasta", (PyCFunction)hllcounter_consume_fasta,
+        METH_VARARGS,
+        "Read sequences from file, break into k-mers, "
+        "and add each k-mer to the counter."
+    },
+    {NULL} /* Sentinel */
+};
+
+static PyTypeObject khmer_KHLLCounter_Type = {
+    PyObject_HEAD_INIT(NULL)
+    0,                                         /* ob_size */
+    "khmer.KHLLCounter",                       /* tp_name */
+    sizeof(khmer_KHLLCounter_Object),          /* tp_basicsize */
+    0,                                         /* tp_itemsize */
+    (destructor)khmer_hllcounter_dealloc,      /* tp_dealloc */
+    0,                                         /* tp_print */
+    0,                                         /* tp_getattr */
+    0,                                         /* tp_setattr */
+    0,                                         /* tp_compare */
+    0,                                         /* tp_repr */
+    0,                                         /* tp_as_number */
+    0,                                         /* tp_as_sequence */
+    0,                                         /* tp_as_mapping */
+    0,                                         /* tp_hash */
+    0,                                         /* tp_call */
+    0,                                         /* tp_str */
+    0,                                         /* tp_getattro */
+    0,                                         /* tp_setattro */
+    0,                                         /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  /* tp_flags */
+    "HyperLogLog counter",                     /* tp_doc */
+    0,                                         /* tp_traverse */
+    0,                                         /* tp_clear */
+    0,                                         /* tp_richcompare */
+    0,                                         /* tp_weaklistoffset */
+    0,                                         /* tp_iter */
+    0,                                         /* tp_iternext */
+    khmer_hllcounter_methods,                  /* tp_methods */
+    0,                                         /* tp_members */
+    0,                                         /* tp_getset */
+    0,                                         /* tp_base */
+    0,                                         /* tp_dict */
+    0,                                         /* tp_descr_get */
+    0,                                         /* tp_descr_set */
+    0,                                         /* tp_dictoffset */
+    0,                                         /* tp_init */
+    0,                                         /* tp_alloc */
+    khmer_hllcounter_new,                      /* tp_new */
+};
+
+#define is_hllcounter_obj(v)  ((v)->ob_type == &khmer_KHLLCounter_Type)
+
+
 //////////////////////////////
 // standalone functions
 
@@ -4259,6 +4465,28 @@ static PyObject * reverse_hash(PyObject * self, PyObject * args)
     }
 
     return PyString_FromString(_revhash(val, ksize).c_str());
+}
+
+static PyObject * murmur3_forward_hash(PyObject * self, PyObject * args)
+{
+    const char * kmer;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
+
+    return PyLong_FromUnsignedLongLong(_hash_murmur(kmer));
+}
+
+static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
+{
+    const char * kmer;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
+
+    return PyLong_FromUnsignedLongLong(_hash_murmur_forward(kmer));
 }
 
 static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
@@ -4338,6 +4566,20 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,       "",
     },
     {
+        "hash_murmur3",
+        murmur3_forward_hash,
+        METH_VARARGS,
+        "Calculate the hash value of a k-mer using MurmurHash3 "
+        "(with reverse complement)",
+    },
+    {
+        "hash_no_rc_murmur3",
+        murmur3_forward_hash_no_rc,
+        METH_VARARGS,
+        "Calculate the hash value of a k-mer using MurmurHash3 "
+        "(no reverse complement)",
+    },
+    {
         "set_reporting_callback",   set_reporting_callback,
         METH_VARARGS,       "",
     },
@@ -4370,6 +4612,10 @@ init_khmer(void)
         return;
     }
 
+    if (PyType_Ready(&khmer_KHLLCounter_Type) < 0) {
+        return;
+    }
+
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
                         "interface for the khmer module low-level extensions" );
@@ -4396,6 +4642,9 @@ init_khmer(void)
 
     Py_INCREF(&khmer_KLabelHashType);
     PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+
+    Py_INCREF(&khmer_KHLLCounter_Type);
+    PyModule_AddObject(m, "_HLLCounter", (PyObject *)&khmer_KHLLCounter_Type);
 }
 
 // vim: set ft=cpp sts=4 sw=4 tw=79:

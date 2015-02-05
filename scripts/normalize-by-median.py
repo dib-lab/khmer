@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -24,8 +24,9 @@ from itertools import izip
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
                               report_on_config, info)
 import argparse
-from khmer.file import (check_space, check_space_for_hashtable,
-                        check_valid_file_exists)
+from khmer.kfile import (check_space, check_space_for_hashtable,
+                         check_valid_file_exists)
+from khmer.utils import write_record
 DEFAULT_DESIRED_COVERAGE = 10
 
 MAX_FALSE_POSITIVE_RATE = 0.8             # see Zhang et al.,
@@ -79,6 +80,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         total += batch_size
 
         # If in paired mode, check that the reads are properly interleaved
+
         if args.paired:
             if not validpair(batch[0], batch[1]):
                 raise IOError('Error: Improperly interleaved pairs \
@@ -103,16 +105,7 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         # Emit records if any passed
         if passed_length and passed_filter:
             for record in batch:
-                if hasattr(record, 'accuracy'):
-                    outfp.write(
-                        '@{name}\n{seq}\n'
-                        '+\n{acc}\n'.format(name=record.name,
-                                            seq=record.sequence,
-                                            acc=record.accuracy))
-                else:
-                    outfp.write(
-                        '>{name}\n{seq}\n'.format(name=record.name,
-                                                  seq=record.sequence))
+                write_record(record, outfp)
         else:
             discarded += batch_size
 

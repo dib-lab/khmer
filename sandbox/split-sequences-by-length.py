@@ -9,7 +9,7 @@
 Trim sequences at k-mers of the given abundance, based on the given counting
 hash table.  Output sequences will be placed in 'infile.abundfilt'.
 
-% python scripts/filter-abund.py <counting.kh> <data1> [ <data2> <...> ]
+% python scripts/filter-abund.py <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """

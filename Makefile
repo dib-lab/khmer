@@ -15,14 +15,13 @@ VERSION=$(shell git describe --tags --dirty | sed s/v//)
 CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 	 -DVERSION=0.0.cppcheck -UNO_UNIQUE_RC --enable=all \
 	 --file-list=- --platform=unix64 --std=c++03 --inline-suppr \
-	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib
+	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
+	 -Ithird-party/smhasher
 
 all: khmer/_khmermodule.so
 
 install-dependencies:
-	pip2 install --user --upgrade $(DEVPKGS) || pip2 install --upgrade \
-		$(DEVPKGS) || pip install --user --upgrade $(DEVPKGS) || pip \
-		install --upgrade $(DEVPKGS)
+	pip2 install --upgrade $(DEVPKGS) || pip install --upgrade $(DEVPKGS)
 
 khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
@@ -129,8 +128,8 @@ coverage-report: .coverage
 	coverage report
 
 coverage-gcovr.xml: coverage-debug .coverage
-	gcovr --root=. --branches --xml --output=coverage-gcovr.xml \
-		--gcov-exclude='.*zlib.*|.*bzip2.*|.*seqan.*' --xml
+	gcovr --root=. --branches --output=coverage-gcovr.xml --xml \
+          --gcov-exclude='.*zlib.*|.*bzip2.*|.*smhasher.*|.*seqan.*'
 
 diff-cover: coverage-gcovr.xml coverage.xml
 	diff-cover coverage-gcovr.xml coverage.xml

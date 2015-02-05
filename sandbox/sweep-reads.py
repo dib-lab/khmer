@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2014. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
@@ -34,8 +34,8 @@ import os
 import time
 import khmer
 from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
-from khmer.file import (check_file_status, check_valid_file_exists,
-                        check_space)
+from khmer.kfile import (check_file_status, check_valid_file_exists,
+                         check_space)
 
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
