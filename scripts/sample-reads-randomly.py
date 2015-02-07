@@ -73,13 +73,6 @@ def get_parser():
     return parser
 
 
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
-
-
 def main():
     info('sample-reads-randomly.py')
     args = get_parser().parse_args()
