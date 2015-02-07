@@ -18,7 +18,7 @@ def print_error(msg):
     print >>sys.stderr, msg
 
 
-def check_is_pair(record1, record2):  # note: dup of fn in extract-paired-reads
+def check_is_pair(record1, record2):
     is_fastq = False
     if hasattr(record1, 'accuracy'):
         is_fastq = True
@@ -28,8 +28,8 @@ def check_is_pair(record1, record2):  # note: dup of fn in extract-paired-reads
     name2 = record2.name
 
     if is_fastq and ' ' in name1:                        # handle '@name 1:rst'
-        name1, rest1 = record1.name.split(' ', 1)[0]
-        name2, rest2 = record2.name.split(' ', 1)[0]
+        name1, rest1 = record1.name.split(' ', 1)
+        name2, rest2 = record2.name.split(' ', 1)
 
         if name1 == name2 and \
            rest1.startswith('1:') and rest2.startswith('2:'):

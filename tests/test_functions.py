@@ -8,6 +8,8 @@ import khmer
 from nose.plugins.attrib import attr
 import os
 import khmer_tst_utils as utils
+import collections
+from khmer.utils import check_is_pair
 
 
 def test_forward_hash():
@@ -110,3 +112,62 @@ def test_extract_hashbits_info():
             os.remove(fn)
         except OSError as e:
             print >>sys.stderr, '...failed to remove {fn}'.format(fn)
+
+
+FakeFQRead = collections.namedtuple('Read', ['name', 'accuracy', 'sequence'])
+FakeFastaRead = collections.namedtuple('Read', ['name', 'sequence'])
+
+
+def test_check_is_pair_1():
+    read1 = FakeFQRead(name='seq', accuracy='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq2', accuracy='###', sequence='AAA')
+
+    assert not check_is_pair(read1, read2)
+
+
+def test_check_is_pair_2():
+    read1 = FakeFQRead(name='seq/1', accuracy='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq/2', accuracy='###', sequence='AAA')
+
+    assert check_is_pair(read1, read2)
+
+
+def test_check_is_pair_3():
+    read1 = FakeFQRead(name='seq 1::', accuracy='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq 2::', accuracy='###', sequence='AAA')
+
+    assert check_is_pair(read1, read2)
+
+
+def test_check_is_pair_4():
+    read1 = FakeFQRead(name='seq/1', accuracy='###', sequence='AAA')
+    read2 = FakeFastaRead(name='seq/2', sequence='AAA')
+
+    try:
+        check_is_pair(read1, read2)
+        assert False                    # expect fail
+    except AssertionError:
+        pass
+
+
+def test_check_is_pair_5():
+    read1 = FakeFastaRead(name='seq/1', sequence='AAA')
+    read2 = FakeFastaRead(name='seq/2', sequence='AAA')
+
+    assert check_is_pair(read1, read2)
+
+
+def test_check_is_pair_6():
+    read1 = FakeFastaRead(name='seq1', sequence='AAA')
+    read2 = FakeFastaRead(name='seq2', sequence='AAA')
+
+    assert not check_is_pair(read1, read2)
+
+
+def test_check_is_pair_7():
+    read1 = FakeFastaRead(name='seq/2', sequence='AAA')
+    read2 = FakeFastaRead(name='seq/1', sequence='AAA')
+
+    assert not check_is_pair(read1, read2)
+
+

@@ -11,6 +11,7 @@
    'check_is_pair'; switched to using 'broken_paired_reader'; fixed use
    of sys.argv.
    * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
+   * tests/test_functions.py: added tests for 'check_is_pair'.
 
 2015-01-25  Titus Brown  <titus@idyll.org>
 
