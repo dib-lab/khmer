@@ -25,7 +25,7 @@ import tempfile
 import shutil
 from screed.screedRecord import _screed_record_dict
 
-from khmer.utils import write_record
+from khmer.utils import (write_record, write_record_pair, broken_paired_reader)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -127,34 +127,69 @@ def main():
         trimfp = open(trimfilename, 'w')
 
         save_pass2 = 0
-        for n, read in enumerate(screed.open(filename)):
+        screed_iter = screed.open(filename)
+        for n, is_pair, read1, read2 in broken_paired_reader(screed_iter):
             if n % 10000 == 0:
                 print '...', n, filename, save_pass2, read_reads, read_bp, \
                     wrote_reads, wrote_bp
 
-            read_reads += 1
-            read_bp += len(read.sequence)
+            if is_pair:
+                read_reads += 2
+                read_bp += len(read1.sequence) + len(read2.sequence)
 
-            seq = read.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
+                seq1 = read1.sequence.replace('N', 'A')
+                seq2 = read2.sequence.replace('N', 'A')
 
-            # has this portion of the graph saturated? if not,
-            # consume & save => pass2.
-            if med < NORMALIZE_LIMIT:
-                ht.consume(seq)
-                write_record(read, pass2fp)
-                save_pass2 += 1
-            else:                       # trim!!
-                trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
-                if trim_at >= K:
-                    new_read = trim_record(read, trim_at)
-                    write_record(new_read, trimfp)
+                med1, _, _ = ht.get_median_count(seq1)
+                med2, _, _ = ht.get_median_count(seq2)
 
-                    wrote_reads += 1
-                    wrote_bp += trim_at
+                if med1 < NORMALIZE_LIMIT or med2 < NORMALIZE_LIMIT:
+                    ht.consume(seq1)
+                    ht.consume(seq2)
+                    write_record_pair(read1, read2, pass2fp)
+                    save_pass2 += 1
+                else:
+                    trim_seq1, trim_at1 = ht.trim_on_abundance(seq1, CUTOFF)
+                    trim_seq2, trim_at2 = ht.trim_on_abundance(seq2, CUTOFF)
 
-                    if trim_at != len(read.sequence):
+                    if trim_at1 >= K:
+                        read1 = trim_record(read1, trim_at1)
+
+                    if trim_at2 >= K:
+                        read2 = trim_record(read2, trim_at2)
+
+                    if trim_at1 != len(seq1):
                         trimmed_reads += 1
+                    if trim_at2 != len(seq2):
+                        trimmed_reads += 1
+
+                    write_record_pair(read1, read2, trimpfp)
+                    wrote_reads += 2
+                    wrote_bp += trim_at1 + trim_at2
+            else:
+                read_reads += 1
+                read_bp += len(read1.sequence)
+
+                seq = read1.sequence.replace('N', 'A')
+                med, _, _ = ht.get_median_count(seq)
+
+                # has this portion of the graph saturated? if not,
+                # consume & save => pass2.
+                if med < NORMALIZE_LIMIT:
+                    ht.consume(seq)
+                    write_record(read1, pass2fp)
+                    save_pass2 += 1
+                else:                       # trim!!
+                    trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
+                    if trim_at >= K:
+                        new_read = trim_record(read1, trim_at)
+                        write_record(new_read, trimfp)
+
+                        wrote_reads += 1
+                        wrote_bp += trim_at
+
+                        if trim_at != len(read1.sequence):
+                            trimmed_reads += 1
 
         pass2fp.close()
         trimfp.close()
@@ -168,12 +203,12 @@ def main():
     for orig_filename, pass2filename, trimfilename in pass2list:
         print 'second pass: looking at sequences kept aside in %s' % \
               pass2filename
+
+        trimfp = open(trimfilename, 'a')
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
                 print '... x 2', n, pass2filename, read_reads, read_bp, \
-                      wrote_reads, wrote_bp
-
-            trimfp = open(trimfilename, 'a')
+                    wrote_reads, wrote_bp
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
