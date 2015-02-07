@@ -373,5 +373,5 @@ def test_trim_low_abund_keep_paired():
     outfile = infile + '.abundtrim'
     assert os.path.exists(outfile), outfile
 
-    seqs = [ r.name for r in screed.open(outfile) ]
+    seqs = [r.name for r in screed.open(outfile)]
     assert seqs[-2:] == ['pair/1', 'pair/2'], seqs

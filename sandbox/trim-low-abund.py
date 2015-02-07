@@ -13,8 +13,8 @@ Output sequences will be placed in 'infile.abundtrim'.
 
 Use -h for parameter help.
 
-TODO: paired support: paired reads should be kept together.
 TODO: load/save counting table.
+TODO: reference appropriate preprint.
 """
 import sys
 import screed
@@ -23,6 +23,7 @@ import khmer
 import argparse
 import tempfile
 import shutil
+import textwrap
 from screed.screedRecord import _screed_record_dict
 
 from khmer.utils import (write_record, write_record_pair, broken_paired_reader)
@@ -49,8 +50,31 @@ def trim_record(read, trim_at):
     return new_read
 
 
-def main():
-    parser = argparse.ArgumentParser(description='XXX')
+def get_parser():
+    epilog = """
+    The output is one file for each input file, <input file>.abundtrim, placed
+    in the current directory.  This output contains the input sequences
+    trimmed at low-abundance k-mers.
+
+    The ``-V/--variable-coverage`` parameter will, if specified,
+    prevent elimination of low-abundance reads by only trimming
+    low-abundance k-mers from high-abundance reads; use this for
+    non-genomic data sets that may have variable coverage.
+
+    Note that the output reads will not necessarily be in the same order
+    as the reads in the input files; if this is an important consideration,
+    use ``load-into-counting.py`` and ``filter-abund.py``.  However, read
+    pairs will be kept together, in "broken-paired" format; you can use
+    ``extract-paired-reads.py`` to extract read pairs and orphans.
+
+    Example::
+
+        trim-low-abund.py -x 5e7 -k 20 -C 2 data/100k-filtered.fa
+    """
+    
+    parser = argparse.ArgumentParser(
+        description='Trim low-abundance k-mers using a streaming algorithm.',
+        epilog=textwrap.dedent(epilog))
 
     env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
     env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
@@ -71,7 +95,7 @@ def main():
                         default=DEFAULT_CUTOFF)
 
     parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
-                        help='base cutoff on median k-mer abundance of this',
+                        help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
     parser.add_argument('--variable-coverage', '-V', action='store_true',
@@ -82,6 +106,12 @@ def main():
                         default='./')
 
     parser.add_argument('input_filenames', nargs='+')
+
+    return parser
+
+
+def main():
+    parser = get_parser()
     args = parser.parse_args()
 
     ###
@@ -106,7 +136,7 @@ def main():
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print 'created temporary directory %s; use -T to change location' % tempdir
 
-    ###
+    # ### FIRST PASS ###
 
     save_pass2_total = 0
 
@@ -201,6 +231,8 @@ def main():
         print '%s: kept aside %d of %d from first pass, in %s' % \
               (filename, save_pass2, n, filename)
         save_pass2_total += save_pass2
+
+    # ### SECOND PASS. ###
 
     skipped_n = 0
     skipped_bp = 0
