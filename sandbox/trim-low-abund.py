@@ -27,6 +27,7 @@ from screed.screedRecord import _screed_record_dict
 
 from khmer.utils import (write_record, write_record_pair, broken_paired_reader)
 
+
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
 
@@ -123,11 +124,11 @@ def main():
 
         pass2list.append((filename, pass2filename, trimfilename))
 
+        screed_iter = screed.open(filename)
         pass2fp = open(pass2filename, 'w')
         trimfp = open(trimfilename, 'w')
 
         save_pass2 = 0
-        screed_iter = screed.open(filename)
         for n, is_pair, read1, read2 in broken_paired_reader(screed_iter):
             if n % 10000 == 0:
                 print '...', n, filename, save_pass2, read_reads, read_bp, \
@@ -256,10 +257,10 @@ def main():
     print 'looked at %d reads twice' % (save_pass2_total,)
     print 'trimmed or removed %.2f%% of bases (%d total)' % \
         ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
+
     if args.variable_coverage:
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
-        print 'output in *.abundtrim'
 
     fp_rate = khmer.calc_expected_collisions(ht)
     print >>sys.stderr, \
@@ -273,6 +274,8 @@ def main():
         print >> sys.stderr, "**"
         print >> sys.stderr, "** Do not use these results!!"
         sys.exit(1)
+
+    print 'output in *.abundtrim'
 
 
 if __name__ == '__main__':

@@ -359,3 +359,19 @@ def test_trim_low_abund_6_trim_high_abund_Z():
     badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
              'GATTTCCGGGCGG'
     assert badseq in seqs       # should be there, untrimmed
+
+
+def test_trim_low_abund_keep_paired():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-V", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir, sandbox=True)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [ r.name for r in screed.open(outfile) ]
+    assert seqs[-2:] == ['pair/1', 'pair/2'], seqs
