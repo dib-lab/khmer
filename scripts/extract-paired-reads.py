@@ -22,24 +22,7 @@ import argparse
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-from khmer.utils import broken_paired_reader
-
-
-def output_pair(read1, read2):
-    if hasattr(read1, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
-            (read1.name, read1.sequence, read1.accuracy,
-             read2.name, read2.sequence, read2.accuracy)
-    else:
-        return ">%s\n%s\n>%s\n%s\n" % (read1.name, read1.sequence, read2.name,
-                                       read2.sequence)
-
-
-def output_single(read):
-    if hasattr(read, 'accuracy'):
-        return "@%s\n%s\n+\n%s\n" % (read.name, read.sequence, read.accuracy)
-    else:
-        return ">%s\n%s\n" % (read.name, read.sequence)
+from khmer.utils import (broken_paired_reader, write_record, write_record_pair)
 
 
 def get_parser():
@@ -97,10 +80,10 @@ def main():
             print '...', index
 
         if is_pair:
-            paired_fp.write(output_pair(read1, read2))
+            write_record_pair(read1, read2, paired_fp)
             n_pe += 1
         else:
-            single_fp.write(output_single(read1))
+            write_record(read1, single_fp)
             n_se += 1
 
     single_fp.close()
@@ -115,6 +98,7 @@ def main():
 
     print >> sys.stderr, 'wrote to: ' + outfile \
         + '.se' + ' and ' + outfile + '.pe'
+
 
 if __name__ == '__main__':
     main()

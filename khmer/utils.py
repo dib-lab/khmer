@@ -74,7 +74,7 @@ def broken_paired_reader(screed_iter):
 
 def write_record(record, fp):
     """
-    Writes output sequence and returns str.
+    Writes sequence record to 'fp' in FASTA/FASTQ format.
     """
     if hasattr(record, 'accuracy'):
         fp.write(
@@ -86,5 +86,16 @@ def write_record(record, fp):
         fp.write(
             '>{name}\n{seq}\n'.format(name=record.name,
                                       seq=record.sequence))
+
+
+def write_record_pair(read1, read2, fp):
+    """
+    Writes pair of sequence records to 'fp' in FASTA/FASTQ format.
+    """
+    if hasattr(read1, 'accuracy'):
+        assert hasattr(read2, 'accuracy')
+    write_record(read1, fp)
+    write_record(read2, fp)
+
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:
