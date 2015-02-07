@@ -197,7 +197,7 @@ def main():
                     if trim_at2 != len(seq2):
                         trimmed_reads += 1
 
-                    write_record_pair(read1, read2, trimpfp)
+                    write_record_pair(read1, read2, trimfp)
                     wrote_reads += 2
                     wrote_bp += trim_at1 + trim_at2
             else:
