@@ -15,7 +15,6 @@ Use -h for parameter help.
 
 TODO: paired support: paired reads should be kept together.
 TODO: load/save counting table.
-TODO: move output_single elsewhere
 """
 import sys
 import screed
@@ -24,6 +23,9 @@ import khmer
 import argparse
 import tempfile
 import shutil
+from screed.screedRecord import _screed_record_dict
+
+from khmer.utils import write_record
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -36,23 +38,14 @@ DEFAULT_MIN_HASHSIZE = 1e6
 MAX_FALSE_POSITIVE_RATE = 0.8
 
 
-def output_single(read, trim_at=None):
-    name = read.name
-    sequence = read.sequence
-
-    accuracy = None
+def trim_record(read, trim_at):
+    new_read = _screed_record_dict()
+    new_read.name = read.name
+    new_read.sequence = read.sequence[:trim_at]
     if hasattr(read, 'accuracy'):
-        accuracy = read.accuracy
+        new_read.accuracy = read.accuracy[:trim_at]
 
-    if trim_at is not None:
-        sequence = sequence[:trim_at]
-        if accuracy:
-            accuracy = accuracy[:trim_at]
-
-    if accuracy:
-        return "@%s\n%s\n+\n%s\n" % (name, sequence, accuracy)
-    else:
-        return ">%s\n%s\n" % (name, sequence)
+    return new_read
 
 
 def main():
@@ -149,14 +142,17 @@ def main():
             # consume & save => pass2.
             if med < NORMALIZE_LIMIT:
                 ht.consume(seq)
-                pass2fp.write(output_single(read))
+                write_record(read, pass2fp)
                 save_pass2 += 1
             else:                       # trim!!
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
-                    trimfp.write(output_single(read, trim_at))
+                    new_read = trim_record(read, trim_at)
+                    write_record(new_read, trimfp)
+
                     wrote_reads += 1
                     wrote_bp += trim_at
+
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
 
@@ -184,7 +180,8 @@ def main():
 
             # do we retain low-abundance components unchanged?
             if med < NORMALIZE_LIMIT and args.variable_coverage:
-                trimfp.write(output_single(read))
+                write_record(read, trimfp)
+
                 wrote_reads += 1
                 wrote_bp += len(read.sequence)
                 skipped_n += 1
@@ -194,9 +191,12 @@ def main():
             else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
                 trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
-                    trimfp.write(output_single(read, trim_at))
+                    new_read = trim_record(read, trim_at)
+                    write_record(new_read, trimfp)
+
                     wrote_reads += 1
                     wrote_bp += trim_at
+
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
 
