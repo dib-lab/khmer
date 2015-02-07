@@ -133,6 +133,9 @@ def main():
                 print '...', n, filename, save_pass2, read_reads, read_bp, \
                     wrote_reads, wrote_bp
 
+            # we want to track paired reads here, to make sure that pairs
+            # are not split between first pass and second pass.
+
             if is_pair:
                 read_reads += 2
                 read_bp += len(read1.sequence) + len(read2.sequence)
@@ -147,10 +150,10 @@ def main():
                     ht.consume(seq1)
                     ht.consume(seq2)
                     write_record_pair(read1, read2, pass2fp)
-                    save_pass2 += 1
+                    save_pass2 += 2
                 else:
-                    trim_seq1, trim_at1 = ht.trim_on_abundance(seq1, CUTOFF)
-                    trim_seq2, trim_at2 = ht.trim_on_abundance(seq2, CUTOFF)
+                    _, trim_at1 = ht.trim_on_abundance(seq1, CUTOFF)
+                    _, trim_at2 = ht.trim_on_abundance(seq2, CUTOFF)
 
                     if trim_at1 >= K:
                         read1 = trim_record(read1, trim_at1)
@@ -180,7 +183,7 @@ def main():
                     write_record(read1, pass2fp)
                     save_pass2 += 1
                 else:                       # trim!!
-                    trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
+                    _, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                     if trim_at >= K:
                         new_read = trim_record(read1, trim_at)
                         write_record(new_read, trimfp)
@@ -204,6 +207,11 @@ def main():
         print 'second pass: looking at sequences kept aside in %s' % \
               pass2filename
 
+        # note that for this second pass, we don't care about paired
+        # reads - they will be output in the same order they're read in,
+        # so pairs will stay together if not orphaned.  This is in contrast
+        # to the first loop.
+
         trimfp = open(trimfilename, 'a')
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
@@ -224,7 +232,7 @@ def main():
 
             # otherwise, examine/trim/truncate.
             else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
-                trim_seq, trim_at = ht.trim_on_abundance(seq, CUTOFF)
+                _, trim_at = ht.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
                     new_read = trim_record(read, trim_at)
                     write_record(new_read, trimfp)
