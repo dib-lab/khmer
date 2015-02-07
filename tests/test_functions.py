@@ -169,5 +169,3 @@ def test_check_is_pair_7():
     read2 = FakeFastaRead(name='seq/1', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
-
-
