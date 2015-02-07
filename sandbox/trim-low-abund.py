@@ -71,7 +71,7 @@ def get_parser():
 
         trim-low-abund.py -x 5e7 -k 20 -C 2 data/100k-filtered.fa
     """
-    
+
     parser = argparse.ArgumentParser(
         description='Trim low-abundance k-mers using a streaming algorithm.',
         epilog=textwrap.dedent(epilog))
