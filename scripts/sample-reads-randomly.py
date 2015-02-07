@@ -106,8 +106,8 @@ def main():
         output_filename = os.path.basename(filename) + '.subset'
 
     if num_samples == 1:
-        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' % \
-            args.num_reads
+        print >>sys.stderr, 'Subsampling %d reads using reservoir sampling.' \
+            % args.num_reads
         print >>sys.stderr, 'Subsampled reads will be placed in %s' % \
             output_filename
         print >>sys.stderr, ''
