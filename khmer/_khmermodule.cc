@@ -1388,8 +1388,8 @@ static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
 
     Py_BEGIN_ALLOW_THREADS
 
-    HashIntoType kmer, kmer_f, kmer_r;
-    kmer = _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
+    HashIntoType kmer_f, kmer_r;
+    _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
 
     counting->partition->find_all_tags(kmer_f, kmer_r, tags,
                                        counting->all_tags);
