@@ -1378,7 +1378,7 @@ static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
         return NULL;
     }
 
-    if (strlen(kmer_s) < counting->ksize()) { // @@
+    if (strlen(kmer_s) < counting->ksize()) {
         PyErr_SetString( PyExc_ValueError,
                          "starting kmer is smaller than the K size of the counting table");
         return NULL;
@@ -1388,8 +1388,8 @@ static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
 
     Py_BEGIN_ALLOW_THREADS
 
-    HashIntoType kmer, kmer_f, kmer_r;
-    kmer = _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
+    HashIntoType kmer_f, kmer_r;
+    _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
 
     counting->partition->find_all_tags(kmer_f, kmer_r, tags,
                                        counting->all_tags);
@@ -2566,7 +2566,7 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
         return NULL;
     }
 
-    if (strlen(kmer_s) < hashbits->ksize()) { // @@
+    if (strlen(kmer_s) < hashbits->ksize()) {
         PyErr_SetString( PyExc_ValueError,
                          "starting kmer is smaller than the K size of the hashbits");
         return NULL;
