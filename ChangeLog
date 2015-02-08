@@ -11,6 +11,13 @@
     * doc/user/scripts.txt: added readstats description.
     * tests/test_scripts.py: added tests for readstats.py
 
+2015-01-23  Jessica Mizzi  <mizzijes@msu.edu>
+
+    * khmer/utils.py: Added single write_record fuction to write FASTA/Q
+    * scripts/{abundance-dist,extract-long-sequences,extract-partitions,
+    interleave-reads,normalize-by-median,sample-reads-randomly}.py: 
+    Replaced FASTA/Q writing method with write_record
+
 2015-01-23  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * Makefile: remove the user installs for the `install-dependencies` target
