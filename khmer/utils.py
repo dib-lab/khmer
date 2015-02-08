@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -19,6 +19,13 @@ def print_error(msg):
 
 
 def check_is_pair(record1, record2):
+    """
+    Checks to see if the two sequence records are left and right pairs
+    of each other, respectively.  Returns True or False as appropriate.
+
+    Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
+    and 'seq::... 2::...'.
+    """
     is_fastq = False
     if hasattr(record1, 'accuracy'):
         is_fastq = True
@@ -47,9 +54,26 @@ def check_is_pair(record1, record2):
 
 
 def broken_paired_reader(screed_iter):
+    """
+    A generator that yields singletons and pairs from a stream of FASTA/FASTQ
+    records (yielded by 'screed_iter').  Yields (n, is_pair, r1, r2) where
+    'r2' is None if is_pair is False.
+
+    The input stream can be fully single-ended reads, interleaved paired-end
+    reads, or paired-end reads with orphans, a.k.a. "broken paired".
+
+    Usage::
+
+       for n, is_pair, read1, read2 in broken_paired_reader(...):
+          ...
+
+    Note that 'n' is the number of records read from the input stream, so
+    is incremented by 2 for a pair of reads.
+    """
     record = None
     prev_record = None
 
+    # handle the majority of the stream.
     for n, record in enumerate(screed_iter):
         if prev_record:
             if check_is_pair(prev_record, record):
@@ -60,6 +84,7 @@ def broken_paired_reader(screed_iter):
 
         prev_record = record
 
+    # handle the last two records (which might be a pair, or not).
     if prev_record:
         if check_is_pair(prev_record, record):
             yield n, True, prev_record, record  # it's a pair!
