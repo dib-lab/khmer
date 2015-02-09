@@ -60,23 +60,35 @@ def update_memory_parameters(parser, args):
     env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
                                    DEFAULT_MIN_TABLESIZE)
 
-    # spec all three
-    # spec none
+    # can't allow all three! (a, b, c)
+    if args.n_tables and args.min_tablesize and args.max_memory:
+        raise exception("cannot specify all three.")  # @CTB
 
+    # if none are specified, set to defaults. (not a, not b, not c)
+    if not (args.n_tables or args.max_memory or args.min_tablesize):
+        args.n_tables = env_n_tables
+        args.min_tablesize = env_tablesize
+
+    # just tablesize and max memory (a, b, not c)
     if args.n_tables is None and (args.max_memory and args.min_tablesize):
         if parser.hashtype == 'counting':
             tablesize = int(args.max_memory / float(args.min_tablesize))
         elif parser.hashtype == 'hashbits':
             tablesize = int(8 * args.max_memory / float(args.min_tablesize))
 
+    # just tablesize and num tables (not a, b, c) - no change needed
     elif args.max_memory is None and (args.n_tables and args.min_tablesize):
         pass
+
+    # just num tables and max memory (a, not b, c)
     elif args.min_tablesize is None and (args.n_tables and args.max_memory):
         if parser.hashtype == 'hashbits':
             args.min_tablesize = int(8 * args.max_memory /
                                      float(args.n_tables))
         else:
             args.min_tablesize = int(args.max_memory / float(args.n_tables))
+
+    # just max memory (a, not b, not c)
     elif args.max_memory and not (args.n_tables or args.min_tablesize):
         args.n_tables = env_n_tables
         if parser.hashtype == 'hashbits':
@@ -84,8 +96,6 @@ def update_memory_parameters(parser, args):
                                      float(args.n_tables))
         else:
             args.min_tablesize = int(args.max_memory / float(args.n_tables))
-    else:
-        raise Exception("missed an if statement @ctb")
 
 
 def build_counting_args(descr=None, epilog=None):
