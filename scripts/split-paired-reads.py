@@ -36,9 +36,9 @@ def get_parser():
     created if it does not already exist.
 
     Alternatively, you can specify the filenames directly with
-    :option:`-1`/:option:`output_first` and
-    :option:`-2`/:option:`output_second`, which will override the :option:`-o`
-    setting on a file-specific basis.
+    :option:`-1`/:option:`--output-first` and
+    :option:`-2`/:option:`--output-second`, which will override the
+    :option:`-o`/:option:`--output-dir` setting on a file-specific basis.
 
     Example::
 
