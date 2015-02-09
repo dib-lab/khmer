@@ -1549,13 +1549,13 @@ def test_split_paired_reads_3_output_dir():
 
     # actual output files...
     outfile1 = utils.get_temp_filename('paired.fq.1')
-    in_dir = os.path.dirname(outfile1)
-    outfile2 = utils.get_temp_filename('paired.fq.2', in_dir)
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = scriptpath('split-paired-reads.py')
-    args = [infile, '--output-dir', in_dir]
+    args = [infile, '--output-dir', output_dir]
 
-    utils.runscript(script, args, in_dir)
+    utils.runscript(script, args)
 
     assert os.path.exists(outfile1), outfile1
     assert os.path.exists(outfile2), outfile2
