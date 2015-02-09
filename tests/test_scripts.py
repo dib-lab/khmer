@@ -1553,7 +1553,7 @@ def test_split_paired_reads_3_output_dir():
     outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
 
     script = scriptpath('split-paired-reads.py')
-    args = [infile, '--output-dir', output_dir]
+    args = ['--output-dir', output_dir, infile]
 
     utils.runscript(script, args)
 

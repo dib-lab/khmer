@@ -30,9 +30,17 @@ def get_parser():
     interleaved; other programs want input in the Insanely Bad Format, with
     left- and right- reads separated. This reformats the former to the latter.
 
+    The directory into which the left- and right- reads are output may be
+    specified using :option:`-o`/:option:`--output-dir`. This directory will be
+    created if it does not already exist.
+
     Example::
 
         split-paired-reads.py tests/test-data/paired.fq
+
+    Example::
+
+        split-paired-reads.py -o ~/reads-go-here tests/test-data/paired.fq
     """
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
