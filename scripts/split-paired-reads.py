@@ -39,7 +39,7 @@ def get_parser():
     :option:`-1`/:option:`output_first` and
     :option:`-2`/:option:`output_second`, which will override the :option:`-o`
     setting on a file-specific basis.
-    
+
     Example::
 
         split-paired-reads.py tests/test-data/paired.fq
