@@ -1,7 +1,7 @@
 2015-02-09  Bede Constantinides  <bede.constantinides@manchester.ac.uk>
 
    * scripts/split-paired-reads.py: added -o option to allow specification
-   of an outut directory
+   of an output directory
    * tests/test_scripts.py: added accompanying test for split-paired-reads.py
 
 2015-02-01  Titus Brown  <titus@idyll.org>
