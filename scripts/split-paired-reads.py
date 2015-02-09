@@ -22,6 +22,7 @@ import argparse
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -34,6 +35,11 @@ def get_parser():
     specified using :option:`-o`/:option:`--output-dir`. This directory will be
     created if it does not already exist.
 
+    Alternatively, you can specify the filenames directly with
+    :option:`-1`/:option:`output_first` and
+    :option:`-2`/:option:`output_second`, which will override the :option:`-o`
+    setting on a file-specific basis.
+    
     Example::
 
         split-paired-reads.py tests/test-data/paired.fq
@@ -41,6 +47,10 @@ def get_parser():
     Example::
 
         split-paired-reads.py -o ~/reads-go-here tests/test-data/paired.fq
+
+        Example::
+
+        split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
     parser = argparse.ArgumentParser(
         description='Split interleaved reads into two files, left and right.',
@@ -48,10 +58,19 @@ def get_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('infile')
+
     parser.add_argument('-o', '--output-dir', metavar="output_directory",
                         dest='output_directory', default='', help='Output '
                         'split reads to specified directory. Creates '
                         'directory if necessary')
+
+    parser.add_argument('-1', '--output-first', metavar='output_first',
+                        default=None, help='Output "left" reads to this '
+                        'file')
+    parser.add_argument('-2', '--output-second', metavar='output_second',
+                        default=None, help='Output "right" reads to this '
+                        'file')
+
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
@@ -78,39 +97,28 @@ def main():
         out1 = os.path.basename(infile) + '.1'
         out2 = os.path.basename(infile) + '.2'
 
+    # OVERRIDE defaults with -1, -2
+    if args.output_first:
+        out1 = args.output_first
+    if args.output_second:
+        out2 = args.output_second
+
     fp_out1 = open(out1, 'w')
     fp_out2 = open(out2, 'w')
-
-    # is input file FASTQ or FASTA? Determine.
-    is_fastq = False
-    record = iter(screed.open(infile)).next()
-
-    if hasattr(record, 'accuracy'):
-        is_fastq = True
 
     counter1 = 0
     counter2 = 0
     index = None
     for index, record in enumerate(screed.open(infile)):
-        if index % 100000 == 0:
+        if index % 100000 == 0 and index:
             print >> sys.stderr, '...', index
 
         name = record.name
         if name.endswith('/1'):
-            if is_fastq:
-                print >> fp_out1, '@%s\n%s\n+\n%s' % (record.name,
-                                                      record.sequence,
-                                                      record.accuracy)
-            else:
-                print >> fp_out1, '>%s\n%s' % (record.name, record.sequence,)
+            write_record(record, fp_out1)
             counter1 += 1
         elif name.endswith('/2'):
-            if is_fastq:
-                print >> fp_out2, '@%s\n%s\n+\n%s' % (record.name,
-                                                      record.sequence,
-                                                      record.accuracy)
-            else:
-                print >> fp_out2, '>%s\n%s' % (record.name, record.sequence,)
+            write_record(record, fp_out2)
             counter2 += 1
 
     print >> sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
