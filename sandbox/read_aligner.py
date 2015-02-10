@@ -3,7 +3,7 @@
 Error correct reads based on a counting hash from a diginorm step.
 Output sequences will be put in @@@.
 
-% python scripts/error-correct-pass2 <counting.kh> <data1> [ <data2> <...> ]
+% python scripts/error-correct-pass2 <counting.ct> <data1> [ <data2> <...> ]
 
 Use '-h' for parameter help.
 """

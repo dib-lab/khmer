@@ -44,10 +44,10 @@ class Test_CountingHash(object):
         assert khmer.forward_hash(GG, 12) == 11184810
 
         collision_1 = 'AAACGTATGACT'
-        assert khmer.forward_hash(collision_1, 12) == 184777L
+        assert khmer.forward_hash(collision_1, 12) == 184777
 
         collision_2 = 'AAATACCGAGCG'
-        assert khmer.forward_hash(collision_2, 12) == 76603L
+        assert khmer.forward_hash(collision_2, 12) == 76603
 
         # note, hash(GG) % 1000003 == hash(collision_1)
         # note, hash(GG) % 1009837 == hash(collision_2)
@@ -64,10 +64,10 @@ class Test_CountingHash(object):
         assert khmer.forward_hash(GG, 12) == 11184810
 
         collision_1 = 'AAACGTATGACT'
-        assert khmer.forward_hash(collision_1, 12) == 184777L
+        assert khmer.forward_hash(collision_1, 12) == 184777
 
         collision_2 = 'AAATACCGAGCG'
-        assert khmer.forward_hash(collision_2, 12) == 76603L
+        assert khmer.forward_hash(collision_2, 12) == 76603
 
         # hash(GG) % 1000003 == hash(collision_1)
         # hash(GG) % 1009837 == hash(collision_2)
@@ -84,10 +84,10 @@ class Test_CountingHash(object):
         assert khmer.forward_hash(GG, 12) == 11184810
 
         collision_1 = 'AAACGTATGACT'
-        assert khmer.forward_hash(collision_1, 12) == 184777L
+        assert khmer.forward_hash(collision_1, 12) == 184777
 
         collision_2 = 'AAATACCGAGCG'
-        assert khmer.forward_hash(collision_2, 12) == 76603L
+        assert khmer.forward_hash(collision_2, 12) == 76603
 
         # hash(GG) % 1000003 == hash(collision_1)
         # hash(GG) % 1009837 == hash(collision_2)
@@ -110,13 +110,13 @@ def test_3_tables():
     assert khmer.forward_hash(GG, 12) == 11184810
 
     collision_1 = 'AAACGTATGACT'
-    assert khmer.forward_hash(collision_1, 12) == 184777L
+    assert khmer.forward_hash(collision_1, 12) == 184777
 
     collision_2 = 'AAATACCGAGCG'
-    assert khmer.forward_hash(collision_2, 12) == 76603L
+    assert khmer.forward_hash(collision_2, 12) == 76603
 
     collision_3 = 'AAACGTATCGAG'
-    assert khmer.forward_hash(collision_3, 12) == 184755L
+    assert khmer.forward_hash(collision_3, 12) == 184755
 
     # hash(GG) % 1000003 == hash(collision_1)
     # hash(GG) % 1009837 == hash(collision_2)
@@ -267,7 +267,6 @@ def test_2_kadian():
     assert x == 1, x
 
 
-@attr('highmem')
 def test_save_load():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave0.ht')
@@ -292,7 +291,6 @@ def test_save_load():
     assert x == y, (x, y)
 
 
-@attr('highmem')
 def test_load_gz():
     inpath = utils.get_test_data('random-20-a.fa')
 
@@ -328,7 +326,6 @@ def test_load_gz():
     assert x == y, (x, y)
 
 
-@attr('highmem')
 def test_save_load_gz():
     inpath = utils.get_test_data('random-20-a.fa')
     savepath = utils.get_temp_filename('tempcountingsave2.ht.gz')
@@ -373,6 +370,92 @@ def test_trim_short():
     assert DNA[:50] == seq, (seq, pos)
     assert hi.get(seq[-6:]) == 2
     assert hi.get(DNA[:51][-6:]) == 1
+
+
+def test_find_spectral_error_positions_1():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[:30])
+
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n + 8])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [30], posns
+
+
+def test_find_spectral_error_positions_2():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA)
+
+    posns = hi.find_spectral_error_positions(DNA, 2)
+    assert posns == [], posns
+
+
+def test_find_spectral_error_positions_6():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[1:])
+
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n + 8])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [0], posns
+
+
+def test_find_spectral_error_positions_4():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+
+    posns = hi.find_spectral_error_positions(DNA, 2)
+    assert posns == [], posns
+
+
+def test_find_spectral_error_positions_5():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[:10])
+    hi.consume(DNA[11:])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [10], posns
+
+
+def test_find_spectral_error_positions_6():
+    K = 8
+    hi = khmer.new_counting_hash(K, 1e6, 2)
+
+    hi.consume(DNA)
+    hi.consume(DNA[K:])
+
+    for n in range(len(DNA) - 8 + 1):
+        print n, hi.get(DNA[n:n + 8])
+
+    posns = hi.find_spectral_error_positions(DNA, 1)
+    assert posns == [7], posns
+
+
+def test_find_spectral_error_positions_err():
+    hi = khmer.new_counting_hash(8, 1e6, 2)
+
+    try:
+        posns = hi.find_spectral_error_positions(DNA[:6], 1)
+        assert 0, "should raise ValueError; too short"
+    except ValueError:
+        pass
+
+    try:
+        posns = hi.find_spectral_error_positions("ACGTACGN", 1)
+        assert 0, "should raise ValueError; contains N"
+    except ValueError:
+        pass
 
 
 def test_maxcount():
@@ -474,10 +557,9 @@ def test_nobigcount_save():
     assert kh.get('AAAA') == MAX_COUNT
 
 
-@attr('highmem')
 def test_bigcount_abund_dist():
-    kh = khmer.new_counting_hash(18, 1e7, 4)
-    tracking = khmer.new_hashbits(18, 1e7, 4)
+    kh = khmer.new_counting_hash(18, 1e2, 4)
+    tracking = khmer.new_hashbits(18, 1e2, 4)
     kh.set_use_bigcount(True)
 
     seqpath = utils.get_test_data('test-abund-read-2.fa')
@@ -491,7 +573,6 @@ def test_bigcount_abund_dist():
     assert dist[1001] == 1, pdist
 
 
-@attr('highmem')
 def test_bigcount_abund_dist_2():
     kh = khmer.new_counting_hash(18, 1e7, 4)
     tracking = khmer.new_hashbits(18, 1e7, 4)
@@ -536,7 +617,7 @@ def test_get_hashsizes():
 #    hb = kh.collect_high_abundance_kmers(seqpath, 2, 4)
 
 
-####
+#
 
 
 def test_load_notexist_should_fail():
@@ -546,7 +627,7 @@ def test_load_notexist_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -570,7 +651,7 @@ def test_load_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -581,7 +662,7 @@ def test_load_gz_notexist_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -605,31 +686,31 @@ def test_load_gz_truncated_should_fail():
     try:
         hi.load(savepath)
         assert 0, "load should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
 def test_counting_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
-    inpath = utils.get_test_data('badversion-k12.kh')
+    inpath = utils.get_test_data('badversion-k12.ct')
 
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
 def test_counting_gz_file_version_check():
     ht = khmer.new_counting_hash(12, 1, 1)
 
-    inpath = utils.get_test_data('badversion-k12.kh.gz')
+    inpath = utils.get_test_data('badversion-k12.ct.gz')
 
     try:
         ht.load(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -641,7 +722,7 @@ def test_counting_file_type_check():
     try:
         kh.load(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -655,7 +736,7 @@ def test_counting_gz_file_type_check():
     try:
         kh.load(inpath)
         assert 0, "this should fail"
-    except IOError, e:
+    except IOError as e:
         print str(e)
 
 
@@ -663,7 +744,7 @@ def test_counting_bad_primes_list():
     try:
         ht = khmer._new_counting_hash(12, ["a", "b", "c"], 1)
         assert 0, "bad list of primes should fail"
-    except TypeError, e:
+    except TypeError as e:
         print str(e)
 
 
@@ -674,7 +755,7 @@ def test_bad_use_bigcount():
     try:
         countingtable.get_use_bigcount(True)
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -683,7 +764,7 @@ def test_consume_absentfasta():
     try:
         countingtable.consume_fasta("absent_file.fa")
         assert 0, "This should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -692,13 +773,15 @@ def test_consume_absentfasta_with_reads_parser():
     try:
         countingtable.consume_fasta_with_reads_parser()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
-    readparser = ReadParser(utils.get_test_data('empty-file'))
     try:
+        readparser = ReadParser(utils.get_test_data('empty-file'))
         countingtable.consume_fasta_with_reads_parser(readparser)
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
+        print str(err)
+    except ValueError as err:
         print str(err)
 
 
@@ -707,12 +790,12 @@ def test_badconsume():
     try:
         countingtable.consume()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         countingtable.consume("AAA")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -721,12 +804,12 @@ def test_get_badmin_count():
     try:
         countingtable.get_min_count()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         countingtable.get_min_count("AAA")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -735,12 +818,12 @@ def test_get_badmax_count():
     try:
         countingtable.get_max_count()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         countingtable.get_max_count("AAA")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -749,12 +832,12 @@ def test_get_badmedian_count():
     try:
         countingtable.get_median_count()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         countingtable.get_median_count("AAA")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -763,12 +846,12 @@ def test_get_badkadian_count():
     try:
         countingtable.get_kadian_count()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     try:
         countingtable.get_kadian_count("AAA")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -777,7 +860,7 @@ def test_badget():
     try:
         countingtable.get()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -793,7 +876,7 @@ def test_badget_2():
     try:
         countingtable.get("AGCTT")
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -804,7 +887,7 @@ def test_badtrim():
     try:
         countingtable.trim_on_abundance()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     countingtable.trim_on_abundance("AAAAAA", 1)
 
@@ -813,19 +896,19 @@ def test_badfasta_count_kmers_by_position():
     countingtable = khmer.new_counting_hash(4, 4 ** 4, 4)
     try:
         countingtable.fasta_count_kmers_by_position()
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
     filename = utils.get_test_data("test-short.fa")
     try:
         countingtable.fasta_count_kmers_by_position(filename, -1, 0)
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
     try:
         countingtable.fasta_count_kmers_by_position(filename, 0, -1)
         assert 0, "this should fail"
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -834,7 +917,7 @@ def test_badload():
     try:
         countingtable.load()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -843,7 +926,7 @@ def test_badsave():
     try:
         countingtable.save()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -852,7 +935,7 @@ def test_badksize():
     try:
         countingtable.ksize(True)
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -861,7 +944,7 @@ def test_badhashsizes():
     try:
         countingtable.hashsizes(True)
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -870,7 +953,7 @@ def test_badconsume_and_tag():
     try:
         countingtable.consume_and_tag()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
 
 
@@ -879,6 +962,6 @@ def test_consume_fasta_and_tag():
     try:
         countingtable.consume_fasta_and_tag()
         assert 0, "this should fail"
-    except TypeError, err:
+    except TypeError as err:
         print str(err)
     countingtable.consume_fasta_and_tag(utils.get_test_data("test-graph2.fa"))

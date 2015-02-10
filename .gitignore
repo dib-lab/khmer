@@ -41,3 +41,5 @@ third-party/zlib/zlib.pc
 pip-log.txt
 sphinx-contrib
 compile_commands.json
+.DS_Store
+pylint_report.txt

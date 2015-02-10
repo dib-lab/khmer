@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -19,6 +19,7 @@ Use '-h' for parameter help.
 import argparse
 import screed
 import sys
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -43,20 +44,7 @@ def main():
     for filename in args.input_filenames:
         for record in screed.open(filename):
             if len(record['sequence']) >= args.length:
-                # FASTQ
-                if hasattr(record, 'quality'):
-                    outfp.write(
-                        '@{name}\n{seq}\n'
-                        '+\n{acc}\n'.format(name=record.name,
-                                            seq=record.sequence,
-                                            acc=record.quality))
-
-                # FASTA
-                else:
-                    outfp.write(
-                        '>{name}\n{seq}\n'.format(name=record.name,
-                                                  seq=record.sequence))
-
+                write_record(record, outfp)
     print >> sys.stderr, 'wrote to: ' + args.output
 
 if __name__ == '__main__':

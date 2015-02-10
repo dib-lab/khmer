@@ -14,34 +14,40 @@ import glob
 TRAVERSE_ON_UNPART = True
 STOP_BIG_TRAVERSALS = True
 
-already_part = sys.argv[1]
-new_to_part = sys.argv[2]
-basename = os.path.basename(new_to_part)
-pmap_filename = sys.argv[3]
 
-# if not os.path.exists(already_part):
-#    print '%s doesn\'t exist! dying.' % already_part
-#    sys.exit(0)
+def main():
+    already_part = sys.argv[1]
+    new_to_part = sys.argv[2]
+    basename = os.path.basename(new_to_part)
+    pmap_filename = sys.argv[3]
 
-# create a fake-ish ht; K matters, but not hashtable size.
-ht = khmer.load_hashbits(already_part + '.ht')
-ht.load_tagset(already_part + '.tagset')
-ht.merge_subset_from_disk(pmap_filename)
+    # if not os.path.exists(already_part):
+    #    print '%s doesn\'t exist! dying.' % already_part
+    #    sys.exit(0)
 
-# find singletons
-n_singletons = ht.find_unpart(
-    new_to_part, TRAVERSE_ON_UNPART, STOP_BIG_TRAVERSALS)
-print 'found:', n_singletons
+    # create a fake-ish ht; K matters, but not hashtable size.
+    ht = khmer.load_hashbits(already_part + '.ht')
+    ht.load_tagset(already_part + '.tagset')
+    ht.merge_subset_from_disk(pmap_filename)
 
-print 'saving', basename + '.unpart'
-n_partitions = ht.output_partitions(new_to_part, basename + '.unpart')
-print 'saving', basename + '.pmap'
-ht.save_partitionmap(basename + '.pmap')
+    # find singletons
+    n_singletons = ht.find_unpart(
+        new_to_part, TRAVERSE_ON_UNPART, STOP_BIG_TRAVERSALS)
+    print 'found:', n_singletons
 
-###
+    print 'saving', basename + '.unpart'
+    n_partitions = ht.output_partitions(new_to_part, basename + '.unpart')
+    print 'saving', basename + '.pmap'
+    ht.save_partitionmap(basename + '.pmap')
 
-(n_partitions, n_singletons) = ht.count_partitions()
+    ###
 
-print 'output partitions:', n_partitions
-print 'pmap partitions:', n_partitions
-print 'singletons:', n_singletons
+    (n_partitions, n_singletons) = ht.count_partitions()
+
+    print 'output partitions:', n_partitions
+    print 'pmap partitions:', n_partitions
+    print 'singletons:', n_singletons
+
+
+if __name__ == '__main__':
+    main()

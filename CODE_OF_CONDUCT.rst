@@ -31,5 +31,5 @@ at the BEACON Center for the Study of Evolution in Action, an NSF Center for
 Science and Technology.
 
 This Code of Conduct is adapted from the `Contributor
-Covenant <http:contributor-covenant.org>`__, version 1.0.0, available at
+Covenant <http://contributor-covenant.org>`__, version 1.0.0, available at
 http://contributor-covenant.org/version/1/0/0/

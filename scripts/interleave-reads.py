@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -25,18 +25,9 @@ import os
 import textwrap
 import argparse
 import khmer
-from khmer.file import check_file_status, check_space
+from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-
-
-def output_pair(read1, read2):
-    if hasattr(read1, 'quality'):
-        return "@%s\n%s\n+\n%s\n@%s\n%s\n+\n%s\n" % \
-            (read1.name, read1.sequence, read1.quality,
-             read2.name, read2.sequence, read2.quality)
-    else:
-        return ">%s\n%s\n>%s\n%s\n" % (read1.name, read1.sequence, read2.name,
-                                       read2.sequence)
+from khmer.utils import write_record
 
 
 def get_parser():
@@ -63,6 +54,8 @@ def get_parser():
                         default=sys.stdout)
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
@@ -71,9 +64,9 @@ def main():
     args = get_parser().parse_args()
 
     for _ in args.infiles:
-        check_file_status(_)
+        check_file_status(_, args.force)
 
-    check_space(args.infiles)
+    check_space(args.infiles, args.force)
 
     s1_file = args.infiles[0]
     if len(args.infiles) == 2:
@@ -92,7 +85,7 @@ def main():
         print >> sys.stderr, "Error! R2 file %s does not exist" % s2_file
         fail = True
 
-    if fail:
+    if fail and not args.force:
         sys.exit(1)
 
     print >> sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
@@ -116,7 +109,8 @@ def main():
 
         read1.name = name1
         read2.name = name2
-        args.output.write(output_pair(read1, read2))
+        write_record(read1, args.output)
+        write_record(read2, args.output)
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
 

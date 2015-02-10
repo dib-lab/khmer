@@ -1,6 +1,6 @@
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -11,8 +11,8 @@ from pkg_resources import Requirement, resource_filename, ResolutionError
 from cStringIO import StringIO
 import nose
 import sys
-import khmer.file
 import traceback
+import subprocess
 
 
 def get_test_data(filename):
@@ -55,7 +55,7 @@ def _runscript(scriptname, sandbox=False):
         pkg_resources.get_distribution("khmer").run_script(
             scriptname, ns)
         return 0
-    except pkg_resources.ResolutionError, err:
+    except pkg_resources.ResolutionError as err:
         if sandbox:
             paths = [os.path.join(os.path.dirname(__file__), "../sandbox")]
         else:
@@ -65,7 +65,7 @@ def _runscript(scriptname, sandbox=False):
         for path in paths:
             scriptfile = os.path.join(path, scriptname)
             if os.path.isfile(scriptfile):
-                execfile(scriptfile, ns)
+                exec(compile(open(scriptfile).read(), scriptfile, 'exec'), ns)
                 return 0
         if sandbox:
             raise nose.SkipTest("sandbox tests are only run in a repository.")
@@ -102,7 +102,7 @@ def runscript(scriptname, args, in_directory=None,
             status = _runscript(scriptname, sandbox=sandbox)
         except nose.SkipTest:
             raise
-        except SystemExit, e:
+        except SystemExit as e:
             status = e.code
         except:
             traceback.print_exc(file=sys.stderr)
@@ -120,3 +120,48 @@ def runscript(scriptname, args, in_directory=None,
         assert False, (status, out, err)
 
     return status, out, err
+
+
+def runscriptredirect(scriptname, args, stdinfilename, in_directory=None,
+                      fail_ok=False, sandbox=False):
+    """
+    Run the given Python script, with the given args, in the given directory,
+    using 'subprocess'.
+    """
+
+    cwd = os.getcwd()
+
+    status = -1
+
+    if sandbox:
+        paths = [os.path.join(os.path.dirname(__file__), "../sandbox")]
+    else:
+        paths = [os.path.join(os.path.dirname(__file__), "../scripts")]
+        paths.extend(os.environ['PATH'].split(':'))
+    for path in paths:
+        scriptfile = os.path.join(path, scriptname)
+        if os.path.isfile(scriptfile):
+            if in_directory:
+                os.chdir(in_directory)
+            sysargs = 'cat ' + stdinfilename + ' | python ' + scriptfile + \
+                " " + args
+            out = open(os.path.join(in_directory, "out"), 'w+b')
+            err = open(os.path.join(in_directory, "err"), 'w+b')
+            print 'running:', scriptname, 'in:', in_directory
+            print 'arguments', sysargs
+            status = subprocess.call(args=sysargs, stdout=out, stderr=err,
+                                     shell=True)
+            os.chdir(cwd)
+            if status != 0 and not fail_ok:
+                out.seek(0)
+                out = out.read()
+                err.seek(0)
+                err = err.read()
+                print out
+                print err
+                assert False, (status, out, err)
+
+            return status, out, err
+
+        if sandbox:
+            raise nose.SkipTest("sandbox tests are only run in a repository.")

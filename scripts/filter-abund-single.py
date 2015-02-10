@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 #
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
 # Contact: khmer-project@idyll.org
 #
@@ -23,8 +23,8 @@ import textwrap
 from khmer.thread_utils import ThreadedSequenceProcessor, verbose_loader
 from khmer.khmer_args import (build_counting_args, report_on_config,
                               add_threading_args, info)
-from khmer.file import (check_file_status, check_space,
-                        check_space_for_hashtable)
+from khmer.kfile import (check_file_status, check_space,
+                         check_space_for_hashtable)
 #
 DEFAULT_CUTOFF = 2
 
@@ -56,28 +56,27 @@ def get_parser():
                         help="FAST[AQ] sequence file to trim")
     parser.add_argument('--report-total-kmers', '-t', action='store_true',
                         help="Prints the total number of k-mers to stderr")
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                        help='Overwrite output file if it exists')
     return parser
 
 
 def main():
-    info('filter-abund-single.py', ['counting'])
+    info('filter-abund-single.py', ['counting', 'SeqAn'])
     args = get_parser().parse_args()
-    check_file_status(args.datafile)
-    check_space([args.datafile])
+    check_file_status(args.datafile, args.force)
+    check_space([args.datafile], args.force)
     if args.savetable:
-        check_space_for_hashtable(args.n_tables * args.min_tablesize)
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
     report_on_config(args)
-
-    config = khmer.get_config()
-    config.set_reads_input_buffer_size(args.threads * 64 * 1024)
 
     print >>sys.stderr, 'making k-mer counting table'
     htable = khmer.new_counting_hash(args.ksize, args.min_tablesize,
-                                     args.n_tables,
-                                     args.threads)
+                                     args.n_tables)
 
     # first, load reads into hash table
-    rparser = khmer.ReadParser(args.datafile, args.threads)
+    rparser = khmer.ReadParser(args.datafile)
     threads = []
     print >>sys.stderr, 'consuming input, round 1 --', args.datafile
     for _ in xrange(args.threads):
