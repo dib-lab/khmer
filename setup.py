@@ -177,7 +177,7 @@ SETUP_METADATA = \
         "package_dir": {'khmer.tests': 'tests'},
         "install_requires": ['screed >= 0.8rc1'],
         # testing screed download link
-        
+
         "extras_require": {':python_version=="2.6"': ['argparse>=1.2.1'],
                            'docs': ['sphinx', 'sphinxcontrib-autoprogram'],
                            'tests': ['nose >= 1.0']},
@@ -250,6 +250,6 @@ Distribution.reinitialize_command = reinitialize_command
 
 # remove dependency_link once screed is published to actual pyli
 # pylint: disable=W0142
-setup(cmdclass=CMDCLASS, dependency_links = [
-            "https://testpypi.python.org/pypi/screed/0.8-rc3"],
-      **SETUP_METADATA )
+setup(cmdclass=CMDCLASS, dependency_links=[
+    "https://testpypi.python.org/pypi/screed/0.8-rc3"],
+    **SETUP_METADATA)
