@@ -243,7 +243,7 @@ def test_filter_abund_3_fq_retained():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
-    # check for 'accuracy' string.
+    # check for 'quality' string.
     seqs = set([r.quality for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
@@ -1564,7 +1564,7 @@ def test_split_paired_reads_3_output_dir():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1572,7 +1572,7 @@ def test_split_paired_reads_3_output_dir():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
