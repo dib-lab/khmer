@@ -1341,21 +1341,17 @@ static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
 
     std::vector<unsigned int> posns;
     std::vector<HashIntoType> tags;
-    try {
-        unsigned int pos = 1;
-        KMerIterator kmers(seq, counting->ksize());
 
-        while (!kmers.done()) {
-            HashIntoType kmer = kmers.next();
-            if (set_contains(counting->all_tags, kmer)) {
-                 posns.push_back(pos);
-                 tags.push_back(kmer);
-            }
-            pos++;
+    unsigned int pos = 1;
+    KMerIterator kmers(seq, counting->ksize());
+
+    while (!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        if (set_contains(counting->all_tags, kmer)) {
+             posns.push_back(pos);
+             tags.push_back(kmer);
         }
-    } catch (_khmer_signal &e) {
-        PyErr_SetString(PyExc_ValueError, e.get_message().c_str());
-        return NULL;
+        pos++;
     }
 
     PyObject * posns_list = PyList_New(posns.size());
