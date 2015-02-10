@@ -11,7 +11,7 @@ import threading
 import Queue
 import sys
 import screed
-
+from khmer import utils
 DEFAULT_WORKER_THREADS = 8
 DEFAULT_GROUPSIZE = 100
 

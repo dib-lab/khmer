@@ -6,6 +6,8 @@
 #
 # pylint: disable=invalid-name,missing-docstring,no-member
 
+from khmer import utils
+
 """
 Find all reads connected to the given contigs on a per-partition basis.
 
@@ -284,16 +286,8 @@ def main():
                     ht.consume_sequence_and_tag_with_labels(record.sequence,
                                                             label)
 
-                    if hasattr(record, 'quality'):
-                        outfp.write('@{name}\n{seq}+{quality}\n'.format(
-                            name=record.name,
-                            seq=record.sequence,
-                            quality=record.quality))
-                    else:
-                        outfp.write('>{name}\n{seq}\n'.format(
-                            name=record.name,
-                            seq=record.sequence))
-
+                    write_record(record, outfp) 
+                   
             except IOError as e:
                 print >>sys.stderr, '!! ERROR !!', e
                 print >>sys.stderr, '...error splitting input. exiting...'
