@@ -150,6 +150,17 @@ def test_check_is_pair_4():
         pass
 
 
+def test_check_is_pair_4b():
+    read1 = FakeFastaRead(name='seq/1', sequence='AAA')
+    read2 = FakeFQRead(name='seq/2', accuracy='###', sequence='AAA')
+
+    try:
+        check_is_pair(read1, read2)
+        assert False                    # check_is_pair should fail here.
+    except ValueError:
+        pass
+
+
 def test_check_is_pair_5():
     read1 = FakeFastaRead(name='seq/1', sequence='AAA')
     read2 = FakeFastaRead(name='seq/2', sequence='AAA')

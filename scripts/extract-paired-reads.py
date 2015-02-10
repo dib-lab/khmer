@@ -22,7 +22,7 @@ import argparse
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-from khmer.utils import (broken_paired_reader, write_record, write_record_pair)
+from khmer.utils import broken_paired_reader, write_record, write_record_pair
 
 
 def get_parser():
