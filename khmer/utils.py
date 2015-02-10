@@ -28,8 +28,9 @@ def check_is_pair(record1, record2):
     """
     is_fastq = False
     if hasattr(record1, 'accuracy'):
+        if not hasattr(record2, 'accuracy'):
+            raise ValueError("both records must be same type (FASTA or FASTQ)")
         is_fastq = True
-        assert hasattr(record2, 'accuracy')
 
     name1 = record1.name
     name2 = record2.name

@@ -145,8 +145,8 @@ def test_check_is_pair_4():
 
     try:
         check_is_pair(read1, read2)
-        assert False                    # expect fail
-    except AssertionError:
+        assert False                    # check_is_pair should fail here.
+    except ValueError:
         pass
 
 
