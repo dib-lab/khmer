@@ -10,6 +10,7 @@ import gzip
 import khmer
 import khmer_tst_utils as utils
 from khmer import ReadParser
+import screed
 
 from nose.plugins.attrib import attr
 
@@ -965,3 +966,50 @@ def test_consume_fasta_and_tag():
     except TypeError as err:
         print str(err)
     countingtable.consume_fasta_and_tag(utils.get_test_data("test-graph2.fa"))
+
+
+def test_consume_and_retrieve_tags_1():
+    ct = khmer.new_counting_hash(4, 4 ** 4, 4)
+
+    # first, for each sequence, build tags.
+    for record in screed.open(utils.get_test_data('test-graph2.fa')):
+        ct.consume_and_tag(record.sequence)
+
+    # check that all the tags in sequences are retrieved by iterating
+    # across the sequence and retrieving by neighborhood.
+
+    ss = set()
+    tt = set()
+    for record in screed.open(utils.get_test_data('test-graph2.fa')):
+        for p, tag in ct.get_tags_and_positions(record.sequence):
+            ss.add(tag)
+
+        for start in range(len(record.sequence) - 20):
+            kmer = record.sequence[start:start + 21]
+            tt.update(ct.find_all_tags_list(kmer))
+
+    assert ss == tt
+
+
+def test_consume_and_retrieve_tags_empty():
+    ct = khmer.new_counting_hash(4, 4 ** 4, 4)
+
+    # load each sequence but do not build tags - everything should be empty.
+    for record in screed.open(utils.get_test_data('test-graph2.fa')):
+        ct.consume(record.sequence)
+
+    # check that all the tags in sequences are retrieved by iterating
+    # across the sequence and retrieving by neighborhood.
+
+    ss = set()
+    tt = set()
+    for record in screed.open(utils.get_test_data('test-graph2.fa')):
+        for p, tag in ct.get_tags_and_positions(record.sequence):
+            ss.add(tag)
+
+        for start in range(len(record.sequence) - 20):
+            kmer = record.sequence[start:start + 21]
+            tt.update(ct.find_all_tags_list(kmer))
+
+    assert not ss
+    assert not tt

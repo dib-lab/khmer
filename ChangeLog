@@ -1,3 +1,15 @@
+2015-02-09  Bede Constantinides  <bede.constantinides@manchester.ac.uk>
+
+   * scripts/split-paired-reads.py: added -o option to allow specification
+   of an output directory
+   * tests/test_scripts.py: added accompanying test for split-paired-reads.py
+
+2015-02-01  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added functions hash_find_all_tags_list and
+   hash_get_tags_and_positions to CountingHash objects.
+   * tests/test_counting_hash.py: added tests for new functionality.
+
 2015-01-25  Titus Brown  <titus@idyll.org>
 
    * sandbox/correct-errors.py: fixed sequence output so that quality
