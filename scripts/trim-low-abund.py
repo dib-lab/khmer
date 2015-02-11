@@ -76,16 +76,16 @@ def get_parser():
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
-    parser.add_argument('--normalize-to', '-Z', type=int, dest='normalize_to',
+    parser.add_argument('--normalize-to', '-Z', type=int,
                         help='base cutoff on this median k-mer abundance',
                         default=DEFAULT_NORMALIZE_LIMIT)
 
     parser.add_argument('--variable-coverage', '-V', action='store_true',
-                        dest='variable_coverage', default=False,
+                        default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
-    parser.add_argument('--tempdir', '-T', type=str,
-                        default='./')
+
+    parser.add_argument('--tempdir', '-T', type=str, default='./')
 
     parser.add_argument('input_filenames', nargs='+')
 
