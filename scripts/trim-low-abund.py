@@ -143,7 +143,7 @@ def main():
         for n, is_pair, read1, read2 in broken_paired_reader(screed_iter):
             if n % 10000 == 0:
                 print >>sys.stderr, '...', n, filename, save_pass2, \
-                   n_reads, n_bp, written_reads, written_bp
+                    n_reads, n_bp, written_reads, written_bp
 
             # we want to track paired reads here, to make sure that pairs
             # are not split between first pass and second pass.
