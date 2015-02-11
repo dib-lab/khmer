@@ -1376,7 +1376,7 @@ static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
 
     if (strlen(kmer_s) != counting->ksize()) {
         PyErr_SetString(PyExc_ValueError,
-                        "kmer length must equal the counting table k-mer size");
+                        "k-mer length must equal the counting table k-mer size");
         return NULL;
     }
 
@@ -1450,7 +1450,7 @@ static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self,
 
     if (strlen(kmer_s) != counting->ksize()) {
         PyErr_SetString(PyExc_ValueError,
-                        "kmer size must equal the k-mer size of the counting table");
+                        "k-mer size must equal the k-mer size of the counting table");
         return NULL;
     }
 
