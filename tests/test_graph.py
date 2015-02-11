@@ -327,7 +327,6 @@ class Test_PythonAPI(object):
         except ValueError:
             pass
 
-
     def test_ordered_connect(self):
         ht = khmer.new_hashbits(20, 4 ** 4 + 1)
 
