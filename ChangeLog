@@ -12,6 +12,7 @@
    of sys.argv.
    * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
    * tests/test_functions.py: added tests for 'check_is_pair'.
+   * doc/user/scripts.txt: added trim-low-abund.py.
 
 2015-02-11  Titus Brown  <titus@idyll.org>
 
