@@ -77,7 +77,7 @@ def main():
     screed_iter = screed.open(args.infile)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
-            print '...', index
+            print >>sys.stderr, '...', index
 
         if is_pair:
             write_record_pair(read1, read2, paired_fp)
