@@ -1,5 +1,5 @@
 //
-// This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+// Thit file is part of khmer, http://github.com/ged-lab/khmer/, and is
 // Copyright (C) Michigan State University, 2009-2015. It is licensed under
 // the three-clause BSD license; see doc/LICENSE.txt.
 // Contact: khmer-project@idyll.org
@@ -23,6 +23,7 @@
 #include "labelhash.hh"
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
+#include <stdlib.h> 
 
 using namespace khmer;
 
@@ -1628,8 +1629,10 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
     if (kcounting_obj == NULL) {
         return NULL;
     }
-
-    kcounting_obj->counting = new CountingHash(k, size);
+    try {
+	kcounting_obj->counting = new CountingHash(k, size);}
+    catch (const std::bad_alloc&) {
+    	exit(EXIT_FAILURE);} 
 
     return (PyObject *) kcounting_obj;
 }
@@ -1674,8 +1677,10 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
     if (kcounting_obj == NULL) {
         return NULL;
     }
-
-    kcounting_obj->counting = new CountingHash(k, sizes);
+    try {
+    	kcounting_obj->counting = new CountingHash(k, sizes);}
+    catch (const std::bad_alloc&) {
+	exit(EXIT_FAILURE);}
 
     return (PyObject *) kcounting_obj;
 }
@@ -3421,8 +3426,13 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
                 return NULL;
             }
         }
+   
+        try{ 
+        	self->hashbits = new Hashbits(k, sizes);}
+	catch (const std::bad_alloc&) {
+    		exit(EXIT_FAILURE);}
 
-        self->hashbits = new Hashbits(k, sizes);
+	
     }
     return (PyObject *) self;
 }
@@ -4204,8 +4214,11 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
     if (khashbits_obj == NULL) {
         return NULL;
     }
-
-    khashbits_obj->hashbits = new Hashbits(k, sizes);
+    
+    try {
+    	khashbits_obj->hashbits = new Hashbits(k, sizes);}
+    catch (const std::bad_alloc&) {
+    	exit(EXIT_FAILURE);}
 
     return (PyObject *) khashbits_obj;
 }
@@ -4238,6 +4251,7 @@ static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
     }
 
     // ...and set the collected kmers as the stoptags.
+	
     khashbits_obj->hashbits = new Hashbits(counting->ksize(), sizes);
     khashbits_obj->hashbits->stop_tags.swap(found_kmers);
 
