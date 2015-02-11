@@ -22,7 +22,7 @@ import khmer
 import textwrap
 from itertools import izip
 from khmer.khmer_args import (build_counting_args, add_loadhash_args,
-                              report_on_config, info)
+                              report_on_config, info, update_memory_parameters)
 import argparse
 from khmer.kfile import (check_space, check_space_for_hashtable,
                          check_valid_file_exists)
@@ -209,7 +209,9 @@ def get_parser():
 
 def main():  # pylint: disable=too-many-branches,too-many-statements
     info('normalize-by-median.py', ['diginorm'])
-    args = get_parser().parse_args()
+    parser = get_parser()
+    args = parser.parse_args()
+    update_memory_parameters(parser, args)
 
     report_on_config(args)
 

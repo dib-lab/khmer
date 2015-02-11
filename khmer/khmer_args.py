@@ -56,9 +56,9 @@ def build_hash_args(descr=None, epilog=None):
 
 
 def update_memory_parameters(parser, args):
-    env_n_tables = os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES)
-    env_tablesize = os.environ.get('KHMER_MIN_TABLESIZE',
-                                   DEFAULT_MIN_TABLESIZE)
+    env_n_tables = int(os.environ.get('KHMER_N_TABLES', DEFAULT_N_TABLES))
+    env_tablesize = float(os.environ.get('KHMER_MIN_TABLESIZE',
+                                   DEFAULT_MIN_TABLESIZE))
 
     # can't allow all three! (a, b, c)
     if args.n_tables and args.min_tablesize and args.max_memory:
@@ -72,9 +72,9 @@ def update_memory_parameters(parser, args):
     # just tablesize and max memory (a, b, not c)
     if args.n_tables is None and (args.max_memory and args.min_tablesize):
         if parser.hashtype == 'counting':
-            tablesize = int(args.max_memory / float(args.min_tablesize))
+            args.n_tables = int(args.max_memory / float(args.min_tablesize))
         elif parser.hashtype == 'hashbits':
-            tablesize = int(8 * args.max_memory / float(args.min_tablesize))
+            args.n_tables = int(8 * args.max_memory / float(args.min_tablesize))
 
     # just tablesize and num tables (not a, b, c) - no change needed
     elif args.max_memory is None and (args.n_tables and args.min_tablesize):
@@ -83,19 +83,19 @@ def update_memory_parameters(parser, args):
     # just num tables and max memory (a, not b, c)
     elif args.min_tablesize is None and (args.n_tables and args.max_memory):
         if parser.hashtype == 'hashbits':
-            args.min_tablesize = int(8 * args.max_memory /
+            args.min_tablesize = float(8 * args.max_memory /
                                      float(args.n_tables))
         else:
-            args.min_tablesize = int(args.max_memory / float(args.n_tables))
+            args.min_tablesize = float(args.max_memory / float(args.n_tables))
 
     # just max memory (a, not b, not c)
     elif args.max_memory and not (args.n_tables or args.min_tablesize):
         args.n_tables = env_n_tables
         if parser.hashtype == 'hashbits':
-            args.min_tablesize = int(8 * args.max_memory /
+            args.min_tablesize = float(8 * args.max_memory /
                                      float(args.n_tables))
         else:
-            args.min_tablesize = int(args.max_memory / float(args.n_tables))
+            args.min_tablesize = float(args.max_memory / float(args.n_tables))
 
 
 def build_counting_args(descr=None, epilog=None):
@@ -159,8 +159,8 @@ will be ignored.'''.format(hashfile=values))
                     x = info[1]
                     n = info[2]
                     setattr(namespace, 'ksize', K)
-                    setattr(namespace, 'n_tables', n)
-                    setattr(namespace, 'min_tablesize', x)
+                    setattr(namespace, 'n_tables', int(n))
+                    setattr(namespace, 'min_tablesize', float(x))
 
     parser.add_argument('-l', '--loadtable', metavar="filename", default=None,
                         help='load a precomputed k-mer table from disk',
