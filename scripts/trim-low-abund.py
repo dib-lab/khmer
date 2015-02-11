@@ -9,7 +9,7 @@
 Trim sequences at k-mers of the given abundance, using a streaming algorithm.
 Output sequences will be placed in 'infile.abundtrim'.
 
-% python sandbox/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]
+% python scripts/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]
 
 Use -h for parameter help.
 
@@ -72,7 +72,7 @@ def get_parser():
         descr='Trim low-abundance k-mers using a streaming algorithm.',
         epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('--cutoff', '-C', type=int, dest='abund_cutoff',
+    parser.add_argument('--cutoff', '-C', type=int, dest='cutoff',
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
@@ -106,14 +106,12 @@ def main():
     ###
 
     K = args.ksize
-    HT_SIZE = args.min_tablesize
-    N_HT = args.n_tables
 
-    CUTOFF = args.abund_cutoff
+    CUTOFF = args.cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
     print >>sys.stderr, 'making counting table'
-    ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
+    ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print >>sys.stderr, 'created temporary directory %s; ' \
@@ -123,10 +121,10 @@ def main():
 
     save_pass2_total = 0
 
-    read_bp = 0
-    read_reads = 0
-    wrote_bp = 0
-    wrote_reads = 0
+    n_bp = 0
+    n_reads = 0
+    written_bp = 0
+    written_reads = 0
     trimmed_reads = 0
 
     pass2list = []
@@ -144,30 +142,30 @@ def main():
         save_pass2 = 0
         for n, is_pair, read1, read2 in broken_paired_reader(screed_iter):
             if n % 10000 == 0:
-                print '...', n, filename, save_pass2, read_reads, read_bp, \
-                    wrote_reads, wrote_bp
+                print >>sys.stderr, '...', n, filename, save_pass2, \
+                   n_reads, n_bp, written_reads, written_bp
 
             # we want to track paired reads here, to make sure that pairs
             # are not split between first pass and second pass.
 
             if is_pair:
-                read_reads += 2
-                read_bp += len(read1.sequence) + len(read2.sequence)
+                n_reads += 2
+                n_bp += len(read1.sequence) + len(read2.sequence)
 
                 seq1 = read1.sequence.replace('N', 'A')
                 seq2 = read2.sequence.replace('N', 'A')
 
-                med1, _, _ = ht.get_median_count(seq1)
-                med2, _, _ = ht.get_median_count(seq2)
+                med1, _, _ = ct.get_median_count(seq1)
+                med2, _, _ = ct.get_median_count(seq2)
 
                 if med1 < NORMALIZE_LIMIT or med2 < NORMALIZE_LIMIT:
-                    ht.consume(seq1)
-                    ht.consume(seq2)
+                    ct.consume(seq1)
+                    ct.consume(seq2)
                     write_record_pair(read1, read2, pass2fp)
                     save_pass2 += 2
                 else:
-                    _, trim_at1 = ht.trim_on_abundance(seq1, CUTOFF)
-                    _, trim_at2 = ht.trim_on_abundance(seq2, CUTOFF)
+                    _, trim_at1 = ct.trim_on_abundance(seq1, CUTOFF)
+                    _, trim_at2 = ct.trim_on_abundance(seq2, CUTOFF)
 
                     if trim_at1 >= K:
                         read1 = trim_record(read1, trim_at1)
@@ -181,29 +179,29 @@ def main():
                         trimmed_reads += 1
 
                     write_record_pair(read1, read2, trimfp)
-                    wrote_reads += 2
-                    wrote_bp += trim_at1 + trim_at2
+                    written_reads += 2
+                    written_bp += trim_at1 + trim_at2
             else:
-                read_reads += 1
-                read_bp += len(read1.sequence)
+                n_reads += 1
+                n_bp += len(read1.sequence)
 
                 seq = read1.sequence.replace('N', 'A')
-                med, _, _ = ht.get_median_count(seq)
+                med, _, _ = ct.get_median_count(seq)
 
                 # has this portion of the graph saturated? if not,
                 # consume & save => pass2.
                 if med < NORMALIZE_LIMIT:
-                    ht.consume(seq)
+                    ct.consume(seq)
                     write_record(read1, pass2fp)
                     save_pass2 += 1
                 else:                       # trim!!
-                    _, trim_at = ht.trim_on_abundance(seq, CUTOFF)
+                    _, trim_at = ct.trim_on_abundance(seq, CUTOFF)
                     if trim_at >= K:
                         new_read = trim_record(read1, trim_at)
                         write_record(new_read, trimfp)
 
-                        wrote_reads += 1
-                        wrote_bp += trim_at
+                        written_reads += 1
+                        written_bp += trim_at
 
                         if trim_at != len(read1.sequence):
                             trimmed_reads += 1
@@ -231,30 +229,30 @@ def main():
         trimfp = open(trimfilename, 'a')
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print '... x 2', n, pass2filename, read_reads, read_bp, \
-                    wrote_reads, wrote_bp
+                print >>sys.stderr, '... x 2', n, pass2filename, \
+                    written_reads, written_bp
 
             seq = read.sequence.replace('N', 'A')
-            med, _, _ = ht.get_median_count(seq)
+            med, _, _ = ct.get_median_count(seq)
 
             # do we retain low-abundance components unchanged?
             if med < NORMALIZE_LIMIT and args.variable_coverage:
                 write_record(read, trimfp)
 
-                wrote_reads += 1
-                wrote_bp += len(read.sequence)
+                written_reads += 1
+                written_bp += len(read.sequence)
                 skipped_n += 1
                 skipped_bp += len(read.sequence)
 
             # otherwise, examine/trim/truncate.
             else:    # med >= NORMALIZE LIMIT or not args.variable_coverage
-                _, trim_at = ht.trim_on_abundance(seq, CUTOFF)
+                _, trim_at = ct.trim_on_abundance(seq, CUTOFF)
                 if trim_at >= K:
                     new_read = trim_record(read, trim_at)
                     write_record(new_read, trimfp)
 
-                    wrote_reads += 1
-                    wrote_bp += trim_at
+                    written_reads += 1
+                    written_bp += trim_at
 
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
@@ -265,19 +263,19 @@ def main():
     print >>sys.stderr, 'removing temp directory & contents (%s)' % tempdir
     shutil.rmtree(tempdir)
 
-    print 'read %d reads, %d bp' % (read_reads, read_bp,)
-    print 'wrote %d reads, %d bp' % (wrote_reads, wrote_bp,)
-    print 'removed %d reads and trimmed %d reads' % (read_reads - wrote_reads,
+    print 'read %d reads, %d bp' % (n_reads, n_bp,)
+    print 'wrote %d reads, %d bp' % (written_reads, written_bp,)
+    print 'removed %d reads and trimmed %d reads' % (n_reads - written_reads,
                                                      trimmed_reads,)
     print 'looked at %d reads twice' % (save_pass2_total,)
     print 'trimmed or removed %.2f%% of bases (%d total)' % \
-        ((1 - (wrote_bp / float(read_bp))) * 100., read_bp - wrote_bp)
+        ((1 - (written_bp / float(n_bp))) * 100., n_bp - written_bp)
 
     if args.variable_coverage:
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
 
-    fp_rate = khmer.calc_expected_collisions(ht)
+    fp_rate = khmer.calc_expected_collisions(ct)
     print >>sys.stderr, \
         'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
 
