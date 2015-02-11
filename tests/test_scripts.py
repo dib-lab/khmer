@@ -1577,6 +1577,117 @@ def test_split_paired_reads_3_output_dir():
     assert n > 0
 
 
+def test_split_paired_reads_3_output_files():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('xxx')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('yyy', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-1', outfile1, '-2', outfile2, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
+def test_split_paired_reads_3_output_files_left():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('xxx')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-o', output_dir, '-1', outfile1, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
+def test_split_paired_reads_3_output_files_right():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fq.1')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('yyy', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-2', outfile2, '-o', output_dir, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
 def test_sample_reads_randomly():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
