@@ -13,6 +13,12 @@
    * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
    * tests/test_functions.py: added tests for 'check_is_pair'.
 
+2015-02-11  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: fixed k-mer size checking; updated some error
+   messages.
+   * tests/test_graph.py: added test for k-mer size checking in find_all_tags.
+
 2015-02-09  Titus Brown  <titus@idyll.org>
 
    * scripts/split-paired-reads.py: added -1 and -2 options to allow fine-
