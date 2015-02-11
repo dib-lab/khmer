@@ -85,13 +85,13 @@ def broken_paired_reader(screed_iter):
 
         prev_record = record
 
-    # handle the last two records (which might be a pair, or not).
+    # handle the two records (which cannot be pairs)
     if prev_record:
-        if check_is_pair(prev_record, record):
-            yield n, True, prev_record, record  # it's a pair!
-            record = None
-        else:                                   # orphan.
-            yield n, False, prev_record, None
+        # the only way into this if statement is if 'prev_record' and
+        # 'record' are both singletons.
+        assert not check_is_pair(prev_record, record)
+
+        yield n, False, prev_record, None
 
     if record:                     # guaranteed to be orphan
         n += 1
