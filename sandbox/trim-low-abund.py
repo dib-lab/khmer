@@ -20,21 +20,17 @@ import sys
 import screed
 import os
 import khmer
-import argparse
 import tempfile
 import shutil
 import textwrap
-from screed.screedRecord import _screed_record_dict
 
+from screed.screedRecord import _screed_record_dict
+from khmer.khmer_args import build_counting_args
 from khmer.utils import (write_record, write_record_pair, broken_paired_reader)
 
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
-
-DEFAULT_K = 32
-DEFAULT_N_HT = 4
-DEFAULT_MIN_HASHSIZE = 1e6
 
 # see Zhang et al., http://arxiv.org/abs/1309.2975
 MAX_FALSE_POSITIVE_RATE = 0.8
@@ -72,23 +68,9 @@ def get_parser():
         trim-low-abund.py -x 5e7 -k 20 -C 2 data/100k-filtered.fa
     """
 
-    parser = argparse.ArgumentParser(
-        description='Trim low-abundance k-mers using a streaming algorithm.',
+    parser = build_counting_args(
+        descr='Trim low-abundance k-mers using a streaming algorithm.',
         epilog=textwrap.dedent(epilog))
-
-    env_ksize = os.environ.get('KHMER_KSIZE', DEFAULT_K)
-    env_n_hashes = os.environ.get('KHMER_N_HASHES', DEFAULT_N_HT)
-    env_hashsize = os.environ.get('KHMER_MIN_HASHSIZE', DEFAULT_MIN_HASHSIZE)
-
-    parser.add_argument('--ksize', '-k', type=int, dest='ksize',
-                        default=env_ksize,
-                        help='k-mer size to use')
-    parser.add_argument('--n_hashes', '-N', type=int, dest='n_hashes',
-                        default=env_n_hashes,
-                        help='number of hash tables to use')
-    parser.add_argument('--hashsize', '-x', type=float, dest='min_hashsize',
-                        default=env_hashsize,
-                        help='lower bound on hashsize to use')
 
     parser.add_argument('--cutoff', '-C', type=int, dest='abund_cutoff',
                         help='remove k-mers below this abundance',
@@ -124,13 +106,13 @@ def main():
     ###
 
     K = args.ksize
-    HT_SIZE = args.min_hashsize
-    N_HT = args.n_hashes
+    HT_SIZE = args.min_tablesize
+    N_HT = args.n_tables
 
     CUTOFF = args.abund_cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
-    print 'making hashtable'
+    print 'making counting table'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
