@@ -1,10 +1,10 @@
-2015-02-10  Titus Brown  <titus@idyll.org>
+2015-02-11  Titus Brown  <titus@idyll.org>
 
    * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and
    'write_record_pair' functions.
-   * sandbox/trim-low-abund.py: upgraded to track pairs properly; added
-   proper get_parser information.
-   * tests/test_sandbox_scripts.py: added paired-read tests for
+   * scripts/trim-low-abund.py: upgraded to track pairs properly; added
+   proper get_parser information; moved to scripts/.
+   * tests/test_scripts.py: added paired-read tests for
    trim-low-abund.py.
    * tests/test-data/test-abund-read-2.paired.fq: data for paired-read tests.
    * scripts/extract-paired-reads.py: removed 'is_pair' in favor of
