@@ -72,7 +72,7 @@ def get_parser():
         descr='Trim low-abundance k-mers using a streaming algorithm.',
         epilog=textwrap.dedent(epilog))
 
-    parser.add_argument('--cutoff', '-C', type=int, dest='cutoff',
+    parser.add_argument('--cutoff', '-C', type=int,
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
 
@@ -84,7 +84,7 @@ def get_parser():
                         dest='variable_coverage', default=False,
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
-    parser.add_argument('--tempdir', '-T', type=str, dest='tempdir',
+    parser.add_argument('--tempdir', '-T', type=str,
                         default='./')
 
     parser.add_argument('input_filenames', nargs='+')
