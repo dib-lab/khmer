@@ -112,11 +112,12 @@ def main():
     CUTOFF = args.abund_cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
-    print 'making counting table'
+    print >>sys.stderr, 'making counting table'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
-    print 'created temporary directory %s; use -T to change location' % tempdir
+    print >>sys.stderr, 'created temporary directory %s; ' \
+                        'use -T to change location' % tempdir
 
     # ### FIRST PASS ###
 
@@ -258,10 +259,10 @@ def main():
                     if trim_at != len(read.sequence):
                         trimmed_reads += 1
 
-        print 'removing %s' % pass2filename
+        print >>sys.stderr, 'removing %s' % pass2filename
         os.unlink(pass2filename)
 
-    print 'removing temp directory & contents (%s)' % tempdir
+    print >>sys.stderr, 'removing temp directory & contents (%s)' % tempdir
     shutil.rmtree(tempdir)
 
     print 'read %d reads, %d bp' % (read_reads, read_bp,)
