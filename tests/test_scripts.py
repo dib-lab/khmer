@@ -2231,3 +2231,46 @@ def test_trim_low_abund_keep_paired():
 
     seqs = [r.name for r in screed.open(outfile)]
     assert seqs[-2:] == ['pair/1', 'pair/2'], seqs
+
+
+def test_trim_low_abund_highfpr():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1", "-N", "1", "-V", infile]
+    code, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                     fail_ok=True)
+
+    assert code == 1
+    print out
+    assert "ERROR: the k-mer counting table is too small" in err
+
+
+def test_trim_low_abund_trimtest():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "2",
+            "-V", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    for record in screed.open(outfile):
+        if record.name == 'seqtrim/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                   'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
+        elif record.name == 'seqtrim/2':
+            print record.name, record.sequence
+            assert record.sequence == \
+                   'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
+        elif record.name == 'seqtrim2/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                   'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
