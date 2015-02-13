@@ -2265,12 +2265,12 @@ def test_trim_low_abund_trimtest():
         if record.name == 'seqtrim/1':
             print record.name, record.sequence
             assert record.sequence == \
-                   'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
         elif record.name == 'seqtrim/2':
             print record.name, record.sequence
             assert record.sequence == \
-                   'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
         elif record.name == 'seqtrim2/1':
             print record.name, record.sequence
             assert record.sequence == \
-                   'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
