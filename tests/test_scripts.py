@@ -2817,12 +2817,12 @@ def test_roundtrip_casava_format_2():
 
 
 def test_existance_failure():
-    expected_output = OSError
-    
-    args = [    
+    expected_output = 'ERROR: Input file'
 
-    status, out, err = utils.runscript('extract-paired-reads.py', args)
-    assert status == 0
+    args = ['thisfiledoesnotexistatall']
 
-    assert expected_output in out
-    
+    status, out, err = utils.runscript(
+        'extract-paired-reads.py', args, fail_ok=True)
+    assert status == 1
+
+    assert expected_output in err
