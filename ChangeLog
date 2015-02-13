@@ -1,3 +1,16 @@
+2015-02-11  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: fixed k-mer size checking; updated some error
+   messages.
+   * tests/test_graph.py: added test for k-mer size checking in find_all_tags.
+
+2015-02-09  Titus Brown  <titus@idyll.org>
+
+   * scripts/split-paired-reads.py: added -1 and -2 options to allow fine-
+   grain specification of output locations; switch to using write_record
+   instead of script-specific output functionality.
+   * tests/test_scripts.py: added accompanying tests.
+
 2015-02-09  Bede Constantinides  <bede.constantinides@manchester.ac.uk>
 
    * scripts/split-paired-reads.py: added -o option to allow specification

@@ -984,8 +984,8 @@ def test_consume_and_retrieve_tags_1():
         for p, tag in ct.get_tags_and_positions(record.sequence):
             ss.add(tag)
 
-        for start in range(len(record.sequence) - 20):
-            kmer = record.sequence[start:start + 21]
+        for start in range(len(record.sequence) - 3):
+            kmer = record.sequence[start:start + 4]
             tt.update(ct.find_all_tags_list(kmer))
 
     assert ss == tt
@@ -1007,9 +1007,29 @@ def test_consume_and_retrieve_tags_empty():
         for p, tag in ct.get_tags_and_positions(record.sequence):
             ss.add(tag)
 
-        for start in range(len(record.sequence) - 20):
-            kmer = record.sequence[start:start + 21]
+        for start in range(len(record.sequence) - 3):
+            kmer = record.sequence[start:start + 4]
             tt.update(ct.find_all_tags_list(kmer))
 
     assert not ss
     assert not tt
+
+
+def test_find_all_tags_list_error():
+    ct = khmer.new_counting_hash(4, 4 ** 4, 4)
+
+    # load each sequence but do not build tags - everything should be empty.
+    for record in screed.open(utils.get_test_data('test-graph2.fa')):
+        ct.consume(record.sequence)
+
+    try:
+        ct.find_all_tags_list("ATA")
+        assert False, "a ValueError should be raised for incorrect k-mer size"
+    except ValueError:
+        pass
+
+    try:
+        ct.find_all_tags_list("ATAGA")
+        assert False, "a ValueError should be raised for incorrect k-mer size"
+    except ValueError:
+        pass
