@@ -1,3 +1,8 @@
+2015-03-06  Jessica Mizzi  <mizzijes@msu.edu>
+
+    * khmer/kfile.py: Added file not existing error for system exit
+    * tests/test_scripts.py: Added test for check_file_status 
+
 2015-03-06  Titus Brown  <titus@idyll.org>
 
    * sandbox/{collect-reads.py,saturate-by-median.py}: update for 'force'
