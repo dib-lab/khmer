@@ -39,6 +39,8 @@ from khmer.khmer_args import (build_hashbits_args, report_on_config, info)
 from khmer.kfile import (check_file_status, check_valid_file_exists,
                          check_space)
 
+from khmer.utils import write_record
+
 DEFAULT_NUM_BUFFERS = 50000
 DEFAULT_MAX_READS = 1000000
 DEFAULT_BUFFER_SIZE = 10

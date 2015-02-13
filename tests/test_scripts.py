@@ -1601,7 +1601,7 @@ def test_split_paired_reads_3_output_files():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1609,7 +1609,7 @@ def test_split_paired_reads_3_output_files():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1638,7 +1638,7 @@ def test_split_paired_reads_3_output_files_left():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1646,7 +1646,7 @@ def test_split_paired_reads_3_output_files_left():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1675,7 +1675,7 @@ def test_split_paired_reads_3_output_files_right():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1683,7 +1683,7 @@ def test_split_paired_reads_3_output_files_right():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
