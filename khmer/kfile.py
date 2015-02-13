@@ -16,13 +16,22 @@ from stat import S_ISBLK, S_ISFIFO
 
 def check_file_status(file_path, force):
     """Check the status of the file; if the file is empty or doesn't exist
-    AND if the file is NOT a fifo/block/named pipe then a warning is printed
+    AND if the file is NOT a fifo/bloc k/named pipe then a warning is printed
     and sys.exit(1) is called
     """
 
     if file_path is '-':
         return
-    mode = os.stat(file_path).st_mode
+    try:
+        mode = os.stat(file_path).st_mode
+
+    except OSError as error:
+        print >>sys.stderr, "ERROR: Input file %s does not exist; exiting" % \
+                            file_path
+
+        if not force:
+            sys.exit(1)
+
     # block devices will be nonzero
     if S_ISBLK(mode) or S_ISFIFO(mode):
         return

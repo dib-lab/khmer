@@ -2814,3 +2814,15 @@ def test_roundtrip_casava_format_2():
     r = open(infile).read()
     r2 = open(outfile).read()
     assert r == r2, (r, r2)
+
+
+def test_existance_failure():
+    expected_output = OSError
+    
+    args = [    
+
+    status, out, err = utils.runscript('extract-paired-reads.py', args)
+    assert status == 0
+
+    assert expected_output in out
+    
