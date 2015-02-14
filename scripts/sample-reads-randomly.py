@@ -140,9 +140,8 @@ def main():
             if total % 10000 == 0:
                 print >>sys.stderr, '...', total, 'reads scanned'
                 if total >= args.max_reads:
-                    print >>sys.stderr, 'reached upper limit of %d reads',\
-                        ' (see -M); exiting' \
-                        % args.max_reads
+                    print >>sys.stderr, 'reached upper limit of %d reads' % \
+                        args.max_reads, '(see -M); exiting'
                     break
 
             # collect first N reads
