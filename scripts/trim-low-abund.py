@@ -88,7 +88,7 @@ def get_parser():
                         'that have high coverage.')
 
     # expert options
-    parser.add_argument('--ignore-pairs', type=bool, default=False)
+    parser.add_argument('--ignore-pairs', default=False, action='store_true')
     parser.add_argument('--tempdir', '-T', type=str, default='./')
 
     return parser
