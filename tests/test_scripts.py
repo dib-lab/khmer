@@ -1540,6 +1540,154 @@ def test_split_paired_reads_2_fq():
     assert n > 0
 
 
+def test_split_paired_reads_3_output_dir():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fq.1')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['--output-dir', output_dir, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
+def test_split_paired_reads_3_output_files():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('xxx')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('yyy', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-1', outfile1, '-2', outfile2, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
+def test_split_paired_reads_3_output_files_left():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('xxx')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('paired.fq.2', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-o', output_dir, '-1', outfile1, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
+def test_split_paired_reads_3_output_files_right():
+    # test input file
+    infile = utils.get_test_data('paired.fq')
+
+    ex_outfile1 = utils.get_test_data('paired.fq.1')
+    ex_outfile2 = utils.get_test_data('paired.fq.2')
+
+    # actual output files...
+    outfile1 = utils.get_temp_filename('paired.fq.1')
+    output_dir = os.path.dirname(outfile1)
+    outfile2 = utils.get_temp_filename('yyy', output_dir)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-2', outfile2, '-o', output_dir, infile]
+
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile1), outfile1
+    assert os.path.exists(outfile2), outfile2
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+    n = 0
+    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+        n += 1
+        assert r.name == q.name
+        assert r.sequence == q.sequence
+        assert r.accuracy == q.accuracy
+    assert n > 0
+
+
 def test_sample_reads_randomly():
     infile = utils.get_temp_filename('test.fq')
     in_dir = os.path.dirname(infile)
@@ -1926,3 +2074,203 @@ def test_readstats_empty():
     assert status == 0
 
     assert expected_output in out
+
+
+def test_trim_low_abund_1():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_trim_low_abund_1_duplicate_filename_err():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile]
+    try:
+        utils.runscript('trim-low-abund.py', args, in_dir)
+        raise Exception("should not reach this")
+    except AssertionError:
+        # an error should be raised by passing 'infile' twice.
+        pass
+
+
+def test_trim_low_abund_2():
+    infile = utils.get_temp_filename('test.fa')
+    infile2 = utils.get_temp_filename('test2.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile2)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+# make sure that FASTQ records are retained.
+
+
+def test_trim_low_abund_3_fq_retained():
+    infile = utils.get_temp_filename('test.fq')
+    infile2 = utils.get_temp_filename('test2.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile2)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-C', '1', infile, infile2]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+    # check for 'accuracy' string.
+    seqs = set([r.accuracy for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert '##################' in seqs
+
+
+# test that the -V option does not trim sequences that are low abundance
+
+
+def test_trim_low_abund_4_retain_low_abund():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+# test that the -V option *does* trim sequences that are low abundance
+
+
+def test_trim_low_abund_5_trim_high_abund():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+
+    # trimmed sequence @ error
+    assert 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGC' in seqs
+
+# test that -V/-Z setting - should not trip if -Z is set high enough.
+
+
+def test_trim_low_abund_6_trim_high_abund_Z():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", '-V', '-Z', '25', infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 2, seqs
+
+    # untrimmed seq.
+    badseq = 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCgtgCCGCAGCTGTCGTCAGGG' \
+             'GATTTCCGGGCGG'
+    assert badseq in seqs       # should be there, untrimmed
+
+
+def test_trim_low_abund_keep_paired():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-V", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [r.name for r in screed.open(outfile)]
+    assert seqs[-2:] == ['pair/1', 'pair/2'], seqs
+
+
+def test_trim_low_abund_highfpr():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1", "-N", "1", "-V", infile]
+    code, out, err = utils.runscript('trim-low-abund.py', args, in_dir,
+                                     fail_ok=True)
+
+    assert code == 1
+    print out
+    assert "ERROR: the k-mer counting table is too small" in err
+
+
+def test_trim_low_abund_trimtest():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "2",
+            "-V", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    for record in screed.open(outfile):
+        if record.name == 'seqtrim/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
+        elif record.name == 'seqtrim/2':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
+        elif record.name == 'seqtrim2/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'

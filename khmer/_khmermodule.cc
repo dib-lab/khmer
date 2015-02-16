@@ -1043,9 +1043,9 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
     } else if (PyString_Check(arg)) {
         std::string s = PyString_AsString(arg);
 
-        if (strlen(s.c_str()) < counting->ksize()) {
+        if (strlen(s.c_str()) != counting->ksize()) {
             PyErr_SetString(PyExc_ValueError,
-                            "string length must >= the counting table k-mer size");
+                            "k-mer size must equal the counting table k-mer size");
             return NULL;
         }
 
@@ -1326,6 +1326,87 @@ static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
     return Py_BuildValue("K", n_consumed);
 }
 
+static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * seq;
+
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
+
+    // call the C++ function, and trap signals => Python
+
+    std::vector<unsigned int> posns;
+    std::vector<HashIntoType> tags;
+
+    unsigned int pos = 1;
+    KMerIterator kmers(seq, counting->ksize());
+
+    while (!kmers.done()) {
+        HashIntoType kmer = kmers.next();
+        if (set_contains(counting->all_tags, kmer)) {
+             posns.push_back(pos);
+             tags.push_back(kmer);
+        }
+        pos++;
+    }
+
+    PyObject * posns_list = PyList_New(posns.size());
+    for (size_t i = 0; i < posns.size(); i++) {
+        PyObject * tup = Py_BuildValue("IK", posns[i], tags[i]);
+        PyList_SET_ITEM(posns_list, i, tup);
+    }
+
+    return posns_list;
+}
+
+static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
+{
+    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
+    CountingHash * counting = me->counting;
+
+    const char * kmer_s = NULL;
+
+    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+        return NULL;
+    }
+
+    if (strlen(kmer_s) != counting->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mer length must equal the counting table k-mer size");
+        return NULL;
+    }
+
+    SeenSet tags;
+
+    Py_BEGIN_ALLOW_THREADS
+
+    HashIntoType kmer_f, kmer_r;
+    _hash(kmer_s, counting->ksize(), kmer_f, kmer_r);
+
+    counting->partition->find_all_tags(kmer_f, kmer_r, tags,
+                                       counting->all_tags);
+
+    Py_END_ALLOW_THREADS
+
+    PyObject * x =  PyList_New(tags.size());
+    if (x == NULL) {
+        return NULL;
+    }
+    SeenSet::iterator si;
+    unsigned long long i = 0;
+    for (si = tags.begin(); si != tags.end(); ++si) {
+        // type K for python unsigned long long
+        PyList_SET_ITEM(x, i, Py_BuildValue("K", *si));
+        i++;
+    }
+
+    return x;
+}
+
 static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
 {
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
@@ -1367,9 +1448,9 @@ static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self,
         return NULL;
     }
 
-    if (strlen(kmer_s) < counting->ksize()) {
+    if (strlen(kmer_s) != counting->ksize()) {
         PyErr_SetString(PyExc_ValueError,
-                        "kmer_s must be less than the k-mer size of the counting hash");
+                        "k-mer size must equal the k-mer size of the counting table");
         return NULL;
     }
 
@@ -1485,6 +1566,8 @@ static PyMethodDef khmer_counting_methods[] = {
         METH_VARARGS, ""
     },
     { "consume_and_tag", hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
+    { "get_tags_and_positions", hash_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
+    { "find_all_tags_list", hash_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
     { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
     { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
     { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
@@ -1839,7 +1922,7 @@ static PyObject * hashbits_count(PyObject * self, PyObject * args)
 
     if (strlen(kmer) != hashbits->ksize()) {
         PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashbits k-size");
+                        "k-mer length must equal the presence table k-mer size");
         return NULL;
     }
 
@@ -2018,7 +2101,7 @@ static PyObject * hashbits_get(PyObject * self, PyObject * args)
 
         if (strlen(s.c_str()) < hashbits->ksize()) {
             PyErr_SetString(PyExc_ValueError,
-                            "string length must >= the presence table k-mer size");
+                            "string length must equal the presence table k-mer size");
             return NULL;
         }
 
@@ -2479,9 +2562,9 @@ static PyObject * hashbits_find_all_tags(PyObject * self, PyObject *args)
         return NULL;
     }
 
-    if (strlen(kmer_s) < hashbits->ksize()) { // @@
+    if (strlen(kmer_s) != hashbits->ksize()) {
         PyErr_SetString( PyExc_ValueError,
-                         "starting kmer is smaller than the K size of the hashbits");
+                         "k-mer size must equal the k-mer size of the presence table");
         return NULL;
     }
 
@@ -4443,7 +4526,7 @@ static PyObject * forward_hash_no_rc(PyObject * self, PyObject * args)
 
     if (strlen(kmer) != ksize) {
         PyErr_SetString(PyExc_ValueError,
-                        "k-mer length must be the same as the hashtable k-size");
+                        "k-mer length must equal the k-size");
         return NULL;
     }
 

@@ -1,3 +1,44 @@
+2015-02-11  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and
+   'write_record_pair' functions.
+   * scripts/trim-low-abund.py: upgraded to track pairs properly; added
+   proper get_parser information; moved to scripts/.
+   * tests/test_scripts.py: added paired-read tests for
+   trim-low-abund.py.
+   * tests/test-data/test-abund-read-2.paired.fq: data for paired-read tests.
+   * scripts/extract-paired-reads.py: removed 'is_pair' in favor of
+   'check_is_pair'; switched to using 'broken_paired_reader'; fixed use
+   of sys.argv.
+   * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
+   * tests/test_functions.py: added tests for 'check_is_pair'.
+   * doc/user/scripts.txt: added trim-low-abund.py.
+
+2015-02-11  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: fixed k-mer size checking; updated some error
+   messages.
+   * tests/test_graph.py: added test for k-mer size checking in find_all_tags.
+
+2015-02-09  Titus Brown  <titus@idyll.org>
+
+   * scripts/split-paired-reads.py: added -1 and -2 options to allow fine-
+   grain specification of output locations; switch to using write_record
+   instead of script-specific output functionality.
+   * tests/test_scripts.py: added accompanying tests.
+
+2015-02-09  Bede Constantinides  <bede.constantinides@manchester.ac.uk>
+
+   * scripts/split-paired-reads.py: added -o option to allow specification
+   of an output directory
+   * tests/test_scripts.py: added accompanying test for split-paired-reads.py
+
+2015-02-01  Titus Brown  <titus@idyll.org>
+
+   * khmer/_khmermodule.cc: added functions hash_find_all_tags_list and
+   hash_get_tags_and_positions to CountingHash objects.
+   * tests/test_counting_hash.py: added tests for new functionality.
+
 2015-01-25  Titus Brown  <titus@idyll.org>
 
    * sandbox/correct-errors.py: fixed sequence output so that quality
