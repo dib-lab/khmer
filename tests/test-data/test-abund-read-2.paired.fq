@@ -34,10 +34,10 @@ GGTTGACGGGGCTCAGGG
 GGTTGACGGGGCTCAGGG
 +
 ##################
-@seq
-GGTTGACGGGGCTCAGGG
+@shortseq
+GAGGG
 +
-##################
+#####
 @pair2/1
 GGTTGACGGGGCTCAcGG
 +

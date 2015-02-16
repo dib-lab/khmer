@@ -1,7 +1,9 @@
-2015-02-11  Titus Brown  <titus@idyll.org>
+2015-02-16  Titus Brown  <titus@idyll.org>
 
    * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and
    'write_record_pair' functions.
+   * tests/test_functions.py: added unit tests for 'check_is_pair' and
+   'broken_paired_reader'.
    * scripts/trim-low-abund.py: upgraded to track pairs properly; added
    proper get_parser information; moved to scripts/.
    * tests/test_scripts.py: added paired-read tests for
@@ -11,7 +13,6 @@
    'check_is_pair'; switched to using 'broken_paired_reader'; fixed use
    of sys.argv.
    * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
-   * tests/test_functions.py: added tests for 'check_is_pair'.
    * doc/user/scripts.txt: added trim-low-abund.py.
 
 2015-02-11  Titus Brown  <titus@idyll.org>

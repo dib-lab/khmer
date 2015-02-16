@@ -52,7 +52,7 @@ def check_is_pair(record1, record2):
     return False
 
 
-def broken_paired_reader(screed_iter):
+def broken_paired_reader(screed_iter, min_length=None, force_single=False):
     """
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ
     records (yielded by 'screed_iter').  Yields (n, is_pair, r1, r2) where
@@ -68,32 +68,46 @@ def broken_paired_reader(screed_iter):
 
     Note that 'n' is the number of records read from the input stream, so
     is incremented by 2 for a pair of reads.
+
+    If 'min_length' is set, all reads under this length are ignored (even
+    if they are pairs).
+
+    If 'force_single' is True, all reads are returned as singletons.
     """
     record = None
     prev_record = None
 
     # handle the majority of the stream.
     for n, record in enumerate(screed_iter):
+        # ignore short reads
+        if min_length and len(record.sequence) < min_length:
+            record = None
+            continue
+
         if prev_record:
-            if check_is_pair(prev_record, record):
+            if check_is_pair(prev_record, record) and not force_single:
                 yield n, True, prev_record, record  # it's a pair!
                 record = None
             else:                                   # orphan.
                 yield n, False, prev_record, None
 
         prev_record = record
+        record = None
 
-    # handle the two records (which cannot be pairs)
+    # handle the last two records (which cannot be pairs)
     if prev_record:
         # the only way into this if statement is if 'prev_record' and
         # 'record' are both singletons.
-        assert not check_is_pair(prev_record, record)
+        if not force_single and record:
+            assert not check_is_pair(prev_record, record)
 
         yield n, False, prev_record, None
 
     if record:                     # guaranteed to be orphan
-        n += 1
-        yield n, False, record, None
+        # ignore short reads
+        if not min_length or len(record.sequence) >= min_length:
+            n += 1
+            yield n, False, record, None
 
 
 def write_record(record, fp):
