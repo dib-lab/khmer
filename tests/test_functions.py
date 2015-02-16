@@ -9,7 +9,7 @@ from nose.plugins.attrib import attr
 import os
 import khmer_tst_utils as utils
 import collections
-from khmer.utils import check_is_pair
+from khmer.utils import check_is_pair, broken_paired_reader
 
 
 def test_forward_hash():
@@ -187,3 +187,65 @@ def test_check_is_pair_7():
     read2 = FakeFastaRead(name='seq/1', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
+
+
+class Test_BrokenPairedReader(object):
+    stream = [FakeFastaRead(name='seq1/1', sequence='A'*5),
+              FakeFastaRead(name='seq1/2', sequence='A'*4),
+              FakeFastaRead(name='seq2/1', sequence='A'*5),
+              FakeFastaRead(name='seq3/1', sequence='A'*3),
+              FakeFastaRead(name='seq3/2', sequence='A'*5)]
+
+    def gather(self, **kw):
+        iter = broken_paired_reader(self.stream, **kw)
+
+        x = []
+        for n, is_pair, read1, read2 in iter:
+            if is_pair:
+                x.append((read1.name, read2.name))
+            else:
+                x.append((read1.name, None))
+
+        return x
+
+    def testDefault(self):
+        x = self.gather(min_length=1)
+
+        expected = [('seq1/1', 'seq1/2'),
+                    ('seq2/1', None),
+                    ('seq3/1', 'seq3/2')]
+        assert x == expected, x
+
+    def testMinLength(self):
+        x = self.gather(min_length=3)
+
+        expected = [('seq1/1', 'seq1/2'),
+                    ('seq2/1', None),
+                    ('seq3/1', 'seq3/2')]
+        assert x == expected, x
+
+    def testMinLength_2(self):
+        x = self.gather(min_length=4)
+
+        expected = [('seq1/1', 'seq1/2'),
+                    ('seq2/1', None),
+                    ('seq3/2', None)]
+        assert x == expected, x
+
+    def testForceSingle(self):
+        x = self.gather(force_single=True)
+
+        expected = [('seq1/1', None),
+                    ('seq1/2', None),
+                    ('seq2/1', None),
+                    ('seq3/1', None),
+                    ('seq3/2', None)]
+        assert x == expected, x
+
+    def testForceSingleAndMinLength(self):
+        x = self.gather(min_length=5, force_single=True)
+
+        expected = [('seq1/1', None),
+                    ('seq2/1', None),
+                    ('seq3/2', None)]
+        assert x == expected, x

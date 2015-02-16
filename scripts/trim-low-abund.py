@@ -72,6 +72,8 @@ def get_parser():
         descr='Trim low-abundance k-mers using a streaming algorithm.',
         epilog=textwrap.dedent(epilog))
 
+    parser.add_argument('input_filenames', nargs='+')
+
     parser.add_argument('--cutoff', '-C', type=int,
                         help='remove k-mers below this abundance',
                         default=DEFAULT_CUTOFF)
@@ -85,9 +87,9 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
+    # expert options
+    parser.add_argument('--ignore-pairs', type=bool, default=False)
     parser.add_argument('--tempdir', '-T', type=str, default='./')
-
-    parser.add_argument('input_filenames', nargs='+')
 
     return parser
 
@@ -140,7 +142,10 @@ def main():
         trimfp = open(trimfilename, 'w')
 
         save_pass2 = 0
-        for n, is_pair, read1, read2 in broken_paired_reader(screed_iter):
+
+        iter = broken_paired_reader(screed_iter, min_length=K,
+                                    force_single=args.ignore_pairs)
+        for n, is_pair, read1, read2 in iter:
             if n % 10000 == 0:
                 print >>sys.stderr, '...', n, filename, save_pass2, \
                     n_reads, n_bp, written_reads, written_bp
@@ -186,6 +191,7 @@ def main():
                 n_bp += len(read1.sequence)
 
                 seq = read1.sequence.replace('N', 'A')
+
                 med, _, _ = ct.get_median_count(seq)
 
                 # has this portion of the graph saturated? if not,
@@ -263,15 +269,22 @@ def main():
     print >>sys.stderr, 'removing temp directory & contents (%s)' % tempdir
     shutil.rmtree(tempdir)
 
+    n_passes = 1.0 + (float(save_pass2_total) / n_reads)
+    percent_reads_trimmed = float(trimmed_reads + (n_reads - written_reads)) /\
+        n_reads * 100.0
+
     print 'read %d reads, %d bp' % (n_reads, n_bp,)
     print 'wrote %d reads, %d bp' % (written_reads, written_bp,)
-    print 'removed %d reads and trimmed %d reads' % (n_reads - written_reads,
-                                                     trimmed_reads,)
-    print 'looked at %d reads twice' % (save_pass2_total,)
+    print 'looked at %d reads twice (%.2f passes)' % (save_pass2_total,
+                                                      n_passes)
+    print 'removed %d reads and trimmed %d reads (%.2f%%)' % \
+        (n_reads - written_reads, trimmed_reads, percent_reads_trimmed)
     print 'trimmed or removed %.2f%% of bases (%d total)' % \
-        ((1 - (written_bp / float(n_bp))) * 100., n_bp - written_bp)
+        ((1 - (written_bp / float(n_bp))) * 100.0, n_bp - written_bp)
 
     if args.variable_coverage:
+        percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
+        print '%d reads were high coverage;' % (n_reads - skipped_n)
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
 
