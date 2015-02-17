@@ -12,9 +12,6 @@ Output sequences will be placed in 'infile.abundtrim'.
 % python scripts/trim-low-abund.py [ <data1> [ <data2> [ ... ] ] ]
 
 Use -h for parameter help.
-
-TODO: load/save counting table.
-TODO: reference appropriate preprint.
 """
 import sys
 import screed
@@ -25,9 +22,11 @@ import shutil
 import textwrap
 
 from screed.screedRecord import _screed_record_dict
-from khmer.khmer_args import build_counting_args
-from khmer.utils import (write_record, write_record_pair, broken_paired_reader)
-
+from khmer.khmer_args import (build_counting_args, info, add_loadhash_args,
+                              report_on_config)
+from khmer.utils import write_record, write_record_pair, broken_paired_reader
+from khmer.kfile import (check_space, check_space_for_hashtable,
+                         check_valid_file_exists)
 
 DEFAULT_NORMALIZE_LIMIT = 20
 DEFAULT_CUTOFF = 2
@@ -87,7 +86,11 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
+    parser.add_argument('-s', '--savetable', metavar="tablefile", default='')
+    parser.add_argument('-l', '--loadtable', metavar="tablefile", default='')
+
     # expert options
+    parser.add_argument('--force', default=False, action='store_true')
     parser.add_argument('--ignore-pairs', default=False, action='store_true')
     parser.add_argument('--tempdir', '-T', type=str, default='./')
 
@@ -95,6 +98,7 @@ def get_parser():
 
 
 def main():
+    info('trim-low-abund.py', ['streaming'])
     parser = get_parser()
     args = parser.parse_args()
 
@@ -107,13 +111,24 @@ def main():
 
     ###
 
+    report_on_config(args)
+    check_valid_file_exists(args.input_filenames)
+    check_space(args.input_filenames, args.force)
+    if args.savetable:
+        check_space_for_hashtable(
+            args.n_tables * args.min_tablesize, args.force)
+
     K = args.ksize
 
     CUTOFF = args.cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
-    print >>sys.stderr, 'making counting table'
-    ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
+    if args.loadtable:
+        print >>sys.stderr, 'loading k-mer counting table from', args.loadtable
+        ct = khmer.load_counting_hash(args.loadtable)
+    else:
+        print >>sys.stderr, 'making k-mer counting table'
+        ct = khmer.new_counting_hash(K, args.min_tablesize, args.n_tables)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print >>sys.stderr, 'created temporary directory %s; ' \
@@ -303,6 +318,9 @@ def main():
 
     print 'output in *.abundtrim'
 
+    if args.savetable:
+        print >>sys.stderr, "Saving k-mer counting table to", args.savetable
+        ct.save(args.savetable)
 
 if __name__ == '__main__':
     main()

@@ -2,6 +2,8 @@
 
    * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and
    'write_record_pair' functions.
+   * khmer/khmer_args.py: added streaming reference for future algorithms
+   citation.
    * tests/test_functions.py: added unit tests for 'check_is_pair' and
    'broken_paired_reader'.
    * scripts/trim-low-abund.py: upgraded to track pairs properly; added
