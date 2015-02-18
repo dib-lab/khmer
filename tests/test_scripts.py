@@ -2819,7 +2819,7 @@ def test_roundtrip_casava_format_2():
 def test_existance_failure():
     expected_output = 'ERROR: Input file'
 
-    args = ['thisfiledoesnotexistatall']
+    args = [utils.get_temp_filename('thisfiledoesnotexistatall')]
 
     status, out, err = utils.runscript(
         'extract-paired-reads.py', args, fail_ok=True)
