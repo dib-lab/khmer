@@ -47,6 +47,8 @@ def get_parser():
                         + khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('--Header-names', dest='Header-names', default=False,
+                        help='Add header names to the .hist output file')
     return parser
 
 
@@ -94,6 +96,9 @@ def main():
               file=sys.stderr)
         sys.exit(1)
     hash_fp = open(args.output_histogram_filename, 'w')
+
+    if Header-names:
+        print("k-mer counts", "Frequency", "cumulative frequency" , "cumulative fraction", file=hash_fp)
 
     sofar = 0
     for _, i in enumerate(abundances):
