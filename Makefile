@@ -90,7 +90,7 @@ cppcheck-result.xml: $(CPPSOURCES)
 cppcheck: $(CPPSOURCES)
 	${CPPCHECK}
 
-## pep8                 : run static analysis on Python code
+## pep8                 : check Python code style
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
 
@@ -101,11 +101,11 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
-## astyle               : check/fix C++ code indentation and formatting
+## astyle               : fix most C++ code indentation and formatting
 astyle: $(CPPSOURCES)
 	astyle -A10 --max-code-length=80 $(CPPSOURCES)
 
-## autopep8             : check/fix Python code indentation and formatting
+## autopep8             : fix most Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
 		setup.py khmer/*.py scripts/*.py tests/*.py
@@ -132,7 +132,6 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
-## .coverage            : test code coverage
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
 	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
@@ -163,7 +162,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 nosetests.xml: FORCE
 	./setup.py nosetests --with-xunit
 
-## doxygen              : generate module documentation with Doxygen
+## doxygen              : generate documentation of the C++ and Python code
 doxygen: doc/doxygen/html/index.html
 
 doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
@@ -172,12 +171,11 @@ doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 		Doxyfile
 	doxygen
 
-## lib                  : build khmer library
 lib:
 	cd lib && \
 	$(MAKE)
 
-## test                 : run khmer test suite
+## test                 : run the khmer test suite
 test: FORCE
 	./setup.py develop
 	./setup.py nosetests
@@ -190,7 +188,6 @@ sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 sloccount: 
 	sloccount lib khmer scripts tests setup.py Makefile
 
-## coverity-build       : static code analysis with Coverity scan
 coverity-build:
 	if [[ -x ${cov_analysis_dir}/bin/cov-build ]]; \
 	then \
@@ -202,7 +199,6 @@ coverity-build:
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
 	fi
 
-## coverity-upload      : upload latest Coverity build
 coverity-upload: cov-int
 	if [[ -n "${COVERITY_TOKEN}" ]]; \
 	then \
@@ -216,11 +212,9 @@ coverity-upload: cov-int
 		'skipping scan'; \
 	fi
 
-## coverity-clean       : clean up Coverity configuration
-coverity-clean:
+coverity-clean-configuration:
 	rm -f ${cov_analysis_dir}/config/coverity_config.xml
 
-## coverity-configure   : configure Coverity
 coverity-configure:
 	if [[ -x ${cov_analysis_dir}/bin/cov-configure ]]; \
 	then \
