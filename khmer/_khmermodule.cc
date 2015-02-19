@@ -4102,7 +4102,7 @@ static void khmer_readaligner_dealloc(khmer_ReadAligner_Object* obj)
 {
     delete obj->aligner;
     obj->aligner = NULL;
-    obj->ob_type->tp_free(obj);
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
 //
@@ -4134,8 +4134,7 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
 }
 
 static PyTypeObject khmer_ReadAlignerType = {
-    PyObject_HEAD_INIT(NULL)
-    0,					    /*ob_size */
+    PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
     "khmer.ReadAligner",		    /*tp_name*/
     sizeof(khmer_ReadAligner_Object),	    /*tp_basicsize*/
     0,					    /*tp_itemsize*/
