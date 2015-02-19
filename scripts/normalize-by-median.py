@@ -180,7 +180,9 @@ def get_parser():
     parser.add_argument('-C', '--cutoff', type=int,
                         default=DEFAULT_DESIRED_COVERAGE)
     parser.add_argument('-p', '--paired', action='store_true')
-    parser.add_argument('-s', '--savetable', metavar="filename", default='')
+    parser.add_argument('-s', '--savetable', metavar="filename", default='',
+                        help='save the k-mer counting table to disk after all'
+                        'reads are loaded.')
     parser.add_argument('-R', '--report',
                         metavar='filename', type=argparse.FileType('w'))
     parser.add_argument('-f', '--fault-tolerant', dest='force',
