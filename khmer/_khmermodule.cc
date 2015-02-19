@@ -288,7 +288,6 @@ static PyTypeObject khmer_Read_Type = {
 static PyTypeObject ReadParser_Type
 CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("ReadParser_Object")
     = { PyVarObject_HEAD_INIT(NULL, 0) };
-static PyTypeObject ReadPairIterator_Type = { PyVarObject_HEAD_INIT(NULL, 0) };
 
 
 typedef struct {
@@ -304,7 +303,7 @@ typedef struct {
     PyObject *  parent;
     //! Persistent value of pair mode across invocations.
     int pair_mode;
-} ReadPairIterator_Object;
+} khmer_ReadPairIterator_Object;
 
 
 static
@@ -322,13 +321,11 @@ _ReadParser_dealloc( PyObject * self )
 
 static
 void
-_ReadPairIterator_dealloc( PyObject * self )
+khmer_ReadPairIterator_dealloc(khmer_ReadPairIterator_Object * obj)
 {
-    ReadPairIterator_Object * myself = (ReadPairIterator_Object *)self;
-
-    Py_DECREF( myself->parent );
-    myself->parent = NULL;
-    ReadPairIterator_Type.tp_free( self );
+    Py_DECREF(obj->parent);
+    obj->parent = NULL;
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
 
@@ -411,11 +408,9 @@ _ReadParser_iternext( PyObject * self )
 
 static
 PyObject *
-_ReadPairIterator_iternext( PyObject * self )
+_ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 {
-    ReadPairIterator_Object *   myself    = (ReadPairIterator_Object *)self;
-    ReadParser_Object *     parent    =
-        (ReadParser_Object *)(myself->parent);
+    ReadParser_Object * parent = (ReadParser_Object*)myself->parent;
     IParser *           parser    = parent->parser;
     uint8_t         pair_mode = myself->pair_mode;
 
@@ -482,6 +477,37 @@ _ReadPairIterator_iternext( PyObject * self )
     return tup;
 }
 
+static PyTypeObject khmer_ReadPairIterator_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "khmer.ReadPairIterator",                       /* tp_name */
+    sizeof(khmer_ReadPairIterator_Object),          /* tp_basicsize */
+    0,                                  /* tp_itemsize */
+    (destructor)khmer_ReadPairIterator_dealloc,      /* tp_dealloc */
+    0,                                         /* tp_print */
+    0,                                         /* tp_getattr */
+    0,                                         /* tp_setattr */
+    0,                                         /* tp_compare */
+    0,                                         /* tp_repr */
+    0,                                         /* tp_as_number */
+    0,                                         /* tp_as_sequence */
+    0,                                         /* tp_as_mapping */
+    0,                                         /* tp_hash */
+    0,                                         /* tp_call */
+    0,                                         /* tp_str */
+    0,                                         /* tp_getattro */
+    0,                                         /* tp_setattro */
+    0,                                         /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,  /* tp_flags */
+    "Iterates over 'ReadParser' objects and returns read pairs.",      /* tp_doc */
+    0,                                         /* tp_traverse */
+    0,                                         /* tp_clear */
+    0,                                         /* tp_richcompare */
+    0,                                         /* tp_weaklistoffset */
+    PyObject_SelfIter,                                         /* tp_iter */
+    (iternextfunc)_ReadPairIterator_iternext,                                         /* tp_iternext */
+};
+
+
 
 static
 PyObject *
@@ -502,13 +528,13 @@ ReadParser_iter_read_pairs( PyObject * self, PyObject * args )
     }
 
     // Capture existing read parser.
-    PyObject * obj = ReadPairIterator_Type.tp_alloc(
-                         &ReadPairIterator_Type, 1
+    PyObject * obj = khmer_ReadPairIterator_Type.tp_alloc(
+                         &khmer_ReadPairIterator_Type, 1
                      );
     if (obj == NULL) {
         return NULL;
     }
-    ReadPairIterator_Object * rpi   = (ReadPairIterator_Object *)obj;
+    khmer_ReadPairIterator_Object * rpi   = (khmer_ReadPairIterator_Object *)obj;
     rpi->parent             = self;
     rpi->pair_mode          = pair_mode;
 
@@ -591,31 +617,6 @@ _init_ReadParser_Type( )
     _debug_class_attrs( ReadParser_Type );
 
 } // _init_ReadParser_Type
-
-
-static
-void
-_init_ReadPairIterator_Type( )
-{
-
-    _common_init_Type<ReadPairIterator_Object>(
-        ReadPairIterator_Type,
-        "ReadParser-pair-iterator",
-        "Iterates over 'ReadParser' objects and returns read pairs."
-    );
-    //ReadPairIterator_Type.tp_new  = (newfunc)_ReadPairIterator_new;
-    ReadPairIterator_Type.tp_dealloc    =
-        (destructor)_ReadPairIterator_dealloc;
-
-    ReadPairIterator_Type.tp_iter   = PyObject_SelfIter;
-    ReadPairIterator_Type.tp_iternext   =
-        (iternextfunc)_ReadPairIterator_iternext;
-
-    PyType_Ready( &ReadPairIterator_Type );
-
-    _debug_class_attrs( ReadPairIterator_Type );
-
-} // _init_ReadPairIterator_Type
 
 } // namespace python
 
@@ -4669,7 +4670,9 @@ init_khmer(void)
         return;
     }
 
-    _init_ReadPairIterator_Type( );
+    if (PyType_Ready(&khmer_ReadPairIterator_Type ) < 0) {
+        return;
+    }
 
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
