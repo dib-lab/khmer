@@ -19,13 +19,14 @@ CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 	 -Ithird-party/smhasher
 
 
-## all                  : default task; show list of build commands
-all: commands
+## all                  : default task; compile C++ code, build shared object library
+all: sharedobj
 
-commands: Makefile
+## help                 : print this help message and exit
+help: Makefile
 	@sed -n 's/^##//p' $<
 
-## install-dependencies : use pip to install Python module dependencies
+## install-dependencies : install most of the development dependencies via pip
 install-dependencies:
 	pip2 install --upgrade $(DEVPKGS) || pip install --upgrade $(DEVPKGS)
 
@@ -35,13 +36,12 @@ sharedobj: khmer/_khmermodule.so
 khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
-## coverage-debug       : debug code test coverage
 coverage-debug: $(CPPSOURCES)
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
 		build_ext --debug --inplace --libraries gcov
 	touch coverage-debug
 
-## install              : install the khmer module to your Python environment
+## install              : install the khmer module and scripts
 install: FORCE
 	./setup.py build install
 
