@@ -66,8 +66,9 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
        for n, is_pair, read1, read2 in broken_paired_reader(...):
           ...
 
-    Note that 'n' is the number of records read from the input stream, so
-    is incremented by 2 for a pair of reads.
+    Note that 'n' behaves like enumerate() and starts at 0, but tracks
+    the number of records read from the input stream, so is
+    incremented by 2 for a pair of reads.
 
     If 'min_length' is set, all reads under this length are ignored (even
     if they are pairs).
@@ -76,9 +77,10 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
     """
     record = None
     prev_record = None
+    n = 0
 
     # handle the majority of the stream.
-    for n, record in enumerate(screed_iter):
+    for record in screed_iter:
         # ignore short reads
         if min_length and len(record.sequence) < min_length:
             record = None
@@ -87,53 +89,44 @@ def broken_paired_reader(screed_iter, min_length=None, force_single=False):
         if prev_record:
             if check_is_pair(prev_record, record) and not force_single:
                 yield n, True, prev_record, record  # it's a pair!
+                n += 2
                 record = None
             else:                                   # orphan.
                 yield n, False, prev_record, None
+                n += 1
 
         prev_record = record
         record = None
 
-    # handle the last two records (which cannot be pairs)
+    # handle the last record, if it exists (i.e. last two records not a pair)
     if prev_record:
-        # the only way into this if statement is if 'prev_record' and
-        # 'record' are both singletons.
-        if not force_single and record:
-            assert not check_is_pair(prev_record, record)
-
         yield n, False, prev_record, None
 
-    if record:                     # guaranteed to be orphan
-        # ignore short reads
-        if not min_length or len(record.sequence) >= min_length:
-            n += 1
-            yield n, False, record, None
 
-
-def write_record(record, fp):
+def write_record(record, fileobj):
     """
-    Writes sequence record to 'fp' in FASTA/FASTQ format.
+    Writes sequence record to 'fileobj' in FASTA/FASTQ format.
     """
     if hasattr(record, 'accuracy'):
-        fp.write(
+        fileobj.write(
             '@{name}\n{seq}\n'
             '+\n{acc}\n'.format(name=record.name,
                                 seq=record.sequence,
                                 acc=record.accuracy))
     else:
-        fp.write(
+        fileobj.write(
             '>{name}\n{seq}\n'.format(name=record.name,
                                       seq=record.sequence))
 
 
-def write_record_pair(read1, read2, fp):
+def write_record_pair(read1, read2, fileobj):
     """
-    Writes pair of sequence records to 'fp' in FASTA/FASTQ format.
+    Writes pair of sequence records to 'fileobj' in FASTA/FASTQ format.
     """
     if hasattr(read1, 'accuracy'):
         assert hasattr(read2, 'accuracy')
-    write_record(read1, fp)
-    write_record(read2, fp)
+    write_record(read1, fileobj)
+    write_record(read2, fileobj)
 
 
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

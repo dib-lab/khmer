@@ -86,8 +86,8 @@ def get_parser():
                         help='Only trim low-abundance k-mers from sequences '
                         'that have high coverage.')
 
+    add_loadhash_args(parser)
     parser.add_argument('-s', '--savetable', metavar="tablefile", default='')
-    parser.add_argument('-l', '--loadtable', metavar="tablefile", default='')
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
@@ -157,10 +157,11 @@ def main():
         trimfp = open(trimfilename, 'w')
 
         save_pass2 = 0
+        n = 0
 
-        iter = broken_paired_reader(screed_iter, min_length=K,
+        paired_reads_iter = broken_paired_reader(screed_iter, min_length=K,
                                     force_single=args.ignore_pairs)
-        for n, is_pair, read1, read2 in iter:
+        for n, is_pair, read1, read2 in paired_reads_iter:
             if n % 10000 == 0:
                 print >>sys.stderr, '...', n, filename, save_pass2, \
                     n_reads, n_bp, written_reads, written_bp
@@ -238,7 +239,7 @@ def main():
 
     skipped_n = 0
     skipped_bp = 0
-    for orig_filename, pass2filename, trimfilename in pass2list:
+    for _, pass2filename, trimfilename in pass2list:
         print 'second pass: looking at sequences kept aside in %s' % \
               pass2filename
 
@@ -299,7 +300,8 @@ def main():
 
     if args.variable_coverage:
         percent_reads_hicov = 100.0 * float(n_reads - skipped_n) / n_reads
-        print '%d reads were high coverage;' % (n_reads - skipped_n)
+        print '%d reads were high coverage (%.2f%%);' % (n_reads - skipped_n,
+                                                         percent_reads_hicov)
         print 'skipped %d reads/%d bases because of low coverage' % \
               (skipped_n, skipped_bp)
 
@@ -321,6 +323,7 @@ def main():
     if args.savetable:
         print >>sys.stderr, "Saving k-mer counting table to", args.savetable
         ct.save(args.savetable)
+
 
 if __name__ == '__main__':
     main()

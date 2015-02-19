@@ -7,7 +7,7 @@
    * tests/test_functions.py: added unit tests for 'check_is_pair' and
    'broken_paired_reader'.
    * scripts/trim-low-abund.py: upgraded to track pairs properly; added
-   proper get_parser information; moved to scripts/.
+   proper get_parser information; moved to scripts/ from sandbox/.
    * tests/test_scripts.py: added paired-read tests for
    trim-low-abund.py.
    * tests/test-data/test-abund-read-2.paired.fq: data for paired-read tests.

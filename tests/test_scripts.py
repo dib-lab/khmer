@@ -2254,12 +2254,75 @@ def test_trim_low_abund_trimtest():
 
     shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
 
-    args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "2",
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-Z", "2", "-C", "1",
             "-V", infile]
     utils.runscript('trim-low-abund.py', args, in_dir)
 
     outfile = infile + '.abundtrim'
     assert os.path.exists(outfile), outfile
+
+    for record in screed.open(outfile):
+        if record.name == 'seqtrim/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
+        elif record.name == 'seqtrim/2':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
+        elif record.name == 'seqtrim2/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
+
+
+def test_trim_low_abund_trimtest_after_load():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    saved_table = utils.get_temp_filename('save.ct')
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", saved_table, infile]
+    utils.runscript('load-into-counting.py', args, in_dir)
+
+    args = ["-Z", "2", "-C", "2", "-V", '--loadtable', saved_table, infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    for record in screed.open(outfile):
+        if record.name == 'seqtrim/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCC'
+        elif record.name == 'seqtrim/2':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCAGCCGC'
+        elif record.name == 'seqtrim2/1':
+            print record.name, record.sequence
+            assert record.sequence == \
+                'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
+
+
+def test_trim_low_abund_trimtest_savetable():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    saved_table = utils.get_temp_filename('save.ct')
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired.fq'), infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2",
+            "-Z", "2", "-C", "2", "-V", '--savetable', saved_table, infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+    assert os.path.exists(saved_table)
 
     for record in screed.open(outfile):
         if record.name == 'seqtrim/1':

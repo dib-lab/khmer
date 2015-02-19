@@ -200,40 +200,48 @@ class Test_BrokenPairedReader(object):
         iter = broken_paired_reader(self.stream, **kw)
 
         x = []
+        m = 0
         for n, is_pair, read1, read2 in iter:
             if is_pair:
                 x.append((read1.name, read2.name))
             else:
                 x.append((read1.name, None))
+            m += 1
 
-        return x
+        return x, n, m
 
     def testDefault(self):
-        x = self.gather(min_length=1)
+        x, n, m = self.gather(min_length=1)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
                     ('seq3/1', 'seq3/2')]
         assert x == expected, x
+        assert m == 3
+        assert n == 3, n
 
     def testMinLength(self):
-        x = self.gather(min_length=3)
+        x, n, m = self.gather(min_length=3)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
                     ('seq3/1', 'seq3/2')]
         assert x == expected, x
+        assert m == 3
+        assert n == 3, n
 
     def testMinLength_2(self):
-        x = self.gather(min_length=4)
+        x, n, m = self.gather(min_length=4)
 
         expected = [('seq1/1', 'seq1/2'),
                     ('seq2/1', None),
                     ('seq3/2', None)]
         assert x == expected, x
+        assert m == 3
+        assert n == 3, n
 
     def testForceSingle(self):
-        x = self.gather(force_single=True)
+        x, n, m = self.gather(force_single=True)
 
         expected = [('seq1/1', None),
                     ('seq1/2', None),
@@ -241,11 +249,15 @@ class Test_BrokenPairedReader(object):
                     ('seq3/1', None),
                     ('seq3/2', None)]
         assert x == expected, x
+        assert m == 5
+        assert n == 4, n
 
     def testForceSingleAndMinLength(self):
-        x = self.gather(min_length=5, force_single=True)
+        x, n, m = self.gather(min_length=5, force_single=True)
 
         expected = [('seq1/1', None),
                     ('seq2/1', None),
                     ('seq3/2', None)]
         assert x == expected, x
+        assert m == 3, m
+        assert n == 2, n
