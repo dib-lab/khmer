@@ -43,6 +43,7 @@ def test_import_all():
 
 
 class _checkImportSucceeds(object):
+
     def __init__(self, tag, filename):
         self.tag = tag
         self.filename = filename
@@ -56,7 +57,7 @@ class _checkImportSucceeds(object):
             print traceback.format_exc()
             raise AssertionError("%s cannot be imported" % (self.filename,))
 
-        ###
+        #
 
         oldargs = sys.argv
         sys.argv = [self.filename]
@@ -68,7 +69,9 @@ class _checkImportSucceeds(object):
         try:
             try:
                 global_dict = {'__name__': '__main__'}
-                execfile(self.filename, global_dict)
+                exec(
+                    compile(open(self.filename).read(), self.filename, 'exec'),
+                    global_dict)
             except (ImportError, SyntaxError):
                 print traceback.format_exc()
                 raise AssertionError("%s cannot be exec'd" % (self.filename,))
@@ -165,10 +168,10 @@ def test_sweep_reads_fq():
             seqsm == set(['read4_multi\t1\t0']))
     assert seqso == set(['read5_orphan'])
 
-    seqs1 = set([r.accuracy for r in screed.open(out1)])
-    seqs2 = set([r.accuracy for r in screed.open(out2)])
-    seqsm = set([r.accuracy for r in screed.open(mout)])
-    seqso = set([r.accuracy for r in screed.open(oout)])
+    seqs1 = set([r.quality for r in screed.open(out1)])
+    seqs2 = set([r.quality for r in screed.open(out2)])
+    seqsm = set([r.quality for r in screed.open(mout)])
+    seqso = set([r.quality for r in screed.open(oout)])
 
 
 def test_sweep_reads_2():
@@ -292,7 +295,7 @@ def test_trim_low_abund_3_fq_retained():
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
     # check for 'accuracy' string.
-    seqs = set([r.accuracy for r in screed.open(outfile)])
+    seqs = set([r.quality for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
 
