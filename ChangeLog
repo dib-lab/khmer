@@ -1,3 +1,8 @@
+2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
+
+  * Makefile: adjust default build target (`all`) to print out a list of
+  all build targets, providing a simple CLI.
+
 2015-02-13  Qingpeng Zhang  <qingpeng@msu.edu>
 
    * scripts/sample-reads-randomly.py: fix a glitch about string formatting.
