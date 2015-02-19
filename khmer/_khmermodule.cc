@@ -25,6 +25,7 @@
 #include "hllcounter.hh"
 
 using namespace khmer;
+using namespace read_parsers;
 
 //
 // Python 2/3 compatibility: PyInt and PyLong
@@ -165,70 +166,59 @@ namespace khmer
 namespace python
 {
 
-
-static PyTypeObject Read_Type = { PyVarObject_HEAD_INIT(NULL, 0) };
-
-
 typedef struct {
     PyObject_HEAD
     //! Pointer to the low-level genomic read object.
     read_parsers:: Read *   read;
-} Read_Object;
+} khmer_Read_Object;
 
 
 static
 void
-_Read_dealloc( PyObject * self )
+khmer_Read_dealloc(khmer_Read_Object * obj)
 {
-    Read_Object * myself = (Read_Object *)self;
-    delete myself->read;
-    myself->read = NULL;
-    Read_Type.tp_free( self );
-}
-
-
-#define KHMER_READ_STRING_GETTER( SELF, ATTR_NAME ) \
-    PyBytes_FromString( \
-    ((((Read_Object *)(SELF))->read)->ATTR_NAME).c_str( ) \
-    )
-
-
-static
-PyObject *
-Read_get_name( PyObject * self, void * closure )
-{
-    return KHMER_READ_STRING_GETTER( self, name );
+    delete obj->read;
+    obj->read = NULL;
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
 
 static
 PyObject *
-Read_get_sequence( PyObject * self, void * closure )
+Read_get_name(khmer_Read_Object * obj, void * closure )
 {
-    return KHMER_READ_STRING_GETTER( self, sequence );
+    return PyBytes_FromString(obj->read->name.c_str()) ;
 }
 
 
 static
 PyObject *
-Read_get_quality( PyObject * self, void * closure )
+Read_get_sequence(khmer_Read_Object * obj, void * closure)
 {
-    return KHMER_READ_STRING_GETTER( self, quality );
+    return PyBytes_FromString(obj->read->sequence.c_str()) ;
 }
 
 
 static
 PyObject *
-Read_get_annotations( PyObject * self, void * closure )
+Read_get_quality(khmer_Read_Object * obj, void * closure)
 {
-    return KHMER_READ_STRING_GETTER( self, annotations );
+    return PyBytes_FromString(obj->read->quality.c_str()) ;
+}
+
+
+static
+PyObject *
+Read_get_annotations(khmer_Read_Object * obj, void * closure)
+{
+    return PyBytes_FromString(obj->read->annotations.c_str()) ;
 }
 
 
 // TODO? Implement setters.
 
 
-static PyGetSetDef _Read_accessors [ ] = {
+static PyGetSetDef khmer_Read_accessors [ ] = {
     {
         (char *)"name",
         (getter)Read_get_name, (setter)NULL,
@@ -254,24 +244,38 @@ static PyGetSetDef _Read_accessors [ ] = {
 };
 
 
-static
-void
-_init_Read_Type( )
-{
-    using namespace read_parsers;
-
-    _common_init_Type<Read_Object>(
-        Read_Type, "Read", "A FASTQ record plus some metadata."
-    );
-    Read_Type.tp_dealloc    = (destructor)_Read_dealloc;
-
-    Read_Type.tp_getset     = (PyGetSetDef *)_Read_accessors;
-
-    PyType_Ready( &Read_Type );
-
-    _debug_class_attrs( Read_Type );
-}
-
+static PyTypeObject khmer_Read_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "khmer.Read",                       /* tp_name */
+    sizeof(khmer_Read_Object),          /* tp_basicsize */
+    0,                                  /* tp_itemsize */
+    (destructor)khmer_Read_dealloc,      /* tp_dealloc */
+    0,                                         /* tp_print */
+    0,                                         /* tp_getattr */
+    0,                                         /* tp_setattr */
+    0,                                         /* tp_compare */
+    0,                                         /* tp_repr */
+    0,                                         /* tp_as_number */
+    0,                                         /* tp_as_sequence */
+    0,                                         /* tp_as_mapping */
+    0,                                         /* tp_hash */
+    0,                                         /* tp_call */
+    0,                                         /* tp_str */
+    0,                                         /* tp_getattro */
+    0,                                         /* tp_setattro */
+    0,                                         /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,  /* tp_flags */
+    "A FASTQ record plus some metadata.",      /* tp_doc */
+    0,                                         /* tp_traverse */
+    0,                                         /* tp_clear */
+    0,                                         /* tp_richcompare */
+    0,                                         /* tp_weaklistoffset */
+    0,                                         /* tp_iter */
+    0,                                         /* tp_iternext */
+    0,                                         /* tp_methods */
+    0,                                         /* tp_members */
+    (PyGetSetDef *)khmer_Read_accessors,            /* tp_getset */
+};
 
 /***********************************************************************/
 
@@ -332,8 +336,6 @@ static
 PyObject *
 _ReadParser_new( PyTypeObject * subtype, PyObject * args, PyObject * kwds )
 {
-    using namespace read_parsers;
-
     const char *      ifile_name_CSTR;
 
     if (!PyArg_ParseTuple(args, "s", &ifile_name_CSTR )) {
@@ -363,8 +365,6 @@ static
 PyObject *
 _ReadParser_iternext( PyObject * self )
 {
-    using namespace read_parsers;
-
     ReadParser_Object * myself  = (ReadParser_Object *)self;
     IParser *       parser  = myself->parser;
 
@@ -403,8 +403,8 @@ _ReadParser_iternext( PyObject * self )
         return NULL;
     }
 
-    PyObject * the_read_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
-    ((Read_Object *)the_read_OBJECT)->read = the_read_PTR;
+    PyObject * the_read_OBJECT = khmer_Read_Type.tp_alloc( &khmer_Read_Type, 1 );
+    ((khmer_Read_Object *)the_read_OBJECT)->read = the_read_PTR;
     return the_read_OBJECT;
 }
 
@@ -413,8 +413,6 @@ static
 PyObject *
 _ReadPairIterator_iternext( PyObject * self )
 {
-    using namespace read_parsers;
-
     ReadPairIterator_Object *   myself    = (ReadPairIterator_Object *)self;
     ReadParser_Object *     parent    =
         (ReadParser_Object *)(myself->parent);
@@ -465,17 +463,17 @@ _ReadPairIterator_iternext( PyObject * self )
 
     // Copy elements of 'ReadPair' object into Python tuple.
     // TODO? Replace dummy reads with 'None' object.
-    PyObject * read_1_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
+    PyObject * read_1_OBJECT = khmer_Read_Type.tp_alloc( &khmer_Read_Type, 1 );
     try {
-        ((Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
+        ((khmer_Read_Object *)read_1_OBJECT)->read = new Read( the_read_pair.first );
     } catch (std::bad_alloc &e) {
         return PyErr_NoMemory();
     }
-    PyObject * read_2_OBJECT = Read_Type.tp_alloc( &Read_Type, 1 );
+    PyObject * read_2_OBJECT = khmer_Read_Type.tp_alloc( &khmer_Read_Type, 1 );
     try {
-        ((Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
+        ((khmer_Read_Object *)read_2_OBJECT)->read = new Read( the_read_pair.second );
     } catch (std::bad_alloc &e) {
-        delete ((Read_Object *)read_1_OBJECT)->read;
+        delete ((khmer_Read_Object *)read_1_OBJECT)->read;
         return PyErr_NoMemory();
     }
     PyObject * tup = PyTuple_Pack( 2, read_1_OBJECT, read_2_OBJECT );
@@ -497,8 +495,6 @@ static
 PyObject *
 ReadParser_iter_read_pairs( PyObject * self, PyObject * args )
 {
-    using namespace read_parsers;
-
     int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
 
     if (!PyArg_ParseTuple( args, "|i", &pair_mode )) {
@@ -542,8 +538,6 @@ static
 void
 _init_ReadParser_Type( )
 {
-    using namespace read_parsers;
-
     _common_init_Type<ReadParser_Object>(
         ReadParser_Type,
         "_khmer.ReadParser",
@@ -622,7 +616,6 @@ _init_ReadPairIterator_Type( )
     _debug_class_attrs( ReadPairIterator_Type );
 
 } // _init_ReadPairIterator_Type
-
 
 } // namespace python
 
@@ -4667,26 +4660,28 @@ init_khmer(void)
         return;
     }
 
+    _init_ReadParser_Type( );
+    if (PyType_Ready( &ReadParser_Type ) < 0) {
+        return;
+    }
+
+    if (PyType_Ready(&khmer_Read_Type ) < 0) {
+        return;
+    }
+
+    _init_ReadPairIterator_Type( );
+
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
                         "interface for the khmer module low-level extensions" );
     if (m == NULL) {
         return;
     }
-    _init_Read_Type( );
-    _init_ReadParser_Type( );
-    if (PyType_Ready( &ReadParser_Type ) < 0) {
-        return;
-    }
-    _init_ReadPairIterator_Type( );
-    // TODO: Finish initialization of other types.
 
+    Py_INCREF(&ReadParser_Type);
     if (PyModule_AddObject( m, "ReadParser", (PyObject *)&ReadParser_Type ) < 0) {
         return;
     }
-    Py_INCREF(&ReadParser_Type);
-    // TODO: Add other types here as their 'new' methods are implemented.
-    //       Then, remove the corresponding factory functions.
 
     Py_INCREF(&khmer_KHashbitsType);
     PyModule_AddObject(m, "_Hashbits", (PyObject *)&khmer_KHashbitsType);
