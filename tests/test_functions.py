@@ -114,27 +114,27 @@ def test_extract_hashbits_info():
             print >>sys.stderr, '...failed to remove {fn}'.format(fn)
 
 
-FakeFQRead = collections.namedtuple('Read', ['name', 'accuracy', 'sequence'])
+FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])
 FakeFastaRead = collections.namedtuple('Read', ['name', 'sequence'])
 
 
 def test_check_is_pair_1():
-    read1 = FakeFQRead(name='seq', accuracy='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq2', accuracy='###', sequence='AAA')
+    read1 = FakeFQRead(name='seq', quality='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq2', quality='###', sequence='AAA')
 
     assert not check_is_pair(read1, read2)
 
 
 def test_check_is_pair_2():
-    read1 = FakeFQRead(name='seq/1', accuracy='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq/2', accuracy='###', sequence='AAA')
+    read1 = FakeFQRead(name='seq/1', quality='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq/2', quality='###', sequence='AAA')
 
     assert check_is_pair(read1, read2)
 
 
 def test_check_is_pair_3_fq():
-    read1 = FakeFQRead(name='seq 1::', accuracy='###', sequence='AAA')
-    read2 = FakeFQRead(name='seq 2::', accuracy='###', sequence='AAA')
+    read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq 2::', quality='###', sequence='AAA')
 
     assert check_is_pair(read1, read2)
 
@@ -147,7 +147,7 @@ def test_check_is_pair_3_fa():
 
 
 def test_check_is_pair_4():
-    read1 = FakeFQRead(name='seq/1', accuracy='###', sequence='AAA')
+    read1 = FakeFQRead(name='seq/1', quality='###', sequence='AAA')
     read2 = FakeFastaRead(name='seq/2', sequence='AAA')
 
     try:
@@ -159,7 +159,7 @@ def test_check_is_pair_4():
 
 def test_check_is_pair_4b():
     read1 = FakeFastaRead(name='seq/1', sequence='AAA')
-    read2 = FakeFQRead(name='seq/2', accuracy='###', sequence='AAA')
+    read2 = FakeFQRead(name='seq/2', quality='###', sequence='AAA')
 
     try:
         check_is_pair(read1, read2)

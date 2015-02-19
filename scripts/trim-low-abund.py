@@ -39,8 +39,8 @@ def trim_record(read, trim_at):
     new_read = _screed_record_dict()
     new_read.name = read.name
     new_read.sequence = read.sequence[:trim_at]
-    if hasattr(read, 'accuracy'):
-        new_read.accuracy = read.accuracy[:trim_at]
+    if hasattr(read, 'quality'):
+        new_read.quality = read.quality[:trim_at]
 
     return new_read
 

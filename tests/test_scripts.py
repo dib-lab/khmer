@@ -243,9 +243,8 @@ def test_filter_abund_3_fq_retained():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
-
-    # check for 'accuracy' string.
-    seqs = set([r.accuracy for r in screed.open(outfile)])
+    # check for 'quality' string.
+    seqs = set([r.quality for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
 
@@ -1039,7 +1038,7 @@ def test_extract_partitions_fq():
     parts = set(parts)
     assert len(parts) == 1, len(parts)
 
-    quals = set([r.accuracy for r in screed.open(partfile)])
+    quals = set([r.quality for r in screed.open(partfile)])
     quals = list(quals)
     assert quals[0], quals
 
@@ -1456,7 +1455,7 @@ def test_extract_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1464,7 +1463,7 @@ def test_extract_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1528,7 +1527,7 @@ def test_split_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1536,7 +1535,7 @@ def test_split_paired_reads_2_fq():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1565,7 +1564,7 @@ def test_split_paired_reads_3_output_dir():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1573,7 +1572,7 @@ def test_split_paired_reads_3_output_dir():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1602,7 +1601,7 @@ def test_split_paired_reads_3_output_files():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1610,7 +1609,7 @@ def test_split_paired_reads_3_output_files():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1639,7 +1638,7 @@ def test_split_paired_reads_3_output_files_left():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1647,7 +1646,7 @@ def test_split_paired_reads_3_output_files_left():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
@@ -1676,7 +1675,7 @@ def test_split_paired_reads_3_output_files_right():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
     n = 0
@@ -1684,19 +1683,19 @@ def test_split_paired_reads_3_output_files_right():
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
-        assert r.accuracy == q.accuracy
+        assert r.quality == q.quality
     assert n > 0
 
 
 def test_sample_reads_randomly():
-    infile = utils.get_temp_filename('test.fq')
+    infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
 
-    shutil.copyfile(utils.get_test_data('test-fastq-reads.fq'), infile)
+    shutil.copyfile(utils.get_test_data('test-reads.fa'), infile)
 
     script = scriptpath('sample-reads-randomly.py')
     # fix random number seed for reproducibility
-    args = ['-N', '10', '-R', '1']
+    args = ['-N', '10', '-M', '12000', '-R', '1']
     args.append(infile)
     utils.runscript(script, args, in_dir)
 
@@ -1704,11 +1703,11 @@ def test_sample_reads_randomly():
     assert os.path.exists(outfile), outfile
 
     seqs = set([r.name for r in screed.open(outfile)])
-    assert seqs == set(['895:1:1:1326:7273', '895:1:1:1373:4848',
-                        '895:1:1:1264:15854', '895:1:1:1338:15407',
-                        '895:1:1:1327:15301', '895:1:1:1265:2265',
-                        '895:1:1:1327:13028', '895:1:1:1368:4434',
-                        '895:1:1:1335:19932', '895:1:1:1340:19387'])
+    assert seqs == set(['850:2:1:2691:14602/1', '850:2:1:1762:5439/1',
+                        '850:2:1:2399:20086/2', '850:2:1:2503:4494/2',
+                        '850:2:1:2084:17145/1', '850:2:1:2273:13309/1',
+                        '850:2:1:2263:11143/2', '850:2:1:1984:7162/2',
+                        '850:2:1:2065:16816/1', '850:2:1:1792:15774/2'])
 
 
 def test_fastq_to_fasta():
@@ -2147,8 +2146,8 @@ def test_trim_low_abund_3_fq_retained():
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
 
-    # check for 'accuracy' string.
-    seqs = set([r.accuracy for r in screed.open(outfile)])
+    # check for 'quality' string.
+    seqs = set([r.quality for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert '##################' in seqs
 

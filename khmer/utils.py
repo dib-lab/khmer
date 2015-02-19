@@ -26,8 +26,8 @@ def check_is_pair(record1, record2):
     Handles both Casava formats: seq/1 and seq/2, and 'seq::... 1::...'
     and 'seq::... 2::...'.
     """
-    if hasattr(record1, 'accuracy') or hasattr(record2, 'accuracy'):
-        if not (hasattr(record1, 'accuracy') and hasattr(record2, 'accuracy')):
+    if hasattr(record1, 'quality') or hasattr(record2, 'quality'):
+        if not (hasattr(record1, 'quality') and hasattr(record2, 'quality')):
             raise ValueError("both records must be same type (FASTA or FASTQ)")
 
     name1 = record1.name
@@ -107,12 +107,12 @@ def write_record(record, fileobj):
     """
     Writes sequence record to 'fileobj' in FASTA/FASTQ format.
     """
-    if hasattr(record, 'accuracy'):
+    if hasattr(record, 'quality'):
         fileobj.write(
             '@{name}\n{seq}\n'
-            '+\n{acc}\n'.format(name=record.name,
+            '+\n{qual}\n'.format(name=record.name,
                                 seq=record.sequence,
-                                acc=record.accuracy))
+                                qual=record.quality))
     else:
         fileobj.write(
             '>{name}\n{seq}\n'.format(name=record.name,
@@ -123,8 +123,8 @@ def write_record_pair(read1, read2, fileobj):
     """
     Writes pair of sequence records to 'fileobj' in FASTA/FASTQ format.
     """
-    if hasattr(read1, 'accuracy'):
-        assert hasattr(read2, 'accuracy')
+    if hasattr(read1, 'quality'):
+        assert hasattr(read2, 'quality')
     write_record(read1, fileobj)
     write_record(read2, fileobj)
 

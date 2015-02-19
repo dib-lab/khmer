@@ -119,7 +119,7 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     is_fastq = False
 
     for index, read, pid in read_partition_file(args.part_filenames[0]):
-        if hasattr(read, 'accuracy'):
+        if hasattr(read, 'quality'):
             suffix = 'fq'
             is_fastq = True
         break
@@ -127,10 +127,10 @@ def main():  # pylint: disable=too-many-locals,too-many-branches
     for filename in args.part_filenames:
         for index, read, pid in read_partition_file(filename):
             if is_fastq:
-                assert hasattr(read, 'accuracy'), \
+                assert hasattr(read, 'quality'), \
                     "all input files must be FASTQ if the first one is"
             else:
-                assert not hasattr(read, 'accuracy'), \
+                assert not hasattr(read, 'quality'), \
                     "all input files must be FASTA if the first one is"
 
             break

@@ -43,7 +43,7 @@ DEFAULT_N_THREADS = 4
 
 
 def worker(queue, basename, stop_big_traversals):
-    while 1:
+    while True:
         try:
             (htable, index, start, stop) = queue.get(False)
         except Queue.Empty:
