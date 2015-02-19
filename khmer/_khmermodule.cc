@@ -23,8 +23,7 @@
 #include "labelhash.hh"
 #include "khmer_exception.hh"
 #include "hllcounter.hh"
-#include <stdlib.h> 
-
+//#include <stdlib.h>
 using namespace khmer;
 
 //
@@ -1349,8 +1348,8 @@ static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
     while (!kmers.done()) {
         HashIntoType kmer = kmers.next();
         if (set_contains(counting->all_tags, kmer)) {
-             posns.push_back(pos);
-             tags.push_back(kmer);
+            posns.push_back(pos);
+            tags.push_back(kmer);
         }
         pos++;
     }
@@ -1630,9 +1629,12 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
         return NULL;
     }
     try {
-	kcounting_obj->counting = new CountingHash(k, size);}
-    catch (const std::bad_alloc&) {
-    	exit(EXIT_FAILURE);} 
+        kcounting_obj->counting = new CountingHash(k, size);
+    } catch (const std::bad_alloc&) {
+        PyErr_SetString(PyExc_MemoryError,"Out of Memory");
+        return NULL;
+    }
+
 
     return (PyObject *) kcounting_obj;
 }
@@ -1678,9 +1680,12 @@ static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
         return NULL;
     }
     try {
-    	kcounting_obj->counting = new CountingHash(k, sizes);}
-    catch (const std::bad_alloc&) {
-	exit(EXIT_FAILURE);}
+        kcounting_obj->counting = new CountingHash(k, sizes);
+    } catch (const std::bad_alloc&) {
+        PyErr_SetString(PyExc_MemoryError,"Out of Memory");
+        return NULL;
+    }
+
 
     return (PyObject *) kcounting_obj;
 }
@@ -3426,13 +3431,16 @@ static PyObject* khmer_hashbits_new(PyTypeObject * type, PyObject * args,
                 return NULL;
             }
         }
-   
-        try{ 
-        	self->hashbits = new Hashbits(k, sizes);}
-	catch (const std::bad_alloc&) {
-    		exit(EXIT_FAILURE);}
 
-	
+        try {
+            self->hashbits = new Hashbits(k, sizes);
+        } catch (const std::bad_alloc&) {
+            PyErr_SetString(PyExc_MemoryError,"Out of Memory");
+            return NULL;
+        }
+
+
+
     }
     return (PyObject *) self;
 }
@@ -4214,11 +4222,13 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
     if (khashbits_obj == NULL) {
         return NULL;
     }
-    
+
     try {
-    	khashbits_obj->hashbits = new Hashbits(k, sizes);}
-    catch (const std::bad_alloc&) {
-    	exit(EXIT_FAILURE);}
+        khashbits_obj->hashbits = new Hashbits(k, sizes);
+    } catch (const std::bad_alloc&) {
+        PyErr_SetString(PyExc_MemoryError,"Out of Memory");
+        return NULL;
+    }
 
     return (PyObject *) khashbits_obj;
 }
@@ -4251,8 +4261,14 @@ static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
     }
 
     // ...and set the collected kmers as the stoptags.
-	
-    khashbits_obj->hashbits = new Hashbits(counting->ksize(), sizes);
+
+    try {
+        khashbits_obj->hashbits = new Hashbits(counting->ksize(), sizes);
+    } catch (const std::bad_alloc&) {
+        PyErr_SetString(PyExc_MemoryError,"Out of Memory");
+        return NULL;
+    }
+
     khashbits_obj->hashbits->stop_tags.swap(found_kmers);
 
     return (PyObject *) khashbits_obj;
