@@ -65,4 +65,4 @@ then
 	make sloccount.sc
 fi
 
-bash -ex 'cd examples/stamps/; ./do.sh'
+bash -ex -c 'cd examples/stamps/; ./do.sh'
