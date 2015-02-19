@@ -45,8 +45,7 @@ os.environ['OPT'] = " ".join(
 # Checking for OpenMP support. Currently clang doesn't work with OpenMP,
 # so it needs to be disabled for now.
 # This function comes from the yt project:
-# https://bitbucket.org/yt_analysis/yt/src/f7c75759e0395861b52d16921d8ce3ad6e3
-# 6f89f/yt/utilities/lib/setup.py?at=yt
+# https://bitbucket.org/yt_analysis/yt/src/f7c75759e0395861b52d16921d8ce3ad6e36f89f/yt/utilities/lib/setup.py?at=yt
 
 
 def check_for_openmp():
@@ -248,7 +247,7 @@ def reinitialize_command(self, command, reinit_subcommands):
 Distribution.reinitialize_command = reinitialize_command
 
 
-# remove dependency_link once screed is published to actual pyli
+# remove dependency_link once screed is published to actual PyPi
 # pylint: disable=W0142
 setup(cmdclass=CMDCLASS, dependency_links=[
     "https://testpypi.python.org/pypi/screed/0.8-rc3"],

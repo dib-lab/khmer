@@ -288,8 +288,8 @@ def main():
                     ht.consume_sequence_and_tag_with_labels(record.sequence,
                                                             label)
 
-                    write_record(record, outfp) 
-                   
+                    write_record(record, outfp)
+ 
             except IOError as e:
                 print >>sys.stderr, '!! ERROR !!', e
                 print >>sys.stderr, '...error splitting input. exiting...'
