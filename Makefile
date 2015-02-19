@@ -18,27 +18,40 @@ CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
 	 -Ithird-party/smhasher
 
-all: khmer/_khmermodule.so
 
+## all                  : default task; show list of build commands
+all: commands
+
+commands: Makefile
+	@sed -n 's/^##//p' $<
+
+## install-dependencies : use pip to install Python module dependencies
 install-dependencies:
 	pip2 install --upgrade $(DEVPKGS) || pip install --upgrade $(DEVPKGS)
+
+## sharedobj            : build khmer shared object file
+sharedobj: khmer/_khmermodule.so
 
 khmer/_khmermodule.so: $(CPPSOURCES)
 	./setup.py build_ext --inplace
 
+## coverage-debug       : debug code test coverage
 coverage-debug: $(CPPSOURCES)
 	export CFLAGS="-pg -fprofile-arcs -ftest-coverage -O0"; ./setup.py \
 		build_ext --debug --inplace --libraries gcov
 	touch coverage-debug
 
+## install              : install the khmer module to your Python environment
 install: FORCE
 	./setup.py build install
 
+## dist                 : create a module package for distribution
 dist: dist/khmer-$(VERSION).tar.gz
 
 dist/khmer-$(VERSION).tar.gz: $(SOURCES)
 	./setup.py sdist
 
+## clean                : clean up all temporary / machine-generated files
 clean: FORCE
 	cd lib && ${MAKE} clean || true
 	cd tests && rm -rf khmertest_* || true
@@ -52,6 +65,7 @@ debug: FORCE
 	export CFLAGS="-pg -fprofile-arcs"; python setup.py build_ext --debug \
 		--inplace
 
+## doc                  : render documentation in HTML
 doc: build/sphinx/html/index.html
 
 build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
@@ -60,6 +74,7 @@ build/sphinx/html/index.html: $(SOURCES) $(wildcard doc/*.txt) doc/conf.py all
 	@echo '--> docs in build/sphinx/html <--'
 	@echo ''
 
+## pdf                  : render documentation as a PDF file
 pdf: build/sphinx/latex/khmer.pdf
 
 build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
@@ -71,9 +86,11 @@ build/sphinx/latex/khmer.pdf: $(SOURCES) doc/conf.py $(wildcard doc/*.txt)
 cppcheck-result.xml: $(CPPSOURCES)
 	${CPPCHECK} --xml-version=2 2> cppcheck-result.xml
 
+## cppcheck             : run static analysis on C++ code
 cppcheck: $(CPPSOURCES)
 	${CPPCHECK}
 
+## pep8                 : run static analysis on Python code
 pep8: $(PYSOURCES) $(wildcard tests/*.py)
 	pep8 --exclude=_version.py setup.py khmer/ scripts/ tests/ || true
 
@@ -84,17 +101,21 @@ pep8_report.txt: $(PYSOURCES) $(wildcard tests/*.py)
 diff_pep8_report: pep8_report.txt
 	diff-quality --violations=pep8 pep8_report.txt
 
+## astyle               : check/fix C++ code indentation and formatting
 astyle: $(CPPSOURCES)
 	astyle -A10 --max-code-length=80 $(CPPSOURCES)
 
+## autopep8             : check/fix Python code indentation and formatting
 autopep8: $(PYSOURCES) $(wildcard tests/*.py)
 	autopep8 --recursive --in-place --exclude _version.py --ignore E309 \
 		setup.py khmer/*.py scripts/*.py tests/*.py
 
 # A command to automatically run astyle and autopep8 on appropriate files
+## format               : check/fix all code indentation and formatting (runs astyle and autopep8)
 format: astyle autopep8
 	# Do nothing
 
+## pylint               : run static code analysis on Python code
 pylint: $(PYSOURCES) $(wildcard tests/*.py)
 	pylint --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 		setup.py khmer/[!_]*.py khmer/__init__.py scripts/*.py tests \
@@ -111,6 +132,7 @@ diff_pylint_report: pylint_report.txt
 # We need to get coverage to look at our scripts. Since they aren't in a
 # python module we can't tell nosetests to look for them (via an import
 # statement). So we run nose inside of coverage.
+## .coverage            : test code coverage
 .coverage: $(PYSOURCES) $(wildcard tests/*.py) khmer/_khmermodule.so
 	coverage run --branch --source=scripts,khmer --omit=khmer/_version.py \
 		-m nose --with-xunit --attr=\!known_failing --processes=0
@@ -141,6 +163,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 nosetests.xml: FORCE
 	./setup.py nosetests --with-xunit
 
+## doxygen              : generate module documentation with Doxygen
 doxygen: doc/doxygen/html/index.html
 
 doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
@@ -149,10 +172,12 @@ doc/doxygen/html/index.html: ${CPPSOURCES} ${PYSOURCES}
 		Doxyfile
 	doxygen
 
+## lib                  : build khmer library
 lib:
 	cd lib && \
 	$(MAKE)
 
+## test                 : run khmer test suite
 test: FORCE
 	./setup.py develop
 	./setup.py nosetests
@@ -161,9 +186,11 @@ sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
 		setup.py Makefile > sloccount.sc
 
+## sloccount            : count lines of code
 sloccount: 
 	sloccount lib khmer scripts tests setup.py Makefile
 
+## coverity-build       : static code analysis with Coverity scan
 coverity-build:
 	if [[ -x ${cov_analysis_dir}/bin/cov-build ]]; \
 	then \
@@ -175,6 +202,7 @@ coverity-build:
 		'${cov_analysis_dir}. Skipping coverity scan.'; \
 	fi
 
+## coverity-upload      : upload latest Coverity build
 coverity-upload: cov-int
 	if [[ -n "${COVERITY_TOKEN}" ]]; \
 	then \
@@ -188,9 +216,11 @@ coverity-upload: cov-int
 		'skipping scan'; \
 	fi
 
-coverity-clean-configuration:
+## coverity-clean       : clean up Coverity configuration
+coverity-clean:
 	rm -f ${cov_analysis_dir}/config/coverity_config.xml
 
+## coverity-configure   : configure Coverity
 coverity-configure:
 	if [[ -x ${cov_analysis_dir}/bin/cov-configure ]]; \
 	then \
