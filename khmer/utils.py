@@ -22,12 +22,12 @@ def write_record(record, fp):
     """
     Writes output sequence and returns str.
     """
-    if hasattr(record, 'accuracy'):
+    if hasattr(record, 'quality'):
         fp.write(
             '@{name}\n{seq}\n'
             '+\n{acc}\n'.format(name=record.name,
                                 seq=record.sequence,
-                                acc=record.accuracy))
+                                acc=record.quality))
     else:
         fp.write(
             '>{name}\n{seq}\n'.format(name=record.name,

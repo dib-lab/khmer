@@ -62,7 +62,7 @@ def test_gzip_decompression_truncated():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -73,7 +73,7 @@ def test_gzip_decompression_truncated_pairiter():
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -94,7 +94,7 @@ def test_bzip2_decompression_truncated():
         for read in rparser:
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -105,7 +105,7 @@ def test_bzip2_decompression_truncated_pairiter():
         for read in rparser.iter_read_pairs():
             pass
         assert 0, "this should fail"
-    except IOError, err:
+    except IOError as err:
         print str(err)
 
 
@@ -117,7 +117,7 @@ def test_badbzip2():
         assert 0, "this should fail"
     except IOError as err:
         print str(err)
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 
 
@@ -318,6 +318,6 @@ def test_iternext():
         assert 0, "Shouldn't be able to iterate over non FASTA file"
     except IOError as err:
         print str(err)
-    except ValueError, err:
+    except ValueError as err:
         print str(err)
 # vim: set ft=python ts=4 sts=4 sw=4 et tw=79:

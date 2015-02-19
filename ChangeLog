@@ -2,6 +2,10 @@
 
   * khmer/_khmermodule.cc: Catch out of memory errors gracefully.
 
+2015-02-13  Qingpeng Zhang  <qingpeng@msu.edu>
+
+   * scripts/sample-reads-randomly.py: fix a glitch about string formatting.
+
 2015-02-11  Titus Brown  <titus@idyll.org>
 
    * khmer/_khmermodule.cc: fixed k-mer size checking; updated some error
