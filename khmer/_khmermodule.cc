@@ -1348,8 +1348,8 @@ static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
     while (!kmers.done()) {
         HashIntoType kmer = kmers.next();
         if (set_contains(counting->all_tags, kmer)) {
-             posns.push_back(pos);
-             tags.push_back(kmer);
+            posns.push_back(pos);
+            tags.push_back(kmer);
         }
         pos++;
     }
@@ -4063,7 +4063,8 @@ static PyTypeObject khmer_KLabelHashType = {
     0,                       /* tp_alloc */
 };
 
-static PyObject * readaligner_align(khmer_ReadAligner_Object * me, PyObject * args)
+static PyObject * readaligner_align(khmer_ReadAligner_Object * me,
+                                    PyObject * args)
 {
     const char * read;
 
@@ -4107,25 +4108,26 @@ static void khmer_readaligner_dealloc(khmer_ReadAligner_Object* obj)
 //
 // new_readaligner
 //
-static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args, PyObject *kwds)
+static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
+                                       PyObject *kwds)
 {
     khmer_ReadAligner_Object * self;
 
     self = (khmer_ReadAligner_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-	khmer_KCountingHashObject * ch = NULL;
-	unsigned short int trusted_cov_cutoff = 2;
-	double bits_theta = 1;
+        khmer_KCountingHashObject * ch = NULL;
+        unsigned short int trusted_cov_cutoff = 2;
+        double bits_theta = 1;
 
-	if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHashType, &ch,
-                         &trusted_cov_cutoff, &bits_theta)) {
-	    Py_DECREF(self);
-	    return NULL;
-	}
+        if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHashType, &ch,
+                             &trusted_cov_cutoff, &bits_theta)) {
+            Py_DECREF(self);
+            return NULL;
+        }
 
-	self->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
-            bits_theta);
+        self->aligner = new ReadAligner(ch->counting, trusted_cov_cutoff,
+                                        bits_theta);
     }
 
     return (PyObject *) self;
@@ -4702,8 +4704,8 @@ init_khmer(void)
         return;
     }
     if (PyType_Ready(&khmer_ReadAlignerType) < 0) {
-	return;
-    } 
+        return;
+    }
 
     PyObject * m;
     m = Py_InitModule3( "_khmer", KhmerMethods,
