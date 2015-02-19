@@ -80,18 +80,20 @@ in the middle.
 CPython Checklist
 -----------------
 
-Here's a checklist for new CPython types::
+Here's a checklist for new CPython types with futureproofing for Python 3::
 
    - [ ] the CPython object name is of the form `khmer_${OBJECTNAME}_Object`
    - [ ] Named struct with `PyObject_HEAD` macro
    - [ ] `static PyTypeObject khmer_${OBJECTNAME}_Type` with the following
      entries
-      - [ ] `PyObject_HEAD_INIT(NULL)`
+      - [ ] `PyVarObject_HEAD_INIT(NULL, 0)` as the object init (this includes
+        the `ob_size` field).
       - [ ] all fields should have their name in a comment for readability
       - [ ] The `tp_name` filed is a dotted name with both the module name and
         the name of the type within the module. Example: `khmer.ReadAligner`
       - [ ] Deallocator defined and cast to `(destructor)` in tp_dealloc
-        - [ ] The object's deallocator must be `self->ob_type->tp_free(self);`
+        - [ ] The object's deallocator must be
+          `Py_TYPE(obj)->tp_free((PyObject*)obj);`
       - [ ] Do _not_ define a `tp_getattr`
       - [ ] BONUS: write methods to present the state of the object via
         `tp_str` & `tp_repr`
