@@ -48,6 +48,7 @@ def get_parser():
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     parser.add_argument('--Header-names', dest='Header-names', default=False,
+                        action='store_true',
                         help='Add header names to the .hist output file')
     return parser
 
