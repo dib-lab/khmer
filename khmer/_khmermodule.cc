@@ -712,7 +712,7 @@ static PyTypeObject khmer_KSubsetPartitionType = {
 typedef struct {
     PyObject_HEAD
     ReadAligner * aligner;
-} khmer_ReadAlignerObject;
+} khmer_ReadAligner_Object;
 
 static void khmer_counting_dealloc(PyObject *);
 
@@ -4063,7 +4063,7 @@ static PyTypeObject khmer_KLabelHashType = {
     0,                       /* tp_alloc */
 };
 
-static PyObject * readaligner_align(khmer_ReadAlignerObject * me, PyObject * args)
+static PyObject * readaligner_align(khmer_ReadAligner_Object * me, PyObject * args)
 {
     const char * read;
 
@@ -4097,7 +4097,7 @@ static PyMethodDef khmer_ReadAligner_methods[] = {
 // khmer_readaligner_dealloc -- clean up readaligner object
 // GRAPHALIGN addition
 //
-static void khmer_readaligner_dealloc(khmer_ReadAlignerObject* obj)
+static void khmer_readaligner_dealloc(khmer_ReadAligner_Object* obj)
 {
     delete obj->aligner;
     obj->aligner = NULL;
@@ -4109,9 +4109,9 @@ static void khmer_readaligner_dealloc(khmer_ReadAlignerObject* obj)
 //
 static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args, PyObject *kwds)
 {
-    khmer_ReadAlignerObject * self;
+    khmer_ReadAligner_Object * self;
 
-    self = (khmer_ReadAlignerObject *)type->tp_alloc(type, 0);
+    self = (khmer_ReadAligner_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
 	khmer_KCountingHashObject * ch = NULL;
@@ -4135,7 +4135,7 @@ static PyTypeObject khmer_ReadAlignerType = {
     PyObject_HEAD_INIT(NULL)
     0,					    /*ob_size */
     "khmer.ReadAligner",		    /*tp_name*/
-    sizeof(khmer_ReadAlignerObject),	    /*tp_basicsize*/
+    sizeof(khmer_ReadAligner_Object),	    /*tp_basicsize*/
     0,					    /*tp_itemsize*/
     (destructor)khmer_readaligner_dealloc,  /*tp_dealloc*/
     0,                          /*tp_print*/
