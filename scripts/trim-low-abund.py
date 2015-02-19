@@ -87,7 +87,9 @@ def get_parser():
                         'that have high coverage.')
 
     add_loadhash_args(parser)
-    parser.add_argument('-s', '--savetable', metavar="tablefile", default='')
+    parser.add_argument('-s', '--savetable', metavar="filename", default='',
+                        help='save the k-mer counting table to disk after all'
+                        'reads are loaded.')
 
     # expert options
     parser.add_argument('--force', default=False, action='store_true')
