@@ -159,9 +159,9 @@ def main():
         save_pass2 = 0
         n = 0
 
-        paired_reads_iter = broken_paired_reader(screed_iter, min_length=K,
-                                    force_single=args.ignore_pairs)
-        for n, is_pair, read1, read2 in paired_reads_iter:
+        paired_iter = broken_paired_reader(screed_iter, min_length=K,
+                                           force_single=args.ignore_pairs)
+        for n, is_pair, read1, read2 in paired_iter:
             if n % 10000 == 0:
                 print >>sys.stderr, '...', n, filename, save_pass2, \
                     n_reads, n_bp, written_reads, written_bp
