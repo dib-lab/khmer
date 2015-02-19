@@ -64,3 +64,5 @@ if type sloccount >/dev/null 2>&1
 then
 	make sloccount.sc
 fi
+
+bash -ex 'cd examples/stamps/; ./do.sh'
