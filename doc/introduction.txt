@@ -25,7 +25,7 @@ required for assembly for every data set.
 Most of khmer relies on an underlying probabilistic data structure
 known as a `Bloom filter <http://en.wikipedia.org/wiki/Bloom_filter>`__
 (also see `MinCount Sketch
-<http://www.eecs.harvard.edu/~michaelm/CS222/countmin.pdf>`__), which is
+<http://dimacs.rutgers.edu/~graham/pubs/papers/cm-full.pdf>`__), which is
 essentially a set of hash tables, each of different size, with no collision
 detection. These hash tables are used to store the presence of specific k-mers
 and/or their count.  The lack of collision detection means that

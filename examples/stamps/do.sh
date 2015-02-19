@@ -10,7 +10,7 @@ load-into-counting.py -x 1e8 -k 20 stamps-reads.ct \
 abundance-dist.py stamps-reads.ct ../../data/stamps-reads.fa.gz \
 	stamps-reads.hist
 normalize-by-median.py -k 20 -C 10 -x 1e8 ../../data/stamps-reads.fa.gz \
-	--savehash stamps-dn.ct
+	--savetable stamps-dn.ct
 abundance-dist.py stamps-dn.ct stamps-reads.fa.gz.keep stamps-dn.hist
 do-partition.py -k 32 -x 1e8 -s 1e4 -T 8 stamps-part \
 	../../data/stamps-reads.fa.gz

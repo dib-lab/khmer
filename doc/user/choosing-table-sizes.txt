@@ -60,7 +60,7 @@ The real full version
 
 khmer's scripts, at their heart, represents k-mers in a very memory
 efficient way by taking advantage of two data structures, `Bloom
-filters <http://en.wikipedia.org/wiki/Bloom_filter>`__ and `CountMin
+filters <http://en.wikipedia.org/wiki/Bloom_filter>`__ and `MinCount
 Sketches <https://sites.google.com/site/countminsketch/>`__, that are
 both *probabilistic* and *constant memory*.  The "probabilistic" part
 means that there are false positives: the less memory you use, the
