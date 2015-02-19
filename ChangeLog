@@ -1,7 +1,7 @@
 2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
 
-   * Makefile: adjust default build target (`all`) to print out a list of
-   all build targets, providing a simple CLI.
+   * Makefile: add a new Makefile target `help` to list and describe all
+   common targets.
 
 2015-02-13  Qingpeng Zhang  <qingpeng@msu.edu>
 
