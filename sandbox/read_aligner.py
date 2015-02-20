@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 """
 Error correct reads based on a counting hash from a diginorm step.
 Output sequences will be put in @@@.
