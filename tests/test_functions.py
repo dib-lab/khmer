@@ -299,3 +299,10 @@ class Test_BrokenPairedReader(object):
         assert x == expected, x
         assert m == 3, m
         assert n == 2, n
+
+
+def check_file_status_kfile():
+    try:
+        kfile.check_file_status('thisfiledoesnotexistatall')
+    except OSError as e:
+        print >>sys.stder, '...failed to remove {fn}'.format(fn)
