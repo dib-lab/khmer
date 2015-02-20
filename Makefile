@@ -18,6 +18,12 @@ CPPCHECK=ls lib/*.cc khmer/_khmermodule.cc | grep -v test | cppcheck -DNDEBUG \
 	 --quiet -Ilib -Ithird-party/bzip2 -Ithird-party/zlib \
 	 -Ithird-party/smhasher
 
+UNAME := $(shell uname)
+ifeq ($(UNAME),Linux)
+	TESTATTR='!known_failing,!jenkins'
+else
+	TESTATTR='!known_failing,!jenkins,!linux'
+endif
 
 ## all         : default task; compile C++ code, build shared object library
 all: sharedobj
@@ -162,7 +168,7 @@ diff-cover.html: coverage-gcovr.xml coverage.xml
 		--html-report diff-cover.html
 
 nosetests.xml: FORCE
-	./setup.py nosetests --with-xunit
+	./setup.py nosetests --with-xunit --attr ${TESTATTR}
 
 ## doxygen     : generate documentation of the C++ and Python code
 doxygen: doc/doxygen/html/index.html
@@ -180,7 +186,7 @@ lib:
 ## test        : run the khmer test suite
 test: FORCE
 	./setup.py develop
-	./setup.py nosetests
+	./setup.py nosetests --attr ${TESTATTR}
 
 sloccount.sc: ${CPPSOURCES} ${PYSOURCES} $(wildcard tests/*.py) Makefile
 	sloccount --duplicates --wide --details lib khmer scripts tests \
