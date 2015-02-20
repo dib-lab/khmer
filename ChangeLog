@@ -1,3 +1,9 @@
+2015-02-20  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc,lib/read_parsers.cc: Rename the 'accuracy' attribute
+   of ReadParser Reads to 'quality'
+   * tests/test_read_parsers.py: update test to match
+
 2015-02-20  Titus Brown  <titus@idyll.org>
 
    * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
