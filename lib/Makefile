@@ -3,49 +3,49 @@
 WANT_PROFILING=false
 
 # Which profiling tool to use?
-# Assuming you have TAU installed and setup properly, 
+# Assuming you have TAU installed and setup properly,
 # you can instrument codes with it to get detailed multi-threaded profiling.
 # Otherwise, gprof is able to give you some information without threading info.
 # Choose one of: gprof, TAU
 PROFILER_OF_CHOICE=gprof
 
 # Perform extra sanity checking?
-# Set this variable to true 
-# if you wish the codes to perform extra sanity checking 
+# Set this variable to true
+# if you wish the codes to perform extra sanity checking
 # (to the possible detriment of performance).
 WANT_EXTRA_SANITY_CHECKING=false
 
 # Compile with debugging symbols?
-# Set this variable to true 
-# if you wish the codes to be built with debugging symbols 
-# (increases code size 
-# and does not always produce accurate stepping in a debugger 
+# Set this variable to true
+# if you wish the codes to be built with debugging symbols
+# (increases code size
+# and does not always produce accurate stepping in a debugger
 # when optimization is turned on).
 WANT_DEBUGGING=false
 
 # Compile with tracing logic turned on?
-# Set this variable to true if you want to use instrumentation provided 
-# in the sources for debugging purposes 
+# Set this variable to true if you want to use instrumentation provided
+# in the sources for debugging purposes
 # and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_TRACING=false
 
 # Trace state transitions?
 # Set this variable to true if you want to use instrumentation which reports
-# on transitions which occur between the states of the various elements of the 
+# on transitions which occur between the states of the various elements of the
 # processing stack.
 # 'WITH_INTERNAL_TRACING' must be true for this to have effect.
 TRACE_STATE_CHANGES=true
 
 # Trace busywaits?
 # Set this variable to true if you want to use instrumentation which reports
-# on various busywaits, such as synchronization barriers, spinlock trials, and 
+# on various busywaits, such as synchronization barriers, spinlock trials, and
 # polling loops.
 # Spinlock trials will only be reported if 'TRACE_SPINLOCKS' is also true.
 # 'WITH_INTERNAL_TRACING' must be true for this to have effect.
 TRACE_BUSYWAITS=true
 
 # Trace spinlocks?
-# Set this variable to true if you want to use instrumentation which reports 
+# Set this variable to true if you want to use instrumentation which reports
 # on entries into and exits from spinlocks and spinlock trials.
 # Spinlock trials will only be reported if 'TRACE_BUSYWAITS' is also true.
 # 'WITH_INTERNAL_TRACING' must be true for this to have effect.
@@ -58,16 +58,16 @@ TRACE_SPINLOCKS=true
 TRACE_MEMCOPIES=true
 
 # Trace data?
-# Set this variable to true if you want to use instrumentation which reports 
+# Set this variable to true if you want to use instrumentation which reports
 # on the pieces of data handled by various levels of the processing stack.
-# WARNING! This can generate *very* large trace logs - use with caution or 
+# WARNING! This can generate *very* large trace logs - use with caution or
 # lots of free storage.
 # 'WITH_INTERNAL_TRACING' must be true for this to have effect.
 TRACE_DATA=false
 
 # Compile with performance metrics turned on?
-# Set this variable to true if you want to use instrumentation provided 
-# in the sources for performance measurement purposes 
+# Set this variable to true if you want to use instrumentation provided
+# in the sources for performance measurement purposes
 # and are willing to accept the overhead such instrumentation introduces.
 WITH_INTERNAL_METRICS=false
 
@@ -80,11 +80,18 @@ CXX_OPTIMIZATION_FLAGS=-O3
 CXX_SHARED_LIB_FLAGS=-fPIC
 CXXFLAGS+= $(CXX_WARNING_FLAGS) $(CXX_OPTIMIZATION_FLAGS) $(CXX_SHARED_LIB_FLAGS)
 
+CFLAGS=
+C_WARNING_FLAGS=-Wall
+C_OPTIMIZATION_FLAGS=-O3
+C_SHARED_LIB_FLAGS=-fPIC
+CFLAGS+= $(C_WARNING_FLAGS) $(C_OPTIMIZATION_FLAGS) $(C_SHARED_LIB_FLAGS)
+
 LIBS=
 
 ifeq ($(WANT_DEBUGGING), true)
 CXX_DEBUG_FLAGS=-g
 CXXFLAGS+= $(CXX_DEBUG_FLAGS)
+CFLAGS+= $(CXX_DEBUG_FLAGS)
 else
 CXX_DEBUG_FLAGS=
 endif
@@ -92,6 +99,7 @@ endif
 ifeq ($(WANT_EXTRA_SANITY_CHECKING), true)
 DEFINE_KHMER_EXTRA_SANITY_CHECKS=-DKHMER_EXTRA_SANITY_CHECKS
 CXXFLAGS+= $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
+CFLAGS+= $(DEFINE_KHMER_EXTRA_SANITY_CHECKS)
 else
 DEFINE_KHMER_EXTRA_SANITY_CHECKS=
 endif
@@ -139,41 +147,48 @@ export CXX
 export CXXFLAGS
 export LIBS
 
-VERSION = $(shell ./get_version.py)
+VERSION = $(shell python get_version.py)
 
 export VERSION
 
 CXXFLAGS+= -DVERSION=$(VERSION)
 
 NO_UNIQUE_RC=0
-
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
+# Third party dependecnies
 ZLIB_DIR=../third-party/zlib
 ZLIB_OBJS_BASE=\
-	adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o \
-	zutil.o inflate.o infback.o inftrees.o inffast.o
+       adler32.o compress.o crc32.o uncompr.o deflate.o trees.o \
+       zutil.o inflate.o infback.o inftrees.o inffast.o
 ZLIB_OBJS=$(addprefix $(ZLIB_DIR)/, $(ZLIB_OBJS_BASE))
 
 BZIP2_DIR=../third-party/bzip2
 BZIP2_OBJS_BASE= \
-	blocksort.o huffman.o crctable.o randtable.o compress.o \
-	decompress.o bzlib.o
+       blocksort.o huffman.o crctable.o randtable.o compress.o \
+       decompress.o bzlib.o
 BZIP2_OBJS=$(addprefix $(BZIP2_DIR)/, $(BZIP2_OBJS_BASE))
+
 
 #DRV_PROGS=bittest # test-StreamReader test-CacheManager test-Parser test-HashTables
 DRV_PROGS+=#graphtest #consume_prof
 AUX_PROGS=#ht-diff
 
+
 CORE_OBJS= error.o khmer_config.o thread_id_map.o trace_logger.o perf_metrics.o kmer_hash.o
 PARSERS_OBJS= read_parsers.o
+LIBKHMER_OBJS= $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o scoringmatrix.o $(ZLIB_OBJS) $(BZIP2_OBJS)
 
-all: $(ZLIB_OBJS) $(BZIP2_OBJS) $(CORE_OBJS) $(PARSERS_OBJS) hashtable.o hashbits.o subset.o counting.o hllcounter.o test aligner.o scoringmatrix.o node.o kmer.o
+KHMER_HEADERS= counting.hh error.hh hashbits.hh hashtable.hh khmer_config.hh khmer_exception.hh khmer.hh \
+               kmer_hash.hh labelhash.hh perf_metrics.hh primes.hh read_aligner.hh read_parsers.hh \
+	       scoringmatrix.hh subset.hh thread_id_map.hh trace_logger.hh
+
+all: $(ZLIB_OBJS) $(BZIP2_OBJS) libkhmer test
 
 clean:
-	-(cd $(ZLIB_DIR) && make distclean)
+	(cd $(ZLIB_DIR) && make distclean)
 	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so clean)
-	rm -f *.o $(DRV_PROGS) $(AUX_PROGS) zlib/Makefile
+	rm -f *.o *.a *.so $(DRV_PROGS) $(AUX_PROGS) zlib/Makefile
 
 test: $(DRV_PROGS) $(AUX_PROGS)
 
@@ -215,48 +230,21 @@ bittest: bittest.o kmer_hash.o
 #	$(CXX) -o $@ consume_prof.o hashtable.o kmer_hash.o $(PARSERS_OBJS) $(LIBS)
 
 $(ZLIB_OBJS):
-	(cd $(ZLIB_DIR) && ./configure --shared && make libz.a)
+	(cd $(ZLIB_DIR) && ./configure && make CFLAGS+='-fPIC')
 
 $(BZIP2_OBJS):
-	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so all)
+	(cd $(BZIP2_DIR) && make -f Makefile-libbz2_so CFLAGS+='-fPIC')
 
-error.o: error.cc error.hh
+%.o: %.cc $(KHMER_HEADERS)
 
-khmer_config.o: khmer_config.cc khmer_config.hh
+libkhmer: libkhmer.so libkhmer.a
 
-thread_id_map.o: thread_id_map.cc thread_id_map.hh
+libkhmer.so: $(LIBKHMER_OBJS)
+	$(CXX) $(CXXFLAGS) -shared -o $@.so $(LIBKHMER_OBJS)
 
-trace_logger.o: trace_logger.cc trace_logger.hh
-
-perf_metrics.o: perf_metrics.cc perf_metrics.hh
-
-read_parsers.o: read_parsers.cc read_parsers.hh
-
-aligntest: aligntest.o zlib parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
-	$(CXX) -pg -o aligntest aligntest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o
-
-bugtest: bugtest.o zlib parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o aligner.o scoringmatrix.o node.o kmer.o
-	$(CXX) -pg -o bugtest bugtest.o aligner.o scoringmatrix.o node.o kmer.o $(Z_LIB_FILES) parsers.o kmer_hash.o hashtable.o hashbits.o subset.o counting.o
-
-kmer.o: kmer.cc kmer.hh
-
-node.o: node.cc node.hh
-
-aligner.o: aligner.cc aligner.hh
-
-scoringmatrix.o: scoringmatrix.cc scoringmatrix.hh
-
-parsers.o: parsers.cc parsers.hh
-
-kmer_hash.o: kmer_hash.cc kmer_hash.hh
-
-hashtable.o: hashtable.cc hashtable.hh kmer_hash.hh khmer.hh
-
-hashbits.o: hashbits.cc hashbits.hh subset.hh hashtable.hh kmer_hash.hh khmer.hh counting.hh
-
-subset.o: subset.cc subset.hh hashbits.hh kmer_hash.hh khmer.hh
-
-counting.o: counting.cc counting.hh hashtable.hh kmer_hash.hh khmer.hh
+libkhmer.a: $(LIBKHMER_OBJS)
+	ar cq $@.a $(LIBKHMER_OBJS)
+	ranlib $@.a
 
 hllcounter.o: hllcounter.cc hllcounter.hh khmer.hh
 
@@ -272,4 +260,3 @@ test-HashTables.o: test-HashTables.cc read_parsers.hh primes.hh
 	$(CXX) $(CXXFLAGS) -c -o $@ test-HashTables.cc -fopenmp
 
 ht-diff.o: counting.hh hashtable.hh kmer_hash.hh khmer.hh
-
