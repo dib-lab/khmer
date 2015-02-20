@@ -25,7 +25,7 @@ def check_file_status(file_path, force):
     try:
         mode = os.stat(file_path).st_mode
 
-    except OSError as error:
+    except OSError:
         print >>sys.stderr, "ERROR: Input file %s does not exist; exiting" % \
                             file_path
 
