@@ -1,6 +1,10 @@
 2015-02-20  Sherine Awad  <sherine.awad@gmail.com>
    * tests/test_scripts.py: Test loading of counting table with bigcounts	
 
+2015-02-20  Aditi Gupta  <agupta@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
+
 2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
