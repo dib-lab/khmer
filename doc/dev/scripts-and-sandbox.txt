@@ -38,9 +38,9 @@ All scripts in ``sandbox/`` must:
 * be importable (enforced by ``test_import_all`` in
   ``test_sandbox_scripts.py``)
 * be mentioned in ``sandbox/README.rst``
-* have a hash-bang line (``#! /usr/bin/env python``) at the top
+* have a hash-bang line (``#! /usr/bin/env python2``) at the top
 * be command-line executable (``chmod a+x``)
-* have a Copyright message
+* have a Copyright message (see below)
 
 All *new* scripts being added to ``sandbox/`` should:
 
@@ -54,9 +54,25 @@ Command line standard options for scripts/
 All scripts in scripts/ should have the following options, if they could apply:
 
 * ``--version`` - should always apply
-* ``--help`` -- should always apply
+* ``--help`` - should always apply
 * ``--force`` - override any sanity checks that may prevent the script from running
-* ``--loadtable`` and ``--savetable`` -- where appropriate (see khmer_args.py)
+* ``--loadtable`` and ``--savetable`` - where appropriate (see khmer_args.py)
+
+Copyright message
+~~~~~~~~~~~~~~~~~
+
+Our current Copyright message is::
+
+   #
+   # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
+   # Copyright (C) Michigan State University, 2009-2015. It is licensed under
+   # the three-clause BSD license; see doc/LICENSE.txt.
+   # Contact: khmer-project@idyll.org
+   #
+
+The beginning year should be the first year that this file existed in
+the repo; the end year should be the last year a coding change was
+made in the file.
 
 Upgrading a script from 'sandbox' to 'scripts'
 ----------------------------------------------
