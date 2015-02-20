@@ -101,6 +101,7 @@ class Test_CountingHash(object):
         assert hi.get(GG) == 2
 
 
+@attr('linux')
 def test_toobig():
     try:
         ct = khmer.new_counting_hash(30, 1e13, 1)

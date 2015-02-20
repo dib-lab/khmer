@@ -54,6 +54,7 @@ def test_load_into_counting():
     assert os.path.exists(outfile)
 
 
+@attr('linux')
 def test_load_into_counting_toobig():
     script = scriptpath('load-into-counting.py')
     args = ['-x', '1e12', '-N', '2', '-k', '20', '-t', '--force']

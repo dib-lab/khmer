@@ -22,6 +22,7 @@ def teardown():
 #  * thread-safety
 
 
+@attr('linux')
 def test_toobig():
     try:
         lh = LabelHash(20, 1e13, 1)
