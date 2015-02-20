@@ -240,11 +240,11 @@ $(BZIP2_OBJS):
 libkhmer: libkhmer.so libkhmer.a
 
 libkhmer.so: $(LIBKHMER_OBJS)
-	$(CXX) $(CXXFLAGS) -shared -o $@.so $(LIBKHMER_OBJS)
+	$(CXX) $(CXXFLAGS) -shared -o $@ $(LIBKHMER_OBJS)
 
 libkhmer.a: $(LIBKHMER_OBJS)
-	ar cq $@.a $(LIBKHMER_OBJS)
-	ranlib $@.a
+	ar cq $@ $(LIBKHMER_OBJS)
+	ranlib $@
 
 hllcounter.o: hllcounter.cc hllcounter.hh khmer.hh
 
