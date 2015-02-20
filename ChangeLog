@@ -3,6 +3,25 @@
    * Makefile: add a new Makefile target `help` to list and describe all
    common targets.
 
+2015-02-16  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and
+   'write_record_pair' functions.
+   * khmer/khmer_args.py: added streaming reference for future algorithms
+   citation.
+   * tests/test_functions.py: added unit tests for 'check_is_pair' and
+   'broken_paired_reader'.
+   * scripts/trim-low-abund.py: upgraded to track pairs properly; added
+   proper get_parser information; moved to scripts/ from sandbox/.
+   * tests/test_scripts.py: added paired-read tests for
+   trim-low-abund.py.
+   * tests/test-data/test-abund-read-2.paired.fq: data for paired-read tests.
+   * scripts/extract-paired-reads.py: removed 'is_pair' in favor of
+   'check_is_pair'; switched to using 'broken_paired_reader'; fixed use
+   of sys.argv.
+   * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
+   * doc/user/scripts.txt: added trim-low-abund.py.
+
 2015-02-13  Qingpeng Zhang  <qingpeng@msu.edu>
 
    * scripts/sample-reads-randomly.py: fix a glitch about string formatting.
