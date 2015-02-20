@@ -5,6 +5,10 @@
     * test/test_{counting_hash,counting_single,hashbits_obj,labelhash,
     scripts}.py: partial tests for the above
 
+2015-02-20  Aditi Gupta  <agupta@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
+
 2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
