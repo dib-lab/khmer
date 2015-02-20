@@ -1,6 +1,13 @@
 2015-02-20  Sherine Awad  <sherine.awad@gmail.com>
    * tests/test_scripts.py: Test loading of counting table with bigcounts	
 
+2014-12-29  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc: convert C++ out of memory exceptions to Python
+    out of memory exception.
+    * test/test_{counting_hash,counting_single,hashbits_obj,labelhash,
+    scripts}.py: partial tests for the above
+
 2015-02-20  Aditi Gupta  <agupta@msu.edu>
 
    * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
