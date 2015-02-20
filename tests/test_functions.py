@@ -306,3 +306,11 @@ def check_file_status_kfile():
         kfile.check_file_status('thisfiledoesnotexistatall')
     except OSError as e:
         print >>sys.stder, '...failed to remove {fn}'.format(fn)
+
+
+def check_file_status_kfile_force():
+    if force:
+        try:
+            kfile.check_file_status('thisfiledoesnotexistatall')
+        except OSError as e:
+            print >>sys.stderr, '...failed to remove {fn}'.format(fn)
