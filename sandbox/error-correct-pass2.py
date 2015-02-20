@@ -55,7 +55,7 @@ def main():
     # the filtering function.
     def process_fn(record):
         # read_aligner is probably not threadsafe?
-        aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
+        aligner = khmer.ReadAligner(ht, 1, C, max_error_region)
 
         name = record['name']
         seq = record['sequence']

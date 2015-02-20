@@ -41,7 +41,7 @@ def main():
     ht = khmer.load_counting_hash(counting_ht)
     K = ht.ksize()
 
-    aligner = khmer.new_readaligner(ht, args.trusted_cov, args.theta) # counting hash, trusted kmer coverage cutoff, bits theta (threshold value for terminating unproductive alignemnts)
+    aligner = khmer.ReadAligner(ht, args.trusted_cov, args.theta) # counting hash, trusted kmer coverage cutoff, bits theta (threshold value for terminating unproductive alignemnts)
     
     ### the filtering loop
     for infile in infiles:

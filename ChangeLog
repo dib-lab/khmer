@@ -4,6 +4,12 @@
    content, and a process for adding new command line scripts into scripts/.
    * doc/dev/index.txt: added scripts-and-sandbox to developer doc index.
 
+2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
+   types
+   * khmer/_khmermodule.cc: Update ReadAligner to follow the new guidelines
+
 2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
 
    * Makefile: add a new Makefile target `help` to list and describe all
