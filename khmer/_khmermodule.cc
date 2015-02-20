@@ -628,7 +628,7 @@ void free_subset_partition_info(void * p)
 typedef struct {
     PyObject_HEAD
     CountingHash * counting;
-} khmer_KCountingHashObject;
+} khmer_KCountingHash_Object;
 
 typedef struct {
     PyObject_HEAD
@@ -671,18 +671,21 @@ typedef struct {
     ReadAligner * aligner;
 } khmer_ReadAligner_Object;
 
-static void khmer_counting_dealloc(PyObject *);
+static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj);
 
-static PyObject * hash_abundance_distribution(PyObject * self,
+static
+PyObject *
+hash_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args);
+
+static
+PyObject *
+hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
         PyObject * args);
 
-static PyObject * hash_abundance_distribution_with_reads_parser(
-    PyObject * self,
-    PyObject * args);
-
-static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_set_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     PyObject * x;
@@ -698,9 +701,10 @@ static PyObject * hash_set_use_bigcount(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyObject * hash_get_use_bigcount(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_use_bigcount(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     if (!PyArg_ParseTuple(args, "")) {
@@ -712,9 +716,10 @@ static PyObject * hash_get_use_bigcount(PyObject * self, PyObject * args)
     return PyBool_FromLong((int)val);
 }
 
-static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_n_occupied(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     HashIntoType start = 0, stop = 0;
@@ -728,9 +733,10 @@ static PyObject * hash_n_occupied(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(n);
 }
 
-static PyObject * hash_n_unique_kmers(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_n_unique_kmers(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     HashIntoType n = counting->n_unique_kmers();
@@ -738,9 +744,10 @@ static PyObject * hash_n_unique_kmers(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(n);
 }
 
-static PyObject * hash_n_entries(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_n_entries(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     if (!PyArg_ParseTuple(args, "")) {
@@ -750,9 +757,10 @@ static PyObject * hash_n_entries(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(counting->n_entries());
 }
 
-static PyObject * hash_count(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * kmer;
@@ -772,10 +780,11 @@ static PyObject * hash_count(PyObject * self, PyObject * args)
     return PyLong_FromLong(1);
 }
 
-static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self,
-        PyObject *args)
+static
+PyObject *
+hash_output_fasta_kmer_pos_freq(khmer_KCountingHash_Object * me,
+                                PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * infile;
@@ -790,9 +799,10 @@ static PyObject * hash_output_fasta_kmer_pos_freq(PyObject * self,
     return PyLong_FromLong(0);
 }
 
-static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_consume_fasta(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
     CountingHash * counting  = me->counting;
 
     const char * filename;
@@ -817,11 +827,11 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
-static PyObject * hash_consume_fasta_with_reads_parser(
-    PyObject * self, PyObject * args
-)
+static
+PyObject *
+hash_consume_fasta_with_reads_parser(khmer_KCountingHash_Object * me,
+                                     PyObject * args)
 {
-    khmer_KCountingHashObject * me  = (khmer_KCountingHashObject *) self;
     CountingHash * counting  = me->counting;
 
     PyObject * rparser_obj = NULL;
@@ -854,9 +864,10 @@ static PyObject * hash_consume_fasta_with_reads_parser(
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
-static PyObject * hash_consume(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_consume(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * long_str;
@@ -877,9 +888,10 @@ static PyObject * hash_consume(PyObject * self, PyObject * args)
     return PyLong_FromLong(n_consumed);
 }
 
-static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_min_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * long_str;
@@ -900,9 +912,10 @@ static PyObject * hash_get_min_count(PyObject * self, PyObject * args)
     return PyLong_FromLong(N);
 }
 
-static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_max_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * long_str;
@@ -923,9 +936,10 @@ static PyObject * hash_get_max_count(PyObject * self, PyObject * args)
     return PyLong_FromLong(N);
 }
 
-static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_median_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * long_str;
@@ -948,9 +962,10 @@ static PyObject * hash_get_median_count(PyObject * self, PyObject * args)
     return Py_BuildValue("iff", med, average, stddev);
 }
 
-static PyObject * hash_get_kadian_count(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_kadian_count(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * long_str;
@@ -973,9 +988,10 @@ static PyObject * hash_get_kadian_count(PyObject * self, PyObject * args)
     return Py_BuildValue("i", kad);
 }
 
-static PyObject * hash_get(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     PyObject * arg;
@@ -1004,9 +1020,10 @@ static PyObject * hash_get(PyObject * self, PyObject * args)
     return PyLong_FromLong(count);
 }
 
-static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
+static
+PyObject *
+count_trim_on_abundance(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * seq = NULL;
@@ -1034,9 +1051,11 @@ static PyObject * count_trim_on_abundance(PyObject * self, PyObject * args)
 
     return ret;
 }
-static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
+
+static
+PyObject *
+count_trim_below_abundance(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * seq = NULL;
@@ -1065,10 +1084,11 @@ static PyObject * count_trim_below_abundance(PyObject * self, PyObject * args)
     return ret;
 }
 
-static PyObject * count_find_spectral_error_positions(PyObject * self,
-        PyObject * args)
+static
+PyObject *
+count_find_spectral_error_positions(khmer_KCountingHash_Object * me,
+                                    PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     khmer::CountingHash * counting = me->counting;
 
     char * seq = NULL;
@@ -1100,10 +1120,11 @@ static PyObject * count_find_spectral_error_positions(PyObject * self,
     return x;
 }
 
-static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
-        PyObject * args)
+static
+PyObject *
+hash_fasta_count_kmers_by_position(khmer_KCountingHash_Object * me,
+                                   PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * inputfile;
@@ -1152,10 +1173,11 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
     return x;
 }
 
-static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self,
-        PyObject * args)
+static
+PyObject *
+hash_fasta_dump_kmers_by_abundance(khmer_KCountingHash_Object * me,
+                                   PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * inputfile;
@@ -1171,9 +1193,10 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self,
     Py_RETURN_NONE;
 }
 
-static PyObject * hash_load(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_load(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * filename = NULL;
@@ -1192,9 +1215,10 @@ static PyObject * hash_load(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyObject * hash_save(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_save(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * filename = NULL;
@@ -1208,9 +1232,10 @@ static PyObject * hash_save(PyObject * self, PyObject * args)
     Py_RETURN_NONE;
 }
 
-static PyObject * hash_get_ksize(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_ksize(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     if (!PyArg_ParseTuple(args, "")) {
@@ -1222,9 +1247,10 @@ static PyObject * hash_get_ksize(PyObject * self, PyObject * args)
     return PyLong_FromLong(k);
 }
 
-static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_hashsizes(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
 
@@ -1242,12 +1268,15 @@ static PyObject * hash_get_hashsizes(PyObject * self, PyObject * args)
     return x;
 }
 
-static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
-        PyObject * args);
+static
+PyObject *
+hash_collect_high_abundance_kmers(khmer_KCountingHash_Object * me,
+                                  PyObject * args);
 
-static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_consume_and_tag(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * seq;
@@ -1270,9 +1299,10 @@ static PyObject * hash_consume_and_tag(PyObject * self, PyObject * args)
     return Py_BuildValue("K", n_consumed);
 }
 
-static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_get_tags_and_positions(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * seq;
@@ -1307,9 +1337,10 @@ static PyObject * hash_get_tags_and_positions(PyObject * self, PyObject * args)
     return posns_list;
 }
 
-static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
+static
+PyObject *
+hash_find_all_tags_list(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * kmer_s = NULL;
@@ -1351,9 +1382,10 @@ static PyObject * hash_find_all_tags_list(PyObject * self, PyObject *args)
     return x;
 }
 
-static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_consume_fasta_and_tag(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * filename;
@@ -1377,10 +1409,11 @@ static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
-static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self,
-        PyObject *args)
+static
+PyObject *
+hash_find_all_tags_truncate_on_abundance(khmer_KCountingHash_Object * me,
+        PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * kmer_s = NULL;
@@ -1420,10 +1453,11 @@ static PyObject * hash_find_all_tags_truncate_on_abundance(PyObject * self,
     return PyCObject_FromVoidPtr(ppi, free_pre_partition_info);
 }
 
-static PyObject * hash_do_subset_partition_with_abundance(PyObject * self,
-        PyObject * args)
+static
+PyObject *
+hash_do_subset_partition_with_abundance(khmer_KCountingHash_Object * me,
+                                        PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     HashIntoType start_kmer = 0, end_kmer = 0;
@@ -1477,82 +1511,101 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self,
 }
 
 static PyMethodDef khmer_counting_methods[] = {
-    { "ksize", hash_get_ksize, METH_VARARGS, "" },
-    { "hashsizes", hash_get_hashsizes, METH_VARARGS, "" },
-    { "set_use_bigcount", hash_set_use_bigcount, METH_VARARGS, "" },
-    { "get_use_bigcount", hash_get_use_bigcount, METH_VARARGS, "" },
-    { "n_unique_kmers", hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
-    { "n_occupied", hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
-    { "n_entries", hash_n_entries, METH_VARARGS, "" },
-    { "count", hash_count, METH_VARARGS, "Count the given kmer" },
-    { "consume", hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
-    { "consume_fasta", hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
     {
-        "consume_fasta_with_reads_parser", hash_consume_fasta_with_reads_parser,
+        "ksize",
+        (PyCFunction)hash_get_ksize,
+        METH_VARARGS,
+        ""
+    },
+    { "hashsizes", (PyCFunction)hash_get_hashsizes, METH_VARARGS, "" },
+    { "set_use_bigcount", (PyCFunction)hash_set_use_bigcount, METH_VARARGS, "" },
+    { "get_use_bigcount", (PyCFunction)hash_get_use_bigcount, METH_VARARGS, "" },
+    { "n_unique_kmers", (PyCFunction)hash_n_unique_kmers, METH_VARARGS, "Count the number of unique kmers" },
+    { "n_occupied", (PyCFunction)hash_n_occupied, METH_VARARGS, "Count the number of occupied bins" },
+    { "n_entries", (PyCFunction)hash_n_entries, METH_VARARGS, "" },
+    { "count", (PyCFunction)hash_count, METH_VARARGS, "Count the given kmer" },
+    { "consume", (PyCFunction)hash_consume, METH_VARARGS, "Count all k-mers in the given string" },
+    { "consume_fasta", (PyCFunction)hash_consume_fasta, METH_VARARGS, "Count all k-mers in a given file" },
+    {
+        "consume_fasta_with_reads_parser", (PyCFunction)hash_consume_fasta_with_reads_parser,
         METH_VARARGS, "Count all k-mers using a given reads parser"
     },
-    { "output_fasta_kmer_pos_freq", hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
-    { "get", hash_get, METH_VARARGS, "Get the count for the given k-mer" },
-    { "get_min_count", hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
-    { "get_max_count", hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
-    { "get_median_count", hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
-    { "get_kadian_count", hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
-    { "trim_on_abundance", count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "trim_below_abundance", count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
-    { "find_spectral_error_positions", count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
-    { "abundance_distribution", hash_abundance_distribution, METH_VARARGS, "" },
-    { "abundance_distribution_with_reads_parser", hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
-    { "fasta_count_kmers_by_position", hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
-    { "fasta_dump_kmers_by_abundance", hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
-    { "load", hash_load, METH_VARARGS, "" },
-    { "save", hash_save, METH_VARARGS, "" },
+    { "output_fasta_kmer_pos_freq", (PyCFunction)hash_output_fasta_kmer_pos_freq, METH_VARARGS, "" },
+    { "get", (PyCFunction)hash_get, METH_VARARGS, "Get the count for the given k-mer" },
+    { "get_min_count", (PyCFunction)hash_get_min_count, METH_VARARGS, "Get the smallest count of all the k-mers in the string" },
+    { "get_max_count", (PyCFunction)hash_get_max_count, METH_VARARGS, "Get the largest count of all the k-mers in the string" },
+    { "get_median_count", (PyCFunction)hash_get_median_count, METH_VARARGS, "Get the median, average, and stddev of the k-mer counts in the string" },
+    { "get_kadian_count", (PyCFunction)hash_get_kadian_count, METH_VARARGS, "Get the kadian (abundance of k-th rank-ordered k-mer) of the k-mer counts in the string" },
+    { "trim_on_abundance", (PyCFunction)count_trim_on_abundance, METH_VARARGS, "Trim on >= abundance" },
+    { "trim_below_abundance", (PyCFunction)count_trim_below_abundance, METH_VARARGS, "Trim on >= abundance" },
+    { "find_spectral_error_positions", (PyCFunction)count_find_spectral_error_positions, METH_VARARGS, "Identify positions of low-abundance k-mers" },
+    { "abundance_distribution", (PyCFunction)hash_abundance_distribution, METH_VARARGS, "" },
+    { "abundance_distribution_with_reads_parser", (PyCFunction)hash_abundance_distribution_with_reads_parser, METH_VARARGS, "" },
+    { "fasta_count_kmers_by_position", (PyCFunction)hash_fasta_count_kmers_by_position, METH_VARARGS, "" },
+    { "fasta_dump_kmers_by_abundance", (PyCFunction)hash_fasta_dump_kmers_by_abundance, METH_VARARGS, "" },
+    { "load", (PyCFunction)hash_load, METH_VARARGS, "" },
+    { "save", (PyCFunction)hash_save, METH_VARARGS, "" },
     {
-        "collect_high_abundance_kmers", hash_collect_high_abundance_kmers,
+        "collect_high_abundance_kmers", (PyCFunction)hash_collect_high_abundance_kmers,
         METH_VARARGS, ""
     },
-    { "consume_and_tag", hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
-    { "get_tags_and_positions", hash_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
-    { "find_all_tags_list", hash_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
-    { "consume_fasta_and_tag", hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
-    { "do_subset_partition_with_abundance", hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
-    { "find_all_tags_truncate_on_abundance", hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
+    { "consume_and_tag", (PyCFunction)hash_consume_and_tag, METH_VARARGS, "Consume a sequence and tag it" },
+    { "get_tags_and_positions", (PyCFunction)hash_get_tags_and_positions, METH_VARARGS, "Retrieve tags and their positions in a sequence." },
+    { "find_all_tags_list", (PyCFunction)hash_find_all_tags_list, METH_VARARGS, "Find all tags within range of the given k-mer, return as list" },
+    { "consume_fasta_and_tag", (PyCFunction)hash_consume_fasta_and_tag, METH_VARARGS, "Count all k-mers in a given file" },
+    { "do_subset_partition_with_abundance", (PyCFunction)hash_do_subset_partition_with_abundance, METH_VARARGS, "" },
+    { "find_all_tags_truncate_on_abundance", (PyCFunction)hash_find_all_tags_truncate_on_abundance, METH_VARARGS, "" },
 
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-#define is_counting_obj(v)  (Py_TYPE(v) == &khmer_KCountingHashType)
+static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
+                                    PyObject * kwds);
 
-static PyTypeObject khmer_KCountingHashType
-CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHashObject")
+static PyTypeObject khmer_KCountingHash_Type
+CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KCountingHash_Object")
 = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "KCountingHash", sizeof(khmer_KCountingHashObject),
-    0,
-    khmer_counting_dealloc, /*tp_dealloc*/
-    0,              /*tp_print*/
-    0,              /*tp_getattr*/
-    0,              /*tp_setattr*/
-    0,              /*tp_compare*/
-    0,              /*tp_repr*/
-    0,              /*tp_as_number*/
-    0,              /*tp_as_sequence*/
-    0,              /*tp_as_mapping*/
-    0,              /*tp_hash */
-    0,              /*tp_call*/
-    0,              /*tp_str*/
-    0,              /*tp_getattro*/
-    0,              /*tp_setattro*/
-    0,              /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,     /*tp_flags*/
-    "counting hash object",           /* tp_doc */
-    0,                       /* tp_traverse */
-    0,                       /* tp_clear */
-    0,                       /* tp_richcompare */
-    0,                       /* tp_weaklistoffset */
-    0,                       /* tp_iter */
-    0,                       /* tp_iternext */
-    khmer_counting_methods,  /* tp_methods */
+    PyVarObject_HEAD_INIT(NULL, 0)       /* init & ob_size */
+    "_khmer.KCountingHash",              /*tp_name*/
+    sizeof(khmer_KCountingHash_Object),  /*tp_basicsize*/
+    0,                                   /*tp_itemsize*/
+    (destructor)khmer_counting_dealloc,  /*tp_dealloc*/
+    0,                                   /*tp_print*/
+    0,                                   /*tp_getattr*/
+    0,                                   /*tp_setattr*/
+    0,                                   /*tp_compare*/
+    0,                                   /*tp_repr*/
+    0,                                   /*tp_as_number*/
+    0,                                   /*tp_as_sequence*/
+    0,                                   /*tp_as_mapping*/
+    0,                                   /*tp_hash */
+    0,                                   /*tp_call*/
+    0,                                   /*tp_str*/
+    0,                                   /*tp_getattro*/
+    0,                                   /*tp_setattro*/
+    0,                                   /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,                  /*tp_flags*/
+    "counting hash object",              /* tp_doc */
+    0,                                   /* tp_traverse */
+    0,                                   /* tp_clear */
+    0,                                   /* tp_richcompare */
+    0,                                   /* tp_weaklistoffset */
+    0,                                   /* tp_iter */
+    0,                                   /* tp_iternext */
+    khmer_counting_methods,              /* tp_methods */
+    0,                                   /* tp_members */
+    0,                                   /* tp_getset */
+    0,                                   /* tp_base */
+    0,                                   /* tp_dict */
+    0,                                   /* tp_descr_get */
+    0,                                   /* tp_descr_set */
+    0,                                   /* tp_dictoffset */
+    0,                                   /* tp_init */
+    0,                                   /* tp_alloc */
+    _new_counting_hash,                  /* tp_new */
 };
+
+#define is_counting_obj(v)  (Py_TYPE(v) == &khmer_KCountingHash_Type)
 
 //
 // new_hashtable
@@ -1567,8 +1620,8 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
         return NULL;
     }
 
-    khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
-            PyObject_New(khmer_KCountingHashObject, &khmer_KCountingHashType);
+    khmer_KCountingHash_Object * kcounting_obj = (khmer_KCountingHash_Object *) \
+            PyObject_New(khmer_KCountingHash_Object, &khmer_KCountingHash_Type);
 
     if (kcounting_obj == NULL) {
         return NULL;
@@ -1587,50 +1640,53 @@ static PyObject* new_hashtable(PyObject * self, PyObject * args)
 // new_counting_hash
 //
 
-static PyObject* _new_counting_hash(PyObject * self, PyObject * args)
+static PyObject* _new_counting_hash(PyTypeObject * type, PyObject * args,
+                                    PyObject * kwds)
 {
-    WordLength k = 0;
-    PyListObject * sizes_list_o = NULL;
+    khmer_KCountingHash_Object * self;
 
-    if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
-        return NULL;
-    }
+    self = (khmer_KCountingHash_Object *)type->tp_alloc(type, 0);
 
-    std::vector<HashIntoType> sizes;
-    Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
-    if (sizes_list_o_length == -1) {
-        PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
-        return NULL;
-    }
-    for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
-        PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
-        if (PyLong_Check(size_o)) {
-            sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
-        } else if (PyInt_Check(size_o)) {
-            sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
-        } else if (PyFloat_Check(size_o)) {
-            sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
-        } else {
-            PyErr_SetString(PyExc_TypeError,
-                            "2nd argument must be a list of ints, longs, or floats");
+    if (self != NULL) {
+        WordLength k = 0;
+        PyListObject * sizes_list_o = NULL;
+
+        if (!PyArg_ParseTuple(args, "bO!", &k, &PyList_Type, &sizes_list_o)) {
+            Py_DECREF(self);
             return NULL;
+        }
+
+        std::vector<HashIntoType> sizes;
+        Py_ssize_t sizes_list_o_length = PyList_GET_SIZE(sizes_list_o);
+        if (sizes_list_o_length == -1) {
+            Py_DECREF(self);
+            PyErr_SetString(PyExc_ValueError, "error with hashtable primes!");
+            return NULL;
+        }
+        for (Py_ssize_t i = 0; i < sizes_list_o_length; i++) {
+            PyObject * size_o = PyList_GET_ITEM(sizes_list_o, i);
+            if (PyLong_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyLong_AsUnsignedLongLong(size_o));
+            } else if (PyInt_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyInt_AsLong(size_o));
+            } else if (PyFloat_Check(size_o)) {
+                sizes.push_back((HashIntoType) PyFloat_AS_DOUBLE(size_o));
+            } else {
+                Py_DECREF(self);
+                PyErr_SetString(PyExc_TypeError,
+                                "2nd argument must be a list of ints, longs, or floats");
+                return NULL;
+            }
+        }
+
+        try {
+            self->counting = new CountingHash(k, sizes);
+        } catch (std::bad_alloc &e) {
+            return PyErr_NoMemory();
         }
     }
 
-    khmer_KCountingHashObject * kcounting_obj = (khmer_KCountingHashObject *) \
-            PyObject_New(khmer_KCountingHashObject, &khmer_KCountingHashType);
-
-    if (kcounting_obj == NULL) {
-        return NULL;
-    }
-
-    try {
-        kcounting_obj->counting = new CountingHash(k, sizes);
-    } catch (std::bad_alloc &e) {
-        return PyErr_NoMemory();
-    }
-
-    return (PyObject *) kcounting_obj;
+    return (PyObject *) self;
 }
 
 //
@@ -1684,11 +1740,11 @@ CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF("khmer_KHashbitsObject")
     0,                       /* tp_alloc */
 };
 
-static PyObject * hash_abundance_distribution_with_reads_parser(
-    PyObject * self,
-    PyObject * args)
+static
+PyObject *
+hash_abundance_distribution_with_reads_parser(khmer_KCountingHash_Object * me,
+        PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     khmer :: python :: khmer_ReadParser_Object * rparser_obj = NULL;
@@ -1731,9 +1787,10 @@ static PyObject * hash_abundance_distribution_with_reads_parser(
     return x;
 }
 
-static PyObject * hash_abundance_distribution(PyObject * self, PyObject * args)
+static
+PyObject *
+hash_abundance_distribution(khmer_KCountingHash_Object * me, PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * filename = NULL;
@@ -1984,10 +2041,10 @@ static PyObject * hashbits_traverse_from_tags(PyObject * self, PyObject * args)
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
 
-    khmer_KCountingHashObject * counting_o = NULL;
+    khmer_KCountingHash_Object * counting_o = NULL;
     unsigned int distance, threshold, frequency;
 
-    if (!PyArg_ParseTuple(args, "O!III", &khmer_KCountingHashType, &counting_o,
+    if (!PyArg_ParseTuple(args, "O!III", &khmer_KCountingHash_Type, &counting_o,
                           &distance, &threshold, &frequency)) {
         return NULL;
     }
@@ -2004,11 +2061,11 @@ static PyObject * hashbits_repartition_largest_partition(PyObject * self,
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
 
-    khmer_KCountingHashObject * counting_o = NULL;
+    khmer_KCountingHash_Object * counting_o = NULL;
     PyObject * subset_o = NULL;
     unsigned int distance, threshold, frequency;
 
-    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHashType,
+    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
                           &counting_o, &distance, &threshold, &frequency)) {
         return NULL;
     }
@@ -2335,11 +2392,11 @@ static PyObject * hashbits_consume_fasta_and_traverse(PyObject * self,
 
     const char * filename;
     unsigned int radius, big_threshold, transfer_threshold;
-    khmer_KCountingHashObject * counting_o = NULL;
+    khmer_KCountingHash_Object * counting_o = NULL;
 
     if (!PyArg_ParseTuple(args, "sIIIO!", &filename,
                           &radius, &big_threshold, &transfer_threshold,
-                          &khmer_KCountingHashType, &counting_o)) {
+                          &khmer_KCountingHash_Type, &counting_o)) {
         return NULL;
     }
 
@@ -3522,9 +3579,9 @@ subset_partition_average_coverages(khmer_KSubsetPartition_Object * me,
 {
     SubsetPartition * subset_p = me->subset;
 
-    khmer_KCountingHashObject * counting_o;
+    khmer_KCountingHash_Object * counting_o;
 
-    if (!PyArg_ParseTuple(args, "O!", &khmer_KCountingHashType, &counting_o)) {
+    if (!PyArg_ParseTuple(args, "O!", &khmer_KCountingHash_Type, &counting_o)) {
         return NULL;
     }
 
@@ -4079,11 +4136,11 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
     self = (khmer_ReadAligner_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        khmer_KCountingHashObject * ch = NULL;
+        khmer_KCountingHash_Object * ch = NULL;
         unsigned short int trusted_cov_cutoff = 2;
         double bits_theta = 1;
 
-        if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHashType, &ch,
+        if(!PyArg_ParseTuple(args, "O!Hd", &khmer_KCountingHash_Type, &ch,
                              &trusted_cov_cutoff, &bits_theta)) {
             Py_DECREF(self);
             return NULL;
@@ -4185,10 +4242,9 @@ static PyObject* _new_hashbits(PyObject * self, PyObject * args)
     return (PyObject *) khashbits_obj;
 }
 
-static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
-        PyObject * args)
+static PyObject * hash_collect_high_abundance_kmers(khmer_KCountingHash_Object *
+        me , PyObject * args)
 {
-    khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
     const char * filename = NULL;
@@ -4227,13 +4283,11 @@ static PyObject * hash_collect_high_abundance_kmers(PyObject * self,
 // khmer_counting_dealloc -- clean up a counting hash object.
 //
 
-static void khmer_counting_dealloc(PyObject* self)
+static void khmer_counting_dealloc(khmer_KCountingHash_Object * obj)
 {
-    khmer_KCountingHashObject * obj = (khmer_KCountingHashObject *) self;
     delete obj->counting;
     obj->counting = NULL;
-
-    PyObject_Del((PyObject *) obj);
+    Py_TYPE(obj)->tp_free((PyObject*)obj);
 }
 
 //
@@ -4586,10 +4640,6 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,       "Create an empty single-table counting hash"
     },
     {
-        "_new_counting_hash",   _new_counting_hash,
-        METH_VARARGS,       "Create an empty counting hash"
-    },
-    {
         "_new_hashbits",        _new_hashbits,
         METH_VARARGS,       "Create an empty hashbits table"
     },
@@ -4631,7 +4681,7 @@ init_khmer(void)
 {
     using namespace python;
 
-    if (PyType_Ready(&khmer_KCountingHashType) < 0) {
+    if (PyType_Ready(&khmer_KCountingHash_Type) < 0) {
         return;
     }
 
@@ -4689,6 +4739,12 @@ init_khmer(void)
     Py_INCREF(&khmer_ReadParser_Type);
     if (PyModule_AddObject( m, "ReadParser",
                             (PyObject *)&khmer_ReadParser_Type ) < 0) {
+        return;
+    }
+
+    Py_INCREF(&khmer_KCountingHash_Type);
+    if (PyModule_AddObject( m, "CountingHash",
+                            (PyObject *)&khmer_KCountingHash_Type ) < 0) {
         return;
     }
 

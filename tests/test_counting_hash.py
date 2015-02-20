@@ -37,7 +37,7 @@ def teardown():
 class Test_CountingHash(object):
 
     def setup(self):
-        self.hi = khmer._new_counting_hash(12, PRIMES_1m)
+        self.hi = khmer.CountingHash(12, PRIMES_1m)
 
     def test_collision_1(self):
 
@@ -114,7 +114,7 @@ def test_3_tables():
     x = list(PRIMES_1m)
     x.append(1000005)
 
-    hi = khmer._new_counting_hash(12, x)
+    hi = khmer.CountingHash(12, x)
 
     GG = 'G' * 12                   # forward_hash: 11184810
     assert khmer.forward_hash(GG, 12) == 11184810
@@ -284,11 +284,11 @@ def test_save_load():
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
 
-    hi = khmer._new_counting_hash(12, sizes)
+    hi = khmer.CountingHash(12, sizes)
     hi.consume_fasta(inpath)
     hi.save(savepath)
 
-    ht = khmer._new_counting_hash(12, sizes)
+    ht = khmer.CountingHash(12, sizes)
     ht.load(savepath)
 
     tracking = khmer._new_hashbits(12, sizes)
@@ -311,7 +311,7 @@ def test_load_gz():
     sizes.append(1000005)
 
     # save uncompressed hashtable.
-    hi = khmer._new_counting_hash(12, sizes)
+    hi = khmer.CountingHash(12, sizes)
     hi.consume_fasta(inpath)
     hi.save(savepath)
 
@@ -323,7 +323,7 @@ def test_load_gz():
     in_file.close()
 
     # load compressed hashtable.
-    ht = khmer._new_counting_hash(12, sizes)
+    ht = khmer.CountingHash(12, sizes)
     ht.load(loadpath)
 
     tracking = khmer._new_hashbits(12, sizes)
@@ -343,11 +343,11 @@ def test_save_load_gz():
     sizes = list(PRIMES_1m)
     sizes.append(1000005)
 
-    hi = khmer._new_counting_hash(12, sizes)
+    hi = khmer.CountingHash(12, sizes)
     hi.consume_fasta(inpath)
     hi.save(savepath)
 
-    ht = khmer._new_counting_hash(12, sizes)
+    ht = khmer.CountingHash(12, sizes)
     ht.load(savepath)
 
     tracking = khmer._new_hashbits(12, sizes)
@@ -752,7 +752,7 @@ def test_counting_gz_file_type_check():
 
 def test_counting_bad_primes_list():
     try:
-        ht = khmer._new_counting_hash(12, ["a", "b", "c"], 1)
+        ht = khmer.CountingHash(12, ["a", "b", "c"], 1)
         assert 0, "bad list of primes should fail"
     except TypeError as e:
         print str(e)
