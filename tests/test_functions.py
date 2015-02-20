@@ -190,11 +190,11 @@ def test_check_is_pair_7():
 
 
 class Test_BrokenPairedReader(object):
-    stream = [FakeFastaRead(name='seq1/1', sequence='A'*5),
-              FakeFastaRead(name='seq1/2', sequence='A'*4),
-              FakeFastaRead(name='seq2/1', sequence='A'*5),
-              FakeFastaRead(name='seq3/1', sequence='A'*3),
-              FakeFastaRead(name='seq3/2', sequence='A'*5)]
+    stream = [FakeFastaRead(name='seq1/1', sequence='A' * 5),
+              FakeFastaRead(name='seq1/2', sequence='A' * 4),
+              FakeFastaRead(name='seq2/1', sequence='A' * 5),
+              FakeFastaRead(name='seq3/1', sequence='A' * 3),
+              FakeFastaRead(name='seq3/2', sequence='A' * 5)]
 
     def gather(self, **kw):
         iter = broken_paired_reader(self.stream, **kw)
