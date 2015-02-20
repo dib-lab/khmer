@@ -1,3 +1,9 @@
+2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
+
+   * Makefile: add a new Makefile target `help` to list and describe all
+   common targets.
+   * khmer/utils.py, tests/test_functions.py: minor style fixes.
+
 2015-02-16  Titus Brown  <titus@idyll.org>
 
    * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and

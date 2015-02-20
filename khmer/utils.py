@@ -111,8 +111,8 @@ def write_record(record, fileobj):
         fileobj.write(
             '@{name}\n{seq}\n'
             '+\n{qual}\n'.format(name=record.name,
-                                seq=record.sequence,
-                                qual=record.quality))
+                                 seq=record.sequence,
+                                 qual=record.quality))
     else:
         fileobj.write(
             '>{name}\n{seq}\n'.format(name=record.name,
