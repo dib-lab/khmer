@@ -14,7 +14,7 @@ from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
 from khmer._khmer import _HLLCounter
-from khmer._khmer import new_readaligner  # sandbox/{ec,error-correct-pass2}.py
+from khmer._khmer import ReadAligner
 
 from khmer._khmer import forward_hash  # figuregen/*.py
 # tests/test_{functions,counting_hash,labelhash,counting_single}.py

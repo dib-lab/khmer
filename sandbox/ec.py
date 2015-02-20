@@ -26,7 +26,7 @@ def main():
     outfp = open(output_filename, 'w')
 
     ht = khmer.load_counting_hash(hash_filename)
-    aligner = khmer.new_readaligner(ht, 1, C, max_error_region)
+    aligner = khmer.ReadAligner(ht, 1, C, max_error_region)
 
     K = ht.ksize()
 

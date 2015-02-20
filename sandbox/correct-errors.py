@@ -93,7 +93,7 @@ def main():
     print 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
-    aligner = khmer.new_readaligner(ht, args.trusted_cov, args.bits_theta)
+    aligner = khmer.ReadAligner(ht, args.trusted_cov, args.bits_theta)
 
     tempdir = tempfile.mkdtemp('khmer', 'tmp', args.tempdir)
     print 'created temporary directory %s; use -T to change location' % tempdir

@@ -14,14 +14,15 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
+   CODE_OF_CONDUCT
    getting-started
    a-quick-guide-to-testing
    codebase-guide
    coding-guidelines-and-review
+   scripts-and-sandbox
    for-khmer-developers
    release
 
    details
    development
    crazy-ideas
-   CODE_OF_CONDUCT
