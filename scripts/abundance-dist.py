@@ -49,7 +49,7 @@ def get_parser():
                         help='Overwrite output file if it exists')
     parser.add_argument('--Header-names', dest='Header_names', default=False,
                         action='store_true',
-                        help='Add header names to the .hist output file')
+                        help='Add header names to the histogram output file')
     return parser
 
 
