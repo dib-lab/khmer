@@ -38,22 +38,23 @@ All scripts in ``sandbox/`` must:
 * be importable (enforced by ``test_import_all`` in
   ``test_sandbox_scripts.py``)
 * be mentioned in ``sandbox/README.rst``
-* have a shebang line ``#! /usr/bin/env python``
-* be command-line executable (``chmod +x``)
+* have a hash-bang line (``#! /usr/bin/env python``) at the top
+* be command-line executable (``chmod a+x``)
 * have a Copyright message
 
 All *new* scripts being added to ``sandbox/`` should:
 
 * have decent automated tests
 * be used in a protocol (see khmer-protocols) or a recipe (see khmer-recipes)
-* be pep8 and pylint nice (see ``make pep8`` and ``make_diff_pylint``.
+* be pep8 clean and pylint clean-ish (see ``make pep8`` and ``make_diff_pylint``.
 
 Command line standard options for scripts/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All scripts in scripts/ should have the following options:
+All scripts in scripts/ should have the following options, if they could apply:
 
-* ``--force``
+* ``--force`` - override any sanity checks that may prevent the script from running
+* ``--version``
 * ``--loadtable`` and ``--savetable`` where appropriate (see khmer_args.py)
 
 Upgrading a script from 'sandbox' to 'scripts'
@@ -93,4 +94,5 @@ development/PR checklist::
    - [ ] the script has been updated with a ``get_parser()`` and added to doc/user/scripts.txt
    - [ ] argparse help text exists, with an epilog docstring, with examples and options
    - [ ] standard command line options are implemented
-   - [ ] version and citation information is output (`khmer_args.info`)
+   - [ ] version and citation information is output to STDERR (`khmer_args.info`)
+   - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
