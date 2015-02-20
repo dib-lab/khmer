@@ -98,7 +98,7 @@ def main():
         sys.exit(1)
     hash_fp = open(args.output_histogram_filename, 'w')
 
-    if Header-names:
+    if args.Header-names:
         print("k-mer counts", "Frequency", "cumulative frequency" , "cumulative fraction", file=hash_fp)
 
     sofar = 0
