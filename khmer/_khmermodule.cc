@@ -461,7 +461,7 @@ static PyTypeObject khmer_ReadPairIterator_Type = {
 
 static
 PyObject *
-ReadParser_iter_reads( PyObject * self, PyObject * args )
+ReadParser_iter_reads(PyObject * self, PyObject * args )
 {
     return PyObject_SelfIter( self );
 }
@@ -469,7 +469,7 @@ ReadParser_iter_reads( PyObject * self, PyObject * args )
 
 static
 PyObject *
-ReadParser_iter_read_pairs( PyObject * self, PyObject * args )
+ReadParser_iter_read_pairs(PyObject * self, PyObject * args )
 {
     int  pair_mode  = IParser:: PAIR_MODE_ERROR_ON_UNPAIRED;
 
@@ -511,11 +511,11 @@ static PyMethodDef _ReadParser_methods [ ] = {
 
 
 static PyTypeObject khmer_ReadParser_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "khmer.ReadParser",                       /* tp_name */
-    sizeof(khmer_ReadParser_Object),          /* tp_basicsize */
-    0,                                  /* tp_itemsize */
-    (destructor)_ReadParser_dealloc,      /* tp_dealloc */
+    PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
+    "khmer.ReadParser",                        /* tp_name */
+    sizeof(khmer_ReadParser_Object),           /* tp_basicsize */
+    0,                                         /* tp_itemsize */
+    (destructor)_ReadParser_dealloc,           /* tp_dealloc */
     0,                                         /* tp_print */
     0,                                         /* tp_getattr */
     0,                                         /* tp_setattr */
@@ -530,16 +530,16 @@ static PyTypeObject khmer_ReadParser_Type = {
     0,                                         /* tp_getattro */
     0,                                         /* tp_setattro */
     0,                                         /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,  /* tp_flags */
+    Py_TPFLAGS_DEFAULT,                        /* tp_flags */
     "Parses streams from various file formats, " \
     "such as FASTA and FASTQ.",                /* tp_doc */
     0,                                         /* tp_traverse */
     0,                                         /* tp_clear */
     0,                                         /* tp_richcompare */
     0,                                         /* tp_weaklistoffset */
-    PyObject_SelfIter,                                         /* tp_iter */
-    (iternextfunc)_ReadParser_iternext,                                         /* tp_iternext */
-    _ReadParser_methods,                  /* tp_methods */
+    PyObject_SelfIter,                         /* tp_iter */
+    (iternextfunc)_ReadParser_iternext,        /* tp_iternext */
+    _ReadParser_methods,                       /* tp_methods */
     0,                                         /* tp_members */
     0,                                         /* tp_getset */
     0,                                         /* tp_base */
@@ -549,10 +549,11 @@ static PyTypeObject khmer_ReadParser_Type = {
     0,                                         /* tp_dictoffset */
     0,                                         /* tp_init */
     0,                                         /* tp_alloc */
-    _ReadParser_new,                      /* tp_new */
+    _ReadParser_new,                           /* tp_new */
 };
 
-/*
+void _init_ReadParser_Type_constants()
+{
     PyObject * cls_attrs_DICT = PyDict_New( );
     if (cls_attrs_DICT == NULL) {
         return;
@@ -588,8 +589,8 @@ static PyTypeObject khmer_ReadParser_Type = {
         return;
     }
 
-    ReadParser_Type.tp_dict     = cls_attrs_DICT;
-*/
+    khmer_ReadParser_Type.tp_dict     = cls_attrs_DICT;
+}
 
 } // namespace python
 
@@ -4634,6 +4635,7 @@ init_khmer(void)
         return;
     }
 
+    _init_ReadParser_Type_constants();
     if (PyType_Ready( &khmer_ReadParser_Type ) < 0) {
         return;
     }
