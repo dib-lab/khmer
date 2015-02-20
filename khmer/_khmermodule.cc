@@ -428,33 +428,33 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 }
 
 static PyTypeObject khmer_ReadPairIterator_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "khmer.ReadPairIterator",                       /* tp_name */
-    sizeof(khmer_ReadPairIterator_Object),          /* tp_basicsize */
-    0,                                  /* tp_itemsize */
-    (destructor)khmer_ReadPairIterator_dealloc,      /* tp_dealloc */
-    0,                                         /* tp_print */
-    0,                                         /* tp_getattr */
-    0,                                         /* tp_setattr */
-    0,                                         /* tp_compare */
-    0,                                         /* tp_repr */
-    0,                                         /* tp_as_number */
-    0,                                         /* tp_as_sequence */
-    0,                                         /* tp_as_mapping */
-    0,                                         /* tp_hash */
-    0,                                         /* tp_call */
-    0,                                         /* tp_str */
-    0,                                         /* tp_getattro */
-    0,                                         /* tp_setattro */
-    0,                                         /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,  /* tp_flags */
-    "Iterates over 'ReadParser' objects and returns read pairs.",      /* tp_doc */
-    0,                                         /* tp_traverse */
-    0,                                         /* tp_clear */
-    0,                                         /* tp_richcompare */
-    0,                                         /* tp_weaklistoffset */
-    PyObject_SelfIter,                                         /* tp_iter */
-    (iternextfunc)_ReadPairIterator_iternext,                                         /* tp_iternext */
+    PyVarObject_HEAD_INIT(NULL, 0)              /* init & ob_size */
+    "khmer.ReadPairIterator",                   /* tp_name */
+    sizeof(khmer_ReadPairIterator_Object),      /* tp_basicsize */
+    0,                                          /* tp_itemsize */
+    (destructor)khmer_ReadPairIterator_dealloc, /* tp_dealloc */
+    0,                                          /* tp_print */
+    0,                                          /* tp_getattr */
+    0,                                          /* tp_setattr */
+    0,                                          /* tp_compare */
+    0,                                          /* tp_repr */
+    0,                                          /* tp_as_number */
+    0,                                          /* tp_as_sequence */
+    0,                                          /* tp_as_mapping */
+    0,                                          /* tp_hash */
+    0,                                          /* tp_call */
+    0,                                          /* tp_str */
+    0,                                          /* tp_getattro */
+    0,                                          /* tp_setattro */
+    0,                                          /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                         /* tp_flags */
+    "Iterates over 'ReadParser' objects and returns read pairs.", /* tp_doc */
+    0,                                          /* tp_traverse */
+    0,                                          /* tp_clear */
+    0,                                          /* tp_richcompare */
+    0,                                          /* tp_weaklistoffset */
+    PyObject_SelfIter,                          /* tp_iter */
+    (iternextfunc)_ReadPairIterator_iternext,   /* tp_iternext */
 };
 
 
