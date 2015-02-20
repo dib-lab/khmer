@@ -95,5 +95,5 @@ development/PR checklist::
    - [ ] the script has been updated with a ``get_parser()`` and added to doc/user/scripts.txt
    - [ ] argparse help text exists, with an epilog docstring, with examples and options
    - [ ] standard command line options are implemented
-   - [ ] version and citation information is output to STDERR (`khmer_args.info`)
+   - [ ] version and citation information is output to STDERR (`khmer_args.info(...)`)
    - [ ] runtime diagnostic information (progress, etc.) is output to STDERR
