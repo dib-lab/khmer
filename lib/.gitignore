@@ -7,3 +7,5 @@ bittest
 ktable_test
 ht-diff
 *.swp
+*.so
+*.a
