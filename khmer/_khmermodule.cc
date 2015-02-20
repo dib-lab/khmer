@@ -203,36 +203,36 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
 
 
 static PyTypeObject khmer_Read_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "khmer.Read",                       /* tp_name */
-    sizeof(khmer_Read_Object),          /* tp_basicsize */
-    0,                                  /* tp_itemsize */
-    (destructor)khmer_Read_dealloc,      /* tp_dealloc */
-    0,                                         /* tp_print */
-    0,                                         /* tp_getattr */
-    0,                                         /* tp_setattr */
-    0,                                         /* tp_compare */
-    0,                                         /* tp_repr */
-    0,                                         /* tp_as_number */
-    0,                                         /* tp_as_sequence */
-    0,                                         /* tp_as_mapping */
-    0,                                         /* tp_hash */
-    0,                                         /* tp_call */
-    0,                                         /* tp_str */
-    0,                                         /* tp_getattro */
-    0,                                         /* tp_setattro */
-    0,                                         /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,  /* tp_flags */
-    "A FASTQ record plus some metadata.",      /* tp_doc */
-    0,                                         /* tp_traverse */
-    0,                                         /* tp_clear */
-    0,                                         /* tp_richcompare */
-    0,                                         /* tp_weaklistoffset */
-    0,                                         /* tp_iter */
-    0,                                         /* tp_iternext */
-    0,                                         /* tp_methods */
-    0,                                         /* tp_members */
-    (PyGetSetDef *)khmer_Read_accessors,            /* tp_getset */
+    PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
+    "khmer.Read",                         /* tp_name */
+    sizeof(khmer_Read_Object),            /* tp_basicsize */
+    0,                                    /* tp_itemsize */
+    (destructor)khmer_Read_dealloc,       /* tp_dealloc */
+    0,                                    /* tp_print */
+    0,                                    /* tp_getattr */
+    0,                                    /* tp_setattr */
+    0,                                    /* tp_compare */
+    0,                                    /* tp_repr */
+    0,                                    /* tp_as_number */
+    0,                                    /* tp_as_sequence */
+    0,                                    /* tp_as_mapping */
+    0,                                    /* tp_hash */
+    0,                                    /* tp_call */
+    0,                                    /* tp_str */
+    0,                                    /* tp_getattro */
+    0,                                    /* tp_setattro */
+    0,                                    /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,                   /* tp_flags */
+    "A FASTQ record plus some metadata.", /* tp_doc */
+    0,                                    /* tp_traverse */
+    0,                                    /* tp_clear */
+    0,                                    /* tp_richcompare */
+    0,                                    /* tp_weaklistoffset */
+    0,                                    /* tp_iter */
+    0,                                    /* tp_iternext */
+    0,                                    /* tp_methods */
+    0,                                    /* tp_members */
+    (PyGetSetDef *)khmer_Read_accessors,  /* tp_getset */
 };
 
 /***********************************************************************/
