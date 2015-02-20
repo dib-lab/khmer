@@ -1,4 +1,14 @@
+2015-02-20  Aditi Gupta  <agupta@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
+
 2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
+   types
+   * khmer/_khmermodule.cc: Update ReadAligner to follow the new guidelines
+
+2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
 
    * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
    types
