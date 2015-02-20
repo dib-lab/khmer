@@ -1,5 +1,11 @@
 2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
 
+   * lib/Makefile: Add libkhmer targets, clean up
+   * lib/get_version.py: Rewrite to use versioneer.py
+   * lib/.gitignore,third-party/.gitignore: Add more compiled outputs
+
+2015-03-23  Kevin Murray  <spam@kdmurray.id.au>
+
    * lib/counting.hh: Add CountingHash::n_tables() accessor
 
 2015-03-16  Jessica Mizzi  <mizzijes@msu.edu>
