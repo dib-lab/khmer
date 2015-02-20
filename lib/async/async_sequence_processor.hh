@@ -16,13 +16,6 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
         unsigned int _ksize;
 
         std::thread * _reader_thread;
-        bool paired = false;
-
-        unsigned int _n_parsed;
-        unsigned int _n_processed;
-
-        bool _parsing_reads;
-        bool _processing_reads;
 
     public:
 
