@@ -1,5 +1,11 @@
 2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
 
+   * sandbox/{calc-best-assembly,calc-error-profile,normalize-by-align,
+   read_aligner,slice-reads-by-coverage}.py: reference /usr/bin/env python2
+   in the shebang line.
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
    * sandbox/sweep-paired-reads.py: remove empty script
 
 2015-02-20  Titus Brown  <titus@idyll.org>
