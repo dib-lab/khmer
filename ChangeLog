@@ -10,12 +10,6 @@
 
 2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
 
-   * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
-   types
-   * khmer/_khmermodule.cc: Update ReadAligner to follow the new guidelines
-
-2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
-
    * Makefile: add a new Makefile target `help` to list and describe all
    common targets.
    * khmer/utils.py, tests/test_functions.py: minor style fixes.
