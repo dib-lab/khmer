@@ -1,3 +1,8 @@
+2015-02-20  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * In the do.sh script, the old argument --savehash has been updated to
+--savetable
+
 2015-02-20  Titus Brown  <titus@idyll.org>
 
    * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
@@ -1648,9 +1653,4 @@ project to conform to the standard layout
 * It is now easy to calculate code coverage.
 
 * setup.py is now PEP8 compliant
-
-2015-02-20  Tamer A. Mansour  <drtamermansour@gmail.com>
-
-* In the do.sh script, the old argument --savehash has been updated to
---savetable
 
