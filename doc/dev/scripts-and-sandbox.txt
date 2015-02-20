@@ -46,16 +46,17 @@ All *new* scripts being added to ``sandbox/`` should:
 
 * have decent automated tests
 * be used in a protocol (see khmer-protocols) or a recipe (see khmer-recipes)
-* be pep8 clean and pylint clean-ish (see ``make pep8`` and ``make_diff_pylint``.
+* be pep8 clean and pylint clean-ish (see ``make pep8`` and ``make_diff_pylint``).
 
 Command line standard options for scripts/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All scripts in scripts/ should have the following options, if they could apply:
 
+* ``--version`` - should always apply
+* ``--help`` -- should always apply
 * ``--force`` - override any sanity checks that may prevent the script from running
-* ``--version``
-* ``--loadtable`` and ``--savetable`` where appropriate (see khmer_args.py)
+* ``--loadtable`` and ``--savetable`` -- where appropriate (see khmer_args.py)
 
 Upgrading a script from 'sandbox' to 'scripts'
 ----------------------------------------------
