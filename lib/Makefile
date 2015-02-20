@@ -72,7 +72,7 @@ TRACE_DATA=false
 WITH_INTERNAL_METRICS=false
 
 
-### NOTE: No user-servicable parts below this line! ###
+### NOTE: No user-serviceable parts below this line! ###
 
 CXXFLAGS=
 CXX_WARNING_FLAGS=-Wall
@@ -156,7 +156,7 @@ CXXFLAGS+= -DVERSION=$(VERSION)
 NO_UNIQUE_RC=0
 CXXFLAGS+= -DNO_UNIQUE_RC=$(NO_UNIQUE_RC)
 
-# Third party dependecnies
+# Third party dependencies
 ZLIB_DIR=../third-party/zlib
 ZLIB_OBJS_BASE=\
        adler32.o compress.o crc32.o uncompr.o deflate.o trees.o \
