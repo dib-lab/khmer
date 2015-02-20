@@ -4,6 +4,10 @@
    content, and a process for adding new command line scripts into scripts/.
    * doc/dev/index.txt: added scripts-and-sandbox to developer doc index.
 
+2015-02-20  Aditi Gupta  <agupta@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
+
 2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
