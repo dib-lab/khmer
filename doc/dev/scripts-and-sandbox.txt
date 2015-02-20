@@ -90,7 +90,7 @@ development/PR checklist::
 
    - [ ] most or all lines of code are covered by automated tests (see output of ``make diff-cover``)
    - [ ] ``make diff_pylint`` is clean
-   - [ ] the script has been updated with a ``get_parser()`` and added to doc/suser/scripts.txt
+   - [ ] the script has been updated with a ``get_parser()`` and added to doc/user/scripts.txt
    - [ ] argparse help text exists, with an epilog docstring, with examples and options
    - [ ] standard command line options are implemented
    - [ ] version and citation information is output (`khmer_args.info`)
