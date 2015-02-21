@@ -91,6 +91,7 @@ def main():
     filenames = [infile]
     check_space(filenames, args.force)
 
+    # decide where to put output files - specific directory? or just default?
     if args.output_directory:
         if not os.path.exists(args.output_directory):
             os.makedirs(args.output_directory)
@@ -100,7 +101,7 @@ def main():
         out1 = os.path.basename(infile) + '.1'
         out2 = os.path.basename(infile) + '.2'
 
-    # OVERRIDE defaults with -1, -2
+    # OVERRIDE output file locations with -1, -2
     if args.output_first:
         out1 = args.output_first
     if args.output_second:
@@ -115,13 +116,16 @@ def main():
 
     screed_iter = screed.open(infile, parse_description=False)
 
+    # walk through all the reads in broken-paired mode.
     for index, is_pair, record1, record2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index:
             print >> sys.stderr, '...', index
 
+        # are we requiring pairs?
         if args.force_paired and not is_pair:
             print >>sys.stderr, 'ERROR, %s is not part of a pair' % \
                 record1.name
+            sys.exit(1)
 
         if is_pair:
             write_record(record1, fp_out1)
