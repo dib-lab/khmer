@@ -1,3 +1,7 @@
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/sweep-paired-reads.py: remove empty script
+
 2015-02-20  Titus Brown  <titus@idyll.org>
 
    * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
