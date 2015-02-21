@@ -27,7 +27,8 @@ import argparse
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-from khmer.utils import write_record
+from khmer.utils import (write_record_pair, check_is_left, check_is_right,
+                         check_is_pair)
 
 
 def get_parser():
@@ -91,29 +92,31 @@ def main():
     print >> sys.stderr, "Interleaving:\n\t%s\n\t%s" % (s1_file, s2_file)
 
     counter = 0
-    for read1, read2 in itertools.izip(screed.open(s1_file),
-                                       screed.open(s2_file)):
+    screed_iter_1 = screed.open(s1_file, parse_description=False)
+    screed_iter_2 = screed.open(s2_file, parse_description=False)
+    for read1, read2 in itertools.izip(screed_iter_1, screed_iter_2):
         if counter % 100000 == 0:
             print >> sys.stderr, '...', counter, 'pairs'
         counter += 1
 
         name1 = read1.name
-        if not name1.endswith('/1'):
+        if not check_is_left(name1):
             name1 += '/1'
         name2 = read2.name
-        if not name2.endswith('/2'):
+        if not check_is_right(name2):
             name2 += '/2'
-
-        assert name1[:-2] == name2[:-2], \
-            "This doesn't look like paired data! %s %s" % (name1, name2)
 
         read1.name = name1
         read2.name = name2
-        write_record(read1, args.output)
-        write_record(read2, args.output)
+
+        if not check_is_pair(read1, read2):
+            print >>sys.stderr, "This doesn't look like paired data! %s %s" % \
+                (read1.name, read2.name)
+            sys.exit(1)
+
+        write_record_pair(read1, read2, args.output)
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
-
     print >> sys.stderr, 'output written to', args.output
 
 if __name__ == '__main__':
