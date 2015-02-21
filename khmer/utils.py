@@ -52,6 +52,40 @@ def check_is_pair(record1, record2):
     return False
 
 
+def check_is_left(name):
+    """
+    Checks if the name belongs to a 'left' sequence (/1).  Returns True or
+    False.
+
+    Handles both Casava formats: seq/1 and 'seq::... 1::...'
+    """
+    if ' ' in name:                        # handle '@name 1:rst'
+        name, rest = name.split(' ', 1)
+        if rest.startswith('1:'):
+            return True
+    elif name.endswith('/1'):              # handle name/1
+        return True
+
+    return False
+
+
+def check_is_right(name):
+    """
+    Checks if the name belongs to a 'right' sequence (/2).  Returns True or
+    False.
+
+    Handles both Casava formats: seq/2 and 'seq::... 2::...'
+    """
+    if ' ' in name:                        # handle '@name 2:rst'
+        name, rest = name.split(' ', 1)
+        if rest.startswith('2:'):
+            return True
+    elif name.endswith('/2'):              # handle name/2
+        return True
+
+    return False
+
+
 def broken_paired_reader(screed_iter, min_length=None, force_single=False):
     """
     A generator that yields singletons and pairs from a stream of FASTA/FASTQ

@@ -2247,6 +2247,23 @@ def test_trim_low_abund_keep_paired():
     assert seqs[-2:] == ['pair/1', 'pair/2'], seqs
 
 
+def test_trim_low_abund_keep_paired_casava18():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired2.fq'),
+                    infile)
+
+    args = ["-k", "17", "-x", "1e7", "-N", "2", "-V", infile]
+    utils.runscript('trim-low-abund.py', args, in_dir)
+
+    outfile = infile + '.abundtrim'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [r.name for r in screed.open(outfile)]
+    assert seqs[-2:] == ['pair:foo', 'pair:foo'], seqs
+
+
 def test_trim_low_abund_highfpr():
     infile = utils.get_temp_filename('test.fa')
     in_dir = os.path.dirname(infile)
