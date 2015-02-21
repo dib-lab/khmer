@@ -2352,9 +2352,15 @@ def test_trim_low_abund_trimtest_savetable():
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
-def test_counting(): 
-    infile = utils.get_temp_filename('test.fa')
-    in_dir = os.path.dirname(infile)
-    shutil.copyfile(utils.get_test_data('test-abund-read-2.fa'), infile)
-    counting_ht = _make_counting(infile, BIGCOUNT=True)
-    return counting_ht
+
+def _test_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
+    script = scriptpath('load-into-counting.py')
+    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
+    outfile = utils.get_temp_filename('out.ct')
+    args.extend([outfile, infilename])
+    utils.runscript(script, args)
+    assert os.path.exists(outfile)
+
+    return outfile
+
+
