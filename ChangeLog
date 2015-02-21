@@ -2,7 +2,7 @@
 
    * sandbox/{calc-best-assembly,calc-error-profile,normalize-by-align,
    read_aligner,slice-reads-by-coverage}.py: reference /usr/bin/env python2
-   in the shebang line.
+   in the #! line.
 
 2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
 
