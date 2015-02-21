@@ -1,7 +1,13 @@
 2015-02-20  Sherine Awad  <sherine.awad@gmail.com>
    * tests/test_scripts.py: Test loading of counting table with bigcounts	
 
-2014-12-29  Michael R. Crusoe  <mcrusoe@msu.edu>
+2015-02-20  Titus Brown  <titus@idyll.org>
+
+   * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
+   content, and a process for adding new command line scripts into scripts/.
+   * doc/dev/index.txt: added scripts-and-sandbox to developer doc index.
+
+2015-02-20  Michael R. Crusoe  <mcrusoe@msu.edu>
 
     * khmer/_khmermodule.cc: convert C++ out of memory exceptions to Python
     out of memory exception.
