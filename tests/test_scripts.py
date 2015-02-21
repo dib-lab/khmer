@@ -2362,5 +2362,3 @@ def _test_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
     assert os.path.exists(outfile)
 
     return outfile
-
-
