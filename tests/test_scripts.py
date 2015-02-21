@@ -2368,3 +2368,42 @@ def test_trim_low_abund_trimtest_savetable():
             print record.name, record.sequence
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
+
+
+def test_roundtrip_casava_format_1():
+    # check to make sure that extract-paired-reads produces a file identical
+    # to the input file when only paired data is given.
+
+    infile = utils.get_temp_filename('test.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('casava_18-pe.fq'), infile)
+
+    _, out, err = utils.runscript('extract-paired-reads.py', [infile], in_dir)
+
+    r = open(infile).read()
+
+    outfile = infile + '.pe'
+    r2 = open(outfile).read()
+    assert r == r2, (r, r2)
+
+
+def test_roundtrip_casava_format_2():
+    # check that split-paired-reads -> interleave-reads produces a file
+    # identical to input, when only paired reads are given.
+
+    infile = utils.get_temp_filename('test.fq')
+    outfile = utils.get_temp_filename('test2.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('casava_18-pe.fq'), infile)
+
+    _, out, err = utils.runscript('split-paired-reads.py', [infile], in_dir)
+
+    utils.runscript('interleave-reads.py', [infile + '.1',
+                                            infile + '.2',
+                                            '-o', outfile], in_dir)
+
+    r = open(infile).read()
+    r2 = open(outfile).read()
+    assert r == r2, (r, r2)
