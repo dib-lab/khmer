@@ -38,7 +38,7 @@ struct Read {
     std:: string    name;
     std:: string    annotations;
     std:: string    sequence;
-    std:: string    accuracy;
+    std:: string    quality;
     // TODO? Add description field.
 
     inline void reset ( )
@@ -46,7 +46,7 @@ struct Read {
         name.clear( );
         annotations.clear( );
         sequence.clear( );
-        accuracy.clear( );
+        quality.clear( );
     }
 };
 

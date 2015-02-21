@@ -5,6 +5,12 @@
    where Mac OS X attempts to allocate as much memory as requested, while
    on Linux it just crashes).
 
+2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc,lib/read_parsers.cc: Rename the 'accuracy' attribute
+   of ReadParser Reads to 'quality'
+   * tests/test_read_parsers.py: update test to match
+
 2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
 
    * sandbox/{calc-best-assembly,calc-error-profile,normalize-by-align,
