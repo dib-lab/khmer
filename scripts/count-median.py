@@ -77,7 +77,7 @@ def main():
     print >>sys.stderr, 'writing to', output_filename
     output = open(output_filename, 'w')
 
-    for record in screed.open(input_filename):
+    for record in screed.open(input_filename, parse_description=False):
         seq = record.sequence.upper()
         if 'N' in seq:
             seq = seq.replace('N', 'G')
