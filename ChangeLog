@@ -1,5 +1,9 @@
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
+   * sandbox/normalize-by-align.py, read_aligner.py, lice-reads-by-coverage.py: "copyright header was added"
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
    * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
 
 2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
