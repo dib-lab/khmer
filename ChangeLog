@@ -1,4 +1,4 @@
-2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
    * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
 
