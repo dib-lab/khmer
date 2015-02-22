@@ -1,7 +1,6 @@
 2015-02-20  Tamer A. Mansour  <drtamermansour@gmail.com>
 
-   * In the do.sh script, the old argument --savehash has been updated to
---savetable
+   * examples/stamps/do.sh: the argument --savehash was updated to --savetable
 
 2015-02-20  Titus Brown  <titus@idyll.org>
 
