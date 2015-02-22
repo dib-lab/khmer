@@ -2260,8 +2260,8 @@ def test_trim_low_abund_keep_paired_casava18():
     outfile = infile + '.abundtrim'
     assert os.path.exists(outfile), outfile
 
-    seqs = [r.name for r in screed.open(outfile)]
-    assert seqs[-2:] == ['pair:foo', 'pair:foo'], seqs
+    seqs = [r.name for r in screed.open(outfile, parse_description=False)]
+    assert seqs[-2:] == ['pair:foo 1::N', 'pair:foo 2::N'], seqs
 
 
 def test_trim_low_abund_highfpr():
