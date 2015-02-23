@@ -1203,9 +1203,9 @@ def test_abundance_dist():
     line = fp.next().strip()
     assert line == 'k-mer_abundance,K-mer_count,Cumulative_count,Fraction_of_total_distinct_k-mers', line
     line = fp.next().strip()
-    assert line == '1 96 96 0.98', line
+    assert line == '1,96,96,0.98', line
     line = fp.next().strip()
-    assert line == '1001 2 98 1.0', line
+    assert line == '1001,2,98,1.0', line
 
 
 
