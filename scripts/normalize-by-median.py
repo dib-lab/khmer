@@ -99,7 +99,6 @@ def normalize_by_median(input_filename, outfp, htable, args, report_fp=None):
         # Emit records if any passed
         if passed_length and passed_filter:
             for record in batch:
-                print 'XXX', record.name
                 write_record(record, outfp)
         else:
             discarded += batch_size
