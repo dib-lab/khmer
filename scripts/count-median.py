@@ -43,9 +43,6 @@ def get_parser():
     format) will yield uninformative names.  Use :option:`--csv` to
     fix this behavior.
 
-    :option:`--csv` will output a comma-separated value file with column
-    headers, and the entire sequence name will be kept.
-
     Example::
 
        count-median.py counts.ct tests/test-data/test-reads.fq.gz medians.txt
