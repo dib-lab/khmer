@@ -1,3 +1,44 @@
+2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * khmer/load_pe.py: Remove unused/undocumented module. See #784
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
+
+2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc,lib/read_parsers.cc: Rename the 'accuracy' attribute
+   of ReadParser Reads to 'quality'
+   * tests/test_read_parsers.py: update test to match
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/{calc-best-assembly,calc-error-profile,normalize-by-align,
+   read_aligner,slice-reads-by-coverage}.py: reference /usr/bin/env python2
+   in the #! line.
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/sweep-paired-reads.py: remove empty script
+
+2015-02-20  Titus Brown  <titus@idyll.org>
+
+   * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
+   content, and a process for adding new command line scripts into scripts/.
+   * doc/dev/index.txt: added scripts-and-sandbox to developer doc index.
+
+2015-02-20  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc: convert C++ out of memory exceptions to Python
+    out of memory exception.
+    * test/test_{counting_hash,counting_single,hashbits_obj,labelhash,
+    scripts}.py: partial tests for the above
+
+2015-02-20  Aditi Gupta  <agupta@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
+
 2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
