@@ -46,7 +46,7 @@ void SeqAnParser::imprint_next_read(Read &the_read)
     bool atEnd = seqan::atEnd(_stream);
     if (!atEnd) {
         ret = seqan::readRecord(the_read.name, the_read.sequence,
-                                the_read.accuracy, _stream);
+                                the_read.quality, _stream);
     }
     __asm__ __volatile__ ("" ::: "memory");
     _seqan_spin_lock = 0;

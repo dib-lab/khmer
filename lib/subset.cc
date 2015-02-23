@@ -131,11 +131,11 @@ size_t SubsetPartition::output_partitioned_file(
             }
 
             if (partition_id > 0 || output_unassigned) {
-                if (read.accuracy.length()) { // FASTQ
+                if (read.quality.length()) { // FASTQ
                     outfile << "@" << read.name << "\t" << partition_id
                             << "\n";
                     outfile << seq << "\n+\n";
-                    outfile << read.accuracy << "\n";
+                    outfile << read.quality << "\n";
                 } else {		// FASTA
                     outfile << ">" << read.name << "\t" << partition_id;
                     outfile << "\n" << seq << "\n";

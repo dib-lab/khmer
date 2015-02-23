@@ -235,9 +235,9 @@ Read_get_sequence( PyObject * self, void * closure )
 
 static
 PyObject *
-Read_get_accuracy( PyObject * self, void * closure )
+Read_get_quality( PyObject * self, void * closure )
 {
-    return KHMER_READ_STRING_GETTER( self, accuracy );
+    return KHMER_READ_STRING_GETTER( self, quality );
 }
 
 
@@ -264,8 +264,8 @@ static PyGetSetDef _Read_accessors [ ] = {
         (char *)"Genomic sequence.", NULL
     },
     {
-        (char *)"accuracy",
-        (getter)Read_get_accuracy, (setter)NULL,
+        (char *)"quality",
+        (getter)Read_get_quality, (setter)NULL,
         (char *)"Quality scores.", NULL
     },
     {
