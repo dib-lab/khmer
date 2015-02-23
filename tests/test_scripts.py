@@ -446,6 +446,42 @@ def test_filter_stoptags():
     assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
 
 
+def test_filter_stoptags_fq():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+    stopfile = utils.get_temp_filename('stoptags', in_dir)
+
+    # first, copy test-abund-read-2.fa to 'test.fa' in the temp dir.
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+
+    # now, create a file with some stop tags in it --
+    K = 18
+    kh = khmer.new_hashbits(K, 1, 1)
+    kh.add_stop_tag('GTTGACGGGGCTCAGGGG')
+    kh.save_stop_tags(stopfile)
+    del kh
+
+    # finally, run filter-stoptags.
+    script = scriptpath('filter-stoptags.py')
+    args = ['-k', str(K), stopfile, infile, infile]
+    utils.runscript(script, args, in_dir)
+
+    # verify that the basic output file exists
+    outfile = infile + '.stopfilt'
+    assert os.path.exists(outfile), outfile
+
+    # it should contain only one unique sequence, because we've trimmed
+    # off everything after the beginning of the only long sequence in there.
+    seqs = set([r.sequence for r in screed.open(outfile)])
+    assert len(seqs) == 1, seqs
+    assert 'GGTTGACGGGGCTCAGGG' in seqs, seqs
+
+    # make sure that record names are carried through unparsed
+    names = [r.name for r in screed.open(outfile, parse_description=False)]
+    names = set(names)
+    assert 'seq 1::BAR' in names
+
+
 def test_normalize_by_median_indent():
     infile = utils.get_test_data('paired-mixed.fa.pe')
     hashfile = utils.get_test_data('normC20k20.ct')
