@@ -52,7 +52,7 @@ def get_parser():
 
         split-paired-reads.py -o ~/reads-go-here tests/test-data/paired.fq
 
-        Example::
+    Example::
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """

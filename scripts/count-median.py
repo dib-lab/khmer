@@ -37,10 +37,11 @@ def get_parser():
     to estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
 
     The output file contains sequence id, median, average, stddev, and
-    seq length; fields are separated by spaces.  For khmer 1.x,
-    sequence names are split at the first space, which means that some
-    sequence formats (e.g. paired FASTQ in Casava 1.8 format) will yield
-    uninformative names.  Use :option:`--csv` to fix this behavior.
+    seq length; fields are separated by spaces. For khmer 1.x
+    count-median.py will split sequence names at the first space which
+    means that some sequence formats (e.g. paired FASTQ in Casava 1.8
+    format) will yield uninformative names.  Use :option:`--csv` to
+    fix this behavior.
 
     :option:`--csv` will output a comma-separated value file with column
     headers, and the entire sequence name will be kept.
