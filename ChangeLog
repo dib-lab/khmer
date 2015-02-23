@@ -1,6 +1,10 @@
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
+<<<<<<< HEAD
    * sandbox/normalize-by-align.py, read_aligner.py, slice-reads-by-coverage.py: add copyright header
+=======
+   * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
+>>>>>>> 93f5c470007f7adde4e9237230251c3483e048c7
 
 2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
 
