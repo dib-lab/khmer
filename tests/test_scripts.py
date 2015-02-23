@@ -1867,6 +1867,10 @@ def test_fastq_to_fasta():
     assert len(out.splitlines()) == 2, len(out.splitlines())
     assert "No lines dropped" in err
 
+    names = [r.name for r in screed.open(clean_outfile,
+                                         parse_description=False)]
+    assert '895:1:1:1246:14654 1:N:0:NNNNN' in names, names
+
     args = [n_infile, '-n', '-o', n_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_n)
     assert len(out.splitlines()) == 2
