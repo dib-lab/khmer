@@ -18,8 +18,8 @@
 
 2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
-   * abundance-dist.py: Use CSV format for the histogram. Includes column 
-   headers.
+   * scripts/abundance-dist.py: Use CSV format for the histogram. Includes
+   column headers.
    * tests/test_scripts.py: add coverage for the new --csv option in
    abundance-dist.py
 

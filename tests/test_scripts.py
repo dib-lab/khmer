@@ -1201,8 +1201,7 @@ def test_abundance_dist():
 
     fp = iter(open(outfile))
     line = fp.next().strip()
-    assert (line == 'k-mer_abundance,K-mer_count,Cumulative_count'
-                    ',Fraction_of_total_distinct_k-mers'), line
+    assert (line == 'abundance,count,cumulative,cumulative_fraction'), line
     line = fp.next().strip()
     assert line == '1,96,96,0.98', line
     line = fp.next().strip()
