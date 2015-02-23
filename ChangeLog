@@ -1,6 +1,9 @@
 2015-02-23	Aditi Gupta	<agupta@msu.edu>
 
-   * sandbox/collect-reads.py, correct-errors.py, normalize-by-median-pct.py, slice-reads-by-coverage.py, sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py: Replaced 'accuracy' with 'quality'. Fixes #787.
+   * sandbox/{collect-reads.py, correct-errors.py, 
+   normalize-by-median-pct.py, slice-reads-by-coverage.py, 
+   sweep-files.py, sweep-reads3.py, to-casava-1.8-fastq.py}: 
+   Replaced 'accuracy' with 'quality'. Fixes #787.
 
 2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
 
