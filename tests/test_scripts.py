@@ -1494,15 +1494,17 @@ def test_extract_paired_reads_2_fq():
     assert os.path.exists(outfile2), outfile2
 
     n = 0
-    for r, q in zip(screed.open(ex_outfile1), screed.open(outfile1)):
+    for r, q in zip(screed.open(ex_outfile1, parse_description=False),
+                    screed.open(outfile1, parse_description=False)):
         n += 1
-        assert r.name == q.name
+        assert r.name == q.name, (r.name, q.name, n)
         assert r.sequence == q.sequence
         assert r.quality == q.quality
     assert n > 0
 
     n = 0
-    for r, q in zip(screed.open(ex_outfile2), screed.open(outfile2)):
+    for r, q in zip(screed.open(ex_outfile2, parse_description=False),
+                    screed.open(outfile2, parse_description=False)):
         n += 1
         assert r.name == q.name
         assert r.sequence == q.sequence
