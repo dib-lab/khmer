@@ -3709,29 +3709,25 @@ typedef struct {
     //PyObject_HEAD
     khmer_KHashbits_Object khashbits;
     LabelHash * labelhash;
-} khmer_KLabelHashObject;
+} khmer_KLabelHash_Object;
 
-static void khmer_labelhash_dealloc(PyObject *);
-static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args,
+static int khmer_labelhash_init(khmer_KLabelHash_Object * self, PyObject *args,
                                 PyObject *kwds);
 static PyObject * khmer_labelhash_new(PyTypeObject * type, PyObject *args,
                                       PyObject *kwds);
 
-#define is_labelhash_obj(v)  (Py_TYPE(v) == &khmer_KLabelHashType)
+#define is_labelhash_obj(v)  (Py_TYPE(v) == &khmer_KLabelHash_Type)
 
 //
 // khmer_labelhash_dealloc -- clean up a labelhash object.
 //
 
-static void khmer_labelhash_dealloc(PyObject* obj)
+static void khmer_labelhash_dealloc(khmer_KLabelHash_Object * obj)
 {
-    khmer_KLabelHashObject * self = (khmer_KLabelHashObject *) obj;
-
-    delete self->labelhash;
-    self->labelhash = NULL;
+    delete obj->labelhash;
+    obj->labelhash = NULL;
 
     Py_TYPE(obj)->tp_free((PyObject*)obj);
-    //PyObject_Del((PyObject *) obj);
 }
 
 // a little weird; we don't actually want to call Hashbits' new method. Rather, we
@@ -3740,8 +3736,8 @@ static void khmer_labelhash_dealloc(PyObject* obj)
 static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
                                       PyObject *kwds)
 {
-    khmer_KLabelHashObject *self;
-    self = (khmer_KLabelHashObject*)type->tp_alloc(type, 0);
+    khmer_KLabelHash_Object *self;
+    self = (khmer_KLabelHash_Object*)type->tp_alloc(type, 0);
 
     if (self != NULL) {
         WordLength k = 0;
@@ -3785,7 +3781,7 @@ static PyObject * khmer_labelhash_new(PyTypeObject *type, PyObject *args,
     return (PyObject *) self;
 }
 
-static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args,
+static int khmer_labelhash_init(khmer_KLabelHash_Object * self, PyObject *args,
                                 PyObject *kwds)
 {
     if (khmer_KHashbits_Type.tp_init((PyObject *)self, args, kwds) < 0) {
@@ -3797,9 +3793,10 @@ static int khmer_labelhash_init(khmer_KLabelHashObject * self, PyObject *args,
     return 0;
 }
 
-static PyObject * labelhash_get_label_dict(PyObject * self, PyObject * args)
+static
+PyObject *
+labelhash_get_label_dict(khmer_KLabelHash_Object * me, PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * hb = me->labelhash;
 
     PyObject * d = PyDict_New();
@@ -3821,10 +3818,11 @@ static PyObject * labelhash_get_label_dict(PyObject * self, PyObject * args)
     return d;
 }
 
-static PyObject * labelhash_consume_fasta_and_tag_with_labels(
-    PyObject * self, PyObject * args)
+static
+PyObject *
+labelhash_consume_fasta_and_tag_with_labels(khmer_KLabelHash_Object * me,
+        PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * hb = me->labelhash;
 
     std::ofstream outfile;
@@ -3857,10 +3855,11 @@ static PyObject * labelhash_consume_fasta_and_tag_with_labels(
 
 }
 
-static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
-    PyObject * self, PyObject * args)
+static
+PyObject *
+labelhash_consume_partitioned_fasta_and_tag_with_labels(
+    khmer_KLabelHash_Object * me, PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * labelhash = me->labelhash;
 
     const char * filename;
@@ -3888,10 +3887,11 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
     return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
-static PyObject * labelhash_consume_sequence_and_tag_with_labels(
-    PyObject * self, PyObject * args)
+static
+PyObject *
+labelhash_consume_sequence_and_tag_with_labels(khmer_KLabelHash_Object * me,
+        PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * hb = me->labelhash;
     const char * seq = NULL;
     unsigned long long c = 0;
@@ -3909,10 +3909,11 @@ static PyObject * labelhash_consume_sequence_and_tag_with_labels(
     return Py_BuildValue("K", n_consumed);
 }
 
-static PyObject * labelhash_sweep_label_neighborhood(PyObject * self,
-        PyObject * args)
+static
+PyObject *
+labelhash_sweep_label_neighborhood(khmer_KLabelHash_Object * me,
+                                   PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * hb = me->labelhash;
 
     const char * seq = NULL;
@@ -3980,10 +3981,11 @@ static PyObject * labelhash_sweep_label_neighborhood(PyObject * self,
 // Similar to find_all_tags, but returns tags in a way actually usable by python
 // need a tags_in_sequence iterator or function in c++ land for reuse in all
 // these functions
-static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self,
-        PyObject *args)
+
+static
+PyObject *
+labelhash_sweep_tag_neighborhood(khmer_KLabelHash_Object * me, PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * labelhash = me->labelhash;
 
     const char * seq = NULL;
@@ -4042,11 +4044,10 @@ static PyObject * labelhash_sweep_tag_neighborhood(PyObject * self,
     return x;
 }
 
-
-static PyObject * labelhash_get_tag_labels(PyObject * self, PyObject * args)
+static
+PyObject *
+labelhash_get_tag_labels(khmer_KLabelHash_Object * me, PyObject * args)
 {
-
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * labelhash = me->labelhash;
 
     HashIntoType tag;
@@ -4071,9 +4072,10 @@ static PyObject * labelhash_get_tag_labels(PyObject * self, PyObject * args)
     return x;
 }
 
-static PyObject * labelhash_n_labels(PyObject * self, PyObject * args)
+static
+PyObject *
+labelhash_n_labels(khmer_KLabelHash_Object * me, PyObject * args)
 {
-    khmer_KLabelHashObject * me = (khmer_KLabelHashObject *) self;
     LabelHash * labelhash = me->labelhash;
 
     if (!PyArg_ParseTuple(args, "")) {
@@ -4084,26 +4086,25 @@ static PyObject * labelhash_n_labels(PyObject * self, PyObject * args)
 }
 
 static PyMethodDef khmer_labelhash_methods[] = {
-    { "consume_fasta_and_tag_with_labels", labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
-    { "sweep_label_neighborhood", labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
-    {"consume_partitioned_fasta_and_tag_with_labels", labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
-    {"sweep_tag_neighborhood", labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
-    {"get_tag_labels", labelhash_get_tag_labels, METH_VARARGS, ""},
-    {"consume_sequence_and_tag_with_labels", labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
-    {"n_labels", labelhash_n_labels, METH_VARARGS, ""},
-    {"get_label_dict", labelhash_get_label_dict, METH_VARARGS, "" },
-
+    { "consume_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_fasta_and_tag_with_labels, METH_VARARGS, "" },
+    { "sweep_label_neighborhood", (PyCFunction)labelhash_sweep_label_neighborhood, METH_VARARGS, "" },
+    {"consume_partitioned_fasta_and_tag_with_labels", (PyCFunction)labelhash_consume_partitioned_fasta_and_tag_with_labels, METH_VARARGS, "" },
+    {"sweep_tag_neighborhood", (PyCFunction)labelhash_sweep_tag_neighborhood, METH_VARARGS, "" },
+    {"get_tag_labels", (PyCFunction)labelhash_get_tag_labels, METH_VARARGS, ""},
+    {"consume_sequence_and_tag_with_labels", (PyCFunction)labelhash_consume_sequence_and_tag_with_labels, METH_VARARGS, "" },
+    {"n_labels", (PyCFunction)labelhash_n_labels, METH_VARARGS, ""},
+    {"get_label_dict", (PyCFunction)labelhash_get_label_dict, METH_VARARGS, "" },
     {NULL, NULL, 0, NULL}           /* sentinel */
 };
 
-static PyTypeObject khmer_KLabelHashType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "_LabelHash",            /* tp_name */
-    sizeof(khmer_KLabelHashObject), /* tp_basicsize */
+static PyTypeObject khmer_KLabelHash_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
+    "_khmer._LabelHash",            /* tp_name */
+    sizeof(khmer_KLabelHash_Object), /* tp_basicsize */
     0,                       /* tp_itemsize */
     (destructor)khmer_labelhash_dealloc, /* tp_dealloc */
     0,                       /* tp_print */
-    0,  /* khmer_labelhash_getattr, tp_getattr */
+    0,                       /* tp_getattr */
     0,                       /* tp_setattr */
     0,                       /* tp_compare */
     0,                       /* tp_repr */
@@ -4134,6 +4135,7 @@ static PyTypeObject khmer_KLabelHashType = {
     0,                       /* tp_dictoffset */
     (initproc)khmer_labelhash_init,   /* tp_init */
     0,                       /* tp_alloc */
+    khmer_labelhash_new,      /* tp_new */
 };
 
 static PyObject * readaligner_align(khmer_ReadAligner_Object * me,
@@ -4688,17 +4690,14 @@ init_khmer(void)
         return;
     }
 
-    // implemented __new__ for Hashbits; keeping factory func around as well
-    // for backwards compat with old scripts
     khmer_KHashbits_Type.tp_methods = khmer_hashbits_methods;
     if (PyType_Ready(&khmer_KHashbits_Type) < 0) {
         return;
     }
     // add LabelHash
 
-    khmer_KLabelHashType.tp_base = &khmer_KHashbits_Type;
-    khmer_KLabelHashType.tp_new = khmer_labelhash_new;
-    if (PyType_Ready(&khmer_KLabelHashType) < 0) {
+    khmer_KLabelHash_Type.tp_base = &khmer_KHashbits_Type;
+    if (PyType_Ready(&khmer_KLabelHash_Type) < 0) {
         return;
     }
 
@@ -4750,8 +4749,11 @@ init_khmer(void)
         return;
     }
 
-    Py_INCREF(&khmer_KLabelHashType);
-    PyModule_AddObject(m, "_LabelHash", (PyObject *)&khmer_KLabelHashType);
+    Py_INCREF(&khmer_KLabelHash_Type);
+    if (PyModule_AddObject(m, "_LabelHash",
+                           (PyObject *)&khmer_KLabelHash_Type) < 0) {
+        return;
+    }
 
     Py_INCREF(&khmer_KHLLCounter_Type);
     PyModule_AddObject(m, "_HLLCounter", (PyObject *)&khmer_KHLLCounter_Type);
