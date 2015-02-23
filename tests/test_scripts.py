@@ -1118,6 +1118,11 @@ def test_extract_partitions_fq():
     assert dist.strip() == '99 1 1 99'
 
     screed_iter = screed.open(partfile, parse_description=False)
+    names = [r.name.split('\t')[0] for r in screed_iter]
+    assert '35 1::FOO' in names
+    assert '46 1::FIZ' in names
+
+    screed_iter = screed.open(partfile, parse_description=False)
     parts = [r.name.split('\t')[1] for r in screed_iter]
 
     assert len(parts) == 99, len(parts)
