@@ -23,6 +23,10 @@
    format, to test format handling.
    * tests/test-data/{casava_18-pe.fq,test-reads.fq.gz}: new test file for
    Casava 1.8 format handling.
+   * tests/test-data/{overlap.curve,paired-mixed.fq.1,paired-mixed.fq.2,
+   simple_1.fa,simple_2.fa,simple_3.fa,test-colors.fa,test-est.fa,
+   test-graph3.fa,test-graph4.fa,test-graph6.fa}: removed no-longer used
+   test files.
 
 2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
