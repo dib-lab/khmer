@@ -258,10 +258,33 @@ def test_filter_abund_3_fq_retained():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 2, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
     # check for 'quality' string.
-    seqs = set([r.quality for r in screed.open(outfile)])
-    assert len(seqs) == 2, seqs
-    assert '##################' in seqs
+    quals = set([r.quality for r in screed.open(outfile)])
+    assert len(quals) == 2, quals
+    assert '##################' in quals
+
+
+# make sure that FASTQ names are properly parsed, both formats.
+
+
+def test_filter_abund_4_fq_casava_18():
+    infile = utils.get_temp_filename('test.fq')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired2.fq'),
+                    infile)
+    counting_ht = _make_counting(infile, K=17)
+
+    script = scriptpath('filter-abund.py')
+    args = [counting_ht, infile, infile]
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile, parse_description=False)])
+    assert 'pair:foo 1::N' in seqs, seqs
 
 
 def test_filter_abund_1_singlefile():
@@ -304,6 +327,24 @@ def test_filter_abund_2_singlefile():
     seqs = set([r.sequence for r in screed.open(outfile)])
     assert len(seqs) == 1, seqs
     assert 'GGTTGACGGGGCTCAGGG' in seqs
+
+
+def test_filter_abund_2_singlefile_fq_casava_18():
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.paired2.fq'),
+                    infile)
+
+    script = scriptpath('filter-abund-single.py')
+    args = ['-x', '1e7', '-N', '2', '-k', '17', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.abundfilt'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile, parse_description=False)])
+    assert 'pair:foo 1::N' in seqs, seqs
 
 
 def test_filter_abund_4_retain_low_abund():

@@ -17,7 +17,7 @@ DEFAULT_GROUPSIZE = 100
 
 
 def verbose_loader(filename):
-    it = screed.open(filename)
+    it = screed.open(filename, parse_description=False)
     for n, record in enumerate(it):
         if n % 100000 == 0:
             print >>sys.stderr, '... filtering', n
