@@ -1,6 +1,8 @@
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
-   * sandbox/normalize-by-align.py, read_aligner.py, slice-reads-by-coverage.py: "copyright header was added"
+   * sandbox/normalize-by-align.py: "copyright header 2013-2015 was added"
+   * sandbob/read_aligner.py: "copyright header 2013-2015 was added"
+   * sandbox/slice-reads-by-coverage.py: "copyright header 2014  was added"
 
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
