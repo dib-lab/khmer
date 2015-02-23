@@ -1194,19 +1194,19 @@ def test_abundance_dist():
     assert line == '1 96 96 0.98', line
     line = fp.next().strip()
     assert line == '1001 2 98 1.0', line
-    
+
     os.remove(outfile)
     args = ['-z', '--csv', htfile, infile, outfile]
     utils.runscript(script, args, in_dir)
 
     fp = iter(open(outfile))
     line = fp.next().strip()
-    assert line == 'k-mer_abundance,K-mer_count,Cumulative_count,Fraction_of_total_distinct_k-mers', line
+    assert (line == 'k-mer_abundance,K-mer_count,Cumulative_count'
+                    ',Fraction_of_total_distinct_k-mers'), line
     line = fp.next().strip()
     assert line == '1,96,96,0.98', line
     line = fp.next().strip()
     assert line == '1001,2,98,1.0', line
-
 
 
 def test_abundance_dist_nobigcount():
