@@ -1,4 +1,4 @@
-#
+
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
@@ -2353,12 +2353,13 @@ def test_trim_low_abund_trimtest_savetable():
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
 
-def _test_counting(infilename, SIZE=1e7, N=2, K=20, BIGCOUNT=True):
-    script = scriptpath('load-into-counting.py')
-    args = ['-x', str(SIZE), '-N', str(N), '-k', str(K)]
-    outfile = utils.get_temp_filename('out.ct')
-    args.extend([outfile, infilename])
-    utils.runscript(script, args)
-    assert os.path.exists(outfile)
-
-    return outfile
+def test_counting():
+    infile = utils.get_temp_filename('test.fa')
+    indir=os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data('count.ct.gz'), infile)
+    assert os.path.exists(infile), infile
+    try:
+    	test_ct = khmer.load_counting_hash(infile)  
+    except IOError:
+        raise 
+	raise Exception("Can't load a counting table with bigcount set")
