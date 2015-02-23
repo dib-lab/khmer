@@ -66,7 +66,8 @@ def get_parser():
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
     parser.add_argument('--csv', default=False, action='store_true',
-                        help='Output CSV format with column headers')
+                        help="Use the CSV format for the histogram."
+                        "Includes column headers.")
     return parser
 
 
