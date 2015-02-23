@@ -788,8 +788,8 @@ def test_count_median_fq_csv():
     assert 'seq,1001,1001.0,0.0,18' in data
 
     # verify that sequence names remain unparsed with '--csv'
-    assert '895:1:37:17593:9954 1::FOO,1,103.803741455,303.702941895,114' \
-           in data, data
+    names = set([line.split(',')[0] for line in data])
+    assert '895:1:37:17593:9954 1::FOO' in names, names
 
 #
 
