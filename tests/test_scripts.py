@@ -1790,7 +1790,8 @@ def test_split_paired_reads_2_fq():
 
 def test_split_paired_reads_2_mixed_fq_require_pair():
     # test input file
-    infile = utils.get_test_data('paired-mixed.fq')
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed.fq'), infile)
     in_dir = os.path.dirname(infile)
 
     script = scriptpath('split-paired-reads.py')
@@ -1803,7 +1804,8 @@ def test_split_paired_reads_2_mixed_fq_require_pair():
 
 def test_split_paired_reads_2_mixed_fq():
     # test input file
-    infile = utils.get_test_data('paired-mixed.fq')
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-2.fq'), infile)
     in_dir = os.path.dirname(infile)
 
     script = scriptpath('split-paired-reads.py')
@@ -1811,12 +1813,13 @@ def test_split_paired_reads_2_mixed_fq():
 
     status, out, err = utils.runscript(script, args, in_dir)
     assert status == 0
-    assert "split 11 sequences (8 left, 3 right)" in err
+    assert "split 11 sequences (7 left, 4 right)" in err, err
 
 
 def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
     # test input file
-    infile = utils.get_test_data('paired-mixed-broken.fq')
+    infile = utils.get_temp_filename('test.fq')
+    shutil.copyfile(utils.get_test_data('paired-mixed-broken.fq'), infile)
     in_dir = os.path.dirname(infile)
 
     script = scriptpath('split-paired-reads.py')
