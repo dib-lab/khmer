@@ -1117,7 +1117,9 @@ def test_extract_partitions_fq():
     dist = open(distfile).readline()
     assert dist.strip() == '99 1 1 99'
 
-    parts = [r.name.split('\t')[1] for r in screed.open(partfile)]
+    screed_iter = screed.open(partfile, parse_description=False)
+    parts = [r.name.split('\t')[1] for r in screed_iter]
+
     assert len(parts) == 99, len(parts)
     parts = set(parts)
     assert len(parts) == 1, len(parts)
@@ -1398,7 +1400,24 @@ def test_do_partition_2():
 
     assert len(parts) == 99, len(parts)
 
-#
+
+def test_do_partition_2_fq():
+    # test with K=21 (no joining of sequences)
+    seqfile = utils.get_test_data('random-20-a.fq')
+    graphbase = utils.get_temp_filename('out')
+    in_dir = os.path.dirname(graphbase)
+
+    script = scriptpath('do-partition.py')
+    args = ["-k", "21", graphbase, seqfile]
+
+    utils.runscript(script, args, in_dir)
+
+    partfile = os.path.join(in_dir, 'random-20-a.fq.part')
+
+    screed_iter = screed.open(partfile, parse_description=False)
+    names = [r.name.split('\t')[0] for r in screed_iter]
+    assert '35 1::FOO' in names
+    assert '46 1::FIZ' in names
 
 
 def test_interleave_reads_1_fq():
