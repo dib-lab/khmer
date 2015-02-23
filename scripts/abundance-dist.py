@@ -47,7 +47,7 @@ def get_parser():
                         + khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--Header-names', dest='Header_names', default=False,
+    parser.add_argument('--header-names', dest='Header_names', default=False,
                         action='store_true',
                         help='Add header names to the histogram output file')
     return parser
@@ -99,7 +99,7 @@ def main():
     hash_fp = open(args.output_histogram_filename, 'w')
 
     if args.Header_names:
-        print("k-mer_abundance", "K-mer_count", "Cumulative_count" , 
+        print("k-mer_abundance", "K-mer_count", "Cumulative_count",
               "Fraction_of_total_distinct_k-mers", file=hash_fp)
 
     sofar = 0
