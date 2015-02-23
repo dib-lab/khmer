@@ -204,7 +204,7 @@ static PyGetSetDef khmer_Read_accessors [ ] = {
 
 static PyTypeObject khmer_Read_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)        /* init & ob_size */
-    "khmer.Read",                         /* tp_name */
+    "_khmer.Read",                         /* tp_name */
     sizeof(khmer_Read_Object),            /* tp_basicsize */
     0,                                    /* tp_itemsize */
     (destructor)khmer_Read_dealloc,       /* tp_dealloc */
@@ -429,7 +429,7 @@ _ReadPairIterator_iternext(khmer_ReadPairIterator_Object * myself)
 
 static PyTypeObject khmer_ReadPairIterator_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)              /* init & ob_size */
-    "khmer.ReadPairIterator",                   /* tp_name */
+    "_khmer.ReadPairIterator",                   /* tp_name */
     sizeof(khmer_ReadPairIterator_Object),      /* tp_basicsize */
     0,                                          /* tp_itemsize */
     (destructor)khmer_ReadPairIterator_dealloc, /* tp_dealloc */
@@ -512,7 +512,7 @@ static PyMethodDef _ReadParser_methods [ ] = {
 
 static PyTypeObject khmer_ReadParser_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)             /* init & ob_size */
-    "khmer.ReadParser",                        /* tp_name */
+    "_khmer.ReadParser",                        /* tp_name */
     sizeof(khmer_ReadParser_Object),           /* tp_basicsize */
     0,                                         /* tp_itemsize */
     (destructor)_ReadParser_dealloc,           /* tp_dealloc */
@@ -644,7 +644,7 @@ static void khmer_subset_dealloc(khmer_KSubsetPartition_Object * obj);
 
 static PyTypeObject khmer_KSubsetPartition_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)         /* init & ob_size */
-    "khmer.KSubsetPartition",              /* tp_name */
+    "_khmer.KSubsetPartition",              /* tp_name */
     sizeof(khmer_KSubsetPartition_Object), /* tp_basicsize */
     0,                                     /* tp_itemsize */
     (destructor)khmer_subset_dealloc,      /*tp_dealloc*/
@@ -4099,7 +4099,7 @@ static PyMethodDef khmer_labelhash_methods[] = {
 
 static PyTypeObject khmer_KLabelHash_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)  /* init & ob_size */
-    "_khmer._LabelHash",            /* tp_name */
+    "_khmer.LabelHash",            /* tp_name */
     sizeof(khmer_KLabelHash_Object), /* tp_basicsize */
     0,                       /* tp_itemsize */
     (destructor)khmer_labelhash_dealloc, /* tp_dealloc */
@@ -4210,7 +4210,7 @@ static PyObject* khmer_ReadAligner_new(PyTypeObject *type, PyObject * args,
 
 static PyTypeObject khmer_ReadAlignerType = {
     PyVarObject_HEAD_INIT(NULL, 0) /* init & ob_size */
-    "khmer.ReadAligner",		    /*tp_name*/
+    "_khmer.ReadAligner",		    /*tp_name*/
     sizeof(khmer_ReadAligner_Object),	    /*tp_basicsize*/
     0,					    /*tp_itemsize*/
     (destructor)khmer_readaligner_dealloc,  /*tp_dealloc*/
@@ -4482,7 +4482,7 @@ static PyMethodDef khmer_hllcounter_methods[] = {
 
 static PyTypeObject khmer_KHLLCounter_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "khmer.KHLLCounter",                       /* tp_name */
+    "_khmer.KHLLCounter",                       /* tp_name */
     sizeof(khmer_KHLLCounter_Object),          /* tp_basicsize */
     0,                                         /* tp_itemsize */
     (destructor)khmer_hllcounter_dealloc,      /* tp_dealloc */
@@ -4745,18 +4745,18 @@ init_khmer(void)
     }
 
     Py_INCREF(&khmer_KHashbits_Type);
-    if (PyModule_AddObject(m, "_Hashbits", (PyObject *)&khmer_KHashbits_Type) < 0) {
+    if (PyModule_AddObject(m, "Hashbits", (PyObject *)&khmer_KHashbits_Type) < 0) {
         return;
     }
 
     Py_INCREF(&khmer_KLabelHash_Type);
-    if (PyModule_AddObject(m, "_LabelHash",
+    if (PyModule_AddObject(m, "LabelHash",
                            (PyObject *)&khmer_KLabelHash_Type) < 0) {
         return;
     }
 
     Py_INCREF(&khmer_KHLLCounter_Type);
-    PyModule_AddObject(m, "_HLLCounter", (PyObject *)&khmer_KHLLCounter_Type);
+    PyModule_AddObject(m, "HLLCounter", (PyObject *)&khmer_KHLLCounter_Type);
     Py_INCREF(&khmer_ReadAlignerType);
     PyModule_AddObject(m, "ReadAligner", (PyObject *)&khmer_ReadAlignerType);
 }
