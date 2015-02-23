@@ -1,3 +1,7 @@
+2015-02-21 Tamer A.Mansour (drtamermansour@gmail.com)
+
+   * scripts/abundance-dist.py: add the argument --header-names
+
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
 
    * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
