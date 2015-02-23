@@ -53,6 +53,11 @@ typedef queue<ReadPtr, Cap> ReadQueue;
 
 class Hashtable;
 
+#define STATE_START -1
+#define STATE_DORMANT 0
+#define STATE_WAIT 1
+#define STATE_RUNNING 2
+
 // General deletion functor
 template <class T> class Delete {
     void operator()(T ptr) { delete ptr; }    

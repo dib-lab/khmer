@@ -12,13 +12,17 @@ class AsyncSequenceParser: public AsyncProducer<ReadBatchPtr> {
 
         bool paired = false;
         unsigned int _n_parsed;
-        unsigned int _n_processed;
+        unsigned int _batchsize;
+        const std::string _current_filename;
 
         AsyncSequenceParser ():
             khmer::AsyncProducer<ReadBatchPtr>() {
         }
 
-        void start(const std::string &filename
+        void start(const std::string &filename, bool paired);
+        void consume();
+        unsigned int queue_load();
+        unsigned int get_batchsize() { return _batchsize; };
 
 }
 

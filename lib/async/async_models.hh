@@ -60,12 +60,16 @@ class Async {
         AsyncExceptionHandler * _exc_handler;
         unsigned int _batchsize;
 
+        int _STATE = STATE_START;
+        uint32_t _state_spin_lock;
+
     public:
 
         Async() {
             //_exc_handler();
             _stdout_spin_lock = 0;
-            _workers_running = false;
+            _state_spin_lock = 0;
+            _STATE = STATE_DORMANT;
             _batchsize = 1;
             _exc_handler = new AsyncExceptionHandler();
         }
@@ -78,7 +82,7 @@ class Async {
 
         void start(unsigned int n_threads) {
             _n_workers = n_threads;
-            _workers_running = true;
+            set_global_state(STATE_WAIT);
             for (unsigned int t=0; t<_n_workers; ++t) {
                 #if(VERBOSITY)
                 std::cout << "Async spawn worker" << std::endl;
@@ -87,8 +91,18 @@ class Async {
             }
         }
 
+        bool set_global_state(int state) {
+            if (state > -2 and state < 3) {
+                while(!__sync_bool_compare_and_swap( &_state_spin_lock, 0, 1 ));
+                _STATE = state;
+                __sync_bool_compare_and_swap( &_state_spin_lock, 1, 0 );
+                return true;
+            }
+            return false;
+        }
+
         void stop() {
-            _workers_running = false;
+            set_global_state(STATE_DORMANT);
             auto wthread = _worker_threads.begin();
             while (wthread != _worker_threads.end()) {
                 if(wthread->joinable()) wthread->join();
@@ -96,8 +110,8 @@ class Async {
             }
         }
 
-        bool workers_running() {
-            return _workers_running;
+        int get_state() {
+            return _STATE;
         }
 
         // Define a lock for writing to standard out

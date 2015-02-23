@@ -3,6 +3,7 @@
 
 #include "khmer_async.hh"
 #include "async_models.hh"
+#include "async_parser.hh"
 
 namespace khmer {
 
@@ -14,8 +15,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
 
         khmer::Hashtable * _ht;
         unsigned int _ksize;
-
-        std::thread * _reader_thread;
+        AsyncParser * aparser;
 
     public:
 
@@ -35,11 +35,7 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
 
         virtual bool iter_stop() = 0;
 
-        bool is_parsing();
-        void read_iparser(const std::string &filename);
         bool is_paired();
-        unsigned int n_parsed();
-        unsigned int reader_queue_load();
 };
 
 class AsyncSequenceProcessorTester: public AsyncSequenceProcessor {
