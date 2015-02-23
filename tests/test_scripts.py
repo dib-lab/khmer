@@ -1843,16 +1843,16 @@ def test_extract_long_sequences():
     in_dir_fq = os.path.dirname(fq_infile)
     in_dir_fa = os.path.dirname(fa_infile)
 
-    args = [fq_infile, '-l', '10', '-o', 'fq_outfile']
+    args = [fq_infile, '-l', '10', '-o', fq_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_fa)
 
-    countlines = sum(1 for line in open(fq_infile))
+    countlines = sum(1 for line in open(fq_outfile))
     assert countlines == 44, countlines
 
-    args = [fa_infile, '-l', '10', '-o', 'fa_outfile']
+    args = [fa_infile, '-l', '10', '-o', fa_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_fa)
 
-    countlines = sum(1 for line in open(fa_infile))
+    countlines = sum(1 for line in open(fa_outfile))
     assert countlines == 22, countlines
 
 
