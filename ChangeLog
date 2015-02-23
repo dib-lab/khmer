@@ -24,6 +24,12 @@
    * tests/test-data/{casava_18-pe.fq,test-reads.fq.gz}: new test file for
    Casava 1.8 format handling.
 
+2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * examples/stamps/do.sh: the argument --savehash was changed to --savetable
+   and change mode to u+x
+   * jenkins-build.sh: add a test to check for the do.sh file
+
 2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
 
    * khmer/load_pe.py: Remove unused/undocumented module. See #784
