@@ -2,7 +2,8 @@
 
    * khmer/utils.py: added 'check_is_left' and 'check_is_right' functions;
    fixed bug in check_is_pair.
-   * tests/test_functions.py: tests for now-fixed bug in check_is_pair.
+   * tests/test_functions.py: added tests for now-fixed bug in check_is_pair,
+   as well as 'check_is_left' and 'check_is_right'.
    * scripts/interleave-reads.py: updated to handle Casava 1.8 formatting.
    * scripts/split-paired-reads.py: fixed bug where sequences with bad names
    got dropped; updated to properly handle Casava 1.8 names in FASTQ files.
