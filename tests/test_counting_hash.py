@@ -291,10 +291,10 @@ def test_save_load():
     ht = khmer.CountingHash(12, sizes)
     ht.load(savepath)
 
-    tracking = khmer._new_hashbits(12, sizes)
+    tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
 
-    tracking = khmer._new_hashbits(12, sizes)
+    tracking = khmer._Hashbits(12, sizes)
     y = ht.abundance_distribution(inpath, tracking)
 
     assert sum(x) == 3966, sum(x)
@@ -326,10 +326,10 @@ def test_load_gz():
     ht = khmer.CountingHash(12, sizes)
     ht.load(loadpath)
 
-    tracking = khmer._new_hashbits(12, sizes)
+    tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
 
-    tracking = khmer._new_hashbits(12, sizes)
+    tracking = khmer._Hashbits(12, sizes)
     y = ht.abundance_distribution(inpath, tracking)
 
     assert sum(x) == 3966, sum(x)
@@ -350,10 +350,10 @@ def test_save_load_gz():
     ht = khmer.CountingHash(12, sizes)
     ht.load(savepath)
 
-    tracking = khmer._new_hashbits(12, sizes)
+    tracking = khmer._Hashbits(12, sizes)
     x = hi.abundance_distribution(inpath, tracking)
 
-    tracking = khmer._new_hashbits(12, sizes)
+    tracking = khmer._Hashbits(12, sizes)
     y = ht.abundance_distribution(inpath, tracking)
 
     assert sum(x) == 3966, sum(x)
