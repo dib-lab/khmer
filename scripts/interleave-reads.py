@@ -78,7 +78,7 @@ def main():
             print >>sys.stderr, ("ERROR: given only one filename, that "
                                  "doesn't contain _R1_. Exiting.")
             sys.exit(1)
-            
+
         print >> sys.stderr, ("given only one file; "
                               "guessing that R2 file is %s" % s2_file)
 
