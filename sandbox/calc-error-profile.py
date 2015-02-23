@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 #
 # This script is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2014. It is licensed under
+# Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt. Contact: ctb@msu.edu
 #
 """

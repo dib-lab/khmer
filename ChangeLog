@@ -1,3 +1,23 @@
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
+
+2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc,lib/read_parsers.cc: Rename the 'accuracy' attribute
+   of ReadParser Reads to 'quality'
+   * tests/test_read_parsers.py: update test to match
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/{calc-best-assembly,calc-error-profile,normalize-by-align,
+   read_aligner,slice-reads-by-coverage}.py: reference /usr/bin/env python2
+   in the #! line.
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/sweep-paired-reads.py: remove empty script
+
 2015-02-20  Titus Brown  <titus@idyll.org>
 
    * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
