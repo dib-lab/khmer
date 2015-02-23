@@ -10,7 +10,6 @@ This is khmer; please see http://khmer.readthedocs.org/.
 
 from khmer._khmer import _new_counting_hash
 from khmer._khmer import _new_hashbits
-from khmer._khmer import set_reporting_callback
 from khmer._khmer import _LabelHash
 from khmer._khmer import _Hashbits
 from khmer._khmer import _HLLCounter
@@ -98,16 +97,6 @@ def load_counting_hash(filename):
     hashtable.load(filename)
 
     return hashtable
-
-
-def _default_reporting_callback(info, n_reads, other):
-    print '...', info, n_reads, other
-
-
-def reset_reporting_callback():
-    set_reporting_callback(_default_reporting_callback)
-
-reset_reporting_callback()
 
 
 def extract_hashbits_info(filename):

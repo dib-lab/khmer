@@ -137,46 +137,6 @@ public:
 
 typedef pre_partition_info _pre_partition_info;
 
-// default callback obj;
-static PyObject *_callback_obj = NULL;
-
-// callback function to pass into C++ functions
-
-void _report_fn(const char * info, void * data, unsigned long long n_reads,
-                unsigned long long other)
-{
-    // handle signals etc. (like CTRL-C)
-    if (PyErr_CheckSignals() != 0) {
-        throw _khmer_signal("PyErr_CheckSignals received a signal");
-    }
-
-    // set data to default?
-    if (!data && _callback_obj) {
-        data = _callback_obj;
-    }
-
-    // if 'data' is set, it is None, or a Python callable
-    if (data) {
-        PyObject * obj = (PyObject *) data;
-        if (obj != Py_None) {
-            PyObject * args = Py_BuildValue("sKK", info, n_reads, other);
-            if (args != NULL) {
-                PyObject * r = PyObject_Call(obj, args, NULL);
-                Py_XDECREF(r);
-            }
-            Py_XDECREF(args);
-        }
-    }
-
-    if (PyErr_Occurred()) {
-        throw _khmer_signal("PyErr_Occurred is set");
-    }
-
-    // ...allow other Python threads to do stuff...
-    Py_BEGIN_ALLOW_THREADS;
-    Py_END_ALLOW_THREADS;
-}
-
 /***********************************************************************/
 
 //
@@ -853,11 +813,8 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     CountingHash * counting  = me->counting;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(
-                args, "s|O", &filename, &callback_obj
-            )) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -865,8 +822,7 @@ static PyObject * hash_consume_fasta(PyObject * self, PyObject * args)
     unsigned long long  n_consumed    = 0;
     unsigned int          total_reads   = 0;
     try {
-        counting->consume_fasta(filename, total_reads, n_consumed,
-                                _report_fn, callback_obj);
+        counting->consume_fasta(filename, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -886,11 +842,8 @@ static PyObject * hash_consume_fasta_with_reads_parser(
     CountingHash * counting  = me->counting;
 
     PyObject * rparser_obj = NULL;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(
-                args, "O|O", &rparser_obj, &callback_obj
-            )) {
+    if (!PyArg_ParseTuple(args, "O", &rparser_obj)) {
         return NULL;
     }
 
@@ -904,8 +857,7 @@ static PyObject * hash_consume_fasta_with_reads_parser(
     bool        exc_raised  = false;
     Py_BEGIN_ALLOW_THREADS
     try {
-        counting->consume_fasta(rparser, total_reads, n_consumed,
-                                _report_fn, callback_obj);
+        counting->consume_fasta(rparser, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
         exc_raised = true;
@@ -1175,10 +1127,9 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
     unsigned int max_read_len = 0;
     long max_read_len_long;
     int limit_by_count_int;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "sli|O", &inputfile, &max_read_len_long,
-                          &limit_by_count_int, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "sli", &inputfile, &max_read_len_long,
+                          &limit_by_count_int)) {
         return NULL;
     }
     if (max_read_len_long < 0 || max_read_len_long >= pow(2, 32)) {
@@ -1197,7 +1148,7 @@ static PyObject * hash_fasta_count_kmers_by_position(PyObject * self,
 
     unsigned long long * counts;
     counts = counting->fasta_count_kmers_by_position(inputfile, max_read_len,
-             (unsigned short) limit_by_count_int, _report_fn, callback_obj);
+             (unsigned short) limit_by_count_int);
 
     PyObject * x = PyList_New(max_read_len);
     if (x == NULL) {
@@ -1226,17 +1177,13 @@ static PyObject * hash_fasta_dump_kmers_by_abundance(PyObject * self,
 
     const char * inputfile;
     int limit_by = 0;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "si|O", &inputfile, &limit_by,
-                          &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "si", &inputfile, &limit_by)) {
         return NULL;
     }
 
     counting->fasta_dump_kmers_by_abundance(inputfile,
-                                            limit_by,
-                                            _report_fn, callback_obj);
-
+                                            limit_by);
 
     Py_RETURN_NONE;
 }
@@ -1427,9 +1374,8 @@ static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
     CountingHash * counting = me->counting;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -1439,8 +1385,7 @@ static PyObject * hash_consume_fasta_and_tag(PyObject * self, PyObject * args)
     unsigned int total_reads;
 
     try {
-        counting->consume_fasta_and_tag(filename, total_reads, n_consumed,
-                                        _report_fn, callback_obj);
+        counting->consume_fasta_and_tag(filename, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -1498,18 +1443,16 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self,
     khmer_KCountingHashObject * me = (khmer_KCountingHashObject *) self;
     CountingHash * counting = me->counting;
 
-    PyObject * callback_obj = NULL;
     HashIntoType start_kmer = 0, end_kmer = 0;
     PyObject * break_on_stop_tags_o = NULL;
     PyObject * stop_big_traversals_o = NULL;
     BoundedCounterType min_count, max_count;
 
-    if (!PyArg_ParseTuple(args, "HH|KKOOO",
+    if (!PyArg_ParseTuple(args, "HH|KKOO",
                           &min_count, &max_count,
                           &start_kmer, &end_kmer,
                           &break_on_stop_tags_o,
-                          &stop_big_traversals_o,
-                          &callback_obj)) {
+                          &stop_big_traversals_o)) {
         return NULL;
     }
 
@@ -1529,8 +1472,7 @@ static PyObject * hash_do_subset_partition_with_abundance(PyObject * self,
         subset_p->do_partition_with_abundance(start_kmer, end_kmer,
                                               min_count, max_count,
                                               break_on_stop_tags,
-                                              stop_big_traversals,
-                                              _report_fn, callback_obj);
+                                              stop_big_traversals);
         Py_END_ALLOW_THREADS
     } catch (_khmer_signal &e) {
         return NULL;
@@ -1870,12 +1812,10 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
     Hashbits * hashbits = me->hashbits;
     khmer_KHashbitsObject * ht2_argu;
     const char * filename;
-    PyObject * callback_obj = NULL;
     Hashbits * ht2;
 
-    if (!PyArg_ParseTuple(args, "sO!|O", &filename, &khmer_KHashbitsType,
-                          &ht2_argu,
-                          &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KHashbitsType,
+                          &ht2_argu)) {
         return NULL;
     }
 
@@ -1888,8 +1828,7 @@ static PyObject * hashbits_count_overlap(PyObject * self, PyObject * args)
     HashIntoType curve[2][100];
 
     try {
-        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed,
-                                        _report_fn, callback_obj);
+        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -2247,15 +2186,13 @@ static PyObject * hashbits_do_subset_partition(PyObject * self,
     khmer_KHashbitsObject * me = (khmer_KHashbitsObject *) self;
     Hashbits * hashbits = me->hashbits;
 
-    PyObject * callback_obj = NULL;
     HashIntoType start_kmer = 0, end_kmer = 0;
     PyObject * break_on_stop_tags_o = NULL;
     PyObject * stop_big_traversals_o = NULL;
 
-    if (!PyArg_ParseTuple(args, "|KKOOO", &start_kmer, &end_kmer,
+    if (!PyArg_ParseTuple(args, "|KKOO", &start_kmer, &end_kmer,
                           &break_on_stop_tags_o,
-                          &stop_big_traversals_o,
-                          &callback_obj)) {
+                          &stop_big_traversals_o)) {
         return NULL;
     }
 
@@ -2273,8 +2210,7 @@ static PyObject * hashbits_do_subset_partition(PyObject * self,
         Py_BEGIN_ALLOW_THREADS
         subset_p = new SubsetPartition(hashbits);
         subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
-                               stop_big_traversals,
-                               _report_fn, callback_obj);
+                               stop_big_traversals);
         Py_END_ALLOW_THREADS
     } catch (_khmer_signal &e) {
         return NULL;
@@ -2350,9 +2286,8 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
     Hashbits * hashbits = me->hashbits;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -2362,8 +2297,7 @@ static PyObject * hashbits_consume_fasta(PyObject * self, PyObject * args)
     unsigned int total_reads = 0;
 
     try {
-        hashbits->consume_fasta(filename, total_reads, n_consumed,
-                                _report_fn, callback_obj);
+        hashbits->consume_fasta(filename, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -2383,10 +2317,9 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
     Hashbits * hashbits = me->hashbits;
 
     PyObject * rparser_obj = NULL;
-    PyObject * callback_obj = NULL;
 
     if (!PyArg_ParseTuple(
-                args, "O|O", &rparser_obj, &callback_obj)) {
+                args, "O", &rparser_obj)) {
         return NULL;
     }
 
@@ -2399,8 +2332,7 @@ static PyObject * hashbits_consume_fasta_with_reads_parser(
     char const * exc = NULL;
     Py_BEGIN_ALLOW_THREADS
     try {
-        hashbits->consume_fasta(rparser, total_reads, n_consumed,
-                                _report_fn, callback_obj);
+        hashbits->consume_fasta(rparser, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
     }
@@ -2451,9 +2383,8 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self,
     Hashbits * hashbits = me->hashbits;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -2463,8 +2394,7 @@ static PyObject * hashbits_consume_fasta_and_tag(PyObject * self,
     unsigned int total_reads;
 
     try {
-        hashbits->consume_fasta_and_tag(filename, total_reads, n_consumed,
-                                        _report_fn, callback_obj);
+        hashbits->consume_fasta_and_tag(filename, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -2484,10 +2414,9 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
     Hashbits * hashbits = me->hashbits;
 
     python::ReadParser_Object * rparser_obj = NULL;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple( args, "O!|O", &python::ReadParser_Type,
-                           &rparser_obj, &callback_obj )) {
+    if (!PyArg_ParseTuple( args, "O!", &python::ReadParser_Type,
+                           &rparser_obj)) {
         return NULL;
     }
 
@@ -2500,7 +2429,7 @@ static PyObject * hashbits_consume_fasta_and_tag_with_reads_parser(
     Py_BEGIN_ALLOW_THREADS
     try {
         hashbits->consume_fasta_and_tag(
-            rparser, total_reads, n_consumed, _report_fn, callback_obj
+            rparser, total_reads, n_consumed
         );
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
@@ -2523,9 +2452,8 @@ static PyObject * hashbits_consume_fasta_and_tag_with_stoptags(PyObject * self,
     Hashbits * hashbits = me->hashbits;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -2536,8 +2464,7 @@ static PyObject * hashbits_consume_fasta_and_tag_with_stoptags(PyObject * self,
 
     try {
         hashbits->consume_fasta_and_tag_with_stoptags(filename,
-                total_reads, n_consumed,
-                _report_fn, callback_obj);
+                total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -2556,9 +2483,8 @@ static PyObject * hashbits_consume_partitioned_fasta(PyObject * self,
     Hashbits * hashbits = me->hashbits;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -2568,8 +2494,7 @@ static PyObject * hashbits_consume_partitioned_fasta(PyObject * self,
     unsigned int total_reads;
 
     try {
-        hashbits->consume_partitioned_fasta(filename, total_reads, n_consumed,
-                                            _report_fn, callback_obj);
+        hashbits->consume_partitioned_fasta(filename, total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -2729,12 +2654,10 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
 
     const char * filename = NULL;
     const char * output = NULL;
-    PyObject * callback_obj = NULL;
     PyObject * output_unassigned_o = NULL;
 
-    if (!PyArg_ParseTuple(args, "ss|OO", &filename, &output,
-                          &output_unassigned_o,
-                          &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "ss|O", &filename, &output,
+                          &output_unassigned_o)) {
         return NULL;
     }
 
@@ -2749,9 +2672,7 @@ static PyObject * hashbits_output_partitions(PyObject * self, PyObject * args)
         SubsetPartition * subset_p = hashbits->partition;
         n_partitions = subset_p->output_partitioned_file(filename,
                        output,
-                       output_unassigned,
-                       _report_fn,
-                       callback_obj);
+                       output_unassigned);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError, e.get_message().c_str());
         return NULL;
@@ -2771,10 +2692,9 @@ static PyObject * hashbits_find_unpart(PyObject * self, PyObject * args)
     const char * filename = NULL;
     PyObject * traverse_o = NULL;
     PyObject * stop_big_traversals_o = NULL;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "sOO|O", &filename, &traverse_o,
-                          &stop_big_traversals_o, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "sOO", &filename, &traverse_o,
+                          &stop_big_traversals_o)) {
         return NULL;
     }
 
@@ -2785,8 +2705,7 @@ static PyObject * hashbits_find_unpart(PyObject * self, PyObject * args)
     try {
         SubsetPartition * subset_p = hashbits->partition;
         n_singletons = subset_p->find_unpart(filename, traverse,
-                                             stop_big_traversals,
-                                             _report_fn, callback_obj);
+                                             stop_big_traversals);
     } catch (_khmer_signal &e) {
         return NULL;
     }
@@ -2804,14 +2723,13 @@ static PyObject * hashbits_filter_if_present(PyObject * self, PyObject * args)
 
     const char * filename = NULL;
     const char * output = NULL;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "ss|O", &filename, &output, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "ss", &filename, &output)) {
         return NULL;
     }
 
     try {
-        hashbits->filter_if_present(filename, output, _report_fn, callback_obj);
+        hashbits->filter_if_present(filename, output);
     } catch (_khmer_signal &e) {
         return NULL;
     }
@@ -3801,9 +3719,8 @@ static PyObject * labelhash_consume_fasta_and_tag_with_labels(
     std::ofstream outfile;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -3813,7 +3730,7 @@ static PyObject * labelhash_consume_fasta_and_tag_with_labels(
     //Py_BEGIN_ALLOW_THREADS
     try {
         hb->consume_fasta_and_tag_with_labels(filename, total_reads,
-                                              n_consumed, _report_fn, callback_obj);
+                                              n_consumed);
     } catch (_khmer_signal &e) {
         exc = e.get_message().c_str();
     } catch (khmer_file_exception &e) {
@@ -3836,9 +3753,8 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
     LabelHash * labelhash = me->labelhash;
 
     const char * filename;
-    PyObject * callback_obj = NULL;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename, &callback_obj)) {
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
 
@@ -3849,7 +3765,7 @@ static PyObject * labelhash_consume_partitioned_fasta_and_tag_with_labels(
 
     try {
         labelhash->consume_partitioned_fasta_and_tag_with_labels(filename,
-                total_reads, n_consumed, _report_fn, callback_obj);
+                total_reads, n_consumed);
     } catch (_khmer_signal &e) {
         PyErr_SetString(PyExc_IOError,
                         "error parsing in consume_partitioned_fasta_and_tag_with_labels");
@@ -4635,21 +4551,6 @@ static PyObject * murmur3_forward_hash_no_rc(PyObject * self, PyObject * args)
     return PyLong_FromUnsignedLongLong(_hash_murmur_forward(kmer));
 }
 
-static PyObject * set_reporting_callback(PyObject * self, PyObject * args)
-{
-    PyObject * o;
-
-    if (!PyArg_ParseTuple(args, "O", &o)) {
-        return NULL;
-    }
-
-    Py_XDECREF(_callback_obj);
-    Py_INCREF(o);
-    _callback_obj = o;
-
-    Py_RETURN_NONE;
-}
-
 //
 // technique for resolving literal below found here:
 // https://gcc.gnu.org/onlinedocs/gcc-4.9.1/cpp/Stringification.html
@@ -4720,10 +4621,6 @@ static PyMethodDef KhmerMethods[] = {
         METH_VARARGS,
         "Calculate the hash value of a k-mer using MurmurHash3 "
         "(no reverse complement)",
-    },
-    {
-        "set_reporting_callback",   set_reporting_callback,
-        METH_VARARGS,       "",
     },
     {
         "get_version_cpp", get_version_cpp,
