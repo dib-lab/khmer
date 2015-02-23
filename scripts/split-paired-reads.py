@@ -22,7 +22,8 @@ import argparse
 import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-from khmer.utils import write_record
+from khmer.utils import (write_record, check_is_left, check_is_right,
+                         broken_paired_reader)
 
 
 def get_parser():
@@ -40,6 +41,9 @@ def get_parser():
     :option:`-2`/:option:`--output-second`, which will override the
     :option:`-o`/:option:`--output-dir` setting on a file-specific basis.
 
+    :option:`-p`/:option:`--force-paired` will require the input file to
+    be properly interleaved; by default, this is not required.
+
     Example::
 
         split-paired-reads.py tests/test-data/paired.fq
@@ -48,7 +52,7 @@ def get_parser():
 
         split-paired-reads.py -o ~/reads-go-here tests/test-data/paired.fq
 
-        Example::
+    Example::
 
         split-paired-reads.py -1 reads.1 -2 reads.2 tests/test-data/paired.fq
     """
@@ -70,6 +74,8 @@ def get_parser():
     parser.add_argument('-2', '--output-second', metavar='output_second',
                         default=None, help='Output "right" reads to this '
                         'file')
+    parser.add_argument('-p', '--force-paired', action='store_true',
+                        help='Require that reads be interleaved')
 
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
@@ -88,6 +94,7 @@ def main():
     filenames = [infile]
     check_space(filenames, args.force)
 
+    # decide where to put output files - specific directory? or just default?
     if args.output_directory:
         if not os.path.exists(args.output_directory):
             os.makedirs(args.output_directory)
@@ -97,7 +104,7 @@ def main():
         out1 = os.path.basename(infile) + '.1'
         out2 = os.path.basename(infile) + '.2'
 
-    # OVERRIDE defaults with -1, -2
+    # OVERRIDE output file locations with -1, -2
     if args.output_first:
         out1 = args.output_first
     if args.output_second:
@@ -109,20 +116,41 @@ def main():
     counter1 = 0
     counter2 = 0
     index = None
-    for index, record in enumerate(screed.open(infile)):
+
+    screed_iter = screed.open(infile, parse_description=False)
+
+    # walk through all the reads in broken-paired mode.
+    for index, is_pair, record1, record2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index:
             print >> sys.stderr, '...', index
 
-        name = record.name
-        if name.endswith('/1'):
-            write_record(record, fp_out1)
+        # are we requiring pairs?
+        if args.force_paired and not is_pair:
+            print >>sys.stderr, 'ERROR, %s is not part of a pair' % \
+                record1.name
+            sys.exit(1)
+
+        if is_pair:
+            write_record(record1, fp_out1)
             counter1 += 1
-        elif name.endswith('/2'):
-            write_record(record, fp_out2)
+            write_record(record2, fp_out2)
             counter2 += 1
+        else:
+            name = record1.name
+            if check_is_left(name):
+                write_record(record1, fp_out1)
+                counter1 += 1
+            elif check_is_right(name):
+                write_record(record1, fp_out2)
+                counter2 += 1
+            else:
+                print >>sys.stderr, \
+                    "Unrecognized format for read pair information: %s" % name
+                print >>sys.stderr, "Exiting."
+                sys.exit(1)
 
     print >> sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
-        (index + 1, counter1, counter2)
+        (counter1 + counter2, counter1, counter2)
     print >> sys.stderr, "/1 reads in %s" % out1
     print >> sys.stderr, "/2 reads in %s" % out2
 
