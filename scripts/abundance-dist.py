@@ -96,14 +96,13 @@ def main():
         print("\tPlease verify that the input files are valid.",
               file=sys.stderr)
         sys.exit(1)
-        
+    
+    hash_fp = open(args.output_histogram_filename, 'w')
     if args.csv:
-+       hash_fp = csv.writer(args.output_histogram_filename)
++       hash_fp_csv = csv.writer(hash_fp)
 +       # write headers:
-+       hash_fp.writerow(['k-mer_abundance', 'K-mer_count', 
++       hash_fp_csv.writerow(['k-mer_abundance', 'K-mer_count', 
             'Cumulative_count', 'Fraction_of_total_distinct_k-mers'])
-    else:
-        hash_fp = open(args.output_histogram_filename, 'w')
 
     sofar = 0
     for _, i in enumerate(abundances):
@@ -114,7 +113,7 @@ def main():
         frac = sofar / float(total)
 
         if args.csv:
-            hash_fp.writerow([_, i, sofar, round(frac, 3)])
+            hash_fp_csv.writerow([_, i, sofar, round(frac, 3)])
         else:
             print(_, i, sofar, round(frac, 3), file=hash_fp)
 
