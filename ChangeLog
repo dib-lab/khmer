@@ -1,9 +1,34 @@
-2015-02-21  Titus Brown  <titus@idyll.org>
+2015-02-23  Titus Brown  <titus@idyll.org>
 
    * setup.cfg: set !linux flag by default, to avoid running tests that
    request too much memory when 'nosetests' is run.  (This is an OS difference
    where Mac OS X attempts to allocate as much memory as requested, while
    on Linux it just crashes).
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: point to the latest screed release candidate to work around
+   versioneer bug.
+
+2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * examples/stamps/do.sh: the argument --savehash was changed to --savetable
+   and change mode to u+x
+   * jenkins-build.sh: add a test to check for the do.sh file
+
+2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * khmer/load_pe.py: Remove unused/undocumented module. See #784
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/normalize-by-align.py: "copyright header 2013-2015 was added"
+   * sandbob/read_aligner.py: "copyright header 2013-2015 was added"
+   * sandbox/slice-reads-by-coverage.py: "copyright header 2014  was added"
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
 
 2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
 
