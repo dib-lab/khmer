@@ -747,6 +747,50 @@ def test_count_median():
     assert 'seq 1001 1001.0 0.0 18' in data
     assert '895:1:37:17593:9954/1 1 103.803741455 303.702941895 114' in data
 
+
+def test_count_median_fq():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = infile + '.counts'
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = scriptpath('count-median.py')
+    args = [counting_ht, infile, outfile]
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile), outfile
+
+    data = [x.strip() for x in open(outfile)]
+    data = set(data)
+    assert len(data) == 2, data
+    assert 'seq 1001 1001.0 0.0 18' in data
+    assert '895:1:37:17593:9954 1 103.803741455 303.702941895 114' in data
+
+
+def test_count_median_fq_csv():
+    infile = utils.get_temp_filename('test.fa')
+    outfile = infile + '.counts'
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-2.fq'), infile)
+    counting_ht = _make_counting(infile, K=8)
+
+    script = scriptpath('count-median.py')
+    args = ['--csv', counting_ht, infile, outfile]
+    utils.runscript(script, args)
+
+    assert os.path.exists(outfile), outfile
+
+    data = [x.strip() for x in open(outfile)]
+    data = set(data)
+    assert len(data) == 4, data
+    assert 'name,median,average,stddev,seqlen' in data
+    assert 'seq,1001,1001.0,0.0,18' in data
+
+    # verify that sequence names remain unparsed with '--csv'
+    assert '895:1:37:17593:9954 1::FOO,1,103.803741455,303.702941895,114' \
+           in data, data
+
 #
 
 

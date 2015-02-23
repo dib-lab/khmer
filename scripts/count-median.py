@@ -21,11 +21,13 @@ NOTE: All 'N's in the input sequences are converted to 'G's.
 """
 import screed
 import argparse
-import khmer
 import sys
+import csv
+import textwrap
+
+import khmer
 from khmer.kfile import check_file_status, check_space
 from khmer.khmer_args import info
-import textwrap
 
 
 def get_parser():
@@ -34,8 +36,18 @@ def get_parser():
     based on the k-mer counts in the given k-mer counting table.  Can be used
     to estimate expression levels (mRNAseq) or coverage (genomic/metagenomic).
 
-    The output file contains sequence id, median, average, stddev, and seq
-    length.
+    The output file contains sequence id, median, average, stddev, and
+    seq length; fields are separated by spaces.  For khmer 1.x,
+    sequence names are split at the first space, which means that some
+    sequence formats (e.g. paired FASTQ in Casava 1.8 format) will yield
+    uninformative names.  Use :option:`--csv` to fix this behavior.
+
+    :option:`--csv` will output a comma-separated value file with column
+    headers, and the entire sequence name will be kept.
+
+    Example::
+
+       count-median.py counts.ct tests/test-data/test-reads.fq.gz medians.txt
 
     NOTE: All 'N's in the input sequences are converted to 'G's.
     """
@@ -53,6 +65,8 @@ def get_parser():
                         + khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('--csv', default=False, action='store_true',
+                        help='Output CSV format with column headers')
     return parser
 
 
@@ -77,14 +91,27 @@ def main():
     print >>sys.stderr, 'writing to', output_filename
     output = open(output_filename, 'w')
 
-    for record in screed.open(input_filename, parse_description=False):
+    if args.csv:
+        output = csv.writer(output)
+        # write headers:
+        output.writerow(['name', 'median', 'average', 'stddev', 'seqlen'])
+
+    parse_description = True            # @legacy behavior: split seq headers
+    if args.csv:
+        parse_description = False       # only enable if we're doing csv out
+
+    for record in screed.open(input_filename,
+                              parse_description=parse_description):
         seq = record.sequence.upper()
         if 'N' in seq:
             seq = seq.replace('N', 'G')
 
         if ksize <= len(seq):
             medn, ave, stdev = htable.get_median_count(seq)
-            print >> output, record.name, medn, ave, stdev, len(seq)
+            if args.csv:
+                output.writerow([record.name, medn, ave, stdev, len(seq)])
+            else:
+                print >> output, record.name, medn, ave, stdev, len(seq)
 
 if __name__ == '__main__':
     main()
