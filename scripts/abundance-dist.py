@@ -16,6 +16,7 @@ Use '-h' for parameter help.
 from __future__ import print_function
 
 import sys
+import csv
 import khmer
 import argparse
 import os
@@ -43,6 +44,8 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
+    parser.add_argument('--csv', default=False, action='store_true', 
+                        help='Output CSV format with column headers')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
     parser.add_argument('-f', '--force', default=False, action='store_true',
