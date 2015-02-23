@@ -99,9 +99,9 @@ def main():
     
     hash_fp = open(args.output_histogram_filename, 'w')
     if args.csv:
-+       hash_fp_csv = csv.writer(hash_fp)
-+       # write headers:
-+       hash_fp_csv.writerow(['k-mer_abundance', 'K-mer_count', 
+        hash_fp_csv = csv.writer(hash_fp)
+        # write headers:
+        hash_fp_csv.writerow(['k-mer_abundance', 'K-mer_count', 
             'Cumulative_count', 'Fraction_of_total_distinct_k-mers'])
 
     sofar = 0
