@@ -1,3 +1,8 @@
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: point to the latest screed release candidate to work around
+   versioneer bug.
+
 2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * abundance-dist.py: Use CSV format for the histogram. Includes column 
