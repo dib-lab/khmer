@@ -33,7 +33,7 @@ def check_is_pair(record1, record2):
     name1 = record1.name
     name2 = record2.name
 
-    if ' ' in name1:                        # handle '@name 1:rst'
+    if ' ' in name1 and ' ' in name2:                    # handle '@name 1:rst'
         name1, rest1 = record1.name.split(' ', 1)
         name2, rest2 = record2.name.split(' ', 1)
 
