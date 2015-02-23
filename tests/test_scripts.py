@@ -498,6 +498,34 @@ def test_normalize_by_median_paired():
     assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
 
 
+def test_normalize_by_median_paired_fq():
+    CUTOFF = '20'
+
+    infile = utils.get_temp_filename('test.fa')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-abund-read-paired.fq'), infile)
+
+    script = scriptpath('normalize-by-median.py')
+    args = ['-C', CUTOFF, '-p', '-k', '17', infile]
+    _, out, err = utils.runscript(script, args, in_dir)
+    print out
+    print err
+
+    outfile = infile + '.keep'
+    assert os.path.exists(outfile), outfile
+
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 6, len(seqs)
+    assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
+    assert seqs[1].startswith('GGTTGACGGGGCTCAGGG'), seqs
+
+    names = [r.name for r in screed.open(outfile, parse_description=False)]
+    assert len(names) == 6, names
+    assert '895:1:37:17593:9954 1::FOO' in names, names
+    assert '895:1:37:17593:9954 2::FOO' in names, names
+
+
 def test_normalize_by_median_impaired():
     CUTOFF = '1'
 
@@ -1723,6 +1751,33 @@ def test_sample_reads_randomly():
                         '850:2:1:2084:17145/1', '850:2:1:2273:13309/1',
                         '850:2:1:2263:11143/2', '850:2:1:1984:7162/2',
                         '850:2:1:2065:16816/1', '850:2:1:1792:15774/2'])
+
+
+def test_sample_reads_randomly_fq():
+    infile = utils.get_temp_filename('test.fq.gz')
+    in_dir = os.path.dirname(infile)
+
+    shutil.copyfile(utils.get_test_data('test-reads.fq.gz'), infile)
+
+    script = scriptpath('sample-reads-randomly.py')
+    # fix random number seed for reproducibility
+    args = ['-N', '10', '-M', '12000', '-R', '1']
+    args.append(infile)
+    utils.runscript(script, args, in_dir)
+
+    outfile = infile + '.subset'
+    assert os.path.exists(outfile), outfile
+
+    seqs = set([r.name for r in screed.open(outfile,
+                                            parse_description=False)])
+
+    assert seqs == set(['850:2:1:2399:20086/2',
+                        '850:2:1:1762:5439 1::FOO',
+                        '850:2:1:2065:16816/1', '850:2:1:2263:11143/2',
+                        '850:2:1:1792:15774/2', '850:2:1:2691:14602/1',
+                        '850:2:1:2503:4494 1::FOO',
+                        '850:2:1:2084:17145/1', '850:2:1:1984:7162 1::FOO',
+                        '850:2:1:2273:13309 1::FOO'])
 
 
 def test_fastq_to_fasta():
