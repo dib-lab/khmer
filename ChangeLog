@@ -1,3 +1,10 @@
+2015-02-24  Luiz Irber  <irberlui@msu.edu>
+
+   * khmer/_khmermodule.cc: Update extension to use recommended practices,
+   PyLong instead of PyInt, Type initialization, PyBytes instead of PyString.
+   Replace common initialization with explicit type structs, and all types
+   conform to the CPython checklist.
+
 2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * jenkins-build.sh: remove examples/stamps/do.sh testing for now; takes too
