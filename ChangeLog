@@ -1,3 +1,7 @@
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/normalize-by-align.py, read_aligner.py, slice-reads-by-coverage.py: add copyright header
+
 2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * khmer/_khmermodule.cc,lib/read_parsers.cc: Rename the 'accuracy' attribute
