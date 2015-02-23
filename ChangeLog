@@ -1,3 +1,10 @@
+2015-02-23  Titus Brown  <titus@idyll.org>
+
+   * setup.cfg: set !linux flag by default, to avoid running tests that
+   request too much memory when 'nosetests' is run.  (This is an OS difference
+   where Mac OS X attempts to allocate as much memory as requested, while
+   on Linux it just crashes).
+
 2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
 
    * khmer/{__init__.py,_khmermodule.cc},lib/{hashbits.cc,hashbits.hh,
