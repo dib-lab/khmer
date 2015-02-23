@@ -1527,6 +1527,65 @@ def test_interleave_reads_1_fq():
     assert r == q, (r, q)
 
 
+def test_interleave_reads_broken_fq():
+    # test input files
+    infile1 = utils.get_test_data('paired-broken.fq.1')
+    infile2 = utils.get_test_data('paired-broken.fq.2')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    status, err, out = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+
+
+def test_interleave_reads_broken_fq_2():
+    # test input files
+    infile1 = utils.get_test_data('paired-broken2.fq.1')
+    infile2 = utils.get_test_data('paired-broken2.fq.2')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    status, err, out = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+
+
+def test_interleave_reads_broken_fq_3():
+    # test input files
+    infile1 = utils.get_test_data('paired-broken3.fq.1')
+    infile2 = utils.get_test_data('paired-broken3.fq.2')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, infile2, '-o', outfile]
+
+    status, err, out = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+
+
+def test_interleave_reads_broken_fq_4():
+    # test input files
+    infile1 = utils.get_test_data('paired-mixed-broken.fq')
+
+    # actual output file
+    outfile = utils.get_temp_filename('out.fq')
+
+    script = scriptpath('interleave-reads.py')
+    args = [infile1, '-o', outfile]
+
+    status, err, out = utils.runscript(script, args, fail_ok=True)
+    assert status == 1
+
+
 def test_interleave_reads_2_fa():
     # test input files
     infile1 = utils.get_test_data('paired.fa.1')
@@ -1727,6 +1786,32 @@ def test_split_paired_reads_2_fq():
         assert r.sequence == q.sequence
         assert r.quality == q.quality
     assert n > 0
+
+
+def test_split_paired_reads_2_mixed_fq():
+    # test input file
+    infile = utils.get_test_data('paired-mixed.fq')
+    in_dir = os.path.dirname(infile)
+
+    script = scriptpath('split-paired-reads.py')
+    args = ['-p', infile]
+
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1
+    assert "is not part of a pair" in err
+
+
+def test_split_paired_reads_2_mixed_fq_broken_pairing_format():
+    # test input file
+    infile = utils.get_test_data('paired-mixed-broken.fq')
+    in_dir = os.path.dirname(infile)
+
+    script = scriptpath('split-paired-reads.py')
+    args = [infile]
+
+    status, out, err = utils.runscript(script, args, in_dir, fail_ok=True)
+    assert status == 1
+    assert "Unrecognized format" in err
 
 
 def test_split_paired_reads_3_output_dir():

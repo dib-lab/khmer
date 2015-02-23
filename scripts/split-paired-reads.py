@@ -41,6 +41,9 @@ def get_parser():
     :option:`-2`/:option:`--output-second`, which will override the
     :option:`-o`/:option:`--output-dir` setting on a file-specific basis.
 
+    :option:`-p`/:option:`--force-paired` will require the input file to
+    be properly interleaved; by default, this is not required.
+
     Example::
 
         split-paired-reads.py tests/test-data/paired.fq
@@ -133,16 +136,18 @@ def main():
             write_record(record2, fp_out2)
             counter2 += 1
         else:
-            name = record.name
+            name = record1.name
             if check_is_left(name):
-                write_record(record, fp_out1)
+                write_record(record1, fp_out1)
                 counter1 += 1
             elif check_is_right(name):
-                write_record(record, fp_out2)
+                write_record(record1, fp_out2)
                 counter2 += 1
             else:
-                raise Exception(
-                    "Unrecognized format for read pair information: %s" % name)
+                print >>sys.stderr, \
+                    "Unrecognized format for read pair information: %s" % name
+                print >>sys.stderr, "Exiting."
+                sys.exit(1)
 
     print >> sys.stderr, "DONE; split %d sequences (%d left, %d right)" % \
         (counter1 + counter2, counter1, counter2)

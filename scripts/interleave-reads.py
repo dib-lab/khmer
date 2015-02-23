@@ -37,9 +37,9 @@ def get_parser():
     with a read in <R2>. By default, the output goes to stdout unless
     :option:`-o`/:option:`--output` is specified.
 
-    As a "bonus", this file ensures that read names are formatted in a
-    consistent way, such that they look like the pre-1.8 Casava format
-    (@name/1, @name/2).
+    As a "bonus", this file ensures that if read names are not already
+    formatted properly, they are reformatted consistently, such that
+    they look like the pre-1.8 Casava format (@name/1, @name/2).
 
     Example::
 
@@ -74,6 +74,11 @@ def main():
         s2_file = args.infiles[1]
     else:
         s2_file = s1_file.replace('_R1_', '_R2_')
+        if s1_file == s2_file:
+            print >>sys.stderr, ("ERROR: given only one filename, that "
+                                 "doesn't contain _R1_. Exiting.")
+            sys.exit(1)
+            
         print >> sys.stderr, ("given only one file; "
                               "guessing that R2 file is %s" % s2_file)
 
@@ -94,7 +99,12 @@ def main():
     counter = 0
     screed_iter_1 = screed.open(s1_file, parse_description=False)
     screed_iter_2 = screed.open(s2_file, parse_description=False)
-    for read1, read2 in itertools.izip(screed_iter_1, screed_iter_2):
+    for read1, read2 in itertools.izip_longest(screed_iter_1, screed_iter_2):
+        if read1 is None or read2 is None:
+            print >>sys.stderr, ("ERROR: Input files contain different number"
+                                 " of records.")
+            sys.exit(1)
+
         if counter % 100000 == 0:
             print >> sys.stderr, '...', counter, 'pairs'
         counter += 1
@@ -110,8 +120,8 @@ def main():
         read2.name = name2
 
         if not check_is_pair(read1, read2):
-            print >>sys.stderr, "This doesn't look like paired data! %s %s" % \
-                (read1.name, read2.name)
+            print >>sys.stderr, "ERROR: This doesn't look like paired data! " \
+                "%s %s" % (read1.name, read2.name)
             sys.exit(1)
 
         write_record_pair(read1, read2, args.output)

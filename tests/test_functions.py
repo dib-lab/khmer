@@ -147,7 +147,7 @@ def test_check_is_pair_3_broken_fq_1():
     assert not check_is_pair(read1, read2)
 
 
-def test_check_is_pair_3_broken_fq_1():
+def test_check_is_pair_3_broken_fq_2():
     read1 = FakeFQRead(name='seq 1::', quality='###', sequence='AAA')
     read2 = FakeFQRead(name='seq', quality='###', sequence='AAA')
 
