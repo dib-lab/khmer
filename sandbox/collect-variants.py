@@ -65,7 +65,7 @@ def main():
         print 'making hashtable'
         ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
-    aligner = khmer.new_readaligner(ht, args.trusted_cutoff, args.bits_theta)
+    aligner = khmer.ReadAligner(ht, args.trusted_cutoff, args.bits_theta)
 
     if args.details_out is not None:
         details_out = open(args.details_out, "w")

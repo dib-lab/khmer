@@ -1,7 +1,91 @@
-2015-02-19  Jacob Fenton  <bocajnotnef@gmail.com>
+2015-02-23  Jacob Fenton  <bocajnotnef@gmail.com>
 
    * doc/introduction.txt, doc/user/choosing-table-sizes.txt: Updated docs to
    reference correct links and function arguments.
+
+2015-02-23  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * setup.py: point to the latest screed release candidate to work around
+   versioneer bug.
+
+2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * examples/stamps/do.sh: the argument --savehash was changed to --savetable
+   and change mode to u+x
+   * jenkins-build.sh: add a test to check for the do.sh file
+
+2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
+
+   * khmer/load_pe.py: Remove unused/undocumented module. See #784
+
+2015-02-21  Hussien Alameldin  <hussien@msu.edu>
+
+   * sandbox/calc-best-assembly.py, collect-variants.py, graph-size.py: Set executable bits using "chmod +x"
+
+2015-02-21  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * khmer/_khmermodule.cc,lib/read_parsers.cc: Rename the 'accuracy' attribute
+   of ReadParser Reads to 'quality'
+   * tests/test_read_parsers.py: update test to match
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/{calc-best-assembly,calc-error-profile,normalize-by-align,
+   read_aligner,slice-reads-by-coverage}.py: reference /usr/bin/env python2
+   in the #! line.
+
+2015-02-21  Rhys Kidd  <rhyskidd@gmail.com>
+
+   * sandbox/sweep-paired-reads.py: remove empty script
+
+2015-02-20  Titus Brown  <titus@idyll.org>
+
+   * doc/dev/scripts-and-sandbox.txt: policies for sandbox/ and scripts/
+   content, and a process for adding new command line scripts into scripts/.
+   * doc/dev/index.txt: added scripts-and-sandbox to developer doc index.
+
+2015-02-20  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+    * khmer/_khmermodule.cc: convert C++ out of memory exceptions to Python
+    out of memory exception.
+    * test/test_{counting_hash,counting_single,hashbits_obj,labelhash,
+    scripts}.py: partial tests for the above
+
+2015-02-20  Aditi Gupta  <agupta@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: fixed spelling errors.
+
+2015-02-19  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * doc/dev/coding-guidelines-and-review.txt: added checklist for new CPython
+   types
+   * khmer/_khmermodule.cc: Update ReadAligner to follow the new guidelines
+
+2015-02-19  Daniel Standage  <daniel.standage@gmail.com>
+
+   * Makefile: add a new Makefile target `help` to list and describe all
+   common targets.
+   * khmer/utils.py, tests/test_functions.py: minor style fixes.
+
+2015-02-16  Titus Brown  <titus@idyll.org>
+
+   * khmer/utils.py: added 'check_is_pair', 'broken_paired_reader', and
+   'write_record_pair' functions.
+   * khmer/khmer_args.py: added streaming reference for future algorithms
+   citation.
+   * tests/test_functions.py: added unit tests for 'check_is_pair' and
+   'broken_paired_reader'.
+   * scripts/trim-low-abund.py: upgraded to track pairs properly; added
+   proper get_parser information; moved to scripts/ from sandbox/.
+   * tests/test_scripts.py: added paired-read tests for
+   trim-low-abund.py.
+   * tests/test-data/test-abund-read-2.paired.fq: data for paired-read tests.
+   * scripts/extract-paired-reads.py: removed 'is_pair' in favor of
+   'check_is_pair'; switched to using 'broken_paired_reader'; fixed use
+   of sys.argv.
+   * scripts/sample-reads-randomly.py: removed unused 'output_single' function.
+   * doc/user/scripts.txt: added trim-low-abund.py.
+>>>>>>> 802abfe6e3240bfdb01f1d31dd1e93825e7061ee
 
 2015-02-13  Qingpeng Zhang  <qingpeng@msu.edu>
 

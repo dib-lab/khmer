@@ -25,7 +25,7 @@ def test_read_properties():
         assert read.name == "895:1:1:1246:14654 1:N:0:NNNNN"
         assert read.sequence == "CAGGCGCCCACCACCGTGCCCTCCAACCTGATGGT"
         assert read.annotations == ""
-        assert read.accuracy == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
+        assert read.quality == """][aaX__aa[`ZUZ[NONNFNNNNNO_____^RQ_"""
 
 
 def test_with_default_arguments():
