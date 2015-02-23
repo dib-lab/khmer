@@ -250,5 +250,5 @@ Distribution.reinitialize_command = reinitialize_command
 # remove dependency_link once screed is published to actual PyPi
 # pylint: disable=W0142
 setup(cmdclass=CMDCLASS, dependency_links=[
-    "https://testpypi.python.org/pypi/screed/0.8-rc3"],
+    "https://testpypi.python.org/pypi/screed/0.8-rc4"],
     **SETUP_METADATA)
