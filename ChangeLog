@@ -1,3 +1,7 @@
+2015-02-23 Tamer A. Mansour (drtamermansour@gmail.com)
+
+   * abundance-dist.py: Output CSV format with column headers
+
 2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
 
    * khmer/load_pe.py: Remove unused/undocumented module. See #784

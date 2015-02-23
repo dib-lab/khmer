@@ -44,7 +44,7 @@ def get_parser():
     parser.add_argument('-s', '--squash', dest='squash_output', default=False,
                         action='store_true',
                         help='Overwrite output file if it exists')
-    parser.add_argument('--csv', default=False, action='store_true', 
+    parser.add_argument('--csv', default=False, action='store_true',
                         help='Output CSV format with column headers')
     parser.add_argument('--version', action='version', version='%(prog)s '
                         + khmer.__version__)
@@ -96,13 +96,13 @@ def main():
         print("\tPlease verify that the input files are valid.",
               file=sys.stderr)
         sys.exit(1)
-    
+
     hash_fp = open(args.output_histogram_filename, 'w')
     if args.csv:
         hash_fp_csv = csv.writer(hash_fp)
         # write headers:
-        hash_fp_csv.writerow(['k-mer_abundance', 'K-mer_count', 
-            'Cumulative_count', 'Fraction_of_total_distinct_k-mers'])
+        hash_fp_csv.writerow(['k-mer_abundance', 'K-mer_count', 'Cumulative
+                             _count', 'Fraction_of_total_distinct_k-mers'])
 
     sofar = 0
     for _, i in enumerate(abundances):
