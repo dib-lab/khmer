@@ -75,7 +75,7 @@ def main():
     n_pe = 0
     n_se = 0
 
-    screed_iter = screed.open(args.infile)
+    screed_iter = screed.open(args.infile, parse_description=False)
     for index, is_pair, read1, read2 in broken_paired_reader(screed_iter):
         if index % 100000 == 0 and index > 0:
             print >>sys.stderr, '...', index
@@ -95,7 +95,7 @@ def main():
 
     print >>sys.stderr, 'DONE; read %d sequences,' \
         ' %d pairs and %d singletons' % \
-        (index + 1, n_pe, n_se)
+        (n_pe * 2 + n_se, n_pe, n_se)
 
     print >> sys.stderr, 'wrote to: ' + outfile \
         + '.se' + ' and ' + outfile + '.pe'
