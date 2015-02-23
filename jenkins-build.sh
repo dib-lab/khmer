@@ -64,3 +64,6 @@ if type sloccount >/dev/null 2>&1
 then
 	make sloccount.sc
 fi
+
+bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false; }
+ 
