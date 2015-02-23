@@ -1,6 +1,7 @@
+
 2015-02-22  Tamer A. Mansour  <drtamermansour@gmail.com>
 
-   * examples/stamps/do.sh: the argument --savehash was updated to --savetable
+   * examples/stamps/do.sh: the argument --savehash was changed to --savetable
    * jenkins-build.sh: add a test to check for the do.sh file
 
 2015-02-21  Hussien Alameldin  <hussien@msu.edu>
