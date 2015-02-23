@@ -1,6 +1,7 @@
-2015-02-23 Tamer A. Mansour (drtamermansour@gmail.com)
+2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
-   * abundance-dist.py: Output CSV format with column headers
+   * abundance-dist.py: Use CSV format for the histogram. Includes column 
+   headers.
 
 2015-02-23  Kevin Murray  <spam@kdmurray.id.au>
 
