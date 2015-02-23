@@ -66,4 +66,3 @@ then
 fi
 
 bash -ex -c 'cd examples/stamps/; ./do.sh' || { echo examples/stamps/do.sh no longer runs; /bin/false }
-
