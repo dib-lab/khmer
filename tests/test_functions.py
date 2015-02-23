@@ -11,6 +11,7 @@ import khmer_tst_utils as utils
 import collections
 from khmer.utils import (check_is_pair, broken_paired_reader, check_is_left,
                          check_is_right)
+from khmer.kfile import check_file_status
 
 
 def test_forward_hash():
@@ -113,6 +114,21 @@ def test_extract_hashbits_info():
             os.remove(fn)
         except OSError as e:
             print >>sys.stderr, '...failed to remove {fn}'.format(fn)
+
+
+def test_check_file_status_kfile():
+    try:
+        utils.get_temp_filename('thisfiledoesnotexistatall')
+    except OSError as e:
+        print >>sys.stder, '...failed to remove {fn}'.format(fn)
+
+
+def test_check_file_status_kfile_force():
+    try:
+        khmer.kfile('thisfiledoesnotexistatall', force)
+        assert False 
+    except OSError as e:
+        print >>sys.stderr, '...failed to remove {fn}'.format(fn)
 
 
 FakeFQRead = collections.namedtuple('Read', ['name', 'quality', 'sequence'])
