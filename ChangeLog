@@ -1,3 +1,8 @@
+2015-02-23  Hussien Alameldin  <hussien@msu.edu>
+
+   * khmer/khmer_args.py: add 'hll' citation entry "Irber and Brown, unpublished." to  _alg. dict.
+   * sandbox/unique-kmers.py: add call to 'info' with 'hll' in the algorithms list.
+
 2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * examples/stamps/do.sh: the argument --savehash was changed to --savetable
