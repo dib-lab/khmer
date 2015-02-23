@@ -1849,6 +1849,10 @@ def test_extract_long_sequences():
     countlines = sum(1 for line in open(fq_outfile))
     assert countlines == 44, countlines
 
+    names = [r.name for r in screed.open(fq_outfile, parse_description=False)]
+    assert "895:1:37:17593:9954 1::foo" in names
+    assert "895:1:37:17593:9954 2::foo" in names
+
     args = [fa_infile, '-l', '10', '-o', fa_outfile]
     (status, out, err) = utils.runscript(script, args, in_dir_fa)
 
