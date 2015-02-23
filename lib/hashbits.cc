@@ -163,9 +163,7 @@ unsigned int Hashbits::check_and_process_read_overlap(std::string &read,
 void Hashbits::consume_fasta_overlap(const std::string &filename,
                                      HashIntoType curve[2][100],Hashbits &ht2,
                                      unsigned int &total_reads,
-                                     unsigned long long &n_consumed,
-                                     CallbackFn callback,
-                                     void * callback_data)
+                                     unsigned long long &n_consumed)
 {
     total_reads = 0;
     n_consumed = 0;
@@ -224,15 +222,6 @@ void Hashbits::consume_fasta_overlap(const std::string &filename,
             curve[0][total_reads/block_size-1] = n_overlap_kmers();
             curve[1][total_reads/block_size-1] = n_unique_kmers();
         }
-        // run callback, if specified
-        if (total_reads % CALLBACK_PERIOD == 0 && callback) {
-            try {
-                callback("consume_fasta", callback_data, total_reads, n_consumed);
-            } catch (...) {
-                throw;
-            }
-        }
-
     } // while
 
     delete parser;
