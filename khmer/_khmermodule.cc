@@ -4339,17 +4339,17 @@ static PyObject* khmer_hllcounter_new(PyTypeObject * type, PyObject * args,
     self = (khmer_KHLLCounter_Object *)type->tp_alloc(type, 0);
 
     if (self != NULL) {
-        double error_rate = 0;
-        WordLength ksize = 0;
+        double error_rate = 0.01;
+        WordLength ksize = 20;
 
-        if (!PyArg_ParseTuple(args, "db", &error_rate, &ksize)) {
+        if (!PyArg_ParseTuple(args, "|db", &error_rate, &ksize)) {
             Py_DECREF(self);
             return NULL;
         }
 
         try {
             self->hllcounter = new HLLCounter(error_rate, ksize);
-        } catch (khmer_exception &e) {
+        } catch (InvalidValue &e) {
             Py_DECREF(self);
             PyErr_SetString(PyExc_ValueError, e.what());
             return NULL;
@@ -4450,16 +4450,76 @@ static PyObject * hllcounter_consume_fasta(khmer_KHLLCounter_Object * me,
 
 static
 PyObject *
-hllcounter_getp(khmer_KHLLCounter_Object * me)
+hllcounter_get_erate(khmer_KHLLCounter_Object * me)
 {
-    return PyLong_FromLong(me->hllcounter->get_p());
+    return PyFloat_FromDouble(me->hllcounter->get_erate());
 }
 
 static
 PyObject *
-hllcounter_getm(khmer_KHLLCounter_Object * me)
+hllcounter_get_ksize(khmer_KHLLCounter_Object * me)
 {
-    return PyLong_FromLong(me->hllcounter->get_m());
+    return PyLong_FromLong(me->hllcounter->get_ksize());
+}
+
+static
+int
+hllcounter_set_ksize(khmer_KHLLCounter_Object * me, PyObject *value,
+                     void *closure)
+{
+    if (value == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute");
+        return -1;
+    }
+
+    if (!PyLong_Check(value) && !PyInt_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Please use an int value for k-mer size");
+        return -1;
+    }
+
+    WordLength ksize = PyLong_AsLong(value);
+    try {
+        me->hllcounter->set_ksize(ksize);
+    } catch (InvalidValue &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return -1;
+    } catch (ReadOnlyAttribute &e) {
+        PyErr_SetString(PyExc_AttributeError, e.what());
+        return -1;
+    }
+
+    return 0;
+}
+
+static
+int
+hllcounter_set_erate(khmer_KHLLCounter_Object * me, PyObject *value,
+                     void *closure)
+{
+    if (value == NULL) {
+        PyErr_SetString(PyExc_TypeError, "Cannot delete attribute");
+        return -1;
+    }
+
+    if (!PyFloat_Check(value)) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Please use a float value for k-mer size");
+        return -1;
+    }
+
+    double erate = PyFloat_AsDouble(value);
+    try {
+        me->hllcounter->set_erate(erate);
+    } catch (InvalidValue &e) {
+        PyErr_SetString(PyExc_ValueError, e.what());
+        return -1;
+    } catch (ReadOnlyAttribute &e) {
+        PyErr_SetString(PyExc_AttributeError, e.what());
+        return -1;
+    }
+
+    return 0;
 }
 
 static
@@ -4516,15 +4576,19 @@ static PyGetSetDef khmer_hllcounter_getseters[] = {
         NULL
     },
     {
-        "p",
-        (getter)hllcounter_getp, NULL,
-        "p for this HLL counter. The number of internal counters m is 2 ** p",
+        "error_rate",
+        (getter)hllcounter_get_erate, (setter)hllcounter_set_erate,
+        "Error rate for this HLL counter. "
+        "Can be changed prior to first counting, but becomes read-only after "
+        "that (raising AttributeError)",
         NULL
     },
     {
-        "m",
-        (getter)hllcounter_getm, NULL,
-        "Number of internal counters for this HLL counter.",
+        "ksize",
+        (getter)hllcounter_get_ksize, (setter)hllcounter_set_ksize,
+        "k-mer size for this HLL counter."
+        "Can be changed prior to first counting, but becomes read-only after "
+        "that (raising AttributeError)",
         NULL
     },
     {

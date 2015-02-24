@@ -36,10 +36,12 @@ double calc_alpha(const int p)
 {
     if (p < 4) {
         // ceil(log2((1.04 / x) ^ 2)) = 4, solve for x
-        throw khmer_exception("Error rate must be smaller than 0.367696");
+        throw InvalidValue("Please set error rate to a value "
+                           "smaller than 0.367696");
     } else if (p > 16) {
         // ceil(log2((1.04 / x) ^ 2)) = 16, solve for x
-        throw khmer_exception("Error rate must be greater than 0.0040624");
+        throw InvalidValue("Please set error rate to a value "
+                           "greater than 0.0040624");
     }
 
     /*
@@ -232,7 +234,8 @@ int get_rho(HashIntoType w, int max_width)
 HLLCounter::HLLCounter(double error_rate, WordLength ksize)
 {
     if (error_rate < 0) {
-        throw khmer_exception("Error rate should be a positive number");
+        throw InvalidValue("Please set error rate to a value "
+                           "greater than zero");
     }
     int p = ceil(log2(pow(1.04 / error_rate, 2)));
     this->init(p, ksize);
@@ -254,6 +257,40 @@ void HLLCounter::init(int p, WordLength ksize)
 
     init_raw_estimate_data();
     init_bias_data();
+}
+
+double HLLCounter::get_erate()
+{
+    return 1.04 / sqrt(this->m);
+}
+
+void HLLCounter::set_erate(double error_rate)
+{
+    if (count(this->M.begin(), this->M.end(), 0) != this->m) {
+        throw ReadOnlyAttribute("You can only change error rate prior to "
+                                "first counting");
+    }
+
+    if (error_rate < 0) {
+        throw InvalidValue("Please set error rate to a value "
+                           "greater than zero");
+    }
+    int p = ceil(log2(pow(1.04 / error_rate, 2)));
+    this->init(p, this->_ksize);
+}
+
+void HLLCounter::set_ksize(WordLength new_ksize)
+{
+    if (count(this->M.begin(), this->M.end(), 0) != this->m) {
+        throw ReadOnlyAttribute("You can only change k-mer size prior to "
+                                "first counting");
+    }
+
+    if (new_ksize <= 0) {
+        throw InvalidValue("Please set k-mer size to a value "
+                           "greater than zero");
+    }
+    this->init(this->p, new_ksize);
 }
 
 double HLLCounter::_Ep()

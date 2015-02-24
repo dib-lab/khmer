@@ -50,10 +50,17 @@ public:
     {
         return m;
     }
+    void set_ksize(WordLength new_ksize);
+    int get_ksize()
+    {
+        return _ksize;
+    }
     std::vector<int> get_M()
     {
         return M;
     }
+    double get_erate();
+    void set_erate(double new_erate);
 private:
     double _Ep();
     double alpha;

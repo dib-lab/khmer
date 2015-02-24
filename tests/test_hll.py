@@ -6,6 +6,7 @@
 #
 # pylint: disable=missing-docstring,protected-access
 
+import math
 import string
 
 import khmer
@@ -13,7 +14,7 @@ import khmer
 from screed.fasta import fasta_iter
 
 import khmer_tst_utils as utils
-from nose.tools import raises
+from nose.tools import assert_raises
 
 
 TT = string.maketrans('ACGT', 'TGCA')
@@ -66,11 +67,11 @@ def test_hll_consume_string():
     assert abs(1 - float(hllcpp.estimate_cardinality()) / N_UNIQUE) < ERR_RATE
 
 
-@raises(IOError)
 def test_hll_empty_fasta():
     filename = utils.get_test_data('test-empty.fa')
     hll = khmer.HLLCounter(ERR_RATE, K)
-    hll.consume_fasta(filename)
+    with assert_raises(IOError):
+        hll.consume_fasta(filename)
 
 
 def test_hll_consume_fasta():
@@ -123,87 +124,103 @@ def test_hll_empty():
     assert len(hllcpp) == 0
 
 
-@raises(AttributeError)
 def test_hll_readonly_alpha():
     hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    hllcpp.alpha = 5
-
-
-@raises(AttributeError)
-def test_hll_readonly_p():
-    hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    hllcpp.p = 5
-
-
-@raises(AttributeError)
-def test_hll_readonly_m():
-    hllcpp = khmer.HLLCounter(ERR_RATE, K)
-    hllcpp.m = 5
+    with assert_raises(AttributeError):
+        hllcpp.alpha = 5
 
 
 def test_hll_cover_calc_alpha():
     hllcpp = khmer.HLLCounter(0.36, K)
+    counters = hllcpp.counters
     assert hllcpp.alpha == 0.673
-    assert hllcpp.p == 4
-    assert hllcpp.m == 16
+    assert len(counters) == 2 ** 4
 
     hllcpp = khmer.HLLCounter(0.21, K)
+    counters = hllcpp.counters
     assert hllcpp.alpha == 0.697
-    assert hllcpp.p == 5
-    assert hllcpp.m == 32
+    assert len(counters) == 2 ** 5
 
     hllcpp = khmer.HLLCounter(0.16, K)
+    counters = hllcpp.counters
     assert hllcpp.alpha == 0.709
-    assert hllcpp.p == 6
-    assert hllcpp.m == 64
+    assert len(counters) == 2 ** 6
 
 
-@raises(ValueError)
 def test_hll_invalid_base():
     # this test should raise a ValueError,
     # since there are invalid bases in read.
 
     hllcpp = khmer.HLLCounter(ERR_RATE, 5)
-    hllcpp.consume_string("ACGTTTCGNAATNNNNN")
+    with assert_raises(ValueError):
+        hllcpp.consume_string("ACGTTTCGNAATNNNNN")
 
 
-@raises(ValueError)
 def test_hll_invalid_error_rate():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.HLLCounter(-0.01, K)
+    with assert_raises(ValueError):
+        hllcpp = khmer.HLLCounter(-0.01, K)
 
 
-@raises(ValueError)
 def test_hll_invalid_error_rate_max():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.HLLCounter(0.367696, K)
+    with assert_raises(ValueError):
+        hllcpp = khmer.HLLCounter(0.367696, K)
 
 
 def test_hll_error_rate_max():
     # test if error_rate is a valid value
 
     hllcpp = khmer.HLLCounter(0.367695, K)
-    assert hllcpp.p == 4
+    assert len(hllcpp.counters) == 2 ** 4
 
 
-@raises(ValueError)
 def test_hll_invalid_error_rate_min():
     # test if error_rate is a valid value
 
-    hllcpp = khmer.HLLCounter(0.0040624, K)
+    with assert_raises(ValueError):
+        hllcpp = khmer.HLLCounter(0.0040624, K)
 
 
 def test_hll_error_rate_min():
     # test if error_rate is a valid value
 
     hllcpp = khmer.HLLCounter(0.0040625, K)
-    assert hllcpp.p == 16
+    assert len(hllcpp.counters) == 2 ** 16
+
+
+def test_hll_change_error_rate():
+    hllcpp = khmer.HLLCounter(0.0040625, K)
+    assert hllcpp.error_rate == 0.0040625
+
+    # error rate is discrete, what we test here is if an error rate of 1%
+    # rounds to the appropriate value
+    hllcpp.error_rate = 0.01
+    assert hllcpp.error_rate == 0.008125
+
+    # error rate can only be changed prior to first counting,
+    hllcpp.consume_string('AAACCACTTGTGCATGTCAGTGCAGTCAGT')
+    with assert_raises(AttributeError):
+        hllcpp.error_rate = 0.3
+
+
+def test_hll_change_ksize():
+    hllcpp = khmer.HLLCounter(0.0040625, K)
+    assert hllcpp.ksize == K
+
+    hllcpp.ksize = 12
+    assert hllcpp.ksize == 12
+
+    # error rate can only be changed prior to first counting,
+    hllcpp.consume_string('AAACCACTTGTGCATGTCAGTGCAGTCAGT')
+    with assert_raises(AttributeError):
+        hllcpp.ksize = 30
 
 
 def test_hll_get_counters():
     hll = khmer.HLLCounter(0.36, K)
     counters = hll.counters
-    assert len(counters) == hll.m
+    assert len(counters) == 2 ** 4
     assert all(c == 0 for c in counters)
