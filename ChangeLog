@@ -1,3 +1,6 @@
+2015-02-24  Sherine Awad  <sherine.awad@gmail.com>
+   * tests/test_scripts.py: Test loading of counting table with bigcounts
+
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 
    * khmer/_khmermodule.cc: Update extension to use recommended practices,
@@ -20,9 +23,6 @@
 2015-02-24  Kevin Murray  <spam@kdmurray.id.au>
 
    * scripts/interleave-reads.py: Make the output file name print nicely.
-
-2015-02-20  Sherine Awad  <sherine.awad@gmail.com>
-   * tests/test_scripts.py: Test loading of counting table with bigcounts	
 
 2015-02-23  Titus Brown  <titus@idyll.org>
 
