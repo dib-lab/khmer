@@ -1,4 +1,5 @@
 2015-02-24  Sherine Awad  <sherine.awad@gmail.com>
+
    * tests/test_scripts.py: Test loading of counting table with bigcounts
 
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
