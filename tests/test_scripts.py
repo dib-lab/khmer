@@ -2702,7 +2702,7 @@ def test_counting():
     try:
         test_ct = khmer.load_counting_hash(infile)
     except IOError:
-        raise Exception("Can't load a counting table with bigcount set")
+        assert 0, "Can't load a counting table with bigcount set"
 
 
 def test_roundtrip_casava_format_1():
