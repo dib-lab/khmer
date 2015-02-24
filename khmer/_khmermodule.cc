@@ -4580,31 +4580,31 @@ static PyMethodDef khmer_hllcounter_methods[] = {
 
 static PyGetSetDef khmer_hllcounter_getseters[] = {
     {
-        "alpha",
+        (char *)"alpha",
         (getter)hllcounter_getalpha, NULL,
-        "alpha constant for this HLL counter.",
+        (char *)"alpha constant for this HLL counter.",
         NULL
     },
     {
-        "error_rate",
+        (char *)"error_rate",
         (getter)hllcounter_get_erate, (setter)hllcounter_set_erate,
-        "Error rate for this HLL counter. "
+        (char *)"Error rate for this HLL counter. "
         "Can be changed prior to first counting, but becomes read-only after "
         "that (raising AttributeError)",
         NULL
     },
     {
-        "ksize",
+        (char *)"ksize",
         (getter)hllcounter_get_ksize, (setter)hllcounter_set_ksize,
-        "k-mer size for this HLL counter."
+        (char *)"k-mer size for this HLL counter."
         "Can be changed prior to first counting, but becomes read-only after "
         "that (raising AttributeError)",
         NULL
     },
     {
-        "counters",
+        (char *)"counters",
         (getter)hllcounter_getcounters, NULL,
-        "Read-only internal counters. len(counters) == m == 2 ** p",
+        (char *)"Read-only internal counters.",
         NULL
     },
     {NULL} /* Sentinel */
