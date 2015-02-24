@@ -286,10 +286,6 @@ void HLLCounter::set_ksize(WordLength new_ksize)
                                 "first counting");
     }
 
-    if (new_ksize <= 0) {
-        throw InvalidValue("Please set k-mer size to a value "
-                           "greater than zero");
-    }
     this->init(this->p, new_ksize);
 }
 

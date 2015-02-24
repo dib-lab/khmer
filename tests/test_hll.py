@@ -200,6 +200,15 @@ def test_hll_change_error_rate():
     hllcpp.error_rate = 0.01
     assert hllcpp.error_rate == 0.008125
 
+    with assert_raises(TypeError):
+        del hllcpp.error_rate
+
+    with assert_raises(TypeError):
+        hllcpp.error_rate = 5
+
+    with assert_raises(ValueError):
+        hllcpp.error_rate = 2.5
+
     # error rate can only be changed prior to first counting,
     hllcpp.consume_string('AAACCACTTGTGCATGTCAGTGCAGTCAGT')
     with assert_raises(AttributeError):
@@ -212,6 +221,15 @@ def test_hll_change_ksize():
 
     hllcpp.ksize = 12
     assert hllcpp.ksize == 12
+
+    with assert_raises(ValueError):
+        hllcpp.ksize = -20
+
+    with assert_raises(TypeError):
+        del hllcpp.ksize
+
+    with assert_raises(TypeError):
+        hllcpp.ksize = 33.4
 
     # error rate can only be changed prior to first counting,
     hllcpp.consume_string('AAACCACTTGTGCATGTCAGTGCAGTCAGT')

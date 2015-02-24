@@ -4472,13 +4472,23 @@ hllcounter_set_ksize(khmer_KHLLCounter_Object * me, PyObject *value,
         return -1;
     }
 
-    if (!PyLong_Check(value) && !PyInt_Check(value)) {
+    long ksize = 0;
+    if (PyLong_Check(value)) {
+        ksize = PyLong_AsLong(value);
+    } else if (PyInt_Check(value)) {
+        ksize = PyInt_AsLong(value);
+    } else {
         PyErr_SetString(PyExc_TypeError,
-                        "Please use an int value for k-mer size");
+                        "Please use an integer value for k-mer size");
         return -1;
     }
 
-    WordLength ksize = PyLong_AsLong(value);
+    if (ksize <= 0) {
+        PyErr_SetString(PyExc_ValueError, "Please set k-mer size to a value "
+                        "greater than zero");
+        return -1;
+    }
+
     try {
         me->hllcounter->set_ksize(ksize);
     } catch (InvalidValue &e) {
