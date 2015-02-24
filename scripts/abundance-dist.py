@@ -65,7 +65,7 @@ def main():
 
     kmer_size = counting_hash.ksize()
     hashsizes = counting_hash.hashsizes()
-    tracking = khmer._new_hashbits(  # pylint: disable=protected-access
+    tracking = khmer._Hashbits(  # pylint: disable=protected-access
         kmer_size, hashsizes)
 
     print ('K:', kmer_size, file=sys.stderr)
