@@ -236,6 +236,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     discarded = 0
     input_filename = None
 
+    auto_output = False
     if args.single_output_filename != '':
         output_name = args.single_output_filename
         if args.append:
