@@ -239,14 +239,14 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
     discarded = 0
     input_filename = None
 
-    for index, input_filename in enumerate(args.input_filenames):
-        if args.single_output_filename != '':
-            output_name = args.single_output_filename
-            outfp = open(args.single_output_filename, 'a')
-        else:
-            output_name = os.path.basename(input_filename) + '.keep'
-            outfp = open(output_name, 'w')
+    if args.single_output_filename != '':
+        output_name = args.single_output_filename
+        outfp = open(args.single_output_filename, 'a')
+    else:
+        output_name = os.path.basename(input_filename) + '.keep'
+        outfp = open(output_name, 'w')
 
+    for index, input_filename in enumerate(args.input_filenames):
         total_acc = 0
         discarded_acc = 0
 
