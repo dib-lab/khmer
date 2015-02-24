@@ -208,7 +208,7 @@ static PyObject * asyncseqproc_queue_load(PyObject * self, PyObject * args)
     khmer_AsyncSequenceProcessorObject * me = (khmer_AsyncSequenceProcessorObject *) self;
     AsyncSequenceProcessor * async_sp = me->async_sp;
 
-    return PyLong_FromUnsignedLongLong(async_sp->reader_queue_load());
+    return PyLong_FromUnsignedLongLong(async_sp->parser_queue_load());
 }
 
 static PyObject * asyncseqproc_n_processed(PyObject * self, PyObject * args)
@@ -356,7 +356,7 @@ static PyObject * asyncdiginorm_queue_load(PyObject * self, PyObject * args)
     AsyncDiginorm * async_diginorm = me->async_diginorm;
 
     return PyTuple_Pack(2,
-                        PyLong_FromUnsignedLongLong(async_diginorm->reader_queue_load()),
+                        PyLong_FromUnsignedLongLong(async_diginorm->parser_queue_load()),
                         PyLong_FromUnsignedLongLong(async_diginorm->output_queue_load()));
 }
 

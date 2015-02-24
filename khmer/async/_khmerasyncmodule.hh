@@ -19,6 +19,7 @@
 #include "khmer_async.hh"
 #include "async_sequence_processor.hh"
 #include "async_diginorm.hh"
+#include "async_parser.hh"
 
 using namespace khmer;
 

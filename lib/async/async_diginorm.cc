@@ -43,7 +43,7 @@ unsigned int AsyncDiginorm::output_queue_load() {
 }
 
 bool AsyncDiginorm::iter_stop() {
-    if (!workers_running() && (n_popped() >= n_kept()))
+    if ((_STATE != STATE_RUNNING) && !aparser->has_output())
         return true;
     return false;
 }
@@ -80,11 +80,11 @@ void AsyncDiginorm::consume() {
     unlock_stdout();
     #endif
 
-    while(_workers_running) {
+    while(_STATE == STATE_RUNNING) {
         TSTART()
-        if (_in_queue->pop(batch)) {
+        if (aparser->pop(batch)) {
             TEND(reader_pop_wait)
-            if (paired) {
+            if (_paired) {
                 filter = filter_paired(batch);
             } else {
                 filter = filter_single(batch->first());
@@ -97,7 +97,7 @@ void AsyncDiginorm::consume() {
                 TSTART()
                 write(batch->first()->sequence.c_str());
                 TEND(write_wait)
-                if (paired) {
+                if (_paired) {
                     //sp = copy_seq(batch->second());
                     TSTART()
                     write(batch->second()->sequence.c_str());
@@ -113,8 +113,8 @@ void AsyncDiginorm::consume() {
             }
             __sync_fetch_and_add(&_n_processed, _batchsize);
         } else {
-            if (!is_parsing() && (_n_processed >= _n_parsed)) {
-                _workers_running = false;
+            if ((aparser->get_state() == STATE_WAIT) && !(aparser->has_output())) {
+                _STATE = STATE_WAIT;
             }
         }
     }

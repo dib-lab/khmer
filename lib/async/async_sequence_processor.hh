@@ -15,7 +15,9 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
 
         khmer::Hashtable * _ht;
         unsigned int _ksize;
-        AsyncParser * aparser;
+        AsyncSequenceParser * aparser;
+        unsigned int _n_processed;
+        bool _paired;
 
     public:
 
@@ -31,8 +33,9 @@ class AsyncSequenceProcessor: public AsyncConsumerProducer<ReadBatchPtr, ReadBat
 
         virtual void consume() = 0;
         unsigned int n_processed();
+        unsigned int n_parsed();
         void write(const char * sequence);
-
+        unsigned int parser_queue_load();
         virtual bool iter_stop() = 0;
 
         bool is_paired();

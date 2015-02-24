@@ -19,23 +19,28 @@ inline ReadBatchPtr imprint_single(IParser * parser) {
     return batch;
 }
 
-void AsyncParser::start(const std::string &filename,
+void AsyncSequenceParser::start(const std::string &filename,
                         bool paired) {
     _batchsize = paired ? 2 : 1;
+    _paired = paired;
     _n_parsed = 0;
     _current_filename = filename;
     AsyncProducer<ReadBatchPtr>::start(1);
 }
 
-void AsyncParser::consume(const std::string &filename) {
+unsigned int AsyncSequenceParser::queue_load() {
+    return _n_parsed - _n_popped;
+}
+
+void AsyncSequenceParser::consume() {
     
     set_global_state(STATE_RUNNING);
 
-    IParser * parser = IParser::get_parser(filename);
+    IParser * parser = IParser::get_parser(_current_filename);
     // Use a function ptr to decide which imprint function to use
     // so as to avoid unnecssary branching
     ReadBatchPtr (*imprint) (IParser *);
-    if (paired) {
+    if (_paired) {
         imprint = &imprint_paired;
     } else {
         imprint = &imprint_single;
@@ -83,6 +88,6 @@ void AsyncParser::consume(const std::string &filename) {
 }
 
 
-unsigned int AsyncParser::n_parsed() {
+unsigned int AsyncSequenceParser::n_parsed() {
     return _n_parsed;
 }

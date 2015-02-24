@@ -29,13 +29,15 @@ void AsyncSequenceProcessor::start(const std::string &filename,
                                     bool paired,
                                     unsigned int n_threads) {
     _ksize = _ht->ksize();
-    aparser = new AsyncParser();
+    aparser = new AsyncSequenceParser();
     aparser->start(filename, paired);
+    _paired = paired;
     _n_processed = 0;
     AsyncConsumerProducer<ReadBatchPtr,ReadBatchPtr>::start(n_threads);
 }
 
 void AsyncSequenceProcessor::stop() {
+    aparser->stop();
     AsyncConsumerProducer<ReadBatchPtr,ReadBatchPtr>::stop();
 }
 
@@ -43,6 +45,17 @@ unsigned int AsyncSequenceProcessor::n_processed() {
     return _n_processed;
 }
 
+unsigned int AsyncSequenceProcessor::n_parsed() {
+    return aparser->n_parsed();
+}
+
+bool AsyncSequenceProcessor::is_paired() {
+    return _paired;
+}
+
+unsigned int AsyncSequenceProcessor::parser_queue_load() {
+    return aparser->queue_load();
+}
 
 /////
 //
@@ -51,7 +64,7 @@ unsigned int AsyncSequenceProcessor::n_processed() {
 /////
 
 bool AsyncSequenceProcessorTester::iter_stop() {
-    if(!workers_running() && (n_popped() >= n_processed()))
+    if((_STATE == STATE_WAIT) && !(aparser->has_output()))
         return true;
     return false;
 }
@@ -59,20 +72,19 @@ bool AsyncSequenceProcessorTester::iter_stop() {
 void AsyncSequenceProcessorTester::consume() {
     ReadBatchPtr batch;
     const char * sp;
-    while(_workers_running) {
-        if(_in_queue->pop(batch)) {
-
+    while(_STATE == STATE_RUNNING) {
+        if(aparser->pop(batch)) {
             sp = copy_seq(batch->first());
             write(sp);            
-            if (paired) {
+            if (_paired) {
                 sp = copy_seq(batch->second());
                 write(sp);
             }
-            while(!(_out_queue->bounded_push(batch))) if (!_workers_running) return;
+            while(!(_out_queue->bounded_push(batch))) if (_STATE != STATE_RUNNING) return;
             __sync_fetch_and_add(&_n_processed, _batchsize); 
         } else {
-            if (!is_parsing() && (_n_processed >= _n_parsed)) {
-                _workers_running = false;
+            if ((aparser->get_state() == STATE_WAIT) && !(aparser->has_output())) {
+                _STATE = STATE_WAIT;
             }
         }
     }
