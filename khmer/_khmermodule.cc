@@ -1858,176 +1858,176 @@ hashbits_count_overlap(khmer_KHashbits_Object * me, PyObject * args)
 
     if (!PyArg_ParseTuple(args, "sO!", &filename, &khmer_KHashbits_Type,
                           &ht2_argu)) {
-    return NULL;
-}
+        return NULL;
+    }
 
-ht2 = ht2_argu->hashbits;
+    ht2 = ht2_argu->hashbits;
 
 // call the C++ function, and trap signals => Python
 
-unsigned long long n_consumed;
-unsigned int total_reads;
-HashIntoType curve[2][100];
+    unsigned long long n_consumed;
+    unsigned int total_reads;
+    HashIntoType curve[2][100];
 
-try {
-    hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed);
-} catch (_khmer_signal &e) {
-    PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-    return NULL;
-}
+    try {
+        hashbits->consume_fasta_overlap(filename, curve, *ht2, total_reads, n_consumed);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    }
 
-HashIntoType n = hashbits->n_unique_kmers();
-HashIntoType n_overlap = hashbits->n_overlap_kmers();
+    HashIntoType n = hashbits->n_unique_kmers();
+    HashIntoType n_overlap = hashbits->n_overlap_kmers();
 
-PyObject * x = PyList_New(200);
+    PyObject * x = PyList_New(200);
 
-for (unsigned int i = 0; i < 100; i++) {
-    PyList_SetItem(x, i, Py_BuildValue("K", curve[0][i]));
-}
-for (unsigned int i = 0; i < 100; i++) {
-    PyList_SetItem(x, i + 100, Py_BuildValue("K", curve[1][i]));
-}
-return Py_BuildValue("KKO", n, n_overlap, x);
+    for (unsigned int i = 0; i < 100; i++) {
+        PyList_SetItem(x, i, Py_BuildValue("K", curve[0][i]));
+    }
+    for (unsigned int i = 0; i < 100; i++) {
+        PyList_SetItem(x, i + 100, Py_BuildValue("K", curve[1][i]));
+    }
+    return Py_BuildValue("KKO", n, n_overlap, x);
 }
 
 static
 PyObject *
 hashbits_n_occupied(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-HashIntoType start = 0, stop = 0;
+    HashIntoType start = 0, stop = 0;
 
-if (!PyArg_ParseTuple(args, "|KK", &start, &stop)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "|KK", &start, &stop)) {
+        return NULL;
+    }
 
-HashIntoType n = hashbits->n_occupied(start, stop);
+    HashIntoType n = hashbits->n_occupied(start, stop);
 
-return PyLong_FromUnsignedLongLong(n);
+    return PyLong_FromUnsignedLongLong(n);
 }
 
 static
 PyObject *
 hashbits_n_tags(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-if (!PyArg_ParseTuple(args, "")) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
 
-return PyLong_FromSize_t(hashbits->n_tags());
+    return PyLong_FromSize_t(hashbits->n_tags());
 }
 
 static
 PyObject *
 hashbits_count(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * kmer;
+    const char * kmer;
 
-if (!PyArg_ParseTuple(args, "s", &kmer)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &kmer)) {
+        return NULL;
+    }
 
-if (strlen(kmer) != hashbits->ksize()) {
-    PyErr_SetString(PyExc_ValueError,
-                    "k-mer length must equal the presence table k-mer size");
-    return NULL;
-}
+    if (strlen(kmer) != hashbits->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "k-mer length must equal the presence table k-mer size");
+        return NULL;
+    }
 
-hashbits->count(kmer);
+    hashbits->count(kmer);
 
-return PyLong_FromLong(1);
+    return PyLong_FromLong(1);
 }
 
 static
 PyObject *
 hashbits_consume(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * long_str;
+    const char * long_str;
 
-if (!PyArg_ParseTuple(args, "s", &long_str)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &long_str)) {
+        return NULL;
+    }
 
-if (strlen(long_str) < hashbits->ksize()) {
-    PyErr_SetString(PyExc_ValueError,
-                    "string length must >= the hashbits k-mer size");
-    return NULL;
-}
+    if (strlen(long_str) < hashbits->ksize()) {
+        PyErr_SetString(PyExc_ValueError,
+                        "string length must >= the hashbits k-mer size");
+        return NULL;
+    }
 
-unsigned int n_consumed;
-n_consumed = hashbits->consume_string(long_str);
+    unsigned int n_consumed;
+    n_consumed = hashbits->consume_string(long_str);
 
-return PyLong_FromLong(n_consumed);
+    return PyLong_FromLong(n_consumed);
 }
 
 static
 PyObject *
 hashbits_print_stop_tags(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename = NULL;
+    const char * filename = NULL;
 
-if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
 
-hashbits->print_stop_tags(filename);
+    hashbits->print_stop_tags(filename);
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_print_tagset(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename = NULL;
+    const char * filename = NULL;
 
-if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
 
-hashbits->print_tagset(filename);
+    hashbits->print_tagset(filename);
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_load_stop_tags(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename = NULL;
-PyObject * clear_tags_o = NULL;
+    const char * filename = NULL;
+    PyObject * clear_tags_o = NULL;
 
-if (!PyArg_ParseTuple(args, "s|O", &filename, &clear_tags_o)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s|O", &filename, &clear_tags_o)) {
+        return NULL;
+    }
 
-bool clear_tags = true;
-if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
-    clear_tags = false;
-}
+    bool clear_tags = true;
+    if (clear_tags_o && !PyObject_IsTrue(clear_tags_o)) {
+        clear_tags = false;
+    }
 
 
-try {
-    hashbits->load_stop_tags(filename, clear_tags);
-} catch (khmer_file_exception &e) {
-    PyErr_SetString(PyExc_IOError, e.what());
-    return NULL;
-}
+    try {
+        hashbits->load_stop_tags(filename, clear_tags);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 
@@ -2035,405 +2035,405 @@ static
 PyObject *
 hashbits_save_stop_tags(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename = NULL;
+    const char * filename = NULL;
 
-if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
 
-hashbits->save_stop_tags(filename);
+    hashbits->save_stop_tags(filename);
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_traverse_from_tags(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-khmer_KCountingHash_Object * counting_o = NULL;
-unsigned int distance, threshold, frequency;
+    khmer_KCountingHash_Object * counting_o = NULL;
+    unsigned int distance, threshold, frequency;
 
-if (!PyArg_ParseTuple(args, "O!III", &khmer_KCountingHash_Type, &counting_o,
-                      &distance, &threshold, &frequency)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "O!III", &khmer_KCountingHash_Type, &counting_o,
+                          &distance, &threshold, &frequency)) {
+        return NULL;
+    }
 
-hashbits->traverse_from_tags(distance, threshold, frequency,
-                             * counting_o->counting);
+    hashbits->traverse_from_tags(distance, threshold, frequency,
+                                 * counting_o->counting);
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_repartition_largest_partition(khmer_KHashbits_Object * me,
-                                   PyObject * args)
+                                       PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-khmer_KCountingHash_Object * counting_o = NULL;
-PyObject * subset_o = NULL;
-unsigned int distance, threshold, frequency;
+    khmer_KCountingHash_Object * counting_o = NULL;
+    PyObject * subset_o = NULL;
+    unsigned int distance, threshold, frequency;
 
-if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
-                      &counting_o, &distance, &threshold, &frequency)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "OO!III", &subset_o, &khmer_KCountingHash_Type,
+                          &counting_o, &distance, &threshold, &frequency)) {
+        return NULL;
+    }
 
-SubsetPartition * subset_p;
-if (subset_o != Py_None) {
-    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
-} else {
-    subset_p = hashbits->partition;
-}
+    SubsetPartition * subset_p;
+    if (subset_o != Py_None) {
+        subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_o);
+    } else {
+        subset_p = hashbits->partition;
+    }
 
-CountingHash * counting = counting_o->counting;
+    CountingHash * counting = counting_o->counting;
 
-unsigned long next_largest = subset_p->repartition_largest_partition(distance,
-                             threshold, frequency, *counting);
+    unsigned long next_largest = subset_p->repartition_largest_partition(distance,
+                                 threshold, frequency, *counting);
 
-return PyLong_FromLong(next_largest);
+    return PyLong_FromLong(next_largest);
 }
 
 static
 PyObject *
 hashbits_get(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-PyObject * arg;
+    PyObject * arg;
 
-if (!PyArg_ParseTuple(args, "O", &arg)) {
-    return NULL;
-}
-
-unsigned long count = 0;
-
-if (PyInt_Check(arg)) {
-    long pos = PyInt_AsLong(arg);
-    count = hashbits->get_count((unsigned int) pos);
-} else if (PyBytes_Check(arg)) {
-    std::string s = PyBytes_AsString(arg);
-
-    if (strlen(s.c_str()) < hashbits->ksize()) {
-        PyErr_SetString(PyExc_ValueError,
-                        "string length must equal the presence table k-mer size");
+    if (!PyArg_ParseTuple(args, "O", &arg)) {
         return NULL;
     }
 
-    count = hashbits->get_count(s.c_str());
-} else {
-    PyErr_SetString(PyExc_ValueError, "must pass in an int or string");
-    return NULL;
-}
+    unsigned long count = 0;
 
-return PyLong_FromLong(count);
+    if (PyInt_Check(arg)) {
+        long pos = PyInt_AsLong(arg);
+        count = hashbits->get_count((unsigned int) pos);
+    } else if (PyBytes_Check(arg)) {
+        std::string s = PyBytes_AsString(arg);
+
+        if (strlen(s.c_str()) < hashbits->ksize()) {
+            PyErr_SetString(PyExc_ValueError,
+                            "string length must equal the presence table k-mer size");
+            return NULL;
+        }
+
+        count = hashbits->get_count(s.c_str());
+    } else {
+        PyErr_SetString(PyExc_ValueError, "must pass in an int or string");
+        return NULL;
+    }
+
+    return PyLong_FromLong(count);
 }
 
 static
 PyObject *
 hashbits_calc_connected_graph_size(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * _kmer;
-unsigned int max_size = 0;
-PyObject * break_on_circum_o = NULL;
-if (!PyArg_ParseTuple(args, "s|IO", &_kmer, &max_size, &break_on_circum_o)) {
-    return NULL;
-}
+    const char * _kmer;
+    unsigned int max_size = 0;
+    PyObject * break_on_circum_o = NULL;
+    if (!PyArg_ParseTuple(args, "s|IO", &_kmer, &max_size, &break_on_circum_o)) {
+        return NULL;
+    }
 
-bool break_on_circum = false;
-if (break_on_circum_o && PyObject_IsTrue(break_on_circum_o)) {
-    break_on_circum = true;
-}
+    bool break_on_circum = false;
+    if (break_on_circum_o && PyObject_IsTrue(break_on_circum_o)) {
+        break_on_circum = true;
+    }
 
-unsigned long long size = 0;
+    unsigned long long size = 0;
 
-Py_BEGIN_ALLOW_THREADS
-SeenSet keeper;
-hashbits->calc_connected_graph_size(_kmer, size, keeper, max_size,
-                                    break_on_circum);
-Py_END_ALLOW_THREADS
+    Py_BEGIN_ALLOW_THREADS
+    SeenSet keeper;
+    hashbits->calc_connected_graph_size(_kmer, size, keeper, max_size,
+                                        break_on_circum);
+    Py_END_ALLOW_THREADS
 
-return PyLong_FromUnsignedLongLong(size);
+    return PyLong_FromUnsignedLongLong(size);
 }
 
 static
 PyObject *
 hashbits_kmer_degree(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * kmer_s = NULL;
+    const char * kmer_s = NULL;
 
-if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &kmer_s)) {
+        return NULL;
+    }
 
-return PyLong_FromLong(hashbits->kmer_degree(kmer_s));
+    return PyLong_FromLong(hashbits->kmer_degree(kmer_s));
 }
 
 static
 PyObject *
 hashbits_trim_on_stoptags(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * seq = NULL;
+    const char * seq = NULL;
 
-if (!PyArg_ParseTuple(args, "s", &seq)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
 
-size_t trim_at;
-Py_BEGIN_ALLOW_THREADS
+    size_t trim_at;
+    Py_BEGIN_ALLOW_THREADS
 
-trim_at = hashbits->trim_on_stoptags(seq);
+    trim_at = hashbits->trim_on_stoptags(seq);
 
-Py_END_ALLOW_THREADS;
+    Py_END_ALLOW_THREADS;
 
-PyObject * trim_seq = PyBytes_FromStringAndSize(seq, trim_at);
-if (trim_seq == NULL) {
-    return NULL;
-}
-PyObject * ret = Py_BuildValue("Ok", trim_seq, (unsigned long) trim_at);
-Py_DECREF(trim_seq);
+    PyObject * trim_seq = PyBytes_FromStringAndSize(seq, trim_at);
+    if (trim_seq == NULL) {
+        return NULL;
+    }
+    PyObject * ret = Py_BuildValue("Ok", trim_seq, (unsigned long) trim_at);
+    Py_DECREF(trim_seq);
 
-return ret;
+    return ret;
 }
 
 static
 PyObject *
 hashbits_identify_stoptags_by_position(khmer_KHashbits_Object * me,
-                                   PyObject * args)
+                                       PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * seq = NULL;
+    const char * seq = NULL;
 
-if (!PyArg_ParseTuple(args, "s", &seq)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &seq)) {
+        return NULL;
+    }
 
-std::vector<unsigned int> posns;
-Py_BEGIN_ALLOW_THREADS
+    std::vector<unsigned int> posns;
+    Py_BEGIN_ALLOW_THREADS
 
-hashbits->identify_stop_tags_by_position(seq, posns);
+    hashbits->identify_stop_tags_by_position(seq, posns);
 
-Py_END_ALLOW_THREADS;
+    Py_END_ALLOW_THREADS;
 
-PyObject * x = PyList_New(posns.size());
+    PyObject * x = PyList_New(posns.size());
 
-for (unsigned int i = 0; i < posns.size(); i++) {
-    PyList_SET_ITEM(x, i, Py_BuildValue("I", posns[i]));
-}
+    for (unsigned int i = 0; i < posns.size(); i++) {
+        PyList_SET_ITEM(x, i, Py_BuildValue("I", posns[i]));
+    }
 
-return x;
+    return x;
 }
 
 static
 PyObject *
 hashbits_do_subset_partition(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-HashIntoType start_kmer = 0, end_kmer = 0;
-PyObject * break_on_stop_tags_o = NULL;
-PyObject * stop_big_traversals_o = NULL;
+    HashIntoType start_kmer = 0, end_kmer = 0;
+    PyObject * break_on_stop_tags_o = NULL;
+    PyObject * stop_big_traversals_o = NULL;
 
-if (!PyArg_ParseTuple(args, "|KKOO", &start_kmer, &end_kmer,
-                      &break_on_stop_tags_o,
-                      &stop_big_traversals_o)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "|KKOO", &start_kmer, &end_kmer,
+                          &break_on_stop_tags_o,
+                          &stop_big_traversals_o)) {
+        return NULL;
+    }
 
-bool break_on_stop_tags = false;
-if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
-    break_on_stop_tags = true;
-}
-bool stop_big_traversals = false;
-if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
-    stop_big_traversals = true;
-}
+    bool break_on_stop_tags = false;
+    if (break_on_stop_tags_o && PyObject_IsTrue(break_on_stop_tags_o)) {
+        break_on_stop_tags = true;
+    }
+    bool stop_big_traversals = false;
+    if (stop_big_traversals_o && PyObject_IsTrue(stop_big_traversals_o)) {
+        stop_big_traversals = true;
+    }
 
-SubsetPartition * subset_p = NULL;
-try {
-    Py_BEGIN_ALLOW_THREADS
-    subset_p = new SubsetPartition(hashbits);
-    subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
-                           stop_big_traversals);
-    Py_END_ALLOW_THREADS
-} catch (_khmer_signal &e) {
-    return NULL;
-} catch (std::bad_alloc &e) {
-    return PyErr_NoMemory();
-}
+    SubsetPartition * subset_p = NULL;
+    try {
+        Py_BEGIN_ALLOW_THREADS
+        subset_p = new SubsetPartition(hashbits);
+        subset_p->do_partition(start_kmer, end_kmer, break_on_stop_tags,
+                               stop_big_traversals);
+        Py_END_ALLOW_THREADS
+    } catch (_khmer_signal &e) {
+        return NULL;
+    } catch (std::bad_alloc &e) {
+        return PyErr_NoMemory();
+    }
 
-return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
+    return PyCObject_FromVoidPtr(subset_p, free_subset_partition_info);
 }
 
 static
 PyObject *
 hashbits_join_partitions_by_path(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * sequence = NULL;
-if (!PyArg_ParseTuple(args, "s", &sequence)) {
-    return NULL;
-}
+    const char * sequence = NULL;
+    if (!PyArg_ParseTuple(args, "s", &sequence)) {
+        return NULL;
+    }
 
-hashbits->partition->join_partitions_by_path(sequence);
+    hashbits->partition->join_partitions_by_path(sequence);
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_merge_subset(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-PyObject * subset_obj;
-if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
-    return NULL;
-}
+    PyObject * subset_obj;
+    if (!PyArg_ParseTuple(args, "O", &subset_obj)) {
+        return NULL;
+    }
 
-if (!PyCObject_Check(subset_obj)) {
-    PyErr_SetString( PyExc_ValueError, "invalid subset");
-    return NULL;
-}
+    if (!PyCObject_Check(subset_obj)) {
+        PyErr_SetString( PyExc_ValueError, "invalid subset");
+        return NULL;
+    }
 
-SubsetPartition * subset_p;
-subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
+    SubsetPartition * subset_p;
+    subset_p = (SubsetPartition *) PyCObject_AsVoidPtr(subset_obj);
 
-hashbits->partition->merge(subset_p);
+    hashbits->partition->merge(subset_p);
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_merge_from_disk(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename = NULL;
-if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-}
+    const char * filename = NULL;
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
 
-try {
-    hashbits->partition->merge_from_disk(filename);
-} catch (khmer_file_exception &e) {
-    PyErr_SetString(PyExc_IOError, e.what());
-    return NULL;
-}
+    try {
+        hashbits->partition->merge_from_disk(filename);
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 static
 PyObject *
 hashbits_consume_fasta(khmer_KHashbits_Object * me, PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename;
+    const char * filename;
 
-if (!PyArg_ParseTuple(args, "s", &filename)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
 
 // call the C++ function, and trap signals => Python
 
-unsigned long long n_consumed = 0;
-unsigned int total_reads = 0;
+    unsigned long long n_consumed = 0;
+    unsigned int total_reads = 0;
 
-try {
-    hashbits->consume_fasta(filename, total_reads, n_consumed);
-} catch (_khmer_signal &e) {
-    PyErr_SetString(PyExc_IOError, e.get_message().c_str());
-    return NULL;
-} catch (khmer_file_exception &e) {
-    PyErr_SetString(PyExc_IOError, e.what());
-    return NULL;
-}
+    try {
+        hashbits->consume_fasta(filename, total_reads, n_consumed);
+    } catch (_khmer_signal &e) {
+        PyErr_SetString(PyExc_IOError, e.get_message().c_str());
+        return NULL;
+    } catch (khmer_file_exception &e) {
+        PyErr_SetString(PyExc_IOError, e.what());
+        return NULL;
+    }
 
-return Py_BuildValue("IK", total_reads, n_consumed);
+    return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
 static
 PyObject *
 hashbits_consume_fasta_with_reads_parser(khmer_KHashbits_Object * me,
-    PyObject * args)
+        PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-PyObject * rparser_obj = NULL;
+    PyObject * rparser_obj = NULL;
 
-if (!PyArg_ParseTuple(
-            args, "O", &rparser_obj)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(
+                args, "O", &rparser_obj)) {
+        return NULL;
+    }
 
-read_parsers:: IParser * rparser =
-    _PyObject_to_khmer_ReadParser( rparser_obj );
+    read_parsers:: IParser * rparser =
+        _PyObject_to_khmer_ReadParser( rparser_obj );
 
 // call the C++ function, and trap signals => Python
-unsigned long long  n_consumed  = 0;
-unsigned int          total_reads = 0;
-char const * exc = NULL;
-Py_BEGIN_ALLOW_THREADS
-try {
-    hashbits->consume_fasta(rparser, total_reads, n_consumed);
-} catch (_khmer_signal &e) {
-    exc = e.get_message().c_str();
-}
+    unsigned long long  n_consumed  = 0;
+    unsigned int          total_reads = 0;
+    char const * exc = NULL;
+    Py_BEGIN_ALLOW_THREADS
+    try {
+        hashbits->consume_fasta(rparser, total_reads, n_consumed);
+    } catch (_khmer_signal &e) {
+        exc = e.get_message().c_str();
+    }
 
-Py_END_ALLOW_THREADS
-if (exc != NULL) {
-    PyErr_SetString(PyExc_IOError, exc);
-    return NULL;
-}
+    Py_END_ALLOW_THREADS
+    if (exc != NULL) {
+        PyErr_SetString(PyExc_IOError, exc);
+        return NULL;
+    }
 
-return Py_BuildValue("IK", total_reads, n_consumed);
+    return Py_BuildValue("IK", total_reads, n_consumed);
 }
 
 static
 PyObject *
 hashbits_consume_fasta_and_traverse(khmer_KHashbits_Object * me,
-                                PyObject * args)
+                                    PyObject * args)
 {
-Hashbits * hashbits = me->hashbits;
+    Hashbits * hashbits = me->hashbits;
 
-const char * filename;
-unsigned int radius, big_threshold, transfer_threshold;
-khmer_KCountingHash_Object * counting_o = NULL;
+    const char * filename;
+    unsigned int radius, big_threshold, transfer_threshold;
+    khmer_KCountingHash_Object * counting_o = NULL;
 
-if (!PyArg_ParseTuple(args, "sIIIO!", &filename,
-                      &radius, &big_threshold, &transfer_threshold,
-                      &khmer_KCountingHash_Type, &counting_o)) {
-    return NULL;
-}
+    if (!PyArg_ParseTuple(args, "sIIIO!", &filename,
+                          &radius, &big_threshold, &transfer_threshold,
+                          &khmer_KCountingHash_Type, &counting_o)) {
+        return NULL;
+    }
 
-CountingHash * counting = counting_o->counting;
+    CountingHash * counting = counting_o->counting;
 
-hashbits->consume_fasta_and_traverse(filename, radius, big_threshold,
-                                     transfer_threshold, *counting);
+    hashbits->consume_fasta_and_traverse(filename, radius, big_threshold,
+                                         transfer_threshold, *counting);
 
 
-Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 void sig(unsigned int total_reads, unsigned int n_consumed)
 {
-std::cout << total_reads << " " << n_consumed << std::endl;
+    std::cout << total_reads << " " << n_consumed << std::endl;
 }
 
 static
