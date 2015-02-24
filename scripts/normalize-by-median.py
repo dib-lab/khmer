@@ -243,10 +243,13 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         else:
             outfp = open(args.single_output_filename, 'w+')
     else:
-        output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w+')
-
+        auto_output = True
+        
     for index, input_filename in enumerate(args.input_filenames):
+        if auto_output:
+            output_name = os.path.basename(input_filename) + '.keep'
+            outfp = open(output_name, 'w+')
+
         total_acc = 0
         discarded_acc = 0
 
