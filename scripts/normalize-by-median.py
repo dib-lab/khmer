@@ -238,7 +238,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
 
     if args.single_output_filename != '':
         output_name = args.single_output_filename
-        if append:
+        if args.append:
             outfp = open(args.single_output_filename, 'a')
         else:
             outfp = open(args.single_output_filename, 'w+')
