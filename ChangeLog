@@ -1,3 +1,11 @@
+2015-02-24  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/normalize-by-median.py: change to the default behavior to
+   overwrite the sequences ouptput file. Also add a new argument --append to
+   append new reads to the outputfile.
+   * tests/test_scripts.py: add test for the --append option in
+   normalize-by-median.py
+
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 
    * khmer/_khmermodule.cc: Fix coding style violations.

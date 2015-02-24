@@ -514,7 +514,7 @@ def test_normalize_by_median():
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
-    ## test for the apppend option
+    # Testing for the apppend option
     shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
 
     args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, '--append', infile]
