@@ -514,6 +514,21 @@ def test_normalize_by_median():
     assert len(seqs) == 1, seqs
     assert seqs[0].startswith('GGTTGACGGGGCTCAGGGGG'), seqs
 
+    ## test for the apppend option
+    shutil.copyfile(utils.get_test_data('test-abund-read-3.fa'), infile)
+
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, '--append', infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile), outfile
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 2, seqs
+
+    args = ['-C', CUTOFF, '-k', '17', '-t', '-o', outfile, infile]
+    (status, out, err) = utils.runscript(script, args, in_dir)
+    assert os.path.exists(outfile), outfile
+    seqs = [r.sequence for r in screed.open(outfile)]
+    assert len(seqs) == 1, seqs
+
 
 def test_normalize_by_median_version():
     script = scriptpath('normalize-by-median.py')
