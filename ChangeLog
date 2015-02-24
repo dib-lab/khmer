@@ -2,6 +2,9 @@
 
    * scripts/interleave-reads.py: Make the output file name print nicely.
 
+2015-02-20  Sherine Awad  <sherine.awad@gmail.com>
+   * tests/test_scripts.py: Test loading of counting table with bigcounts	
+
 2015-02-23  Titus Brown  <titus@idyll.org>
 
    * khmer/utils.py: added 'check_is_left' and 'check_is_right' functions;

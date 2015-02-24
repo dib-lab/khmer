@@ -1,4 +1,4 @@
-#
+
 # This file is part of khmer, http://github.com/ged-lab/khmer/, and is
 # Copyright (C) Michigan State University, 2009-2015. It is licensed under
 # the three-clause BSD license; see doc/LICENSE.txt.
@@ -2680,6 +2680,17 @@ def test_trim_low_abund_trimtest_savetable():
             assert record.sequence == \
                 'GGTTGACGGGGCTCAGGGGGCGGCTGACTCCGAGAGACAGCA'
 
+
+def test_counting():
+    infile = utils.get_temp_filename('count.ct.gz')
+    indir=os.path.dirname(infile)
+    shutil.copyfile(utils.get_test_data('count.ct.gz'), infile)
+    assert os.path.exists(infile), infile
+    try:
+    	test_ct = khmer.load_counting_hash(infile)  
+    except IOError:
+        raise 
+	raise Exception("Can't load a counting table with bigcount set")
 
 def test_roundtrip_casava_format_1():
     # check to make sure that extract-paired-reads produces a file identical
