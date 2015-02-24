@@ -1,3 +1,10 @@
+2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
+
+   * scripts/abundance-dist.py: Use CSV format for the histogram. Includes
+   column headers.
+   * tests/test_scripts.py: add coverage for the new --csv option in
+   abundance-dist.py
+
 2015-02-23  Titus Brown  <titus@idyll.org>
 
    * setup.cfg: set !linux flag by default, to avoid running tests that
@@ -15,13 +22,6 @@
 
    * setup.py: point to the latest screed release candidate to work around
    versioneer bug.
-
-2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
-
-   * scripts/abundance-dist.py: Use CSV format for the histogram. Includes
-   column headers.
-   * tests/test_scripts.py: add coverage for the new --csv option in
-   abundance-dist.py
 
 2015-02-23  Tamer A. Mansour  <drtamermansour@gmail.com>
 
