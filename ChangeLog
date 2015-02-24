@@ -1,3 +1,8 @@
+2015-02-24  Michael R. Crusoe  <mcrusoe@msu.edu>
+
+   * sandbox/write-trimmomatic.py: use the Debian Trimmomatic, remove hard
+   coded paths
+
 2015-02-24  Luiz Irber  <irberlui@msu.edu>
 
    * khmer/_khmermodule.cc: Fix coding style violations.
