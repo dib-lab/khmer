@@ -1,3 +1,7 @@
+2015-02-24  Kevin Murray  <spam@kdmurray.id.au>
+
+   * scripts/interleave-reads.py: Make the output file name print nicely.
+
 2015-02-23  Titus Brown  <titus@idyll.org>
 
    * khmer/utils.py: added 'check_is_left' and 'check_is_right' functions;

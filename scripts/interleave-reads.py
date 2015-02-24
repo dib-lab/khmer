@@ -127,7 +127,7 @@ def main():
         write_record_pair(read1, read2, args.output)
 
     print >> sys.stderr, 'final: interleaved %d pairs' % counter
-    print >> sys.stderr, 'output written to', args.output
+    print >> sys.stderr, 'output written to', args.output.name
 
 if __name__ == '__main__':
     main()
