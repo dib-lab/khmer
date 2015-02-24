@@ -1,8 +1,8 @@
 2015-02-24  Tamer A. Mansour  <drtamermansour@gmail.com>
 
    * scripts/normalize-by-median.py: change to the default behavior to
-   overwrite the sequences ouptput file. Also add a new argument --append to
-   append new reads to the outputfile.
+   overwrite the sequences output file. Also add a new argument --append to
+   append new reads to the output file.
    * tests/test_scripts.py: add test for the --append option in
    normalize-by-median.py
 
