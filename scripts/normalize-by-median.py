@@ -244,7 +244,7 @@ def main():  # pylint: disable=too-many-branches,too-many-statements
         outfp = open(args.single_output_filename, 'a')
     else:
         output_name = os.path.basename(input_filename) + '.keep'
-        outfp = open(output_name, 'w')
+        outfp = open(output_name, 'w+')
 
     for index, input_filename in enumerate(args.input_filenames):
         total_acc = 0
